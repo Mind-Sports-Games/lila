@@ -62,7 +62,7 @@ case class Chapter(
     updateRoot(_.forceVariationAt(force, path))
 
   def opening: Option[FullOpening] =
-    if !Variant.openingSensibleVariants(setup.variant.gameLogic)(setup.variant) then none
+    if (!Variant.openingSensibleVariants(setup.variant.gameLogic)(setup.variant)) none
     else FullOpeningDB.searchInFens(setup.variant.gameLogic, root.mainline.map(_.fen))
 
   def isEmptyInitial = order == 1 && root.children.nodes.isEmpty
@@ -96,7 +96,7 @@ case class Chapter(
 
   def withoutChildren = copy(root = root.withoutChildren)
 
-  def withoutChildrenIfPractice = if isPractice then copy(root = root.withoutChildren) else this
+  def withoutChildrenIfPractice = if (isPractice) copy(root = root.withoutChildren) else this
 
   def relayAndTags = relay map { Chapter.RelayAndTags(id, _, tags) }
 

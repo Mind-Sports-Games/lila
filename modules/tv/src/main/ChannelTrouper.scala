@@ -65,8 +65,8 @@ final private[tv] class ChannelTrouper(
           manyIds = candidates
             .sortBy { g =>
               -(~g.averageUsersRating)
-              -(if !g.olderThan(30) then 5000 else 0)
-              -(if g.hasClock then 10000 else 0)
+              -(if (!g.olderThan(30)) 5000 else 0)
+              -(if (g.hasClock) 10000 else 0)
             }
             .take(50)
             .map(_.id)

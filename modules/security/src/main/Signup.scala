@@ -37,12 +37,12 @@ final class Signup(
     def apply(print: Option[FingerPrint])(implicit req: RequestHeader): Fu[MustConfirmEmail] = {
       val ip = HTTPRequest.ipAddress(req)
       store.recentByIpExists(ip) flatMap { ipExists =>
-        if ipExists then fuccess(YesBecauseIpExists)
-        else if HTTPRequest.weirdUA(req) then fuccess(YesBecauseUA)
+        if (ipExists) fuccess(YesBecauseIpExists)
+        else if (HTTPRequest.weirdUA(req)) fuccess(YesBecauseUA)
         else
           print.fold[Fu[MustConfirmEmail]](fuccess(YesBecausePrintMissing)) { fp =>
             store.recentByPrintExists(fp) flatMap { printFound =>
-              if printFound then fuccess(YesBecausePrintExists)
+              if (printFound) fuccess(YesBecausePrintExists)
               else
                 ipTrust.isSuspicious(ip).map {
                   case true => YesBecauseIpSusp
@@ -66,7 +66,7 @@ final class Signup(
           .fold[Fu[Signup.Result]](
             err => fuccess(Signup.Bad(err.tap(signupErrLog))),
             data =>
-              signupRateLimit(data.username, if hcaptchaResult == Hcaptcha.Result.Valid then 1 else 3) {
+              signupRateLimit(data.username, if (hcaptchaResult == Hcaptcha.Result.Valid) 1 else 3) {
                 MustConfirmEmail(data.fingerPrint) flatMap { mustConfirm =>
                   lila.mon.user.register.count(none)
                   lila.mon.user.register.mustConfirmEmail(mustConfirm.toString).increment()
@@ -100,9 +100,9 @@ final class Signup(
       apiVersion: Option[ApiVersion]
   )(user: User)(implicit req: RequestHeader, lang: Lang): Fu[Signup.Result] =
     store.deletePreviousSessions(user) >> {
-      if mustConfirm.value then
+      if (mustConfirm.value)
         emailConfirm.send(user, email.acceptable) >> {
-          if emailConfirm.effective then
+          if (emailConfirm.effective)
             api.saveSignup(user.id, apiVersion, fingerPrint) inject
               Signup.ConfirmEmail(user, email.acceptable)
           else fuccess(Signup.AllSet(user, email.acceptable))

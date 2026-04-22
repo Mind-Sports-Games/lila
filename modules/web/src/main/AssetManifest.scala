@@ -26,7 +26,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
 
   private var lastModified: Instant = Instant.MIN
   private var maps: AssetMaps       = AssetMaps(Map.empty, Map.empty, Map.empty)
-  private val filename              = s"manifest.${if net.minifiedAssets then "prod" else "dev"}.json"
+  private val filename              = s"manifest.${if (net.minifiedAssets) "prod" else "dev"}.json"
   private val logger                = lila.log("assetManifest")
 
   def js(key: String): Option[SplitAsset]    = maps.js.get(key)
@@ -36,7 +36,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
   def lastUpdate: Instant                    = lastModified
 
   def update(): Unit =
-    if environment.mode == Mode.Prod || net.externalManifest then
+    if (environment.mode == Mode.Prod || net.externalManifest)
       fetchManifestJson(filename).foreach {
         _.foreach { manifestJson =>
           maps = readMaps(manifestJson)
@@ -47,7 +47,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
       val pathname = environment.getFile(s"public/compiled/$filename").toPath
       try {
         val current = Files.getLastModifiedTime(pathname).toInstant
-        if current.isAfter(lastModified) then {
+        if (current.isAfter(lastModified)) {
           maps = readMaps(Json.parse(Files.newInputStream(pathname)))
           lastModified = current
         }
@@ -93,7 +93,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
       .toMap
     val js = splits.map {
       case (k, asset) => {
-        k -> (if asset.imports.nonEmpty then asset.copy(imports = closure(asset.name, splits).distinct)
+        k -> (if (asset.imports.nonEmpty) asset.copy(imports = closure(asset.name, splits).distinct)
               else asset)
       }
     }
@@ -116,7 +116,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
           val name       = k.substring(k.lastIndexOf('/') + 1)
           val extPos     = name.indexOf('.')
           val hashedName =
-            if extPos < 0 then s"${name}.$hash"
+            if (extPos < 0) s"${name}.$hash"
             else s"${name.slice(0, extPos)}.$hash${name.substring(extPos)}"
           (k, s"hashed/$hashedName")
         }

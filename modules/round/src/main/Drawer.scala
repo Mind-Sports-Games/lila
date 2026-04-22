@@ -17,20 +17,20 @@ final private[round] class Drawer(
 
   implicit private val chatLang: Lang = defaultLang
 
-  def autoThreefold(game: Game): Fu[Option[Pov]] = if game.playable then
+  def autoThreefold(game: Game): Fu[Option[Pov]] = if (game.playable)
     Future
       .sequence(
         Pov(game)
           .map { pov =>
             import Pref.PrefZero
-            if game.playerHasOfferedDrawRecently(pov.playerIndex) then fuccess(pov.some)
+            if (game.playerHasOfferedDrawRecently(pov.playerIndex)) fuccess(pov.some)
             else
               pov.player.userId so prefApi.getPref map { pref =>
                 pref.autoThreefold == Pref.AutoThreefold.ALWAYS || {
                   pref.autoThreefold == Pref.AutoThreefold.TIME &&
                   game.clock.exists(_.remainingTime(pov.playerIndex) < Centis.ofSeconds(30))
                 } || pov.player.userId.exists(isBotSync)
-              } map { if _ then pov.some else none }
+              } map { if (_) pov.some else none }
           }
       )
       .dmap(_.flatten.headOption)
@@ -53,7 +53,7 @@ final private[round] class Drawer(
     }
   }
 
-  def no(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = if !pov.game.playable then fuccess(Nil)
+  def no(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = if (!pov.game.playable) fuccess(Nil)
   else {
     pov match {
       case Pov(g, playerIndex) if pov.player.isOfferingDraw =>
@@ -75,7 +75,7 @@ final private[round] class Drawer(
   }
 
   def claim(pov: Pov)(implicit proxy: GameProxy): Fu[Events] =
-    if pov.game.playable && pov.game.situation.threefoldRepetition then
+    if (pov.game.playable && pov.game.situation.threefoldRepetition)
       finisher.other(
         pov.game,
         _.Draw,
@@ -86,12 +86,12 @@ final private[round] class Drawer(
   def force(game: Game)(implicit proxy: GameProxy): Fu[Events] = finisher.other(game, _.Draw, None, None)
 
   private def publishDrawOffer(pov: Pov)(implicit proxy: GameProxy): Unit = {
-    if pov.game.isCorrespondence && pov.game.nonAi then
+    if (pov.game.isCorrespondence && pov.game.nonAi)
       Bus.publish(
         lila.hub.actorApi.round.CorresDrawOfferEvent(pov.gameId),
         "offerEventCorres"
       )
-    if lila.game.Game.isBoardOrBotCompatible(pov.game) then
+    if (lila.game.Game.isBoardOrBotCompatible(pov.game))
       proxy
         .withPov(pov.playerIndex) { p =>
           fuccess(

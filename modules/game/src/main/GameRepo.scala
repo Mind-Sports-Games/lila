@@ -184,7 +184,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     }
 
   private def nonEmptyMod(mod: String, doc: Bdoc) =
-    if doc.isEmpty then $empty else $doc(mod -> doc)
+    if (doc.isEmpty) $empty else $doc(mod -> doc)
 
   def setRatingDiffs(id: ID, diffs: RatingDiffs) =
     coll.update.one(
@@ -408,7 +408,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def insertDenormalized(g: Game, initialFen: Option[FEN] = None): Funit = {
     val g2 =
-      if g.rated && (g.userIds.distinct.size != 2 || !Game.allowRated(g.variant, g.clock.map(_.config))) then
+      if (g.rated && (g.userIds.distinct.size != 2 || !Game.allowRated(g.variant, g.clock.map(_.config))))
         g.copy(mode = Mode.Casual)
       else g
     val userIds = g2.userIds.distinct
@@ -419,9 +419,9 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         .filterNot(_.initial)
     }
     val checkInHours =
-      if g2.isPgnImport then none
-      else if g2.hasClock then 1.some
-      else if g2.hasAi then (Game.aiAbandonedHours + 1).some
+      if (g2.isPgnImport) none
+      else if (g2.hasClock) 1.some
+      else if (g2.hasAi) (Game.aiAbandonedHours + 1).some
       else (24 * 10).some
     val bson = (gameBSONHandler.write(g2)) ++ $doc(
       F.initialFen  -> fen,
@@ -456,7 +456,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll.primitiveOne[FEN]($id(gameId), F.initialFen)
 
   def initialFen(game: Game): Fu[Option[FEN]] =
-    if game.imported || !game.variant.standardInitialPosition then
+    if (game.imported || !game.variant.standardInitialPosition)
       initialFen(game.id) dmap {
         case None if game.variant.variableInitialFen => Some(game.variant.initialFen)
         case fen                                     => fen
@@ -715,7 +715,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def calculateWinRatePercentages: Fu[List[WinRatePercentages]] =
     calculateWinRates.map { list =>
       list.map { wr =>
-        if wr.total > 0 then {
+        if (wr.total > 0) {
           val p2Pct   = (wr.p2 * 100) / wr.total
           val drawPct = (wr.draws * 100) / wr.total
           val p1Pct   = 100 - p2Pct - drawPct

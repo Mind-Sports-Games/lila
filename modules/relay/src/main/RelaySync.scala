@@ -51,7 +51,7 @@ final private class RelaySync(
       chapters: List[Chapter],
       nbGames: Int
   ): Option[Chapter] =
-    if nbGames == 1 || game.looksLikePlayStrategy then chapters find game.staticTagsMatch
+    if (nbGames == 1 || game.looksLikePlayStrategy) chapters find game.staticTagsMatch
     else chapters.find(_.relay.exists(_.index == game.index))
 
   private def updateChapter(
@@ -107,7 +107,7 @@ final private class RelaySync(
                   .some
               )(who) inject position + n
           } inject {
-            if chapter.root.children.nodes.isEmpty && node.mainline.nonEmpty then
+            if (chapter.root.children.nodes.isEmpty && node.mainline.nonEmpty)
               studyApi.reloadChapters(study)
             node.mainline.size
           }
@@ -122,7 +122,7 @@ final private class RelaySync(
       game: RelayGame
   ): Funit = {
     val gameTags = game.tags.value.foldLeft(Tags(Nil)) { case (newTags, tag) =>
-      if !chapter.tags.value.exists(tag ==) then newTags + tag
+      if (!chapter.tags.value.exists(tag ==)) newTags + tag
       else newTags
     }
     val newEndTag = game.end
@@ -134,7 +134,7 @@ final private class RelaySync(
       PgnTags(chapterTags + tag)
     }
     (chapterNewTags != chapter.tags) so {
-      if vs(chapterNewTags) != vs(chapter.tags) then
+      if (vs(chapterNewTags) != vs(chapter.tags))
         logger.info(s"Update ${showSC(study, chapter)} tags '${vs(chapter.tags)}' -> '${vs(chapterNewTags)}'")
       studyApi.setTags(
         studyId = study.id,

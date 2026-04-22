@@ -24,7 +24,7 @@ final case class SimulPairing(
 
   def winnerPlayerIndex =
     wins.map { w =>
-      if w then !hostPlayerIndex else hostPlayerIndex
+      if (w) !hostPlayerIndex else hostPlayerIndex
     }
 }
 

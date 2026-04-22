@@ -32,7 +32,7 @@ case class Report(
   def add(atom: Atom) =
     atomBy(atom.by)
       .fold(copy(atoms = atom :: atoms)) { existing =>
-        if existing.text.contains(atom.text) then this
+        if (existing.text.contains(atom.text)) this
         else
           copy(
             atoms = {
@@ -87,9 +87,9 @@ object Report {
   case class Score(value: Double) extends AnyVal {
     def +(s: Score) = Score(s.value + value)
     def playerIndex =
-      if value >= 150 then "red"
-      else if value >= 100 then "orange"
-      else if value >= 50 then "yellow"
+      if (value >= 150) "red"
+      else if (value >= 100) "orange"
+      else if (value >= 50) "yellow"
       else "green"
     def atLeast(v: Int) = Score(value.atLeast(v))
   }

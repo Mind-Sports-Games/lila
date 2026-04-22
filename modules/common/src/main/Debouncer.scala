@@ -31,7 +31,7 @@ final class Debouncer[Id](scheduler: Scheduler, duration: FiniteDuration, initia
     .computeIfPresent(
       id,
       (_, queued) =>
-        if queued == Queued.Another then {
+        if (queued == Queued.Another) {
           f(id)
           scheduler.scheduleOnce(duration) { runScheduled(id) }
           Queued.Empty

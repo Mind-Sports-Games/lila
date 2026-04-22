@@ -21,7 +21,7 @@ object TournamentMedleyUtil {
     val medleySpeedFactors: List[Double] =
       medleyVariantsInTournament.map(v => medleySpeedChoice.get(v.key).getOrElse(1.0))
     val medleyIntervalSeconds: List[Int] =
-      if mBalanced then {
+      if (mBalanced) {
         val times: List[Int] =
           medleySpeedFactors.map(s => (s * (minutes / medleySpeedFactors.sum) * 60).toInt)
         val extra               = minutes * 60 - times.sum

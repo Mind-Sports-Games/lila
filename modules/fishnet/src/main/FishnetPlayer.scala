@@ -31,7 +31,7 @@ final class FishnetPlayer(
   private val defaultClock = Clock(300, 0)
 
   private def delayFor(g: Game): Option[FiniteDuration] =
-    if !g.bothPlayersHaveMoved then 2.seconds.some
+    if (!g.bothPlayersHaveMoved) 2.seconds.some
     else
       for {
         pov <- g.aiPov
@@ -46,12 +46,12 @@ final class FishnetPlayer(
         randomized = millis + (millis * (java.util.concurrent.ThreadLocalRandom
           .current()
           .nextFloat() - 0.5f)).toLong
-        divided = randomized / (if g.turnCount > 9 then 1 else 2)
+        divided = randomized / (if (g.turnCount > 9) 1 else 2)
       } yield divided.toLong.millis
 
   private def makeWork(game: Game, level: Int): Fu[Work.Move] =
-    if game.situation.playable(true) then
-      if game.turnCount <= maxTurns then
+    if (game.situation.playable(true))
+      if (game.turnCount <= maxTurns)
         gameRepo.initialFen(game) zip uciMemo.get(game) map { case (initialFen, moves) =>
           Work.Move(
             _id = Work.makeId,
@@ -67,7 +67,7 @@ final class FishnetPlayer(
                 .mkString(" ")
             ),
             level =
-              if level < 3 && game.clock.exists(_.config.limit.toSeconds < 60) then 3
+              if (level < 3 && game.clock.exists(_.config.limit.toSeconds < 60)) 3
               else level,
             clock = game.clock.map { clk =>
               Work.Clock(

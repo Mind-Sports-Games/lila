@@ -78,10 +78,10 @@ final private[forum] class TopicApi(
           promotion.save(me, post.text)
           shutup ! {
             val text = s"${topic.name} ${post.text}"
-            if post.isTeam then lila.hub.actorApi.shutup.RecordTeamForumMessage(me.id, text)
+            if (post.isTeam) lila.hub.actorApi.shutup.RecordTeamForumMessage(me.id, text)
             else lila.hub.actorApi.shutup.RecordPublicForumMessage(me.id, text)
           }
-          if !post.troll && !categ.quiet then
+          if (!post.troll && !categ.quiet)
             timeline ! Propagate(ForumPost(me.id, topic.id.some, topic.name, post.id)).toFollowersOf(me.id)
           lila.mon.forum.post.create.increment()
           env.mentionNotifier.notifyMentionedUsers(post, topic)
@@ -134,7 +134,7 @@ final private[forum] class TopicApi(
       }
     }
     val cachedAdapter =
-      if categ.isTeam then adapter
+      if (categ.isTeam) adapter
       else new CachedAdapter(adapter, nbResults = fuccess(1000))
     Paginator(
       adapter = cachedAdapter,

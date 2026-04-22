@@ -75,19 +75,19 @@ object Pov {
   private def isFresher(a: Pov, b: Pov) = {
     val aDate = a.game.updatedAt.getMillis / 1000
     val bDate = b.game.updatedAt.getMillis / 1000
-    if aDate == bDate then a.gameId < b.gameId
+    if (aDate == bDate) a.gameId < b.gameId
     else aDate > bDate
   }
 
   def priority(a: Pov, b: Pov) =
-    if !a.isMyTurn && !b.isMyTurn then isFresher(a, b)
-    else if !a.isMyTurn && b.isMyTurn then false
-    else if a.isMyTurn && !b.isMyTurn then true
+    if (!a.isMyTurn && !b.isMyTurn) isFresher(a, b)
+    else if (!a.isMyTurn && b.isMyTurn) false
+    else if (a.isMyTurn && !b.isMyTurn) true
     // first move has priority over games with more than 30s left
-    else if !a.hasMoved && orInf(b.remainingSeconds) > 30 then true
-    else if !b.hasMoved && orInf(a.remainingSeconds) > 30 then false
-    else if orInf(a.remainingSeconds) < orInf(b.remainingSeconds) then true
-    else if orInf(b.remainingSeconds) < orInf(a.remainingSeconds) then false
+    else if (!a.hasMoved && orInf(b.remainingSeconds) > 30) true
+    else if (!b.hasMoved && orInf(a.remainingSeconds) > 30) false
+    else if (orInf(a.remainingSeconds) < orInf(b.remainingSeconds)) true
+    else if (orInf(b.remainingSeconds) < orInf(a.remainingSeconds)) false
     else isFresher(a, b)
 }
 

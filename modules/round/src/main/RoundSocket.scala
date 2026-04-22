@@ -50,7 +50,7 @@ final class RoundSocket(
 
   def getGame(gameId: Game.ID): Fu[Option[Game]] =
     rounds.getOrMake(gameId).getGame.addEffect { g =>
-      if g.isEmpty then finishRound(Game.Id(gameId))
+      if (g.isEmpty) finishRound(Game.Id(gameId))
     }
   def getGames(gameIds: List[Game.ID]): Fu[List[(Game.ID, Option[Game])]] =
     Future.sequence(gameIds.map { id =>
@@ -139,7 +139,7 @@ final class RoundSocket(
           tellRound(gameId, on)
           terminationDelay.cancel(gameId)
         case (gameId, _) =>
-          if rounds.exists(gameId.value) then terminationDelay.schedule(gameId)
+          if (rounds.exists(gameId.value)) terminationDelay.schedule(gameId)
       }
     case Protocol.In.Bye(fullId) => tellRound(fullId.gameId, ByePlayer(fullId.playerId))
     case RP.In.TellRoomSri(_, P.In.TellSri(_, _, tpe, _)) =>
@@ -205,7 +205,7 @@ final class RoundSocket(
     Bus.subscribeFun(BusChan.Round.chan, BusChan.Global.chan) {
       case ChatLine(Chat.Id(id), l) =>
         val line = RoundLine(l, id.endsWith("/w"))
-        rounds.tellIfPresent(if line.watcher then id take Game.gameIdSize else id, line)
+        rounds.tellIfPresent(if (line.watcher) id take Game.gameIdSize else id, line)
       case OnTimeout(Chat.Id(id), userId) =>
         send(RP.Out.tellRoom(RoomId(id take Game.gameIdSize), makeMessage("chat_timeout", userId)))
       case OnReinstate(Chat.Id(id), userId) =>
@@ -231,7 +231,7 @@ object RoundSocket {
   val disconnectTimeout = 40.seconds
 
   def povDisconnectTimeout(pov: Pov): FiniteDuration =
-    if !pov.game.hasClock then 30.days
+    if (!pov.game.hasClock) 30.days
     else
       disconnectTimeout * {
         pov.game.speed match {
@@ -246,7 +246,7 @@ object RoundSocket {
           case _                                                                      => 1
         }
       } / {
-        if pov.player.hasUser then 1 else 2
+        if (pov.player.hasUser) 1 else 2
       }
 
   object Protocol {
@@ -278,7 +278,7 @@ object RoundSocket {
                   case (gameId, cs) =>
                     (
                       Game.Id(gameId),
-                      if cs.isEmpty then None else Some(RoomCrowd(cs(0) == '+', cs(1) == '+'))
+                      if (cs.isEmpty) None else Some(RoomCrowd(cs(0) == '+', cs(1) == '+'))
                     )
                 }
               }
@@ -349,12 +349,12 @@ object RoundSocket {
         }
 
       private def centis(s: String): Option[Centis] =
-        if s == "-" then none
+        if (s == "-") none
         else s.toIntOption map Centis.apply
 
       private def readPlayerIndex(s: String) =
-        if s == "w" then Some(P1)
-        else if s == "b" then Some(P2)
+        if (s == "w") Some(P1)
+        else if (s == "b") Some(P2)
         else None
     }
 
@@ -369,14 +369,14 @@ object RoundSocket {
 
       def tellVersion(roomId: RoomId, version: SocketVersion, e: Event) = {
         val flags = new StringBuilder(2)
-        if e.watcher then flags += 's'
-        else if e.owner then flags += 'p'
+        if (e.watcher) flags += 's'
+        else if (e.owner) flags += 'p'
         else
           e.only.map(_.fold('w', 'b')).orElse {
             e.moveBy.map(_.fold('W', 'B'))
           } foreach flags.+=
-        if e.troll then flags += 't'
-        if flags.isEmpty then flags += '-'
+        if (e.troll) flags += 't'
+        if (flags.isEmpty) flags += '-'
         s"r/ver $roomId $version $flags ${e.typ} ${e.data}"
       }
 

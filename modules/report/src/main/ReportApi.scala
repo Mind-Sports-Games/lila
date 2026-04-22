@@ -70,7 +70,7 @@ final class ReportApi(
             // ) discordApi.commReportBurst(c.suspect.user)
             coll.update.one($id(report.id), report, upsert = true).void >>
               autoAnalysis(candidate).andDo {
-                if report.isCheat then
+                if (report.isCheat)
                   Bus.publish(lila.hub.actorApi.report.CheatReportCreated(report.user), "cheatReport")
               }
           }
@@ -245,7 +245,7 @@ final class ReportApi(
       userRepo.pair(winnerId, loserId) zip getPlayStrategyReporter flatMap {
         case ((isSame, Some((winner, loser))), reporter) if !winner.lame && !loser.lame =>
           val loginsText =
-            if isSame then "Found matching IP/print"
+            if (isSame) "Found matching IP/print"
             else "No IP/print match found"
           create(
             Candidate(
@@ -448,7 +448,7 @@ final class ReportApi(
       opens <- findBest(nb, selectOpenInRoom(room, snoozedIdsOf(mod)))
       nbClosed = nb - opens.size
       closed <-
-        if room.contains(Room.Xfiles) || nbClosed < 1 then fuccess(Nil)
+        if (room.contains(Room.Xfiles) || nbClosed < 1) fuccess(Nil)
         else findRecent(nbClosed, closedSelect ++ roomSelect(room))
       withNotes <- addSuspectsAndNotes(opens ++ closed)
     } yield withNotes
@@ -494,7 +494,7 @@ final class ReportApi(
               .sort(sortLastAtomAt)
               .cursor[Report](ReadPreference.secondaryPreferred)
               .list(20) flatMap { reports =>
-              if reports.sizeIs < 4 then fuccess(none) // not enough data to know
+              if (reports.sizeIs < 4) fuccess(none) // not enough data to know
               else {
                 val userIds = reports.map(_.user).distinct
                 userRepo.countEngines(userIds) map { nbEngines =>
@@ -603,7 +603,7 @@ final class ReportApi(
       }
 
     private def cancel(mod: Mod)(report: Report): Funit =
-      if report.isOther && report.onlyAtom.map(_.by.value).has(mod.user.id) then
+      if (report.isOther && report.onlyAtom.map(_.by.value).has(mod.user.id))
         coll.delete.one($id(report.id)).void // cancel spontaneous inquiry
       else
         coll.update

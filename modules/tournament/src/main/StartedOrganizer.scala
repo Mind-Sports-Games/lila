@@ -58,18 +58,18 @@ final private class StartedOrganizer(
   }
 
   private def processMedleyRoundChange(tour: Tournament) =
-    if tour.needsNewMedleyRound then api.newMedleyRound(tour)
+    if (tour.needsNewMedleyRound) api.newMedleyRound(tour)
     else tour
 
   private def processPairings(tour: Tournament) =
-    if !tour.isScheduled && tour.nbPlayers < 30 && ThreadLocalRandom.nextInt(10) == 0 then
+    if (!tour.isScheduled && tour.nbPlayers < 30 && ThreadLocalRandom.nextInt(10) == 0)
       playerRepo.nbActiveUserIds(tour.id) flatMap { nb =>
         (nb >= 2) so startPairing(tour)
       }
     else startPairing(tour)
 
   private def processTour(tour: Tournament): Fu[Int] =
-    if tour.isOver then api.finish(tour).inject(0)
+    if (tour.isOver) api.finish(tour).inject(0)
     else
       tour
         .pipe(processMedleyRoundChange)

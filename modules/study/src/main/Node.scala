@@ -26,7 +26,7 @@ sealed trait RootOrNode {
   val glyphs: Glyphs
   val score: Option[Score]
   def addChild(node: Node): RootOrNode
-  def fullTurnCount = 1 + (turnCount - (if playedPlayerIndex == playerIndex then 0 else 1)) / 2
+  def fullTurnCount = 1 + (turnCount - (if (playedPlayerIndex == playerIndex) 0 else 1)) / 2
   def mainline: Vector[Node]
   def playerIndex = fen.player.getOrElse(PlayerIndex.P1)
   def moveOption: Option[Uci.WithSan]
@@ -177,8 +177,8 @@ object Node {
             (newChildren, isDone) <- node.children.promoteUpAt(tail)
             newNode = node.copy(children = newChildren)
           } yield
-            if isDone then update(newNode) -> true
-            else if newNode.id == mainlineNode.id then update(newNode) -> false
+            if (isDone) update(newNode) -> true
+            else if (newNode.id == mainlineNode.id) update(newNode) -> false
             else Children(newNode +: nodes.filterNot(newNode ==))      -> true
       }
 
@@ -265,36 +265,36 @@ object Node {
     def addChild(child: Node) = copy(children = children.addNode(child))
 
     def nodeAt(path: Path): Option[RootOrNode] =
-      if path.isEmpty then this.some else children.nodeAt(path)
+      if (path.isEmpty) this.some else children.nodeAt(path)
 
     def pathExists(path: Path): Boolean = nodeAt(path).isDefined
 
     def setShapesAt(shapes: Shapes, path: Path): Option[Root] =
-      if path.isEmpty then copy(shapes = shapes).some
+      if (path.isEmpty) copy(shapes = shapes).some
       else updateChildrenAt(path, _.setShapes(shapes))
 
     def setCommentAt(comment: Comment, path: Path): Option[Root] =
-      if path.isEmpty then copy(comments = comments.set(comment)).some
+      if (path.isEmpty) copy(comments = comments.set(comment)).some
       else updateChildrenAt(path, _.setComment(comment))
 
     def deleteCommentAt(commentId: Comment.Id, path: Path): Option[Root] =
-      if path.isEmpty then copy(comments = comments.delete(commentId)).some
+      if (path.isEmpty) copy(comments = comments.delete(commentId)).some
       else updateChildrenAt(path, _.deleteComment(commentId))
 
     def setGamebookAt(gamebook: Gamebook, path: Path): Option[Root] =
-      if path.isEmpty then copy(gamebook = gamebook.some).some
+      if (path.isEmpty) copy(gamebook = gamebook.some).some
       else updateChildrenAt(path, _.setGamebook(gamebook))
 
     def toggleGlyphAt(glyph: Glyph, path: Path): Option[Root] =
-      if path.isEmpty then copy(glyphs = glyphs.toggle(glyph)).some
+      if (path.isEmpty) copy(glyphs = glyphs.toggle(glyph)).some
       else updateChildrenAt(path, _.toggleGlyph(glyph))
 
     def setClockAt(clock: Option[Centis], path: Path): Option[Root] =
-      if path.isEmpty then copy(clock = clock).some
+      if (path.isEmpty) copy(clock = clock).some
       else updateChildrenAt(path, _.withClock(clock))
 
     def forceVariationAt(force: Boolean, path: Path): Option[Root] =
-      if path.isEmpty then copy(clock = clock).some
+      if (path.isEmpty) copy(clock = clock).some
       else updateChildrenAt(path, _.withForceVariation(force))
 
     private def updateChildrenAt(path: Path, f: Node => Node): Option[Root] =

@@ -69,7 +69,7 @@ final private class DuelStore {
     } byTourId.compute(
       tour.id,
       (_: Tournament.ID, v: TreeSet[Duel]) => {
-        if v == null then TreeSet(tb)(using gameIdOrdering)
+        if (v == null) TreeSet(tb)(using gameIdOrdering)
         else v + tb
       }
     )
@@ -80,7 +80,7 @@ final private class DuelStore {
         tourId,
         (_: Tournament.ID, tb: TreeSet[Duel]) => {
           val w = tb - emptyGameId(game.id)
-          if w.isEmpty then null else w
+          if (w.isEmpty) null else w
         }
       )
     }

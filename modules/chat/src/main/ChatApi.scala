@@ -109,8 +109,8 @@ final class ChatApi(
         persist: Boolean
     ): Funit =
       (persist so persistLine(chatId, line)).andDo {
-        if persist then {
-          if publicSource.isDefined then cached invalidate chatId
+        if (persist) {
+          if (publicSource.isDefined) cached invalidate chatId
           shutup ! {
             publicSource match {
               case Some(source) => RecordPublicChat(userId, text, source)
@@ -146,7 +146,7 @@ final class ChatApi(
     }
 
     def service(chatId: Chat.Id, text: String, busChan: BusChan.Select, isVolatile: Boolean): Unit = {
-      val _ = (if isVolatile then volatile else system) (chatId, text, busChan)
+      val _ = (if (isVolatile) volatile else system) (chatId, text, busChan)
     }
 
     def timeout(
@@ -173,7 +173,7 @@ final class ChatApi(
           reason = reason,
           scope = ChatTimeout.Scope.Global,
           text = data.text,
-          busChan = if data.chan == "tournament" then _.Tournament else _.Simul
+          busChan = if (data.chan == "tournament") _.Tournament else _.Simul
         )
       }
 
@@ -200,7 +200,7 @@ final class ChatApi(
         }
         // Only add the system announcement line for a newly created timeout
         val line: Option[UserLine] =
-          if isNew then
+          if (isNew)
             c.hasRecentLine(user)
               .option(
                 UserLine(
@@ -221,7 +221,7 @@ final class ChatApi(
           line foreach { l =>
             publish(chat.id, actorApi.ChatLine(chat.id, l), busChan)
           }
-          if isMod(mod) then {
+          if (isMod(mod)) {
             // Log every mod action; only purge public chats for a newly created timeout
             lila.common.Bus.publish(
               lila.hub.actorApi.mod.ChatTimeout(
@@ -232,7 +232,7 @@ final class ChatApi(
               ),
               "chatTimeout"
             )
-            if isNew then
+            if (isNew)
               lila.common.Bus
                 .publish(lila.hub.actorApi.security.DeletePublicChats(user.id), "deletePublicChats")
           } else logger.info(s"${mod.username} times out ${user.username} in #${c.id} for ${reason.key}")
@@ -264,7 +264,7 @@ final class ChatApi(
         case (Some(user), false) if user.enabled =>
           Writer.cut(t1) flatMap { t2 =>
             val allow =
-              if user.isBot then !lila.common.String.hasLinks(t2)
+              if (user.isBot) !lila.common.String.hasLinks(t2)
               else flood.allowMessage(userId, t2)
             allow option {
               UserLine(
@@ -289,7 +289,7 @@ final class ChatApi(
       findOption(chatId).dmap(_ | Chat.makeMixed(chatId))
 
     def findIf(chatId: Chat.Id, cond: Boolean): Fu[MixedChat] =
-      if cond then find(chatId)
+      if (cond) find(chatId)
       else fuccess(Chat.makeMixed(chatId))
 
     def findNonEmpty(chatId: Chat.Id): Fu[Option[MixedChat]] =
@@ -346,7 +346,7 @@ final class ChatApi(
     def preprocessUserInput(in: String) = multiline(spam.replace(noShouting(noPrivateUrl(in))))
 
     def removeSelfMention(in: String, username: User.ID) =
-      if in.contains('@') then
+      if (in.contains('@'))
         ("""(?i)@(?<![\w@#/]@)""" + username + """(?![@\w-]|\.\w)""").r.replaceAllIn(in, username)
       else in
 

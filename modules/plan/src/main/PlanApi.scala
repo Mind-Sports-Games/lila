@@ -101,7 +101,7 @@ final class PlanApi(
     def onSubscriptionDeleted(sub: StripeSubscription): Funit =
       customerIdPatron(sub.customer) flatMap {
         _ so { patron =>
-          if patron.isLifetime then funit
+          if (patron.isLifetime) funit
           else
             userRepo.byId(patron.userId).orFail(s"Missing user for $patron") flatMap { user =>
               setDbUserPlan(user, user.plan.disable) >>
@@ -223,7 +223,7 @@ final class PlanApi(
       order <- payPalClient.captureOrder(orderId)
       cents <- order.capturedMoney.fold[Fu[Cents]](fufail(s"Invalid paypal capture $order"))(fuccess)
       _     <-
-        if cents.value < 100 then {
+        if (cents.value < 100) {
           logger.info(s"Ignoring invalid paypal amount from $ip ${order.userId} $cents ${orderId}")
           funit
         } else {
@@ -274,7 +274,7 @@ final class PlanApi(
       sub   <- payPalClient.getSubscription(subId).orFail(s"Missing paypal subscription for order $order")
       cents = sub.capturedMoney
       _ <-
-        if cents.value < 100 then {
+        if (cents.value < 100) {
           logger.info(s"Ignoring invalid paypal amount from $ip ${order.userId} $cents $orderId")
           funit
         } else {
@@ -322,10 +322,10 @@ final class PlanApi(
 
   private def setDbUserPlanOnCharge(user: User, levelUp: Boolean): Funit = {
     val plan =
-      if levelUp then user.plan.incMonths
+      if (levelUp) user.plan.incMonths
       else user.plan.enable
     Bus.publish(lila.hub.actorApi.plan.MonthInc(user.id, plan.months), "plan")
-    if plan.months > 1 then notifier.onRenew(user.copy(plan = plan))
+    if (plan.months > 1) notifier.onRenew(user.copy(plan = plan))
     else notifier.onStart(user)
     setDbUserPlan(user, plan)
   }
@@ -366,7 +366,7 @@ final class PlanApi(
               case subscription => fuccess(Synced(patron.some, none, subscription))
             }
           case (_, _, Some(_)) =>
-            if !user.plan.active then {
+            if (!user.plan.active) {
               logger.warn(s"${user.username} sync: enable plan of customer with paypal")
               setDbUserPlan(user, user.plan.enable) inject ReloadUser
             } else fuccess(Synced(patron.some, none, none))
@@ -387,7 +387,7 @@ final class PlanApi(
     }
 
   def setLifetime(user: User): Funit = {
-    if user.plan.isEmpty then Bus.publish(lila.hub.actorApi.plan.MonthInc(user.id, 0), "plan")
+    if (user.plan.isEmpty) Bus.publish(lila.hub.actorApi.plan.MonthInc(user.id, 0), "plan")
     userRepo.setPlan(
       user,
       user.plan.enable
@@ -509,8 +509,8 @@ final class PlanApi(
           lila.mon.plan.goal.update(m.goal.value)
           lila.mon.plan.current.update(m.current.value)
           lila.mon.plan.percent.update(m.percent)
-          if charge.isPayPalCheckout then lila.mon.plan.paypalCheckout.amount.record(charge.cents.value)
-          else if charge.isStripe then lila.mon.plan.stripe.record(charge.cents.value)
+          if (charge.isPayPalCheckout) lila.mon.plan.paypalCheckout.amount.record(charge.cents.value)
+          else if (charge.isStripe) lila.mon.plan.stripe.record(charge.cents.value)
         }
       }
 

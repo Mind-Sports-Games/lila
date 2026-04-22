@@ -44,7 +44,7 @@ final private[tv] class TvTrouper(
     case GetChampions(promise) => promise success Tv.Champions(channelChampions)
 
     case lila.game.actorApi.StartGame(g) =>
-      if g.hasClock || g.hasCorrespondenceClock || g.isUnlimited then {
+      if (g.hasClock || g.hasCorrespondenceClock || g.isUnlimited) {
         val candidate = Tv.toCandidate(lightUserSync)(g)
         channelTroupers collect {
           case (chan, trouper) if chan.filter(candidate) => trouper
@@ -77,7 +77,7 @@ final private[tv] class TvTrouper(
         }
       )
       Bus.publish(lila.hub.actorApi.tv.TvSelect(game.id, game.speed, data), "tvSelect")
-      if channel == Tv.Channel.AllGames then {
+      if (channel == Tv.Channel.AllGames) {
         implicit val timeout: akka.util.Timeout = makeTimeout(100 millis)
         actorAsk(renderer.actor, actorApi.RenderFeaturedJs(game)) foreach { case html: String =>
           val pov   = Pov.naturalOrientation(game)

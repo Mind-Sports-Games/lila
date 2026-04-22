@@ -76,8 +76,8 @@ object activities {
     def add(gameId: GameId, moved: Boolean, ended: Boolean) =
       Corres(
         moves = moves + (moved so 1),
-        movesIn = if moved then (gameId :: movesIn).distinct.take(maxSubEntries) else movesIn,
-        end = if ended then (gameId :: end).take(maxSubEntries) else end
+        movesIn = if (moved) (gameId :: movesIn).distinct.take(maxSubEntries) else movesIn,
+        end = if (ended) (gameId :: end).take(maxSubEntries) else end
       )
   }
   implicit val CorresZero: Zero[Corres] = Zero(Corres(0, Nil, Nil))
@@ -86,7 +86,7 @@ object activities {
   case class FollowList(ids: List[User.ID], nb: Option[Int]) {
     def actualNb       = nb | ids.size
     def +(id: User.ID) =
-      if ids contains id then this
+      if (ids contains id) this
       else {
         val newIds = (id :: ids).distinct
         copy(

@@ -12,7 +12,7 @@ final class Share(
   def getPrefId(insighted: User) = prefApi.getPrefById(insighted.id).dmap(_.insightShare)
 
   def grant(insighted: User, to: Option[User]): Fu[Boolean] =
-    if to so Granter(_.SeeInsight) then fuTrue
+    if (to so Granter(_.SeeInsight)) fuTrue
     else
       prefApi.getPrefById(insighted.id) flatMap { pref =>
         pref.insightShare match {

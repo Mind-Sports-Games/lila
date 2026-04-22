@@ -43,7 +43,7 @@ final class LilaCookie(domain: NetDomain, baker: SessionCookieBaker) {
     DiscardingCookie(name, "/", cookieDomain.some, baker.httpOnly)
 
   def ensure(req: RequestHeader)(res: Result): Result =
-    if req.session.data.contains(LilaCookie.sessionId) then res
+    if (req.session.data.contains(LilaCookie.sessionId)) res
     else res.withCookies(makeSessionId(using req))
 
   def ensureAndGet(req: RequestHeader)(res: String => Fu[Result])(implicit ec: ExecutionContext): Fu[Result] =

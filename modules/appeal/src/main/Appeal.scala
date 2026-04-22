@@ -30,11 +30,11 @@ case class Appeal(
       msgs = msgs :+ msg,
       updatedAt = DateTime.now,
       status =
-        if isByMod(msg) && status == Appeal.Status.Unread then Appeal.Status.Read
-        else if !isByMod(msg) && status == Appeal.Status.Read then Appeal.Status.Unread
+        if (isByMod(msg) && status == Appeal.Status.Unread) Appeal.Status.Read
+        else if (!isByMod(msg) && status == Appeal.Status.Read) Appeal.Status.Unread
         else status,
       firstUnrepliedAt =
-        if isByMod(msg) || msgs.lastOption.exists(isByMod) then DateTime.now
+        if (isByMod(msg) || msgs.lastOption.exists(isByMod)) DateTime.now
         else firstUnrepliedAt
     )
   }
@@ -51,7 +51,7 @@ case class Appeal(
 
   def unread     = copy(status = Appeal.Status.Unread)
   def read       = copy(status = Appeal.Status.Read)
-  def toggleMute = if isMuted then read else copy(status = Appeal.Status.Muted)
+  def toggleMute = if (isMuted) read else copy(status = Appeal.Status.Muted)
 
   def isByMod(msg: AppealMsg) = msg.by != id
 }

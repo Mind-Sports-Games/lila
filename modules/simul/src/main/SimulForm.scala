@@ -50,7 +50,7 @@ object SimulForm {
   private def nameType(host: User) =
     eventName(2, 40).verifying(
       Constraint[String] { (t: String) =>
-        if t.toLowerCase.contains("playstrategy") then
+        if (t.toLowerCase.contains("playstrategy"))
           validation.Invalid(validation.ValidationError("Must not contain \"playstrategy\""))
         else validation.Valid
       },

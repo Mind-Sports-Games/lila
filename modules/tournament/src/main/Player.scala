@@ -36,7 +36,7 @@ private[tournament] case class Player(
   def unWithdraw = copy(withdraw = false)
 
   def magicScore =
-    score * 100000 + (if playedGames then 1 else 0) * 10000 + (performanceOption | actualRating)
+    score * 100000 + (if (playedGames) 1 else 0) * 10000 + (performanceOption | actualRating)
 
   def performanceOption = (performance > 0).option(performance)
 }

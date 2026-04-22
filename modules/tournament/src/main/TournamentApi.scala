@@ -80,7 +80,7 @@ final class TournamentApi(
       by = Right(me),
       name = setup.name,
       clock = setup.clock,
-      minutes = if setup.isMedley then setup.medleyDuration else setup.minutes,
+      minutes = if (setup.isMedley) setup.medleyDuration else setup.minutes,
       waitMinutes = setup.waitMinutes | TournamentForm.waitMinuteDefault,
       startDate = setup.startDate,
       mode = setup.realMode,
@@ -137,7 +137,7 @@ final class TournamentApi(
       conditions = data.conditions
         .convert(tour.perfType, leaderTeams.view.map(_.pair).toMap)
         .copy(teamMember = old.conditions.teamMember), // can't change that
-      mode = if tour.position.isDefined then strategygames.Mode.Casual else tour.mode
+      mode = if (tour.position.isDefined) strategygames.Mode.Casual else tour.mode
     )
 
   private def processHandicappedChanges(tour: Tournament, old: Tournament): Funit =
@@ -177,7 +177,7 @@ final class TournamentApi(
     Future.sequence(userIds.toSeq.map(updatePlayer(tour, variant, None))).void
 
   private def updateBotRatingCache(tour: Tournament, variant: Variant): Future[List[Unit]] =
-    if tour.botsAllowed then
+    if (tour.botsAllowed)
       playerRepo
         .byTourAndUserIds(tour.id, LightUser.tourBotsIDs)
         .flatMap { p =>
@@ -189,7 +189,7 @@ final class TournamentApi(
     !hadPairings.get(tour.id) || users.haveWaitedEnough(tour.minWaitingUsersForPairings)
 
   private[tournament] def withdrawInactivePlayers(tourId: Tournament.ID, userIds: Set[User.ID]): Funit =
-    if hadPairings.get(tourId) then funit
+    if (hadPairings.get(tourId)) funit
     else
       playerRepo.nonActivePlayers(tourId, userIds) flatMap { players =>
         Future.sequence(players.map(player => playerRepo.withdraw(tourId, player.userId).void)).void
@@ -322,7 +322,7 @@ final class TournamentApi(
       lang: Lang = defaultLang
   ): Tournament = {
     val newTour     = tour.withNextMedleyRound
-    val balanceText = if newTour.isMedley then s" (for ${newTour.currentIntervalTime} minutes)" else ""
+    val balanceText = if (newTour.isMedley) s" (for ${newTour.currentIntervalTime} minutes)" else ""
     tournamentRepo.setMedleyVariant(newTour.id, newTour.variant)
     socket.systemChat(
       newTour.id,
@@ -333,8 +333,8 @@ final class TournamentApi(
   }
 
   def kill(tour: Tournament): Funit =
-    if tour.isStarted then finish(tour)
-    else if tour.isCreated then destroy(tour)
+    if (tour.isStarted) finish(tour)
+    else if (tour.isCreated) destroy(tour)
     else funit
 
   private def awardTrophyByRank(tour: Tournament, trophyKind: String, rank: Int, date: DateTime) =
@@ -434,13 +434,13 @@ final class TournamentApi(
       playerRepo.exists(tour.id, me.id) flatMap { playerExists =>
         import Tournament.JoinResult
         val fuResult: Fu[JoinResult] =
-          if !playerExists && tour.password.exists(p => !password.contains(p)) then
+          if (!playerExists && tour.password.exists(p => !password.contains(p)))
             fuccess(JoinResult.WrongPassword)
-          else if !tour.botsAllowed && me.isBot then fuccess(JoinResult.NoBotsAllowed)
+          else if (!tour.botsAllowed && me.isBot) fuccess(JoinResult.NoBotsAllowed)
           else
             getVerdicts(tour, me.some, getUserTeamIds) flatMap { verdicts =>
-              if !verdicts.accepted then fuccess(JoinResult.Verdicts)
-              else if !pause.canJoin(me.id, tour) then fuccess(JoinResult.Paused)
+              if (!verdicts.accepted) fuccess(JoinResult.Verdicts)
+              else if (!pause.canJoin(me.id, tour)) fuccess(JoinResult.Paused)
               else {
                 // TODO: the below tour.currentPerfType probably represents another race condition.
                 //       if someone joins _just_ before the new medley round, but after the
@@ -465,7 +465,7 @@ final class TournamentApi(
                     tour.teamBattle match {
                       case Some(battle) if battle.teams contains team =>
                         getUserTeamIds(me) flatMap { myTeams =>
-                          if myTeams.contains(team) then proceedWithTeam(team.some)
+                          if (myTeams.contains(team)) proceedWithTeam(team.some)
                           else fuccess(JoinResult.MissingTeam)
                         }
                       case _ => fuccess(JoinResult.Nope)
@@ -474,7 +474,7 @@ final class TournamentApi(
               }
             }
         fuResult map { result =>
-          if result.ok then
+          if (result.ok)
             withTeamId.ifTrue(asLeader && tour.isTeamBattle) foreach {
               tournamentRepo.setForTeam(tour.id, _)
             }
@@ -530,9 +530,9 @@ final class TournamentApi(
         for {
           _        <- playerRepo.withdraw(tour.id, userId)
           pausable <-
-            if isPause then cached.ranking(tour).map { _ get userId exists (7 >) } else fuccess(isStalling)
+            if (isPause) cached.ranking(tour).map { _ get userId exists (7 >) } else fuccess(isStalling)
         } yield {
-          if pausable then pause.add(userId)
+          if (pausable) pause.add(userId)
           socket.reload(tour.id)
           publish()
         }
@@ -630,11 +630,11 @@ final class TournamentApi(
     for {
       opponent       <- g.opponentByUserId(userId)
       opponentRating <- opponent.rating
-      multiplier = g.winnerUserId.so(winner => if winner == userId then 1 else -1)
+      multiplier = g.winnerUserId.so(winner => if (winner == userId) 1 else -1)
     } yield opponentRating + 500 * multiplier
 
   private def withdrawNonMover(game: Game): Unit =
-    if game.status == strategygames.Status.NoStart then
+    if (game.status == strategygames.Status.NoStart)
       for {
         tourId <- game.tournamentId
         player <- game.playerWhoDidNotMove
@@ -656,7 +656,7 @@ final class TournamentApi(
         .sequence(ids.map { tourId =>
           Sequencing(tourId, "kickFromTeam")(tournamentRepo.byId) { tour =>
             val fu =
-              if tour.isCreated then playerRepo.remove(tour.id, userId)
+              if (tour.isCreated) playerRepo.remove(tour.id, userId)
               else playerRepo.withdraw(tour.id, userId)
             fu >> updateNbPlayers(tourId).andDo(socket.reload(tourId))
           }
@@ -690,11 +690,11 @@ final class TournamentApi(
       disqualify: Boolean,
       updateLeaderboard: Boolean
   ) =
-    if updateLeaderboard then leaderboardApi.ejectEntry(userId, tourId, disqualify)
+    if (updateLeaderboard) leaderboardApi.ejectEntry(userId, tourId, disqualify)
     else funit
 
   private def ejectPlayer(tourId: Tournament.ID, userId: User.ID, disqualify: Boolean) =
-    if disqualify then playerRepo.disqualify(tourId, userId)
+    if (disqualify) playerRepo.disqualify(tourId, userId)
     else playerRepo.remove(tourId, userId)
 
   // erases player from tournament and reassigns winner and trophies
@@ -707,7 +707,7 @@ final class TournamentApi(
     Sequencing(tourId, "ejectPlayerAndRewriteHistory")(tournamentRepo.finishedById) { tour =>
       ejectFromLeaderboard(tourId, userId, disqualify, updateLeaderboard) >>
         ejectPlayer(tourId, userId, disqualify) >> {
-          (if tour.winnerId.contains(userId) then {
+          (if (tour.winnerId.contains(userId)) {
              playerRepo.winner(tour.id) flatMap { winner =>
                winner
                  .fold(funit) { (p: Player) =>
@@ -934,7 +934,7 @@ final class TournamentApi(
       { case (past, next) => Tournament.PastAndNext(past, next) }
 
   def toggleFeaturing(tourId: Tournament.ID, v: Boolean): Funit =
-    if v then
+    if (v)
       tournamentRepo.byId(tourId) flatMap {
         _ so { tour =>
           tournamentRepo.setSchedule(tour.id, Schedule.uniqueFor(tour).some)
@@ -984,7 +984,7 @@ final class TournamentApi(
     private def publishNow(tourId: Tournament.ID) =
       tournamentTop(tourId) map { top =>
         val lastHash: Int = ~lastPublished.getIfPresent(tourId)
-        if lastHash != top.hashCode then {
+        if (lastHash != top.hashCode) {
           Bus.publish(
             lila.hub.actorApi.round.TourStanding(tourId, JsonView.top(top, lightUserApi.sync)),
             "tourStanding"
@@ -996,7 +996,7 @@ final class TournamentApi(
     private val throttler = system.actorOf(Props(new EarlyMultiThrottler(logger = logger)))
 
     def apply(tour: Tournament): Unit =
-      if !tour.isTeamBattle then
+      if (!tour.isTeamBattle)
         throttler ! EarlyMultiThrottler.Work(
           id = tour.id,
           run = () => publishNow(tour.id),

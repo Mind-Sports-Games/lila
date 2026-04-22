@@ -5,12 +5,12 @@ import lila.common.IpAddress
 final class IpTrust(proxyApi: Ip2Proxy, geoApi: GeoIP, torApi: Tor, firewallApi: Firewall) {
 
   def isSuspicious(ip: IpAddress): Fu[Boolean] =
-    if firewallApi.blocksIp(ip) then fuTrue
-    else if torApi.isExitNode(ip) then fuTrue
+    if (firewallApi.blocksIp(ip)) fuTrue
+    else if (torApi.isExitNode(ip)) fuTrue
     else {
       val location = geoApi.orUnknown(ip)
-      if location == Location.unknown || location == Location.tor then fuTrue
-      else if isUndetectedProxy(location) then fuTrue
+      if (location == Location.unknown || location == Location.tor) fuTrue
+      else if (isUndetectedProxy(location)) fuTrue
       else proxyApi(ip)
     }
 

@@ -39,8 +39,8 @@ private object AntmaPairing {
       Chronometer.syncMon(_.tournament.pairing.wmmatching) {
         WMMatching(
           players.toArray,
-          if data.tour.isTeamBattle then battleScore
-          else if data.onlyTwoActivePlayers then duelScore
+          if (data.tour.isTeamBattle) battleScore
+          else if (data.onlyTwoActivePlayers) duelScore
           else pairScore
         ).fold(
           err => {

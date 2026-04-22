@@ -119,7 +119,7 @@ final private[round] class Titivate(
 
             case None =>
               val hours = game.daysPerTurn.fold(
-                if game.hasAi then Game.aiAbandonedHours
+                if (game.hasAi) Game.aiAbandonedHours
                 else Game.abandonedDays * 24
               )(_ * 24)
               gameRepo.setCheckAt(game, DateTime.now.plusHours(hours)).void

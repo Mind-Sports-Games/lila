@@ -105,7 +105,7 @@ object RelayRoundForm {
       relay.copy(
         name = name,
         sync = makeSync(user) pipe { sync =>
-          if relay.sync.playing then sync.play else sync
+          if (relay.sync.playing) sync.play else sync
         },
         startsAt = startsAt,
         finished = relay.finished && startsAt.fold(true)(_.isBeforeNow)

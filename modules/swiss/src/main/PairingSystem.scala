@@ -25,8 +25,8 @@ final private class PairingSystem(
   private def invoke(swiss: Swiss, input: Source[String, ?]): Fu[List[String]] =
     withTempFile(swiss, input) { file =>
       val flavour =
-        if swiss.nbPlayers < 250 then "dutch"
-        else if swiss.nbPlayers < 700 then "burstein"
+        if (swiss.nbPlayers < 250) "dutch"
+        else if (swiss.nbPlayers < 700) "burstein"
         else "fast"
       val command = s"$executable --$flavour $file -p"
       val stdout  = new collection.mutable.ListBuffer[String]
@@ -41,9 +41,9 @@ final private class PairingSystem(
           )
         }
       }
-      if status != 0 then {
+      if (status != 0) {
         val error = stderr.toString
-        if error.contains("No valid pairing exists") then Nil
+        if (error.contains("No valid pairing exists")) Nil
         else throw PairingSystem.BBPairingException(error, swiss)
       } else stdout.toList
     }

@@ -83,7 +83,7 @@ object Theme extends ThemeObject {
 
   def addMissingDefaultsIfAny(currentThemes: List[Theme]): List[Theme] =
     defaults.map { x =>
-      if currentThemes.filter(t => t.gameFamily == x.gameFamily).size == 1 then
+      if (currentThemes.filter(t => t.gameFamily == x.gameFamily).size == 1)
         currentThemes.filter(t => t.gameFamily == x.gameFamily)(0)
       else x
     }

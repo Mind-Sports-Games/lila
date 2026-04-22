@@ -36,7 +36,7 @@ final private[puzzle] class PuzzleFinisher(
       user: User,
       result: Result
   ): Fu[Option[(PuzzleRound, Perf)]] =
-    if api.casual(user, id) then
+    if (api.casual(user, id))
       fuccess {
         PuzzleRound(
           id = PuzzleRound.Id(user.id, id),
@@ -127,7 +127,7 @@ final private[puzzle] class PuzzleFinisher(
                       historyApi.addPuzzle(user = user, completedAt = now, perf = userPerf) void
                   }
                   .andDo {
-                    if prevRound.isEmpty then
+                    if (prevRound.isEmpty)
                       Bus.publish(
                         Puzzle.UserResult(
                           puzzle.id,
@@ -177,21 +177,21 @@ final private[puzzle] class PuzzleFinisher(
     ).map(_.key)
 
     private def weightOf(theme: PuzzleTheme.Key, result: Result) =
-      if theme == PuzzleTheme.mix.key then 1
-      else if isObvious(theme) then if result.win then 0.2f else 0.6f
-      else if isHinting(theme) then if result.win then 0.3f else 0.7f
-      else if result.win then 0.7f
+      if (theme == PuzzleTheme.mix.key) 1
+      else if (isObvious(theme)) if (result.win) 0.2f else 0.6f
+      else if (isHinting(theme)) if (result.win) 0.3f else 0.7f
+      else if (result.win) 0.7f
       else 0.8f
 
     def player(theme: PuzzleTheme.Key, result: Result, glicko: (Glicko, Glicko), puzzle: Glicko) = {
       val provisionalPuzzle = puzzle.provisional so {
-        if result.win then -0.2f else -0.7f
+        if (result.win) -0.2f else -0.7f
       }
       glicko._1.average(glicko._2, (weightOf(theme, result) + provisionalPuzzle).atLeast(0.1f))
     }
 
     def puzzle(theme: PuzzleTheme.Key, result: Result, glicko: (Glicko, Glicko), player: Glicko) =
-      if player.clueless then glicko._1
+      if (player.clueless) glicko._1
       else glicko._1.average(glicko._2, weightOf(theme, result))
   }
 

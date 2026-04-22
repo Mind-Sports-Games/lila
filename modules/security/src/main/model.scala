@@ -61,8 +61,8 @@ case class UserAgent(value: String) {
   import UserAgent.Client
 
   lazy val client: Client =
-    if value.contains("Lichobile") then Client.App
-    else if value.contains("Mobile") then Client.Mob
+    if (value.contains("Lichobile")) Client.App
+    else if (value.contains("Mobile")) Client.Mob
     else Client.PC
 
   def parse = org.uaparser.scala.Parser.default.parse(value)

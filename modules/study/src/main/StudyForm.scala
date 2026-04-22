@@ -104,7 +104,7 @@ object StudyForm {
             variant = variantStr,
             pgn = onePgn.some,
             orientation =
-              if pgns.sizeIs > 1 then "auto"
+              if (pgns.sizeIs > 1) "auto"
               else (orientationStr.flatMap(PlayerIndex.fromName) | P1).name,
             mode = mode,
             initial = initial && index == 0

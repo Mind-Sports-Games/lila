@@ -30,7 +30,7 @@ final class HistoryApi(coll: Coll, userRepo: UserRepo, cacheApi: lila.memo.Cache
   def add(user: User, game: Game, perfs: Perfs): Funit = {
     val variantPerf = Perfs.variantLens(game.ratingVariant).map(_(perfs))
     val speedPerf   =
-      if variantPerf == Some(perfs.standard) then Some(Perfs.speedLens(game.speed)(perfs))
+      if (variantPerf == Some(perfs.standard)) Some(Perfs.speedLens(game.speed)(perfs))
       else None
     val changes = List(
       variantPerf.map(game.ratingVariant.key -> _),

@@ -61,7 +61,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
               case (acc, mat) =>
                 $doc(
                   "$cond" -> $arr(
-                    $doc((if mat.negative then "$lt" else "$lte") -> $arr("$" + F.moves("i"), mat.imbalance)),
+                    $doc((if (mat.negative) "$lt" else "$lte") -> $arr("$" + F.moves("i"), mat.imbalance)),
                     mat.id,
                     acc
                   )

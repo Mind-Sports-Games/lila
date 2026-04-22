@@ -188,7 +188,7 @@ object EmailConfirm {
       userRepo.withEmails(username) flatMap {
         case None                                => fuccess(NoSuchUser(username))
         case Some(User.WithEmails(user, emails)) =>
-          if !user.enabled then fuccess(Closed(username))
+          if (!user.enabled) fuccess(Closed(username))
           else
             userRepo.mustConfirmEmail(user.id) dmap {
               case true =>

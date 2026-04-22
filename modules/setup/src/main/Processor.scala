@@ -29,7 +29,7 @@ final private[setup] class Processor(
         }
       case Right(Some(seek)) =>
         ctx.userId.so(gameCache.nbPlaying) dmap { nbPlaying =>
-          if maxPlaying <= nbPlaying then Refused
+          if (maxPlaying <= nbPlaying) Refused
           else {
             Bus.publish(AddSeek(seek), "lobbyTrouper")
             Created(seek.id)
@@ -55,7 +55,7 @@ final private[setup] class Processor(
         }
       case Right(Some(seek)) =>
         ctx.userId.so(gameCache.nbPlaying) dmap { nbPlaying =>
-          if maxPlaying <= nbPlaying then Refused
+          if (maxPlaying <= nbPlaying) Refused
           else {
             Bus.publish(AddSeek(seek), "lobbyTrouper")
             Created(seek.id)

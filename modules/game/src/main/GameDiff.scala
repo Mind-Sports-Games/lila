@@ -51,16 +51,16 @@ object GameDiff {
 
     def d[A](name: String, getter: Game => A, toBson: A => BSONValue): Unit = {
       val vb = getter(b)
-      if getter(a) != vb then {
-        if vb == None || vb == null || vb == "" then unsetBuilder += (name -> bTrue)
+      if (getter(a) != vb) {
+        if (vb == None || vb == null || vb == "") unsetBuilder += (name -> bTrue)
         else setBuilder += name -> toBson(vb)
       }
     }
 
     def dOpt[A](name: String, getter: Game => A, toBson: A => Option[BSONValue]): Unit = {
       val vb = getter(b)
-      if getter(a) != vb then {
-        if vb == None || vb == null || vb == "" then unsetBuilder += (name -> bTrue)
+      if (getter(a) != vb) {
+        if (vb == None || vb == null || vb == "") unsetBuilder += (name -> bTrue)
         else
           toBson(vb) match {
             case None    => unsetBuilder += (name -> bTrue)
@@ -118,7 +118,7 @@ object GameDiff {
 
     a.variant.gameLogic match {
       case GameLogic.Chess() =>
-        if a.variant.key == "standard" then
+        if (a.variant.key == "standard")
           dTry(huffmanPgn, _.actionStrs.flatten, writeBytes compose PgnStorage.Huffman.encode)
         else {
           dTry(oldPgn, _.actionStrs, writeBytes compose PgnStorage.OldBin.encodeActionStrs)
@@ -144,13 +144,13 @@ object GameDiff {
             CastleLastMove.castleLastMoveBSONHandler.writeTry
           )
           // since variants are always OldBin
-          if a.variant.key == "threeCheck" || a.variant.key == "fiveCheck" then
+          if (a.variant.key == "threeCheck" || a.variant.key == "fiveCheck")
             dOpt(
               checkCount,
               _.history.checkCount,
               (o: CheckCount) => o.nonEmpty so { BSONHandlers.checkCountWriter writeOpt o }
             )
-          if a.variant.dropsVariant then
+          if (a.variant.dropsVariant)
             dOpt(
               pocketData,
               _.board.pocketData,
@@ -178,7 +178,7 @@ object GameDiff {
         d(positionHashes, _.history.positionHashes, w.bytes)
         d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
         d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
-        if a.variant.frisianVariant || a.variant.draughts64Variant then
+        if (a.variant.frisianVariant || a.variant.draughts64Variant)
           dOptTry(
             kingMoves,
             _.history.kingMoves,
@@ -213,7 +213,7 @@ object GameDiff {
         d(positionHashes, _.history.positionHashes, w.bytes)
         d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
         d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
-        if a.variant.dropsVariant then
+        if (a.variant.dropsVariant)
           dOpt(
             pocketData,
             _.board.pocketData,
@@ -278,7 +278,7 @@ object GameDiff {
           _.history.score,
           (o: Score) => o.nonEmpty so { BSONHandlers.scoreWriter writeOpt o }
         )
-        if a.variant.dropsVariant then
+        if (a.variant.dropsVariant)
           dOpt(
             pocketData,
             _.board.pocketData,
@@ -311,7 +311,7 @@ object GameDiff {
         d(positionHashes, _.history.positionHashes, w.bytes)
         d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
         d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
-        if a.variant.dropsVariant then
+        if (a.variant.dropsVariant)
           dOpt(
             pocketData,
             _.board.pocketData,
@@ -366,7 +366,7 @@ object GameDiff {
     }
 
     d(turns, _.turnCount, w.int)
-    dOpt(plies, { g => if g.plies == g.turnCount then 0 else g.plies }, w.intO)
+    dOpt(plies, { g => if (g.plies == g.turnCount) 0 else g.plies }, w.intO)
     d(activePlayer, _.situation.player.hashCode, w.int)
     dOpt(plyTimes, _.binaryPlyTimes, (o: Option[ByteArray]) => o flatMap ByteArrayBSONHandler.writeOpt)
     dOpt(p1ClockHistory, getClockHistory(P1), clockHistoryToBytes)
@@ -385,7 +385,7 @@ object GameDiff {
     for i <- 0 to 1 do {
       import Player.BSONFields.*
       val name                   = s"p$i."
-      val player: Game => Player = if i == 0 then (_.p1Player) else (_.p2Player)
+      val player: Game => Player = if (i == 0) (_.p1Player) else (_.p2Player)
       dOpt(s"$name$isOfferingDraw", player(_).isOfferingDraw, w.boolO)
       dOpt(s"$name$isOfferingSelectSquares", player(_).isOfferingSelectSquares, w.boolO)
       dOpt(s"$name$proposeTakebackAt", player(_).proposeTakebackAt, w.intO)

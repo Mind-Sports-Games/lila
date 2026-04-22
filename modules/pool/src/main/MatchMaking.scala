@@ -32,7 +32,7 @@ object MatchMaking {
     // 2500 ~> 500
     // 3000 ~> 600
     private def ratingToMaxScore(rating: Int) =
-      if rating < 2500 then 500
+      if (rating < 2500) 500
       else rating / 5
 
     // quality of a potential pairing. Lower is better.
@@ -59,7 +59,7 @@ object MatchMaking {
 
     // bonus if both players have rating ranges, and they're compatible
     private def rangeBonus(a: PoolMember, b: PoolMember) =
-      if a.ratingRange.exists(_.contains(b.rating)) && b.ratingRange.exists(_.contains(a.rating)) then 200
+      if (a.ratingRange.exists(_.contains(b.rating)) && b.ratingRange.exists(_.contains(a.rating))) 200
       else 0
 
     // if players block each other
@@ -70,9 +70,9 @@ object MatchMaking {
     // bonus if the two players both have a bad sit counter
     // malus (so negative number as bonus) if neither of those are true, meaning that their sit counters are far away (e.g. 0 and -5)
     private def ragesitBonus(a: PoolMember, b: PoolMember) =
-      if a.rageSitCounter >= -2 && b.rageSitCounter >= -2 then 30        // good players
-      else if a.rageSitCounter <= -10 && b.rageSitCounter <= -10 then 80 // very bad players
-      else if a.rageSitCounter <= -5 && b.rageSitCounter <= -5 then 30   // bad players
+      if (a.rageSitCounter >= -2 && b.rageSitCounter >= -2) 30        // good players
+      else if (a.rageSitCounter <= -10 && b.rageSitCounter <= -10) 80 // very bad players
+      else if (a.rageSitCounter <= -5 && b.rageSitCounter <= -5) 30   // bad players
       else (abs(a.rageSitCounter - b.rageSitCounter).atMost(10)) * -30   // match of good and bad player
 
     def apply(members: Vector[PoolMember]): Option[Vector[Couple]] =

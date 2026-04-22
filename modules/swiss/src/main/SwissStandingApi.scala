@@ -25,7 +25,7 @@ final class SwissStandingApi(
 
   def apply(swiss: Swiss, page: Int): Fu[JsObject] =
     fuccess(pageCache.getIfPresent(swiss.id -> page)) getOrElse {
-      if page == 1 then first get swiss.id
+      if (page == 1) first get swiss.id
       else compute(swiss, page)
     }
 

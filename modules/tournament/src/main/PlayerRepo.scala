@@ -31,7 +31,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
   def byId(id: Tournament.ID): Fu[Option[Player]] = coll.one[Player](selectId(id))
 
   private def selectTour(tourId: Tournament.ID, noDQs: Boolean): Bdoc =
-    if noDQs then selectTourNoDQ(tourId)
+    if (noDQs) selectTourNoDQ(tourId)
     else selectTour(tourId)
 
   private[tournament] def bestByTour(
@@ -109,7 +109,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
           rt.updateRank(pos + 1)
         }
       } map { ranked =>
-      if ranked.sizeIs == battle.teams.size then ranked
+      if (ranked.sizeIs == battle.teams.size) ranked
       else
         ranked ::: battle.teams
           .foldLeft(List.empty[RankedTeam]) {

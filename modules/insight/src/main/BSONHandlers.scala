@@ -32,14 +32,14 @@ private object BSONHandlers {
   // When we originally wrote this we made LOA have the same index as Chess
   // But we have since split all other Roles by GameFamily (not GameLogic)
   private def roleIndex(r: Role): Int =
-    if r.gameLogic == GameLogic.Chess() then r.gameLogic.id else r.gameFamily.id
+    if (r.gameLogic == GameLogic.Chess()) r.gameLogic.id else r.gameFamily.id
 
   implicit val RoleBSONHandler: BSONHandler[Role] = tryHandler[Role](
     { case BSONString(r) =>
       r.split(":") match {
         case Array(lib, r) =>
           // require gf for fairy as roles are different, all other gamelogic currently dont need this
-          if lib.toInt == 2 then
+          if (lib.toInt == 2)
             Role
               .allByForsyth(
                 GameLogic.FairySF(),
@@ -74,7 +74,7 @@ private object BSONHandlers {
 
   private val BSONBooleanNullHandler = quickHandler[Boolean](
     { case BSONBoolean(v) => v; case BSONNull => false },
-    v => if v then BSONBoolean(true) else BSONNull
+    v => if (v) BSONBoolean(true) else BSONNull
   )
 
   implicit val BlurBSONHandler: BSONHandler[Blur] = BSONBooleanNullHandler.as[Blur](Blur.apply, _.id)

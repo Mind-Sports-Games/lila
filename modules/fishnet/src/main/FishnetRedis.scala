@@ -26,7 +26,7 @@ final class FishnetRedis(
   private var stopping = false
 
   def request(work: Work.Move): Unit =
-    if !stopping then { val _ = connOut.async.publish(chanOut, writeWork(work)) }
+    if (!stopping) { val _ = connOut.async.publish(chanOut, writeWork(work)) }
 
   connIn.async.subscribe(chanIn)
 

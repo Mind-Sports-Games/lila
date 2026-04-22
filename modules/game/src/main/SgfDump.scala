@@ -22,7 +22,7 @@ final class SgfDump(
       hideRatings: Boolean = false
   ): Fu[String] = {
     val tagsFuture =
-      if isTags then
+      if (isTags)
         tags(
           game,
           initialFen,
@@ -31,7 +31,7 @@ final class SgfDump(
         )
       else fuccess(Tags(Nil))
     tagsFuture map { tags =>
-      if game.gameRecordFormat == "sgf" then format(game, tags, initialFen)
+      if (game.gameRecordFormat == "sgf") format(game, tags, initialFen)
       else "SGF NOT SUPPORTED"
     }
   }
@@ -95,7 +95,7 @@ final class SgfDump(
           teams.flatMap { t => (!isP1Black).option(Tag("BT", t.p2)) },
           teams.flatMap { t => (!isP1Black).option(Tag("WT", t.p1)) },
           teams.flatMap { t => isP1Black.option(Tag("WT", t.p2)) },
-          if !isGo && !isBackgammon then { initialFen.map { fen => Tag(_.IP, fen.value) } }
+          if (!isGo && !isBackgammon) { initialFen.map { fen => Tag(_.IP, fen.value) } }
           else None
         ).flatten
       } ++ (game.variant.gameFamily match {
@@ -103,7 +103,7 @@ final class SgfDump(
           Tags {
             List(
               Tag(_.GM, 9),
-              Tag(_.SU, if game.variant.key == "linesOfAction" then "Standard" else "Scrambled-eggs")
+              Tag(_.SU, if (game.variant.key == "linesOfAction") "Standard" else "Scrambled-eggs")
             )
           }
         case GameFamily.Shogi() =>
@@ -111,7 +111,7 @@ final class SgfDump(
             List(
               Tag(_.GM, 8),
               Tag(_.SZ, game.variant.toFairySF.boardSize.height),
-              Tag(_.SU, if game.variant.key == "shogi" then "Standard" else "MiniShogi")
+              Tag(_.SU, if (game.variant.key == "shogi") "Standard" else "MiniShogi")
             )
           }
         case GameFamily.Xiangqi() =>
@@ -119,7 +119,7 @@ final class SgfDump(
             List(
               Tag(_.GM, 7),
               Tag(_.SZ, game.variant.toFairySF.boardSize.height),
-              Tag(_.SU, if game.variant.key == "xiangqi" then "Standard" else "MiniXiangqi")
+              Tag(_.SU, if (game.variant.key == "xiangqi") "Standard" else "MiniXiangqi")
             )
           }
         case GameFamily.Flipello() =>
@@ -130,7 +130,7 @@ final class SgfDump(
             List(
               Tag(_.GM, 41),
               Tag(_.SZ, game.variant.toFairySF.boardSize.height),
-              Tag(_.SU, if game.variant.key == "breakthroughtroyka" then "Standard" else "MiniBreakthrough")
+              Tag(_.SU, if (game.variant.key == "breakthroughtroyka") "Standard" else "MiniBreakthrough")
             )
           }
         case GameFamily.Go() =>
@@ -149,8 +149,8 @@ final class SgfDump(
               _ => false
             )
           val crawfordVariantLine =
-            if game.variant.key == "hyper" then ":Hypergammon3"
-            else if game.variant.key == "nackgammon" then ":Nackgammon"
+            if (game.variant.key == "hyper") ":Hypergammon3"
+            else if (game.variant.key == "nackgammon") ":Nackgammon"
             else ""
           val matchInfo = game.multiPointState.fold((1, 0, 0, 0))(mps =>
             (mps.target, game.metadata.multiMatchGameNr.fold(0)(x => x - 1), mps.p1Points, mps.p2Points)
@@ -158,7 +158,7 @@ final class SgfDump(
           Tags {
             List(
               Tag(_.GM, 6),
-              Tag(_.RU, "Crawford" + (if isCrawfordGame then ":CrawfordGame" else "") + crawfordVariantLine),
+              Tag(_.RU, "Crawford" + (if (isCrawfordGame) ":CrawfordGame" else "") + crawfordVariantLine),
               Tag(_.CV, 1),
               Tag(_.CO, game.board.cubeData.fold('n')(_ => 'c')),
               Tag.matchInfo(matchInfo._1, matchInfo._2, matchInfo._3, matchInfo._4)
@@ -173,7 +173,7 @@ final class SgfDump(
 object SgfDump {
 
   def result(game: Game) =
-    if game.finished then
+    if (game.finished)
       game.variant.key match {
         case "backgammon" | "nackgammon" | "hyper" => backgammonResult(game)
         case _                                     => PlayerIndex.showResult(game.winnerPlayerIndex, false)
@@ -182,9 +182,9 @@ object SgfDump {
 
   def backgammonResult(game: Game): String = {
     val isWinnerP1 = game.winnerPlayerIndex == Some(PlayerIndex.P1)
-    val winner     = if isWinnerP1 then "W" else "B"
+    val winner     = if (isWinnerP1) "W" else "B"
     val maxPoints  =
-      game.multiPointState.fold(1)(mps => mps.target - (if isWinnerP1 then mps.p1Points else mps.p2Points))
+      game.multiPointState.fold(1)(mps => mps.target - (if (isWinnerP1) mps.p1Points else mps.p2Points))
     val points = Math.min(game.pointValue.getOrElse(1), game.multiPointState.fold(1)(_ => maxPoints))
     val resign =
       if (Status.resigned ++ List(Status.Outoftime, Status.OutoftimeGammon, Status.OutoftimeBackgammon))

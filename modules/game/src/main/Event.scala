@@ -233,7 +233,7 @@ object Event {
           // and should be ready to go now validMoves handles this ghosts logic internally
           // see Situation.Draughts.destinations
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
-            if situation.ghosts > 0 then
+            if (situation.ghosts > 0)
               Map(
                 Pos.Draughts(moveDest) ->
                   situation.destinationsFrom(moveDest).map(Pos.Draughts.apply)
@@ -258,10 +258,10 @@ object Event {
         pocketData = pocketData,
         captLen = (situation, move.dest) match {
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
-            if situation.ghosts > 0 then situation.captureLengthFrom(moveDest)
+            if (situation.ghosts > 0) situation.captureLengthFrom(moveDest)
             else situation.allMovesCaptureLength.some
           case (Situation.Dameo(situation), Pos.Dameo(moveDest)) =>
-            if situation.ghosts > 0 then situation.captureLengthFrom(moveDest)
+            if (situation.ghosts > 0) situation.captureLengthFrom(moveDest)
             else situation.allMovesCaptureLength.some
           case _ => None
         }
@@ -637,7 +637,7 @@ object Event {
   }
 
   def deadStoneOfferStateJson(canSelectSquares: Boolean): Option[String] =
-    if canSelectSquares then Some("ChooseFirstOffer") else None
+    if (canSelectSquares) Some("ChooseFirstOffer") else None
 
   object Pass {
     def apply(
@@ -1090,12 +1090,12 @@ object Event {
   object PossibleDropsByRole {
 
     def json(drops: Map[Role, List[Pos]]) =
-      if drops.isEmpty then JsNull
+      if (drops.isEmpty) JsNull
       else {
         val sb    = new java.lang.StringBuilder(128)
         var first = true
         drops foreach { case (orig, dests) =>
-          if first then first = false
+          if (first) first = false
           else sb.append(" ")
           sb.append(orig.forsyth)
           dests.foreach(d => sb.append(d.key))
@@ -1107,16 +1107,16 @@ object Event {
   object PossibleMoves {
 
     def json(moves: Map[Pos, List[Pos]], apiVersion: ApiVersion) =
-      if apiVersion.gte(4) then newJson(moves)
+      if (apiVersion.gte(4)) newJson(moves)
       else oldJson(moves)
 
     def newJson(moves: Map[Pos, List[Pos]]) =
-      if moves.isEmpty then JsNull
+      if (moves.isEmpty) JsNull
       else {
         val sb    = new java.lang.StringBuilder(128)
         var first = true
         moves foreach { case (orig, dests) =>
-          if first then first = false
+          if (first) first = false
           else sb.append(" ")
           sb.append(orig.key)
           dests.foreach(d => sb.append(d.key))
@@ -1125,7 +1125,7 @@ object Event {
       }
 
     def oldJson(moves: Map[Pos, List[Pos]]) =
-      if moves.isEmpty then JsNull
+      if (moves.isEmpty) JsNull
       else
         moves.foldLeft(JsObject(Nil)) { case (res, (o, d)) =>
           res + (o.key -> JsString(d map (_.key) mkString))

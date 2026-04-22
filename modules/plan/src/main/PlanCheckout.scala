@@ -31,7 +31,7 @@ object PlanCheckout {
     PlanCheckout(
       email,
       Usd(amount).cents,
-      if freq == "monthly" then Freq.Monthly else Freq.Onetime
+      if (freq == "monthly") Freq.Monthly else Freq.Onetime
     )
 
   val form = Form[PlanCheckout](

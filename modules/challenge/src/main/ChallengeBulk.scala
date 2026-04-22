@@ -65,9 +65,9 @@ final class ChallengeBulkApi(
 
   def schedule(bulk: ScheduledBulk): Fu[Either[String, ScheduledBulk]] = workQueue(bulk.by) {
     coll.list[ScheduledBulk]($doc("by" -> bulk.by, "pairedAt" `$exists` false)) flatMap { bulks =>
-      if bulks.sizeIs >= 10 then fuccess(Left("Already too many bulks queued"))
-      else if bulks.map(_.games.size).sum >= 1000 then fuccess(Left("Already too many games queued"))
-      else if bulks.exists(_.collidesWith(bulk)) then
+      if (bulks.sizeIs >= 10) fuccess(Left("Already too many bulks queued"))
+      else if (bulks.map(_.games.size).sum >= 1000) fuccess(Left("Already too many games queued"))
+      else if (bulks.exists(_.collidesWith(bulk)))
         fuccess(Left("A bulk containing the same players is scheduled at the same time"))
       else coll.insert.one(bulk) inject Right(bulk)
     }
@@ -139,7 +139,7 @@ final class ChallengeBulkApi(
       .addEffect { nb =>
         val _ = lila.mon.api.challenge.bulk.createNb(bulk.by).increment(nb)
       } >> {
-      if bulk.startClocksAt.isDefined then coll.updateField($id(bulk._id), "pairedAt", DateTime.now)
+      if (bulk.startClocksAt.isDefined) coll.updateField($id(bulk._id), "pairedAt", DateTime.now)
       else coll.delete.one($id(bulk._id))
     }.void
   }

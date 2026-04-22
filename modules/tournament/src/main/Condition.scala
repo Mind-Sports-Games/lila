@@ -34,14 +34,14 @@ object Condition {
   case object Titled extends Condition with FlatCond {
     def name(implicit lang: Lang) = "Only titled players"
     def apply(user: User)         =
-      if user.title.exists(!_.equals(Title.PM)) && user.noBot then Accepted
+      if (user.title.exists(!_.equals(Title.PM)) && user.noBot) Accepted
       else Refused(name(using _))
   }
 
   case class NbRatedGame(perf: Option[PerfType], nb: Int) extends Condition with FlatCond {
 
     def apply(user: User) =
-      if user.hasTitle then Accepted
+      if (user.hasTitle) Accepted
       else
         perf match {
           case Some(p) if user.perfs(p).nb >= nb => Accepted
@@ -72,12 +72,12 @@ object Condition {
     def apply(
         getMaxRating: GetMaxRating
     )(user: User)(implicit ec: scala.concurrent.ExecutionContext): Fu[Verdict] =
-      if user.perfs(perf).provisional then
+      if (user.perfs(perf).provisional)
         fuccess(Refused { (lang: Lang) =>
           given Lang = lang
           trans.yourPerfRatingIsProvisional.txt(perf.trans)
         })
-      else if user.perfs(perf).intRating > rating then
+      else if (user.perfs(perf).intRating > rating)
         fuccess(Refused { (lang: Lang) =>
           given Lang = lang
           trans.yourPerfRatingIsTooHigh.txt(perf.trans, user.perfs(perf).intRating)
@@ -101,13 +101,13 @@ object Condition {
   case class MinRating(perf: PerfType, rating: Int) extends Condition with FlatCond {
 
     def apply(user: User) =
-      if user.hasTitle then Accepted
-      else if user.perfs(perf).provisional then
+      if (user.hasTitle) Accepted
+      else if (user.perfs(perf).provisional)
         Refused { (lang: Lang) =>
           given Lang = lang
           trans.yourPerfRatingIsProvisional.txt(perf.trans)
         }
-      else if user.perfs(perf).intRating < rating then
+      else if (user.perfs(perf).intRating < rating)
         Refused { (lang: Lang) =>
           given Lang = lang
           trans.yourPerfRatingIsTooLow.txt(perf.trans, user.perfs(perf).intRating)
@@ -123,7 +123,7 @@ object Condition {
         ec: scala.concurrent.ExecutionContext
     ) =
       getUserTeamIds(user) map { userTeamIds =>
-        if userTeamIds contains teamId then Accepted
+        if (userTeamIds contains teamId) Accepted
         else
           Refused { (lang: Lang) =>
             given Lang = lang
@@ -252,7 +252,7 @@ object Condition {
       def convert(tourPerf: PerfType): Option[NbRatedGame] =
         (nb > 0).option(
           NbRatedGame(
-            if perf.contains(perfAuto._1) then tourPerf.some else PerfType(~perf),
+            if (perf.contains(perfAuto._1)) tourPerf.some else PerfType(~perf),
             nb
           )
         )

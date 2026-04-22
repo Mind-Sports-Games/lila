@@ -65,7 +65,7 @@ final private[round] class RoundDuct(
 
     def setOnline(on: Boolean): Unit = {
       isLongGone.foreach(_ so notifyGone(playerIndex, gone = !on))
-      offlineSince = if on then None else offlineSince orElse nowMillis.some
+      offlineSince = if (on) None else offlineSince orElse nowMillis.some
       bye = bye && !on
     }
     def setBye(): Unit =
@@ -75,7 +75,7 @@ final private[round] class RoundDuct(
 
     private def timeoutMillis: Long = {
       val base = {
-        if bye then RoundSocket.ragequitTimeout
+        if (bye) RoundSocket.ragequitTimeout
         else
           proxy.withGameOptionSync { g =>
             RoundSocket.povDisconnectTimeout(g.pov(playerIndex))
@@ -89,7 +89,7 @@ final private[round] class RoundDuct(
     } so isHostingSimul.not
 
     def showMillisToGone: Fu[Option[Long]] =
-      if botConnected then fuccess(none)
+      if (botConnected) fuccess(none)
       else {
         val now = nowMillis
         offlineSince.filter { since =>
@@ -100,7 +100,7 @@ final private[round] class RoundDuct(
       }
 
     def setBotConnected(v: Boolean) =
-      botConnections = Math.max(0, botConnections + (if v then 1 else -1))
+      botConnections = Math.max(0, botConnections + (if (v) 1 else -1))
   }
 
   private val p1Player = new Player(P1)
@@ -118,7 +118,7 @@ final private[round] class RoundDuct(
         mightBeSimul = game.isSimul
         p1Player.goneWeight = p1GoneWeight
         p2Player.goneWeight = p2GoneWeight
-        if game.playableByAi then player.requestFishnet(game, this)
+        if (game.playableByAi) player.requestFishnet(game, this)
       }
 
     // socket stuff
@@ -220,8 +220,8 @@ final private[round] class RoundDuct(
 
     case p: HumanPlay =>
       handle(p.playerId) { pov =>
-        if pov.player.isAi then fufail(s"player $pov can't play AI")
-        else if pov.game.outoftime(withGrace = true) then finisher.outOfTime(pov.game)
+        if (pov.player.isAi) fufail(s"player $pov can't play AI")
+        else if (pov.game.outoftime(withGrace = true)) finisher.outOfTime(pov.game)
         else {
           recordLag(pov)
           player.human(p, this)(pov)
@@ -242,7 +242,7 @@ final private[round] class RoundDuct(
       val res = proxy
         .withPov(PlayerId(p.playerId)) {
           _ so { pov =>
-            if pov.game.outoftime(withGrace = true) then finisher.outOfTime(pov.game)
+            if (pov.game.outoftime(withGrace = true)) finisher.outOfTime(pov.game)
             else player.bot(p.uci, this)(pov)
           }
         }
@@ -337,11 +337,11 @@ final private[round] class RoundDuct(
       }
 
     // exceptionally we don't publish events
-    // if the game is abandoned, then nobody is around to see it
+    // if (the game is abandoned,) nobody is around to see it
     case Abandon =>
       proxy withGame { game =>
         game.abandoned so {
-          if game.abortable then finisher.other(game, _.Aborted, None)
+          if (game.abortable) finisher.other(game, _.Aborted, None)
           else finisher.other(game, _.Resign, Some(!game.player.playerIndex))
         }
       }
@@ -479,7 +479,7 @@ final private[round] class RoundDuct(
     case NoStart =>
       handle { game =>
         game.timeBeforeExpirationAtStart.exists(_.centis == 0) so {
-          if game.isSwiss then
+          if (game.isSwiss)
             game.startClock so { g =>
               proxy.save(g) inject List(Event.Reload)
             }
@@ -490,14 +490,14 @@ final private[round] class RoundDuct(
     case ForceExpiredAction =>
       handle { game =>
         game.timeBeforeExpirationOnPaused.exists(_.centis == 0) so {
-          if game.selectSquaresPossible then {
+          if (game.selectSquaresPossible) {
             val pov = Pov(game, game.activePlayerIndex)
-            if game.neitherPlayerHasMadeAnOffer then selectSquarer.selectSquares(List[Pos]())(pov)
+            if (game.neitherPlayerHasMadeAnOffer) selectSquarer.selectSquares(List[Pos]())(pov)
             else selectSquarer.accept(pov)
           } else fuccess(List[Event]())
         }
       } >> proxy.withGame { g =>
-        if g.selectSquaresPossible then fuccess(scheduleActionExpiration(g))
+        if (g.selectSquaresPossible) fuccess(scheduleActionExpiration(g))
         else funit
       }
 
@@ -517,10 +517,10 @@ final private[round] class RoundDuct(
       proxy.withGameOptionSync { g =>
         (g.forceResignableNow) so fuccess {
           PlayerIndex.all.foreach { c =>
-            if !getPlayer(c).isOnline && getPlayer(!c).isOnline then
+            if (!getPlayer(c).isOnline && getPlayer(!c).isOnline)
               getPlayer(c).showMillisToGone foreach {
                 _ so { millis =>
-                  if millis <= 0 then notifyGone(c, gone = true)
+                  if (millis <= 0) notifyGone(c, gone = true)
                   else g.clock.exists(_.remainingTime(c).millis > millis + 3000) so notifyGoneIn(c, millis)
                 }
               }
@@ -534,9 +534,9 @@ final private[round] class RoundDuct(
   private def getPlayer(playerIndex: PlayerIndex): Player = playerIndex.fold(p1Player, p2Player)
 
   private def recordLag(pov: Pov): Unit =
-    if ((pov.game.playedTurns & 30) == 10) && pov.game.actionStrs.lastOption.map(_.size) == Some(1) then
+    if (((pov.game.playedTurns & 30) == 10) && pov.game.actionStrs.lastOption.map(_.size) == Some(1))
       // Triggers on the first action of every 32 turns, starting on turn 10.
-      // i.e. if single action per turn, then this triggers on ply: 10, 11, 42, 43, 74, 75, ...
+      // i.e. if (single action per turn,) this triggers on ply: 10, 11, 42, 43, 74, 75, ...
       for {
         user  <- pov.player.userId
         clock <- pov.game.clock
@@ -585,7 +585,7 @@ final private[round] class RoundDuct(
     }
 
   private def publish[A](events: Events): Unit =
-    if events.nonEmpty then {
+    if (events.nonEmpty) {
       events foreach { e =>
         version = version.inc
         socketSend {

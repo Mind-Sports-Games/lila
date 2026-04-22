@@ -338,22 +338,22 @@ object Schedule {
       clock match {
         case _: ByoyomiClock.Config => {
           val time = clock.estimateTotalSeconds
-          if time <= (180 + 5 * 25) then Byoyomi35
+          if (time <= (180 + 5 * 25)) Byoyomi35
           else Byoyomi510
         }
         case Clock.SimpleDelayConfig(_, _) => {
           val time = clock.estimateTotalSeconds
-          if time <= (180 + 10 * 40) then Delay310
+          if (time <= (180 + 10 * 40)) Delay310
           else Delay212
         }
         case Clock.Config(_, _) | Clock.BronsteinConfig(_, _) => {
           val time = clock.estimateTotalSeconds
-          if time < 30 then UltraBullet
-          else if time < 60 then HyperBullet
-          else if time < 120 then Bullet
-          else if time < 180 then HippoBullet
-          else if time < 480 then Blitz
-          else if time < 1500 then Rapid
+          if (time < 30) UltraBullet
+          else if (time < 60) HyperBullet
+          else if (time < 120) Bullet
+          else if (time < 180) HippoBullet
+          else if (time < 480) Blitz
+          else if (time < 1500) Rapid
           else Classical
         }
         // NOTE: not using case _ => here, because we want an error when a new clock is added.
@@ -508,7 +508,7 @@ object Schedule {
     s.copy(conditions = conditionFor(s))
 
   private[tournament] def conditionFor(s: Schedule) =
-    if s.conditions.relevant then s.conditions
+    if (s.conditions.relevant) s.conditions
     else {
 
       // No rated games required, because no-one has them.

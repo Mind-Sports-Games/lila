@@ -95,7 +95,7 @@ object AutoConfig {
     '{
       new ConfigLoader[T] {
         def load(config: Config, path: String): T = {
-          val conf = if path.isEmpty then config else config.getConfig(path)
+          val conf = if (path.isEmpty) config else config.getConfig(path)
           // we're invoking the lambda we manually constructed above
           $buildConfig(conf)
         }

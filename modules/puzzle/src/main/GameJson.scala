@@ -16,7 +16,7 @@ final private class GameJson(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def apply(gameId: Game.ID, plies: Int, bc: Boolean): Fu[JsObject] =
-    (if bc then bcCache else cache) get writeKey(gameId, plies)
+    (if (bc) bcCache else cache) get writeKey(gameId, plies)
 
   def noCacheBc(game: Game, plies: Int): Fu[JsObject] =
     lightUserApi preloadMany game.userIds map { _ =>
@@ -53,7 +53,7 @@ final private class GameJson(
   private def generate(gameId: Game.ID, plies: Int, bc: Boolean): Fu[JsObject] =
     gameRepo.game(gameId).orFail(s"Missing puzzle game $gameId!") flatMap { game =>
       lightUserApi preloadMany game.userIds map { _ =>
-        if bc then generateBc(game, plies)
+        if (bc) generateBc(game, plies)
         else generate(game, plies)
       }
     }
@@ -75,7 +75,7 @@ final private class GameJson(
     game.clock.map { clock => clock.config.show } getOrElse {
       game.daysPerTurn
         .map { days =>
-          if days == 1 then I18nKeys.oneDay.txt()
+          if (days == 1) I18nKeys.oneDay.txt()
           else I18nKeys.nbDays.pluralSame(days).toString
         }
         .getOrElse { "∞" }

@@ -82,7 +82,7 @@ final private class ExplorerIndexer(
     def apply(pgn: String): Unit = {
       buf += pgn
       val startAt = nowMillis
-      if buf.sizeIs >= max then {
+      if (buf.sizeIs >= max) {
         ws.url(internalEndPointUrl).put(buf mkString separator) andThen {
           case Success(res) if res.status == 200 =>
             lila.mon.explorer.index.time.record((nowMillis - startAt) / max)
@@ -134,8 +134,8 @@ final private class ExplorerIndexer(
     ~(for {
       p1Rating <- stableRating(game.p1Player)
       p2Rating <- stableRating(game.p2Player)
-      minPlayerRating  = if game.variant.exotic then 1400 else 1500
-      minAverageRating = if game.variant.exotic then 1520 else 1600
+      minPlayerRating  = if (game.variant.exotic) 1400 else 1500
+      minAverageRating = if (game.variant.exotic) 1520 else 1600
       if p1Rating >= minPlayerRating
       if p2Rating >= minPlayerRating
       averageRating = (p1Rating + p2Rating) / 2

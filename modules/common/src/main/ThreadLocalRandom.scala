@@ -16,8 +16,8 @@ object ThreadLocalRandom {
   def nextGaussian(): Double              = current.nextGaussian()
   def nextChar(): Char                    = {
     val i = nextInt(62)
-    if i < 26 then i + 65
-    else if i < 52 then i + 71
+    if (i < 26) i + 65
+    else if (i < 52) i + 71
     else i - 4
   }.toChar
   def shuffle[T, C](xs: IterableOnce[T])(implicit bf: scala.collection.BuildFrom[xs.type, T, C]): C =

@@ -49,7 +49,7 @@ case class AnaMove(
     newGame.andThen { case (game, move) =>
       game.actionStrs.flatten.lastOption toValid "Moved but no last move!" map { lastAction =>
         val gameRecordNotation =
-          if lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic.Backgammon() then
+          if (lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic.Backgammon())
             strategygames.format.sgf.Dumper(variant, Vector(Vector(lastAction)))
           else lastAction
         val uci = Uci(
@@ -65,7 +65,7 @@ case class AnaMove(
         val fen     = Forsyth.>>(lib, game)
         val captLen = (sit, dest) match {
           case (Situation.Draughts(sit), Pos.Draughts(dest)) =>
-            if sit.ghosts > 0 then sit.captureLengthFrom(dest)
+            if (sit.ghosts > 0) sit.captureLengthFrom(dest)
             else sit.allMovesCaptureLength.some
           case _ => None
         }
@@ -85,7 +85,7 @@ case class AnaMove(
           id = UciCharPair(lib, uci),
           ply = game.plies,
           turnCount = game.turnCount,
-          playedPlayerIndex = if game.board.history.currentTurn.nonEmpty then game.player else !game.player,
+          playedPlayerIndex = if (game.board.history.currentTurn.nonEmpty) game.player else !game.player,
           variant = variant,
           move = Uci.WithSan(lib, uci, gameRecordNotation),
           fen = fen,
@@ -112,7 +112,7 @@ case class AnaMove(
           opening = (game.turnCount <= 30 && Variant.openingSensibleVariants(lib)(variant)) so {
             FullOpeningDB.findByFen(lib, fen)
           },
-          drops = if movable then game.situation.drops else Some(Nil),
+          drops = if (movable) game.situation.drops else Some(Nil),
           dropsByRole = game.situation.dropsByRole,
           pocketData = game.situation.board.pocketData
         )

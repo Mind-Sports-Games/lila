@@ -44,7 +44,7 @@ final class PuzzleReplayApi(
     maybeDays map { days =>
       replays.getFuture((user.id, variant), _ => createReplayFor(user, days, variant, theme)) flatMap {
         current =>
-          if current.days == days && current.theme == theme && current.remaining.nonEmpty then
+          if (current.days == days && current.theme == theme && current.remaining.nonEmpty)
             fuccess(current)
           else createReplayFor(user, days, variant, theme) tap { replays.put((user.id, variant), _) }
       } flatMap { replay =>
@@ -62,7 +62,7 @@ final class PuzzleReplayApi(
   ): Funit =
     replays.getIfPresent((round.userId, variant)) so {
       _ map { replay =>
-        if replay.days == days && replay.theme == theme then
+        if (replay.days == days && replay.theme == theme)
           replays.put((round.userId, variant), fuccess(replay.step))
       }
     }
@@ -99,7 +99,7 @@ final class PuzzleReplayApi(
                       "$match" -> $doc(
                         "$expr" -> {
                           val baseMatch = $doc("$eq" -> $arr("$_id", "$$pid"))
-                          if theme == PuzzleTheme.mix.key then
+                          if (theme == PuzzleTheme.mix.key)
                             $doc(
                               "$and" -> $arr(
                                 baseMatch,

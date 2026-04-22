@@ -8,7 +8,7 @@ case class Blurs(bits: Long) extends AnyVal {
   def nb = java.lang.Long.bitCount(bits)
 
   def add(moveIndex: Int) =
-    if moveIndex < 0 || moveIndex > 63 then this
+    if (moveIndex < 0 || moveIndex > 63) this
     else Blurs(bits | (1L << moveIndex))
 
   def asInt = ((bits >>> 32) == 0).option(bits.toInt)

@@ -28,7 +28,7 @@ object Eval {
     def mateFound   = value.isRight
 
     def invert                  = copy(value = value.left.map(_.invert).map(_.invert))
-    def invertIf(cond: Boolean) = if cond then invert else this
+    def invertIf(cond: Boolean) = if (cond) invert else this
 
     def eval = Eval(cp, mate, None)
   }
@@ -49,12 +49,12 @@ object Eval {
     def showPawns: String = "%.2f" format pawns
 
     def ceiled =
-      if value > Cp.CEILING then Cp(Cp.CEILING)
-      else if value < -Cp.CEILING then Cp(-Cp.CEILING)
+      if (value > Cp.CEILING) Cp(Cp.CEILING)
+      else if (value < -Cp.CEILING) Cp(-Cp.CEILING)
       else this
 
     def invert                  = Cp(value = -value)
-    def invertIf(cond: Boolean) = if cond then invert else this
+    def invertIf(cond: Boolean) = if (cond) invert else this
 
     def compare(other: Cp) = Integer.compare(value, other.value)
 
@@ -73,7 +73,7 @@ object Eval {
     def moves = value
 
     def invert                  = Mate(value = -value)
-    def invertIf(cond: Boolean) = if cond then invert else this
+    def invertIf(cond: Boolean) = if (cond) invert else this
 
     def compare(other: Mate) = Integer.compare(value, other.value)
 

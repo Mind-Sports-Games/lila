@@ -28,7 +28,7 @@ final class Paginator[A] private[paginator] (
   /** Returns the number of pages.
     */
   def nbPages: Int =
-    if maxPerPage.value > 0 then (nbResults + maxPerPage.value - 1) / maxPerPage.value
+    if (maxPerPage.value > 0) (nbResults + maxPerPage.value - 1) / maxPerPage.value
     else 0
 
   /** Returns whether we have to paginate or not. This is true if the number of results is higher than the max
@@ -88,8 +88,8 @@ object Paginator {
       currentPage: Int = 1,
       maxPerPage: MaxPerPage = MaxPerPage(10)
   )(implicit ec: scala.concurrent.ExecutionContext): Validated[String, Fu[Paginator[A]]] =
-    if currentPage < 1 then Validated.invalid("Max per page must be greater than zero")
-    else if maxPerPage.value <= 0 then Validated.invalid("Current page must be greater than zero")
+    if (currentPage < 1) Validated.invalid("Max per page must be greater than zero")
+    else if (maxPerPage.value <= 0) Validated.invalid("Current page must be greater than zero")
     else
       Validated.valid(for {
         results   <- adapter.slice((currentPage - 1) * maxPerPage.value, maxPerPage.value)

@@ -96,7 +96,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
     import data.*
     tour.copy(
       name = name,
-      clock = if tour.isCreated then clock else tour.clock,
+      clock = if (tour.isCreated) clock else tour.clock,
       minutes = minutes,
       variant = realVariant,
       handicapped = data.handicapped,

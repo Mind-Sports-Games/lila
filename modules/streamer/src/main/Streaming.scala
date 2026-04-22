@@ -74,7 +74,7 @@ final private class Streaming(
   private val streamStartMemo = new lila.memo.ExpireSetMemo(2 hour)
 
   def publishStreams(streamers: List[Streamer], newStreams: LiveStreams) = {
-    if newStreams != liveStreams then {
+    if (newStreams != liveStreams) {
       newStreams.streams filterNot { s =>
         liveStreams.has(s.streamer)
       } foreach { s =>
@@ -93,11 +93,11 @@ final private class Streaming(
     liveStreams = newStreams
     streamers foreach { streamer =>
       streamer.twitch.foreach { t =>
-        if liveStreams.streams.exists(s => s.serviceName == "twitch" && s.is(streamer)) then
+        if (liveStreams.streams.exists(s => s.serviceName == "twitch" && s.is(streamer)))
           lila.mon.tv.streamer.present(s"${t.userId}@twitch").increment()
       }
       streamer.youTube.foreach { t =>
-        if liveStreams.streams.exists(s => s.serviceName == "youTube" && s.is(streamer)) then
+        if (liveStreams.streams.exists(s => s.serviceName == "youTube" && s.is(streamer)))
           lila.mon.tv.streamer.present(s"${t.channelId}@youtube").increment()
       }
     }
@@ -107,10 +107,10 @@ final private class Streaming(
 
   def fetchYouTubeStreams(streamers: List[Streamer]): Fu[List[YouTube.Stream]] = {
     val youtubeStreamers = streamers.filter(_.youTube.isDefined)
-    if youtubeStreamers.nonEmpty && googleApiKey.value.nonEmpty then {
+    if (youtubeStreamers.nonEmpty && googleApiKey.value.nonEmpty) {
       val now = DateTime.now
       val res =
-        if prevYouTubeStreams.at.isAfter(now.minusMinutes(15)) then fuccess(prevYouTubeStreams)
+        if (prevYouTubeStreams.at.isAfter(now.minusMinutes(15))) fuccess(prevYouTubeStreams)
         else {
           ws.url("https://www.googleapis.com/youtube/v3/search")
             .withQueryStringParameters(

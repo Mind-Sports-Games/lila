@@ -81,8 +81,8 @@ final private class FirebasePush(
         )
       ) flatMap { res =>
       lila.mon.push.firebaseStatus(res.status).increment()
-      if res.status == 200 then funit
-      else if res.status == 404 then {
+      if (res.status == 200) funit
+      else if (res.status == 404) {
         logger.info(s"Delete missing firebase device $device")
         deviceApi.delete(device)
       } else {

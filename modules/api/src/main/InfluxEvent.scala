@@ -21,6 +21,6 @@ final class InfluxEvent(
         case Failure(err: Exception) => lila.log("influxEvent").error(endpoint, err)
         case Failure(err)            => throw err
         case Success(res)            =>
-          if res.status != 204 then lila.log("influxEvent").error(s"$endpoint ${res.status}")
+          if (res.status != 204) lila.log("influxEvent").error(s"$endpoint ${res.status}")
       }
 }

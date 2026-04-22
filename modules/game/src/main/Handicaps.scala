@@ -109,8 +109,8 @@ object Handicaps {
 
   private def goRankDiff(rating: Int, diff: Int): Int = {
     def computeRankDiff(r: Int, diffLeft: Int, rank: Int): Int = {
-      val ratingIncrease = if r < 1000 then 33 else if r < 1700 then 50 else 100
-      if !(diffLeft >= ratingIncrease) then return rank
+      val ratingIncrease = if (r < 1000) 33 else if (r < 1700) 50 else 100
+      if (!(diffLeft >= ratingIncrease)) return rank
       else computeRankDiff(r + ratingIncrease, diffLeft - ratingIncrease, rank + 1)
     }
 
@@ -134,7 +134,7 @@ object Handicaps {
   val psRating    = s"^([0-9]+)$$".r
 
   def goRatingDisplay(rating: Int): String =
-    if rating >= 2100 then (mcMahonScoreFromRating(rating).toInt + 1).toString() + "d"
+    if (rating >= 2100) (mcMahonScoreFromRating(rating).toInt + 1).toString() + "d"
     else (mcMahonScoreFromRating(rating).toInt * -1).toString() + "k"
 
   def mcMahonScoreFromRating(rating: Int): Double =

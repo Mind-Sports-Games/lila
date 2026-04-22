@@ -180,8 +180,8 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         }
       }
       .addEffect { v =>
-        incPlayerIndex(u1, if v then 1 else -1)
-        incPlayerIndex(u2, if v then -1 else 1)
+        incPlayerIndex(u1, if (v) 1 else -1)
+        incPlayerIndex(u2, if (v) -1 else 1)
       }
 
   def firstGetsP1(u1O: Option[User.ID], u2O: Option[User.ID]): Fu[Boolean] =
@@ -255,12 +255,12 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .void
 
   def setUsernameCased(id: ID, username: String): Funit = {
-    if id == username.toLowerCase then {
+    if (id == username.toLowerCase) {
       coll.update.one(
         $id(id) ++ (F.changedCase `$exists` false),
         $set(F.username -> username, F.changedCase -> true)
       ) flatMap { result =>
-        if result.n == 0 then fufail(s"You have already changed your username")
+        if (result.n == 0) fufail(s"You have already changed your username")
         else funit
       }
     } else fufail(s"Proposed username $username does not match old username $id")
@@ -278,7 +278,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   val enabledSelect                                = $doc(F.enabled -> true)
   val disabledSelect                               = $doc(F.enabled -> false)
   def markSelect(mark: UserMark)(v: Boolean): Bdoc =
-    if v then $doc(F.marks -> mark.key)
+    if (v) $doc(F.marks -> mark.key)
     else F.marks `$ne` mark.key
   def engineSelect = markSelect(UserMark.Engine)
   def trollSelect  = markSelect(UserMark.Troll)
@@ -444,7 +444,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .one(
         $id(user.id),
         $set(F.enabled -> false) ++ $unset(F.roles) ++ {
-          if keepEmail then $unset(F.mustConfirmEmail)
+          if (keepEmail) $unset(F.mustConfirmEmail)
           else $doc("$rename" -> $doc(F.email -> F.prevEmail))
         }
       )
@@ -465,7 +465,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .one(
         $id(id),
         $set(F.email -> normalizedEmail) ++ $unset(F.prevEmail) ++ {
-          if email.value == normalizedEmail.value then $unset(F.verbatimEmail)
+          if (email.value == normalizedEmail.value) $unset(F.verbatimEmail)
           else $set(F.verbatimEmail -> email)
         }
       )
@@ -567,12 +567,12 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def isManaged(id: ID): Fu[Boolean] = email(id).dmap(_.exists(_.isNoReply))
 
   def setBot(user: User): Funit =
-    if user.count.game > 0 then
+    if (user.count.game > 0)
       fufail(lila.base.LilaInvalid("You already have games played. Make a new account."))
     else coll.updateField($id(user.id), F.title, Title.BOT).void
 
   private def botSelect(v: Boolean) =
-    if v then $doc(F.title -> Title.BOT)
+    if (v) $doc(F.title -> Title.BOT)
     else $doc(F.title      -> $ne(Title.BOT))
 
   private[user] def botIds =
@@ -726,7 +726,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     ) ++ {
       (email.value != normalizedEmail.value) so $doc(F.verbatimEmail -> email)
     } ++ {
-      if blind then $doc(F.blind -> true) else $empty
+      if (blind) $doc(F.blind -> true) else $empty
     }
   }
 }

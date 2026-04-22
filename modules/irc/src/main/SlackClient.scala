@@ -22,7 +22,7 @@ final private class SlackClient(ws: StandaloneWSClient, url: Secret)(implicit
 
   def apply(msg: SlackMessage): Funit =
     limiter(msg) {
-      if url.value.isEmpty then fuccess(lila.log("slack").info(msg.toString))
+      if (url.value.isEmpty) fuccess(lila.log("slack").info(msg.toString))
       else
         ws.url(url.value)
           .post(

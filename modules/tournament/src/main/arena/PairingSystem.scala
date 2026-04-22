@@ -71,7 +71,7 @@ final private[tournament] class PairingSystem(
     lastOpponents.hash.isEmpty || users.haveWaitedEnough(Math.min(2, activePlayers))
 
   private def isBotAvailable(tourId: Tournament.ID)(botId: User.ID): Fu[Option[User.ID]] =
-    pairingRepo.isPlaying(tourId, botId).map(isPlaying => if isPlaying then None else Some(botId)).recover {
+    pairingRepo.isPlaying(tourId, botId).map(isPlaying => if (isPlaying) None else Some(botId)).recover {
       case _ => None
     }
 
@@ -88,7 +88,7 @@ final private[tournament] class PairingSystem(
       .map(_.flatten.toSet)
 
   private def botsToAdd(tour: Tournament, activePlayers: Int): Fu[Set[User.ID]] =
-    if tour.botsAllowed && activePlayers < minPlayersForNoBots && activePlayers % 2 == 1 then
+    if (tour.botsAllowed && activePlayers < minPlayersForNoBots && activePlayers % 2 == 1)
       playerRepo
         .byTourAndUserIds(tour.id, LightUser.tourBotsIDs)
         .flatMap { availableBots(tour.id) }
@@ -104,17 +104,17 @@ final private[tournament] class PairingSystem(
 
   private def makePreps(data: Data, users: Set[User.ID]): Fu[List[Pairing.Prep]] = {
     import data.*
-    if users.sizeIs < 2 then fuccess(Nil)
+    if (users.sizeIs < 2) fuccess(Nil)
     else
       playerRepo.rankedByTourAndUserIds(tour.id, users, ranking) map { idles =>
         val nbIdles = idles.size
-        if data.tour.isRecentlyStarted && !data.tour.isTeamBattle then proximityPairings(tour, idles)
-        else if nbIdles > maxGroupSize then {
+        if (data.tour.isRecentlyStarted && !data.tour.isTeamBattle) proximityPairings(tour, idles)
+        else if (nbIdles > maxGroupSize) {
           // make sure groupSize is even with / 4 * 2
           val groupSize = (nbIdles / 4 * 2).atMost(maxGroupSize)
           bestPairings(data, idles take groupSize) :::
             bestPairings(data, idles.slice(groupSize, groupSize + groupSize))
-        } else if nbIdles > 1 then bestPairings(data, idles)
+        } else if (nbIdles > 1) bestPairings(data, idles)
         else Nil
       }
   }.monSuccess(_.tournament.pairing.prep)

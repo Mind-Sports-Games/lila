@@ -11,6 +11,6 @@ package puzzle {
 
   case class Result(win: Boolean) extends AnyVal {
     def loss   = !win
-    def glicko = if win then Glicko.Result.Win else Glicko.Result.Loss
+    def glicko = if (win) Glicko.Result.Win else Glicko.Result.Loss
   }
 }

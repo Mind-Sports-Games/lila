@@ -42,14 +42,14 @@ final private class PovToEntry(
       (_ flatMap convert toRight game)
 
   private def removeWrongAnalysis(game: Game): Boolean =
-    if game.metadata.analysed && !game.analysable then {
+    if (game.metadata.analysed && !game.analysable) {
       gameRepo.setUnanalysed(game.id)
       analysisRepo.remove(game.id)
       true
     } else false
 
   private def enrich(game: Game, userId: String, provisional: Boolean): Fu[Option[RichPov]] =
-    if removeWrongAnalysis(game) then fuccess(none)
+    if (removeWrongAnalysis(game)) fuccess(none)
     else
       lila.game.Pov.ofUserId(game, userId) so { pov =>
         gameRepo.initialFen(game) zip
@@ -103,7 +103,7 @@ final private class PovToEntry(
       .flatten
       .map(pgnMoveToRole(from.pov.game.variant.gameFamily, _))
     val boards = {
-      val pivot = if from.pov.playerIndex == from.pov.game.startPlayerIndex then 0 else 1
+      val pivot = if (from.pov.playerIndex == from.pov.game.startPlayerIndex) 0 else 1
       from.boards.toList.zipWithIndex.collect {
         case (e, i) if (i % 2) == pivot => e
       }
@@ -152,7 +152,7 @@ final private class PovToEntry(
   private def slidingPlyTimesCvs(plytimes: Seq[Centis]): Seq[Option[Float]] = {
     val sliding = 13 // should be odd
     val nb      = plytimes.size
-    if nb < sliding then Vector.fill(nb)(none[Float])
+    if (nb < sliding) Vector.fill(nb)(none[Float])
     else {
       val sides = Vector.fill(sliding / 2)(none[Float])
       val cvs   = plytimes
@@ -198,7 +198,7 @@ final private class PovToEntry(
       playerIndex = pov.playerIndex,
       perf = perfType,
       eco =
-        if game.playable || game.turnCount < 4 || game.fromPosition || game.variant.exotic then none
+        if (game.playable || game.turnCount < 4 || game.fromPosition || game.variant.exotic) none
         else strategygames.chess.opening.Ecopening.fromGame(game.actionStrs),
       // flatten until insights support something other than chess
       myCastling = Castling.fromMoves(game.actionStrs(pov.playerIndex).flatten),

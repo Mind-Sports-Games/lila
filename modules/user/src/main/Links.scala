@@ -16,7 +16,7 @@ object Links {
           Try(Url.parse(domain).toStringPunycode).toOption.map(Link.Site.Other.apply) map { site =>
             Link(
               site = site,
-              url = if line.startsWith("http") then line else s"https://$line"
+              url = if (line.startsWith("http")) line else s"https://$line"
             )
           }
       case _ => none

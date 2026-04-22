@@ -34,7 +34,7 @@ final class NoteApi(
     coll
       .find(
         $doc("to" -> user.id) ++ {
-          if isMod then
+          if (isMod)
             $or(
               $doc("from" -> me.id),
               $doc("mod"  -> true)

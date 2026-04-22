@@ -61,11 +61,11 @@ case class Tournament(
 
   def name(full: Boolean = true)(implicit lang: Lang): String = {
     import lila.i18n.I18nKeys.tourname.*
-    if isMarathon || isUnique then name
-    else if isTeamBattle && full then xTeamBattle.txt(name)
-    else if isTeamBattle then name
+    if (isMarathon || isUnique) name
+    else if (isTeamBattle && full) xTeamBattle.txt(name)
+    else if (isTeamBattle) name
     // else schedule.fold(if (full) s"$name Arena" else name)(_.name(full))
-    else if full then s"$name Arena"
+    else if (full) s"$name Arena"
     else name
   }
 
@@ -183,11 +183,11 @@ case class Tournament(
 
   def perfType: PerfType = PerfType(variant, speed)
 
-  def iconChar = if isMedley then '5' else perfType.iconChar
+  def iconChar = if (isMedley) '5' else perfType.iconChar
 
   def durationString =
-    if minutes < 60 then s"${minutes}m"
-    else s"${minutes / 60}h" + (if minutes % 60 != 0 then s" ${minutes % 60}m" else "")
+    if (minutes < 60) s"${minutes}m"
+    else s"${minutes / 60}h" + (if (minutes % 60 != 0) s" ${minutes % 60}m" else "")
 
   def berserkable = !noBerserk && clock.berserkable
   def streakable  = !noStreak
@@ -217,7 +217,7 @@ case class Tournament(
   def nonPlayStrategyCreatedBy = (createdBy != User.playstrategyId).option(createdBy)
 
   def ratingVariant =
-    if variant.fromPositionVariant then Variant.libStandard(variant.gameLogic) else variant
+    if (variant.fromPositionVariant) Variant.libStandard(variant.gameLogic) else variant
 
   def startingPosition = position flatMap Thematic.byFen
 
@@ -230,7 +230,7 @@ case class Tournament(
   def medleyGameGroupsString: Option[String] =
     medleyGameGroups.map(_.map(VariantKeys.gameGroupName).mkString(", "))
 
-  val minWaitingUsersForPairings: Int = if botsAllowed then 1 else 2
+  val minWaitingUsersForPairings: Int = if (botsAllowed) 1 else 2
 
   override def toString =
     s"$id $startsAt ${name()(using defaultLang)} $minutes minutes, $clock, $nbPlayers players"

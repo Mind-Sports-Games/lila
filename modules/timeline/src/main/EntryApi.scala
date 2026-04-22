@@ -99,12 +99,12 @@ final class EntryApi(
         bcs.headOption.fold(entries) { mostRecentBc =>
           val interleaved = {
             val oldestEntry = entries.lastOption
-            if oldestEntry.fold(true)(_.date.isBefore(mostRecentBc.date)) then
+            if (oldestEntry.fold(true)(_.date.isBefore(mostRecentBc.date)))
               (entries ++ bcs).sortBy(-_.date.getMillis)
             else entries
           }
           // sneak recent broadcast at first place
-          if mostRecentBc.date.isAfter(DateTime.now.minusDays(1)) then
+          if (mostRecentBc.date.isAfter(DateTime.now.minusDays(1)))
             mostRecentBc +: interleaved.filter(mostRecentBc !=)
           else interleaved
         }

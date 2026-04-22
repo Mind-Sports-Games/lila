@@ -18,9 +18,9 @@ final class IdGenerator(gameRepo: GameRepo)(implicit ec: scala.concurrent.Execut
   }
 
   def games(nb: Int): Fu[Set[Game.ID]] =
-    if nb < 1 then fuccess(Set.empty)
-    else if nb == 1 then game.dmap(Set(_))
-    else if nb < 5 then Future.sequence(Set.fill(nb)(game))
+    if (nb < 1) fuccess(Set.empty)
+    else if (nb == 1) game.dmap(Set(_))
+    else if (nb < 5) Future.sequence(Set.fill(nb)(game))
     else {
       val ids = Set.fill(nb)(uncheckedGame)
       gameRepo.coll.distinctEasy[Game.ID, Set]("_id", $inIds(ids)) flatMap { collisions =>

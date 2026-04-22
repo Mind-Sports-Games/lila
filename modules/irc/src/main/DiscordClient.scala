@@ -25,7 +25,7 @@ final private class DiscordClient(ws: StandaloneWSClient, urlMatchMaking: Secret
 
   def apply(msg: DiscordMessage): Funit =
     limiter(msg) {
-      if urlForMsg(msg).isEmpty then fuccess(lila.log("discord").info(msg.toString))
+      if (urlForMsg(msg).isEmpty) fuccess(lila.log("discord").info(msg.toString))
       else
         ws.url(urlForMsg(msg))
           .post(

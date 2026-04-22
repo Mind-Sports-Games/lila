@@ -50,8 +50,8 @@ final class Gamify(
   private def buildHistoryAfter(afterYear: Int, afterMonth: Int, until: DateTime): Funit =
     Future
       .sequence((afterYear to until.getYear).flatMap { year =>
-        ((if year == afterYear then afterMonth + 1 else 1) to
-          (if year == until.getYear then until.getMonthOfYear else 12)).map { month =>
+        ((if (year == afterYear) afterMonth + 1 else 1) to
+          (if (year == until.getYear) until.getMonthOfYear else 12)).map { month =>
           mixedLeaderboard(
             after = new DateTime(year, month, 1, 0, 0),
             before = new DateTime(year, month, 1, 0, 0).plusMonths(1).some

@@ -67,7 +67,7 @@ final class SeekApi(
               Some(seek.user.id)
             )
               .mkString(",")
-          if h contains seekH then (res, h)
+          if (h contains seekH) (res, h)
           else (seek :: res, h + seekH)
       }
       ._1

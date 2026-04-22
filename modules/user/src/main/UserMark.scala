@@ -36,7 +36,7 @@ case class UserMarks(value: List[UserMark]) extends AnyVal {
 
   def set(sel: UserMark.type => UserMark, v: Boolean) =
     UserMarks {
-      if v then sel(UserMark) :: value
+      if (v) sel(UserMark) :: value
       else value.filter(sel(UserMark) !=)
     }
 }

@@ -48,7 +48,7 @@ final class JsonView(
               .obj(
                 "key"  -> t.key,
                 "name" -> {
-                  if t == PuzzleTheme.mix then lila.i18n.I18nKeys.puzzle.puzzleThemes.txt()
+                  if (t == PuzzleTheme.mix) lila.i18n.I18nKeys.puzzle.puzzleThemes.txt()
                   else t.name.txt()
                 },
                 "desc" -> t.description.txt()
@@ -211,7 +211,7 @@ final class JsonView(
             id = UciCharPair(game.situation.board.variant.gameLogic, move.toUci),
             ply = game.plies,
             turnCount = game.turnCount,
-            playedPlayerIndex = if game.board.history.currentTurn.nonEmpty then game.player else !game.player,
+            playedPlayerIndex = if (game.board.history.currentTurn.nonEmpty) game.player else !game.player,
             variant = game.situation.board.variant,
             // TODO multiaction. For now we can flatten actionStrs as we are dealing with just Chess
             move =

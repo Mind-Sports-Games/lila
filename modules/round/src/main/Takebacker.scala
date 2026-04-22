@@ -25,7 +25,7 @@ final private class Takebacker(
         case Pov(game, playerIndex) if pov.opponent.isProposingTakeback =>
           {
             val povTurn = playerIndex == pov.game.turnPlayerIndex
-            if pov.opponent.proposeTakebackAt == pov.game.plies && povTurn then
+            if (pov.opponent.proposeTakebackAt == pov.game.plies && povTurn)
               // go back until the playerindex switches
               takebackSwitchPlayer(game)
             else
@@ -72,11 +72,11 @@ final private class Takebacker(
     }
 
   def isAllowedIn(game: Game): Fu[Boolean] =
-    if game.isMandatory || !game.situation.takebackable then fuFalse
+    if (game.isMandatory || !game.situation.takebackable) fuFalse
     else isAllowedByPrefs(game)
 
   private def isAllowedByPrefs(game: Game): Fu[Boolean] =
-    if game.hasAi then fuTrue
+    if (game.hasAi) fuTrue
     else
       Future.sequence(game.userIds.map {
         prefApi.getPref(_, (p: Pref) => p.takeback)
@@ -87,15 +87,15 @@ final private class Takebacker(
       }
 
   private def publishTakebackOffer(pov: Pov): Unit =
-    if pov.game.isCorrespondence && pov.game.nonAi && pov.player.hasUser then
+    if (pov.game.isCorrespondence && pov.game.nonAi && pov.player.hasUser)
       Bus.publish(
         lila.hub.actorApi.round.CorresTakebackOfferEvent(pov.gameId),
         "offerEventCorres"
       )
 
   private def IfAllowed[A](game: Game)(f: => Fu[A]): Fu[A] =
-    if !game.playable then fufail(ClientError("[takebacker] game is over " + game.id))
-    else if game.isMandatory then fufail(ClientError("[takebacker] game disallows it " + game.id))
+    if (!game.playable) fufail(ClientError("[takebacker] game is over " + game.id))
+    else if (game.isMandatory) fufail(ClientError("[takebacker] game disallows it " + game.id))
     else
       isAllowedByPrefs(game) flatMap {
         case true => f
@@ -107,10 +107,10 @@ final private class Takebacker(
 
   // Would be nice to test these methods with a multimove game that has > 2 plies in a turn
   private def takebackSwitchPlayer(game: Game)(implicit proxy: GameProxy): Fu[Events] =
-    if currentPlayerTakingBack(game) then rewindPly(game)
+    if (currentPlayerTakingBack(game)) rewindPly(game)
     else rewindTurnAndPly(game)
   private def takebackRetainPlayer(game: Game)(implicit proxy: GameProxy): Fu[Events] =
-    if currentPlayerTakingBack(game) then rewindTurnAndPly(game)
+    if (currentPlayerTakingBack(game)) rewindTurnAndPly(game)
     else rewindPly(game)
 
   private def rewindPly(game: Game)(implicit proxy: GameProxy): Fu[Events] =

@@ -45,7 +45,7 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
       uciMove: String,
       steps: Forecast.Steps
   ): Funit =
-    if !pov.isMyTurn then funit
+    if (!pov.isMyTurn) funit
     else
       Uci
         .Move(pov.game.variant.gameLogic, pov.game.variant.gameFamily, uciMove)
@@ -67,7 +67,7 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
     pov.forecastable so coll.byId[Forecast](pov.fullId) flatMap {
       case None     => fuccess(none)
       case Some(fc) =>
-        if firstStep(fc.steps).exists(_.ply != pov.game.plies + 1) then clearPov(pov) inject none
+        if (firstStep(fc.steps).exists(_.ply != pov.game.plies + 1)) clearPov(pov) inject none
         else fuccess(fc.some)
     }
 
@@ -75,7 +75,7 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
     pov.game.forecastable so coll.byId[Forecast](pov.fullId) flatMap {
       case None     => fuccess(none)
       case Some(fc) =>
-        if firstStep(fc.steps).exists(_.ply != pov.game.plies) then clearPov(pov) inject none
+        if (firstStep(fc.steps).exists(_.ply != pov.game.plies)) clearPov(pov) inject none
         else fuccess(fc.some)
     }
 

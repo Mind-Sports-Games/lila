@@ -71,7 +71,7 @@ final class CoachApi(
       $id(User.normalize(username)),
       $set("approved" -> value)
     ) dmap { result =>
-      if result.n > 0 then "Done!"
+      if (result.n > 0) "Done!"
       else "No such coach"
     }
 
@@ -120,7 +120,7 @@ final class CoachApi(
               updatedAt = DateTime.now
             )
         }
-        if me.marks.troll then fuccess(review)
+        if (me.marks.troll) fuccess(review)
         else
           reviewColl.update.one($id(id), review, upsert = true) >>
             notifyApi.addNotification(
@@ -137,7 +137,7 @@ final class CoachApi(
       reviewColl.byId[CoachReview](CoachReview.makeId(user, coach))
 
     def approve(r: CoachReview, v: Boolean) = {
-      if v then
+      if (v)
         reviewColl.update
           .one(
             $id(r.id),

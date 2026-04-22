@@ -29,7 +29,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
   private def sinceSelect(date: DateTime)      = $doc("startsAt" `$gt` date)
   private def libSelect(lib: GameLogic)        = $doc("lib" -> lib.id)
   private def variantSelect(variant: Variant)  =
-    if variant.standardVariant then $doc("variant" `$exists` false)
+    if (variant.standardVariant) $doc("variant" `$exists` false)
     else $doc("variant" -> variant.id)
   private val nonEmptySelect           = $doc("nbPlayers" `$ne` 0)
   private[tournament] val selectUnique = $doc("schedule.freq" -> "unique")

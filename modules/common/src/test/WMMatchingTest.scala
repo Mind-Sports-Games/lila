@@ -6,7 +6,7 @@ object WMMatchingTest {
   def toMate(n: Int, l: List[(Int, Int)]): Array[Int] = {
     val a = Array.fill(n)(-1)
     l.foreach { case (i, j) => a(i) = j; a(j) = i }
-    if a.count(_ >= 0) != 2 * l.length then null else a
+    if (a.count(_ >= 0) != 2 * l.length) null else a
   }
 
   def check0(a: Array[(Int, Int, Int)], maxcardinality: Boolean, expectedMate: Seq[Int]): Boolean = {
@@ -19,7 +19,7 @@ object WMMatchingTest {
       w += p._3
     }
     val l = toMate(n, WMMatching.maxWeightMatching(e.result(), w.result(), maxcardinality))
-    if l eq null then false else expectedMate.sameElements(l)
+    if (l eq null) false else expectedMate.sameElements(l)
   }
 
   def check(n: Int, a: Array[Int], res: (Int, Int)): Boolean = {
@@ -27,10 +27,10 @@ object WMMatchingTest {
     def f(x: Int)                              = (x * (x + 1)) / 2
     def off(i: Int)                            = f(n - 1) - f(n - 1 - i)
     def pairScore(i: Int, j: Int): Option[Int] =
-      if i > j then pairScore(j, i)
+      if (i > j) pairScore(j, i)
       else {
         val o = off(i) + (j - (i + 1))
-        if a(o) < 0 then None else Some(a(o))
+        if (a(o) < 0) None else Some(a(o))
       }
     def score(l: List[(Int, Int)]): (Int, Int) = (l.length, l.map(t => pairScore(t._1, t._2).head).sum)
     def checkScore(ans: (Int, Int)): Boolean   = res == ans

@@ -101,8 +101,8 @@ object Sheet {
     def targets   = `gsx$target`.toString.split(';').map(_.trim).toList flatMap (_.toIntOption)
     def tags      =
       `gsx$tags`.toString.split(';').map(_.trim.toLowerCase).toList.filter(_.nonEmpty) ::: {
-        if targets contains 1 then List("beginner")
-        else if targets contains 3 then List("advanced")
+        if (targets contains 1) List("beginner")
+        else if (targets contains 3) List("advanced")
         else Nil
       }
     def lang      = `gsx$language`.toString.trim

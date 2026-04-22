@@ -32,7 +32,7 @@ final private class SwissTiebreak(
                   case Left(_)                  => None
                   case Right(None)              => Some(r.draw(hero, foe))
                   case Right(Some(playerIndex)) =>
-                    if pairing(playerIndex) == hero.id then Some(r.win(hero, foe))
+                    if (pairing(playerIndex) == hero.id) Some(r.win(hero, foe))
                     else Some(r.lose(hero, foe))
                 }
               }
@@ -70,7 +70,7 @@ final private class SwissScoring(
           sheets     = SwissSheet.many(swiss, prevPlayers, pairingMap)
           withPoints = (prevPlayers zip sheets).map { case (player, sheet) =>
             player.copy(points =
-              if !swiss.settings.mcmahon then sheet.points
+              if (!swiss.settings.mcmahon) sheet.points
               else
                 sheet.points + Swiss.Points(
                   (player.mcMahonStartingScore(swiss.settings.mcmahonCutoffGrade) * 2).toInt
@@ -89,7 +89,7 @@ final private class SwissScoring(
                 val opponent = playerMap.get(pairing.opponentOf(p.userId))
                 val result   = pairing.resultFor(p.userId)
                 val newPerf  = perfSum + opponent.so(_.actualRating) + result.so { win =>
-                  if win then 500 else -500
+                  if (win) 500 else -500
                 }
                 newPerf
               }

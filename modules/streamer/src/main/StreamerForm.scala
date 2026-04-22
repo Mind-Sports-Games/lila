@@ -94,7 +94,7 @@ object StreamerForm {
               granted = m.granted,
               tier = m.tier | streamer.approval.tier,
               requested = !m.granted && {
-                if streamer.approval.requested != m.requested then m.requested
+                if (streamer.approval.requested != m.requested) m.requested
                 else streamer.approval.requested || m.requested
               },
               ignored = m.ignored && !m.granted,

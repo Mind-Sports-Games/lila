@@ -44,8 +44,8 @@ final private class GameStarter(
     (perfs.get(p1.userId), perfs.get(p2.userId)).mapN((_, _)) so { case (perf1, perf2) =>
       for {
         p1P1 <- userRepo.firstGetsP1(p1.userId, p2.userId)
-        (p1Perf, p2Perf)     = if p1P1 then perf1 -> perf2 else perf2 -> perf1
-        (p1Member, p2Member) = if p1P1 then p1 -> p2 else p2 -> p1
+        (p1Perf, p2Perf)     = if (p1P1) perf1 -> perf2 else perf2 -> perf1
+        (p1Member, p2Member) = if (p1P1) p1 -> p2 else p2 -> p1
         game                 = makeGame(
           id,
           pool,
@@ -141,8 +141,8 @@ final private class BotGameStarter(
     (perfs.get(p1.userId), perfs.get(p2.userId)).mapN((_, _)) so { case (perf1, perf2) =>
       for {
         p1P1 <- userRepo.firstGetsP1(p1.userId, p2.userId)
-        (p1Perf, p2Perf)     = if p1P1 then perf1 -> perf2 else perf2 -> perf1
-        (p1Member, p2Member) = if p1P1 then p1 -> p2 else p2 -> p1
+        (p1Perf, p2Perf)     = if (p1P1) perf1 -> perf2 else perf2 -> perf1
+        (p1Member, p2Member) = if (p1P1) p1 -> p2 else p2 -> p1
         game                 = makeGame(
           id,
           pool,

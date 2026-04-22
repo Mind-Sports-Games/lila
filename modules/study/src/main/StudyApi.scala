@@ -247,7 +247,7 @@ final class StudyApi(
   )(who: Who)(implicit variant: Variant): Fu[Option[() => Funit]] = {
     val singleNode   = rawNode.withoutChildren
     def failReload() = reloadSriBecauseOf(study, who.sri, position.chapter.id)
-    if position.chapter.isOverweight then {
+    if (position.chapter.isOverweight) {
       logger.info(s"Overweight chapter ${study.id}/${position.chapter.id}")
       failReload()
       fuccess(none)
@@ -287,7 +287,7 @@ final class StudyApi(
   private def updateConceal(study: Study, chapter: Chapter, position: Position.Ref) =
     chapter.conceal so { conceal =>
       chapter.root.lastMainlinePlyOf(position.path).some.filter(_ > conceal) so { newConceal =>
-        if newConceal >= chapter.root.lastMainlinePly then
+        if (newConceal >= chapter.root.lastMainlinePly)
           chapterRepo.removeConceal(chapter.id).andDo(sendTo(study.id)(_.setConceal(position, none)))
         else
           chapterRepo
@@ -329,7 +329,7 @@ final class StudyApi(
       Contribute(who.u, study) {
         chapter.updateRoot { root =>
           root.withChildren { children =>
-            if toMainline then children.promoteToMainlineAt(position.path)
+            if (toMainline) children.promoteToMainlineAt(position.path)
             else children.promoteUpAt(position.path).map(_._1)
           }
         } match {
@@ -584,7 +584,7 @@ final class StudyApi(
   def explorerGame(studyId: Study.Id, data: actorApi.ExplorerGame)(who: Who) =
     sequenceStudyWithChapter(studyId, data.position.chapterId) { case Study.WithChapter(study, chapter) =>
       Contribute(who.u, study) {
-        if data.insert then
+        if (data.insert)
           explorerGameHandler.insert(study, Position(chapter, data.position.path), data.gameId) flatMap {
             case None =>
               fufail(s"Invalid explorerGame insert $studyId $data").andDo(
@@ -617,7 +617,7 @@ final class StudyApi(
         sequenceStudy(studyId) { study =>
           Contribute(who.u, study) {
             chapterRepo.countByStudyId(study.id) flatMap { count =>
-              if count >= Study.maxChapters then funit
+              if (count >= Study.maxChapters) funit
               else
                 chapterRepo.nextOrderByStudy(study.id) flatMap { order =>
                   chapterMaker(study, data, order, who.u) flatMap { chapter =>
@@ -698,10 +698,10 @@ final class StudyApi(
                 chapter.description | "-"
               }
             )
-            if chapter == newChapter then funit
+            if (chapter == newChapter) funit
             else
               chapterRepo.update(newChapter) >> {
-                if chapter.conceal != newChapter.conceal then
+                if (chapter.conceal != newChapter.conceal)
                   (newChapter.conceal.isDefined && study.position.chapterId == chapter.id)
                     .so {
                       val newPosition = study.position.withPath(Path.root)
@@ -715,7 +715,7 @@ final class StudyApi(
                         (newChapter.practice != chapter.practice) ||
                         (newChapter.gamebook != chapter.gamebook) ||
                         (newChapter.description != chapter.description)
-                    if shouldReload then sendTo(study.id)(_.updateChapter(chapter.id, who))
+                    if (shouldReload) sendTo(study.id)(_.updateChapter(chapter.id, who))
                     else reloadChapters(study)
                   }
               }
@@ -750,7 +750,7 @@ final class StudyApi(
           _.so { (chapter: Chapter) =>
             chapterRepo.orderedMetadataByStudy(studyId).flatMap { chaps =>
               // deleting the only chapter? Automatically create an empty one
-              if chaps.sizeIs < 2 then
+              if (chaps.sizeIs < 2)
                 chapterMaker(study, ChapterMaker.Data(Chapter.Name("Chapter 1")), 1, who.u) flatMap { c =>
                   doAddChapter(study, c, sticky = true, who) >> doSetChapter(study, c.id, who)
                 }
@@ -837,10 +837,10 @@ final class StudyApi(
   def like(studyId: Study.Id, v: Boolean)(who: Who): Funit =
     studyRepo.like(studyId, who.u, v) map { likes =>
       sendTo(studyId)(_.setLiking(Study.Liking(likes, v), who))
-      if v then
+      if (v)
         studyRepo.byId(studyId) foreach {
           _ foreach { study =>
-            if who.u != study.ownerId && study.isPublic then
+            if (who.u != study.ownerId && study.isPublic)
               timeline ! (Propagate(StudyLike(who.u, study.id.value, study.name.value)).toFollowersOf(who.u))
           }
         }
@@ -895,7 +895,7 @@ final class StudyApi(
 
   import alleycats.Zero
   private def Contribute[A](userId: User.ID, study: Study)(f: => A)(implicit default: Zero[A]): A =
-    if study.canContribute(userId) then f else default.zero
+    if (study.canContribute(userId)) f else default.zero
 
   // work around circular dependency
   private var socket: Option[StudySocket]                                         = None

@@ -18,7 +18,7 @@ final class Authenticator(
   def compare(auth: AuthData, p: ClearPassword): Boolean = {
     val newP = auth.salt.fold(p) { s =>
       val salted = s"${p.value}{$s}" // BC
-      ClearPassword(if ~auth.sha512 then salted.sha512 else salted.sha1)
+      ClearPassword(if (~auth.sha512) salted.sha512 else salted.sha1)
     }
     passHasher.check(auth.bpass, newP)
   }
@@ -51,7 +51,7 @@ final class Authenticator(
 
   private def authWithBenefits(auth: AuthData)(p: ClearPassword): Boolean = {
     val res = compare(auth, p)
-    if res && auth.salt.isDefined then
+    if (res && auth.salt.isDefined)
       setPassword(id = auth._id, p).andDo { val _ = lila.mon.user.auth.bcFullMigrate.increment() }
     res
   }

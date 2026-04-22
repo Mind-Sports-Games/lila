@@ -27,7 +27,7 @@ case class UserRecord(
       case o if o != Outcome.Good         => 1
     } sum
 
-  def badOutcomeRatio: Float = if bans.sizeIs < 3 then 0.4f else 0.3f
+  def badOutcomeRatio: Float = if (bans.sizeIs < 3) 0.4f else 0.3f
 
   def minBadOutcomes: Int =
     bans.size match {
@@ -111,7 +111,7 @@ object TempBan {
             case h           => (55.6 * prev.mins / (Math.pow(5.56 * prev.mins - 54.6, h / 720) + 54.6)).toInt
           }
         }
-        .atLeast(baseMinutes)) * (if accountCreationDate.plusDays(3).isAfterNow then 2 else 1)
+        .atLeast(baseMinutes)) * (if (accountCreationDate.plusDays(3).isAfterNow) 2 else 1)
     }
 }
 

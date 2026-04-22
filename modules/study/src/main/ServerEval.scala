@@ -162,7 +162,7 @@ object ServerEval {
         id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
         ply = g.plies,
         turnCount = g.turnCount,
-        playedPlayerIndex = if g.board.history.currentTurn.nonEmpty then g.player else !g.player,
+        playedPlayerIndex = if (g.board.history.currentTurn.nonEmpty) g.player else !g.player,
         variant = g.situation.board.variant,
         move = m,
         fen = Forsyth.>>(g.situation.board.variant.gameLogic, g),

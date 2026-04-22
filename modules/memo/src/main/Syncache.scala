@@ -63,7 +63,7 @@ final private[memo] class Syncache[K, V](
         strategy match {
           case NeverWait                         => default(k)
           case WaitAfterUptime(duration, uptime) =>
-            if Uptime.startedSinceSeconds(uptime) then waitForResult(k, future, duration)
+            if (Uptime.startedSinceSeconds(uptime)) waitForResult(k, future, duration)
             else default(k)
         }
     }

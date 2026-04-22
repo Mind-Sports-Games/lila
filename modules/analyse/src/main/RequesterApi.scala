@@ -16,7 +16,7 @@ final class RequesterApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         $id(requester),
         $inc(
           "total"                       -> 1,
-          formatter.print(DateTime.now) -> (if ownGame then 1 else 2)
+          formatter.print(DateTime.now) -> (if (ownGame) 1 else 2)
         ),
         upsert = true
       )

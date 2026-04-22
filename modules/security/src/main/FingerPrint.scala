@@ -28,7 +28,7 @@ object FingerHash {
 
   private def normalize(fp: FingerPrint): String = {
     val str = fp.value.replace("-", "")
-    if str.length % 2 != 0 then s"${str}0" else str
+    if (str.length % 2 != 0) s"${str}0" else str
   }
 
   implicit val fingerHashIso: Iso.StringIso[FingerHash]   = Iso.string[FingerHash](FingerHash.apply, _.value)

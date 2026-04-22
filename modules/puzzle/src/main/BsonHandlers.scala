@@ -71,7 +71,7 @@ object BsonHandlers {
             Success(PuzzleRound.Theme(theme.key, v.head == '+'))
           }
       },
-      rt => BSONString(s"${if rt.vote then "+" else "-"}${rt.theme}")
+      rt => BSONString(s"${if (rt.vote) "+" else "-"}${rt.theme}")
     )
 
   implicit private[puzzle] val RoundHandler: BSON[PuzzleRound] = new BSON[PuzzleRound] {

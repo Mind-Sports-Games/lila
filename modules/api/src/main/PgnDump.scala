@@ -27,7 +27,7 @@ final class PgnDump(
       realPlayers: Option[RealPlayers] = None
   ): Fu[Pgn] =
     dumper(game, initialFen, flags, teams) flatMap { pgn =>
-      if flags.tags then
+      if (flags.tags)
         (game.simulId so simulApi.idToName) map { simulName =>
           simulName
             .orElse(game.tournamentId flatMap getTournamentName.get)
@@ -37,7 +37,7 @@ final class PgnDump(
       else fuccess(pgn)
     } map { pgn =>
       val evaled = analysis.ifTrue(flags.evals).fold(pgn)(addEvals(pgn, _))
-      if flags.literate then annotator(evaled, game, analysis)
+      if (flags.literate) annotator(evaled, game, analysis)
       else evaled
     } map { pgn =>
       realPlayers.fold(pgn)(_.update(game, pgn))

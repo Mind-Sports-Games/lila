@@ -184,9 +184,9 @@ final private[api] class RoundApi(
       me: Option[User],
       withForecast: Boolean = false
   ) =
-    (if withForecast then owner.so(forecastApi.loadForDisplay(pov)) else fuccess(none)).map { fco =>
+    (if (withForecast) owner.so(forecastApi.loadForDisplay(pov)) else fuccess(none)).map { fco =>
       val addForecast: JsObject => JsObject =
-        if withForecast then this.withForecast(pov, owner, fco) else identity
+        if (withForecast) this.withForecast(pov, owner, fco) else identity
       addForecast(withTree(pov, analysis = none, initialFen, WithFlags(opening = true)) {
         jsonView.userAnalysisJson(pov, pref, initialFen, orientation, owner = owner, me = me)
       })
@@ -221,7 +221,7 @@ final private[api] class RoundApi(
     ))
 
   private def withNote(note: String)(json: JsObject) =
-    if note.isEmpty then json else json + ("note" -> JsString(note))
+    if (note.isEmpty) json else json + ("note" -> JsString(note))
 
   private def withBookmark(v: Boolean)(json: JsObject) =
     json.add("bookmarked" -> v)
@@ -232,10 +232,10 @@ final private[api] class RoundApi(
     }
 
   private def withForecast(pov: Pov, owner: Boolean, fco: Option[Forecast])(json: JsObject) =
-    if pov.game.forecastable && owner then
+    if (pov.game.forecastable && owner)
       json + (
         "forecast" -> {
-          if pov.forecastable then
+          if (pov.forecastable)
             fco.fold[JsValue](Json.obj("none" -> true)) { fc =>
               import Forecast.forecastJsonWriter
               Json toJson fc

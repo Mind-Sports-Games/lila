@@ -95,7 +95,7 @@ case class Challenge(
 
   def notableInitialFen: Option[FEN] =
     variant match {
-      case Variant.Chess(variant) => if variant.standardInitialPosition then none else initialFen
+      case Variant.Chess(variant) => if (variant.standardInitialPosition) none else initialFen
       case Variant.Draughts(_)    => draughtsCustomStartingPosition so initialFen
       case Variant.Go(_) | Variant.Backgammon(_) => customStartingPosition so initialFen
       case _                                     => none
@@ -197,7 +197,7 @@ object Challenge {
   }
 
   case class Rating(int: Int, provisional: Boolean) {
-    def show = s"$int${if provisional then "?" else ""}"
+    def show = s"$int${if (provisional) "?" else ""}"
   }
   object Rating {
     def apply(p: lila.rating.Perf): Rating = Rating(p.intRating, p.provisional)
@@ -300,11 +300,11 @@ object Challenge {
         if variant.fromPositionVariant || variant.gameFamily == GameFamily
             .Go() || variant.gameFamily == GameFamily.Backgammon()
         then initialFen
-        else if variant == Variant.Chess(Chess960) then
+        else if (variant == Variant.Chess(Chess960))
           initialFen filter { fen =>
             fen.chessFen.map(fen => Chess960.positionNumber(fen).isDefined).getOrElse(false)
           }
-        else if variant.initialFens.size > 1 then Random.shuffle(variant.initialFens).headOption
+        else if (variant.initialFens.size > 1) Random.shuffle(variant.initialFens).headOption
         else (!variant.standardInitialPosition).option(variant.initialFen),
       timeControl = timeControl,
       mode = finalMode,
@@ -315,14 +315,14 @@ object Challenge {
       rematchOf = rematchOf,
       createdAt = DateTime.now,
       seenAt = (!isOpen).option(DateTime.now),
-      expiresAt = if isOpen then DateTime.now.plusDays(1) else inTwoWeeks,
+      expiresAt = if (isOpen) DateTime.now.plusDays(1) else inTwoWeeks,
       open = isOpen.option(true),
       name = name,
       multiMatch = multiMatch.option(true),
       backgammonPoints = backgammonPoints
     )
-    if multiMatch && !challenge.customStartingPosition then challenge = challenge.copy(multiMatch = none)
-    if challenge.mode.rated && !challenge.isMultiMatch && challenge.customStartingPosition then
+    if (multiMatch && !challenge.customStartingPosition) challenge = challenge.copy(multiMatch = none)
+    if (challenge.mode.rated && !challenge.isMultiMatch && challenge.customStartingPosition)
       challenge = challenge.copy(mode = Mode.Casual)
     challenge
   }

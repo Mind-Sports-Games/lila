@@ -33,7 +33,7 @@ final class FishnetApi(
   def keyExists(key: Client.Key) = repo.getEnabledClient(key).map(_.isDefined)
 
   def authenticateClient(req: JsonApi.Request, ip: IpAddress): Fu[Try[Client]] = {
-    if config.offlineMode then repo.getOfflineClient map some
+    if (config.offlineMode) repo.getOfflineClient map some
     else repo.getEnabledClient(req.fishnet.apikey)
   } map {
     case None         => Failure(new Exception("Can't authenticate: invalid key or disabled client"))
@@ -94,7 +94,7 @@ final class FishnetApi(
           data.completeOrPartial match {
             case complete: CompleteAnalysis =>
               {
-                if complete.weak && work.game.variant.key == "standard" then {
+                if (complete.weak && work.game.variant.key == "standard") {
                   Monitor.weak(work, client, complete)
                   repo.updateOrGiveUpAnalysis(work.weak) >> fufail(WeakAnalysis(client))
                 } else

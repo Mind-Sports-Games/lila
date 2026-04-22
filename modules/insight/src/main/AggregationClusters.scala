@@ -7,7 +7,7 @@ object AggregationClusters {
 
   def apply[X](question: Question[X], aggDocs: List[Bdoc]): List[Cluster[X]] =
     postSort(question) {
-      if Metric.isStacked(question.metric) then stacked(question, aggDocs)
+      if (Metric.isStacked(question.metric)) stacked(question, aggDocs)
       else single(question, aggDocs)
     }
 
@@ -37,7 +37,7 @@ object AggregationClusters {
       }
       total    = stack.map(_.v.toInt.get).sum
       percents =
-        if total == 0 then points
+        if (total == 0) points
         else
           points.map { case (n, p) =>
             n -> Point(100 * p.y / total)

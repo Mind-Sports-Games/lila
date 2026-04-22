@@ -20,7 +20,7 @@ case class RelayTour(
 
   lazy val slug = {
     val s = lila.common.String.slugify(name)
-    if s.isEmpty then "-" else s
+    if (s.isEmpty) "-" else s
   }
 
   def withRounds(rounds: List[RelayRound]) = RelayTour.WithRounds(this, rounds)

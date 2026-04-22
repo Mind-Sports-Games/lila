@@ -12,10 +12,10 @@ object RawHtml {
     val sb      = new jStringBuilder(s.length)
     var counter = 0
     for char <- s do
-      if char == '\n' then {
+      if (char == '\n') {
         counter += 1
-        if counter < 3 then sb.append("<br>")
-      } else if char != '\r' then {
+        if (counter < 3) sb.append("<br>")
+      } else if (char != '\r') {
         counter = 0
         sb.append(char)
       }
@@ -44,17 +44,17 @@ object RawHtml {
 
   def expandAtUser(text: String): List[String] = {
     val m = atUsernamePat.matcher(text)
-    if m.find then {
+    if (m.find) {
       var idx = 0
       val buf = List.newBuilder[String]
       while {
-        if idx < m.start then buf += text.substring(idx, m.start)
+        if (idx < m.start) buf += text.substring(idx, m.start)
         buf += DOMAIN + "/@/" + m.group(1)
         idx = m.end
         m.find
       }
       do ()
-      if idx < text.length then buf += text.substring(idx)
+      if (idx < text.length) buf += text.substring(idx)
       buf.result()
     } else List(text)
   }
@@ -65,7 +65,7 @@ object RawHtml {
     expandAtUser(text).map { expanded =>
       val m = urlPattern.matcher(expanded)
 
-      if !m.find then escapeHtmlRaw(expanded) // preserve fast case!
+      if (!m.find) escapeHtmlRaw(expanded) // preserve fast case!
       else {
         val sb            = new jStringBuilder(expanded.length + 200)
         val sArr          = expanded.toCharArray
@@ -80,7 +80,7 @@ object RawHtml {
 
           val end = {
             val e = m.end
-            if isLetterOrDigit(sArr(e - 1)) then e
+            if (isLetterOrDigit(sArr(e - 1))) e
             else adjustUrlEnd(sArr, Math.max(pathS, domainS), e)
           }
 
@@ -95,17 +95,17 @@ object RawHtml {
           val isTldInternal = DOMAIN == domain
 
           val csb = new jStringBuilder()
-          if !isTldInternal then csb.append(domain)
-          if pathS >= 0 then {
-            if sArr(pathS) != '/' then csb.append('/')
+          if (!isTldInternal) csb.append(domain)
+          if (pathS >= 0) {
+            if (sArr(pathS) != '/') csb.append('/')
             csb.append(sArr, pathS, end - pathS)
           }
 
           val allButScheme = escapeHtmlRaw(csb.toString)
 
-          if isTldInternal then
+          if (isTldInternal)
             sb.append(s"""<a href="${
-                if allButScheme.isEmpty then "/"
+                if (allButScheme.isEmpty) "/"
                 else allButScheme
               }">${allButScheme match {
                 case USER_LINK(user) => "@" + user
@@ -113,10 +113,10 @@ object RawHtml {
               }}</a>""")
           else {
             val isHttp  = domainS - start == 7
-            val url     = (if isHttp then "http://" else "https://") + allButScheme
-            val text    = if isHttp then url else allButScheme
+            val url     = (if (isHttp) "http://" else "https://") + allButScheme
+            val text    = if (isHttp) url else allButScheme
             val imgHtml =
-              if (end < sArr.length && sArr(end) == '"') || !expandImg then None
+              if ((end < sArr.length && sArr(end) == '"') || !expandImg) None
               else imgUrl(url)
             sb.append(
               imgHtml.getOrElse(
@@ -145,9 +145,9 @@ object RawHtml {
       }
     do last -= 1
 
-    if sArr(last) == ')' then {
+    if (sArr(last) == ')') {
       @tailrec def pCnter(idx: Int, acc: Int): Int =
-        if idx >= last then acc
+        if (idx >= last) acc
         else
           pCnter(
             idx + 1,

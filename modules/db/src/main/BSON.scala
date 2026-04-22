@@ -82,14 +82,14 @@ object BSON extends Handlers {
   final class Writer {
 
     def bool(b: Boolean): BSONBoolean               = BSONBoolean(b)
-    def boolO(b: Boolean): Option[BSONBoolean]      = if b then Some(BSONBoolean(true)) else None
+    def boolO(b: Boolean): Option[BSONBoolean]      = if (b) Some(BSONBoolean(true)) else None
     def str(s: String): BSONString                  = BSONString(s)
-    def strO(s: String): Option[BSONString]         = if s.nonEmpty then Some(BSONString(s)) else None
+    def strO(s: String): Option[BSONString]         = if (s.nonEmpty) Some(BSONString(s)) else None
     def int(i: Int): BSONInteger                    = BSONInteger(i)
-    def intO(i: Int): Option[BSONInteger]           = if i != 0 then Some(BSONInteger(i)) else None
+    def intO(i: Int): Option[BSONInteger]           = if (i != 0) Some(BSONInteger(i)) else None
     def date(d: DateTime): BSONValue                = BSONJodaDateTimeHandler.writeTry(d).get
     def byteArrayO(b: ByteArray): Option[BSONValue] =
-      if b.isEmpty then None else ByteArray.ByteArrayBSONHandler.writeOpt(b)
+      if (b.isEmpty) None else ByteArray.ByteArrayBSONHandler.writeOpt(b)
     def bytesO(b: Array[Byte]): Option[BSONValue]          = byteArrayO(ByteArray(b))
     def bytes(b: Array[Byte]): BSONBinary                  = BSONBinary(b, ByteArray.subtype)
     def strListO(list: List[String]): Option[List[String]] =
@@ -101,12 +101,12 @@ object BSON extends Handlers {
         case full         => Some(full)
       }
     def listO[A](list: List[A])(implicit writer: BSONWriter[A]): Option[Barr] =
-      if list.isEmpty then None
+      if (list.isEmpty) None
       else Some(BSONArray(list flatMap writer.writeOpt))
-    def docO(o: Bdoc): Option[Bdoc]                      = if o.isEmpty then None else Some(o)
+    def docO(o: Bdoc): Option[Bdoc]                      = if (o.isEmpty) None else Some(o)
     def double(i: Double): BSONDouble                    = BSONDouble(i)
-    def doubleO(i: Double): Option[BSONDouble]           = if i != 0 then Some(BSONDouble(i)) else None
-    def zero[A](a: A)(implicit zero: Zero[A]): Option[A] = if zero.zero == a then None else Some(a)
+    def doubleO(i: Double): Option[BSONDouble]           = if (i != 0) Some(BSONDouble(i)) else None
+    def zero[A](a: A)(implicit zero: Zero[A]): Option[A] = if (zero.zero == a) None else Some(a)
   }
 
   val writer = new Writer

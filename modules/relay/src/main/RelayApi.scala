@@ -194,16 +194,16 @@ final class RelayApi(
     WithRelay(id) { relay =>
       relay.sync.upstream.flatMap(_.asUrl).map(_.withRound) foreach formatApi.refresh
       update(relay) { r =>
-        if v then r.withSync(_.play) else r.withSync(_.pause)
+        if (v) r.withSync(_.play) else r.withSync(_.pause)
       } void
     }
 
   def update(from: RelayRound)(f: RelayRound => RelayRound): Fu[RelayRound] = {
     val round = f(from) pipe { r =>
-      if r.sync.upstream != from.sync.upstream then r.withSync(_.clearLog) else r
+      if (r.sync.upstream != from.sync.upstream) r.withSync(_.clearLog) else r
     }
     studyApi.rename(round.studyId, Study.Name(round.name)) >> {
-      if round == from then fuccess(round)
+      if (round == from) fuccess(round)
       else
         roundRepo.coll.update.one($id(round.id), round).void >> {
           (round.sync.playing != from.sync.playing) so sendToContributors(

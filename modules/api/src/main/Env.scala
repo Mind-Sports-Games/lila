@@ -96,7 +96,7 @@ final class Env(
     endpoint = config.influxEventEndpoint,
     env = config.influxEventEnv
   )
-  if mode == Mode.Prod then scheduler.scheduleOnce(5 seconds)(influxEvent.start())
+  if (mode == Mode.Prod) scheduler.scheduleOnce(5 seconds)(influxEvent.start())
 
   private lazy val linkCheck = wire[LinkCheck]
 

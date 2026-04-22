@@ -56,7 +56,7 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
       drawOffers: GameDrawOffers,
       @annotation.nowarn("msg=unused") _variant: Variant
   ): Pgn =
-    if drawOffers.isEmpty then pgn
+    if (drawOffers.isEmpty) pgn
     else
       drawOffers.normalizedTurns.foldLeft(pgn) { case (pgn, turnCount) =>
         pgn.updateTurnCount(

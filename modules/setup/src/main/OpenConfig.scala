@@ -24,13 +24,13 @@ final case class OpenConfig(
   def validFen = ApiConfig.validFen(variant, position)
 
   def initialFen: Option[FEN] = position.flatMap(p =>
-    if variant.initialFens.contains(p) && variant.initialFens.size > 1 then
+    if (variant.initialFens.contains(p) && variant.initialFens.size > 1)
       Random.shuffle(variant.initialFens).headOption
     else Some(p)
   )
 
   def autoVariant =
-    if variant == Variant.Chess(Standard) && position.exists(!_.initial) then
+    if (variant == Variant.Chess(Standard) && position.exists(!_.initial))
       copy(variant = Variant.wrap(FromPosition))
     else this
 }

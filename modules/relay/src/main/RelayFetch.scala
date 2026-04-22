@@ -62,14 +62,14 @@ final private class RelayFetch(
         }
         Future
           .sequence(relays.map { rt =>
-            if rt.round.sync.ongoing then
+            if (rt.round.sync.ongoing)
               processRelay(rt) flatMap { newRelay =>
                 api.update(rt.round)(_ => newRelay)
               }
-            else if rt.round.hasStarted then {
+            else if (rt.round.hasStarted) {
               logger.info(s"Finish by lack of activity ${rt.round}")
               api.update(rt.round)(_.finish)
-            } else if rt.round.shouldGiveUp then {
+            } else if (rt.round.shouldGiveUp) {
               logger.info(s"Finish for lack of start ${rt.round}")
               api.update(rt.round)(_.finish)
             } else fuccess(rt.round)
@@ -80,7 +80,7 @@ final private class RelayFetch(
 
   // no writing the relay; only reading!
   def processRelay(rt: RelayRound.WithTour): Fu[RelayRound] =
-    if !rt.round.sync.playing then fuccess(rt.round.withSync(_.play))
+    if (!rt.round.sync.playing) fuccess(rt.round.withSync(_.play))
     else
       fetchGames(rt)
         .mon(_.relay.fetchTime(rt.tour.official, rt.round.slug))
@@ -98,10 +98,10 @@ final private class RelayFetch(
         .recover { case e: Exception =>
           (e match {
             case _: lila.core.lilaism.LilaTimeout =>
-              if rt.tour.official then logger.info(s"Sync timeout ${rt.round}")
+              if (rt.tour.official) logger.info(s"Sync timeout ${rt.round}")
               SyncResult.Timeout
             case _ =>
-              if rt.tour.official then logger.info(s"Sync error ${rt.round} ${e.getMessage take 80}")
+              if (rt.tour.official) logger.info(s"Sync error ${rt.round} ${e.getMessage take 80}")
               SyncResult.Error(e.getMessage)
           }) -> rt.round.withSync(_.addLog(SyncLog.event(0, e.some)))
         }
@@ -121,7 +121,7 @@ final private class RelayFetch(
   def continueRelay(rt: RelayRound.WithTour): RelayRound =
     rt.round.sync.upstream.fold(rt.round) { upstream =>
       val seconds =
-        if rt.round.sync.log.alwaysFails && !upstream.local then {
+        if (rt.round.sync.log.alwaysFails && !upstream.local) {
           rt.round.sync.log.events.lastOption
             .filterNot(_.isTimeout)
             .flatMap(_.error)
@@ -131,12 +131,12 @@ final private class RelayFetch(
           60
         } else
           rt.round.sync.delay getOrElse {
-            if upstream.local then 3 else 6
+            if (upstream.local) 3 else 6
           }
       rt.round.withSync {
         _.copy(
           nextAt = DateTime.now plusSeconds {
-            seconds atLeast { if rt.round.sync.log.justTimedOut then 10 else 2 }
+            seconds atLeast { if (rt.round.sync.log.justTimedOut) 10 else 2 }
           } some
         )
       }
@@ -254,7 +254,7 @@ private object RelayFetch {
   case class GamesSeenBy(games: Fu[RelayGames], seenBy: Set[RelayRound.Id])
 
   def maxChapters(tour: RelayTour) =
-    lila.study.Study.maxChapters * (if tour.official then 2 else 1)
+    lila.study.Study.maxChapters * (if (tour.official) 2 else 1)
 
   private object DgtJson {
     case class PairingPlayer(
@@ -320,7 +320,7 @@ private object RelayFetch {
               case (Success((acc, index)), pgn) =>
                 pgnCache.get(pgn) flatMap { f =>
                   val game = f(index)
-                  if game.isEmpty then Failure(LilaException(s"Found an empty PGN at index $index"))
+                  if (game.isEmpty) Failure(LilaException(s"Found an empty PGN at index $index"))
                   else Success((acc :+ game, index + 1))
                 }
               case (acc, _) => acc

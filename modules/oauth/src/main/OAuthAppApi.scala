@@ -67,7 +67,7 @@ final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.Executi
 
   def update(from: OAuthApp)(f: OAuthApp => OAuthApp): Fu[OAuthApp] = {
     val app = f(from)
-    if app == from then fuccess(app)
+    if (app == from) fuccess(app)
     else colls.app(_.update.one($doc(F.clientId -> app.clientId), app)) inject app
   }
 

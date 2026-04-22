@@ -16,7 +16,7 @@ final class PostRepo(val coll: Coll, filter: Filter = Safe)(implicit
     withFilter(user.filter(_.marks.troll).fold[Filter](Safe) { u =>
       SafeAnd(u.id)
     })
-  def withFilter(f: Filter) = if f == filter then this else new PostRepo(coll, f)
+  def withFilter(f: Filter) = if (f == filter) this else new PostRepo(coll, f)
   def unsafe                = withFilter(Unsafe)
 
   import BSONHandlers.PostBSONHandler
@@ -86,7 +86,7 @@ final class PostRepo(val coll: Coll, filter: Filter = Safe)(implicit
   val selectNotErased = $doc("erasedAt" `$exists` false)
 
   def selectLangs(langs: List[String]) =
-    if langs.isEmpty then $empty
+    if (langs.isEmpty) $empty
     else $doc("lang" `$in` langs)
 
   def findDuplicate(post: Post): Fu[Option[Post]] =

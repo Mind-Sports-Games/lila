@@ -25,7 +25,7 @@ final class PrefApi(
   }
 
   def saveTag(user: User, tag: Pref.Tag.type => String, value: Boolean) = {
-    if value then
+    if (value)
       coll.update
         .one(
           $id(user.id),

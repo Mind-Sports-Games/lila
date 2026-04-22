@@ -94,14 +94,14 @@ final private class Player(
       progress: Progress,
       action: Action
   )(implicit proxy: GameProxy): Fu[Events] = {
-    if pov.game.hasAi then uciMemo.add(pov.game, action)
+    if (pov.game.hasAi) uciMemo.add(pov.game, action)
     notifyMove(action, progress.game)
-    if progress.game.finished then moveFinish(progress.game) dmap { progress.events ::: _ }
+    if (progress.game.finished) moveFinish(progress.game) dmap { progress.events ::: _ }
     else {
-      if progress.game.playableByAi then requestFishnet(progress.game, round)
-      if pov.opponent.isOfferingDraw then round ! DrawNo(PlayerId(pov.player.id))
-      if pov.player.isProposingTakeback then round ! TakebackNo(PlayerId(pov.player.id))
-      if progress.game.forecastable then
+      if (progress.game.playableByAi) requestFishnet(progress.game, round)
+      if (pov.opponent.isOfferingDraw) round ! DrawNo(PlayerId(pov.player.id))
+      if (pov.player.isProposingTakeback) round ! TakebackNo(PlayerId(pov.player.id))
+      if (progress.game.forecastable)
         (action match {
           case m: StratMove => Some(m)
           case _            => None
@@ -109,13 +109,13 @@ final private class Player(
           round ! ForecastPlay(move)
         }
       scheduleExpiration(progress.game)
-      if progress.game.selectSquaresPossible then scheduleActionExpiration(progress.game)
+      if (progress.game.selectSquaresPossible) scheduleActionExpiration(progress.game)
       fuccess(progress.events)
     }
   }
 
   private[round] def fishnet(game: Game, ply: Int, uci: Uci)(implicit proxy: GameProxy): Fu[Events] =
-    if game.playable && game.player.isAi && game.playedPlies == ply then
+    if (game.playable && game.player.isAi && game.playedPlies == ply)
       applyUci(game, uci, blur = false, metrics = fishnetLag)
         .fold(errs => fufail(ClientError(errs)), fuccess)
         .flatMap {
@@ -126,7 +126,7 @@ final private class Player(
               .andDo(uciMemo.add(progress.game, action))
               .andDo { val _ = lila.mon.fishnet.move(~game.aiLevel).increment() }
               .andDo(notifyMove(action, progress.game)) >> {
-              if progress.game.finished then moveFinish(progress.game) dmap { progress.events ::: _ }
+              if (progress.game.finished) moveFinish(progress.game) dmap { progress.events ::: _ }
               else fuccess(progress.events)
             }
         }
@@ -139,7 +139,7 @@ final private class Player(
 
   private[round] def requestFishnet(game: Game, round: RoundDuct): Funit =
     game.playableByAi so {
-      if game.turnCount <= fishnetPlayer.maxTurns then fishnetPlayer(game)
+      if (game.turnCount <= fishnetPlayer.maxTurns) fishnetPlayer(game)
       else fuccess(round ! actorApi.round.ResignAi)
     }
 
@@ -187,7 +187,7 @@ final private class Player(
     Bus.publish(MoveGameEvent(game, moveEvent.fen, moveEvent.move), MoveGameEvent.makeChan(game.id))
 
     // publish correspondence moves
-    if game.isCorrespondence && game.nonAi then
+    if (game.isCorrespondence && game.nonAi)
       Bus.publish(
         CorresMoveEvent(
           move = moveEvent,

@@ -92,7 +92,7 @@ final class PuzzleApi(
             _ so { prevRound =>
               trustApi.vote(user, prevRound, vote) flatMap {
                 _ so { weight =>
-                  val voteValue = (if vote then 1 else -1) * weight
+                  val voteValue = (if (vote) 1 else -1) * weight
                   lila.mon.puzzle.vote(vote, prevRound.win).increment()
                   updatePuzzle(id, voteValue, prevRound.vote) zip
                     colls.round {
@@ -153,7 +153,7 @@ final class PuzzleApi(
           round.themeVote(theme, vote) so { newThemes =>
             import PuzzleRound.BSONFields as F
             val update =
-              if newThemes.isEmpty || !PuzzleRound.themesLookSane(newThemes) then
+              if (newThemes.isEmpty || !PuzzleRound.themesLookSane(newThemes))
                 fuccess($unset(F.themes, F.puzzle).some)
               else
                 vote match {

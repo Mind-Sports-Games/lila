@@ -63,7 +63,7 @@ final class EvalCacheApi(
 
   private def fetchAndSetAccess(id: Id): Fu[Option[EvalCacheEntry]] =
     coll.find($id(id)).one[EvalCacheEntry] addEffect { res =>
-      if res.isDefined then coll.updateFieldUnchecked($id(id), "usedAt", DateTime.now)
+      if (res.isDefined) coll.updateFieldUnchecked($id(id), "usedAt", DateTime.now)
     }
 
   private def put(trustedUser: TrustedUser, input: Input, sri: Socket.Sri): Funit =

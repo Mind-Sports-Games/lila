@@ -30,7 +30,7 @@ final class SelfReport(
         //   Env.report.api.autoBotReport(u.id, referer, name)
         // }
         def doLog(): Unit =
-          if name != "ceval" then {
+          if (name != "ceval") {
             lila
               .log("cheat")
               .branch("jslog")
@@ -46,11 +46,11 @@ final class SelfReport(
               )
             }
           }
-        if name == "kb" || fullId.value == "____________" then fuccess(doLog())
+        if (name == "kb" || fullId.value == "____________") fuccess(doLog())
         else
           proxyRepo.pov(fullId.value) flatMap {
             _ so { pov =>
-              if !known then doLog()
+              if (!known) doLog()
               if Set("ceval", "rcb", "cma", "lga")(name) ||
                 (name.startsWith("soc") && (
                   name.contains("stockfish") || name.contains("userscript") ||
@@ -58,7 +58,7 @@ final class SelfReport(
                 ))
               then
                 fuccess {
-                  if userId.isDefined then
+                  if (userId.isDefined)
                     tellRound(pov.gameId, lila.round.actorApi.round.Cheat(pov.playerIndex))
                   user.ifTrue(name == "cma") foreach { u =>
                     lila.common.Bus

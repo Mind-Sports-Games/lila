@@ -25,7 +25,7 @@ final private class HookRepo {
 
   // O(n + nb * log(n))
   def truncateIfNeeded() =
-    if hooks.size >= hardLimit then {
+    if (hooks.size >= hardLimit) {
       logger.warn(s"Found ${hooks.size} hooks, cleaning up!")
       hooks = hooks.reset(Heapsort.topN(hooks.values, hardLimit * 3 / 4, creationOrdering).toSet)
       logger.warn(s"Kept ${hooks.size} hooks")

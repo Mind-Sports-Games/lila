@@ -20,7 +20,7 @@ case class PoolMember(
   def ratingDiff(other: PoolMember) = Math.abs(rating - other.rating)
 
   def withRange(r: Option[RatingRange]) =
-    if r == ratingRange then this
+    if (r == ratingRange) this
     else copy(ratingRange = r, misses = 0)
 
   def hasRange = ratingRange.isDefined

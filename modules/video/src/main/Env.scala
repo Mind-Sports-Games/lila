@@ -48,7 +48,7 @@ final class Env(
     api = api
   )
 
-  if mode == Mode.Prod then {
+  if (mode == Mode.Prod) {
     scheduler.scheduleWithFixedDelay(config.sheetDelay * 2, config.sheetDelay) { () =>
       sheet.fetchAll.logFailure(logger).discard
     }

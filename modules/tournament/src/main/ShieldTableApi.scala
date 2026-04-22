@@ -91,7 +91,7 @@ object ShieldTableApi {
 
     def titleFromId(id: Int) = s"${getFromId(id).name} Shield Leaderboard"
 
-    def restrictionGameFamily(id: Int) = if id == 0 then "" else s"${getFromId(id).name} "
+    def restrictionGameFamily(id: Int) = if (id == 0) "" else s"${getFromId(id).name} "
   }
 
   case class ShieldTableEntry(

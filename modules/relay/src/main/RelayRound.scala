@@ -25,7 +25,7 @@ case class RelayRound(
 
   lazy val slug = {
     val s = lila.common.String.slugify(name)
-    if s.isEmpty then "-" else s
+    if (s.isEmpty) "-" else s
   }
 
   def finish =
@@ -77,13 +77,13 @@ object RelayRound {
     def hasUpstream = upstream.isDefined
 
     def renew =
-      if hasUpstream then copy(until = DateTime.now.plusHours(1).some)
+      if (hasUpstream) copy(until = DateTime.now.plusHours(1).some)
       else pause
 
     def ongoing = until so DateTime.now.isBefore
 
     def play =
-      if hasUpstream then renew.copy(nextAt = nextAt orElse DateTime.now.plusSeconds(3).some)
+      if (hasUpstream) renew.copy(nextAt = nextAt orElse DateTime.now.plusSeconds(3).some)
       else pause
 
     def pause =
@@ -134,7 +134,7 @@ object RelayRound {
     val tour: RelayTour
     def fullName     = s"${tour.name} • ${round.name}"
     def path: String =
-      s"/broadcast/${tour.slug}/${if round.slug == tour.slug then "-" else round.slug}/${round.id}"
+      s"/broadcast/${tour.slug}/${if (round.slug == tour.slug) "-" else round.slug}/${round.id}"
     def path(chapterId: Chapter.Id): String = s"$path/$chapterId"
   }
 

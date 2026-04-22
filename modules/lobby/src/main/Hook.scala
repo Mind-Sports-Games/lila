@@ -75,7 +75,7 @@ case class Hook(
         "clock" -> clock.show,
         "t"     -> clock.estimateTotalSeconds,
         "s"     -> speed.id,
-        "i"     -> (if clock.graceSeconds > 0 then 1 else 0)
+        "i"     -> (if (clock.graceSeconds > 0) 1 else 0)
       )
       .add("prov" -> perf.map(_.provisional).filter(identity))
       .add("u" -> user.map(_.username))

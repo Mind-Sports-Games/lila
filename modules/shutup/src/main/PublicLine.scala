@@ -51,6 +51,6 @@ object PublicLine {
       case BSONString(text)  => Success(PublicLine(text, none, none))
       case a                 => lila.db.BSON.handlerBadValue(s"Invalid PublicLine $a")
     },
-    x => if x.from.isDefined then objectHandler.writeTry(x).get else BSONString(x.text)
+    x => if (x.from.isDefined) objectHandler.writeTry(x).get else BSONString(x.text)
   )
 }

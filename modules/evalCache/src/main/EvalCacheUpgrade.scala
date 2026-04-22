@@ -37,7 +37,7 @@ final private class EvalCacheUpgrade(scheduler: akka.actor.Scheduler)(implicit
       Option(evals.get(makeSetupId(input.id.variant, input.fen, multiPv)))
     } foreach { sris =>
       val wms = sris.withFilter(sri.value !=).flatMap(i => Option(members.get(i)))
-      if wms.nonEmpty then {
+      if (wms.nonEmpty) {
         val json = JsonHandlers.writeEval(input.eval, input.fen)
         wms foreach { wm =>
           wm.push(json + ("path" -> JsString(wm.path)))
@@ -56,7 +56,7 @@ final private class EvalCacheUpgrade(scheduler: akka.actor.Scheduler)(implicit
   private def unregisterEval(setupId: SetupId, sri: Socket.Sri): Unit =
     Option(evals.get(setupId)) foreach { sris =>
       val newSris = sris - sri.value
-      if newSris.isEmpty then evals.remove(setupId)
+      if (newSris.isEmpty) evals.remove(setupId)
       else evals.put(setupId, newSris)
     }
 

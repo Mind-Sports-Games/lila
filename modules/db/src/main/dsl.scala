@@ -112,7 +112,7 @@ trait dsl {
     }
 
   def $setBoolOrUnset(field: String, value: Boolean): Bdoc = {
-    if value then $set(field -> true) else $unset(field)
+    if (value) $set(field -> true) else $unset(field)
   }
 
   def $min(item: ElementProducer): Bdoc = {
@@ -162,7 +162,7 @@ trait dsl {
     def isValid: Boolean = Seq("date", "timestamp") contains value
 
     def produce: BSONValue = {
-      if !isValid then throw new IllegalArgumentException(value)
+      if (!isValid) throw new IllegalArgumentException(value)
 
       $doc("$type" -> value)
     }
@@ -178,7 +178,7 @@ trait dsl {
     $doc("$addToSet" -> $doc((Seq(item) ++ items)*))
 
   def $pop(item: (String, Int)): Bdoc = {
-    if item._2 != -1 && item._2 != 1 then
+    if (item._2 != -1 && item._2 != 1)
       throw new IllegalArgumentException(s"${item._2} is not equal to: -1 | 1")
     $doc("$pop" -> $doc(item))
   }
@@ -199,7 +199,7 @@ trait dsl {
     $doc("$pull" -> $doc(item))
 
   def $addOrPull[T: BSONWriter](key: String, value: T, add: Boolean): Bdoc =
-    $doc((if add then "$addToSet" else "$pull") -> $doc(key -> value))
+    $doc((if (add) "$addToSet" else "$pull") -> $doc(key -> value))
 
   // End ofTop Level Array Update Operators
   // **********************************************************************************************//

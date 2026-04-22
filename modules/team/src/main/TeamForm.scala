@@ -160,7 +160,7 @@ final private[team] class TeamForm(
     teamRepo.coll.exists($id(Team.nameToId(setup.trim.name)))
 
   private def lameName(d: TeamSetup)(implicit ctx: lila.user.UserContext) =
-    if isGranted(_.Admin)(using ctx) then false else LameName.team(d.name)
+    if (isGranted(_.Admin)(using ctx)) false else LameName.team(d.name)
 }
 
 private[team] case class TeamSetup(

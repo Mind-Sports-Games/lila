@@ -49,7 +49,7 @@ final private class FishnetLimiter(
         def perUser =
           requesterApi.countTodayAndThisWeek(userId) map { case (daily, weekly) =>
             weekly < maxPerWeek &&
-            daily < (if weekly < maxPerWeek * 2 / 3 then maxPerDay else maxPerDay * 2 / 3)
+            daily < (if (weekly < maxPerWeek * 2 / 3) maxPerDay else maxPerDay * 2 / 3)
           }
         ip.fold(perUser) { ipAddress =>
           RequestLimitPerIP(ipAddress, cost = 1)(perUser)(fuccess(false))

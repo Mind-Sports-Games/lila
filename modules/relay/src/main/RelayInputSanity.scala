@@ -11,8 +11,8 @@ private object RelayInputSanity {
       extends Fail(s"Game ${gamePos + 1} matches with Chapter ${chapterPos + 1}")
 
   def apply(chapters: List[Chapter], games: RelayGames): Option[Fail] =
-    if chapters.isEmpty then none
-    else if isValidTCEC(chapters, games) then none
+    if (chapters.isEmpty) none
+    else if (isValidTCEC(chapters, games)) none
     else {
       val relayChapters: List[RelayChapter] = chapters.flatMap { chapter =>
         chapter.relay map chapter.->

@@ -105,7 +105,7 @@ final private[video] class VideoApi(
       )
 
     def byTags(user: Option[User], tags: List[Tag], page: Int): Fu[Paginator[VideoView]] =
-      if tags.isEmpty then popular(user, page)
+      if (tags.isEmpty) popular(user, page)
       else
         Paginator(
           adapter = new Adapter[Video](
@@ -217,7 +217,7 @@ final private[video] class VideoApi(
       _.expireAfterAccess(10 minutes)
         .buildAsyncFuture { filterTags =>
           val allPaths =
-            if filterTags.isEmpty then
+            if (filterTags.isEmpty)
               allPopular map { tags =>
                 tags.filterNot(_.isNumeric)
               }
@@ -246,7 +246,7 @@ final private[video] class VideoApi(
               all find (_.tag == t)
             }
             list.sortBy { t =>
-              if filterTags contains t.tag then Int.MinValue
+              if (filterTags contains t.tag) Int.MinValue
               else -t.nb
             }
           }

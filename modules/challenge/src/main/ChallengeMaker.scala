@@ -66,7 +66,7 @@ final class ChallengeMaker(
         case _                => TimeControl.Unlimited
       }
       val playerIndexName =
-        if pov.game.variant.gameLogic == GameLogic.Backgammon() then pov.playerIndex.name
+        if (pov.game.variant.gameLogic == GameLogic.Backgammon()) pov.playerIndex.name
         else (!pov.playerIndex).name
       Challenge.make(
         variant = pov.game.variant,

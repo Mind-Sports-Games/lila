@@ -25,7 +25,7 @@ final private class PushApi(
 ) {
 
   def finish(game: Game): Funit =
-    if !game.isCorrespondence || game.hasAi then funit
+    if (!game.isCorrespondence || game.hasAi) funit
     else
       Future
         .sequence(
@@ -283,7 +283,7 @@ final private class PushApi(
     lightUser(t.lastMsg.user) flatMap {
       _ so { sender =>
         userRepo.isKid(t.other(sender)) flatMap { isKid =>
-          if isKid then funit
+          if (isKid) funit
           else
             pushToAll(
               t.other(sender),

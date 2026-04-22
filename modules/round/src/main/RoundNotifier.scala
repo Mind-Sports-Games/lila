@@ -15,7 +15,7 @@ final private class RoundNotifier(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def gameEnd(game: Game)(playerIndex: PlayerIndex) =
-    if !game.aborted then
+    if (!game.aborted)
       game.player(playerIndex).userId foreach { userId =>
         game.perfType foreach { perfType =>
           timeline ! (Propagate(

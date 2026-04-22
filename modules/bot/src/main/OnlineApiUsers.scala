@@ -19,7 +19,7 @@ final class OnlineApiUsers(
     // We must delay the event publication, because caffeine
     // delays the removal listener, therefore when a bot reconnects,
     // the offline event is sent after the online event.
-    if !isOnline(userId) || !cache.get(userId) then
+    if (!isOnline(userId) || !cache.get(userId))
       scheduler.scheduleOnce(1 second) {
         publish(userId, isOnline = true)
       }

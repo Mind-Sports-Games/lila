@@ -130,7 +130,7 @@ final class GameApiV2(
           )
           .documentSource()
           .map(g => config.postFilter(g).option(g))
-          .throttle(config.perSecond.value * 10, 1 second, e => if e.isDefined then 10 else 2)
+          .throttle(config.perSecond.value * 10, 1 second, e => if (e.isDefined) 10 else 2)
           .mapConcat(_.toList)
           .take(config.max | Int.MaxValue)
           .via(upgradeOngoingGame)
@@ -145,7 +145,7 @@ final class GameApiV2(
         gameRepo
           .sortedCursor(
             $inIds(config.ids),
-            if chronological then Query.sortChronological else Query.sortCreated,
+            if (chronological) Query.sortChronological else Query.sortCreated,
             batchSize = config.perSecond.value
           )
           .documentSource()
@@ -197,7 +197,7 @@ final class GameApiV2(
               case Format.SGF  => sgfDump.formatter(config.flags)(game, fen, analysis, teams, none)
               case Format.JSON =>
                 def addBerserk(playerIndex: PlayerIndex)(json: JsObject) =
-                  if pairing.berserkOf(playerIndex) then
+                  if (pairing.berserkOf(playerIndex))
                     json deepMerge Json.obj(
                       "players" -> Json.obj(playerIndex.name -> Json.obj("berserk" -> true))
                     )
@@ -362,7 +362,7 @@ object GameApiV2 {
     case object PGN  extends Format
     case object JSON extends Format
     case object SGF  extends Format
-    def byRequest(req: play.api.mvc.RequestHeader) = if HTTPRequest.acceptsNdJson(req) then JSON else PGN
+    def byRequest(req: play.api.mvc.RequestHeader) = if (HTTPRequest.acceptsNdJson(req)) JSON else PGN
   }
 
   sealed trait Config {

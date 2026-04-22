@@ -39,7 +39,7 @@ object I18nLangPicker {
     }
 
   def findCloser(to: Lang): Option[Lang] =
-    if Registry.langs contains to then Some(to)
+    if (Registry.langs contains to) Some(to)
     else
       defaultByLanguage.get(to.language) orElse
         playstrategyCodes.get(to.language)

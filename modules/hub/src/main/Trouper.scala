@@ -26,8 +26,7 @@ abstract class Trouper(implicit ec: ExecutionContext) extends lila.common.Tellab
     isAlive = false
 
   def !(msg: Any): Unit =
-    if isAlive && stateRef.getAndUpdate(state => Some(state.fold(Queue.empty[Any])(_ enqueue msg))).isEmpty
-    then run(msg)
+    if (isAlive && stateRef.getAndUpdate(state => Some(state.fold(Queue.empty[Any])(_ enqueue msg))).isEmpty) run(msg)
 
   def ask[A](makeMsg: Promise[A] => Any): Fu[A] = {
     val promise = Promise[A]()
@@ -65,7 +64,7 @@ object Trouper {
   private val postRunUpdate = new UnaryOperator[State] {
     override def apply(state: State): State =
       state flatMap { q =>
-        if q.isEmpty then None else Some(q.tail)
+        if (q.isEmpty) None else Some(q.tail)
       }
   }
 

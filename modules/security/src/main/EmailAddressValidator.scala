@@ -40,12 +40,12 @@ final class EmailAddressValidator(
     userRepo.countRecentByPrevEmail(email.normalize).dmap(1 <)
 
   val acceptableConstraint = Constraint[String]("constraint.email_acceptable") { e =>
-    if EmailAddress.from(e).exists(isAcceptable) then Valid
+    if (EmailAddress.from(e).exists(isAcceptable)) Valid
     else Invalid(ValidationError("error.email_acceptable"))
   }
 
   val sendableConstraint = Constraint[String]("constraint.email_acceptable") { e =>
-    if EmailAddress.from(e).exists(_.isSendable) then Valid
+    if (EmailAddress.from(e).exists(_.isSendable)) Valid
     else Invalid(ValidationError("error.email_acceptable"))
   }
 
@@ -54,13 +54,13 @@ final class EmailAddressValidator(
       val email           = EmailAddress(e)
       val (taken, reused) =
         (isTakenBySomeoneElse(email, forUser) zip wasUsedTwiceRecently(email)).await(2 seconds, "emailUnique")
-      if taken || reused then Invalid(ValidationError("error.email_unique"))
+      if (taken || reused) Invalid(ValidationError("error.email_unique"))
       else Valid
     }
 
   def differentConstraint(than: Option[EmailAddress]) =
     Constraint[String]("constraint.email_different") { e =>
-      if than.contains(EmailAddress(e)) then Invalid(ValidationError("error.email_different"))
+      if (than.contains(EmailAddress(e))) Invalid(ValidationError("error.email_different"))
       else Valid
     }
 
@@ -70,7 +70,7 @@ final class EmailAddressValidator(
   // only compute valid and non-p1listed email domains
   private def hasAcceptableDns(e: EmailAddress): Fu[Boolean] =
     isAcceptable(e) so e.domain.map(_.lower) so { domain =>
-      if DisposableEmailDomain.p1listed(domain) then fuccess(true)
+      if (DisposableEmailDomain.p1listed(domain)) fuccess(true)
       else
         dnsApi.mx(domain).dmap { domains =>
           domains.nonEmpty && !domains.exists { disposable(_) }

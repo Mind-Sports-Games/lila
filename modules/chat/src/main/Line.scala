@@ -79,8 +79,8 @@ object Line {
     }
   def userLineToStr(x: UserLine): String = {
     val sep =
-      if x.troll then "!"
-      else if x.deleted then "?"
+      if (x.troll) "!"
+      else if (x.deleted) "?"
       else " "
     val tit = x.title.so(_.value + titleSep)
     s"$tit${x.username}$sep${x.text}"

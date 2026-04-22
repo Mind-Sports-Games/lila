@@ -11,7 +11,7 @@ case class RageSit(counter: Int) extends AnyVal {
   def isTerrible = counter <= -160
 
   def goneWeight: Float =
-    if !isBad then 1f
+    if (!isBad) 1f
     else (1 - 0.7 * sqrt(log10(-(counter / 10) - 3))).toFloat.atLeast(0.1f)
 
   def counterView = counter / 10
@@ -35,10 +35,10 @@ object RageSit {
           case _                                          => 0
         }
       } * {
-        if loser.p1 then 1 else -1
+        if (loser.p1) 1 else -1
       } * {
-        if game.speed <= Speed.Bullet then 5
-        else if game.speed == Speed.Blitz then 10
+        if (game.speed <= Speed.Bullet) 5
+        else if (game.speed == Speed.Blitz) 10
         else 15
       }
     }

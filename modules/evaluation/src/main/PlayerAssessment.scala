@@ -155,10 +155,10 @@ object PlayerAssessment {
         case _                                   => NotCheating
       }
 
-      if flags.suspiciousHoldAlert then assessment
-      else if ~game.wonBy(playerIndex) then assessment
-      else if assessment == Cheating then LikelyCheating
-      else if assessment == LikelyCheating then Unclear
+      if (flags.suspiciousHoldAlert) assessment
+      else if (~game.wonBy(playerIndex)) assessment
+      else if (assessment == Cheating) LikelyCheating
+      else if (assessment == LikelyCheating) Unclear
       else assessment
     }
 

@@ -21,7 +21,7 @@ final class ModApi(
       sus = prev.set(_.withMarks(_.set(_.Alt, v)))
       _ <- reportApi.process(mod, sus, Set(Room.Cheat, Room.Print))
       _ <- logApi.alt(mod, sus, v)
-    } yield if v then notifier.reporters(mod, sus).discard
+    } yield if (v) notifier.reporters(mod, sus).discard
 
   def setEngine(mod: Mod, prev: Suspect, v: Boolean): Funit =
     (prev.user.marks.engine != v) so {
@@ -32,7 +32,7 @@ final class ModApi(
         _ <- logApi.engine(mod, sus, v)
       } yield {
         Bus.publish(lila.hub.actorApi.mod.MarkCheater(sus.user.id, v), "adjustCheater")
-        if v then {
+        if (v) {
           notifier.reporters(mod, sus)
           refunder.schedule(sus)
         }
@@ -55,7 +55,7 @@ final class ModApi(
     } yield ()
 
   def setBoost(mod: Mod, prev: Suspect, v: Boolean): Fu[Suspect] =
-    if prev.user.marks.boost == v then fuccess(prev)
+    if (prev.user.marks.boost == v) fuccess(prev)
     else
       for {
         _ <- userRepo.setBoost(prev.user.id, v)
@@ -63,7 +63,7 @@ final class ModApi(
         _ <- reportApi.process(mod, sus, Set(Room.Other))
         _ <- logApi.booster(mod, sus, v)
       } yield {
-        if v then {
+        if (v) {
           Bus.publish(lila.hub.actorApi.mod.MarkBooster(sus.user.id), "adjustBooster")
           notifier.reporters(mod, sus)
         }
@@ -80,7 +80,7 @@ final class ModApi(
       }
     } >>
       reportApi.process(mod, sus, Set(Room.Comm)).andDo {
-        if value then notifier.reporters(mod, sus).discard
+        if (value) notifier.reporters(mod, sus).discard
       } inject sus
   }
 
@@ -161,7 +161,7 @@ final class ModApi(
 
   def setRankban(mod: Mod, sus: Suspect, v: Boolean): Funit =
     (sus.user.marks.rankban != v) so {
-      if v then Bus.publish(lila.hub.actorApi.mod.KickFromRankings(sus.user.id), "kickFromRankings")
+      if (v) Bus.publish(lila.hub.actorApi.mod.KickFromRankings(sus.user.id), "kickFromRankings")
       userRepo.setRankban(sus.user.id, v) >> logApi.rankban(mod, sus, v)
     }
 

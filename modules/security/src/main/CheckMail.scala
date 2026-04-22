@@ -23,7 +23,7 @@ final private class CheckMail(
 ) {
 
   def apply(domain: Domain.Lower): Fu[Boolean] =
-    if config.key.value.isEmpty then fuccess(true)
+    if (config.key.value.isEmpty) fuccess(true)
     else
       cache
         .get(domain)

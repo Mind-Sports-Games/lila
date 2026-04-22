@@ -133,7 +133,7 @@ final class ClasApi(
       coll.update
         .one(
           $id(c.id),
-          if v then $set("archived" -> Clas.Recorded(t.id, DateTime.now))
+          if (v) $set("archived" -> Clas.Recorded(t.id, DateTime.now))
           else $unset("archived")
         )
         .void
@@ -275,7 +275,7 @@ final class ClasApi(
         .findAndUpdate[Student](
           selector = $id(sId),
           update =
-            if v then $set("archived" -> Clas.Recorded(by.id, DateTime.now))
+            if (v) $set("archived" -> Clas.Recorded(by.id, DateTime.now))
             else $unset("archived"),
           fetchNewObject = true
         )
@@ -368,7 +368,7 @@ ${clas.desc}""",
         invite: ClasInvite
     ): Fu[ClasInvite.Feedback] = {
       val url = s"$baseUrl/class/invitation/${invite._id}"
-      if student.kid then fuccess(ClasInvite.Feedback.CantMsgKid(url))
+      if (student.kid) fuccess(ClasInvite.Feedback.CantMsgKid(url))
       else {
         import lila.i18n.I18nKeys.clas.*
         implicit val lang = student.realLang | lila.i18n.defaultLang

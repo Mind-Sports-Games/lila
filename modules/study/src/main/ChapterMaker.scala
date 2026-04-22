@@ -29,7 +29,7 @@ final private class ChapterMaker(
         }
       case Some(game) => fromGame(study, game, data, order, userId)
     } map { (c: Chapter) =>
-      if c.name.value.isEmpty then c.copy(name = Chapter.defaultName(order)) else c
+      if (c.name.value.isEmpty) c.copy(name = Chapter.defaultName(order)) else c
     }
 
   def fromFenOrPgnOrBlank(study: Study, data: Data, order: Int, userId: User.ID): Fu[Chapter] =
@@ -93,7 +93,7 @@ final private class ChapterMaker(
           ply = sit.plies,
           turnCount = sit.turnCount,
           playedPlayerIndex =
-            if sit.situation.board.history.currentTurn.nonEmpty then sit.situation.player
+            if (sit.situation.board.history.currentTurn.nonEmpty) sit.situation.player
             else !sit.situation.player,
           variant = sit.situation.board.variant,
           fen = Forsyth.>>(sit.situation.board.variant.gameLogic, sit),
@@ -148,7 +148,7 @@ final private class ChapterMaker(
       root <- game2root(game, initialFen)
       tags <- pgnDump.tags(game, initialFen, none, withOpening = true)
       name <-
-        if data.isDefaultName then
+        if (data.isDefaultName)
           Namer.gameVsText(game, withRatings = false)(using lightUser.async).dmap(Chapter.Name.apply)
         else fuccess(data.name)
       _ = notifyChat(study, game, userId)
@@ -173,7 +173,7 @@ final private class ChapterMaker(
     )
 
   def notifyChat(study: Study, game: Game, userId: User.ID) =
-    if study.isPublic then
+    if (study.isPublic)
       List(game.id, s"${game.id}/w") foreach { chatId =>
         chatApi.userChat.write(
           chatId = Chat.Id(chatId),

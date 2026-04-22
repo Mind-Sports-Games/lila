@@ -36,8 +36,8 @@ object TeamBattle {
     }
     def updateRank(newRank: Int)           = new RankedTeam(newRank, teamId, leaders, score)
     override def compare(that: RankedTeam) =
-      if this.score > that.score then -1
-      else if this.score < that.score then 1
+      if (this.score > that.score) -1
+      else if (this.score < that.score) 1
       else that.magicScore - this.magicScore
   }
 
@@ -80,7 +80,7 @@ object TeamBattle {
       def potentialTeamIds: Set[TeamID] = {
         val lines    = teams.linesIterator.toList
         val dirtyIds =
-          if lines.sizeIs > 1 then lines.map(_.takeWhile(' ' !=))
+          if (lines.sizeIs > 1) lines.map(_.takeWhile(' ' !=))
           else lines.headOption.so(_.split(',').toList)
         dirtyIds.map(_.trim).filter(_.nonEmpty).toSet
       }

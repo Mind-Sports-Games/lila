@@ -52,7 +52,7 @@ final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(impl
         }
         .monSuccess(_.tv.streamer.twitch)
         .flatMap { result =>
-          if result.data.exists(_.nonEmpty) then
+          if (result.data.exists(_.nonEmpty))
             fetchStreams(streamers, page + 1, result.pagination) map (result.liveStreams ::: _)
           else fuccess(Nil)
         }

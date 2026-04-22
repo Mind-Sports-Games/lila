@@ -65,8 +65,8 @@ sealed trait Context extends lila.user.UserContextWrapper {
   def currentSoundSet = lila.pref.SoundSet(pref.soundSet)
 
   lazy val currentBg =
-    if pref.bg == Pref.Bg.TRANSPARENT then "transp"
-    else if pref.bg == Pref.Bg.LIGHT then "light"
+    if (pref.bg == Pref.Bg.TRANSPARENT) "transp"
+    else if (pref.bg == Pref.Bg.LIGHT) "light"
     else "dark"
 
   def currentSelectedColorCls = Pref.Color.asString.get(pref.color).getOrElse(Pref.Color.default)

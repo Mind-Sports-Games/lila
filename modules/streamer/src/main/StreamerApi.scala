@@ -58,7 +58,7 @@ final class StreamerApi(
   def setLiveNow(ids: List[Streamer.Id]): Funit =
     coll.update.one($doc("_id" `$in` ids), $set("liveAt" -> DateTime.now), multi = true) >>
       cache.candidateIds.getUnit.map { candidateIds =>
-        if ids.exists(candidateIds.contains) then cache.candidateIds.invalidateUnit()
+        if (ids.exists(candidateIds.contains)) cache.candidateIds.invalidateUnit()
       }
 
   def update(prev: Streamer, data: StreamerForm.UserData, asMod: Boolean): Fu[Streamer.ModChange] = {

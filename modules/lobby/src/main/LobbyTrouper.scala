@@ -100,7 +100,7 @@ final private class LobbyTrouper(
     case BiteSeek(seekId, user) =>
       NoPlayban(user.some) {
         gameCache.nbPlaying(user.id) foreach { nbPlaying =>
-          if maxPlaying > nbPlaying then {
+          if (maxPlaying > nbPlaying) {
             lila.mon.lobby.seek.join.increment()
             seekApi.find(seekId) foreach {
               _ foreach { seek =>
@@ -140,7 +140,7 @@ final private class LobbyTrouper(
     case WithPromise(Sris(sris), promise) =>
       poolApi.socketIds(Sris(sris))
       val fewSecondsAgo = DateTime.now.minusSeconds(5)
-      if remoteDisconnectAllAt.isBefore(fewSecondsAgo) then
+      if (remoteDisconnectAllAt.isBefore(fewSecondsAgo))
         this ! RemoveHooks {
           hookRepo
             .notInSris(sris)
@@ -196,7 +196,7 @@ final private class LobbyTrouper(
 
   private object recentlyAbortedUserIdPairs {
     private val cache                                     = new lila.memo.ExpireSetMemo(1 hour)
-    private def makeKey(u1: User.ID, u2: User.ID): String = if u1 < u2 then s"$u1/$u2" else s"$u2/$u1"
+    private def makeKey(u1: User.ID, u2: User.ID): String = if (u1 < u2) s"$u1/$u2" else s"$u2/$u1"
     def register(g: Game)                                 =
       for {
         w <- g.p1Player.userId

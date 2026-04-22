@@ -21,7 +21,7 @@ private object BSONHandlers {
   implicit val PvsHandler: BSONHandler[NonEmptyList[Pv]] = new BSONHandler[NonEmptyList[Pv]] {
     private def scoreWrite(s: Score): String          = s.value.fold(_.value.toString, m => s"#${m.value}")
     private def scoreRead(str: String): Option[Score] =
-      if str.startsWith("#") then
+      if (str.startsWith("#"))
         str.drop(1).toIntOption map { m =>
           Score.mate(Mate(m))
         }

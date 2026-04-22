@@ -90,7 +90,7 @@ final class LeaderboardApi(
       }
 
   private def ejectEntries(entryIds: List[String], disqualify: Boolean) =
-    if disqualify then repo.coll.update.one($inIds(entryIds), $set("dq" -> true)).void
+    if (disqualify) repo.coll.update.one($inIds(entryIds), $set("dq" -> true)).void
     else repo.coll.delete.one($inIds(entryIds)).void
 
   def getAndEjectRecent(userId: User.ID, since: DateTime, disqualify: Boolean): Fu[List[Tournament.ID]] =
@@ -104,7 +104,7 @@ final class LeaderboardApi(
     }
 
   def ejectEntry(userId: User.ID, tourId: Tournament.ID, disqualify: Boolean) =
-    if disqualify then repo.coll.update.one(tourUserSelector(userId, tourId), $set("dq" -> true)).void
+    if (disqualify) repo.coll.update.one(tourUserSelector(userId, tourId), $set("dq" -> true)).void
     else repo.coll.delete.one(tourUserSelector(userId, tourId)).void
 
   private def paginator(

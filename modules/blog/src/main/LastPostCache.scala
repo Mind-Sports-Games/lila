@@ -32,7 +32,7 @@ final class LastPostCache(
 
   private def maybeNotifyLastPost(posts: List[MiniPost]): Unit =
     posts.headOption foreach { last =>
-      if lastNotifiedId.so(last.id !=) then notifier(last.id)
+      if (lastNotifiedId.so(last.id !=)) notifier(last.id)
       lastNotifiedId = last.id.some
     }
 

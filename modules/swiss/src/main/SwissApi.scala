@@ -126,28 +126,28 @@ final class SwissApi(
   def update(swiss: Swiss, data: SwissForm.SwissData): Funit =
     Sequencing(swiss.id)(byId) { old =>
       val position =
-        if old.isCreated || old.settings.position.isDefined then
+        if (old.isCreated || old.settings.position.isDefined)
           data.realVariant.standardVariant so data.realPosition
         else old.settings.position
       val swiss =
         old.copy(
           name = data.name | old.name,
-          clock = if old.isCreated then data.clock else old.clock,
-          variant = if old.isCreated && data.variant.isDefined then data.realVariant else old.variant,
+          clock = if (old.isCreated) data.clock else old.clock,
+          variant = if (old.isCreated && data.variant.isDefined) data.realVariant else old.variant,
           startsAt = data.startsAt.ifTrue(old.isCreated) | old.startsAt,
           nextRoundAt =
-            if old.isCreated then Some(data.startsAt | old.startsAt)
+            if (old.isCreated) Some(data.startsAt | old.startsAt)
             else old.nextRoundAt,
           settings = old.settings.copy(
             nbRounds = data.nbRounds,
             rated = position.isEmpty && (data.rated | old.settings.rated),
-            mcmahon = if data.mcmahon.mcmahon.isDefined then data.isMcMahon else old.settings.mcmahon,
+            mcmahon = if (data.mcmahon.mcmahon.isDefined) data.isMcMahon else old.settings.mcmahon,
             mcmahonCutoff =
-              if data.mcmahonCutoff.isDefined then ~data.mcmahonCutoff else old.settings.mcmahonCutoff,
+              if (data.mcmahonCutoff.isDefined) ~data.mcmahonCutoff else old.settings.mcmahonCutoff,
             handicapped =
-              if data.handicaps.handicapped.isDefined then data.isHandicapped else old.settings.handicapped,
+              if (data.handicaps.handicapped.isDefined) data.isHandicapped else old.settings.handicapped,
             inputPlayerRatings =
-              if data.inputPlayerRatings.isDefined then ~data.inputPlayerRatings
+              if (data.inputPlayerRatings.isDefined) ~data.inputPlayerRatings
               else old.settings.inputPlayerRatings,
             backgammonPoints = data.backgammonPoints,
             isMatchScore = data.isMatchScore,
@@ -160,10 +160,10 @@ final class SwissApi(
             position = position,
             chatFor = data.chatFor | old.settings.chatFor,
             roundInterval =
-              if data.roundInterval.isDefined then data.realRoundInterval
+              if (data.roundInterval.isDefined) data.realRoundInterval
               else old.settings.roundInterval,
             halfwayBreak =
-              if data.halfwayBreak.isDefined then data.realHalfwayBreak
+              if (data.halfwayBreak.isDefined) data.realHalfwayBreak
               else old.settings.halfwayBreak,
             password = data.password,
             conditions = data.conditions.all,
@@ -177,22 +177,20 @@ final class SwissApi(
               else old.settings.medleyVariants
           )
         ) pipe { s =>
-          if s.isStarted && s.nbOngoing == 0 && (s.nextRoundAt.isEmpty || old.settings.manualRounds) && !s.settings.manualRounds
-          then
+          if (s.isStarted && s.nbOngoing == 0 && (s.nextRoundAt.isEmpty || old.settings.manualRounds) && !s.settings.manualRounds)
             s.copy(nextRoundAt =
               DateTime.now
                 .plusSeconds(
-                  if s.isHalfway && s.settings.halfwayBreak.toSeconds.toInt != 0 then
+                  if (s.isHalfway && s.settings.halfwayBreak.toSeconds.toInt != 0)
                     s.settings.halfwayBreak.toSeconds.toInt
                   else s.settings.roundInterval.toSeconds.toInt
                 )
                 .some
             )
-          else if s.settings.manualRounds && !old.settings.manualRounds then s.copy(nextRoundAt = none)
+          else if (s.settings.manualRounds && !old.settings.manualRounds) s.copy(nextRoundAt = none)
           else s
         }
-      if (swiss.settings.handicapped || swiss.settings.mcmahon) && old.settings.inputPlayerRatings != ~data.inputPlayerRatings
-      then {
+      if ((swiss.settings.handicapped || swiss.settings.mcmahon) && old.settings.inputPlayerRatings != ~data.inputPlayerRatings) {
         val playerRatingMap = Handicaps.playerInputRatings(swiss.settings.inputPlayerRatings)
         Future.sequence(playerRatingMap.toList.map { case (u, r) =>
           colls.player
@@ -207,8 +205,7 @@ final class SwissApi(
           playerRatingMap.keys.toList.map(u => SwissPlayer.Id(s"${swiss.id}:${u}"))
         ) >>
           recomputeAndUpdateAll(swiss.id)
-      } else if !(swiss.settings.handicapped || swiss.settings.mcmahon) && (old.settings.handicapped || old.settings.mcmahon)
-      then
+      } else if (!(swiss.settings.handicapped || swiss.settings.mcmahon) && (old.settings.handicapped || old.settings.mcmahon))
         unsetAllPlayerInputRating(swiss.id) >>
           recomputeAndUpdateAll(swiss.id)
       colls.swiss.update.one($id(old.id), addFeaturable(swiss)).void.andDo {
@@ -216,7 +213,7 @@ final class SwissApi(
         socket.reload(swiss.id)
       }
     } >> {
-      if swiss.settings.mcmahon then recomputeAndUpdateAll(swiss.id) // need to update player points preStart
+      if (swiss.settings.mcmahon) recomputeAndUpdateAll(swiss.id) // need to update player points preStart
       else funit
     }
 
@@ -245,8 +242,8 @@ final class SwissApi(
   def scheduleNextRound(swiss: Swiss, date: DateTime): Funit =
     Sequencing(swiss.id)(notFinishedById) { old =>
       old.settings.manualRounds so {
-        if old.isCreated then colls.swiss.updateField($id(old.id), "startsAt", date).void
-        else if old.isStarted && old.nbOngoing == 0 then
+        if (old.isCreated) colls.swiss.updateField($id(old.id), "startsAt", date).void
+        else if (old.isStarted && old.nbOngoing == 0)
           colls.swiss.updateField($id(old.id), "nextRoundAt", date).void.andDo {
             val show = org.joda.time.format.DateTimeFormat.forStyle("MS").print(date)
             systemChat(swiss.id, s"Round ${swiss.round.value + 1} scheduled at $show UTC")
@@ -263,7 +260,7 @@ final class SwissApi(
 
   def join(id: Swiss.Id, me: User, isInTeam: TeamID => Boolean, password: Option[String]): Fu[Boolean] =
     Sequencing(id)(notFinishedById) { swiss =>
-      if swiss.settings.password.exists(_ != ~password) then fuFalse
+      if (swiss.settings.password.exists(_ != ~password)) fuFalse
       else
         colls.player // try a rejoin first
           .updateField($id(SwissPlayer.makeId(swiss.id, me.id)), SwissPlayer.Fields.absent, false)
@@ -499,7 +496,7 @@ final class SwissApi(
     Sequencing(id)(notFinishedById) { swiss =>
       SwissPlayer.fields { f =>
         val selId = $id(SwissPlayer.makeId(swiss.id, userId))
-        if swiss.isStarted then colls.player.updateField(selId, f.absent, true)
+        if (swiss.isStarted) colls.player.updateField(selId, f.absent, true)
         else
           colls.player.delete.one(selId) flatMap { res =>
             (res.n == 1) so colls.swiss.update.one($id(swiss.id), $inc("nbPlayers" -> -1)).void
@@ -675,8 +672,7 @@ final class SwissApi(
       case (true, _, _)           => finishGame(spgame)
       case (false, true, None)    => rematchForMultiGame(spgame)
       case (false, true, Some(g)) => {
-        if g.length + 1 < spgame.nbGamesPerRound || spgame.isMultiPoint
-        then // actual logic in SwissPairing (game.finishedOrAborted)
+        if (g.length + 1 < spgame.nbGamesPerRound || spgame.isMultiPoint) // actual logic in SwissPairing (game.finishedOrAborted)
           rematchForMultiGame(spgame)
         else funit // This will be called by checkOngoingGames
       }
@@ -686,7 +682,7 @@ final class SwissApi(
 
   private[swiss] def finishGame(game: SwissPairingGames): Funit =
     Sequencing(game.swissId)(byId) { swiss =>
-      if !swiss.isStarted then {
+      if (!swiss.isStarted) {
         logger.info(s"Removing pairing ${game.game.id} finished after swiss ${swiss.id}")
         colls.pairing.delete.one($id(game.game.id)) inject false
       } else
@@ -706,10 +702,10 @@ final class SwissApi(
             )
           )
           .flatMap { result =>
-            if result.nModified == 0 then fuccess(false) // dedup
+            if (result.nModified == 0) fuccess(false) // dedup
             else
               {
-                if swiss.nbOngoing > 0 then colls.swiss.update.one($id(swiss.id), $inc("nbOngoing" -> -1))
+                if (swiss.nbOngoing > 0) colls.swiss.update.one($id(swiss.id), $inc("nbOngoing" -> -1))
                 else
                   fuccess {
                     logger.warn(s"swiss ${swiss.id} nbOngoing = ${swiss.nbOngoing}")
@@ -732,8 +728,8 @@ final class SwissApi(
                     }
                 ) >> {
                   (swiss.nbOngoing <= 1) so {
-                    if swiss.round.value == swiss.settings.nbRounds then doFinish(swiss)
-                    else if swiss.settings.manualRounds then
+                    if (swiss.round.value == swiss.settings.nbRounds) doFinish(swiss)
+                    else if (swiss.settings.manualRounds)
                       fuccess {
                         systemChat(swiss.id, s"Round ${swiss.round.value + 1} needs to be scheduled.")
                       }
@@ -746,7 +742,7 @@ final class SwissApi(
                             case Some(days) => game.createdAt.plusDays(days)
                             case None       =>
                               DateTime.now.plusSeconds(
-                                if swiss.isHalfway && swiss.settings.halfwayBreak.toSeconds.toInt != 0 then
+                                if (swiss.isHalfway && swiss.settings.halfwayBreak.toSeconds.toInt != 0)
                                   swiss.settings.halfwayBreak.toSeconds.toInt
                                 else swiss.settings.roundInterval.toSeconds.toInt
                               )
@@ -768,7 +764,7 @@ final class SwissApi(
     }
 
   private def medleyRoundText(swiss: Swiss, offset: Int = 0) =
-    if swiss.isMedley then s" [${VariantKeys.variantName(swiss.variantForRound(swiss.round.value + offset))}]"
+    if (swiss.isMedley) s" [${VariantKeys.variantName(swiss.variantForRound(swiss.round.value + offset))}]"
     else ""
 
   private[swiss] def destroy(swiss: Swiss): Funit =
@@ -782,7 +778,7 @@ final class SwissApi(
   private[swiss] def finish(oldSwiss: Swiss): Funit =
     Sequencing(oldSwiss.id)(startedById) { swiss =>
       colls.pairing.exists($doc(SwissPairing.Fields.swissId -> swiss.id)) flatMap {
-        if _ then doFinish(swiss)
+        if (_) doFinish(swiss)
         else destroy(swiss)
       }
     }
@@ -812,7 +808,7 @@ final class SwissApi(
           .void >>
           SwissPairing.fields { f =>
             colls.pairing.delete.one($doc(f.swissId -> swiss.id, f.status -> true)) map { res =>
-              if res.n > 0 then logger.warn(s"Swiss ${swiss.id} finished with ${res.n} ongoing pairings")
+              if (res.n > 0) logger.warn(s"Swiss ${swiss.id} finished with ${res.n} ongoing pairings")
             }
           }.void
       }
@@ -831,8 +827,8 @@ final class SwissApi(
       }
 
   def kill(swiss: Swiss): Funit = {
-    if swiss.isStarted then finish(swiss).andDo(systemChat(swiss.id, s"Tournament cancelled by its creator."))
-    else if swiss.isCreated then destroy(swiss)
+    if (swiss.isStarted) finish(swiss).andDo(systemChat(swiss.id, s"Tournament cancelled by its creator."))
+    else if (swiss.isCreated) destroy(swiss)
     else funit
   }.andDo(cache.featuredInTeam.invalidate(swiss.teamId))
 
@@ -906,8 +902,8 @@ final class SwissApi(
       .flatMap { ids =>
         lila.common.LilaFuture.applySequentially(ids) { id =>
           Sequencing(id)(notFinishedById) { swiss =>
-            if swiss.round.value >= swiss.settings.nbRounds then doFinish(swiss)
-            else if swiss.nbPlayers >= 2 then
+            if (swiss.round.value >= swiss.settings.nbRounds) doFinish(swiss)
+            else if (swiss.nbPlayers >= 2)
               director.startRound(swiss).flatMap {
                 _.fold {
                   systemChat(swiss.id, "All possible pairings were played.")
@@ -923,7 +919,7 @@ final class SwissApi(
                       .void
                 }
               }
-            else if swiss.startsAt.isBefore(DateTime.now.minusMinutes(60)) then destroy(swiss)
+            else if (swiss.startsAt.isBefore(DateTime.now.minusMinutes(60))) destroy(swiss)
             else {
               systemChat(swiss.id, "Not enough players for first round; delaying start.", volatile = true)
               colls.swiss.update
@@ -981,10 +977,10 @@ final class SwissApi(
                 lila.mon.swiss.games("ongoing").record(ongoing.size)
                 lila.mon.swiss.games("flagged").record(flagged.size)
                 lila.mon.swiss.games("missing").record(missingIds.size)
-                if flagged.nonEmpty then
+                if (flagged.nonEmpty)
                   Bus.publish(lila.hub.actorApi.map.TellMany(flagged.map(_.id), QuietFlag), "roundSocket")
                 ongoing.foreach(updateMultiMatchProgress)
-                if missingIds.nonEmpty then colls.pairing.delete.one($inIds(missingIds))
+                if (missingIds.nonEmpty) colls.pairing.delete.one($inIds(missingIds))
                 finished
               }
             } flatMap { games =>

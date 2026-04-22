@@ -55,12 +55,12 @@ case class Swiss(
 
   def allRounds: List[SwissRound.Number]      = (1 to round.value).toList.map(SwissRound.Number.apply)
   def finishedRounds: List[SwissRound.Number] = (1 until round.value).toList.map(SwissRound.Number.apply)
-  def tieBreakRounds: List[SwissRound.Number] = if isFinished then allRounds
+  def tieBreakRounds: List[SwissRound.Number] = if (isFinished) allRounds
   else (1 until ((round.value + 1).atMost(settings.nbRounds))).toList.map(SwissRound.Number.apply)
-  def allAcceleratedRounds: List[SwissRound.Number] = if isFinished then allRounds
+  def allAcceleratedRounds: List[SwissRound.Number] = if (isFinished) allRounds
   else (1 to ((round.value + 1).atMost(settings.nbRounds))).toList.map(SwissRound.Number.apply)
 
-  def actualNbRounds = if isFinished then round.value else settings.nbRounds
+  def actualNbRounds = if (isFinished) round.value else settings.nbRounds
 
   def startRound =
     copy(
@@ -89,15 +89,15 @@ case class Swiss(
 
   def estimatedDurationString = {
     val minutes = estimatedDuration.toMinutes
-    if minutes < 60 then s"${minutes}m"
-    else s"${minutes / 60}h" + (if minutes % 60 != 0 then s" ${minutes % 60}m" else "")
+    if (minutes < 60) s"${minutes}m"
+    else s"${minutes / 60}h" + (if (minutes % 60 != 0) s" ${minutes % 60}m" else "")
   }
 
   def roundInfo = Swiss.RoundInfo(teamId, settings.chatFor)
 
   def betweenRounds = nextRoundAt.nonEmpty
 
-  def roundVariant = variantForRound(round.value + (if betweenRounds then 1 else 0))
+  def roundVariant = variantForRound(round.value + (if (betweenRounds) 1 else 0))
 
   def variantForRound(roundIndex: Int) =
     settings.medleyVariants.getOrElse(List()).lift(roundIndex - 1).getOrElse(variant)
@@ -118,9 +118,9 @@ case class Swiss(
     medleyGameGroups.map(_.map(VariantKeys.gameGroupName).mkString(", "))
 
   def mainGameFamily: Option[GameFamily] =
-    if isMedley then {
+    if (isMedley) {
       val firstGameFamily = medleyGameFamilies.flatMap(_.headOption)
-      if firstGameFamily.toList.some == medleyGameFamilies then firstGameFamily
+      if (firstGameFamily.toList.some == medleyGameFamilies) firstGameFamily
       else None
     } else variant.gameFamily.some
 
@@ -192,16 +192,16 @@ object Swiss {
   ) {
     lazy val intervalSeconds                       = roundInterval.toSeconds.toInt
     lazy val timeBeforeStartToJoin: Option[String] = minutesBeforeStartToJoin.map(m =>
-      if m < 60 then s"$m minutes"
-      else if m < 24 * 60 then s"${m / 60} hour${if m == 60 then "" else "s"}"
-      else s"${m / 24 / 60} day${if m == 24 * 60 then "" else "s"}"
+      if (m < 60) s"$m minutes"
+      else if (m < 24 * 60) s"${m / 60} hour${if (m == 60) "" else "s"}"
+      else s"${m / 24 / 60} day${if (m == 24 * 60)  "" else "s"}"
     )
     lazy val halfwayBreakText: Option[String] = (halfwayBreak.toSeconds.toInt match {
       case 0                  => None
       case s if s < 60        => Some(s"$s seconds")
-      case s if s < 3600      => Some(s"${s / 60} minute${if s == 60 then "" else "s"}")
-      case s if s < 24 * 3600 => Some(s"${s / 3600} hour${if s == 60 * 60 then "" else "s"}")
-      case s                  => Some(s"${s / 24 / 3600} day${if s == 24 * 60 * 60 then "" else "s"}")
+      case s if s < 3600      => Some(s"${s / 60} minute${if (s == 60) "" else "s"}")
+      case s if s < 24 * 3600 => Some(s"${s / 3600} hour${if (s == 60 * 60) "" else "s"}")
+      case s                  => Some(s"${s / 24 / 3600} day${if (s == 24 * 60 * 60) "" else "s"}")
     }).map(s => s"${s} break after round ${halfwayBreakRound}")
     lazy val halfwayBreakRound = (nbRounds + 1) / 2
     def manualRounds           = intervalSeconds == Swiss.RoundInterval.manual

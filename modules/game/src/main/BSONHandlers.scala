@@ -193,7 +193,7 @@ object BSONHandlers {
     { case arr: BSONArray =>
       Success(arr.values.foldLeft(GameDrawOffers.empty) {
         case (offers, BSONInteger(p)) =>
-          if p > 0 then offers.copy(p1 = offers.p1 incl p)
+          if (p > 0) offers.copy(p1 = offers.p1 incl p)
           else offers.copy(p2 = offers.p2 incl -p)
         case (offers, _) => offers
       })
@@ -319,7 +319,7 @@ object BSONHandlers {
                   halfMoveClock = decoded.halfMoveClock,
                   positionHashes = decoded.positionHashes,
                   unmovedRooks = decoded.unmovedRooks,
-                  checkCount = if gameVariant.key == "threeCheck" || gameVariant.key == "fiveCheck" then {
+                  checkCount = if (gameVariant.key == "threeCheck" || gameVariant.key == "fiveCheck") {
                     val counts = r.intsD(F.checkCount)
                     chess.CheckCount(~counts.headOption, ~counts.lastOption)
                   } else Game.emptyCheckCount
@@ -357,14 +357,14 @@ object BSONHandlers {
             // whilst Draughts isnt upgraded to multiaction
             lastMove = r.strO(F.historyLastTurn) flatMap (draughts.format.Uci.apply),
             positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
-            kingMoves = if gameVariant.frisianVariant || gameVariant.draughts64Variant then {
+            kingMoves = if (gameVariant.frisianVariant || gameVariant.draughts64Variant) {
               val counts = r.intsD(F.kingMoves)
-              if counts.length > 0 then {
+              if (counts.length > 0) {
                 draughts.KingMoves(
                   ~counts.headOption,
                   ~counts.tail.headOption,
-                  if counts.length > 2 then gameVariant.boardSize.pos.posAt(counts(2)) else none,
-                  if counts.length > 3 then gameVariant.boardSize.pos.posAt(counts(3)) else none
+                  if (counts.length > 2) gameVariant.boardSize.pos.posAt(counts(2)) else none,
+                  if (counts.length > 3) gameVariant.boardSize.pos.posAt(counts(3)) else none
                 )
               } else draughts.KingMoves(0, 0)
             } else draughts.KingMoves(0, 0),
@@ -376,7 +376,7 @@ object BSONHandlers {
         // we can flatten as draughts does not have any multiaction games (yet)
         val midCapture =
           actionStrs.flatten.lastOption.fold(false)(_.indexOf('x') != -1) && decodedBoard.ghosts != 0
-        val currentPly = if midCapture then plies - 1 else plies
+        val currentPly = if (midCapture) plies - 1 else plies
 
         val decodedSituation = draughts.Situation(
           board = decodedBoard,
@@ -688,9 +688,9 @@ object BSONHandlers {
                 history = abalone.History(
                   lastTurn = turnUcis(r.strO(F.historyLastTurn)),
                   currentTurn = currentTurnUcis,
-                  pliesRemainingThisTurn = if gameVariant.hasPrevPlayer then {
-                    val completedPlies = if turns == 0 then 0 else 2 * turns - 1
-                    Some((if turns == 0 then 1 else 2) - (plies - completedPlies))
+                  pliesRemainingThisTurn = if (gameVariant.hasPrevPlayer) {
+                    val completedPlies = if (turns == 0) 0 else 2 * turns - 1
+                    Some((if (turns == 0) 1 else 2) - (plies - completedPlies))
                   } else None,
                   // halfMoveClock only affects FEN serialization and has no impact on game logic
                   // (3-fold repetition uses positionHashes; no N-move rule for Abalone).
@@ -804,7 +804,7 @@ object BSONHandlers {
         ),
         F.status       -> o.status,
         F.turns        -> o.stratGame.turnCount,
-        F.plies        -> w.intO(if o.stratGame.plies == o.stratGame.turnCount then 0 else o.stratGame.plies),
+        F.plies        -> w.intO(if (o.stratGame.plies == o.stratGame.turnCount) 0 else o.stratGame.plies),
         F.activePlayer -> o.stratGame.situation.player.hashCode,
         F.startedAtPly -> w.intO(o.stratGame.startedAtPly),
         F.startedAtTurn -> w.intO(o.stratGame.startedAtTurn),
@@ -947,7 +947,7 @@ object BSONHandlers {
               F.historyCurrentTurn -> o.history.currentTurnUciString
             )
           case _ => // chess or fail
-            if o.variant.key == "standard" then
+            if (o.variant.key == "standard")
               $doc(F.huffmanPgn -> PgnStorage.Huffman.encode(o.actionStrs.flatten take Game.maxPlies))
             else {
               $doc(

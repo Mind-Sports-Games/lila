@@ -15,7 +15,7 @@ final class DiscordApi(
   def matchmakingAnnouncement(text: String, variant: Variant, isHook: Boolean): Funit =
     client(
       DiscordMessage(
-        text = linkifyUsers(text) + (if isHook then s" ${gameFamilyRole(variant)}" else ""),
+        text = linkifyUsers(text) + (if (isHook) s" ${gameFamilyRole(variant)}" else ""),
         channel = MatchMaking
       )
     )
@@ -41,7 +41,7 @@ final class DiscordApi(
     )
 
   private def variantLine(variantName: String, isMedley: Boolean) =
-    if isMedley then s"Medley beginning with $variantName"
+    if (isMedley) s"Medley beginning with $variantName"
     else variantName
 
   private def freqIcon(freq: String): String = freq match {

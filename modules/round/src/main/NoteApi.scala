@@ -12,7 +12,7 @@ final class NoteApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) 
     coll.primitiveOne[String]($id(makeId(gameId, userId)), "t").dmap(~_)
 
   def set(gameId: String, userId: String, text: String) = {
-    if text.isEmpty then coll.delete.one($id(makeId(gameId, userId)))
+    if (text.isEmpty) coll.delete.one($id(makeId(gameId, userId)))
     else
       coll.update.one(
         $id(makeId(gameId, userId)),

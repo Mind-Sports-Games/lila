@@ -256,7 +256,7 @@ final class RankingApi(
 
     // from 600 to 2800 by Stat.group
     private def compute(perfId: Perf.ID): Fu[List[NbUsers]] =
-      if !lila.rating.PerfType(perfId).exists(lila.rating.PerfType.leaderboardable.contains) then fuccess(Nil)
+      if (!lila.rating.PerfType(perfId).exists(lila.rating.PerfType.leaderboardable.contains)) fuccess(Nil)
       else
         coll
           .aggregateWith[Bdoc](

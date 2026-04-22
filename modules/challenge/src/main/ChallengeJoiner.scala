@@ -60,7 +60,7 @@ private object ChallengeJoiner {
           startedAtTurn = sp.turnCount,
           clock = c.clock.map(_.config.toClock)
         )
-        if c.variant.fromPositionVariant && Forsyth.>>(c.variant.gameLogic, game).initial then
+        if (c.variant.fromPositionVariant && Forsyth.>>(c.variant.gameLogic, game).initial)
           makeStratGame(Variant.libStandard(c.variant.gameLogic)) -> none
         else game                                                 -> baseState
       }
@@ -72,7 +72,7 @@ private object ChallengeJoiner {
         stratGame = stratGame,
         p1Player = Player.make(P1, c.finalPlayerIndex.fold(origUser, destUser), perfPicker),
         p2Player = Player.make(P2, c.finalPlayerIndex.fold(destUser, origUser), perfPicker),
-        mode = if stratGame.board.variant.fromPositionVariant then Mode.Casual else c.mode,
+        mode = if (stratGame.board.variant.fromPositionVariant) Mode.Casual else c.mode,
         source = Source.Friend,
         daysPerTurn = c.daysPerTurn,
         pgnImport = None,

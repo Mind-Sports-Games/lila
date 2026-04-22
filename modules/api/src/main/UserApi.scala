@@ -33,7 +33,7 @@ final private[api] class UserApi(
     }
 
   def extended(u: User, as: Option[User]): Fu[JsObject] =
-    if u.disabled then
+    if (u.disabled)
       fuccess {
         Json.obj(
           "id"       -> u.id,

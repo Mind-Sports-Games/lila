@@ -29,7 +29,7 @@ final class ApiActionStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView
             .queue[JsObject](16, akka.stream.OverflowStrategy.dropHead)
             .statefulMapConcat { () => js =>
               moves += 1
-              if game.finished || moves <= delayKeepsFirstMoves then List(js)
+              if (game.finished || moves <= delayKeepsFirstMoves) List(js)
               else {
                 buffer.enqueue(js)
                 (buffer.size > delayMovesBy) so List(buffer.dequeue())
@@ -62,7 +62,7 @@ final class ApiActionStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView
                   )
                 }
               }
-              if game.finished then {
+              if (game.finished) {
                 queue offer gameJsonView(game, initialFen)
                 queue.complete()
               } else {

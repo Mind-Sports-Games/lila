@@ -38,7 +38,7 @@ final private[tournament] class Cached(
   }
 
   def ranking(tour: Tournament): Fu[Ranking] =
-    if tour.isFinished then finishedRanking get tour.id
+    if (tour.isFinished) finishedRanking get tour.id
     else ongoingRanking get tour.id
 
   private[tournament] val teamInfo =
@@ -102,7 +102,7 @@ final private[tournament] class Cached(
         tour.id,
         userId,
         Sheet.versionOf(tour.startsAt),
-        if tour.streakable then Sheet.Streaks else Sheet.NoStreaks,
+        if (tour.streakable) Sheet.Streaks else Sheet.NoStreaks,
         tour.statusScoring
       )
 

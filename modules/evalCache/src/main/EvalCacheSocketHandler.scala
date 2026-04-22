@@ -32,7 +32,7 @@ final private class EvalCacheSocketHandler(
           pushData(json + ("path" -> JsString(path)))
         }
       }
-      if d.value contains "up" then upgrade.register(sri, variant, fen, multiPv, path)(pushData)
+      if (d.value contains "up") upgrade.register(sri, variant, fen, multiPv, path)(pushData)
     }
 
   def untrustedEvalPut(sri: Socket.Sri, userId: User.ID, data: JsObject): Unit =

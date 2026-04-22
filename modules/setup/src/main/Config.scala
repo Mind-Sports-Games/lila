@@ -76,19 +76,19 @@ private[setup] trait Config {
       case TimeMode.ByoyomiClock =>
         ByoyomiClock.Config(
           (time * 60).toInt,
-          if clockHasByoyomiTime then increment else 0,
-          if clockHasByoyomiTime then byoyomi else 10,
+          if (clockHasByoyomiTime) increment else 0,
+          if (clockHasByoyomiTime) byoyomi else 10,
           periods
         )
       case TimeMode.SimpleDelayClock =>
-        Clock.SimpleDelayConfig((time * 60).toInt, if clockHasSimpleDelayTime then increment else 1)
+        Clock.SimpleDelayConfig((time * 60).toInt, if (clockHasSimpleDelayTime) increment else 1)
       case TimeMode.BronsteinDelayClock =>
-        Clock.BronsteinConfig((time * 60).toInt, if clockHasBronsteinDelayTime then increment else 1)
+        Clock.BronsteinConfig((time * 60).toInt, if (clockHasBronsteinDelayTime) increment else 1)
       // NOTE: This would have always returned a Clock.Config before anywys. The reason
       //       why I'm not using the case _ => clause, is I want this code to not compile
       //       when we add new clocks in the future.
       case TimeMode.Correspondence | TimeMode.FischerClock | TimeMode.Unlimited =>
-        Clock.Config((time * 60).toInt, if clockHasFischerTime then increment else 1)
+        Clock.Config((time * 60).toInt, if (clockHasFischerTime) increment else 1)
     }
 
   def makeDaysPerTurn: Option[Int] = (timeMode == TimeMode.Correspondence).option(days)
@@ -166,7 +166,7 @@ trait Positional { self: Config =>
           startedAtTurn = sit.turnCount,
           clock = makeClock.map(_.toClock)
         )
-        if Forsyth.>>(sit.situation.gameLogic, game).initial then
+        if (Forsyth.>>(sit.situation.gameLogic, game).initial)
           makeGame(Variant.libStandard(sit.situation.gameLogic)) -> none
         else game                                                -> baseState
       }

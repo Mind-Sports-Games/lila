@@ -17,10 +17,10 @@ final class Messenger(api: ChatApi) {
 
   def system(persistent: Boolean)(game: Game, message: String): Unit = {
     val apiCall =
-      if persistent then api.userChat.system
+      if (persistent) api.userChat.system
       else api.userChat.volatile
     apiCall(watcherId(Chat.Id(game.id)), message, _.Round)
-    val _ = if game.nonAi then apiCall(Chat.Id(game.id), message, _.Round)
+    val _ = if (game.nonAi) apiCall(Chat.Id(game.id), message, _.Round)
   }
 
   def systemForOwners(chatId: Chat.Id, message: String): Unit =

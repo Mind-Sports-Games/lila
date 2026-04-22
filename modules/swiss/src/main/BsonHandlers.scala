@@ -106,7 +106,7 @@ object BsonHandlers {
         case Right(l) =>
           BSONArray(l.map { p =>
             p match {
-              case Some(p) => BSONInteger(if p.name == "p1" then 1 else 2)
+              case Some(p) => BSONInteger(if (p.name == "p1") 1 else 2)
               case _       => BSONInteger(0)
             }
           })

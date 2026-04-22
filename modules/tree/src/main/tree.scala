@@ -81,7 +81,7 @@ case class Root(
 
   def addChild(branch: Branch)     = copy(children = children :+ branch)
   def prependChild(branch: Branch) = copy(children = branch :: children)
-  def dropFirstChild               = copy(children = if children.isEmpty then children else children.tail)
+  def dropFirstChild               = copy(children = if (children.isEmpty) children else children.tail)
 }
 
 case class Branch(
@@ -117,7 +117,7 @@ case class Branch(
 
   def addChild(branch: Branch)     = copy(children = children :+ branch)
   def prependChild(branch: Branch) = copy(children = branch :: children)
-  def dropFirstChild               = copy(children = if children.isEmpty then children else children.tail)
+  def dropFirstChild               = copy(children = if (children.isEmpty) children else children.tail)
 
   def setComp = copy(comp = true)
 }
@@ -126,12 +126,12 @@ case class Branch(
 private object DropsByRole {
 
   def json(drops: Map[Role, List[Pos]]) =
-    if drops.isEmpty then JsNull
+    if (drops.isEmpty) JsNull
     else {
       val sb    = new java.lang.StringBuilder(128)
       var first = true
       drops foreach { case (orig, dests) =>
-        if first then first = false
+        if (first) first = false
         else sb.append(" ")
         sb.append(orig.forsyth)
         dests.foreach(d => sb.append(d.key))
@@ -175,7 +175,7 @@ object Node {
     case class Text(value: String) extends AnyVal {
       def removeMeta: Option[Text] = {
         val v = metaReg.replaceAllIn(value, "").trim
-        if v.nonEmpty then Some(Text(v)) else None
+        if (v.nonEmpty) Some(Text(v)) else None
       }
     }
     sealed trait Author
@@ -200,7 +200,7 @@ object Node {
     def findBy(author: Comment.Author) = list.find(_.by == author)
     def set(comment: Comment)          =
       Comments {
-        if list.exists(_.by == comment.by) then
+        if (list.exists(_.by == comment.by))
           list.map {
             case c if c.by == comment.by => c.copy(text = comment.text)
             case c                       => c
@@ -303,7 +303,7 @@ object Node {
 
   implicit def nodeListJsonWriter(alwaysChildren: Boolean): Writes[List[Node]] =
     Writes[List[Node]] { list =>
-      val writer = if alwaysChildren then defaultNodeJsonWriter else minimalNodeJsonWriter
+      val writer = if (alwaysChildren) defaultNodeJsonWriter else minimalNodeJsonWriter
       JsArray(list map writer.writes)
     }
 
@@ -326,10 +326,10 @@ object Node {
           .add("san", moveOption.map(_.san))
           .add("check", check)
           .add("eval", eval.filterNot(_.isEmpty))
-          .add("comments", if comments.nonEmpty then Some(comments) else None)
+          .add("comments", if (comments.nonEmpty) Some(comments) else None)
           .add("gamebook", gamebook)
           .add("glyphs", glyphs.nonEmpty)
-          .add("shapes", if shapes.list.nonEmpty then Some(shapes.list) else None)
+          .add("shapes", if (shapes.list.nonEmpty) Some(shapes.list) else None)
           .add("opening", opening)
           .add(
             "dests",
@@ -353,7 +353,7 @@ object Node {
           .add("comp", comp)
           .add(
             "children",
-            if alwaysChildren || children.nonEmpty then
+            if (alwaysChildren || children.nonEmpty)
               Some {
                 nodeListJsonWriter(true) writes children
               }
@@ -371,7 +371,7 @@ object Node {
     val sb    = new java.lang.StringBuilder(80)
     var first = true
     dests foreach { case (orig, dests) =>
-      if first then first = false
+      if (first) first = false
       else sb.append(" ")
       sb.append(orig.piotr)
       dests.foreach(d => sb.append(d.piotr))

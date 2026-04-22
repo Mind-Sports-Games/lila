@@ -21,7 +21,7 @@ trait Granter {
     }
 
   def isGrantedMod(categSlug: String)(implicit ctx: UserContext): Fu[Boolean] =
-    if ctx.me so Master(Permission.ModerateForum) then fuTrue
+    if (ctx.me so Master(Permission.ModerateForum)) fuTrue
     else
       Categ.slugToTeamId(categSlug) so { teamId =>
         ctx.userId so {

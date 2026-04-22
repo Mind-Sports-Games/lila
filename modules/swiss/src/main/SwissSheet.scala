@@ -64,16 +64,16 @@ private object SwissSheet {
             pairing.status match {
               case Left(_)     => List(Ongoing)
               case Right(None) =>
-                if swiss.settings.isMatchScore then outcomeListFromMultiMatch(player, pairing)
+                if (swiss.settings.isMatchScore) outcomeListFromMultiMatch(player, pairing)
                 else List(Draw)
               case Right(Some(playerIndex)) =>
-                if swiss.settings.isMatchScore then outcomeListFromMultiMatch(player, pairing)
-                else if pairing(playerIndex) == player.userId then List(Win)
+                if (swiss.settings.isMatchScore) outcomeListFromMultiMatch(player, pairing)
+                else if (pairing(playerIndex) == player.userId) List(Win)
                 else List(Loss)
             }
           case None if player.byes(round) =>
-            if swiss.settings.isMatchScore then
-              if swiss.settings.isBestOfX then
+            if (swiss.settings.isMatchScore)
+              if (swiss.settings.isBestOfX)
                 List.fill(swiss.settings.nbGamesPerRound / 2 + 1)(
                   Bye
                 ) // odd nbGamesPerRound not allowed in form for this setup...
@@ -93,7 +93,7 @@ private object SwissSheet {
             outcome.fold[Outcome](Draw)(c => {
               pairing.variant match {
                 case Some(v) if v.gameFamily == GameFamily.Backgammon() => {
-                  if pairing(c) == player.userId then Win else Loss
+                  if (pairing(c) == player.userId) Win else Loss
                 } // multimatch Backgammon games require players to keep colour/player for display same pieces
                 case _ => {
                   if (pairing(c) == player.userId && index % 2 == 0) || (pairing(
@@ -125,7 +125,7 @@ final private class SwissSheetApi(colls: SwissColls)(implicit
       sort: Bdoc
   ): Source[(SwissPlayer, Map[SwissRound.Number, SwissPairing], SwissSheet), ?] = {
     val readPreference =
-      if swiss.finishedAt.exists(_.isBefore(DateTime.now.minusSeconds(10))) then
+      if (swiss.finishedAt.exists(_.isBefore(DateTime.now.minusSeconds(10))))
         ReadPreference.secondaryPreferred
       else ReadPreference.primary
     SwissPlayer

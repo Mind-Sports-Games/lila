@@ -122,7 +122,7 @@ object Seek {
   implicit val lobbyPerfBSONHandler: BSONHandler[LobbyPerf] =
     BSONIntegerHandler.as[LobbyPerf](
       b => LobbyPerf(b.abs, b < 0),
-      x => x.rating * (if x.provisional then -1 else 1)
+      x => x.rating * (if (x.provisional) -1 else 1)
     )
 
   // TODO: this should probably go somewhere else.

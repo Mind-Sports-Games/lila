@@ -140,13 +140,13 @@ final class AssessApi(
       def consistentMoveTimes(game: Game)(player: Player) =
         Statistics.moderatelyConsistentPlyTimes(Pov(game, player))
       val shouldAssess =
-        if !game.source.exists(assessableSources.contains) then false
-        else if game.mode.casual then false
-        else if Player.HoldAlert.suspicious(holdAlerts) then true
-        else if game.isCorrespondence then false
-        else if game.playedTurns < 40 then false
-        else if game.players exists consistentMoveTimes(game) then true
-        else if game.createdAt.isBefore(bottomDate) then false
+        if (!game.source.exists(assessableSources.contains)) false
+        else if (game.mode.casual) false
+        else if (Player.HoldAlert.suspicious(holdAlerts)) true
+        else if (game.isCorrespondence) false
+        else if (game.playedTurns < 40) false
+        else if (game.players exists consistentMoveTimes(game)) true
+        else if (game.createdAt.isBefore(bottomDate)) false
         else true
       shouldAssess.so {
         createPlayerAssessment(PlayerAssessment.make(game.pov(P1), Some(analysis), holdAlerts.p1)) >>
@@ -234,31 +234,31 @@ final class AssessApi(
         !game.createdAt.isBefore(bottomDate)
 
     val shouldAnalyse: Fu[Option[AutoAnalysis.Reason]] =
-      if !game.analysable then fuccess(none)
-      else if game.speed >= strategygames.Speed.Blitz && (p1.hasTitle || p2.hasTitle) then
+      if (!game.analysable) fuccess(none)
+      else if (game.speed >= strategygames.Speed.Blitz && (p1.hasTitle || p2.hasTitle))
         fuccess(TitledPlayer.some)
-      else if !isEligibleForAssessment then fuccess(none)
+      else if (!isEligibleForAssessment) fuccess(none)
       // stop here for long games
-      else if game.playedTurns > 95 then fuccess(none)
-      else if isUpset then fuccess(Upset.some)
+      else if (game.playedTurns > 95) fuccess(none)
+      else if (isUpset) fuccess(Upset.some)
       // p1 has consistent move times
-      else if p1SuspCoefVariation.isDefined then fuccess(P1MoveTime.some)
+      else if (p1SuspCoefVariation.isDefined) fuccess(P1MoveTime.some)
       // p2 has consistent move times
-      else if p2SuspCoefVariation.isDefined then fuccess(P2MoveTime.some)
+      else if (p2SuspCoefVariation.isDefined) fuccess(P2MoveTime.some)
       else
         // someone is using a bot
         gameRepo.holdAlert.game(game) map { holdAlerts =>
-          if Player.HoldAlert.suspicious(holdAlerts) then HoldAlert.some
+          if (Player.HoldAlert.suspicious(holdAlerts)) HoldAlert.some
           // don't analyse most of other bullet games
-          else if game.speed == strategygames.Speed.Bullet && randomPercent(70) then none
+          else if (game.speed == strategygames.Speed.Bullet && randomPercent(70)) none
           // someone blurs a lot
-          else if game.players exists manyBlurs then Blurs.some
+          else if (game.players exists manyBlurs) Blurs.some
           // the winner shows a great rating progress
-          else if game.players exists winnerGreatProgress then WinnerRatingProgress.some
+          else if (game.players exists winnerGreatProgress) WinnerRatingProgress.some
           // analyse some tourney games
           // else if (game.isTournament) randomPercent(20) option "Tourney random"
           /// analyse new player games
-          else if winnerNbGames.so(40 >) && randomPercent(75) then NewPlayerWin.some
+          else if (winnerNbGames.so(40 >) && randomPercent(75)) NewPlayerWin.some
           else none
         }
 
@@ -266,7 +266,7 @@ final class AssessApi(
     // using blur and move-time flags only (engine accuracy flags are set to false).
     // This feeds the same PlayerAggregateAssessment / assessUser pipeline as analysed games.
     val assessUnanalysableGames: Funit =
-      if !game.analysable && isEligibleForAssessment then
+      if (!game.analysable && isEligibleForAssessment)
         gameRepo.holdAlert.game(game) flatMap { holdAlerts =>
           def consistentMoveTimes(player: Player) =
             Statistics.moderatelyConsistentPlyTimes(Pov(game, player))

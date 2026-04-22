@@ -26,7 +26,7 @@ final class PimpedOption[A](private val self: Option[A]) extends AnyVal {
 
   def err(message: => String): A = self.getOrElse(sys.error(message))
 
-  def ifNone(n: => Unit): Unit = if self.isEmpty then n
+  def ifNone(n: => Unit): Unit = if (self.isEmpty) n
 
   def has(a: A) = self contains a
 }
@@ -34,13 +34,13 @@ final class PimpedOption[A](private val self: Option[A]) extends AnyVal {
 final class PimpedString(private val s: String) extends AnyVal {
 
   def replaceIf(t: Char, r: Char): String =
-    if s.indexOf(t.toInt) >= 0 then s.replace(t, r) else s
+    if (s.indexOf(t.toInt) >= 0) s.replace(t, r) else s
 
   def replaceIf(t: Char, r: CharSequence): String =
-    if s.indexOf(t.toInt) >= 0 then s.replace(String.valueOf(t), r) else s
+    if (s.indexOf(t.toInt) >= 0) s.replace(String.valueOf(t), r) else s
 
   def replaceIf(t: CharSequence, r: CharSequence): String =
-    if s.contains(t) then s.replace(t, r) else s
+    if (s.contains(t)) s.replace(t, r) else s
 }
 
 final class PimpedConfig(private val config: Config) extends AnyVal {
@@ -54,8 +54,8 @@ final class PimpedDateTime(private val date: DateTime) extends AnyVal {
   def getSeconds: Long         = date.getMillis / 1000
   def getCentis: Long          = date.getMillis / 10
   def toNow                    = new Duration(date, DateTime.now)
-  def atMost(other: DateTime)  = if other.isBefore(date) then other else date
-  def atLeast(other: DateTime) = if other.isAfter(date) then other else date
+  def atMost(other: DateTime)  = if (other.isBefore(date)) other else date
+  def atLeast(other: DateTime) = if (other.isAfter(date)) other else date
 }
 
 final class PimpedTry[A](private val v: Try[A]) extends AnyVal {
@@ -91,12 +91,12 @@ final class PimpedFiniteDuration(private val d: FiniteDuration) extends AnyVal {
     Centis {
       // divide by Double, then round, to avoid rounding issues with just `/10`!
       math.round {
-        if d.unit eq MILLISECONDS then d.length / 10d
+        if (d.unit eq MILLISECONDS) d.length / 10d
         else d.toMillis / 10d
       }
     }
 
-  def abs = if d.length < 0 then -d else d
+  def abs = if (d.length < 0) -d else d
 }
 
 final class RichValidated[E, A](private val v: Validated[E, A]) extends AnyVal {

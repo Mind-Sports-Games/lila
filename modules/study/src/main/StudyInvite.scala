@@ -45,23 +45,23 @@ final private class StudyInvite(
       _         <- relation.contains(Block) so fufail[Unit]("This user does not want to join")
       isPresent <- getIsPresent(invited.id)
       _         <-
-        if isPresent then funit
+        if (isPresent) funit
         else
           prefApi.getPref(invited).map(_.studyInvite).flatMap {
             case Pref.StudyInvite.ALWAYS => funit
             case Pref.StudyInvite.NEVER  => fufail("This user doesn't accept study invitations")
             case Pref.StudyInvite.FRIEND =>
-              if relation.contains(Follow) then funit
+              if (relation.contains(Follow)) funit
               else fufail("This user only accept study invitations from friends")
           }
       _ <- studyRepo.addMember(study, StudyMember.make(invited))
       shouldNotify  = !isPresent && (!inviter.marks.troll || relation.contains(Follow))
       rateLimitCost =
-        if relation.contains(Follow) then 10
-        else if inviter.roles.contains("ROLE_COACH") then 20
-        else if inviter.hasTitle then 20
-        else if inviter.perfs.bestRating >= 2000 then 50
-        else if invited.hasTitle then 200
+        if (relation.contains(Follow)) 10
+        else if (inviter.roles.contains("ROLE_COACH")) 20
+        else if (inviter.hasTitle) 20
+        else if (inviter.perfs.bestRating >= 2000) 50
+        else if (invited.hasTitle) 200
         else 100
       _ <- shouldNotify so notifyRateLimit(inviter.id, rateLimitCost) {
         val notificationContent = InvitedToStudy(

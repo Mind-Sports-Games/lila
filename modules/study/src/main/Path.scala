@@ -28,7 +28,7 @@ case class Path(ids: Vector[UciCharPair]) extends AnyVal {
     }
 
   def toDbField =
-    if ids.isEmpty then s"root.${Path.rootDbKey}"
+    if (ids.isEmpty) s"root.${Path.rootDbKey}"
     else s"root.${Path `encodeDbKey` this}"
 
   def depth = ids.size

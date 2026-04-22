@@ -184,10 +184,10 @@ final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal {
 final class PimpedFutureBoolean(private val fua: Fu[Boolean]) extends AnyVal {
 
   def >>&(fub: => Fu[Boolean]): Fu[Boolean] =
-    fua.flatMap(if _ then fub else fuFalse)(using EC.parasitic)
+    fua.flatMap(if (_) fub else fuFalse)(using EC.parasitic)
 
   def >>|(fub: => Fu[Boolean]): Fu[Boolean] =
-    fua.flatMap(if _ then fuTrue else fub)(using EC.parasitic)
+    fua.flatMap(if (_) fuTrue else fub)(using EC.parasitic)
 
   @inline def unary_! = fua.map(!_)(using EC.parasitic)
 }

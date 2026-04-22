@@ -122,7 +122,7 @@ case class User(
 
   def isPatron = plan.active
 
-  def activePlan: Option[Plan] = if plan.active then Some(plan) else None
+  def activePlan: Option[Plan] = if (plan.active) Some(plan) else None
 
   def planMonths: Option[Int] = activePlan.map(_.months)
 
@@ -156,10 +156,10 @@ object User {
     import LoginCandidate.*
     def apply(p: PasswordAndToken): Result = {
       val res =
-        if check(p.password) then
+        if (check(p.password))
           user.totpSecret.fold[Result](Success(user)) { tp =>
             p.token.fold[Result](MissingTotpToken) { token =>
-              if tp.verify(token) then Success(user) else InvalidTotpToken
+              if (tp.verify(token)) Success(user) else InvalidTotpToken
             }
           }
         else InvalidUsernameOrPassword
@@ -224,7 +224,7 @@ object User {
     def isApiHog               = roles.exists(_ contains "ROLE_API_HOG")
     def isDaysOld(days: Int)   = createdAt.isBefore(DateTime.now.minusDays(days))
     def isHoursOld(hours: Int) = createdAt.isBefore(DateTime.now.minusHours(hours))
-    def kidId                  = if isKid then KidId(id) else NonKidId(id)
+    def kidId                  = if (isKid) KidId(id) else NonKidId(id)
   }
   case class Contacts(orig: Contact, dest: Contact) {
     def hasKid = orig.isKid || dest.isKid
@@ -316,7 +316,7 @@ object User {
         id = r.str(id),
         username = r.str(username),
         perfs = r.getO[Perfs](perfs).fold(Perfs.default) { perfs =>
-          if userTitle.has(Title.BOT) then perfs.copy(ultraBullet = Perf.default)
+          if (userTitle.has(Title.BOT)) perfs.copy(ultraBullet = Perf.default)
           else perfs
         },
         count = r.get[Count](count),

@@ -81,7 +81,7 @@ final class PgnDump(
       )
       genTags
         .foldLeft(chapter.tags.value.reverse) { case (tags, tag) =>
-          if tags.exists(t => tag.name == t.name) then tags
+          if (tags.exists(t => tag.name == t.name)) tags
           else tag :: tags
         }
         .reverse
@@ -100,7 +100,7 @@ object PgnDump {
     nodes.headOption.map { firstNode =>
       Turn(
         san = nodes.map(_.move.san).mkString(","),
-        glyphs = if flags.comments then firstNode.glyphs else Glyphs.empty,
+        glyphs = if (flags.comments) firstNode.glyphs else Glyphs.empty,
         comments = flags.comments so {
           firstNode.comments.list.map(_.text.value) ::: shapeComment(firstNode.shapes).toList
         },
@@ -189,7 +189,7 @@ object PgnDump {
     line
       .drop(1)
       .foldLeft(Vector(line.take(1))) { case (turn, node) =>
-        if turn.head.head.playedPlayerIndex != node.playedPlayerIndex then Vector(node) +: turn
+        if (turn.head.head.playedPlayerIndex != node.playedPlayerIndex) Vector(node) +: turn
         else (turn.head :+ node) +: turn.tail
       }
       .reverse

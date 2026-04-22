@@ -54,7 +54,7 @@ final class ChallengeGranter(
     fromOption
       .fold[Fu[Option[ChallengeDenied.Reason]]](
         // Allow anonymous users to challenge bots
-        if dest.isBot then fuccess(none)
+        if (dest.isBot) fuccess(none)
         else fuccess(YouAreAnon.some)
       ) { from =>
         relationApi.fetchRelation(dest, from) zip
@@ -67,7 +67,7 @@ final class ChallengeGranter(
             case (_, Pref.Challenge.FRIEND)                        => FriendsOnly.some
             case (_, Pref.Challenge.RATING)                        =>
               perfType so { pt =>
-                if from.perfs(pt).provisional || dest.perfs(pt).provisional then RatingIsProvisional(pt).some
+                if (from.perfs(pt).provisional || dest.perfs(pt).provisional) RatingIsProvisional(pt).some
                 else {
                   val diff = math.abs(from.perfs(pt).intRating - dest.perfs(pt).intRating)
                   (diff > ratingThreshold).option(RatingOutsideRange(pt))

@@ -31,7 +31,7 @@ final private class SwissDirector(
 
   private def randomDrawForVariant(variant: Variant)(): Option[FEN] = {
     val tables: List[FEN] = availableDrawTables(variant)
-    if tables.isEmpty then None
+    if (tables.isEmpty) None
     else tables.lift(Random.nextInt(tables.size))
   }
 
@@ -44,28 +44,28 @@ final private class SwissDirector(
     // weaker player must be p1 in handicap go games
     val wRating = players.filter(_.userId == w).map(_.actualRating).headOption.getOrElse(1500)
     val bRating = players.filter(_.userId == b).map(_.actualRating).headOption.getOrElse(1500)
-    val p1Id    = if wRating <= bRating then w else b
-    val p2Id    = if wRating <= bRating then b else w
+    val p1Id    = if (wRating <= bRating) w else b
+    val p2Id    = if (wRating <= bRating) b else w
 
     // handle mcmahon handicaped games
     val wPoints: Float     = players.filter(_.userId == w).map(_.points.value).headOption.getOrElse(0)
     val bPoints: Float     = players.filter(_.userId == b).map(_.points.value).headOption.getOrElse(0)
     val scoreDiff          = Math.abs(wPoints - bPoints).toInt
     val mcMahonHandicapped = swiss.settings.mcmahon && scoreDiff >= 2
-    val mmp1Id             = if wPoints <= bPoints then w else b
-    val mmp2Id             = if wPoints <= bPoints then b else w
+    val mmp1Id             = if (wPoints <= bPoints) w else b
+    val mmp2Id             = if (wPoints <= bPoints) b else w
 
-    if swiss.settings.handicapped then
+    if (swiss.settings.handicapped)
       (
         p1Id,
         p2Id,
         Handicaps.startingFen(
           swiss.roundVariant.some,
-          if p1Id == w then wRating else bRating,
-          if p2Id == w then wRating else bRating
+          if (p1Id == w) wRating else bRating,
+          if (p2Id == w) wRating else bRating
         )
       )
-    else if mcMahonHandicapped then
+    else if (mcMahonHandicapped)
       (mmp1Id, mmp2Id, Handicaps.startingFenMcMahon(swiss.roundVariant.some, scoreDiff))
     else if swiss.settings.backgammonPoints.getOrElse(1) > 1 && swiss.variant.gameFamily == GameFamily
         .Backgammon()
@@ -78,14 +78,14 @@ final private class SwissDirector(
     pairingSystem(from)
       .flatMap { pendings =>
         val pendingPairings = pendings.collect { case Right(p) => p }
-        if pendingPairings.isEmpty then fuccess(none) // terminate
+        if (pendingPairings.isEmpty) fuccess(none) // terminate
         else {
           val swiss                        = from.startRound
           val randomPos: () => Option[FEN] = () => randomDrawForVariant(swiss.roundVariant)()
           val randomPairingPos             = swiss.settings.usePerPairingDrawTables
           val randomRoundPos               = swiss.settings.useDrawTables && !randomPairingPos
           val perSwissPos                  = swiss.settings.position
-          val perRoundPos = if randomRoundPos then randomPos().orElse(perSwissPos) else perSwissPos
+          val perRoundPos = if (randomRoundPos) randomPos().orElse(perSwissPos) else perSwissPos
           for {
             players <- SwissPlayer.fields { f =>
               colls.player.list[SwissPlayer]($doc(f.swissId -> swiss.id))
@@ -110,8 +110,8 @@ final private class SwissDirector(
                   isBestOfX = swiss.settings.isBestOfX,
                   isPlayX = swiss.settings.isPlayX,
                   nbGamesPerRound = swiss.settings.nbGamesPerRound,
-                  if p1p2sf._3 != None then p1p2sf._3
-                  else if randomPairingPos then randomPos().orElse(perRoundPos)
+                  if (p1p2sf._3 != None) p1p2sf._3
+                  else if (randomPairingPos) randomPos().orElse(perRoundPos)
                   else perRoundPos,
                   swiss.roundVariant.some
                 )
@@ -143,7 +143,7 @@ final private class SwissDirector(
         }
       }
       .recover { case PairingSystem.BBPairingException(msg, input) =>
-        if msg.contains("The number of rounds is larger than the reported number of rounds.") then none
+        if (msg.contains("The number of rounds is larger than the reported number of rounds.")) none
         else {
           logger.warn(s"BBPairing ${from.id} $msg")
           logger.info(s"BBPairing ${from.id} $input")
@@ -154,14 +154,14 @@ final private class SwissDirector(
 
   private def makeClock(swiss: Swiss, prevGame: Option[Game]) =
     prevGame.fold(swiss.clock.toClock.some)(pg =>
-      if pg.metadata.multiPointState.nonEmpty then
+      if (pg.metadata.multiPointState.nonEmpty)
         pg.clock.fold(swiss.clock.toClock.some)(pgc => {
           swiss.clock.toClock
             .giveTime(P1, -pgc.clockPlayer(P1).elapsed)
             .giveTime(P2, -pgc.clockPlayer(P2).elapsed)
             .giveTime(
               pg.situation.player,
-              if Status.resigned.contains(pg.status) then Centis.ofSeconds(swiss.clock.graceSeconds)
+              if (Status.resigned.contains(pg.status)) Centis.ofSeconds(swiss.clock.graceSeconds)
               else Centis(0)
             )
             .some
@@ -181,7 +181,7 @@ final private class SwissDirector(
         stratGame = strategygames.Game(
           swiss.roundVariant.gameLogic,
           variant = Some {
-            if swiss.settings.position.isEmpty then swiss.roundVariant
+            if (swiss.settings.position.isEmpty) swiss.roundVariant
             else
               Variant
                 .byName(swiss.roundVariant.gameLogic, "From Position")
@@ -229,21 +229,21 @@ final private class SwissDirector(
         source = lila.game.Source.Swiss,
         pgnImport = None,
         multiMatch =
-          if prevGame.nonEmpty then
+          if (prevGame.nonEmpty)
             s"${pairing.multiMatchGameIds.fold(1)(ids => ids.size + 1)}:${pairing.id}".some // link to first mm game
-          else if swiss.settings.nbGamesPerRound > 1 || swiss.settings.backgammonPoints.getOrElse(1) > 1 then
+          else if (swiss.settings.nbGamesPerRound > 1 || swiss.settings.backgammonPoints.getOrElse(1) > 1)
             s"1:${pairing.id}".some
           else none
       )
       .withId(
-        if prevGame.nonEmpty then pairing.multiMatchGameIds.fold(pairing.gameId)(l => l.last) else pairing.id
+        if (prevGame.nonEmpty) pairing.multiMatchGameIds.fold(pairing.gameId)(l => l.last) else pairing.id
       )
       .withSwissId(swiss.id.value)
       .withHandicappedTournament(
         swiss.settings.handicapped || (swiss.settings.mcmahon && pairing.openingFEN.nonEmpty)
       )
       .withMultiPointState(
-        if prevGame.isEmpty then MultiPointState(swiss.settings.backgammonPoints)
+        if (prevGame.isEmpty) MultiPointState(swiss.settings.backgammonPoints)
         else
           prevGame.flatMap { g =>
             g.metadata.multiPointState.flatMap(

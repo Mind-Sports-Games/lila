@@ -107,7 +107,7 @@ final class BotJsonView(
   def chatLine(username: String, text: String, player: Boolean) =
     Json.obj(
       "type"     -> "chatLine",
-      "room"     -> (if player then "player" else "spectator"),
+      "room"     -> (if (player) "player" else "spectator"),
       "username" -> username,
       "text"     -> text
     )
@@ -142,7 +142,7 @@ final class BotJsonView(
     pov.game.clock
       .fold(0)(_ match {
         case bc: strategygames.ByoyomiClock =>
-          if bc.spentPeriodsOf(pov.playerIndex) == 0 then bc.config.graceSeconds.seconds.toMillis.toInt
+          if (bc.spentPeriodsOf(pov.playerIndex) == 0) bc.config.graceSeconds.seconds.toMillis.toInt
           else bc.config.byoyomi.millis.toInt
         case c => c.config.graceSeconds.seconds.toMillis.toInt
       })

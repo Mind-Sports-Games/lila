@@ -53,7 +53,7 @@ case class AnaDests(
 
   val dests: String = variant match {
     case Variant.Draughts(variant) =>
-      if isInitial then AnaDests.initialDraughtsDests
+      if (isInitial) AnaDests.initialDraughtsDests
       else
         sit.playable(false) so {
           val truncatedDests = truncatedMoves.map {
@@ -65,11 +65,11 @@ case class AnaDests(
               .to(Map)
               .map { case (p, lp) => (Pos.Draughts(p), lp.map(Pos.Draughts.apply)) }
           val destStr = destString(destsToConvert)
-          if captureLength > 0 then s"#$captureLength $destStr"
+          if (captureLength > 0) s"#$captureLength $destStr"
           else destStr
         }
     case _ =>
-      if isInitial then AnaDests.initialChessDests
+      if (isInitial) AnaDests.initialChessDests
       else sit.playable(false) so destString(sit.destinations)
   }
 
@@ -107,8 +107,8 @@ object AnaDests {
       i += 2
       unique = uci._2.slice(0, i)
     }
-    if i == uci._2.length then uci
-    else if i == 2 then (none, uci._2.slice(0, 4))
+    if (i == uci._2.length) uci
+    else if (i == 2) (none, uci._2.slice(0, 4))
     else (none, unique)
   }
 
@@ -119,7 +119,7 @@ object AnaDests {
       fullCapture: Boolean
   ): Map[strategygames.draughts.Pos, List[strategygames.draughts.Move]] = sit match {
     case Situation.Draughts(sit) =>
-      from.fold(if fullCapture then sit.validMovesFinal else sit.validMoves) { pos =>
+      from.fold(if (fullCapture) sit.validMovesFinal else sit.validMoves) { pos =>
         Map(pos -> sit.movesFrom(pos, fullCapture))
       }
     case _ => Map.empty[strategygames.draughts.Pos, List[strategygames.draughts.Move]]
@@ -131,7 +131,7 @@ object AnaDests {
   ): MapView[strategygames.draughts.Pos, List[String]] = {
     var truncated      = false
     val truncatedMoves = validMoves map { case (pos, moves) =>
-      if moves.size <= 1 then pos -> moves.map(m => (m.after.some, m.toUci.uci))
+      if (moves.size <= 1) pos -> moves.map(m => (m.after.some, m.toUci.uci))
       else
         pos -> moves.foldLeft(List[BoardWithUci]()) { (acc, move) =>
           val sameDestUcis = moves
@@ -139,9 +139,9 @@ object AnaDests {
             .map(m => (m.after.some, m.toUci.uci))
           val uci    = (move.after.some, move.toUci.uci)
           val newUci =
-            if sameDestUcis.isEmpty && move.orig != move.dest then uci else uniqueUci(sameDestUcis, uci)
-          if !acc.contains(newUci) then {
-            if newUci._2.length != uci._2.length then truncated = true
+            if (sameDestUcis.isEmpty && move.orig != move.dest) uci else uniqueUci(sameDestUcis, uci)
+          if (!acc.contains(newUci)) {
+            if (newUci._2.length != uci._2.length) truncated = true
             newUci :: acc
           } else {
             truncated = true
@@ -149,7 +149,7 @@ object AnaDests {
           }
         }
     }
-    (if truncated then truncateUcis(truncatedMoves) else truncatedMoves).view.mapValues { _ map { _._2 } }
+    (if (truncated) truncateUcis(truncatedMoves) else truncatedMoves).view.mapValues { _ map { _._2 } }
   }
 
   // draughts
@@ -159,7 +159,7 @@ object AnaDests {
   ): Map[strategygames.draughts.Pos, List[BoardWithUci]] = {
     var truncated     = false
     val truncatedUcis = validUcis map { case (pos, uciList) =>
-      if uciList.size <= 1 then pos -> uciList
+      if (uciList.size <= 1) pos -> uciList
       else
         pos -> uciList.foldLeft(List[BoardWithUci]()) { (acc, uci) =>
           val dest         = uci._2.takeRight(2)
@@ -168,9 +168,9 @@ object AnaDests {
               dest
             ) || (u._1.isEmpty && uci._1.isEmpty) || u._1 != uci._1)
           )
-          val newUci = if sameDestUcis.isEmpty then uci else uniqueUci(sameDestUcis, uci)
-          if !acc.contains(newUci) then {
-            if newUci._2.length != uci._2.length then truncated = true
+          val newUci = if (sameDestUcis.isEmpty) uci else uniqueUci(sameDestUcis, uci)
+          if (!acc.contains(newUci)) {
+            if (newUci._2.length != uci._2.length) truncated = true
             newUci :: acc
           } else {
             truncated = true
@@ -178,7 +178,7 @@ object AnaDests {
           }
         }
     }
-    if truncated then truncateUcis(truncatedUcis)
+    if (truncated) truncateUcis(truncatedUcis)
     else truncatedUcis
   }
 

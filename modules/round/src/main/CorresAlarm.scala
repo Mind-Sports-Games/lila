@@ -34,7 +34,7 @@ final private class CorresAlarm(
   scheduler.scheduleOnce(10 seconds) { scheduleNext() }
 
   Bus.subscribeFun("finishGame") { case lila.game.actorApi.FinishGame(game, _, _) =>
-    if game.hasCorrespondenceClock && !game.hasAi then coll.delete.one($id(game.id)).discard
+    if (game.hasCorrespondenceClock && !game.hasAi) coll.delete.one($id(game.id)).discard
   }
 
   Bus.subscribeFun("moveEventCorres") {

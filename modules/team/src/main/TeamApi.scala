@@ -86,7 +86,7 @@ final class TeamApi(
         hideForum = Some(e.hideForum)
       ) pipe { team =>
         teamRepo.coll.update.one($id(team.id), team).void >>
-          (if !team.leaders(me.id) then modLog.teamEdit(me.id, team.createdBy, team.name)
+          (if (!team.leaders(me.id)) modLog.teamEdit(me.id, team.createdBy, team.name)
            else funit).andDo(indexer ! InsertTeam(team))
       }
     }
@@ -127,13 +127,13 @@ final class TeamApi(
     }
 
   def join(team: Team, me: User, request: Option[String], password: Option[String]): Fu[Requesting] =
-    if team.open then
-      if team.password.fold(true)(_ == ~password) then doJoin(team, me) inject Requesting.Joined
+    if (team.open)
+      if (team.password.fold(true)(_ == ~password)) doJoin(team, me) inject Requesting.Joined
       else fuccess(Requesting.NeedPassword)
     else motivateOrJoin(team, me, request)
 
   def joinApi(team: Team, me: User, oAuthAppOwner: Option[User.ID], msg: Option[String]): Fu[Requesting] =
-    if team.open || oAuthAppOwner.contains(team.createdBy) then doJoin(team, me) inject Requesting.Joined
+    if (team.open || oAuthAppOwner.contains(team.createdBy)) doJoin(team, me) inject Requesting.Joined
     else motivateOrJoin(team, me, msg)
 
   private def motivateOrJoin(team: Team, me: User, msg: Option[String]) =
@@ -215,7 +215,7 @@ final class TeamApi(
 
   private def doQuit(team: Team, userId: User.ID): Funit =
     memberRepo.remove(team.id, userId) map { res =>
-      if res.n == 1 then teamRepo.incMembers(team.id, -1)
+      if (res.n == 1) teamRepo.incMembers(team.id, -1)
       cached.invalidateTeamIds(userId)
     }
 
@@ -255,7 +255,7 @@ final class TeamApi(
     } getOrElse Set.empty
     memberRepo.filterUserIdsInTeam(team.id, leaders) flatMap { ids =>
       ids.nonEmpty so {
-        if ids(team.createdBy) || !team.leaders(team.createdBy) || by.id == team.createdBy || byMod then {
+        if (ids(team.createdBy) || !team.leaders(team.createdBy) || by.id == team.createdBy || byMod) {
           cached.leaders.put(team.id, fuccess(ids))
           logger.info(s"valid setLeaders ${team.id}: ${ids mkString ", "} by @${by.id}")
           teamRepo.setLeaders(team.id, ids).void
@@ -276,7 +276,7 @@ final class TeamApi(
     if lila.security.Granter(_.ManageTeam)(by) || team.createdBy == by.id ||
       (team.leaders(by.id) && !team.leaders(team.createdBy))
     then
-      if team.enabled then
+      if (team.enabled)
         teamRepo.disable(team).void >>
           memberRepo.userIdsByTeam(team.id).map { _ foreach cached.invalidateTeamIds } >>
           requestRepo.removeByTeam(team.id).void.andDo(indexer ! RemoveTeam(team.id))

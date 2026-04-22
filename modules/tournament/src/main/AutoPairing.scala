@@ -28,13 +28,13 @@ final class AutoPairing(
         stratGame = StratGame(
           variant.gameLogic,
           Some {
-            if tour.position.isEmpty then variant
+            if (tour.position.isEmpty) variant
             else
               Variant
                 .byName(variant.gameLogic, "From Position")
                 .getOrElse(Variant.orDefault(variant.gameLogic, 3))
           },
-          if tour.handicapped then
+          if (tour.handicapped)
             Handicaps.startingFen(variant.some, player1.actualRating, player2.actualRating)
           else tour.position
         ) pipe { g =>

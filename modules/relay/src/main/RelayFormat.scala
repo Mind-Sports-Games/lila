@@ -130,7 +130,7 @@ private object RelayFormat {
 
   def addPart(url: Url, part: String)             = url.withPath(url.path addPart part)
   def replaceLastPart(url: Url, withPart: String) =
-    if url.path.isEmpty then addPart(url, withPart)
+    if (url.path.isEmpty) addPart(url, withPart)
     else
       url.withPath {
         url.path.withParts {

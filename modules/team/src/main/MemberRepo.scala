@@ -46,7 +46,7 @@ final class MemberRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCo
     coll.update
       .one(
         selectId(teamId, userId),
-        if v then $unset("unsub")
+        if (v) $unset("unsub")
         else $set("unsub" -> true)
       )
       .void

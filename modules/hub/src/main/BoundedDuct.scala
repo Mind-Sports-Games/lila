@@ -19,7 +19,7 @@ final class BoundedDuct(maxSize: Int, name: String, logging: Boolean = true)(pro
     stateRef.getAndUpdate { state =>
       Some {
         state.fold(emptyQueue) { q =>
-          if q.size >= maxSize then q
+          if (q.size >= maxSize) q
           else q.enqueue(msg)
         }
       }
@@ -29,9 +29,9 @@ final class BoundedDuct(maxSize: Int, name: String, logging: Boolean = true)(pro
         true
       case Some(q) =>
         val success = q.size < maxSize
-        if !success then {
+        if (!success) {
           lila.mon.duct.overflow(name).increment()
-          if logging then lila.log("duct").warn(s"[$name] queue is full ($maxSize)")
+          if (logging) lila.log("duct").warn(s"[$name] queue is full ($maxSize)")
         }
         success
     }
@@ -39,7 +39,7 @@ final class BoundedDuct(maxSize: Int, name: String, logging: Boolean = true)(pro
   def ask[A](makeMsg: Promise[A] => Any): Fu[A] = {
     val promise = Promise[A]()
     val success = this ! makeMsg(promise)
-    if !success then promise failure new EnqueueException(s"The $name duct queue is full ($maxSize)")
+    if (!success) promise failure new EnqueueException(s"The $name duct queue is full ($maxSize)")
     promise.future
   }
 

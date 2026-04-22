@@ -35,7 +35,7 @@ final private class Monitor(
 
     monBy.totalSecond(userId).increment(sumOf(result.evaluations)(_.time) / 1000)
 
-    if result.stockfish.isNnue then
+    if (result.stockfish.isNnue)
       monBy
         .totalMeganode(userId)
         .increment(sumOf(result.evaluations) { eval =>
@@ -52,7 +52,7 @@ final private class Monitor(
       (nb > 0).option(sum / nb)
     }
     avgOf(_.time) foreach { monBy.movetime(userId).record(_) }
-    if result.stockfish.isNnue then {
+    if (result.stockfish.isNnue) {
       avgOf(_.nodes) foreach { monBy.node(userId).record(_) }
       avgOf(_.cappedNps) foreach { monBy.nps(userId).record(_) }
     }
@@ -67,7 +67,7 @@ final private class Monitor(
   }
 
   private def sample[A](elems: List[A], n: Int) =
-    if elems.sizeIs <= n then elems else lila.common.ThreadLocalRandom.shuffle(elems) take n
+    if (elems.sizeIs <= n) elems else lila.common.ThreadLocalRandom.shuffle(elems) take n
 
   private def monitorClients(): Funit =
     repo.allRecentClients map { clients =>
@@ -112,7 +112,7 @@ object Monitor {
     monResult.success(client.userId.value).increment()
 
     work.acquiredAt foreach { acquiredAt =>
-      lila.mon.fishnet.queueTime(if work.sender.system then "system" else "user").record {
+      lila.mon.fishnet.queueTime(if (work.sender.system) "system" else "user").record {
         acquiredAt.getMillis - work.createdAt.getMillis
       }
     }

@@ -50,7 +50,7 @@ case class Simul(
 
   def addApplicant(applicant: SimulApplicant) =
     Created {
-      if !hasApplicant(applicant.player.user) && variants.contains(applicant.player.variant) then
+      if (!hasApplicant(applicant.player.user) && variants.contains(applicant.player.variant))
         copy(applicants = applicants :+ applicant)
       else this
     }
@@ -100,7 +100,7 @@ case class Simul(
     hasUser(userId).option(removeApplicant(userId).removePairing(userId))
 
   private def finishIfDone =
-    if isStarted && pairings.forall(_.finished) then
+    if (isStarted && pairings.forall(_.finished))
       copy(
         status = SimulStatus.Finished,
         finishedAt = DateTime.now.some,
@@ -133,7 +133,7 @@ case class Simul(
   def setPairingHostPlayerIndex(gameId: String, hostPlayerIndex: PlayerIndex) =
     updatePairing(gameId, _.copy(hostPlayerIndex = hostPlayerIndex))
 
-  private def Created(s: => Simul): Simul = if isCreated then s else this
+  private def Created(s: => Simul): Simul = if (isCreated) s else this
 
   def wins    = pairings.count(p => p.finished && p.wins.contains(false))
   def draws   = pairings.count(p => p.finished && p.wins.isEmpty)
@@ -178,7 +178,7 @@ object Simul {
       createdAt = DateTime.now,
       estimatedStartAt = estimatedStartAt,
       variants =
-        if position.isDefined then List(Variant.wrap(strategygames.chess.variant.Standard)) else variants,
+        if (position.isDefined) List(Variant.wrap(strategygames.chess.variant.Standard)) else variants,
       position = position,
       applicants = Nil,
       pairings = Nil,

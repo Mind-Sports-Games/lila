@@ -19,8 +19,8 @@ private[tournament] case class WaitingUsers(
   // 5+0  -> 36  -> 36
   // 10+0 -> 66  -> 50
   private val waitSeconds: Int =
-    if clock.estimateTotalSeconds < 30 then 8
-    else if clock.estimateTotalSeconds < 60 then 10
+    if (clock.estimateTotalSeconds < 30) 8
+    else if (clock.estimateTotalSeconds < 60) 10
     else
       {
         clock.estimateTotalSeconds / 20 + 6
@@ -34,7 +34,7 @@ private[tournament] case class WaitingUsers(
 
   // skips the most recent user if odd
   def evenNumber: Set[User.ID] =
-    if isOdd then all - hash.maxBy(_._2.getMillis)._1
+    if (isOdd) all - hash.maxBy(_._2.getMillis)._1
     else all
 
   def haveWaitedEnough(minWaiters: Int): Boolean =

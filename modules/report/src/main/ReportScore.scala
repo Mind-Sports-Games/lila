@@ -33,16 +33,16 @@ final private class ReportScore(
     // https://github.com/ornicar/lila/issues/4093
     // https://github.com/ornicar/lila/issues/4587
     def fixedAutoCommPrintScore(c: Report.Candidate)(score: Double): Double =
-      if c.isAutoComm then baseScore
-      else if c.isPrint || c.isCoachReview || c.isPlaybans then baseScore * 2
+      if (c.isAutoComm) baseScore
+      else if (c.isPrint || c.isCoachReview || c.isPlaybans) baseScore * 2
       else score
 
     def fixedBoostScore(c: Report.Candidate)(score: Double): Double =
-      if c.isAutoBoost then baseScore
+      if (c.isAutoBoost) baseScore
       else score
 
     def commFlagScore(c: Report.Candidate)(score: Double): Double =
-      if c.isCommFlag then score / 2
+      if (c.isCommFlag) score / 2
       else score
   }
 }

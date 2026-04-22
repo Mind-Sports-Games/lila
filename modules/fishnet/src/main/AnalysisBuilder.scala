@@ -26,7 +26,7 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
        * to prevent the mobile app from thinking it's complete
        * https://github.com/veloce/lichobile/issues/722
        */
-      val cached = if isPartial then cachedFull - 0 else cachedFull
+      val cached = if (isPartial) cachedFull - 0 else cachedFull
       def debug  = s"${work.game.variant.key} analysis for ${work.game.id} by ${client.fullId}"
       Replay(
         work.game.variant.gameLogic,
@@ -53,8 +53,8 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
                 errors foreach { e =>
                   logger.debug(s"[UciToPgn] $debug $e")
                 }
-                if analysis.valid then {
-                  if !isPartial && analysis.emptyRatio >= 1d / 10 then
+                if (analysis.valid) {
+                  if (!isPartial && analysis.emptyRatio >= 1d / 10)
                     fufail(
                       s"${work.game.variant.key} analysis $debug has ${analysis.nbEmptyInfos} empty infos out of ${analysis.infos.size}"
                     )
@@ -68,7 +68,7 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
       work: Work.Analysis,
       evals: List[Option[Evaluation.OrSkipped[Uci]]]
   ): List[Option[Evaluation.OrSkipped[Uci]]] =
-    if work.game.variant.key == "amazons" then evals.flatMap(e => List(e, e)) else evals
+    if (work.game.variant.key == "amazons") evals.flatMap(e => List(e, e)) else evals
 
   private def mergeEvalsAndCached(
       work: Work.Analysis,
@@ -107,7 +107,7 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
           ),
           variation = variation.map(_.uci).map(Vector(_))
         )
-        if info.ply % 2 == 1 then info.invert else info
+        if (info.ply % 2 == 1) info.invert else info
       case ((_, _), index) => Info(index + 1 + startedAtTurn, Eval.empty)
     }
 }

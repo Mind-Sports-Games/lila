@@ -52,7 +52,7 @@ final class AskPipeline[A](compute: () => Fu[A], timeout: FiniteDuration, name: 
           err => current.foreach(_ failure err),
           res => current.foreach(_ success res)
         )
-        if next.isEmpty then state = Idle
+        if (next.isEmpty) state = Idle
         else {
           startComputing()
           state = Processing(next, Nil)

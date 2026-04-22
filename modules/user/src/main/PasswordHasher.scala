@@ -16,9 +16,9 @@ final private class Aes(secret: Secret) {
   private val sKey = {
     val sk    = Base64.getDecoder.decode(secret.value)
     val kBits = sk.length * 8
-    if kBits != 128 then {
-      if !(kBits == 192 || kBits == 256) then throw new IllegalArgumentException
-      if kBits > Cipher.getMaxAllowedKeyLength("AES/CTS/NoPadding") then
+    if (kBits != 128) {
+      if (!(kBits == 192 || kBits == 256)) throw new IllegalArgumentException
+      if (kBits > Cipher.getMaxAllowedKeyLength("AES/CTS/NoPadding"))
         throw new IllegalStateException(s"$kBits bit AES unavailable")
     }
     new SecretKeySpec(sk, "AES")
@@ -99,7 +99,7 @@ object PasswordHasher {
   def rateLimit[A](
       enforce: lila.common.config.RateLimit
   )(username: String, req: RequestHeader)(run: RateLimit.Charge => Fu[A])(default: => Fu[A]): Fu[A] =
-    if enforce.value then {
+    if (enforce.value) {
       val cost = 1
       val ip   = HTTPRequest.ipAddress(req)
       rateLimitPerUser(User.normalize(username), cost = cost) {

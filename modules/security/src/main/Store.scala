@@ -30,7 +30,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
           .one[Bdoc]
           .map {
             _.flatMap { doc =>
-              if doc.getAsOpt[DateTime]("date").fold(true)(_.isBefore(DateTime.now.minusHours(12))) then
+              if (doc.getAsOpt[DateTime]("date").fold(true)(_.isBefore(DateTime.now.minusHours(12))))
                 coll.updateFieldUnchecked($id(id), "date", DateTime.now)
               doc.getAsOpt[User.ID]("user") map { AuthInfo(_, doc.contains("fp")) }
             }
@@ -144,7 +144,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
       .find(
         $doc(
           "user" -> user.id,
-          "date" `$gt` (if user.createdAt.isAfter(DateTime.now.minusYears(1)) then user.createdAt
+          "date" `$gt` (if (user.createdAt.isAfter(DateTime.now.minusYears(1))) user.createdAt
                         else DateTime.now.minusYears(1))
         ),
         $doc("_id" -> false, "ip" -> true, "ua" -> true, "fp" -> true, "date" -> true).some

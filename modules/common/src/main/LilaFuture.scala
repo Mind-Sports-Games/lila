@@ -10,7 +10,7 @@ object LilaFuture {
   def delay[A](
       duration: FiniteDuration
   )(run: => Fu[A])(using ec: scala.concurrent.ExecutionContext, scheduler: Scheduler): Fu[A] =
-    if duration == 0.millis then run
+    if (duration == 0.millis) run
     else akka.pattern.after(duration, scheduler)(run)
 
   def sleep(duration: FiniteDuration)(using ec: Executor, scheduler: Scheduler): Funit = {
@@ -22,7 +22,7 @@ object LilaFuture {
   def makeItLast[A](
       duration: FiniteDuration
   )(run: => Fu[A])(using ec: Executor, scheduler: Scheduler): Fu[A] =
-    if duration == 0.millis then run
+    if (duration == 0.millis) run
     else run.zip(akka.pattern.after(duration, scheduler)(funit)).dmap(_._1)
 
   def retry[T](op: () => Fu[T], delay: FiniteDuration, retries: Int, logger: Option[lila.log.Logger])(using
@@ -54,7 +54,7 @@ object LilaFuture {
   )(f: A => Fu[Boolean])(using ec: scala.concurrent.ExecutionContext): Fu[Option[A]] =
     list.foldLeft(fuccess(none[A])) { (acc, a) =>
       acc.flatMap {
-        case None => f(a).map { if _ then Some(a) else None }
+        case None => f(a).map { if (_) Some(a) else None }
         case res  => fuccess(res)
       }
     }

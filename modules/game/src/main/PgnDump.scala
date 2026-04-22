@@ -34,7 +34,7 @@ final class PgnDump(
       case _                         => false
     }
     val tagsFuture =
-      if flags.tags then
+      if (flags.tags)
         tags(
           game,
           initialFen,
@@ -69,10 +69,10 @@ final class PgnDump(
                 .fold(shortenDraughtsMoves(pliesFull))(moves => moves)
               val delayedPlies = flags.keepDelayIf(game.playable).applyDelay(plies)
               val algPlies     =
-                if algebraic then san2alg(delayedPlies, variant.boardSize.pos)
+                if (algebraic) san2alg(delayedPlies, variant.boardSize.pos)
                 else delayedPlies
               val offsetPlies =
-                if fenSituation.exists(_.situation.player.p2) then ".." +: algPlies
+                if (fenSituation.exists(_.situation.player.p2)) ".." +: algPlies
                 else algPlies
               offsetPlies.toVector.map(Vector(_))
             }
@@ -80,15 +80,15 @@ final class PgnDump(
               // Grand Abalone: P1's first turn = 1 ply, all subsequent turns = 2 plies each
               val flat    = game.actionStrs.flatten.toVector
               val grouped =
-                if flat.isEmpty then Vector.empty[Vector[String]]
+                if (flat.isEmpty) Vector.empty[Vector[String]]
                 else Vector(Vector(flat.head)) ++ flat.tail.grouped(2).map(_.toVector).toVector
               (flags.keepDelayIf(game.playable) applyDelay {
-                if fenSituation.exists(_.situation.player.p2) then Vector("..") +: grouped
+                if (fenSituation.exists(_.situation.player.p2)) Vector("..") +: grouped
                 else grouped
               }).toVector
             case _ =>
               (flags.keepDelayIf(game.playable) applyDelay {
-                if fenSituation.exists(_.situation.player.p2) then Vector("..") +: game.actionStrs
+                if (fenSituation.exists(_.situation.player.p2)) Vector("..") +: game.actionStrs
                 else game.actionStrs
               }).toVector
           },
@@ -103,10 +103,10 @@ final class PgnDump(
 
   private def shortenDraughtsMoves(moves: Seq[String]) = moves map { move =>
     val x1 = move.indexOf("x")
-    if x1 == -1 then move
+    if (x1 == -1) move
     else {
       val x2 = move.lastIndexOf("x")
-      if x2 == x1 || x2 == -1 then move
+      if (x2 == x1 || x2 == -1) move
       else move.slice(0, x1) + move.slice(x2, move.length)
     }
   }
@@ -114,9 +114,9 @@ final class PgnDump(
   private def san2alg(moves: Seq[String], boardPos: strategygames.draughts.BoardPos) =
     moves map { move =>
       val capture         = move.contains('x')
-      val fields          = if capture then move.split("x") else move.split("-")
+      val fields          = if (capture) move.split("x") else move.split("-")
       val algebraicFields = fields.flatMap { boardPos.algebraic(_) }
-      val sep             = if capture then "x" else "-"
+      val sep             = if (capture) "x" else "-"
       algebraicFields mkString sep
     }
 
@@ -168,7 +168,7 @@ final class PgnDump(
 
   private def ratingDiffTag(p: Player, tag: Tag.type => TagType) =
     p.ratingDiff.map { rd =>
-      Tag(tag(Tag), s"${if rd >= 0 then "+" else ""}$rd")
+      Tag(tag(Tag), s"${if (rd >= 0) "+" else ""}$rd")
     }
 
   def tags(
@@ -188,7 +188,7 @@ final class PgnDump(
         List[Option[Tag]](
           Tag(
             _.Event,
-            imported.flatMap(_.tags(_.Event)) | { if game.imported then "Import" else eventOf(game) }
+            imported.flatMap(_.tags(_.Event)) | { if (game.imported) "Import" else eventOf(game) }
           ).some,
           Tag(_.Site, gameUrl(game.id)).some,
           Tag(_.Date, importedDate | Tag.UTCDate.format.print(game.createdAt)).some,
@@ -251,7 +251,7 @@ final class PgnDump(
                   case None                    => None
                   case _                       => sys.error("invalid draughts fen in pgnDump tags")
                 }).flatMap { fen =>
-                  if algebraic then
+                  if (algebraic)
                     strategygames.draughts.format.Forsyth.toAlgebraic(
                       variant,
                       fen
@@ -320,13 +320,13 @@ object PgnDump {
       delayTurns: Boolean = false
   ) {
     def applyDelay[M](actionStrs: Seq[M]): Seq[M] =
-      if !delayTurns then actionStrs
+      if (!delayTurns) actionStrs
       else actionStrs.take((actionStrs.size - delayTurnsBy).atLeast(delayKeepsFirstTurns))
 
     def keepDelayIf(cond: Boolean) = copy(delayTurns = delayTurns && cond)
   }
 
   def result(game: Game, draughtsResult: Boolean) =
-    if game.finished then PlayerIndex.showResult(game.winnerPlayerIndex, draughtsResult)
+    if (game.finished) PlayerIndex.showResult(game.winnerPlayerIndex, draughtsResult)
     else "*"
 }

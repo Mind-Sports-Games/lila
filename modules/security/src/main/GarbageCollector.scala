@@ -28,7 +28,7 @@ final class GarbageCollector(
 
   // User just signed up and doesn't have security data yet, so wait a bit
   def delay(user: User, email: EmailAddress, req: RequestHeader): Unit =
-    if user.createdAt.isAfter(DateTime.now.minusDays(3)) then {
+    if (user.createdAt.isAfter(DateTime.now.minusDays(3))) {
       val ip = HTTPRequest.ipAddress(req)
       val _  = scheduler
         .scheduleOnce(6 seconds) {
@@ -104,7 +104,7 @@ final class GarbageCollector(
       logger.info(message)
       noteApi.playstrategyWrite(user, s"Garbage collected because of $msg")
       slack.garbageCollector(message).andDo {
-        if armed then {
+        if (armed) {
           doInitialSb(user)
           val _ = scheduler.scheduleOnce(wait) {
             doCollect(user)

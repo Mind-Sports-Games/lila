@@ -51,9 +51,9 @@ final private class LeaderboardIndexer(
   private def metaPointsFromRank(category: Option[Schedule.Freq], rank: Int): Option[Int] =
     category match {
       case Some(c) if c == Schedule.Freq.Shield || c == Schedule.Freq.MedleyShield =>
-        if rank == 1 then Some(5)
-        else if rank == 2 then Some(3)
-        else if rank == 3 then Some(2)
+        if (rank == 1) Some(5)
+        else if (rank == 2) Some(3)
+        else if (rank == 3) Some(2)
         else Some(1)
       case _ => None
     }
@@ -82,7 +82,7 @@ final private class LeaderboardIndexer(
           nbGames = nb,
           score = player.score,
           rank = rank,
-          rankRatio = Ratio(if tour.nbPlayers > 0 then rank.toDouble / tour.nbPlayers else 0),
+          rankRatio = Ratio(if (tour.nbPlayers > 0) rank.toDouble / tour.nbPlayers else 0),
           metaPoints = metaPointsFromRank(tour.schedule.map(_.freq), rank),
           shieldKey = shieldKeyFromTour(tour),
           freq = tour.schedule.map(_.freq),

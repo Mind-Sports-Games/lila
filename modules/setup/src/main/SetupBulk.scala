@@ -189,7 +189,7 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
               case (u, nb) if nb > 1 => u
             }
             .toList
-          if dups.nonEmpty then fuccess(Left(DuplicateUsers(dups)))
+          if (dups.nonEmpty) fuccess(Left(DuplicateUsers(dups)))
           else {
             val pairs = allPlayers.reverse
               .grouped(2)

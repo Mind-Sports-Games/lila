@@ -41,7 +41,7 @@ object RatingRange {
   def orDefault(from: Option[String]) = from.flatMap(apply) | default
 
   def noneIfDefault(from: String) =
-    if from == default.toString then none
+    if (from == default.toString) none
     else apply(from).filter(_ != default)
 
   def valid(from: String) = apply(from).isDefined

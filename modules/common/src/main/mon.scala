@@ -49,7 +49,7 @@ object mon {
     gauge("caffeine.request").withTags(tags("name" -> name, "hit" -> true)).update(stats.hitCount.toDouble)
     gauge("caffeine.request").withTags(tags("name" -> name, "hit" -> false)).update(stats.missCount.toDouble)
     histogram("caffeine.hit.rate").withTag("name", name).record((stats.hitRate * 100000).toLong)
-    if stats.totalLoadTime > 0 then {
+    if (stats.totalLoadTime > 0) {
       gauge("caffeine.load.count")
         .withTags(tags("name" -> name, "success" -> "success"))
         .update(stats.loadSuccessCount.toDouble)
@@ -78,7 +78,7 @@ object mon {
   object evalCache {
     private val r                         = counter("evalCache.request")
     def request(ply: Int, isHit: Boolean) =
-      r.withTags(tags("ply" -> (if ply < 15 then ply.toString else "15+"), "hit" -> isHit))
+      r.withTags(tags("ply" -> (if (ply < 15) ply.toString else "15+"), "hit" -> isHit))
     object upgrade {
       val count     = counter("evalCache.upgrade.count").withoutTags()
       val members   = gauge("evalCache.upgrade.members").withoutTags()
@@ -260,7 +260,7 @@ object mon {
     def zoneSegment(name: String) = future("mod.zone.segment", name)
   }
   object relay {
-    private def by(official: Boolean)                  = if official then "official" else "user"
+    private def by(official: Boolean)                  = if (official) "official" else "user"
     private def relay(official: Boolean, slug: String) =
       tags("by" -> by(official), "slug" -> slug)
     def ongoing(official: Boolean)                 = gauge("relay.ongoing").withTag("by", by(official))
@@ -526,7 +526,7 @@ object mon {
     }
   }
   object racer {
-    private def tpe(lobby: Boolean) = if lobby then "lobby" else "friend"
+    private def tpe(lobby: Boolean) = if (lobby) "lobby" else "friend"
     def race(lobby: Boolean)        = counter("racer.lobby.race").withTag("tpe", tpe(lobby))
     def players(lobby: Boolean)     =
       histogram("racer.lobby.players").withTag("tpe", tpe(lobby))
@@ -719,7 +719,7 @@ object mon {
         tags("success" -> successTag(success), "segment" -> segment)
       )
 
-  private def successTag(success: Boolean) = if success then "success" else "failure"
+  private def successTag(success: Boolean) = if (success) "success" else "failure"
 
   private def apiTag(api: Option[ApiVersion]) = api.fold("-")(_.toString)
 

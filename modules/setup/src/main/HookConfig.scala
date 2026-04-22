@@ -84,7 +84,7 @@ case class HookConfig(
             sri = sri,
             variant = variant,
             clock = clock,
-            mode = if lila.game.Game.allowRated(variant, clock.some) then mode else Mode.Casual,
+            mode = if (lila.game.Game.allowRated(variant, clock.some)) mode else Mode.Casual,
             playerIndex = playerIndex.name,
             user = user,
             blocking = blocking,

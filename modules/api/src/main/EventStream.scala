@@ -84,14 +84,14 @@ final class EventStream(
         case SetOnline =>
           onlineApiUsers.setOnline(me.id)
 
-          if lastSetSeenAt.isBefore(DateTime.now.minusMinutes(10)) then {
+          if (lastSetSeenAt.isBefore(DateTime.now.minusMinutes(10))) {
             userRepo.setSeenAt(me.id)
             lastSetSeenAt = DateTime.now
           }
 
           val _ = context.system.scheduler
             .scheduleOnce(6 second) {
-              if online then {
+              if (online) {
                 // gotta send a message to check if the client has disconnected
                 queue offer None
                 self ! SetOnline

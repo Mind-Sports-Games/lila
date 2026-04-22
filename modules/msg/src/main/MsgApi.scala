@@ -53,7 +53,7 @@ final class MsgApi(
     val before   = beforeMillis flatMap { millis =>
       Try(new DateTime(millis)).toOption
     }
-    if userId != me.id then
+    if (userId != me.id)
       lightUserApi.async(userId).flatMap {
         case None          => fuccess(none)
         case Some(contact) =>
@@ -94,10 +94,10 @@ final class MsgApi(
           case _: MsgSecurity.Reject  => fuccess(PostResult.Bounced)
           case send: MsgSecurity.Send =>
             val msg =
-              if verdict == MsgSecurity.Spam then msgPre.copy(text = spam.replace(msgPre.text)) else msgPre
+              if (verdict == MsgSecurity.Spam) msgPre.copy(text = spam.replace(msgPre.text)) else msgPre
             val msgWrite    = colls.msg.insert.one(writeMsg(msg, threadId))
             val threadWrite =
-              if isNew then
+              if (isNew)
                 colls.thread.insert.one {
                   writeThread(
                     MsgThread.make(orig, dest, msg),
@@ -112,7 +112,7 @@ final class MsgApi(
                   .one(
                     $id(threadId),
                     $set("lastMsg" -> msg.asLast) ++ {
-                      if multi then $pull("del" -> List(orig))
+                      if (multi) $pull("del" -> List(orig))
                       else
                         $pull(
                           // unset "deleted by receiver" unless the message is muted
@@ -122,7 +122,7 @@ final class MsgApi(
                   )
                   .void
             (msgWrite zip threadWrite).void.andDo {
-              if !send.mute then {
+              if (!send.mute) {
                 notifier.onPost(threadId)
                 Bus.publish(
                   lila.hub.actorApi.socket.SendTo(

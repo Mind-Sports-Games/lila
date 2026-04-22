@@ -54,7 +54,7 @@ final class TournamentShieldApi(
 
   private[tournament] def clearAfterMarking(userId: User.ID): Funit = cache.getUnit map { hist =>
     import cats.implicits.*
-    if hist.value.exists(_._2.exists(_.owner.value === userId)) then clear()
+    if (hist.value.exists(_._2.exists(_.owner.value === userId))) clear()
   }
 
   private val cache = cacheApi.unit[History] {
@@ -144,10 +144,10 @@ object TournamentShield {
     def url              = s"https://playstrategy.org/tournament/medley-shield/${key}"
     def medleyMinutes    = arenaMinutes / medleyRounds
     def balancedFormat   =
-      if weekOfMonth.nonEmpty then ""
+      if (weekOfMonth.nonEmpty) ""
       else
         " Each variant is active for a short period of the tournament. The length each variant gets is variable but balanced so that quicker/slower variants have shorter/longer interval times."
-    def intervalStr          = if weekOfMonth.isEmpty then "week" else "month"
+    def intervalStr          = if (weekOfMonth.isEmpty) "week" else "month"
     def arenaFormatFull      = s"${arenaFormat} ${balancedFormat}"
     def arenaDescriptionFull =
       s"${arenaDescription}\r\n\r\nWin the tournament, win the shield... until next ${intervalStr}!\r\n\r\nMore info here: ${url}"
@@ -669,7 +669,7 @@ object TournamentShield {
       Months.monthsBetween(monthlyMedleyShieldStartDate, startsAt).getMonths()
 
     def countSinceStart(startsAt: DateTime, isWeekly: Boolean) =
-      if isWeekly then weeksSinceStart(startsAt)
+      if (isWeekly) weeksSinceStart(startsAt)
       else monthsSinceStart(startsAt)
 
     def makeName(baseName: String, startsAt: DateTime, isWeekly: Boolean, countOffset: Int) =
@@ -688,7 +688,7 @@ object TournamentShield {
     def matches(tour: Tournament) = Some(variant).contains(tour.variant)
 
     private def hoursList(month: Int) =
-      if month % 2 == 0 then TournamentShield.defaultShieldHours
+      if (month % 2 == 0) TournamentShield.defaultShieldHours
       else TournamentShield.alternateShieldHours
 
     def scheduleHour(month: Int) =

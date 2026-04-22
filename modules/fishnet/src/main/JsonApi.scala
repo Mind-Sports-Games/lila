@@ -67,7 +67,7 @@ object JsonApi {
         with Result {
 
       def completeOrPartial =
-        if analysis.headOption.so(_.isDefined) then CompleteAnalysis(fishnet, stockfish, analysis.flatten)
+        if (analysis.headOption.so(_.isDefined)) CompleteAnalysis(fishnet, stockfish, analysis.flatten)
         else PartialAnalysis(fishnet, stockfish, analysis)
     }
 
@@ -128,7 +128,7 @@ object JsonApi {
 
       case class Score(cp: Option[Cp], mate: Option[Mate]) {
         def invert                  = copy(cp.map(_.invert), mate.map(_.invert))
-        def invertIf(cond: Boolean) = if cond then invert else this
+        def invertIf(cond: Boolean) = if (cond) invert else this
       }
 
       val npsCeil = 10_000_000
@@ -169,7 +169,7 @@ object JsonApi {
 
   def fromGame(g: W.Game) =
     Game(
-      game_id = if g.studyId.isDefined then "" else g.id,
+      game_id = if (g.studyId.isDefined) "" else g.id,
       position = g.initialFen match {
         case Some(initialFen) => initialFen
         case None             => g.variant.initialFen
@@ -225,7 +225,7 @@ object JsonApi {
       Reads[Option[Request.Evaluation.OrSkipped[LexicalUci]]] {
         case JsNull => JsSuccess(None)
         case obj    =>
-          if ~obj.boolean("skipped") then JsSuccess(Left(Request.Evaluation.Skipped).some)
+          if (~obj.boolean("skipped")) JsSuccess(Left(Request.Evaluation.Skipped).some)
           else EvaluationReads reads obj map Right.apply map some
       }
     implicit val PostAnalysisReads: Reads[Request.PostAnalysisLexicalUci] =

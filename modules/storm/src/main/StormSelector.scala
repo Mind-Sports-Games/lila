@@ -53,7 +53,7 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
               val fenPlayerIndexRegex = $doc(
                 "$regexMatch" -> $doc(
                   "input" -> "$fen",
-                  "regex" -> { if scala.util.Random.nextBoolean() then " w " else " b " }
+                  "regex" -> { if (scala.util.Random.nextBoolean()) " w " else " b " }
                 )
               )
               List(
@@ -127,8 +127,8 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
   private def monitor(puzzles: Vector[StormPuzzle], poolSize: Int): Unit = {
     val nb = puzzles.size
     lila.mon.storm.selector.count.record(nb)
-    if nb < poolSize * 0.9 then logger.warn(s"Selector wanted $poolSize puzzles, only got $nb")
-    if nb > 1 then {
+    if (nb < poolSize * 0.9) logger.warn(s"Selector wanted $poolSize puzzles, only got $nb")
+    if (nb > 1) {
       val rest = puzzles.toVector drop 1
       lila.common.Maths.mean(rest.map(_.rating)) foreach { r =>
         val _ = lila.mon.storm.selector.rating.record(r.toInt)

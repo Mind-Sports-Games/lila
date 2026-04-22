@@ -75,7 +75,7 @@ case class ImportData(pgn: String, analyse: Option[String]) {
             case _ => sys.error("Not implemented for draughts yet")
           }
           chessVariant | {
-            if fromPosition then strategygames.chess.variant.FromPosition
+            if (fromPosition) strategygames.chess.variant.FromPosition
             else strategygames.chess.variant.Standard
           }
         } match {

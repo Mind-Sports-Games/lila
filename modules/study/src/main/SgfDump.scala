@@ -83,19 +83,19 @@ final class SgfDump(
           case GameFamily.LinesOfAction() => // not currently used
             List(
               Tag(_.GM, 9),
-              Tag(_.SU, if chapter.setup.variant.key == "linesOfAction" then "Standard" else "Scrambled-eggs")
+              Tag(_.SU, if (chapter.setup.variant.key == "linesOfAction") "Standard" else "Scrambled-eggs")
             )
           case GameFamily.Shogi() =>
             List(
               Tag(_.GM, 8),
               Tag(_.SZ, chapter.setup.variant.toFairySF.boardSize.height),
-              Tag(_.SU, if chapter.setup.variant.key == "shogi" then "Standard" else "MiniShogi")
+              Tag(_.SU, if (chapter.setup.variant.key == "shogi") "Standard" else "MiniShogi")
             )
           case GameFamily.Xiangqi() =>
             List(
               Tag(_.GM, 7),
               Tag(_.SZ, chapter.setup.variant.toFairySF.boardSize.height),
-              Tag(_.SU, if chapter.setup.variant.key == "xiangqi" then "Standard" else "MiniXiangqi")
+              Tag(_.SU, if (chapter.setup.variant.key == "xiangqi") "Standard" else "MiniXiangqi")
             )
           case GameFamily.Flipello() =>
             List(Tag(_.GM, 2), Tag(_.SZ, chapter.setup.variant.toFairySF.boardSize.height))
@@ -106,7 +106,7 @@ final class SgfDump(
               Tag(_.SZ, chapter.setup.variant.toFairySF.boardSize.height),
               Tag(
                 _.SU,
-                if chapter.setup.variant.key == "breakthroughtroyka" then "Standard" else "MiniBreakthrough"
+                if (chapter.setup.variant.key == "breakthroughtroyka") "Standard" else "MiniBreakthrough"
               )
             )
           case GameFamily.Go() =>
@@ -126,7 +126,7 @@ final class SgfDump(
               Tag.matchInfo(1, 1, 0, 0), // multipoint info
               Tag(
                 _.SU,
-                if chapter.setup.variant.key == "backgammon" then "Standard" else chapter.setup.variant.name
+                if (chapter.setup.variant.key == "backgammon") "Standard" else chapter.setup.variant.name
               )
             )
           case _ => List()
@@ -142,7 +142,7 @@ object SgfDump {
     line
       .drop(1)
       .foldLeft(Vector(line.take(1))) { case (turn, node) =>
-        if turn.head.head.playedPlayerIndex != node.playedPlayerIndex then Vector(node) +: turn
+        if (turn.head.head.playedPlayerIndex != node.playedPlayerIndex) Vector(node) +: turn
         else (turn.head :+ node) +: turn.tail
       }
       .reverse

@@ -204,7 +204,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
     countLikes(studyId).flatMap {
       case None                         => fuccess(Study.Likes(0))
       case Some((prevLikes, createdAt)) =>
-        val likes = Study.Likes(prevLikes.value + (if v then 1 else -1))
+        val likes = Study.Likes(prevLikes.value + (if (v) 1 else -1))
         coll {
           _.update.one(
             $id(studyId),
@@ -212,7 +212,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
               F.likes -> likes,
               F.rank  -> Study.Rank.compute(likes, createdAt)
             ) ++ {
-              if v then $addToSet(F.likers -> userId) else $pull(F.likers -> userId)
+              if (v) $addToSet(F.likers -> userId) else $pull(F.likers -> userId)
             }
           ) inject likes
         }

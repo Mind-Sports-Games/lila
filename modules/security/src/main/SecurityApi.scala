@@ -90,7 +90,7 @@ final class SecurityApi(
       case true  => fufail(SecurityApi.MustConfirmEmail(userId))
       case false =>
         val sessionId = Random.secureString(22)
-        if tor.isExitNode(HTTPRequest.ipAddress(req)) then logger.info(s"Tor login $userId")
+        if (tor.isExitNode(HTTPRequest.ipAddress(req))) logger.info(s"Tor login $userId")
         store.save(sessionId, userId, req, apiVersion, up = true, fp = none) inject sessionId
     }
 
@@ -102,7 +102,7 @@ final class SecurityApi(
   }
 
   def restoreUser(req: RequestHeader): Fu[Option[Either[AppealUser, FingerPrintedUser]]] =
-    if !firewall.accepts(req) then fuccess(none)
+    if (!firewall.accepts(req)) fuccess(none)
     else
       reqSessionId(req).fold(fuccess(none[Either[AppealUser, FingerPrintedUser]])) { sessionId =>
         appeal.authenticate(sessionId) match {
@@ -133,7 +133,7 @@ final class SecurityApi(
   private lazy val nonModRoles: Set[String] = Permission.nonModPermissions.map(_.dbKey)
 
   private def stripRolesOfOAuthUser(scoped: OAuthScope.Scoped) =
-    if scoped.scopes.contains(OAuthScope.Web.Mod) then scoped
+    if (scoped.scopes.contains(OAuthScope.Web.Mod)) scoped
     else scoped.copy(user = scoped.user.copy(roles = scoped.user.roles.filter(nonModRoles.contains)))
 
   def oauthScoped(

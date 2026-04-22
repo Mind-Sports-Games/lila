@@ -126,11 +126,11 @@ final class JsonView(
             "lib"                    -> full.option(tour.variant.gameLogic.id),
             "variant"                -> full.option(variantJson(tour.variant)),
             "p1Name"                 -> full.option(
-              if tour.isMedley || tour.variant.recalcStartPlayerForStats then trans.p1.txt()
+              if (tour.isMedley || tour.variant.recalcStartPlayerForStats) trans.p1.txt()
               else tour.variant.playerNames(P1)
             ),
             "p2Name" -> full.option(
-              if tour.isMedley || tour.variant.recalcStartPlayerForStats then trans.p2.txt()
+              if (tour.isMedley || tour.variant.recalcStartPlayerForStats) trans.p2.txt()
               else tour.variant.playerNames(P2)
             )
           )
@@ -241,7 +241,7 @@ final class JsonView(
     }
 
   private def fetchCurrentGameId(tour: Tournament, user: User): Fu[Option[Game.ID]] =
-    if Uptime.startedSinceSeconds(60) then fuccess(duelStore.find(tour, user))
+    if (Uptime.startedSinceSeconds(60)) fuccess(duelStore.find(tour, user))
     else pairingRepo.playingByTourAndUserId(tour.id, user.id)
 
   private def fetchFeaturedGame(tour: Tournament): Fu[Option[FeaturedGame]] =
@@ -433,7 +433,7 @@ final class JsonView(
 
   def apiTeamStanding(tour: Tournament): Fu[Option[JsArray]] =
     tour.teamBattle so { battle =>
-      if battle.hasTooManyTeams then bigTeamStandingJsonCache.get(tour.id).dmap(some)
+      if (battle.hasTooManyTeams) bigTeamStandingJsonCache.get(tour.id).dmap(some)
       else teamStandingJsonCache.get(tour.id).dmap(some)
     }
 
@@ -586,7 +586,7 @@ object JsonView {
       .add("fire" -> (streakable && s.onFire))
 
   private[tournament] def sheetScoreJson(score: arena.Sheet.Score) =
-    if score.flag == arena.Sheet.Normal then JsNumber(score.value)
+    if (score.flag == arena.Sheet.Normal) JsNumber(score.value)
     else Json.arr(score.value, score.flag.id)
 
   private def formatDate(date: DateTime) = ISODateTimeFormat.dateTime.print(date)

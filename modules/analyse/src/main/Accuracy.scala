@@ -7,7 +7,7 @@ import strategygames.Player as PlayerIndex
 
 object Accuracy {
 
-  private def withSignOf(i: Int, signed: Int) = if signed < 0 then -i else i
+  private def withSignOf(i: Int, signed: Int) = if (signed < 0) -i else i
 
   private val makeDiff: PartialFunction[(Option[Cp], Option[Mate], Option[Cp], Option[Mate]), Int] = {
     case (Some(s1), _, Some(s2), _) => s2.ceiled.centipawns - s1.ceiled.centipawns
@@ -30,20 +30,20 @@ object Accuracy {
     )
 
   def diffsList(pov: PovLike, analysis: Analysis): List[Int] = {
-    if pov.playerIndex == pov.startPlayerIndex then Info.start(pov.startedAtTurn) :: analysis.infos
+    if (pov.playerIndex == pov.startPlayerIndex) Info.start(pov.startedAtTurn) :: analysis.infos
     else analysis.infos
   }.grouped(2)
     .foldLeft(List[Int]()) {
       case (list, List(i1, i2)) =>
         makeDiff.lift((i1.cp, i1.mate, i2.cp, i2.mate)).fold(list) { diff =>
-          (if pov.playerIndex.p1 then -diff else diff).max(0) :: list
+          (if (pov.playerIndex.p1) -diff else diff).max(0) :: list
         }
       case (list, _) => list
     }
     .reverse
 
   def prevPlayerIndexInfos(pov: PovLike, analysis: Analysis): List[Info] = {
-    if pov.playerIndex == pov.startPlayerIndex then Info.start(pov.startedAtTurn) :: analysis.infos
+    if (pov.playerIndex == pov.startPlayerIndex) Info.start(pov.startedAtTurn) :: analysis.infos
     else analysis.infos
   }.zipWithIndex.collect {
     case (e, i) if (i % 2) == 0 => e

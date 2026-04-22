@@ -32,7 +32,7 @@ case class AnaPass(
               ply = game.plies,
               turnCount = game.turnCount,
               playedPlayerIndex =
-                if game.board.history.currentTurn.nonEmpty then game.player else !game.player,
+                if (game.board.history.currentTurn.nonEmpty) game.player else !game.player,
               variant: Variant,
               move = strategygames.format.Uci.GoWithSan(Uci.WithSan(uci, san)),
               fen = fen,
@@ -40,7 +40,7 @@ case class AnaPass(
               dests = Some(movable so Game.Go(game).situation.destinations),
               opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) so FullOpeningDB
                 .findByFen(variant.gameLogic, fen),
-              drops = if movable then Game.Go(game).situation.drops else Some(Nil),
+              drops = if (movable) Game.Go(game).situation.drops else Some(Nil),
               pocketData = Game.Go(game).situation.board.pocketData
             )
           }

@@ -33,10 +33,10 @@ final private class MsgSecurity(
     val verified               = 5
     val hog                    = 1
     def apply(u: User.Contact) =
-      if u.isApiHog then hog
-      else if u.isVerified then verified
-      else if u.isDaysOld(3) then normal
-      else if u.isHoursOld(3) then normal * 2
+      if (u.isApiHog) hog
+      else if (u.isVerified) verified
+      else if (u.isDaysOld(3)) normal
+      else if (u.isHoursOld(3)) normal * 2
       else normal * 4
   }
 
@@ -61,7 +61,7 @@ final private class MsgSecurity(
         unlimited: Boolean = false
     ): Fu[Verdict] = {
       val text = rawText.trim
-      if text.isEmpty then fuccess(Invalid)
+      if (text.isEmpty) fuccess(Invalid)
       else
         may.post(contacts, isNew) flatMap {
           case false => fuccess(Block)
@@ -74,7 +74,7 @@ final private class MsgSecurity(
         } flatMap {
           case mute: Mute =>
             relationApi.fetchFollows(contacts.dest.id, contacts.orig.id) dmap { isFriend =>
-              if isFriend then Ok else mute
+              if (isFriend) Ok else mute
             }
           case verdict => fuccess(verdict)
         } addEffect {
@@ -90,8 +90,8 @@ final private class MsgSecurity(
     }
 
     private def isLimited(contacts: User.Contacts, isNew: Boolean, unlimited: Boolean): Fu[Option[Verdict]] =
-      if unlimited then fuccess(none)
-      else if isNew then
+      if (unlimited) fuccess(none)
+      else if (isNew)
         {
           isLeaderOf(contacts) >>| isTeacherOf(contacts)
         } map {
@@ -149,7 +149,7 @@ final private class MsgSecurity(
       )
 
     private def kidCheck(contacts: User.Contacts, isNew: Boolean): Fu[Boolean] =
-      if !isNew || !contacts.hasKid then fuTrue
+      if (!isNew || !contacts.hasKid) fuTrue
       else
         (contacts.orig.kidId, contacts.dest.kidId) match {
           case (a: KidId, b: KidId)    => Bus.ask[Boolean]("clas") { AreKidsInSameClass(a, b, _) }

@@ -85,14 +85,14 @@ final class HcaptchaReal(
         res.body[JsValue].validate[GoodResponse] match {
           case JsSuccess(res, _) =>
             lila.mon.security.hCaptcha.hit(client, "success").increment()
-            if res.success && res.hostname == netDomain.value then Result.Valid
+            if (res.success && res.hostname == netDomain.value) Result.Valid
             else Result.Fail
           case JsError(err) =>
             res.body[JsValue].validate[BadResponse].asOpt match {
               case Some(err) if err.missingInput =>
                 logger.info(s"hcaptcha missing ${HTTPRequest `printClient` req}")
                 lila.mon.security.hCaptcha.hit(client, "missing").increment()
-                if HTTPRequest.apiVersion(req).isDefined then Result.Pass else Result.Fail
+                if (HTTPRequest.apiVersion(req).isDefined) Result.Pass else Result.Fail
               case Some(err) =>
                 lila.mon.security.hCaptcha.hit(client, err.toString).increment()
                 Result.Fail

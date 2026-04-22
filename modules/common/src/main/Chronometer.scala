@@ -44,7 +44,7 @@ object Chronometer {
     def seconds = (millis / 1000).toInt
 
     def logIfSlow(threshold: Int, logger: lila.log.Logger)(msg: A => String) =
-      if millis >= threshold then log(logger)(msg)
+      if (millis >= threshold) log(logger)(msg)
       else this
     def log(logger: lila.log.Logger)(msg: A => String) = {
       logger.info(s"<${millis}ms> ${msg(result)}")
@@ -71,10 +71,10 @@ object Chronometer {
       result
     }
     def ppIfGt(msg: String, duration: FiniteDuration): A =
-      if nanos > duration.toNanos then pp(msg)
+      if (nanos > duration.toNanos) pp(msg)
       else result
 
-    def showDuration: String = if millis >= 1 then s"$millis ms" else s"$micros micros"
+    def showDuration: String = if (millis >= 1) s"$millis ms" else s"$micros micros"
   }
 
   case class LapTry[A](result: scala.util.Try[A], nanos: Long) {

@@ -23,6 +23,6 @@ final class Env(
   private def makeHttp(index: Index): ESClientHttp = wire[ESClientHttp]
 
   val makeClient = (index: Index) =>
-    if config.enabled then makeHttp(index)
+    if (config.enabled) makeHttp(index)
     else wire[ESClientStub]
 }

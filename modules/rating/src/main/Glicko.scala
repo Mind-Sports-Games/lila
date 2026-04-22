@@ -23,7 +23,7 @@ case class Glicko(
 
   def rankable(variant: Variant) =
     deviation <= {
-      if variant.key == "standard" then Glicko.standardRankableDeviation
+      if (variant.key == "standard") Glicko.standardRankableDeviation
       else Glicko.variantRankableDeviation
     }
   def provisional          = deviation >= Glicko.provisionalDeviation
@@ -50,8 +50,8 @@ case class Glicko(
     )
 
   def average(other: Glicko, weight: Float = 0.5f) =
-    if weight >= 1 then other
-    else if weight <= 0 then this
+    if (weight >= 1) other
+    else if (weight <= 0) this
     else
       Glicko(
         rating = rating * (1 - weight) + other.rating * weight,

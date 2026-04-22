@@ -75,12 +75,12 @@ object PuzzleDashboard {
     def unfixed   = nb - wins
     def failed    = fixed + unfixed
 
-    def winPercent      = if nb == 0 then 0 else wins * 100 / nb
-    def fixedPercent    = if nb == 0 then 0 else fixed * 100 / nb
-    def firstWinPercent = if nb == 0 then 0 else firstWins * 100 / nb
+    def winPercent      = if (nb == 0) 0 else wins * 100 / nb
+    def fixedPercent    = if (nb == 0) 0 else fixed * 100 / nb
+    def firstWinPercent = if (nb == 0) 0 else firstWins * 100 / nb
 
     lazy val performance =
-      if nb == 0 then puzzleRatingAvg else puzzleRatingAvg - 500 + math.round(1000 * (firstWins.toFloat / nb))
+      if (nb == 0) puzzleRatingAvg else puzzleRatingAvg - 500 + math.round(1000 * (firstWins.toFloat / nb))
 
     def clear   = nb >= 6 && firstWins >= 2 && failed >= 2
     def unclear = !clear

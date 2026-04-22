@@ -173,7 +173,7 @@ final private class StripeClient(
         (implicitly[Reads[A]] reads res.body[JsValue]).fold(
           errs =>
             fufail {
-              if isDeleted(res.body[JsValue]) then
+              if (isDeleted(res.body[JsValue]))
                 new DeletedException(s"[stripe] Upstream resource was deleted: ${res.body}")
               else new Exception(s"[stripe] Can't parse ${res.body} --- $errs")
             },

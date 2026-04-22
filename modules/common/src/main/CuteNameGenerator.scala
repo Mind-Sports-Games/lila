@@ -8,8 +8,8 @@ object CuteNameGenerator {
 
   def make(maxSize: Int = 20, triesLeft: Int = 100): Option[CuteName] = {
     val name = makeForSure
-    if name.sizeIs <= maxSize then name.some
-    else if triesLeft <= 0 then none
+    if (name.sizeIs <= maxSize) name.some
+    else if (triesLeft <= 0) none
     else make(maxSize, triesLeft - 1)
   }
 

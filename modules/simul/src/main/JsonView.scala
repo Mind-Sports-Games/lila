@@ -24,7 +24,7 @@ final class JsonView(
   implicit private val simulTeamWriter: OWrites[SimulTeam] = Json.writes[SimulTeam]
 
   private def fetchGames(simul: Simul) =
-    if simul.isFinished then gameRepo.gamesFromSecondary(simul.gameIds)
+    if (simul.isFinished) gameRepo.gamesFromSecondary(simul.gameIds)
     else Future.sequence(simul.gameIds.map(proxyRepo.game)).dmap(_.flatten)
 
   def apply(simul: Simul, team: Option[SimulTeam]): Fu[JsObject] =

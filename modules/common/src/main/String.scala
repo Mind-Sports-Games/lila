@@ -35,7 +35,7 @@ object String {
 
   private def oneline(s: String)                            = s.replace('\n', ' ')
   def shorten(text: String, length: Int, sep: String = "?") =
-    if text.lengthIs > length + sep.length then oneline(text take length) ++ sep
+    if (text.lengthIs > length + sep.length) oneline(text take length) ++ sep
     else oneline(text)
 
   def isShouting(text: String) =
@@ -50,7 +50,7 @@ object String {
         }
       } > 0
     }
-  def noShouting(str: String): String = if isShouting(str) then str.toLowerCase else str
+  def noShouting(str: String): String = if (isShouting(str)) str.toLowerCase else str
 
   def hasLinks = RawHtml.hasLinks
 
@@ -74,7 +74,7 @@ object String {
     def richText(rawText: String, nl2br: Boolean = true, expandImg: Boolean = true): Frag =
       raw {
         val withLinks = RawHtml.addLinks(rawText, expandImg)
-        if nl2br then RawHtml.nl2br(withLinks) else withLinks
+        if (nl2br) RawHtml.nl2br(withLinks) else withLinks
       }
 
     def nl2brUnsafe(text: String): Frag =
@@ -94,7 +94,7 @@ object String {
     def markdownLinksOrRichText(text: String): Frag = {
       val escaped = escapeHtmlRaw(text)
       val marked  = RawHtml.justMarkdownLinks(escaped)
-      if marked == escaped then richText(text)
+      if (marked == escaped) richText(text)
       else nl2brUnsafe(marked)
     }
 

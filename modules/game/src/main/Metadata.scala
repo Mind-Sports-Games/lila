@@ -36,13 +36,13 @@ private[game] case class Metadata(
     multiMatch.fold(false)(x => x.contains("challengeMultiMatch"))
 
   def multiMatchGameNr = multiMatch so { mm =>
-    if mm == "multiMatch" then 1.some
-    else if mm.length() == 10 && mm.substring(1, 2) == ":" then toInt(mm.take(1))
+    if (mm == "multiMatch") 1.some
+    else if (mm.length() == 10 && mm.substring(1, 2) == ":") toInt(mm.take(1))
     else none
   }
 
   def multiMatchGameId = multiMatch.map { mm =>
-    if mm.length() == 10 && mm.substring(1, 2) == ":" then mm.drop(2)
+    if (mm.length() == 10 && mm.substring(1, 2) == ":") mm.drop(2)
     else "*"
   }
 

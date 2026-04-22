@@ -12,7 +12,7 @@ final class UnsubApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext)
   private def select(channel: String, userId: User.ID) = $id(makeId(channel, userId))
 
   def set(channel: String, userId: User.ID, v: Boolean): Funit = {
-    if v then coll.insert.one(select(channel, userId)).void
+    if (v) coll.insert.one(select(channel, userId)).void
     else coll.delete.one(select(channel, userId)).void
   } recover { case _: Exception =>
     ()

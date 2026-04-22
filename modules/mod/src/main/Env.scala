@@ -91,12 +91,12 @@ final class Env(
           sandbagWatch(game)
           assessApi.onGameReady(game, p1User, p2User)
         }
-        if game.status == strategygames.Status.Cheat then
+        if (game.status == strategygames.Status.Cheat)
           game.loserUserId foreach { userId =>
             logApi.cheatDetected(userId, game.id) >>
               logApi.countRecentCheatDetected(userId) flatMap { count =>
                 (count >= 3) so {
-                  if game.hasClock then
+                  if (game.hasClock)
                     api.autoMark(
                       lila.report.SuspectId(userId),
                       lila.report.ModId.playstrategy,

@@ -70,7 +70,7 @@ final class Env(
   private val defaultGoneWeight                      = fuccess(1f)
   private def goneWeight(userId: User.ID): Fu[Float] = playban.getRageSit(userId).dmap(_.goneWeight)
   private val goneWeightsFor                         = (game: Game) =>
-    if !game.playable || !game.hasClock || game.hasAi || !Uptime.startedSinceMinutes(1) then fuccess(1f -> 1f)
+    if (!game.playable || !game.hasClock || game.hasAi || !Uptime.startedSinceMinutes(1)) fuccess(1f -> 1f)
     else
       game.p1Player.userId.fold(defaultGoneWeight)(goneWeight) zip
         game.p2Player.userId.fold(defaultGoneWeight)(goneWeight)
@@ -208,6 +208,6 @@ final class Env(
   val apiActionStream = wire[ApiActionStream]
 
   def resign(pov: Pov): Unit =
-    if pov.game.abortable then tellRound(pov.gameId, Abort(pov.playerId))
-    else if pov.game.resignable then tellRound(pov.gameId, Resign(pov.playerId))
+    if (pov.game.abortable) tellRound(pov.gameId, Abort(pov.playerId))
+    else if (pov.game.resignable) tellRound(pov.gameId, Resign(pov.playerId))
 }

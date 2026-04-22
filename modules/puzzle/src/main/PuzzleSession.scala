@@ -146,7 +146,7 @@ final class PuzzleSessionApi(
               .getAsOpt[List[Puzzle]]("puzzle")
               .flatMap(_.headOption)
               .fold[NextPuzzleResult](PuzzleMissing(puzzleId)) { puzzle =>
-                if doc.getAsOpt[List[Bdoc]]("round").exists(_.nonEmpty) then PuzzleAlreadyPlayed(puzzle)
+                if (doc.getAsOpt[List[Bdoc]]("round").exists(_.nonEmpty)) PuzzleAlreadyPlayed(puzzle)
                 else PuzzleFound(puzzle)
               }
           }
@@ -169,7 +169,7 @@ final class PuzzleSessionApi(
       _ map { session =>
         // yes, even if the completed puzzle was not the current session puzzle
         // in that case we just skip a puzzle on the path, which doesn't matter
-        if session.path.theme == theme then sessions.put(round.userId, fuccess(session.next))
+        if (session.path.theme == theme) sessions.put(round.userId, fuccess(session.next))
       }
     }
 
@@ -198,7 +198,7 @@ final class PuzzleSessionApi(
       theme: PuzzleTheme.Key
   ): Fu[PuzzleSession] =
     sessions.getFuture(user.id, _ => createSessionFor(user, variant, theme)) flatMap { current =>
-      if current.path.theme == theme && current.path.variant.key == variant.key then fuccess(current)
+      if (current.path.theme == theme && current.path.variant.key == variant.key) fuccess(current)
       else createSessionFor(user, variant, theme, current.difficulty) tap { sessions.put(user.id, _) }
     }
 

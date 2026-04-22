@@ -67,14 +67,14 @@ case class GameConfig(
   def perfType: Option[PerfType] = PerfPicker.perfType(Speed(makeClock), variant, makeDaysPerTurn)
 
   def actualFen: Option[FEN] = fen.fold {
-    if variant.gameFamily == GameFamily.Go() then
+    if (variant.gameFamily == GameFamily.Go())
       Some(
         FEN(
           variant.gameLogic,
           variant.toGo.fenFromSetupConfig(goHandicap, goKomi).value
         )
       )
-    else if variant.gameFamily == GameFamily.Backgammon() then
+    else if (variant.gameFamily == GameFamily.Backgammon())
       Some(
         FEN(
           variant.gameLogic,

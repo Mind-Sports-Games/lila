@@ -15,7 +15,7 @@ object Maths {
       Sorting.stableSort(arr)
       val size = arr.length
       val mid  = size / 2
-      if size % 2 == 0 then n.toDouble(arr(mid) + arr(mid - 1)) / 2
+      if (size % 2 == 0) n.toDouble(arr(mid) + arr(mid - 1)) / 2
       else n.toDouble(arr(mid))
     }
 
@@ -34,7 +34,7 @@ object Maths {
   @scala.annotation.tailrec
   def boxedNormalDistribution(mean: Int, deviation: Int, factor: Double): Int = {
     val normal = mean + deviation * ThreadLocalRandom.nextGaussian() * factor.atMost(1)
-    if normal > mean - deviation && normal < mean + deviation then normal.toInt
+    if (normal > mean - deviation && normal < mean + deviation) normal.toInt
     else boxedNormalDistribution(mean, deviation, factor)
   }
 }

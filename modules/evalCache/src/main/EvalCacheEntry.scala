@@ -80,8 +80,8 @@ object EvalCacheEntry {
 
     def intNodes: Int = {
       val nodes = value * 1000d
-      if nodes.toInt == nodes then nodes.toInt
-      else if nodes > 0 then Integer.MAX_VALUE
+      if (nodes.toInt == nodes) nodes.toInt
+      else if (nodes > 0) Integer.MAX_VALUE
       else Integer.MIN_VALUE
     }
   }

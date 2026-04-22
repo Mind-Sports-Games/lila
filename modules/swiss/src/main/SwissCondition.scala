@@ -31,15 +31,15 @@ object SwissCondition {
   case object Titled extends SwissCondition with FlatCond {
     def name(perf: PerfType)(implicit lang: Lang) = "Only titled players"
     def apply(user: User, perf: PerfType)         =
-      if user.title.exists(_ != Title.PM) then Accepted
+      if (user.title.exists(_ != Title.PM)) Accepted
       else Refused(name(perf)(using _))
   }
 
   case class NbRatedGame(nb: Int) extends SwissCondition with FlatCond {
 
     def apply(user: User, perf: PerfType) =
-      if user.hasTitle then Accepted
-      else if user.perfs(perf).nb >= nb then Accepted
+      if (user.hasTitle) Accepted
+      else if (user.perfs(perf).nb >= nb) Accepted
       else
         Refused { (lang: Lang) =>
           given Lang  = lang
@@ -56,12 +56,12 @@ object SwissCondition {
     def apply(perf: PerfType, getMaxRating: GetMaxRating)(
         user: User
     )(implicit ec: scala.concurrent.ExecutionContext): Fu[Verdict] =
-      if user.perfs(perf).provisional then
+      if (user.perfs(perf).provisional)
         fuccess(Refused { (lang: Lang) =>
           given Lang = lang
           trans.yourPerfRatingIsProvisional.txt(perf.trans)
         })
-      else if user.perfs(perf).intRating > rating then
+      else if (user.perfs(perf).intRating > rating)
         fuccess(Refused { (lang: Lang) =>
           given Lang = lang
           trans.yourPerfRatingIsTooHigh.txt(perf.trans, user.perfs(perf).intRating)
@@ -85,13 +85,13 @@ object SwissCondition {
   case class MinRating(rating: Int) extends SwissCondition with FlatCond {
 
     def apply(user: User, perf: PerfType) =
-      if user.hasTitle then Accepted
-      else if user.perfs(perf).provisional then
+      if (user.hasTitle) Accepted
+      else if (user.perfs(perf).provisional)
         Refused { (lang: Lang) =>
           given Lang = lang
           trans.yourPerfRatingIsProvisional.txt(perf.trans)
         }
-      else if user.perfs(perf).intRating < rating then
+      else if (user.perfs(perf).intRating < rating)
         Refused { (lang: Lang) =>
           given Lang = lang
           trans.yourPerfRatingIsTooLow.txt(perf.trans, user.perfs(perf).intRating)

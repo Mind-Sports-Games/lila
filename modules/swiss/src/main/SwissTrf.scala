@@ -25,7 +25,7 @@ final class SwissTrf(
         forbiddenPairings(swiss, playerIds) concat sheetApi
           .source(swiss, sort = sorted.so($doc(f.inputRating -> -1, f.rating -> -1)))
           .map(playerLine(swiss, playerIds).tupled)
-          .map(formatLine) concat (if swiss.settings.mcmahon || swiss.settings.isMatchScore then
+          .map(formatLine) concat (if (swiss.settings.mcmahon || swiss.settings.isMatchScore)
                                      sheetApi
                                        .source(
                                          swiss,
@@ -70,7 +70,7 @@ final class SwissTrf(
     }
 
   private def additionalPoints(swiss: Swiss, player: SwissPlayer, sheet: SwissSheet, round: Int): Double =
-    if swiss.settings.isMatchScore then {
+    if (swiss.settings.isMatchScore) {
       val outcomesSoFar = sheet.outcomes.slice(0, round - 1)
       Swiss
         .Points {
@@ -81,7 +81,7 @@ final class SwissTrf(
         })
         .value
         .toDouble
-    } else if swiss.settings.mcmahon then {
+    } else if (swiss.settings.mcmahon) {
       val maxScore = 30.0 // so that all scores are positive
       maxScore + player.mcMahonStartingScore(swiss.settings.mcmahonCutoffGrade)
     } else 0
@@ -170,7 +170,7 @@ final class SwissTrf(
       }
 
   private def forbiddenPairings(swiss: Swiss, playerIds: PlayerIds): Source[String, ?] =
-    if swiss.settings.forbiddenPairings.isEmpty then Source.empty[String]
+    if (swiss.settings.forbiddenPairings.isEmpty) Source.empty[String]
     else
       Source.fromIterator { () =>
         swiss.settings.forbiddenPairings.linesIterator.flatMap {

@@ -16,7 +16,7 @@ final class Divider {
     apply(game.id, game.actionStrs, game.variant, initialFen)
 
   def apply(id: Game.ID, actionStrs: => ActionStrs, variant: Variant, initialFen: Option[FEN]) =
-    if !Variant.divisionSensibleVariants(variant.gameLogic)(variant) then Division.empty
+    if (!Variant.divisionSensibleVariants(variant.gameLogic)(variant)) Division.empty
     else
       cache.get(
         id,

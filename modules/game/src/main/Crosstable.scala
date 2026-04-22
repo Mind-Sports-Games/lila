@@ -39,8 +39,8 @@ object Crosstable {
     val nbGames = (user1.score + user2.score) / 10
 
     def user(id: String): Option[User] =
-      if id == user1.id then Some(user1)
-      else if id == user2.id then Some(user2)
+      if (id == user1.id) Some(user1)
+      else if (id == user2.id) Some(user2)
       else None
 
     def toList = List(user1, user2)
@@ -54,17 +54,17 @@ object Crosstable {
     }
 
     def showOpponentScore(userId: String) =
-      if userId == user1.id then showScore(user2.id).some
-      else if userId == user2.id then showScore(user1.id).some
+      if (userId == user1.id) showScore(user2.id).some
+      else if (userId == user2.id) showScore(user1.id).some
       else none
 
     def fromPov(userId: String) =
-      if userId == user2.id then copy(user1 = user2, user2 = user1)
+      if (userId == user2.id) copy(user1 = user2, user2 = user1)
       else this
 
     def winnerId =
-      if user1.score > user2.score then Some(user1.id)
-      else if user1.score < user2.score then Some(user2.id)
+      if (user1.score > user2.score) Some(user1.id)
+      else if (user1.score < user2.score) Some(user2.id)
       else None
   }
 
@@ -83,7 +83,7 @@ object Crosstable {
       )
   }
 
-  private[game] def makeKey(u1: String, u2: String): String = if u1 < u2 then s"$u1/$u2" else s"$u2/$u1"
+  private[game] def makeKey(u1: String, u2: String): String = if (u1 < u2) s"$u1/$u2" else s"$u2/$u1"
 
   import reactivemongo.api.bson.*
   import lila.db.BSON

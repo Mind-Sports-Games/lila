@@ -90,17 +90,17 @@ final class ChallengeApi(
       playerIndex: Option[strategygames.Player] = None
   ): Fu[Option[Pov]] =
     acceptQueue {
-      if user.exists(_.isBot) && !Game.isBotCompatible(strategygames.Speed(c.clock.map(_.config))) then
+      if (user.exists(_.isBot) && !Game.isBotCompatible(strategygames.Speed(c.clock.map(_.config))))
         fuccess(none)
-      else if c.challengerIsOpen then repo.setChallenger(c.setChallenger(user, sid), playerIndex) inject none
+      else if (c.challengerIsOpen) repo.setChallenger(c.setChallenger(user, sid), playerIndex) inject none
       else
         joiner(c, user, playerIndex).flatMap {
           _ so { pov =>
             repo.accept(c).andDo {
               uncacheAndNotify(c)
               Bus.publish(Event.Accept(c, user.map(_.id)), "challenge")
-              if !c.timeControl.isInstanceOf[Challenge.TimeControl.Correspondence] then {
-                if !user.exists(_.isBot) then
+              if (!c.timeControl.isInstanceOf[Challenge.TimeControl.Correspondence]) {
+                if (!user.exists(_.isBot))
                   c.destUserId foreach { userId =>
                     Bus.publish(
                       SendTo(
@@ -151,7 +151,7 @@ final class ChallengeApi(
     joiner(challenge, dest.some, none).map2(_.game)
 
   private def isLimitedByMaxPlaying(c: Challenge) =
-    if c.hasClock then fuFalse
+    if (c.hasClock) fuFalse
     else
       Future
         .sequence(

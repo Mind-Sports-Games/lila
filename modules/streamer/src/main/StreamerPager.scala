@@ -23,7 +23,7 @@ final class StreamerPager(
     val adapter = new Adapter[Streamer](
       collection = coll,
       selector =
-        if approvalRequested then approvalRequestedSelector
+        if (approvalRequested) approvalRequestedSelector
         else
           $doc(
             "approval.granted" -> true,
@@ -32,7 +32,7 @@ final class StreamerPager(
           )
       ,
       projection = none,
-      sort = if approvalRequested then $sort.asc("updatedAt") else $sort.desc("liveAt")
+      sort = if (approvalRequested) $sort.asc("updatedAt") else $sort.desc("liveAt")
     ).mapFutureList(withUsers)
     Paginator(
       adapter = new CachedAdapter(adapter, nbResults = fuccess(6000)),

@@ -88,11 +88,11 @@ final class RemoteSocket(
   ) {
     case SendTos(userIds, payload) =>
       val connectedUsers = userIds intersect onlineUserIds.get
-      if connectedUsers.nonEmpty then send(Out.tellUsers(connectedUsers, payload))
+      if (connectedUsers.nonEmpty) send(Out.tellUsers(connectedUsers, payload))
     case SendTo(userId, payload) =>
-      if onlineUserIds.get.contains(userId) then send(Out.tellUser(userId, payload))
+      if (onlineUserIds.get.contains(userId)) send(Out.tellUser(userId, payload))
     case SendToAsync(userId, makePayload) =>
-      if onlineUserIds.get.contains(userId) then
+      if (onlineUserIds.get.contains(userId))
         makePayload() foreach { payload =>
           send(Out.tellUser(userId, payload))
         }
@@ -112,13 +112,13 @@ final class RemoteSocket(
       send(Out.impersonate(userId, modId))
     case ApiUserIsOnline(userId, value) =>
       send(Out.apiUserOnline(userId, value))
-      if value then { val _ = onlineUserIds.getAndUpdate(_ + userId) }
+      if (value) { val _ = onlineUserIds.getAndUpdate(_ + userId) }
     case Follow(u1, u2)   => send(Out.follow(u1, u2))
     case UnFollow(u1, u2) => send(Out.unfollow(u1, u2))
   }
 
   final class StoppableSender(conn: PubSub[String, String], channel: Channel) extends Sender {
-    def apply(msg: String): Unit = if !stopping then { val _ = conn.async.publish(channel, msg) }
+    def apply(msg: String): Unit = if (!stopping) { val _ = conn.async.publish(channel, msg) }
     def sticky(_id: String, msg: String): Unit = apply(msg)
   }
 
@@ -129,11 +129,11 @@ final class RemoteSocket(
     def sticky(id: String, msg: String): Unit = publish(id.hashCode.abs % parallelism, msg)
 
     private def publish(subChannel: Int, msg: String) =
-      if !stopping then { val _ = conn.async.publish(s"$channel:$subChannel", msg) }
+      if (!stopping) { val _ = conn.async.publish(s"$channel:$subChannel", msg) }
   }
 
   def makeSender(channel: Channel, parallelism: Int = 1): Sender =
-    if parallelism > 1 then new RoundRobinSender(redisClient.connectPubSub(), channel, parallelism)
+    if (parallelism > 1) new RoundRobinSender(redisClient.connectPubSub(), channel, parallelism)
     else new StoppableSender(redisClient.connectPubSub(), channel)
 
   private val send: Send = makeSender("site-out").apply
@@ -282,9 +282,9 @@ object RemoteSocket {
         } yield TellSri(Sri(sri), optional(user), typ, obj)
       }
 
-      def commas(str: String): Array[String]    = if str == "-" then Array.empty else str split ','
+      def commas(str: String): Array[String]    = if (str == "-") Array.empty else str split ','
       def boolean(str: String): Boolean         = str == "+"
-      def optional(str: String): Option[String] = if str == "-" then None else Some(str)
+      def optional(str: String): Option[String] = if (str == "-") None else Some(str)
     }
 
     object Out {
@@ -315,8 +315,8 @@ object RemoteSocket {
       def pong(id: String)                     = s"pong $id"
       def stop(reqId: Int)                     = s"lila/stop $reqId"
 
-      def commas(strs: Iterable[Any]): String         = if strs.isEmpty then "-" else strs mkString ","
-      def boolean(v: Boolean): String                 = if v then "+" else "-"
+      def commas(strs: Iterable[Any]): String         = if (strs.isEmpty) "-" else strs mkString ","
+      def boolean(v: Boolean): String                 = if (v) "+" else "-"
       def optional(str: Option[String])               = str getOrElse "-"
       def playerIndex(c: PlayerIndex): String         = c.fold("w", "b")
       def playerIndex(c: Option[PlayerIndex]): String = optional(c.map(_.fold("w", "b")))

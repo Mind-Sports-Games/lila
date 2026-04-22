@@ -36,7 +36,7 @@ private object UciToPgn {
     } to Set
 
     val onlyMeaningfulVariations: List[Info] = analysis.infos map { info =>
-      if pliesWithAdviceAndVariation(info.ply) then info
+      if (pliesWithAdviceAndVariation(info.ply)) info
       else info.dropVariation
     }
     val logic  = variant.gameLogic
@@ -44,7 +44,7 @@ private object UciToPgn {
 
     def uciToPgn(ply: Int, variation: List[String]): Validated[String, List[PgnMove]] = {
       val situationV =
-        if ply == replay.setup.plies + 1 then valid(replay.setup.situation)
+        if (ply == replay.setup.plies + 1) valid(replay.setup.situation)
         else
           replay
             .actionAtPly(ply)

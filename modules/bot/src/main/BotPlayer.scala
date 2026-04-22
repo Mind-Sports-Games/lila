@@ -38,11 +38,11 @@ final class BotPlayer(
         uciStr
       ).fold(clientError[Unit](s"Invalid UCI: $uciStr")) { uci =>
         lila.mon.bot.moves(me.username).increment()
-        if !pov.isMyTurn then clientError("Not your turn, or game already over")
+        if (!pov.isMyTurn) clientError("Not your turn, or game already over")
         else {
           val promise = Promise[Unit]()
-          if pov.player.isOfferingDraw && offeringDraw.contains(false) then declineDraw(pov)
-          else if !pov.player.isOfferingDraw && ~offeringDraw then offerDraw(pov)
+          if (pov.player.isOfferingDraw && offeringDraw.contains(false)) declineDraw(pov)
+          else if (!pov.player.isOfferingDraw && ~offeringDraw) offerDraw(pov)
           tellRound(pov.gameId, BotPlay(pov.playerId, uci, promise.some))
           promise.future recover {
             case _: lila.round.GameIsFinishedError if ~offeringDraw && pov.game.drawn => ()
@@ -56,7 +56,7 @@ final class BotPlayer(
       fuccess {
         lila.mon.bot.chats(me.username).increment()
         val chatId = lila.chat.Chat.Id {
-          if d.room == "player" then gameId else s"$gameId/w"
+          if (d.room == "player") gameId else s"$gameId/w"
         }
         val source = d.room == "spectator" option {
           lila.hub.actorApi.shutup.PublicSource.Watcher(gameId)
@@ -72,9 +72,9 @@ final class BotPlayer(
     gameRepo.game(id) map {
       _.flatMap(Pov(_, me)).filter(p => isOfferingRematch(!p)) so { pov =>
         // delay so it feels more natural
-        lila.common.LilaFuture.delay(if accept then 100.millis else 2.seconds) {
+        lila.common.LilaFuture.delay(if (accept) 100.millis else 2.seconds) {
           fuccess {
-            tellRound(pov.gameId, if accept then RematchYes(pov.playerId) else RematchNo(pov.playerId))
+            tellRound(pov.gameId, if (accept) RematchYes(pov.playerId) else RematchNo(pov.playerId))
           }
         }
         true
@@ -85,41 +85,41 @@ final class BotPlayer(
     Bus.publish(Tell(id, msg), "roundSocket")
 
   def abort(pov: Pov): Funit =
-    if !pov.game.abortable then clientError("This game can no longer be aborted")
+    if (!pov.game.abortable) clientError("This game can no longer be aborted")
     else
       fuccess {
         tellRound(pov.gameId, Abort(pov.playerId))
       }
 
   def resign(pov: Pov): Funit =
-    if pov.game.abortable then abort(pov)
-    else if pov.game.resignable then
+    if (pov.game.abortable) abort(pov)
+    else if (pov.game.resignable)
       fuccess {
         tellRound(pov.gameId, Resign(pov.playerId))
       }
     else clientError("This game cannot be resigned")
 
   def declineDraw(pov: Pov): Unit =
-    if pov.game.drawable && pov.opponent.isOfferingDraw then
+    if (pov.game.drawable && pov.opponent.isOfferingDraw)
       tellRound(pov.gameId, DrawNo(PlayerId(pov.playerId)))
 
   def offerDraw(pov: Pov): Unit =
-    if pov.game.drawable && (pov.game.playerCanOfferDraw(pov.playerIndex) || pov.opponent.isOfferingDraw) then
+    if (pov.game.drawable && (pov.game.playerCanOfferDraw(pov.playerIndex) || pov.opponent.isOfferingDraw))
       tellRound(pov.gameId, DrawYes(PlayerId(pov.playerId)))
 
   def setDraw(pov: Pov, v: Boolean): Unit =
-    if v then offerDraw(pov) else declineDraw(pov)
+    if (v) offerDraw(pov) else declineDraw(pov)
 
   def declineSelectSquares(pov: Pov): Unit =
-    if pov.opponent.isOfferingSelectSquares then
+    if (pov.opponent.isOfferingSelectSquares)
       tellRound(pov.gameId, SelectSquaresDecline(PlayerId(pov.playerId)))
 
   def acceptSelectSquares(pov: Pov): Unit =
-    if pov.opponent.isOfferingSelectSquares then
+    if (pov.opponent.isOfferingSelectSquares)
       tellRound(pov.gameId, SelectSquaresAccept(PlayerId(pov.playerId)))
 
   def decideSelectSquares(pov: Pov, v: Boolean): Unit =
-    if v then acceptSelectSquares(pov) else declineSelectSquares(pov)
+    if (v) acceptSelectSquares(pov) else declineSelectSquares(pov)
 
   def selectSquares(pov: Pov, squares: List[Pos]): Unit =
     tellRound(pov.gameId, PlayerSelectSquares(PlayerId(pov.playerId), squares))

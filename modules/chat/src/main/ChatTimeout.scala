@@ -22,7 +22,7 @@ final class ChatTimeout(
     isActive(chat.id, user.id) flatMap {
       case true  => fuccess(false)
       case false =>
-        if scope == Scope.Global then global.put(user.id)
+        if (scope == Scope.Global) global.put(user.id)
         coll.insert
           .one(
             $doc(

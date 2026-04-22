@@ -31,9 +31,9 @@ final class TournamentStandingApi(
   )
 
   def apply(tour: Tournament, page: Int): Fu[JsObject] =
-    if page == 1 then first get tour.id
-    else if page > 50 then
-      if tour.isCreated then createdCache.get(tour.id -> page)
+    if (page == 1) first get tour.id
+    else if (page > 50)
+      if (tour.isCreated) createdCache.get(tour.id -> page)
       else computeMaybe(tour.id, page)
     else compute(tour, page)
 

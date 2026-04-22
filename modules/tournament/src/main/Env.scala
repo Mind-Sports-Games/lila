@@ -83,8 +83,8 @@ final class Env(
     clearJsonViewCache = jsonView.clearCache,
     clearWinnersCache = winners.clearCache,
     clearTrophyCache = tour => {
-      if tour.isShield then { val _ = scheduler.scheduleOnce(10 seconds) { shieldApi.clear() } }
-      else if Revolution.is(tour) then {
+      if (tour.isShield) { val _ = scheduler.scheduleOnce(10 seconds) { shieldApi.clear() } }
+      else if (Revolution.is(tour)) {
         val _ = scheduler.scheduleOnce(10 seconds) { revolutionApi.clear() }
       }
     },

@@ -69,7 +69,7 @@ final private class TournamentScheduler(
     def monthOfWithWeekAndDayOfWeek(month: OfMonth, weekOfMonth: Int, dayOfWeek: Int) =
       month.firstDay
         .plusDays(
-          if month.firstDay.getDayOfWeek <= dayOfWeek then dayOfWeek - month.firstDay.getDayOfWeek
+          if (month.firstDay.getDayOfWeek <= dayOfWeek) dayOfWeek - month.firstDay.getDayOfWeek
           else 7 - month.firstDay.getDayOfWeek + dayOfWeek
         )
         .plusDays(7 * (weekOfMonth - 1))
@@ -362,8 +362,8 @@ final private class TournamentScheduler(
       (Variant.Chess(strategygames.chess.variant.Standard), Blitz32)
 
     def rotate[A](l: List[A], x: Int): List[A] =
-      if x <= 0 || l.size <= 1 then l
-      else if x >= l.size then rotate(l, x % l.size)
+      if (x <= 0 || l.size <= 1) l
+      else if (x >= l.size) rotate(l, x % l.size)
       else rotate(l.tail ++ List(l.head), x - 1)
 
     // weekly tournaments
@@ -1086,7 +1086,7 @@ Thank you all, you rock!"""
   private[tournament] def pruneConflicts(scheds: List[Tournament], newTourns: List[Tournament]) =
     newTourns
       .foldLeft(List[Tournament]()) { case (tourns, t) =>
-        if overlaps(t, tourns) || overlaps(t, scheds) then tourns
+        if (overlaps(t, tourns) || overlaps(t, scheds)) tourns
         else t :: tourns
       }
       .reverse

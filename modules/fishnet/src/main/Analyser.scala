@@ -67,7 +67,7 @@ final class Analyser(
         val sender = Work.Sender(req.userId, none, mod = false, system = false)
         (fuccess(req.unlimited) >>| limiter(sender, ignoreConcurrentCheck = true, ownGame = false)) flatMap {
           accepted =>
-            if !accepted then
+            if (!accepted)
               logger.info(s"Study request declined: ${req.studyId}/${req.chapterId} by $sender")
             accepted so {
               val work = makeWork(

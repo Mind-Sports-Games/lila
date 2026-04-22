@@ -119,7 +119,7 @@ case class StripePaymentMethod(card: Option[StripeCard])
 case class StripeCard(brand: String, last4: String, exp_year: Int, exp_month: Int)
 
 case class StripeCompletedSession(customer: StripeCustomerId, mode: String) {
-  def freq = if mode == "subscription" then Freq.Monthly else Freq.Onetime
+  def freq = if (mode == "subscription") Freq.Monthly else Freq.Onetime
 }
 
 case class StripeSetupIntent(payment_method: String)

@@ -41,7 +41,7 @@ final class PlaybanApi(
 
   private def blameable(game: Game): Fu[Boolean] =
     (game.source.exists(blameableSources.contains) && game.hasClock) so {
-      if game.rated then fuTrue
+      if (game.rated) fuTrue
       else userRepo.containsEngine(game.userIds).not
     }
 
@@ -114,7 +114,7 @@ final class PlaybanApi(
 
   private def propagateSitting(game: Game, userId: User.ID): Funit =
     rageSitCache get userId map { rageSit =>
-      if rageSit.isBad then Bus.publish(SittingDetected(game, userId), "playban")
+      if (rageSit.isBad) Bus.publish(SittingDetected(game, userId), "playban")
     }
 
   def other(game: Game, status: Status.type => Status, winner: Option[PlayerIndex]): Funit =
@@ -124,7 +124,7 @@ final class PlaybanApi(
         loser = game.player(!w)
         loserId <- loser.userId
       } yield {
-        if Status.NoStart.is(status) then
+        if (Status.NoStart.is(status))
           save(Outcome.NoPlay, loserId, RageSit.Reset).andDo(feedback.noStart(Pov(game, !w)))
         else
           game.clock
@@ -172,7 +172,7 @@ final class PlaybanApi(
         .dmap {
           _.flatMap(_.getAsOpt[List[TempBan]]("b")).so(_.find(_.inEffect))
         } addEffect { ban =>
-        if ban.isEmpty then cleanUserIds.put(userId)
+        if (ban.isEmpty) cleanUserIds.put(userId)
       }
     }
 
@@ -251,7 +251,7 @@ final class PlaybanApi(
               lila.hub.actorApi.mod.AutoWarning(record.userId, MsgPreset.sittingAuto.name),
               "autoWarning"
             )
-            if record.isLethal then
+            if (record.isLethal)
               userRepo
                 .byId(record.userId)
                 .flatMap {

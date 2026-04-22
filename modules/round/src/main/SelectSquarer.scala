@@ -22,7 +22,7 @@ final private[round] class SelectSquarer(
 
   implicit private val chatLang: Lang = defaultLang
 
-  def accept(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = if pov.game.playable then {
+  def accept(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = if (pov.game.playable) {
     val squares: List[Pos] = pov.game.selectedSquares.getOrElse(List[Pos]().empty)
     pov match {
       case Pov(g, playerIndex) if pov.opponent.isOfferingSelectSquares =>
@@ -41,7 +41,7 @@ final private[round] class SelectSquarer(
     }
   } else fuccess(Nil)
 
-  def decline(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = if pov.game.playable then {
+  def decline(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = if (pov.game.playable) {
     val squares: List[Pos] = pov.game.selectedSquares.getOrElse(List[Pos]().empty)
     pov match {
       case Pov(g, playerIndex) if pov.opponent.isOfferingSelectSquares =>
@@ -58,7 +58,7 @@ final private[round] class SelectSquarer(
   } else fuccess(Nil)
 
   def selectSquares(squares: List[Pos])(pov: Pov)(implicit proxy: GameProxy): Fu[Events] =
-    if pov.game.playable then
+    if (pov.game.playable)
       pov match {
         case Pov(g, playerIndex) if g.playerCanOfferSelectSquares(playerIndex) =>
           proxy
@@ -86,7 +86,7 @@ final private[round] class SelectSquarer(
   ): Funit = {
     val uciStr = "ss:" + squares.mkString(",")
     Uci(variant, uciStr).fold(clientError[Unit](s"Invalid UCI: $uciStr")) { uci =>
-      if player.isAi || player.isPSBot then fuccess(tellRound(gameId, BotPlay(player.id, uci, None)))
+      if (player.isAi || player.isPSBot) fuccess(tellRound(gameId, BotPlay(player.id, uci, None)))
       else fuccess(tellRound(gameId, HumanPlay(Game.PlayerId(player.id), uci, false)))
     }
   }
@@ -94,12 +94,12 @@ final private[round] class SelectSquarer(
   private def publishSquareOfferEvent(pov: Pov)(implicit
       proxy: GameProxy
   ) = {
-    if pov.game.isCorrespondence && pov.game.nonAi then
+    if (pov.game.isCorrespondence && pov.game.nonAi)
       Bus.publish(
         lila.hub.actorApi.round.CorresSelectSquaresOfferEvent(pov.gameId),
         "offerEventCorres"
       )
-    if lila.game.Game.isBoardOrBotCompatible(pov.game) then
+    if (lila.game.Game.isBoardOrBotCompatible(pov.game))
       proxy
         .withPov(pov.playerIndex) { p =>
           fuccess(

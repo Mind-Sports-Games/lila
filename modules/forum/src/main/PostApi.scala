@@ -61,10 +61,10 @@ final class PostApi(
                 !categ.quiet so env.recent.invalidate()
                 promotion.save(me, post.text)
                 shutup ! {
-                  if post.isTeam then lila.hub.actorApi.shutup.RecordTeamForumMessage(me.id, post.text)
+                  if (post.isTeam) lila.hub.actorApi.shutup.RecordTeamForumMessage(me.id, post.text)
                   else lila.hub.actorApi.shutup.RecordPublicForumMessage(me.id, post.text)
                 }
-                if !post.troll && !categ.quiet && !topic.isTooBig then
+                if (!post.troll && !categ.quiet && !topic.isTooBig)
                   timeline ! Propagate(ForumPost(me.id, topic.id.some, topic.name, post.id)).pipe {
                     _.toFollowersOf(me.id).toUsers(topicUserIds).exceptUser(me.id)
                   }
@@ -125,12 +125,12 @@ final class PostApi(
 
   def react(postId: String, me: User, reaction: String, v: Boolean): Fu[Option[Post]] =
     Post.Reaction.set(reaction) so {
-      if v then lila.mon.forum.reaction(reaction).increment()
+      if (v) lila.mon.forum.reaction(reaction).increment()
       env.postRepo.coll.ext
         .findAndUpdate[Post](
           selector = $id(postId),
           update = {
-            if v then $addToSet(s"reactions.$reaction" -> me.id)
+            if (v) $addToSet(s"reactions.$reaction" -> me.id)
             else $pull(s"reactions.$reaction"          -> me.id)
           },
           fetchNewObject = true
@@ -208,7 +208,7 @@ final class PostApi(
             for {
               first <- env.postRepo.isFirstPost(view.topic.id, view.post.id)
               _     <-
-                if first then env.topicApi.delete(view.categ, view.topic)
+                if (first) env.topicApi.delete(view.categ, view.topic)
                 else
                   env.postRepo.coll.delete.one($id(view.post.id)) >>
                     (env.topicApi.denormalize(view.topic)) >>

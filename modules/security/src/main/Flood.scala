@@ -24,7 +24,7 @@ final class Flood(duration: FiniteDuration) {
     val quick              = !dominated && quickPost(msg, msgs)
     val dominated_or_quick = dominated || quick
     val result             = !dominated_or_quick
-    if result then cache.put(uid, msg :: msgs)
+    if (result) cache.put(uid, msg :: msgs)
     result
   }
 

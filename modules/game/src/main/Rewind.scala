@@ -35,7 +35,7 @@ object Rewind {
             actionStrs = game.actionStrs,
             op = actionStrs => {
               // rewindTurn (which might just be one ply)
-              if actionStrs.takeRight(1).flatten.size <= 1 || !rewindPly then
+              if (actionStrs.takeRight(1).flatten.size <= 1 || !rewindPly)
                 // adding empty Vector enables actionStrs to tell that the previous turn was complete
                 actionStrs.dropRight(1) :+ Vector()
               // rewindPly - keeps the same turn
@@ -45,7 +45,7 @@ object Rewind {
           )
     }).andThen(_.valid) map { replay =>
       val switchPlayer = game.turnPlayerIndex != replay.state.player
-      val playerIndex  = if switchPlayer then game.turnPlayerIndex else !game.turnPlayerIndex
+      val playerIndex  = if (switchPlayer) game.turnPlayerIndex else !game.turnPlayerIndex
       val rewindedGame = replay.state
       val pliesRemoved = game.stratGame.plies - rewindedGame.plies
       val newClock     = game.clock.map(_.takeback(switchPlayer)) map { clk =>

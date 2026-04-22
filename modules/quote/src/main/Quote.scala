@@ -745,7 +745,7 @@ object Quote {
         "Charles Buxton"
       ),
       new Quote(
-        "Chess is a part of culture and if a culture is declining then chess too will decline.",
+        "Chess is a part of culture and if (a culture is declining) chess too will decline.",
         "Mikhail Botvinnik"
       ),
       new Quote(
@@ -1483,7 +1483,7 @@ object Quote {
         "Mikhail Tal"
       ),
       new Quote(
-        "Fortunately I’ve got a weak character, so I never did decide to dedicate myself to only one of my professions. And I’m very glad. After all, if I’d rejected chess or music then my life wouldn’t have been two times, but a hundred times less interesting.",
+        "Fortunately I’ve got a weak character, so I never did decide to dedicate myself to only one of my professions. And I’m very glad. After all, if (I’d rejected chess or music) my life wouldn’t have been two times, but a hundred times less interesting.",
         "Mark Taimanov"
       ),
       new Quote(

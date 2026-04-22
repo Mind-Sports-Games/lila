@@ -33,7 +33,7 @@ case class SwissPlayer(
   val tieBreak2 = bhTieBreak.map(_ => sbTieBreak.value)
 
   def mcMahonStartingScore(mcmahonCutoff: Int): Double =
-    if actualRating > mcmahonCutoff then mcMahonScoreFromRating(mcmahonCutoff)
+    if (actualRating > mcmahonCutoff) mcMahonScoreFromRating(mcmahonCutoff)
     else mcMahonScoreFromRating(actualRating)
 
   def recomputeScore =

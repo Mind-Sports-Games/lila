@@ -58,7 +58,7 @@ object Clock {
 
   def formatLimit(l: Int) = // Assumes seconds
     StratClock.Config(l, 0).limitString + {
-      if l <= 60 then " minute" else " minutes"
+      if (l <= 60) " minute" else " minutes"
     }
 
   def clockConfigMappingsMinutes(clockTimes: Seq[Double], byoyomiLimits: Seq[Int]): Mapping[ClockConfig] =

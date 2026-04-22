@@ -46,7 +46,7 @@ object PieceSet extends PieceSetObject {
 
   def addMissingDefaultsIfAny(currentPieceSets: List[PieceSet]): List[PieceSet] =
     defaults.map { x =>
-      if currentPieceSets.filter(ps => ps.gameFamily == x.gameFamily).size == 1 then
+      if (currentPieceSets.filter(ps => ps.gameFamily == x.gameFamily).size == 1)
         currentPieceSets.filter(ps => ps.gameFamily == x.gameFamily)(0)
       else x
     }

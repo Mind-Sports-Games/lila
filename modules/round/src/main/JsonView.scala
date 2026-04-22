@@ -52,8 +52,8 @@ final class JsonView(
   private def coordSystemForVariant(prefCoordSystem: Int, gameVariant: Variant): Int =
     gameVariant match {
       case Variant.Draughts(v) => {
-        if v.invertNumericCoords && prefCoordSystem == 0 then 2
-        else if !v.draughts64Variant && prefCoordSystem == 1 then 0
+        if (v.invertNumericCoords && prefCoordSystem == 0) 2
+        else if (!v.draughts64Variant && prefCoordSystem == 1) 0
         else prefCoordSystem
       }
       case _ => prefCoordSystem
@@ -131,7 +131,7 @@ final class JsonView(
                 "coordSystem"       -> coordSystemForVariant(pref.coordSystem, pov.game.variant),
                 "resizeHandle"      -> pref.resizeHandle,
                 "replay"            -> pref.replay,
-                "autoQueen"         -> (if pov.game.variant == strategygames.chess.variant.Antichess then
+                "autoQueen"         -> (if (pov.game.variant == strategygames.chess.variant.Antichess)
                                   Pref.AutoQueen.NEVER
                                 else pref.autoQueen),
                 "clockTenths" -> pref.clockTenths,
@@ -390,7 +390,7 @@ final class JsonView(
           .option(Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion))
       case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
         (pov.game.playableBy(pov.player)) option {
-          if situation.ghosts > 0 then {
+          if (situation.ghosts > 0) {
             val move    = pov.game.actionStrs(pov.game.actionStrs.length - 1)(0)
             val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
             destPos match {
@@ -502,7 +502,7 @@ final class JsonView(
   private def captureLength(pov: Pov): Int =
     (pov.game.situation, pov.game.variant) match {
       case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
-        if situation.ghosts > 0 then {
+        if (situation.ghosts > 0) {
           val move    = pov.game.actionStrs(pov.game.actionStrs.length - 1)(0)
           val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
           destPos match {
@@ -511,7 +511,7 @@ final class JsonView(
           }
         } else situation.allMovesCaptureLength
       case (Situation.Dameo(situation), Variant.Dameo(_)) => {
-        if situation.ghosts > 0 then {
+        if (situation.ghosts > 0) {
           val action = pov.game.actionStrs(pov.game.actionStrs.length - 1)
           val move   = action(action.length - 1)
           move match {
@@ -532,7 +532,7 @@ final class JsonView(
 
   private def animationMillis(pov: Pov, pref: Pref) =
     pref.animationMillis * {
-      if pov.game.finished then 1
+      if (pov.game.finished) 1
       else math.max(0, math.min(1.2, ((pov.game.estimateTotalTime - 60) / 60) * 0.2))
     }
 }

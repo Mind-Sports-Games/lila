@@ -29,7 +29,7 @@ final class SlackApi(
         val firsts    = Heapsort.topN(buffer, 10, amountOrdering).map(_.username).map(userAt).mkString(", ")
         val amountSum = buffer.map(_.amount).sum
         val patrons   =
-          if firsts.lengthIs > 10 then s"$firsts and, like, ${firsts.length - 10} others,"
+          if (firsts.lengthIs > 10) s"$firsts and, like, ${firsts.length - 10} others,"
           else firsts
         displayMessage {
           s"$patrons donated ${amount(amountSum)}. Monthly progress: ${buffer.last.percent}%"
@@ -50,7 +50,7 @@ final class SlackApi(
       )
 
     private def userAt(username: String) =
-      if username == "Anonymous" then "Anonymous"
+      if (username == "Anonymous") "Anonymous"
       else s"@$username"
 
     private def amount(cents: Int) = s"$$${BigDecimal(cents.toLong, 2)}"
@@ -80,7 +80,7 @@ final class SlackApi(
         username = mod.user.username,
         icon = "eye",
         text = {
-          val finalS = if user.username.endsWith("s") then "" else "s"
+          val finalS = if (user.username.endsWith("s")) "" else "s"
           s"checked out _*${userLink(user.username)}*_'$finalS communications "
         } + reportBy.filter(mod.id !=).fold("spontaneously") { by =>
           s"while investigating a report created by ${userLink(by)}"
@@ -124,8 +124,8 @@ final class SlackApi(
     client(
       SlackMessage(
         username = mod.user.username,
-        icon = if v then "anger" else "information_source",
-        text = s"${if v then "Enabled" else "Disabled"} $chatPanicLink",
+        icon = if (v) "anger" else "information_source",
+        text = s"${if (v) "Enabled" else "Disabled"} $chatPanicLink",
         channel = rooms.tavern
       )
     )

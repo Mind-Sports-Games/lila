@@ -15,7 +15,7 @@ final private class Moretimer(
   def apply(pov: Pov, duration: FiniteDuration): Fu[Option[Progress]] =
     IfAllowed(pov.game) {
       (pov.game.moretimeable(!pov.playerIndex)) so {
-        if pov.game.hasClock then give(pov.game, List(!pov.playerIndex), duration).some
+        if (pov.game.hasClock) give(pov.game, List(!pov.playerIndex), duration).some
         else
           pov.game.hasCorrespondenceClock option {
             messenger.volatile(pov.game, s"${!pov.playerIndex} gets more time")
@@ -26,7 +26,7 @@ final private class Moretimer(
     }
 
   def isAllowedIn(game: Game): Fu[Boolean] =
-    if game.isMandatory then fuFalse
+    if (game.isMandatory) fuFalse
     else isAllowedByPrefs(game)
 
   private[round] def give(game: Game, playerIndexs: List[PlayerIndex], duration: FiniteDuration): Progress =
@@ -51,8 +51,8 @@ final private class Moretimer(
     }
 
   private def IfAllowed[A](game: Game)(f: => A): Fu[A] =
-    if !game.playable then fufail(ClientError("[moretimer] game is over " + game.id))
-    else if game.isMandatory then fufail(ClientError("[moretimer] game disallows it " + game.id))
+    if (!game.playable) fufail(ClientError("[moretimer] game is over " + game.id))
+    else if (game.isMandatory) fufail(ClientError("[moretimer] game disallows it " + game.id))
     else
       isAllowedByPrefs(game) flatMap {
         case true => fuccess(f)

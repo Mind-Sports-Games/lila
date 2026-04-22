@@ -88,7 +88,7 @@ final private class EventBus[Event, Channel, Subscriber](
       channel,
       (_: Channel, subs: Set[Subscriber]) => {
         val newSubs = subs - subscriber
-        if newSubs.isEmpty then null
+        if (newSubs.isEmpty) null
         else newSubs
       }
     )

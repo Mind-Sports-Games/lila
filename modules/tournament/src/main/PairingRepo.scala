@@ -54,8 +54,8 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
             case (acc, List(u1, u2)) =>
               val b1   = userIds.contains(u1)
               val b2   = !b1 || userIds.contains(u2)
-              val acc1 = if !b1 || acc.contains(u1) then acc else acc.updated(u1, u2)
-              if !b2 || acc.contains(u2) then acc1 else acc1.updated(u2, u1)
+              val acc1 = if (!b1 || acc.contains(u1)) acc else acc.updated(u1, u2)
+              if (!b2 || acc.contains(u2)) acc1 else acc1.updated(u2, u1)
             case (acc, _) => acc
           }
           .takeWhile(
@@ -178,7 +178,7 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
     }.void
 
   def finish(g: lila.game.Game) =
-    if g.aborted then coll.delete.one($id(g.id)).void
+    if (g.aborted) coll.delete.one($id(g.id)).void
     else
       coll.update
         .one(
@@ -187,7 +187,7 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
             "s"  -> g.status.id,
             "w"  -> g.winnerPlayerIndex.map(_.p1),
             "t"  -> g.playedTurns,
-            "st" -> (if g.startPlayerIndex == Player.P2 && g.variant.recalcStartPlayerForStats then Some(true)
+            "st" -> (if (g.startPlayerIndex == Player.P2 && g.variant.recalcStartPlayerForStats) Some(true)
                      else None),
             "f" -> DateTime.now
           )
@@ -225,8 +225,8 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
       }
 
   def setBerserk(pairing: Pairing, userId: User.ID) = {
-    if pairing.user1 == userId then "b1".some
-    else if pairing.user2 == userId then "b2".some
+    if (pairing.user1 == userId) "b1".some
+    else if (pairing.user2 == userId) "b2".some
     else none
   } so { field =>
     coll.update

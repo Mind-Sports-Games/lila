@@ -86,7 +86,7 @@ final class LobbySocket(
       case RemoveHook(hookId) => val _ = removedHookIds.append(hookId)
 
       case SendHookRemovals =>
-        if removedHookIds.nonEmpty then {
+        if (removedHookIds.nonEmpty) {
           tellActiveHookSubscribers(makeMessage("hrm", removedHookIds.toString))
           removedHookIds.clear()
         }

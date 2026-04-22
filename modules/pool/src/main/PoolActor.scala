@@ -39,7 +39,7 @@ final private class PoolActor(
       members.find(joiner.is) match {
         case None =>
           members = members :+ PoolMember(joiner, config, rageSit)
-          if members.sizeIs >= config.wave.players.value then self ! FullWave
+          if (members.sizeIs >= config.wave.players.value) self ! FullWave
         case Some(member) if member.ratingRange != joiner.ratingRange =>
           members = members.map {
             case m if m == member => m.withRange(joiner.ratingRange)
@@ -84,7 +84,7 @@ final private class PoolActor(
 
       members = members.diff(pairedMembers).map(_.incMisses)
 
-      if pairings.nonEmpty then gameStarter(config, pairings)
+      if (pairings.nonEmpty) gameStarter(config, pairings)
       else if candidates
           .filter(!_.lame)
           .size == 1

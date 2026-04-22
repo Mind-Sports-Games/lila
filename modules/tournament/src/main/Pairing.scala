@@ -26,8 +26,8 @@ case class Pairing(
   def notContains(user: User.ID)                  = !contains(user)
 
   def opponentOf(userId: User.ID) =
-    if userId == user1 then user2.some
-    else if userId == user2 then user1.some
+    if (userId == user1) user2.some
+    else if (userId == user2) user1.some
     else none
 
   def finished = status >= strategygames.Status.Mate
@@ -46,13 +46,13 @@ case class Pairing(
   def draw: Boolean                     = finished && winner.isEmpty
 
   def playerIndexOf(userId: User.ID): Option[PlayerIndex] =
-    if userId == user1 then PlayerIndex.P1.some
-    else if userId == user2 then PlayerIndex.P2.some
+    if (userId == user1) PlayerIndex.P1.some
+    else if (userId == user2) PlayerIndex.P2.some
     else none
 
   def berserkOf(userId: User.ID): Boolean =
-    if userId == user1 then berserk1
-    else if userId == user2 then berserk2
+    if (userId == user1) berserk1
+    else if (userId == user2) berserk2
     else false
 
   def berserkOf(playerIndex: PlayerIndex) = playerIndex.fold(berserk1, berserk2)
@@ -97,9 +97,9 @@ private[tournament] object Pairing {
       p1: RankedPlayerWithPlayerIndexHistory,
       p2: RankedPlayerWithPlayerIndexHistory
   ) =
-    if tour.handicapped then
+    if (tour.handicapped)
       // in go handicapped tournament weaker player must go first
-      if p1.player.actualRating <= p2.player.actualRating then
+      if (p1.player.actualRating <= p2.player.actualRating)
         Prep(tour.id, p1.player.userId, p2.player.userId)
       else Prep(tour.id, p2.player.userId, p1.player.userId)
     else if p1.playerIndexHistory.firstGetsP1(p2.playerIndexHistory)(() =>

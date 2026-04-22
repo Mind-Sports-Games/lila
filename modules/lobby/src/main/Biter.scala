@@ -16,11 +16,11 @@ final private class Biter(
 ) {
 
   def apply(hook: Hook, sri: Sri, user: Option[LobbyUser]): Fu[JoinHook] =
-    if canJoin(hook, user) then join(hook, sri, user)
+    if (canJoin(hook, user)) join(hook, sri, user)
     else fufail(s"$user cannot bite hook $hook")
 
   def apply(seek: Seek, user: LobbyUser): Fu[JoinSeek] =
-    if canJoin(seek, user) then join(seek, user)
+    if (canJoin(seek, user)) join(seek, user)
     else fufail(s"$user cannot join seek $seek")
 
   private def join(hook: Hook, sri: Sri, lobbyUserOption: Option[LobbyUser]): Fu[JoinHook] =

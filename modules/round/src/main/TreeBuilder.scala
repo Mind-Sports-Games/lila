@@ -22,7 +22,7 @@ object TreeBuilder {
     )
 
   def fullOpeningOf(fen: FEN, variant: Variant, withFlags: WithFlags): Option[FullOpening] =
-    if withFlags.opening && Variant.openingSensibleVariants(variant.gameLogic)(variant) then
+    if (withFlags.opening && Variant.openingSensibleVariants(variant.gameLogic)(variant))
       FullOpeningDB.findByFen(variant.gameLogic, fen)
     else None
 
@@ -56,7 +56,7 @@ object TreeBuilder {
         val root = Root(
           ply = init.plies,
           turnCount = init.turnCount,
-          playedPlayerIndex = if init.board.history.currentTurn.nonEmpty then init.player else !init.player,
+          playedPlayerIndex = if (init.board.history.currentTurn.nonEmpty) init.player else !init.player,
           variant = game.variant,
           fen = fen,
           check = init.situation.check,
@@ -80,16 +80,16 @@ object TreeBuilder {
             id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
             ply = g.plies,
             turnCount = g.turnCount,
-            playedPlayerIndex = if g.board.history.currentTurn.nonEmpty then g.player else !g.player,
+            playedPlayerIndex = if (g.board.history.currentTurn.nonEmpty) g.player else !g.player,
             variant = g.situation.board.variant,
             move = m,
             fen = fen,
             captureLength = (g.situation, m) match {
               case (Situation.Draughts(situation), Uci.DraughtsWithSan(uciMove)) =>
-                if situation.ghosts > 0 then situation.captureLengthFrom(uciMove.uci.dest)
+                if (situation.ghosts > 0) situation.captureLengthFrom(uciMove.uci.dest)
                 else situation.allMovesCaptureLength.some
               case (Situation.Dameo(situation), Uci.DameoWithSan(uciMove)) =>
-                if situation.ghosts > 0 then situation.captureLengthFrom(uciMove.uci.dest)
+                if (situation.ghosts > 0) situation.captureLengthFrom(uciMove.uci.dest)
                 else situation.allMovesCaptureLength.some
               case _ => None
             },
@@ -156,7 +156,7 @@ object TreeBuilder {
         id = UciCharPair(variant.gameLogic, m.uci),
         ply = g.plies,
         turnCount = g.turnCount,
-        playedPlayerIndex = if g.board.history.currentTurn.nonEmpty then g.player else !g.player,
+        playedPlayerIndex = if (g.board.history.currentTurn.nonEmpty) g.player else !g.player,
         variant = variant,
         move = m,
         fen = fen,

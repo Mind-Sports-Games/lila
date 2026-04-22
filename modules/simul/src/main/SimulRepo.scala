@@ -160,7 +160,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
       .one(
         $id(simul.id),
         $set(SimulBSONHandler writeTry simul get) ++
-          (if simul.estimatedStartAt.isEmpty then $unset("estimatedStartAt") else $empty)
+          (if (simul.estimatedStartAt.isEmpty) $unset("estimatedStartAt") else $empty)
       )
       .void
 

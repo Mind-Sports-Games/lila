@@ -38,14 +38,12 @@ final private class Finisher(
     })
 
   def outOfTime(game: Game)(implicit proxy: GameProxy): Fu[Events] =
-    if !game.isCorrespondence && !Uptime.startedSinceSeconds(120) && game.updatedAt.isBefore(Uptime.startedAt)
-    then {
+    if (!game.isCorrespondence && !Uptime.startedSinceSeconds(120) && game.updatedAt.isBefore(Uptime.startedAt)) {
       logger.info(s"Aborting game last played before JVM boot: ${game.id}")
       other(game, _.Aborted, none)
-    } else if game.player(!game.player.playerIndex).isOfferingDraw then
+    } else if (game.player(!game.player.playerIndex).isOfferingDraw)
       apply(game, _.Draw, None, Some(trans.drawOfferAccepted.txt()))
-    else if game.variant.useRuleOfGinOnInsufficientMaterial && game.situation.opponentHasInsufficientMaterial
-    then apply(game, game.situation.insufficientMaterialStatus, Some(game.player.playerIndex))
+    else if (game.variant.useRuleOfGinOnInsufficientMaterial && game.situation.opponentHasInsufficientMaterial) apply(game, game.situation.insufficientMaterialStatus, Some(game.player.playerIndex))
     else {
       val winner = Some(!game.player.playerIndex).ifFalse(game.situation.opponentHasInsufficientMaterial)
       apply(game, game.situation.outOfTimeStatus, winner).andDo(winner.foreach { w =>
@@ -57,7 +55,7 @@ final private class Finisher(
     game.playerWhoDidNotMove so { culprit =>
       lila.mon.round.expiration.count.increment()
       playban.noStart(Pov(game, culprit))
-      if game.isMandatory then apply(game, _.NoStart, Some(!culprit.playerIndex))
+      if (game.isMandatory) apply(game, _.NoStart, Some(!culprit.playerIndex))
       else apply(game, _.Aborted, None, Some("Game aborted by server"))
     }
 
@@ -108,7 +106,7 @@ final private class Finisher(
   )(implicit proxy: GameProxy): Fu[Events] = {
     val status = makeStatus(Status)
     val prog   = game.finish(status, winnerC)
-    if game.nonAi && game.isCorrespondence then PlayerIndex.all foreach notifier.gameEnd(prog.game)
+    if (game.nonAi && game.isCorrespondence) PlayerIndex.all foreach notifier.gameEnd(prog.game)
     lila.mon.game
       .finish(
         variant = game.variant.key,
@@ -167,8 +165,8 @@ final private class Finisher(
       val totalTime = (game.hasClock && user.playTime.isDefined) so game.durationSeconds
       val tvTime    = totalTime.ifTrue(recentTvGames.get(game.id))
       val result    =
-        if game.winnerUserId.contains(user.id) then 1
-        else if game.loserUserId.contains(user.id) then -1
+        if (game.winnerUserId.contains(user.id)) 1
+        else if (game.loserUserId.contains(user.id)) -1
         else 0
       userRepo
         .incNbGames(user.id, game.rated, game.hasAi, result = result, totalTime = totalTime, tvTime = tvTime)

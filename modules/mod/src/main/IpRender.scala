@@ -21,7 +21,7 @@ final class IpRender {
 
   import IpRender.*
 
-  def apply(mod: Holder): RenderIp = if Granter.is(_.Admin)(mod) then visible else encrypted
+  def apply(mod: Holder): RenderIp = if (Granter.is(_.Admin)(mod)) visible else encrypted
 
   val visible = (ip: IpAddress) => ip.value
 

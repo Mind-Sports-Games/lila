@@ -27,7 +27,7 @@ final class DuctSequencer(maxSize: Int, timeout: FiniteDuration, name: String, l
           {
             case LilaTimeout(msg) =>
               val fullMsg = s"$name DuctSequencer $msg"
-              if logging then lila.log("duct").warn(fullMsg)
+              if (logging) lila.log("duct").warn(fullMsg)
               LilaTimeout(fullMsg)
             case e => e
           }

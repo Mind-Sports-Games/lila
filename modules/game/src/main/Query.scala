@@ -40,7 +40,7 @@ object Query {
   val notFinished: Bdoc = F.status `$lte` Status.Started.id
 
   def analysed(an: Boolean): Bdoc =
-    if an then F.analysed `$eq` true
+    if (an) F.analysed `$eq` true
     else F.analysed `$ne` true
 
   val frozen: Bdoc = F.status `$gte` Status.Mate.id
@@ -112,9 +112,9 @@ object Query {
 
   def variant(v: Variant) =
     $and(
-      if v.gameLogic.id == 0 then $or($doc(F.lib -> 0), $doc(F.lib `$exists` false))
+      if (v.gameLogic.id == 0) $or($doc(F.lib -> 0), $doc(F.lib `$exists` false))
       else $doc(F.lib -> v.gameLogic.id),
-      if v.id == 1 then $or($doc(F.variant -> 1), $doc(F.variant `$exists` false))
+      if (v.id == 1) $or($doc(F.variant -> 1), $doc(F.variant `$exists` false))
       else $doc(F.variant -> v.id)
     )
 

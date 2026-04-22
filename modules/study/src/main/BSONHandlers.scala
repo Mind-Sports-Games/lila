@@ -94,7 +94,7 @@ object BSONHandlers {
     BSONIntegerHandler.as[Score](
       v =>
         Score {
-          if v >= mateFactor || v <= -mateFactor then Right(Eval.Mate(v / mateFactor))
+          if (v >= mateFactor || v <= -mateFactor) Right(Eval.Mate(v / mateFactor))
           else Left(Eval.Cp(v))
         },
       _.value.fold(
@@ -393,7 +393,7 @@ object BSONHandlers {
         playedPlayerIndex <- doc
           .getAsOpt[PlayerIndex](F.playedPlayerIndex)
           .orElse(
-            PlayerIndex.apply(if ply % 2 == 1 then "p1" else "p2")
+            PlayerIndex.apply(if (ply % 2 == 1) "p1" else "p2")
           ) // assume existing studies were single action
         uci <- doc.getAsOpt[Uci](F.uci)
         san <- doc.getAsOpt[String](F.san)

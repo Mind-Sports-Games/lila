@@ -317,8 +317,8 @@ object Dimension {
             $doc(
               "$or" -> many.map { range =>
                 val intRange = lila.insight.MaterialRange.toRange(range)
-                if intRange._1 == intRange._2 then $doc(d.dbKey -> intRange._1)
-                else if range.negative then $doc(d.dbKey `$gte` intRange._1 `$lt` intRange._2)
+                if (intRange._1 == intRange._2) $doc(d.dbKey -> intRange._1)
+                else if (range.negative) $doc(d.dbKey `$gte` intRange._1 `$lt` intRange._2)
                 else $doc(d.dbKey `$gt` intRange._1 `$lte` intRange._2)
               }
             )

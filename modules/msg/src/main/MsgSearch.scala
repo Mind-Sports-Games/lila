@@ -20,7 +20,7 @@ final class MsgSearch(
   import BsonHandlers.*
 
   def apply(me: User, q: String): Fu[MsgSearch.Result] =
-    if me.kid then forKid(me, q)
+    if (me.kid) forKid(me, q)
     else
       searchThreads(me, q) zip searchFriends(me, q) zip searchUsers(me, q) map {
         case ((threads, friends), users) =>

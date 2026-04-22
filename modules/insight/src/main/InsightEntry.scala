@@ -162,7 +162,7 @@ object QueenTrade {
   object Yes extends QueenTrade(true, "Queen trade")
   object No  extends QueenTrade(false, "No queen trade")
   val all                           = List(Yes, No)
-  def apply(v: Boolean): QueenTrade = if v then Yes else No
+  def apply(v: Boolean): QueenTrade = if (v) Yes else No
 }
 
 sealed abstract class RelativeStrength(val id: Int, val name: String)
@@ -225,7 +225,7 @@ object MaterialRange {
     (p.id, p)
   } toMap
   def toRange(mr: MaterialRange): (Int, Int) =
-    if mr.id == Equal.id then (0, 0)
+    if (mr.id == Equal.id) (0, 0)
     else
       (
         byId.get(mr.id - 1).fold(Int.MinValue)(_.imbalance),
@@ -238,7 +238,7 @@ object Blur {
   object Yes extends Blur(true, "Blur")
   object No  extends Blur(false, "No blur")
   val all                     = List(Yes, No)
-  def apply(v: Boolean): Blur = if v then Yes else No
+  def apply(v: Boolean): Blur = if (v) Yes else No
 }
 
 sealed abstract class TimeVariance(val id: Float, val name: String) {
@@ -257,7 +257,7 @@ object TimeVariance {
   def apply(v: Float)                       = all.find(_.id >= v) | VeryVariable
   val intFactor: Int                        = 100_000 // multiply variance by that to get an Int for storage
   def toRange(tv: TimeVariance): (Int, Int) =
-    if tv == VeryVariable then (QuiteVariable.intFactored, Int.MaxValue)
+    if (tv == VeryVariable) (QuiteVariable.intFactored, Int.MaxValue)
     else
       (
         all.indexOf(tv).some.filter(-1 !=).map(_ - 1).flatMap(all.lift).fold(0)(_.intFactored),
@@ -270,8 +270,8 @@ object CplRange {
   val all = List(0, 10, 25, 50, 100, 200, 500, 99999).map { cpl =>
     new CplRange(
       name =
-        if cpl == 0 then "Perfect"
-        else if cpl == 99999 then "> 500 CPL"
+        if (cpl == 0) "Perfect"
+        else if (cpl == 99999) "> 500 CPL"
         else s"≤ $cpl CPL",
       cpl = cpl
     )

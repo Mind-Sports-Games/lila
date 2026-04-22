@@ -14,7 +14,7 @@ final private class AbortListener(
       .andDo(lobbyTrouper.registerAbortedGame(pov.game))
 
   private def cancelPlayerIndexIncrement(pov: Pov): Unit =
-    if pov.game.source.exists(s => s == Source.Lobby || s == Source.Pool) then
+    if (pov.game.source.exists(s => s == Source.Lobby || s == Source.Pool))
       pov.game.userIds match {
         case List(u1, u2) =>
           userRepo.incPlayerIndex(u1, -1)

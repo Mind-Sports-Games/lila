@@ -18,7 +18,7 @@ final class GeoIP(config: GeoIP.Config) {
     config.file.nonEmpty so {
       try {
         val dbFile = new File(config.file)
-        if dbFile.exists() then {
+        if (dbFile.exists()) {
           val r = new DatabaseReader.Builder(dbFile).build()
           logger.info("MaxMindIpGeo is enabled")
           r.some

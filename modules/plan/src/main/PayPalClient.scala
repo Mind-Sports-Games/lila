@@ -123,7 +123,7 @@ final private class PayPalClient(
       s"${path.plans}?product_id=$patronMonthProductId&page_size=$plansPerPage&page=$page"
     )
       .flatMap { plans =>
-        if plans.size == plansPerPage then getPlans(page + 1).map(plans ::: _)
+        if (plans.size == plansPerPage) getPlans(page + 1).map(plans ::: _)
         else fuccess(plans)
       }
       .map(_.filter(_.active))

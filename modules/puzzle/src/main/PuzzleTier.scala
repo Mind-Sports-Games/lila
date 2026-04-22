@@ -14,12 +14,12 @@ object PuzzleTier {
   case object All  extends PuzzleTier("all")
 
   def stepDown(tier: PuzzleTier): Option[PuzzleTier] =
-    if tier == Top then Good.some
-    else if tier == Good then All.some
+    if (tier == Top) Good.some
+    else if (tier == Good) All.some
     else none
 
   def from(tier: String) =
-    if tier == Top.key then Top
-    else if tier == Good.key then Good
+    if (tier == Top.key) Top
+    else if (tier == Good.key) Good
     else All
 }

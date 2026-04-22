@@ -12,8 +12,8 @@ final class PrintBan(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext)
   def blocks(hash: FingerHash): Boolean = current contains hash.value
 
   def toggle(hash: FingerHash, block: Boolean): Funit = {
-    current = if block then current + hash.value else current - hash.value
-    if block then
+    current = if (block) current + hash.value else current - hash.value
+    if (block)
       coll.update
         .one(
           $id(hash.value),

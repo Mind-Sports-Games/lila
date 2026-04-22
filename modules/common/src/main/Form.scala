@@ -138,7 +138,7 @@ object Form {
   def trueish(v: Any) = v == 1 || v == "1" || v == "true" || v == "on" || v == "yes"
 
   private def pluralize(pattern: String, nb: Int) =
-    pattern.replace("{s}", if nb == 1 then "" else "s")
+    pattern.replace("{s}", if (nb == 1) "" else "s")
 
   def absoluteUrl = of[AbsoluteUrl](using formatter.absoluteUrlFormatter)
 
@@ -179,12 +179,12 @@ object Form {
     import play.api.data.validation as V
     def minLength[A](from: A => String)(length: Int): Constraint[A] =
       Constraint[A]("constraint.minLength", length) { o =>
-        if from(o).lengthIs >= length then V.Valid
+        if (from(o).lengthIs >= length) V.Valid
         else V.Invalid(V.ValidationError("error.minLength", length))
       }
     def maxLength[A](from: A => String)(length: Int): Constraint[A] =
       Constraint[A]("constraint.maxLength", length) { o =>
-        if from(o).lengthIs <= length then V.Valid
+        if (from(o).lengthIs <= length) V.Valid
         else V.Invalid(V.ValidationError("error.maxLength", length))
       }
   }

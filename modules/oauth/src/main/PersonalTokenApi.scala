@@ -36,7 +36,7 @@ final class PersonalTokenApi(colls: OauthColls)(implicit ec: scala.concurrent.Ex
     }
 
   def create(token: AccessToken) = colls.token(_.insert.one(token).void).andDo {
-    if token.scopes contains OAuthScope.Web.Login then
+    if (token.scopes contains OAuthScope.Web.Login)
       logger.warn(s"web:login token created by ${token.userId} ${~token.description}")
   }
 
