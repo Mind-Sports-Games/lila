@@ -59,7 +59,7 @@ final class Game(
               .pipe(asAttachment(filename))
               .withHeaders(
                 lila.app.http.ResponseHeaders.headersForApiOrApp(req)*
-              ) `as` gameContentType(config)
+              ).as(gameContentType(config))
           }
         }
     }

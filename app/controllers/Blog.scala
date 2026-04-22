@@ -76,7 +76,7 @@ final class Blog(
   def atom =
     Action.async {
       atomCache.getUnit map { xml =>
-        Ok(xml) `as` XML
+        Ok(xml).as(XML)
       }
     }
 
@@ -98,7 +98,7 @@ final class Blog(
   def sitemapTxt =
     Action.async {
       sitemapCache.getUnit map { txt =>
-        Ok(txt) `as` TEXT
+        Ok(txt).as(TEXT)
       }
     }
 

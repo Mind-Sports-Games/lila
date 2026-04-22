@@ -483,7 +483,7 @@ final class Puzzle(
         _ =>
           OptionFuOk(Puz.numericalId(nid) so env.puzzle.api.puzzle.find) { puz =>
             env.puzzle.jsonView.bc(puzzle = puz, user = ctx.me)
-          }.dmap(_ `as` JSON)
+          }.dmap(_.as(JSON))
       )
     }
 

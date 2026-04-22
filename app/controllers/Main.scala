@@ -119,7 +119,7 @@ final class Main(
             lila.mon.http.imageBytes.record(image.size.toLong)
             Ok(image.data).withHeaders(
               CACHE_CONTROL -> "max-age=1209600"
-            ) `as` image.contentType.getOrElse("image/jpeg")
+            ).as(image.contentType.getOrElse("image/jpeg"))
         }
     }
 

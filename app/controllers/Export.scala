@@ -76,5 +76,5 @@ final class Export(env: Env) extends LilaController(env) {
   }
 
   private def stream(contentType: String)(stream: Source[ByteString, ?]) =
-    Ok.chunked(stream).withHeaders(noProxyBufferHeader) `as` contentType
+    Ok.chunked(stream).withHeaders(noProxyBufferHeader).as(contentType)
 }

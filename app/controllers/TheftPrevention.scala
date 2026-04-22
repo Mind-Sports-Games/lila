@@ -43,5 +43,5 @@ private[controllers] trait TheftPrevention { self: LilaController =>
     jsonError(
       "This game requires authentication"
     )
-  ) `as` JSON
+  ).as(JSON)
 }

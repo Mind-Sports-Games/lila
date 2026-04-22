@@ -348,7 +348,7 @@ abstract private[controllers] class LilaController(val env: Env)
                 jsonError(
                   s"Banned from playing for ${ban.remainingMinutes} minutes. Reason: Too many aborts, unplayed games, or rage quits."
                 )
-              ) `as` JSON
+              ).as(JSON)
             }
         )
       }
@@ -365,7 +365,7 @@ abstract private[controllers] class LilaController(val env: Env)
                 jsonError(
                   s"You are already playing ${current.opponent}"
                 )
-              ) `as` JSON
+              ).as(JSON)
             }
         )
       }
@@ -374,8 +374,8 @@ abstract private[controllers] class LilaController(val env: Env)
   protected def NoPlaybanOrCurrent(a: => Fu[Result])(implicit ctx: Context): Fu[Result] =
     NoPlayban(NoCurrentGame(a))
 
-  protected def JsonOk(body: JsValue): Result             = Ok(body) `as` JSON
-  protected def JsonOk[A: Writes](body: A): Result        = Ok(Json toJson body) `as` JSON
+  protected def JsonOk(body: JsValue): Result             = Ok(body).as(JSON)
+  protected def JsonOk[A: Writes](body: A): Result        = Ok(Json toJson body).as(JSON)
   protected def JsonOk[A: Writes](fua: Fu[A]): Fu[Result] = fua dmap { JsonOk(_) }
 
   protected val jsonOkBody   = Json.obj("ok" -> true)
@@ -523,7 +523,7 @@ abstract private[controllers] class LilaController(val env: Env)
     lila.api.Mobile.Api
       .requestVersion(req)
       .fold(html) { v =>
-        api(v).dmap(_ `as` JSON)
+        api(v).dmap(_.as(JSON))
       }
       .dmap(_.withHeaders("Vary" -> "Accept"))
 

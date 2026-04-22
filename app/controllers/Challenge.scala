@@ -309,7 +309,7 @@ final class Challenge(
                             case false =>
                               BadRequest(jsonError("Challenge not created"))
                           }
-                      } map (_ `as` JSON)
+                      } map (_.as(JSON))
                   }
                 }
               }(rateLimitedFu)
@@ -434,7 +434,7 @@ final class Challenge(
                 case false =>
                   BadRequest(jsonError("Challenge not created"))
               }
-            }(rateLimitedFu).dmap(_ `as` JSON)
+            }(rateLimitedFu).dmap(_.as(JSON))
         )
     }
 
