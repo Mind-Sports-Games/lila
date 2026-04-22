@@ -113,10 +113,22 @@ object show {
           )
         ),
         dailyPuzzle map { p =>
-          views.html.puzzle.embed.dailyLink(p)(ctx.lang)(cls := "library__puzzle")
+          div(cls := "library__puzzle")(
+            div(cls := "color-choice title")(
+              div(dataIcon := "-"),
+              h2("Daily Puzzle"),
+              div(" ")
+            ),
+            views.html.puzzle.embed.dailyLink(p)(ctx.lang)
+          )
         },
         featuredGame map { g =>
-          div(cls := "library__tv")(
+          div(cls := List("library__tv" -> true, "library__tv--centered" -> dailyPuzzle.isEmpty))(
+            div(cls := "color-choice title")(
+              div(dataIcon := "1"),
+              h2("Featured Game"),
+              div(" ")
+            ),
             views.html.game.mini(Pov naturalOrientation g, tv = false)
           )
         },
