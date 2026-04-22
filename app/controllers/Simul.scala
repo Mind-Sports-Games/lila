@@ -100,8 +100,8 @@ final class Simul(env: Env) extends LilaController(env) {
     Auth { implicit ctx => me =>
       AsHost(simulId) { simul =>
         env.simul.api.abort(simul.id) inject {
-          if !simul.isHost(me) then env.mod.logApi.terminateTournament(me.id, simul.fullName)
-          if HTTPRequest.isXhr(ctx.req) then jsonOkResult
+          if (!simul.isHost(me)) env.mod.logApi.terminateTournament(me.id, simul.fullName)
+          if (HTTPRequest.isXhr(ctx.req)) jsonOkResult
           else Redirect(routes.Simul.home)
         }
       }
@@ -170,7 +170,7 @@ final class Simul(env: Env) extends LilaController(env) {
       NoLameOrBot {
         env.team.cached.teamIds(me.id) flatMap { teamIds =>
           env.simul.api.addApplicant(id, me, teamIds.contains, variant) inject {
-            if HTTPRequest.isXhr(ctx.req) then jsonOkResult
+            if (HTTPRequest.isXhr(ctx.req)) jsonOkResult
             else Redirect(routes.Simul.show(id))
           }
         }
@@ -180,7 +180,7 @@ final class Simul(env: Env) extends LilaController(env) {
   def withdraw(id: String) =
     Auth { implicit ctx => me =>
       env.simul.api.removeApplicant(id, me) inject {
-        if HTTPRequest.isXhr(ctx.req) then jsonOkResult
+        if (HTTPRequest.isXhr(ctx.req)) jsonOkResult
         else Redirect(routes.Simul.show(id))
       }
     }
@@ -221,7 +221,7 @@ final class Simul(env: Env) extends LilaController(env) {
       f: Sim => Fu[Result]
   )(implicit ctx: Context): Fu[Result] =
     AsHost(id) { sim =>
-      if sim.isStarted then Redirect(routes.Simul.show(sim.id)).fuccess
+      if (sim.isStarted) Redirect(routes.Simul.show(sim.id)).fuccess
       else f(sim)
     }
 }

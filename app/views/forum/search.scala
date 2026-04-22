@@ -25,7 +25,7 @@ object search {
         ),
         strong(cls := "nb-results box__pad")(pager.nbResults, " posts found"),
         table(cls := "slist slist-pad search__results")(
-          if pager.nbResults > 0 then
+          if (pager.nbResults > 0)
             tbody(cls := "infinite-scroll")(
               pager.currentPageResults.map { view =>
                 tr(cls := "paginated")(

@@ -133,7 +133,7 @@ trait FormHelper { self: I18nHelper =>
         label(`for` := fieldId)
       )
 
-    private def displayStyle(displayed: Boolean): String = if displayed then "block" else "none"
+    private def displayStyle(displayed: Boolean): String = if (displayed) "block" else "none"
 
     def select(
         field: Field,
@@ -251,7 +251,7 @@ trait FormHelper { self: I18nHelper =>
       }
 
     def flatpickr(field: Field, withTime: Boolean = true, utc: Boolean = false): Tag =
-      input(field, klass = s"flatpickr${if utc then " flatpickr-utc" else ""}")(
+      input(field, klass = s"flatpickr${if (utc) " flatpickr-utc" else ""}")(
         dataEnableTime := withTime,
         datatime24h    := withTime
       )

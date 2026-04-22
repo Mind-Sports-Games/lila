@@ -172,7 +172,7 @@ final class Env(
   Bus.subscribeFun("garbageCollect") { case lila.hub.actorApi.security.GarbageCollect(userId) =>
     // GC can be aborted by reverting the initial SB mark
     user.repo.isTroll(userId) foreach { troll =>
-      if troll then
+      if (troll)
         scheduler.scheduleOnce(1.second) {
           playstrategyClose(userId).discard
         }

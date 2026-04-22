@@ -111,7 +111,7 @@ final class Blog(
 
   def year(year: Int) =
     WithPrismic { implicit ctx => implicit prismic =>
-      if lila.blog.allYears contains year then
+      if (lila.blog.allYears contains year)
         blogApi.byYear(prismic, year) map { posts => Ok(views.html.blog.index.byYear(year, posts)) }
       else notFound
     }

@@ -19,7 +19,7 @@ object bits {
     )(name)
 
   def idToName(id: Swiss.Id): String = env.swiss.getName(id) getOrElse "Tournament"
-  def iconChar(swiss: Swiss): String = if swiss.isMedley then "5" else swiss.perfType.iconChar.toString
+  def iconChar(swiss: Swiss): String = if (swiss.isMedley) "5" else swiss.perfType.iconChar.toString
 
   def notFound()(implicit ctx: Context) =
     views.html.base.layout(
@@ -52,13 +52,13 @@ object bits {
                 span(cls := "setup")(
                   s.clock.show,
                   " • ",
-                  if s.variant.exotic then
+                  if (s.variant.exotic)
                     s.settings.backgammonPoints.fold("")(p => s"${p}pt ") + VariantKeys.variantName(s.variant)
                   else s.perfType.trans,
                   " • ",
-                  if s.settings.handicapped then trans.handicappedTournament()
-                  else if s.settings.mcmahon then trans.mcmahon()
-                  else if s.settings.rated then trans.ratedTournament()
+                  if (s.settings.handicapped) trans.handicappedTournament()
+                  else if (s.settings.mcmahon) trans.mcmahon()
+                  else if (s.settings.rated) trans.ratedTournament()
                   else trans.casualTournament(),
                   " • ",
                   s.estimatedDurationString
@@ -81,7 +81,7 @@ object bits {
       case None if s.settings.manualRounds => frag("Rounds are started manually")
       case None                            =>
         frag(
-          if s.settings.intervalSeconds < 60 then pluralize("second", s.settings.intervalSeconds)
+          if (s.settings.intervalSeconds < 60) pluralize("second", s.settings.intervalSeconds)
           else pluralize("minute", s.settings.intervalSeconds / 60),
           " between rounds"
         )
@@ -105,14 +105,14 @@ object bits {
       div(
         s"${trans.swiss.medleyGameGroups.txt()}: ${gameGroups}."
       ),
-      if displayFirstRound then
+      if (displayFirstRound)
         variants.headOption.map { v =>
           div(cls := "medley__rounds")(
             s"${trans.swiss.firstRound.txt()}: ",
             a(href := routes.Page.variant(v.key))(VariantKeys.variantName(v))
           )
         }
-      else if displayAllRounds then
+      else if (displayAllRounds)
         table(cls := "medley__rounds")(
           tbody(
             variants.zipWithIndex.filter { case (_, i) => i < maxRounds }.map { case (v, i) =>

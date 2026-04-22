@@ -123,7 +123,7 @@ final class Swiss(
 
   def apiCreate(teamId: String) =
     ScopedBody(_.Tournament.Write) { implicit req => me =>
-      if me.isBot || me.lame then notFoundJson("This account cannot create tournaments")
+      if (me.isBot || me.lame) notFoundJson("This account cannot create tournaments")
       else
         env.team.cached.isLeader(teamId, me.id) flatMap {
           case false => notFoundJson("You're not a leader of that team")
@@ -162,7 +162,7 @@ final class Swiss(
         env.team.cached.teamIds(me.id) flatMap { teamIds =>
           env.swiss.api.join(SwissId(id), me, teamIds.contains, password) flatMap { result =>
             fuccess {
-              if result then jsonOkResult
+              if (result) jsonOkResult
               else BadRequest(Json.obj("joined" -> false))
             }
           }
@@ -294,8 +294,8 @@ final class Swiss(
       f: SwissModel => Fu[Result]
   )(implicit ctx: Context): Fu[Result] =
     WithSwiss(id) { swiss =>
-      if swiss.createdBy == me.id && !swiss.isFinished then f(swiss)
-      else if isGranted(_.ManageTournament) then f(swiss)
+      if (swiss.createdBy == me.id && !swiss.isFinished) f(swiss)
+      else if (isGranted(_.ManageTournament)) f(swiss)
       else Redirect(routes.Swiss.show(swiss.id.value)).fuccess
     }
 
@@ -314,7 +314,7 @@ final class Swiss(
     }
 
   private def canModChat(swiss: SwissModel)(implicit ctx: Context): Fu[Boolean] =
-    if isGranted(_.ChatTimeout) then fuTrue
+    if (isGranted(_.ChatTimeout)) fuTrue
     else ctx.userId so { env.team.cached.isLeader(swiss.teamId, _) }
 
   private val streamerCache =

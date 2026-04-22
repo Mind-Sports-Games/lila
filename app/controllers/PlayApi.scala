@@ -140,21 +140,21 @@ final class PlayApi(
 
   private def WithPovAsBot(anyId: String, me: lila.user.User)(f: Pov => Fu[Result]) =
     WithPov(anyId, me) { pov =>
-      if me.noBot then
+      if (me.noBot)
         BadRequest(
           jsonError(
             "This endpoint can only be used with a Bot account. See https://playstrategy.org/api#operation/botAccountUpgrade"
           )
         ).fuccess
-      else if !lila.game.Game.isBotCompatible(pov.game) then
+      else if (!lila.game.Game.isBotCompatible(pov.game))
         BadRequest(jsonError("This game cannot be played with the Bot API.")).fuccess
       else f(pov)
     }
 
   private def WithPovAsBoard(anyId: String, me: lila.user.User)(f: Pov => Fu[Result]) =
     WithPov(anyId, me) { pov =>
-      if me.isBot then notForBotAccounts.fuccess
-      else if !lila.game.Game.isBoardCompatible(pov.game) then
+      if (me.isBot) notForBotAccounts.fuccess
+      else if (!lila.game.Game.isBoardCompatible(pov.game))
         BadRequest(jsonError("This game cannot be played with the Board API.")).fuccess
       else f(pov)
     }

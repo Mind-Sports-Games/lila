@@ -44,7 +44,7 @@ object show {
           )})""")
       ),
       moreCss = cssTag {
-        if tour.isTeamBattle then "tournament.show.team-battle"
+        if (tour.isTeamBattle) "tournament.show.team-battle"
         else "tournament.show"
       },
       chessground = false,
@@ -52,14 +52,14 @@ object show {
         .OpenGraph(
           title = s"${tour.name()}: ${VariantKeys
               .variantName(tour.variant)} ${tour.clock.show} ${
-              if tour.handicapped then trans.handicapped.txt()
+              if (tour.handicapped) trans.handicapped.txt()
               else tour.mode.name
             } #${tour.id}",
           url = s"$netBaseUrl${routes.Tournament.show(tour.id).url}",
           description =
             s"${tour.nbPlayers} players compete in the ${showEnglishDate(tour.startsAt)} ${tour.name()}. " +
               s"${tour.clock.show} ${
-                  if tour.handicapped then trans.handicapped.txt()
+                  if (tour.handicapped) trans.handicapped.txt()
                   else tour.mode.name
                 } games are played during ${tour.minutes} minutes. " +
               tour.winnerId.fold("Winner is not yet decided.") { winnerId =>

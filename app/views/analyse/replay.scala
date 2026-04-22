@@ -141,7 +141,7 @@ object replay {
                 div(cls := "analyse__underboard__panels")(
                   game.analysable.option(
                     div(cls := "computer-analysis")(
-                      if analysis.isDefined || analysisStarted then div(id := "acpl-chart")
+                      if (analysis.isDefined || analysisStarted) div(id := "acpl-chart")
                       else
                         postForm(
                           cls    := s"future-game-analysis${ctx.isAnon so " must-login"}",
@@ -199,7 +199,7 @@ object replay {
             )
           )
         ),
-        if ctx.blind then
+        if (ctx.blind)
           div(cls := "blind-content none")(
             h2(s"${game.gameRecordFormat.toUpperCase} downloads"),
             gameRecordLinks

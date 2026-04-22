@@ -25,7 +25,7 @@ final class Study(
   def search(text: String, page: Int) =
     OpenBody { implicit ctx =>
       Reasonable(page) {
-        if text.trim.isEmpty then
+        if (text.trim.isEmpty)
           env.study.pager.all(ctx.me, Order.default, page) flatMap { pag =>
             negotiate(
               html = Ok(html.study.list.all(pag, Order.default)).fuccess,
@@ -157,7 +157,7 @@ final class Study(
   private def orRelay(id: String, chapterId: Option[String] = None)(
       f: => Fu[Result]
   )(implicit ctx: Context): Fu[Result] =
-    if HTTPRequest.isRedirectable(ctx.req) then
+    if (HTTPRequest.isRedirectable(ctx.req))
       env.relay.api.getOngoing(lila.relay.RelayRound.Id(id)) flatMap {
         _.fold(f) { rt =>
           Redirect(chapterId.map(Chapter.Id.apply).fold(rt.path)(rt.path)).fuccess
@@ -270,7 +270,7 @@ final class Study(
               owner   <- env.study.studyRepo.recentByOwner(me.id, 50)
               contrib <- env.study.studyRepo.recentByContributor(me.id, 50)
               res     <-
-                if owner.isEmpty && contrib.isEmpty then createStudy(data, me)
+                if (owner.isEmpty && contrib.isEmpty) createStudy(data, me)
                 else Ok(html.study.create(data, owner, contrib)).fuccess
             } yield res
         )
@@ -404,7 +404,7 @@ final class Study(
 
   def cloneApply(id: String) =
     Auth { implicit ctx => me =>
-      val cost = if isGranted(_.Coach) || me.hasTitle then 1 else 3
+      val cost = if (isGranted(_.Coach) || me.hasTitle) 1 else 3
       CloneLimitPerUser(me.id, cost = cost) {
         CloneLimitPerIP(HTTPRequest.ipAddress(ctx.req), cost = cost) {
           OptionFuResult(env.study.api.byId(id)) { prev =>
@@ -509,7 +509,7 @@ final class Study(
           .throttle(30, 1 second)
       } { source =>
         Ok.chunked(source)
-          .pipe(asAttachmentStream(s"${username}-${if isMe then "all" else "public"}-studies.pgn"))
+          .pipe(asAttachmentStream(s"${username}-${if (isMe) "all" else "public"}-studies.pgn"))
           .as(pgnContentType)
       }
       .fuccess
@@ -581,7 +581,7 @@ final class Study(
   private[controllers] def CanViewResult(
       study: StudyModel
   )(f: => Fu[Result])(implicit ctx: lila.api.Context) =
-    if canView(study) then f
+    if (canView(study)) f
     else
       negotiate(
         html = fuccess(Unauthorized(html.site.message.privateStudy(study))),

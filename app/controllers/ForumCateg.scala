@@ -24,7 +24,7 @@ final class ForumCateg(env: Env) extends LilaController(env) with ForumControlle
           OptionFuOk(categApi.show(slug, page, ctx.me)) { case (categ, topics) =>
             for {
               canWrite    <- isGrantedWrite(categ.slug)
-              stickyPosts <- if page == 1 then env.forum.topicApi.getSticky(categ, ctx.me) else fuccess(Nil)
+              stickyPosts <- if (page == 1) env.forum.topicApi.getSticky(categ, ctx.me) else fuccess(Nil)
               _ <- env.user.lightUserApi preloadMany topics.currentPageResults.flatMap(_.lastPostUserId)
             } yield html.forum.categ.show(categ, topics, canWrite, stickyPosts)
           }

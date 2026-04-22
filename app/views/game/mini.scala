@@ -39,7 +39,7 @@ object mini {
   )(implicit ctx: Context): Tag = {
     val game    = pov.game
     val isLive  = game.isBeingPlayed
-    val tag     = if withLink then a else span
+    val tag     = if (withLink) a else span
     val extra   = extraClasses(game.variant)
     val variant = game.variant.key
     tag(
@@ -60,7 +60,7 @@ object mini {
     val extra   = extraClasses(game.variant)
     val variant = game.variant.key
     a(
-      href := (if tv then routes.Tv.index else routes.Round.watcher(pov.gameId, pov.playerIndex.name)),
+      href := (if (tv) routes.Tv.index else routes.Round.watcher(pov.gameId, pov.playerIndex.name)),
       cls := s"mini-game mini-game-${game.id} mini-game--init is2d ${isLive so "mini-game--live"} ${extra} ${variant} variant-${variant}",
       dataLive := isLive.option(game.id),
       renderState(pov)
@@ -104,12 +104,12 @@ object mini {
       )(
         playerUsername(pov.player, withRating = false),
         span(cls := "rating")(lila.game.Namer.ratingString(pov.player)),
-        if pov.player.berserk then iconTag("`")
+        if (pov.player.berserk) iconTag("`")
       ),
       span(cls := s"mini-game__score--${pov.playerIndex.name}")(
-        if !pov.game.finished then calculateScore(pov) else ""
+        if (!pov.game.finished) calculateScore(pov) else ""
       ),
-      if pov.game.finished then renderResult(pov)
+      if (pov.game.finished) renderResult(pov)
       else pov.game.clock.map { renderClock(_, pov) }
     )
 
@@ -122,7 +122,7 @@ object mini {
       }
       case None => {
         val score = pov.game.calculateScore(pov.playerIndex)
-        if score == "" then ""
+        if (score == "") ""
         else " (" + score + ")"
       }
     }
@@ -130,7 +130,7 @@ object mini {
   private def renderResult(pov: Pov) =
     span(cls := "mini-game__result")(
       pov.game.winnerPlayerIndex.fold("½") { c =>
-        if c == pov.playerIndex then "1" else "0"
+        if (c == pov.playerIndex) "1" else "0"
       }
         +
           calculateScore(pov)

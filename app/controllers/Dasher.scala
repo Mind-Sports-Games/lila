@@ -41,12 +41,12 @@ final class Dasher(env: Env) extends LilaController(env) {
 
   private def translations(implicit ctx: Context) =
     lila.i18n.JsDump.keysToObject(
-      if ctx.isAnon then translationsAnon else translationsAuth,
+      if (ctx.isAnon) translationsAnon else translationsAuth,
       ctx.lang
     ) ++ lila.i18n.JsDump.keysToObject(
       // the language settings should never be in a totally foreign language
       List(trans.language.key),
-      if I18nLangPicker.allFromRequestHeaders(ctx.req).contains(ctx.lang) then ctx.lang
+      if (I18nLangPicker.allFromRequestHeaders(ctx.req).contains(ctx.lang)) ctx.lang
       else I18nLangPicker.bestFromRequestHeaders(ctx.req) | enLang
     )
 

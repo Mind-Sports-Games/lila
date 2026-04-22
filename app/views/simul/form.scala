@@ -98,7 +98,7 @@ object form {
               )
             }
             val n        = options.size
-            val fakeDivs = if n % 3 == 2 then 1 else 0
+            val fakeDivs = if (n % 3 == 2) 1 else 0
             div(cls := "variants")(
               checkboxes ++ Seq.fill(fakeDivs)(div(cls := "checkable fake", style := "visibility:hidden")())
             )

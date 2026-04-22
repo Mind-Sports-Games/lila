@@ -15,10 +15,10 @@ object userAnalysisI18n {
   )(implicit lang: Lang) =
     i18nJsObject(
       baseTranslations ++
-        (if withCeval then cevalTranslations else Vector.empty) ++
-        (if withExplorer then explorerTranslations else Vector.empty) ++
-        (if withForecast then forecastTranslations else Vector.empty) ++
-        (if withAdvantageChart then advantageChartTranslations else Vector.empty)
+        (if (withCeval) cevalTranslations else Vector.empty) ++
+        (if (withExplorer) explorerTranslations else Vector.empty) ++
+        (if (withForecast) forecastTranslations else Vector.empty) ++
+        (if (withAdvantageChart) advantageChartTranslations else Vector.empty)
     )
 
   private val baseTranslations: Vector[MessageKey] = Vector(

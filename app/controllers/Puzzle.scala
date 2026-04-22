@@ -29,7 +29,7 @@ final class Puzzle(
   )(implicit
       ctx: Context
   ): Fu[JsObject] =
-    if apiVersion.exists(!_.puzzleV2) then
+    if (apiVersion.exists(!_.puzzleV2))
       env.puzzle.jsonView.bc(puzzle = puzzle, user = newUser orElse ctx.me)
     else
       env.puzzle.jsonView(puzzle = puzzle, theme = theme.some, replay = replay, user = newUser orElse ctx.me)
@@ -201,7 +201,7 @@ final class Puzzle(
                         for {
                           _    <- env.puzzle.session.onComplete(round, variant, theme.key)
                           json <-
-                            if mobileBc then
+                            if (mobileBc)
                               fuccess {
                                 env.puzzle.jsonView.bc.userJson(perf.intRating) ++ Json.obj(
                                   "round" -> Json.obj(
@@ -254,7 +254,7 @@ final class Puzzle(
                     }
                   case None =>
                     env.puzzle.finisher.incPuzzlePlays(id)
-                    if mobileBc then fuccess(Json.obj("user" -> false))
+                    if (mobileBc) fuccess(Json.obj("user" -> false))
                     else
                       nextPuzzleForMe(variant, theme.key) flatMap {
                         renderJson(_, theme)
@@ -382,7 +382,7 @@ final class Puzzle(
     NoBot {
       val theme = PuzzleTheme.findOrAny(themeKey)
       OptionFuResult(env.puzzle.api.puzzle.find(Puz.Id(id))) { puzzle =>
-        if puzzle.themes contains theme.key then
+        if (puzzle.themes contains theme.key)
           ctx.me.so { env.puzzle.api.casual.setCasualIfNotYetPlayed(_, puzzle) } >>
             renderShow(puzzle, theme)
         else Redirect(routes.Puzzle.show(variant, puzzle.id.value)).fuccess

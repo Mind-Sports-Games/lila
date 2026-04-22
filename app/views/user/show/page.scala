@@ -56,7 +56,7 @@ object page {
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s"${u.username} : ${userGameFilterTitleNoTag(u, info.nbs, filters.current)}${
-          if games.currentPage == 1 then ""
+          if (games.currentPage == 1) ""
           else " - page " + games.currentPage
         }",
       moreJs = moreJs(info, filters.current.name == "search"),

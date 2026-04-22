@@ -37,7 +37,7 @@ final class Main(
               Redirect(redirect).withCookies(
                 env.lilaCookie.cookie(
                   env.api.config.accessibility.blindCookieName,
-                  if enable == "0" then "" else env.api.config.accessibility.hash,
+                  if (enable == "0") "" else env.api.config.accessibility.hash,
                   maxAge = env.api.config.accessibility.blindCookieMaxAge.toSeconds.toInt.some,
                   httpOnly = true.some
                 )
@@ -52,7 +52,7 @@ final class Main(
   def captchaCheck(id: String) =
     Open { implicit ctx =>
       env.hub.captcher.actor ? ValidCaptcha(id, get("solution").getOrElse("")) map { case valid: Boolean =>
-        Ok(if valid then 1 else 0)
+        Ok(if (valid) 1 else 0)
       }
     }
 
@@ -125,7 +125,7 @@ final class Main(
 
   val robots = Action { (req: play.api.mvc.RequestHeader) =>
     Ok {
-      if env.net.crawlable && req.domain == env.net.domain.value then """User-agent: *
+      if (env.net.crawlable && req.domain == env.net.domain.value) """User-agent: *
 Allow: /
 Disallow: /game/export/
 Disallow: /games/export/
@@ -200,7 +200,7 @@ Allow: /
   def instantChess =
     Open { implicit ctx =>
       pageHit
-      if ctx.isAuth then fuccess(Redirect(routes.Lobby.home))
+      if (ctx.isAuth) fuccess(Redirect(routes.Lobby.home))
       else
         fuccess {
           Redirect(s"${routes.Lobby.home}#pool/3+2-standard").withCookies(

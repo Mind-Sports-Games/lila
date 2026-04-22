@@ -19,7 +19,7 @@ object opponents {
       ),
       table(cls := "slist")(
         tbody(
-          if sugs.nonEmpty then
+          if (sugs.nonEmpty)
             sugs.map { r =>
               tr(
                 td(userLink(r.user)),

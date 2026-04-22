@@ -27,7 +27,7 @@ object bits {
       moreJs = moreJs,
       moreCss = frag(
         cssTag {
-          if variant.hasDetachedPocket then "round.zh"
+          if (variant.hasDetachedPocket) "round.zh"
           else "round"
         },
         ctx.blind.option(cssTag("round.nvui")),
@@ -118,7 +118,7 @@ object bits {
               span(cls := "meta")(
                 playerText(pov.opponent, withRating = false),
                 span(cls := "indicator")(
-                  if pov.isMyTurn then
+                  if (pov.isMyTurn)
                     pov.remainingSeconds
                       .fold[Frag](trans.yourTurn())(secondsFromNow(_, alwaysRelative = true))
                   else nbsp

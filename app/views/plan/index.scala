@@ -67,7 +67,7 @@ object index {
               iconTag(patronIconChar),
               div(
                 h1(thankYou()),
-                if p.isLifetime then youHaveLifetime()
+                if (p.isLifetime) youHaveLifetime()
                 else
                   p.expiresAt.map { expires =>
                     frag(
@@ -102,7 +102,7 @@ object index {
                 )(
                   ctx.me map { me =>
                     p(style := "text-align:center;margin-bottom:1em")(
-                      if patron.exists(_.isLifetime) then makeExtraDonation()
+                      if (patron.exists(_.isLifetime)) makeExtraDonation()
                       else
                         frag(
                           "Donating ",
@@ -185,7 +185,7 @@ object index {
                   ),
                   div(cls := "service")(
                     div(cls := "buttons")(
-                      if ctx.isAuth then
+                      if (ctx.isAuth)
                         frag(
                           button(cls := "stripe button")(withCreditCard()),
                           (payPalPublicKey != "").option(

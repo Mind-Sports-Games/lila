@@ -193,7 +193,7 @@ final class Tournament(
         _ so { tour =>
           env.team.teamRepo.mini(teamId) flatMap {
             _ so { team =>
-              if HTTPRequest.isXhr(ctx.req) then jsonView.teamInfo(tour, teamId) map { _ so JsonOk }
+              if (HTTPRequest.isXhr(ctx.req)) jsonView.teamInfo(tour, teamId) map { _ so JsonOk }
               else
                 api.teamBattleTeamInfo(tour, teamId) map {
                   _ so { info =>
@@ -237,7 +237,7 @@ final class Tournament(
 
   def apiJoin(id: String) =
     ScopedBody(_.Tournament.Write) { implicit req => me =>
-      if me.lame || me.isBot then
+      if (me.lame || me.isBot)
         Unauthorized(Json.obj("error" -> "This user cannot join tournaments")).fuccess
       else {
         val data =
@@ -271,7 +271,7 @@ final class Tournament(
     Auth { implicit ctx => me =>
       OptionResult(repo.byId(id)) { tour =>
         api.selfPause(tour.id, me.id)
-        if HTTPRequest.isXhr(ctx.req) then jsonOkResult
+        if (HTTPRequest.isXhr(ctx.req)) jsonOkResult
         else Redirect(routes.Tournament.show(tour.id))
       }
     }
@@ -319,7 +319,7 @@ final class Tournament(
       create: => Fu[Result]
   ): Fu[Result] = {
     val cost =
-      if isGranted(_.ManageEvent, me) then 2
+      if (isGranted(_.ManageEvent, me)) 2
       else if me.hasTitle ||
         env.streamer.liveStreamApi.isStreaming(me.id) ||
         me.isVerified ||
@@ -348,7 +348,7 @@ final class Tournament(
                   rateLimitCreation(me, setup.isPrivate, ctx.req, Redirect(routes.Tournament.home)) {
                     api.createTournament(setup, me, teams) map { tour =>
                       Redirect {
-                        if tour.isTeamBattle then routes.Tournament.teamBattleEdit(tour.id)
+                        if (tour.isTeamBattle) routes.Tournament.teamBattleEdit(tour.id)
                         else routes.Tournament.show(tour.id)
                       }.flashSuccess
                     }
@@ -362,7 +362,7 @@ final class Tournament(
 
   def apiCreate =
     ScopedBody(_.Tournament.Write) { implicit req => me =>
-      if me.isBot || me.lame then notFoundJson("This account cannot create tournaments")
+      if (me.isBot || me.lame) notFoundJson("This account cannot create tournaments")
       else doApiCreate(me)
     }
 

@@ -29,8 +29,8 @@ object gamesContent {
         views.html.game.crosstable(_, none)
       },
       div(cls := "search__result")(
-        if filterName == "search" then {
-          if pager.nbResults > 0 then
+        if (filterName == "search") {
+          if (pager.nbResults > 0)
             frag(
               div(cls := "search__status")(
                 strong(pager.nbResults.localize, " games found")
@@ -48,7 +48,7 @@ object gamesContent {
               "now-playing center"    -> (filterName == "playing" && pager.nbResults > 2)
             )
           )(
-            if filterName == "playing" && pager.nbResults > 2 then
+            if (filterName == "playing" && pager.nbResults > 2)
               pager.currentPageResults.flatMap { Pov(_, u) }.map { pov =>
                 views.html.game.mini(pov)(using ctx)(cls := "paginated")
               }

@@ -44,7 +44,7 @@ object communication {
               dataIcon := ""
             ),
             isGranted(_.ViewPrivateComms) option {
-              if priv then
+              if (priv)
                 a(cls := "priv button active", href := routes.Mod.communicationPublic(u.username))("PMs")
               else
                 a(
@@ -102,7 +102,7 @@ object communication {
           )
         ),
         h2("Dubious public chats"),
-        if publicLines.isEmpty then strong("None!")
+        if (publicLines.isEmpty) strong("None!")
         else
           ul(cls := "public_chats")(
             publicLines.reverse.map { line =>
@@ -170,7 +170,7 @@ object communication {
                         val author = msg.user == u.id
                         tr(cls := List("post" -> true, "author" -> author))(
                           td(momentFromNowOnce(msg.date)),
-                          td(strong(if author then u.username else convo.contact.name)),
+                          td(strong(if (author) u.username else convo.contact.name)),
                           td(highlightBad(msg.text))
                         )
                       }
@@ -187,7 +187,7 @@ object communication {
   // incompatible with richText
   def highlightBad(text: String): Frag = {
     val words = Analyser(text).badWords
-    if words.isEmpty then frag(text)
+    if (words.isEmpty) frag(text)
     else {
       val regex             = ("""(?iu)\b""" + words.mkString("(", "|", ")") + """\b""").r
       def tag(word: String) = s"<bad>$word</bad>"

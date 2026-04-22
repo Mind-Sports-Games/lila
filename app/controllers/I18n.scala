@@ -34,14 +34,14 @@ final class I18n(env: Env) extends LilaController(env) {
                       val pageUri = java.net.URI(str)
                       val path    = pageUri.getPath
                       val query   = pageUri.getQuery
-                      if query == null then path
+                      if (query == null) path
                       else path + "?" + query
                     } catch {
                       case _: java.net.URISyntaxException => routes.Lobby.home.url
                     }
                   }
                 }
-                if ctx.isAnon then redir.withCookies(env.lilaCookie.session("lang", lang.code))
+                if (ctx.isAnon) redir.withCookies(env.lilaCookie.session("lang", lang.code))
                 else redir
               }.fuccess,
               api = _ => Ok(Json.obj("lang" -> lang.code)).fuccess

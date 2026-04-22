@@ -112,7 +112,7 @@ object list {
     }
 
   private[study] def paginate(pager: Paginator[WithChaptersAndLiked], url: Call)(implicit ctx: Context) =
-    if pager.currentPageResults.isEmpty then
+    if (pager.currentPageResults.isEmpty)
       div(cls := "nostudies")(
         iconTag("4"),
         p(trans.study.noneYet())
@@ -128,7 +128,7 @@ object list {
   private[study] def menu(active: String, order: Order, topics: List[StudyTopic] = Nil)(implicit
       ctx: Context
   ) = {
-    val nonMineOrder = if order == Order.Mine then Order.Hot else order
+    val nonMineOrder = if (order == Order.Mine) Order.Hot else order
     st.aside(cls := "page-menu__menu subnav")(
       a(cls := active.active("all"), href := routes.Study.all(nonMineOrder.key))(trans.study.allStudies()),
       ctx.isAuth.option(bits.authLinks(active, nonMineOrder)),

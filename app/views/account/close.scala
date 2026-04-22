@@ -16,7 +16,7 @@ object close {
     ) {
       div(cls := "account box box-pad")(
         h1(dataIcon := "j", cls := "text")(closeAccount()),
-        if managed then p("Your account is managed, and cannot be closed.")
+        if (managed) p("Your account is managed, and cannot be closed.")
         else
           postForm(cls := "form3", action := routes.Account.closeConfirm)(
             div(cls := "form-group")(closeAccountExplanation()),

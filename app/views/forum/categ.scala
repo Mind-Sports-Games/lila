@@ -26,7 +26,7 @@ object categ {
           bits.searchForm()
         ),
         showCategs(categs.filterNot(_.categ.isTeam)),
-        if categs.exists(_.categ.isTeam) then
+        if (categs.exists(_.categ.isTeam))
           frag(
             h1("Your teams boards"),
             showCategs(categs.filter(_.categ.isTeam))

@@ -24,7 +24,7 @@ object forms {
   )(implicit ctx: Context) =
     layout(
       "game",
-      (if user.isDefined then trans.challenge.challengeToPlay else trans.createAGame) (),
+      (if (user.isDefined) trans.challenge.challengeToPlay else trans.createAGame) (),
       routes.Setup.game("sri-placeholder", user map (_.id)),
       inputVariant.map(v => s"${v.gameFamily.id}_${v.id}").getOrElse(""),
       inputTimeMode.getOrElse(""),

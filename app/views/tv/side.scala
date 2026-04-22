@@ -56,12 +56,12 @@ object side {
             div(cls := "setup")(
               views.html.game.widgets.showClock(game),
               separator,
-              (if game.rated then trans.rated else trans.casual).txt(),
+              (if (game.rated) trans.rated else trans.casual).txt(),
               separator,
-              if game.variant.exotic then
+              if (game.variant.exotic)
                 views.html.game.bits.variantLink(
                   game.variant,
-                  (if game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill) then
+                  (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
                      VariantKeys.variantShortName(game.variant)
                    else VariantKeys.variantName(game.variant)).toUpperCase,
                   matchPoints = game.metadata.multiPointState.map(_.target)

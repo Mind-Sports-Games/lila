@@ -25,7 +25,7 @@ private[controllers] trait ForumController extends forum.Granter { self: LilaCon
       categSlug: String
   )(a: => Fu[A])(implicit ctx: Context): Fu[Result] =
     isGrantedWrite(categSlug) flatMap { granted =>
-      if granted then a
+      if (granted) a
       else fuccess(Forbidden("You cannot post to this category"))
     }
 
@@ -33,7 +33,7 @@ private[controllers] trait ForumController extends forum.Granter { self: LilaCon
       categSlug: String
   )(a: => Fu[A])(implicit ctx: Context): Fu[Result] =
     isGrantedMod(categSlug) flatMap { granted =>
-      if granted | isGranted(_.ModerateForum) then a
+      if (granted | isGranted(_.ModerateForum)) a
       else fuccess(Forbidden("You cannot post to this category"))
     }
 }

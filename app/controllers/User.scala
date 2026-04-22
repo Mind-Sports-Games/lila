@@ -74,7 +74,7 @@ final class User(
       }
     }
   private def renderShow(u: UserModel, status: Results.Status = Results.Ok)(implicit ctx: Context) =
-    if HTTPRequest.isSynchronousHttp(ctx.req) then {
+    if (HTTPRequest.isSynchronousHttp(ctx.req)) {
       for {
         as     <- env.activity.read.recent(u)
         nbs    <- env.userNbGames(u, ctx, withCrosstable = false)
@@ -96,7 +96,7 @@ final class User(
     OpenBody { implicit ctx =>
       Reasonable(page) {
         EnabledUser(username) { u =>
-          if filter == "search" && ctx.isAnon then
+          if (filter == "search" && ctx.isAnon)
             negotiate(
               html = Unauthorized(html.search.login(u.count.game)).fuccess,
               api = _ => Unauthorized(jsonError("Login required")).fuccess
@@ -118,7 +118,7 @@ final class User(
                   pag.currentPageResults.flatMap(_.tournamentId).map(_ -> ctxLang)
                 }
                 res <-
-                  if HTTPRequest.isSynchronousHttp(ctx.req) then
+                  if (HTTPRequest.isSynchronousHttp(ctx.req))
                     for {
                       info   <- env.userInfo(u, nbs, ctx)
                       _      <- env.team.cached.nameCache.preloadMany(info.teamIds)
@@ -137,7 +137,7 @@ final class User(
     }
 
   private def EnabledUser(username: String)(f: UserModel => Fu[Result])(implicit ctx: Context): Fu[Result] =
-    if UserModel.isGhost(username) then
+    if (UserModel.isGhost(username))
       negotiate(
         html = Ok(html.site.bits.ghost).fuccess,
         api = _ => notFoundJson("Deleted user")
@@ -151,7 +151,7 @@ final class User(
         case Some(u)                                          =>
           negotiate(
             html = env.user.repo.isErased(u) flatMap { erased =>
-              if erased.value then notFound
+              if (erased.value) notFound
               else NotFound(html.user.show.page.disabled(u)).fuccess
             },
             api = _ => fuccess(NotFound(jsonError("No such user, or account closed")))
@@ -160,7 +160,7 @@ final class User(
   def showMini(username: String) =
     Open { implicit ctx =>
       OptionFuResult(env.user.repo.named(username)) { user =>
-        if user.enabled || isGranted(_.UserModView) then
+        if (user.enabled || isGranted(_.UserModView))
           ctx.userId.so { relationApi.fetchBlocks(user.id, _) } zip
             ctx.userId.so { env.game.crosstableApi(user.id, _).dmap(some) } zip
             ctx.isAuth.so { env.pref.api.followable(user.id) } zip
@@ -273,7 +273,7 @@ final class User(
             } yield Ok(
               html.user.list(
                 tourneyWinners = tourneyWinners,
-                online = if topOnline.isEmpty || topOnline.length < 25 then anyOnline else topOnline,
+                online = if (topOnline.isEmpty || topOnline.length < 25) anyOnline else topOnline,
                 leaderboards = leaderboards,
                 nbAllTime = nbAllTime
               )
@@ -377,7 +377,7 @@ final class User(
   protected[controllers] def modZoneOrRedirect(holder: Holder, username: String)(implicit
       ctx: Context
   ): Fu[Result] =
-    if HTTPRequest.isEventSource(ctx.req) then renderModZone(holder, username)
+    if (HTTPRequest.isEventSource(ctx.req)) renderModZone(holder, username)
     else fuccess(modC.redirect(username))
 
   private def modZoneSegment(fu: Fu[Frag], name: String, user: UserModel): Source[Frag, ?] =
@@ -552,7 +552,7 @@ final class User(
   def perfStat(username: String, perfKey: String) =
     Open { implicit ctx =>
       OptionFuResult(env.user.repo.named(username)) { u =>
-        if (u.disabled || (u.lame && !ctx.is(u))) && !isGranted(_.UserModView) then notFound
+        if ((u.disabled || (u.lame && !ctx.is(u))) && !isGranted(_.UserModView)) notFound
         else
           PerfType(perfKey).fold(notFound) { perfType =>
             for {
@@ -612,11 +612,11 @@ final class User(
                 }
             }
           } flatMap { userIds =>
-            if getBool("names") then
+            if (getBool("names"))
               env.user.lightUserApi.asyncMany(userIds) map { users =>
                 Json toJson users.flatMap(_.map(_.name))
               }
-            else if getBool("object") then
+            else if (getBool("object"))
               env.user.lightUserApi.asyncMany(userIds) map { users =>
                 Json.obj(
                   "result" -> JsArray(users.flatten.map { u =>

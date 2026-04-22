@@ -32,7 +32,7 @@ object invite {
           .option(
             postForm(cls := "form3", action := routes.Clas.invitationAccept(invite._id.value))(
               form3.actions(
-                if !invite.accepted.has(false) then
+                if (!invite.accepted.has(false))
                   form3.submit(
                     trans.decline(),
                     nameValue = ("v" -> false.toString).some,

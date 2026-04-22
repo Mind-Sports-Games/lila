@@ -204,7 +204,7 @@ object shields {
           h2("Current Tournament Format"),
           h4(medleyShield.arenaFormatFull),
           h2("Variants Used in this Medley"),
-          if medleyShield.hasAllVariants then {
+          if (medleyShield.hasAllVariants) {
             h4(
               a(
                 cls  := "all-variants",

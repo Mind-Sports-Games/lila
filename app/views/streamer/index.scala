@@ -17,11 +17,11 @@ object index {
       requests: Boolean
   )(implicit ctx: Context) = {
 
-    val title = if requests then "Streamer approval requests" else playstrategyStreamers.txt()
+    val title = if (requests) "Streamer approval requests" else playstrategyStreamers.txt()
 
     def widget(s: lila.streamer.Streamer.WithUser, stream: Option[lila.streamer.Stream]) =
       frag(
-        if requests then a(href := s"${routes.Streamer.edit}?u=${s.user.username}", cls := "overlay")
+        if (requests) a(href := s"${routes.Streamer.edit}?u=${s.user.username}", cls := "overlay")
         else bits.redirectLink(s.user.username, stream.isDefined.some)(cls := "overlay"),
         stream.isDefined.option(span(cls := "ribbon")(span(trans.streamer.live()))),
         bits.pic(s.streamer, s.user),
@@ -30,7 +30,7 @@ object index {
           s.streamer.headline.map(_.value).map { d =>
             p(
               cls := s"headline ${
-                  if d.length < 60 then "small" else if d.length < 120 then "medium" else "large"
+                  if (d.length < 60) "small" else if (d.length < 120) "medium" else "large"
                 }"
             )(d)
           },
@@ -63,7 +63,7 @@ object index {
       moreJs = infiniteScrollTag
     ) {
       main(cls := "page-menu")(
-        bits.menu(if requests then "requests" else "index", none)(using ctx)(cls := " page-menu__menu"),
+        bits.menu(if (requests) "requests" else "index", none)(using ctx)(cls := " page-menu__menu"),
         div(cls := "page-menu__content box streamer-list")(
           h1(dataIcon := "", cls := "text")(title),
           (!requests).option(
@@ -84,7 +84,7 @@ object index {
                 addQueryParameter(
                   addQueryParameter(routes.Streamer.index().url, "page", np),
                   "requests",
-                  if requests then 1 else 0
+                  if (requests) 1 else 0
                 )
             )
           )

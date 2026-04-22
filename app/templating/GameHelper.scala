@@ -34,15 +34,15 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
     val p1            = playerText(player, withRating = true)
     val p2            = playerText(opponent, withRating = true)
     val speedAndClock =
-      if game.imported then "imported"
+      if (game.imported) "imported"
       else
         game.clock.fold(strategygames.Speed.Correspondence.name) { c =>
           s"${strategygames.Speed(c.config).name} (${c.config.show})"
         }
     val mode    = game.mode.name
     val variant =
-      if game.variant.fromPositionVariant then s"position setup ${game.variant.gameLogic.name}"
-      else if game.variant.exotic then VariantKeys.variantName(game.variant)
+      if (game.variant.fromPositionVariant) s"position setup ${game.variant.gameLogic.name}"
+      else if (game.variant.exotic) VariantKeys.variantName(game.variant)
       else game.variant.gameLogic.name.toLowerCase()
     import strategygames.Status.*
     val result = (game.winner, game.loser, game.status, game.variant.gameLogic) match {
@@ -115,7 +115,7 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
       player.userId.flatMap(lightUser).fold[Frag](trans.anonymous.txt()) { user =>
         frag(
           titleTag(user.title.ifTrue(withTitle) map Title.apply),
-          if withRating then s"${user.name} (${lila.game.Namer `ratingString` player})"
+          if (withRating) s"${user.name} (${lila.game.Namer `ratingString` player})"
           else user.name
         )
       }
@@ -157,9 +157,9 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
         )
       case Some(user) =>
         frag(
-          (if link then a else span) (
+          (if (link) a else span) (
             cls  := userClass(user.id, cssClass, withOnline),
-            href := s"${routes.User `show` user.name}${if mod then "?mod" else ""}"
+            href := s"${routes.User `show` user.name}${if (mod) "?mod" else ""}"
           )(
             withOnline.option(frag(lineIcon(user), " ")),
             playerUsername(player, withRating),
@@ -281,20 +281,20 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
           case Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka) =>
             trans.raceFinished.txt()
           case Variant.Samurai(strategygames.samurai.variant.Oware) =>
-            if game.situation.isRepetition then trans.gameFinishedRepetition.txt()
+            if (game.situation.isRepetition) trans.gameFinishedRepetition.txt()
             else trans.gameFinished.txt()
           case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) =>
             trans.gameFinished.txt()
           case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe) =>
             trans.gameFinished.txt()
           case Variant.Go(strategygames.go.variant.Go9x9) =>
-            if game.situation.isRepetition then trans.gameFinishedRepetition.txt()
+            if (game.situation.isRepetition) trans.gameFinishedRepetition.txt()
             else trans.gameFinished.txt()
           case Variant.Go(strategygames.go.variant.Go13x13) =>
-            if game.situation.isRepetition then trans.gameFinishedRepetition.txt()
+            if (game.situation.isRepetition) trans.gameFinishedRepetition.txt()
             else trans.gameFinished.txt()
           case Variant.Go(strategygames.go.variant.Go19x19) =>
-            if game.situation.isRepetition then trans.gameFinishedRepetition.txt()
+            if (game.situation.isRepetition) trans.gameFinishedRepetition.txt()
             else trans.gameFinished.txt()
           case Variant.Backgammon(strategygames.backgammon.variant.Backgammon) =>
             trans.gameFinished.txt()
@@ -312,12 +312,12 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
 
   // p1Username 1-0 p2Username
   def gameSummary(p1UserId: String, p2UserId: String, finished: Boolean, result: Option[Boolean]) = {
-    val res = if finished then PlayerIndex.showResult(result map PlayerIndex.fromP1) else "*"
+    val res = if (finished) PlayerIndex.showResult(result map PlayerIndex.fromP1) else "*"
     s"${usernameOrId(p1UserId)} $res ${usernameOrId(p2UserId)}"
   }
 
   def gameResult(game: Game) =
-    if game.finished then PlayerIndex.showResult(game.winnerPlayerIndex)
+    if (game.finished) PlayerIndex.showResult(game.winnerPlayerIndex)
     else "*"
 
   def gameLink(
@@ -327,7 +327,7 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
       tv: Boolean = false
   )(implicit ctx: Context): String = {
     val owner = ownerLink so ctx.me.flatMap(game.player)
-    if tv then routes.Tv.index
+    if (tv) routes.Tv.index
     else
       owner.fold(routes.Round.watcher(game.id, playerIndex.name)) { o =>
         routes.Round.player(game.fullIdOf(o.playerIndex))
@@ -344,7 +344,7 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
       s"${usernameOrId(reg.id)} (${reg.rating.show})"
     }
     val players =
-      if c.isOpen then "Open challenge"
+      if (c.isOpen) "Open challenge"
       else
         c.destUser.fold(s"Challenge from $challenger") { dest =>
           s"$challenger challenges ${usernameOrId(dest.id)} (${dest.rating.show})"

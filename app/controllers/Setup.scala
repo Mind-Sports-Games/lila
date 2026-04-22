@@ -40,7 +40,7 @@ final class Setup(
 
   def gameForm(userId: Option[String]) =
     Open { implicit ctx =>
-      if HTTPRequest.isXhr(ctx.req) then {
+      if (HTTPRequest.isXhr(ctx.req)) {
         val lib                      = gameLogic(getInt("lib"))
         val variant: Option[Variant] = get("variant").map(Variant.orDefault)
         val inputTimeMode            = get("time")
@@ -241,7 +241,7 @@ final class Setup(
   def boardApiHook =
     ScopedBody(_.Board.Play) { implicit req => me =>
       implicit val lang: play.api.i18n.Lang = reqLang
-      if me.isBot then notForBotAccounts.fuccess
+      if (me.isBot) notForBotAccounts.fuccess
       else
         forms.boardApiHook
           .bindFromRequest()
@@ -279,7 +279,7 @@ final class Setup(
 
   private[controllers] def redirectPov(pov: Pov)(implicit ctx: Context) = {
     val redir = Redirect(routes.Round.watcher(pov.gameId, pov.game.variant.startPlayer.name))
-    if ctx.isAuth then redir
+    if (ctx.isAuth) redir
     else
       redir.withCookies(
         env.lilaCookie.cookie(

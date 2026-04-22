@@ -12,7 +12,7 @@ final class Options(env: Env) extends LilaController(env) {
 
   def all(@nowarn("msg=unused") url: String) =
     Action { (req: play.api.mvc.RequestHeader) =>
-      if isApiOrApp(req) then apiHeaders
+      if (isApiOrApp(req)) apiHeaders
       else NotFound
     }
 

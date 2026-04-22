@@ -141,7 +141,7 @@ final class Plan(env: Env)(implicit @annotation.nowarn("msg=unused") system: akk
 
   def webhook =
     Action.async(parse.json) { req =>
-      if req.headers.hasHeader("PAYPAL-TRANSMISSION-SIG") then
+      if (req.headers.hasHeader("PAYPAL-TRANSMISSION-SIG"))
         env.plan.webhook.payPal(req.body) inject Ok("kthxbye")
       else env.plan.webhook.stripe(req.body) inject Ok("kthxbye")
     }
@@ -265,7 +265,7 @@ final class Plan(env: Env)(implicit @annotation.nowarn("msg=unused") system: akk
               BadRequest(jsonError(err.errors.map(_.message) mkString ", ")).fuccess
             },
             checkout => {
-              if checkout.freq.renew then
+              if (checkout.freq.renew)
                 for {
                   sub <- env.plan.api.payPal.createSubscription(checkout, me)
                 } yield JsonOk(Json.obj("subscription" -> Json.obj("id" -> sub.id.value)))

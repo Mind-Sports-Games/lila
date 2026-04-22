@@ -133,10 +133,10 @@ final class Streamer(
                 },
               data =>
                 api.update(sws.streamer, data, isGranted(_.Streamers)) flatMap { change =>
-                  if change.decline then env.mod.logApi.streamerDecline(lila.report.Mod(me), s.user.id)
+                  if (change.decline) env.mod.logApi.streamerDecline(lila.report.Mod(me), s.user.id)
                   change.list foreach { env.mod.logApi.streamerList(lila.report.Mod(me), s.user.id, _) }
                   change.tier foreach { env.mod.logApi.streamerTier(lila.report.Mod(me), s.user.id, _) }
-                  if data.approval.flatMap(_.quick).isDefined then
+                  if (data.approval.flatMap(_.quick).isDefined)
                     env.streamer.pager.nextRequestId map { nextId =>
                       Redirect {
                         nextId.fold(s"${routes.Streamer.index()}?requests=1") { id =>
@@ -145,7 +145,7 @@ final class Streamer(
                       }
                     }
                   else {
-                    val next = if sws.streamer.is(me) then "" else s"?u=${sws.user.id}"
+                    val next = if (sws.streamer.is(me)) "" else s"?u=${sws.user.id}"
                     Redirect(s"${routes.Streamer.edit.url}$next").fuccess
                   }
                 }
@@ -191,7 +191,7 @@ final class Streamer(
 
   private def AsStreamer(f: StreamerModel.WithUser => Fu[Result])(implicit ctx: Context) =
     ctx.me.fold(notFound) { me =>
-      if StreamerModel.canApply(me) then
+      if (StreamerModel.canApply(me))
         api.find(get("u").ifTrue(isGranted(_.Streamers)) | me.id) flatMap {
           _.fold(Ok(html.streamer.bits.create).fuccess)(f)
         }
@@ -205,7 +205,7 @@ final class Streamer(
 
   private def WithVisibleStreamer(s: StreamerModel.WithUser)(f: Fu[Result])(implicit ctx: Context) =
     ctx.noKid so {
-      if s.streamer.isListed || ctx.me.so(s.streamer.is) || isGranted(_.Admin) then f
+      if (s.streamer.isListed || ctx.me.so(s.streamer.is) || isGranted(_.Admin)) f
       else notFound
     }
 }

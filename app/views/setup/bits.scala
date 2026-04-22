@@ -361,10 +361,10 @@ private object bits {
         ),
         renderSelect(
           form("timeMode"),
-          if allowCorrespondence then translatedTimeModeChoices else translatedTimeModeChoicesLive
+          if (allowCorrespondence) translatedTimeModeChoices else translatedTimeModeChoicesLive
         )
       ),
-      if ctx.blind then
+      if (ctx.blind)
         frag(
           div(cls := "time_choice")(
             renderLabel(form("time"), trans.minutesPerSide()),
@@ -418,7 +418,7 @@ private object bits {
         )
       ,
       div(cls := "correspondence")(
-        if ctx.blind then
+        if (ctx.blind)
           div(cls := "days_choice")(
             renderLabel(form("days"), trans.daysPerTurn()),
             renderSelect(form("days"), corresDaysChoices)

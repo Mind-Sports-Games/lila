@@ -24,9 +24,9 @@ object edit extends Context.ToLang {
       main(cls := "page-menu")(
         bits.menu("edit", s.withoutStream.some),
         div(cls := "page-menu__content box streamer-edit")(
-          if ctx.is(s.user) then
+          if (ctx.is(s.user))
             div(cls := "streamer-header")(
-              if s.streamer.hasPicture then
+              if (s.streamer.hasPicture)
                 a(targetBlank, href := routes.Streamer.picture, title := changePicture.txt())(
                   bits.pic(s.streamer, s.user)
                 )
@@ -53,9 +53,9 @@ object edit extends Context.ToLang {
               (ctx.is(s.user) && s.streamer.listed.value).option(
                 div(
                   cls      := s"status is${granted so "-green"}",
-                  dataIcon := (if granted then "E" else "")
+                  dataIcon := (if (granted) "E" else "")
                 )(
-                  if granted then
+                  if (granted)
                     frag(
                       approved(),
                       (s.streamer.approval.tier > 0).option(
@@ -71,10 +71,10 @@ object edit extends Context.ToLang {
                     )
                   else
                     frag(
-                      if s.streamer.approval.requested then pendingReview()
+                      if (s.streamer.approval.requested) pendingReview()
                       else
                         frag(
-                          if s.streamer.completeEnough then
+                          if (s.streamer.completeEnough)
                             whenReady(
                               postForm(action := routes.Streamer.approvalRequest)(
                                 button(tpe := "submit", cls := "button", (!ctx.is(s.user)).option(disabled))(
@@ -184,7 +184,7 @@ object edit extends Context.ToLang {
                         frag("Embed stream chat too"),
                         half = true
                       ),
-                      if granted then
+                      if (granted)
                         form3.group(
                           form("approval.tier"),
                           raw("Homepage tier"),

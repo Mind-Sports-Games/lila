@@ -32,10 +32,10 @@ object finishedList {
         span(
           t.clock.show,
           " • ",
-          if t.variant.exotic then VariantKeys.variantName(t.variant) else t.perfType.trans,
+          if (t.variant.exotic) VariantKeys.variantName(t.variant) else t.perfType.trans,
           t.position.isDefined.option(frag(" • ", trans.thematic())),
           " • ",
-          if t.handicapped then trans.handicappedTournament()
+          if (t.handicapped) trans.handicappedTournament()
           else t.mode.fold(trans.casualTournament, trans.ratedTournament)(),
           " • ",
           t.durationString

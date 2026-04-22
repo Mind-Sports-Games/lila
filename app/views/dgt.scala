@@ -88,7 +88,7 @@ object dgt {
         form(action := routes.DgtCtrl.generateToken, method := "post")(
           st.section(
             h2("PlayStrategy connectivity"),
-            if token.isDefined then
+            if (token.isDefined)
               p(cls := "text", dataIcon := "E")(
                 "You have an OAuth token suitable for DGT play.",
                 br,

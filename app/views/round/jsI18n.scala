@@ -10,7 +10,7 @@ object jsI18n {
   def apply(g: lila.game.Game)(implicit lang: Lang) =
     i18nJsObject {
       baseTranslations ++ {
-        if g.isCorrespondence then correspondenceTranslations
+        if (g.isCorrespondence) correspondenceTranslations
         else realtimeTranslations
       } ++ {
         g.variant.exotic so variantTranslations

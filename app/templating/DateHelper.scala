@@ -79,7 +79,7 @@ trait DateHelper { self: I18nHelper & StringHelper =>
   private val oneDayMillis = 1000 * 60 * 60 * 24
 
   def momentFromNow(date: DateTime, alwaysRelative: Boolean = false, once: Boolean = false): Tag = {
-    if !alwaysRelative && (date.getMillis - nowMillis) > oneDayMillis then absClientDateTime(date)
+    if (!alwaysRelative && (date.getMillis - nowMillis) > oneDayMillis) absClientDateTime(date)
     else timeTag(cls := s"timeago${once so " once"}", datetimeAttr := isoDate(date))(nbsp)
   }
 
@@ -106,12 +106,12 @@ trait DateHelper { self: I18nHelper & StringHelper =>
     lazy val weeks        = days / 7
     lazy val months       = days / 30
     lazy val years        = days / 365
-    if minutes == 0 then "right now"
-    else if hours == 0 then s"${pluralize("minute", minutes)} ago"
-    else if days < 2 then s"${pluralize("hour", hours)} ago"
-    else if weeks == 0 then s"${pluralize("day", days)} ago"
-    else if months == 0 then s"${pluralize("week", weeks)} ago"
-    else if years == 0 then s"${pluralize("month", months)} ago"
+    if (minutes == 0) "right now"
+    else if (hours == 0) s"${pluralize("minute", minutes)} ago"
+    else if (days < 2) s"${pluralize("hour", hours)} ago"
+    else if (weeks == 0) s"${pluralize("day", days)} ago"
+    else if (months == 0) s"${pluralize("week", weeks)} ago"
+    else if (years == 0) s"${pluralize("month", months)} ago"
     else s"${pluralize("year", years)} ago"
   }
 

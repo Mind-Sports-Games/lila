@@ -20,8 +20,8 @@ object header {
   )(implicit ctx: Context) =
     frag(
       div(cls := "box__top user-show__header")(
-        if u.isPatron then
-          h1(cls := s"user-link ${if isOnline(u.id) then "online" else "offline"}")(
+        if (u.isPatron)
+          h1(cls := s"user-link ${if (isOnline(u.id)) "online" else "offline"}")(
             a(href := routes.Plan.index)(patronIcon),
             userSpan(u, withPowerTip = false, withOnline = false)
           )
@@ -114,7 +114,7 @@ object header {
               isBot = u.isBot
             )
           ),
-          if ctx.is(u) then
+          if (ctx.is(u))
             a(
               cls  := "btn-rack__btn",
               href := routes.Game.exportByUser(u.username),
@@ -140,7 +140,7 @@ object header {
               name        := "text",
               placeholder := "Write a private note about this user"
             ),
-            if isGranted(_.ModNote) then
+            if (isGranted(_.ModNote))
               div(cls := "mod-note")(
                 submitButton(cls := "button")(trans.send()),
                 div(
@@ -200,7 +200,7 @@ object header {
           val profile   = u.profileOrDefault
           val hideTroll = u.marks.troll && !ctx.is(u)
           div(id := "us_profile")(
-            if info.ratingChart.isDefined && (!u.lame || ctx.is(u) || isGranted(_.UserModView)) then
+            if (info.ratingChart.isDefined && (!u.lame || ctx.is(u) || isGranted(_.UserModView)))
               div(cls := "rating-history")(spinner)
             else ctx.is(u).option(newPlayer(u)),
             div(cls := "profile-side")(

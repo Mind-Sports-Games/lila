@@ -111,7 +111,7 @@ abstract private[controllers] class LilaController(val env: Env)
       scoped: RequestHeader => UserModel => Fu[Result]
   ): Action[Unit] =
     Action.async(parse.empty) { req =>
-      if HTTPRequest.isOAuth(req) then handleScoped(selectors)(scoped)(req)
+      if (HTTPRequest.isOAuth(req)) handleScoped(selectors)(scoped)(req)
       else handleOpen(open, req)
     }
 
@@ -130,7 +130,7 @@ abstract private[controllers] class LilaController(val env: Env)
       scoped: Request[A] => UserModel => Fu[Result]
   ): Action[A] =
     Action.async(parser) { req =>
-      if HTTPRequest.isOAuth(req) then ScopedBody(parser)(selectors)(scoped)(req)
+      if (HTTPRequest.isOAuth(req)) ScopedBody(parser)(selectors)(scoped)(req)
       else OpenBody(parser)(open)(req)
     }
 
@@ -139,7 +139,7 @@ abstract private[controllers] class LilaController(val env: Env)
       scoped: RequestHeader => UserModel => Fu[Result]
   ): Action[Unit] =
     Action.async(parse.empty) { req =>
-      if HTTPRequest.isOAuth(req) then handleScoped(selectors)(scoped)(req)
+      if (HTTPRequest.isOAuth(req)) handleScoped(selectors)(scoped)(req)
       else anon(req)
     }
 
@@ -148,7 +148,7 @@ abstract private[controllers] class LilaController(val env: Env)
       scoped: Request[A] => UserModel => Fu[Result]
   ): Action[A] =
     Action.async(parser) { req =>
-      if HTTPRequest.isOAuth(req) then ScopedBody(parser)(selectors)(scoped)(req)
+      if (HTTPRequest.isOAuth(req)) ScopedBody(parser)(selectors)(scoped)(req)
       else anon(req)
     }
 
@@ -157,7 +157,7 @@ abstract private[controllers] class LilaController(val env: Env)
       scoped: RequestHeader => UserModel => Fu[Result]
   ): Action[Unit] =
     Action.async(parse.empty) { req =>
-      if HTTPRequest.isOAuth(req) then handleScoped(selectors)(scoped)(req)
+      if (HTTPRequest.isOAuth(req)) handleScoped(selectors)(scoped)(req)
       else handleAuth(auth, req)
     }
 
@@ -171,7 +171,7 @@ abstract private[controllers] class LilaController(val env: Env)
       scoped: Request[A] => UserModel => Fu[Result]
   ): Action[A] =
     Action.async(parser) { req =>
-      if HTTPRequest.isOAuth(req) then ScopedBody(parser)(selectors)(scoped)(req)
+      if (HTTPRequest.isOAuth(req)) ScopedBody(parser)(selectors)(scoped)(req)
       else AuthBody(parser)(auth)(req)
     }
 
@@ -210,19 +210,19 @@ abstract private[controllers] class LilaController(val env: Env)
       parser: BodyParser[A]
   )(perm: Permission)(f: Context => Holder => Fu[Result]): Action[A] =
     Auth(parser) { implicit ctx => me =>
-      if isGranted(perm) then f(ctx)(Holder(me)) else authorizationFailed
+      if (isGranted(perm)) f(ctx)(Holder(me)) else authorizationFailed
     }
 
   protected def SecureF(s: UserModel => Boolean)(f: Context => UserModel => Fu[Result]): Action[AnyContent] =
     Auth(parse.anyContent) { implicit ctx => me =>
-      if s(me) then f(ctx)(me) else authorizationFailed
+      if (s(me)) f(ctx)(me) else authorizationFailed
     }
 
   protected def SecureBody[A](
       parser: BodyParser[A]
   )(perm: Permission)(f: BodyContext[A] => Holder => Fu[Result]): Action[A] =
     AuthBody(parser) { implicit ctx => me =>
-      if isGranted(perm) then f(ctx)(Holder(me)) else authorizationFailed
+      if (isGranted(perm)) f(ctx)(Holder(me)) else authorizationFailed
     }
 
   protected def SecureBody(
@@ -280,7 +280,7 @@ abstract private[controllers] class LilaController(val env: Env)
       scoped: RequestHeader => Holder => Fu[Result]
   ): Action[Unit] =
     Action.async(parse.empty) { req =>
-      if HTTPRequest.isOAuth(req) then securedScopedAction(perm, req)(scoped)
+      if (HTTPRequest.isOAuth(req)) securedScopedAction(perm, req)(scoped)
       else Secure(parse.empty)(perm(Permission))(secure)(req)
     }
   protected def SecureOrScopedBody(perm: Permission.Selector)(
@@ -288,7 +288,7 @@ abstract private[controllers] class LilaController(val env: Env)
       scoped: RequestHeader => Holder => Fu[Result]
   ): Action[AnyContent] =
     Action.async(parse.anyContent) { req =>
-      if HTTPRequest.isOAuth(req) then securedScopedAction(perm, req.map(_ => ()))(scoped)
+      if (HTTPRequest.isOAuth(req)) securedScopedAction(perm, req.map(_ => ()))(scoped)
       else SecureBody(parse.anyContent)(perm(Permission))(secure)(req)
     }
   private def securedScopedAction(perm: Permission.Selector, req: Request[Unit])(
@@ -299,34 +299,34 @@ abstract private[controllers] class LilaController(val env: Env)
     }(req)
 
   def IfGranted(perm: Permission.Selector)(f: => Fu[Result])(implicit ctx: Context): Fu[Result] =
-    if isGranted(perm) then f else authorizationFailed
+    if (isGranted(perm)) f else authorizationFailed
 
   def IfGranted(perm: Permission.Selector, req: RequestHeader, me: UserModel)(f: => Fu[Result]): Fu[Result] =
-    if isGranted(perm, me) then f else authorizationFailed(req)
+    if (isGranted(perm, me)) f else authorizationFailed(req)
 
   protected def Firewall[A <: Result](a: => Fu[A])(implicit ctx: Context): Fu[Result] =
-    if env.security.firewall.accepts(ctx.req) then a
+    if (env.security.firewall.accepts(ctx.req)) a
     else keyPages.p2listed.fuccess
 
   protected def NoTor(res: => Fu[Result])(implicit ctx: Context) =
-    if env.security.tor.isExitNode(HTTPRequest.ipAddress(ctx.req)) then
+    if (env.security.tor.isExitNode(HTTPRequest.ipAddress(ctx.req)))
       Unauthorized(views.html.auth.bits.tor()).fuccess
     else res
 
   protected def NoEngine[A <: Result](a: => Fu[A])(implicit ctx: Context): Fu[Result] =
-    if ctx.me.exists(_.marks.engine) then Forbidden(views.html.site.message.noEngine).fuccess else a
+    if (ctx.me.exists(_.marks.engine)) Forbidden(views.html.site.message.noEngine).fuccess else a
 
   protected def NoBooster[A <: Result](a: => Fu[A])(implicit ctx: Context): Fu[Result] =
-    if ctx.me.exists(_.marks.boost) then Forbidden(views.html.site.message.noBooster).fuccess else a
+    if (ctx.me.exists(_.marks.boost)) Forbidden(views.html.site.message.noBooster).fuccess else a
 
   protected def NoLame[A <: Result](a: => Fu[A])(implicit ctx: Context): Fu[Result] =
     NoEngine(NoBooster(a))
 
   protected def NoBot[A <: Result](a: => Fu[A])(implicit ctx: Context): Fu[Result] =
-    if ctx.me.exists(_.isBot) then Forbidden(views.html.site.message.noBot).fuccess else a
+    if (ctx.me.exists(_.isBot)) Forbidden(views.html.site.message.noBot).fuccess else a
 
   protected def NoUserBot[A <: Result](a: => Fu[A])(implicit ctx: Context): Fu[Result] =
-    if ctx.me.exists(_.isUserBot) then Forbidden(views.html.site.message.noBot).fuccess else a
+    if (ctx.me.exists(_.isUserBot)) Forbidden(views.html.site.message.noBot).fuccess else a
 
   protected def NoLameOrBot[A <: Result](a: => Fu[A])(implicit ctx: Context): Fu[Result] =
     NoLame(NoBot(a))
@@ -335,7 +335,7 @@ abstract private[controllers] class LilaController(val env: Env)
     NoLame(NoUserBot(a))
 
   protected def NoShadowban[A <: Result](a: => Fu[A])(implicit ctx: Context): Fu[Result] =
-    if ctx.me.exists(_.marks.troll) then notFound else a
+    if (ctx.me.exists(_.marks.troll)) notFound else a
 
   protected def NoPlayban(a: => Fu[Result])(implicit ctx: Context): Fu[Result] =
     ctx.userId.so(env.playban.api.currentBan) flatMap {
@@ -449,7 +449,7 @@ abstract private[controllers] class LilaController(val env: Env)
   def notFound(implicit ctx: Context): Fu[Result] =
     negotiate(
       html =
-        if HTTPRequest.isSynchronousHttp(ctx.req) then fuccess(renderNotFound(ctx))
+        if (HTTPRequest.isSynchronousHttp(ctx.req)) fuccess(renderNotFound(ctx))
         else fuccess(Results.NotFound("Resource not found")),
       api = _ => notFoundJson("Resource not found")
     )
@@ -485,7 +485,7 @@ abstract private[controllers] class LilaController(val env: Env)
     negotiate(
       html = fuccess {
         Redirect(
-          if HTTPRequest.isClosedLoginPath(ctx.req) then routes.Auth.login else routes.Auth.signup
+          if (HTTPRequest.isClosedLoginPath(ctx.req)) routes.Auth.login else routes.Auth.signup
         ).withCookies(
           env.lilaCookie
             .session(env.security.api.AccessUri, ctx.req.uri)
@@ -504,7 +504,7 @@ abstract private[controllers] class LilaController(val env: Env)
   protected def authorizationFailed(implicit ctx: Context): Fu[Result] =
     negotiate(
       html =
-        if HTTPRequest.isSynchronousHttp(ctx.req) then
+        if (HTTPRequest.isSynchronousHttp(ctx.req))
           fuccess {
             Forbidden(views.html.site.message.authFailed)
           }
@@ -552,7 +552,7 @@ abstract private[controllers] class LilaController(val env: Env)
     val nonce  = isPage.option(Nonce.random)
     ctx.me.fold(fuccess(PageData.anon(ctx.req, nonce, blindMode(using ctx)))) { me =>
       env.pref.api.getPref(me, ctx.req) zip {
-        if isPage then {
+        if (isPage) {
           env.user.lightUserApi.preloadUser(me)
           val enabledId = me.enabled.option(me.id)
           enabledId.so(env.team.api.nbRequests) zip
@@ -612,13 +612,13 @@ abstract private[controllers] class LilaController(val env: Env)
   protected val csrfForbiddenResult = Forbidden("Cross origin request forbidden").fuccess
 
   private def CSRF(req: RequestHeader)(f: => Fu[Result]): Fu[Result] =
-    if csrfCheck(req) then f else csrfForbiddenResult
+    if (csrfCheck(req)) f else csrfForbiddenResult
 
   protected def XhrOnly(res: => Fu[Result])(implicit ctx: Context) =
-    if HTTPRequest.isXhr(ctx.req) then res else notFound
+    if (HTTPRequest.isXhr(ctx.req)) res else notFound
 
   protected def XhrOrRedirectHome(res: => Fu[Result])(implicit ctx: Context) =
-    if HTTPRequest.isXhr(ctx.req) then res
+    if (HTTPRequest.isXhr(ctx.req)) res
     else Redirect(routes.Lobby.home).fuccess
 
   protected def Reasonable(
@@ -626,21 +626,21 @@ abstract private[controllers] class LilaController(val env: Env)
       max: Int = 40,
       errorPage: => Fu[Result] = BadRequest("resource too old").fuccess
   )(result: => Fu[Result]): Fu[Result] =
-    if page < max then result else errorPage
+    if (page < max) result else errorPage
 
   protected def NotForKids(f: => Fu[Result])(implicit ctx: Context) =
-    if ctx.kid then notFound else f
+    if (ctx.kid) notFound else f
 
   protected def NotForBots(res: => Fu[Result])(implicit ctx: Context) =
-    if HTTPRequest.isCrawler(ctx.req) then notFound else res
+    if (HTTPRequest.isCrawler(ctx.req)) notFound else res
 
   protected def OnlyHumans(result: => Fu[Result])(implicit ctx: lila.api.Context) =
-    if HTTPRequest.isCrawler(ctx.req) then fuccess(NotFound)
+    if (HTTPRequest.isCrawler(ctx.req)) fuccess(NotFound)
     else result
 
   protected def OnlyHumansAndFacebookOrTwitter(result: => Fu[Result])(implicit ctx: lila.api.Context) =
-    if HTTPRequest.isFacebookOrTwitterBot(ctx.req) then result
-    else if HTTPRequest.isCrawler(ctx.req) then fuccess(NotFound)
+    if (HTTPRequest.isFacebookOrTwitterBot(ctx.req)) result
+    else if (HTTPRequest.isCrawler(ctx.req)) fuccess(NotFound)
     else result
 
   protected def NotManaged(result: => Fu[Result])(implicit ctx: Context) =
@@ -689,7 +689,7 @@ abstract private[controllers] class LilaController(val env: Env)
     fuccess(BadRequest(errorsAsJson(err)))
 
   protected def pageHit(req: RequestHeader): Unit =
-    if HTTPRequest.isHuman(req) then { val _ = lila.mon.http.path(req.path).increment() }
+    if (HTTPRequest.isHuman(req)) { val _ = lila.mon.http.path(req.path).increment() }
 
   protected def BadRequestWithReason(reason: String) = makeCustomResult(BAD_REQUEST, reason).pp
 

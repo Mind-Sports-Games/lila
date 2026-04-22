@@ -87,14 +87,14 @@ object bits {
     val libName   = fen.gameLogic.name
     val orient    = orientation.toString().toLowerCase()
     val boardSize = boardSizeOpt.getOrElse(Board.D100)
-    val data      = if libName == "Draughts" then {
+    val data      = if (libName == "Draughts") {
       s"${fen.value}|${boardSize.width}x${boardSize.height}|${orient}|$lastMove"
     } else {
       s"${fen.value}|${orient}|$lastMove|${multiPointResult.fold(MultiPointState.noDataChar)(_.toString)}"
     }
     val extra =
-      if libName == "Draughts" then s"is${boardSize.key} ${libName.toLowerCase()}"
-      else if variantKey == "linesOfAction" then
+      if (libName == "Draughts") s"is${boardSize.key} ${libName.toLowerCase()}"
+      else if (variantKey == "linesOfAction")
         "loa" // TODO daily puzzle (test other variants when supported)
       else s"${libName.toLowerCase()}"
     tag(

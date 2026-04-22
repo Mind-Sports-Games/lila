@@ -30,7 +30,7 @@ trait TournamentHelper { self: I18nHelper & DateHelper & UserHelper =>
   def tournamentLink(tour: Tournament)(implicit lang: Lang): Frag =
     a(
       dataIcon := "g",
-      cls      := (if tour.isScheduled then "text is-gold" else "text"),
+      cls      := (if (tour.isScheduled) "text is-gold" else "text"),
       href     := routes.Tournament.show(tour.id).url
     )(tour.name())
 
@@ -67,9 +67,9 @@ trait TournamentHelper { self: I18nHelper & DateHelper & UserHelper =>
 
     def apply(name: String): Frag =
       raw {
-        if name.contains("Medley Shield") then
+        if (name.contains("Medley Shield"))
           name.split(" ").dropRight(1).mkString(" ").replace(" Medley Shield", icon('5'))
-        else if name.contains("End of Year") then
+        else if (name.contains("End of Year"))
           (name.split(" ").drop(1).dropRight(2) ++ name.split(" ").takeRight(1)).toList.mkString(" ")
         else
           // old replacements

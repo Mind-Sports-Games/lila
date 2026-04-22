@@ -62,7 +62,7 @@ object search {
                   "button text" -> true,
                   "active"      -> blocked
                 )
-              )(if blocked then "Banned" else "Ban this print")
+              )(if (blocked) "Banned" else "Ban this print")
             )
           ),
           div(cls := "box__pad")(
@@ -100,7 +100,7 @@ object search {
                   "button text" -> true,
                   "active"      -> blocked
                 )
-              )(if blocked then "Banned" else "Ban this IP")
+              )(if (blocked) "Banned" else "Ban this IP")
             )
           ),
           isGranted(_.Admin).option(
@@ -154,7 +154,7 @@ object search {
         tbody(
           users.map { case lila.user.User.WithEmails(u, emails) =>
             tr(
-              if isGranted(_.ViewAltUsernames) then
+              if (isGranted(_.ViewAltUsernames))
                 td(
                   userLink(u, withBestRating = true, params = "?mod"),
                   (isGranted(_.Admin) && isGranted(_.SetEmail))

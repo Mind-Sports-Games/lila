@@ -59,27 +59,27 @@ object home {
                 s.isStarted.option(frag(s.round.value, " / ")),
                 s.settings.nbRounds,
                 " rounds",
-                if s.settings.isBestOfX then {
+                if (s.settings.isBestOfX) {
                   s" (best of ${s.settings.nbGamesPerRound} games"
-                } else if s.settings.isPlayX then {
+                } else if (s.settings.isPlayX) {
                   s" (${s.settings.nbGamesPerRound} games per round"
                 },
-                if s.settings.isMatchScore then " using match score"
+                if (s.settings.isMatchScore) " using match score"
                 else "",
-                if s.settings.isBestOfX || s.settings.isPlayX then ")"
+                if (s.settings.isBestOfX || s.settings.isPlayX) ")"
                 else ""
               ),
               span(cls := "setup")(
                 s.clock.show,
                 " • ",
-                if s.isMedley then trans.medley.txt()
-                else if s.variant.exotic then
+                if (s.isMedley) trans.medley.txt()
+                else if (s.variant.exotic)
                   s.settings.backgammonPoints.fold("")(p => s"${p}pt ") + VariantKeys.variantName(s.variant)
                 else s.perfType.trans,
                 " • ",
-                if s.settings.handicapped then trans.handicappedTournament()
-                else if s.settings.mcmahon then trans.mcmahon()
-                else if s.settings.rated then trans.ratedTournament()
+                if (s.settings.handicapped) trans.handicappedTournament()
+                else if (s.settings.mcmahon) trans.mcmahon()
+                else if (s.settings.rated) trans.ratedTournament()
                 else trans.casualTournament()
               )
             ),
@@ -182,14 +182,14 @@ object home {
         br,
         "The winner will be the player who won the most games and the final result will be recorded as normal e.g. 1-0.",
         br,
-        "In best of x, players will also play x rounds, but if one player gets too far ahead then the remaining games will not get played."
+        "In best of x, players will also play x rounds, but if (one player gets too far ahead) the remaining games will not get played."
       )
     ),
     div(cls := "faq", id := "faqMatchScore")(
       i("?"),
       p(
         strong("In a Swiss tournament what does it mean by using match score?"),
-        "In a swiss tournament, if there is more than 1 game per round (see above), then the match score between the players is used instead of the usual scoring system.",
+        "In a swiss tournament, if (there is more than 1 game per round (see above),) the match score between the players is used instead of the usual scoring system.",
         br,
         "For example, if you won 2.5-1.5 (in a best of 4), you would score 2.5 (and opponent 1.5) instead of the usual 1 (and opponent 0)",
         br,

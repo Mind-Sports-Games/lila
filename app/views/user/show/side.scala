@@ -27,14 +27,14 @@ object side {
           "active" -> active.contains(perfType)
         ),
         href := {
-          if isPuzzle then
+          if (isPuzzle)
             ctx.is(u).option(routes.Puzzle.dashboard(perfType.key.split("_")(1), 30, "home").url)
           else routes.User.perfStat(u.username, perfType.key).url.some
         },
         span(
           h3(perfType.trans),
           st.rating(
-            if perf.glicko.clueless then strong("?")
+            if (perf.glicko.clueless) strong("?")
             else
               strong(
                 perf.glicko.intRating,
@@ -45,7 +45,7 @@ object side {
             ratingProgress(perf.progress),
             " ",
             span(
-              if isPuzzle then trans.nbPuzzles(perf.nb, perf.nb.localize)
+              if (isPuzzle) trans.nbPuzzles(perf.nb, perf.nb.localize)
               else trans.nbGames(perf.nb, perf.nb.localize)
             )
           ) // pla-1604-hide-rank-from-player-profile-until-ranks-system-revamp rank is not properly computed (ranking col would need TTL index), and ranking system needs a revamp, so hide it for now

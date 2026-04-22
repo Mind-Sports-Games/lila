@@ -23,7 +23,7 @@ trait ChessgroundHelper {
     wrap {
       cgBoard {
         raw {
-          if ctx.pref.is3d then ""
+          if (ctx.pref.is3d) ""
           else {
             // TODO we shouldn't be unwrapping Pos here. And does this work with different board sizes? Why a fixed 7?
             def top(p: Pos) = p match {
@@ -52,12 +52,12 @@ trait ChessgroundHelper {
               s"""<square class="last-move" style="top:${top(pos)}%;left:${left(pos)}%"></square>"""
             } mkString ""
             val pieces =
-              if ctx.pref.isBlindfold then ""
+              if (ctx.pref.isBlindfold) ""
               else
                 // note this doesnt seem to be used although it is passed through on round creation
                 board.pieces.map { case (pos, (piece, count)) =>
                   val klass =
-                    if count > 1 then s"${piece.player.name} ${piece.role.name}${count}"
+                    if (count > 1) s"${piece.player.name} ${piece.role.name}${count}"
                     else s"${piece.player.name} ${piece.role.name}"
                   s"""<piece class="$klass" style="top:${top(pos)}%;left:${left(pos)}%"></piece>"""
                 } mkString ""
@@ -72,7 +72,7 @@ trait ChessgroundHelper {
   ): Frag = wrap {
     cgBoard {
       raw {
-        def addX(p: draughts.PosMotion) = if p.y % 2 != 0 then -0.5 else -1.0
+        def addX(p: draughts.PosMotion) = if (p.y % 2 != 0) -0.5 else -1.0
         def top(p: draughts.PosMotion)  = orient.fold(p.y - 1, 10 - p.y) * 10.0
         def left(p: draughts.PosMotion) = orient.fold(addX(p) + p.x, 4.5 - (addX(p) + p.x)) * 20.0
         val highlights                  = ctx.pref.highlight so lastMove.distinct.map { pos =>
@@ -80,7 +80,7 @@ trait ChessgroundHelper {
           s"""<square class="last-move" style="top:${top(pm)}%;left:${left(pm)}%"></square>"""
         } mkString ""
         val pieces =
-          if ctx.pref.isBlindfold then ""
+          if (ctx.pref.isBlindfold) ""
           else
             board.pieces.map { case (pos, piece) =>
               val klass = s"${piece.player.name} ${piece.role.name}"

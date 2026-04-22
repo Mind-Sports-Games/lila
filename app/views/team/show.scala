@@ -41,7 +41,7 @@ object show {
               .add("chat" -> chatOption.map { chat =>
                 views.html.chat.json(
                   chat.chat,
-                  name = if t.isChatFor(_.LEADERS) then leadersChat.txt() else trans.chatRoom.txt(),
+                  name = if (t.isChatFor(_.LEADERS)) leadersChat.txt() else trans.chatRoom.txt(),
                   timeout = chat.timeout,
                   public = true,
                   resourceId = lila.chat.Chat.ResourceId(s"team/${chat.chat.id}"),
@@ -61,7 +61,7 @@ object show {
         div(cls := "box__top")(
           h1(cls := "text", dataIcon := "f")(t.name),
           div(
-            if t.disabled then span(cls := "staff")("CLOSED")
+            if (t.disabled) span(cls := "staff")("CLOSED")
             else nbMembers.plural(t.nbMembers, strong(t.nbMembers.localize))
           )
         ),
@@ -94,7 +94,7 @@ object show {
             div(cls := "team-show__actions")(
               (t.enabled && !info.mine).option(
                 frag(
-                  if info.requestedByMe then
+                  if (info.requestedByMe)
                     frag(
                       strong(beingReviewed()),
                       postForm(action := routes.Team.quit(t.id))(

@@ -37,7 +37,7 @@ object theme {
                     themes.map { pt =>
                       (pt.count > 0).option {
                         val url =
-                          if pt.theme == PuzzleTheme.mix then routes.Puzzle.home(variant.key)
+                          if (pt.theme == PuzzleTheme.mix) routes.Puzzle.home(variant.key)
                           else routes.Puzzle.show(variant.key, pt.theme.key.value)
                         a(cls := "puzzle-themes__link", href := url.url)(
                           span(

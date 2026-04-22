@@ -42,7 +42,7 @@ final class Tv(
     OptionFuResult(env.tv.tv.getGameAndHistory(channel)) { case (game, history) =>
       val flip    = getBool("flip")
       val natural = Pov.naturalOrientation(game)
-      val pov     = if flip then !natural else natural
+      val pov     = if (flip) !natural else natural
       val onTv    = lila.round.OnPlayStrategyTv(channel.key, flip)
       negotiate(
         html = env.tournament.api.gameView.watcher(pov.game) flatMap { tour =>
@@ -89,7 +89,7 @@ final class Tv(
       (env.round.tvBroadcast ? TvBroadcast.Connect(bc)).mapTo(using
         scala.reflect.classTag[TvBroadcast.SourceType]
       ) map { source =>
-        if bc then Ok.chunked(source via EventSource.flow).as(ContentTypes.EVENT_STREAM).pipe(noProxyBuffer)
+        if (bc) Ok.chunked(source via EventSource.flow).as(ContentTypes.EVENT_STREAM).pipe(noProxyBuffer)
         else apiC.sourceToNdJson(source)
       }
     }

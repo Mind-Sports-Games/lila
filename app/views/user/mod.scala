@@ -140,7 +140,7 @@ object mod {
         }
       ),
       div(cls := "btn-rack")(
-        if u.enabled then {
+        if (u.enabled) {
           isGranted(_.CloseAccount) option {
             postForm(
               action := routes.Mod.closeAccount(u.username),
@@ -150,7 +150,7 @@ object mod {
               submitButton(cls := "btn-rack__btn")("Close")
             )
           }
-        } else if erased.value then {
+        } else if (erased.value) {
           "Erased"
         } else {
           isGranted(_.CloseAccount) option {
@@ -219,9 +219,9 @@ object mod {
     frag(
       canViewRoles(u).option(
         mzSection("roles")(
-          (if isGranted(_.ChangePermission) then a(href := routes.Mod.permissions(u.username)) else span) (
+          (if (isGranted(_.ChangePermission)) a(href := routes.Mod.permissions(u.username)) else span) (
             strong(cls := "text inline", dataIcon := " ")("Permissions: "),
-            if u.roles.isEmpty then "Add some" else Permission(u.roles).map(_.name).mkString(", ")
+            if (u.roles.isEmpty) "Add some" else Permission(u.roles).map(_.name).mkString(", ")
           )
         )
       ),
@@ -504,7 +504,7 @@ object mod {
                 ),
                 td(
                   span(cls := s"sig sig_${Display.holdSig(result)}", dataIcon := "J"),
-                  if result.basics.hold then "Yes" else "No"
+                  if (result.basics.hold) "Yes" else "No"
                 ),
                 td(
                   div(cls := "aggregate")(
@@ -530,7 +530,7 @@ object mod {
   private val reportban                         = iconTag("!")
   private val notesText                         = iconTag("m")
   private def markTd(nb: Int, content: => Frag) =
-    if nb > 0 then td(cls := "i", dataSort := nb)(content)
+    if (nb > 0) td(cls := "i", dataSort := nb)(content)
     else td
 
   @annotation.nowarn("msg=unused")
@@ -578,7 +578,7 @@ object mod {
               dataTags := s"${other.ips.map(renderIp).mkString(" ")} ${other.fps.mkString(" ")}",
               cls      := (o == u).option("same")
             )(
-              if o == u || isGranted(_.ViewAltUsernames) then
+              if (o == u || isGranted(_.ViewAltUsernames))
                 td(dataSort := o.id)(userLink(o, withBestRating = true, params = "?mod"))
               else td,
               isGranted(_.Admin).option(td(othersWithEmail.emailValueOf(o))),
@@ -699,7 +699,7 @@ object mod {
                   val parsed = ua.value.parse
                   tr(
                     td(title := ua.value.value)(
-                      if parsed.device.family == "Other" then "Computer" else parsed.device.family
+                      if (parsed.device.family == "Other") "Computer" else parsed.device.family
                     ),
                     td(parts(parsed.os.family.some, parsed.os.major)),
                     td(parts(parsed.userAgent.family.some, parsed.userAgent.major)),

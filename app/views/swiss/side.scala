@@ -25,7 +25,7 @@ object side {
   ) =
     frag(
       div(cls := "swiss__meta")(
-        st.section(dataIcon := (if s.isMedley then "5" else s.perfType.iconChar.toString))(
+        st.section(dataIcon := (if (s.isMedley) "5" else s.perfType.iconChar.toString))(
           div(
             p(
               a(
@@ -34,26 +34,26 @@ object side {
                 target := "_blank"
               )(s.clock.show),
               separator,
-              if s.isMedley then {
+              if (s.isMedley) {
                 views.html.game.bits.medleyLink
-              } else if s.variant.exotic then {
+              } else if (s.variant.exotic) {
                 views.html.game.bits.variantLink(
                   s.variant,
-                  if s.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill) then
+                  if (s.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
                     VariantKeys.variantShortName(s.variant)
                   else VariantKeys.variantName(s.variant),
                   matchPoints = s.settings.backgammonPoints
                 )
               } else s.perfType.trans,
               separator,
-              if s.settings.usingDrawTables then trans.swiss.usingDrawTables() else emptyFrag,
-              if s.settings.usingDrawTables then separator else "",
-              if s.settings.handicapped then
+              if (s.settings.usingDrawTables) trans.swiss.usingDrawTables() else emptyFrag,
+              if (s.settings.usingDrawTables) separator else "",
+              if (s.settings.handicapped)
                 a(href := routes.Page.lonePage("handicaps"), target := "_blank")(
                   trans.handicappedTournament()
                 )
-              else if s.settings.mcmahon then trans.mcmahon()
-              else if s.settings.rated then trans.ratedTournament()
+              else if (s.settings.mcmahon) trans.mcmahon()
+              else if (s.settings.rated) trans.ratedTournament()
               else trans.casualTournament(),
               separator,
               a(href := routes.Swiss.home)("Swiss")
@@ -66,14 +66,14 @@ object side {
               span(cls := "swiss__meta__rounds")(
                 title := trans.swiss.numberOfRoundsInSwiss.txt(),
                 " rounds",
-                if s.settings.isBestOfX then {
+                if (s.settings.isBestOfX) {
                   s" (best of ${s.settings.nbGamesPerRound} games"
-                } else if s.settings.isPlayX then {
+                } else if (s.settings.isPlayX) {
                   s" (${s.settings.nbGamesPerRound} games per round"
                 },
-                if s.settings.isMatchScore then
+                if (s.settings.isMatchScore)
                   a(href := s"${routes.Swiss.home}#faqMatchScore")(" using match score"),
-                if s.settings.isBestOfX || s.settings.isPlayX then ")"
+                if (s.settings.isBestOfX || s.settings.isPlayX) ")"
                 else ""
               ),
               (isGranted(_.ManageTournament) || (ctx.userId.has(s.createdBy) && !s.isFinished)).option(
@@ -138,9 +138,9 @@ object side {
           )
         }),
         teamLink(s.teamId),
-        if verdicts.relevant then
+        if (verdicts.relevant)
           st.section(
-            dataIcon := (if ctx.isAuth && verdicts.accepted then "E"
+            dataIcon := (if (ctx.isAuth && verdicts.accepted) "E"
                          else "L"),
             cls := List(
               "conditions" -> true,

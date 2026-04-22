@@ -20,12 +20,12 @@ final class Relation(
 
   private def renderActions(userId: String, mini: Boolean)(implicit ctx: Context) =
     (ctx.userId.fold(fuccess(none[Boolean]))(uid => api.fetchRelation(uid, userId))) zip
-      (if ctx.isAuth then env.pref.api.followable(userId) else fuFalse) zip
+      (if (ctx.isAuth) env.pref.api.followable(userId) else fuFalse) zip
       (ctx.userId.fold(fuFalse)(uid => api.fetchBlocks(userId, uid))) flatMap {
         case ((relation, followable), blocked) =>
           negotiate(
             html = fuccess(Ok {
-              if mini then
+              if (mini)
                 html.relation.mini(userId, blocked = blocked, followable = followable, relation = relation)
               else
                 html.relation.actions(userId, relation = relation, blocked = blocked, followable = followable)
@@ -171,7 +171,7 @@ final class Relation(
 
   private def followship(userIds: Seq[String])(implicit ctx: Context): Fu[List[Related]] =
     env.user.repo.usersFromSecondary(userIds.map(UserModel.normalize)) flatMap { users =>
-      (if ctx.isAuth then env.pref.api.followableIds(users map (_.id))
+      (if (ctx.isAuth) env.pref.api.followableIds(users map (_.id))
        else fuccess(Set.empty[String])) flatMap { followables =>
         Future.sequence(users.map { u =>
           ctx.userId.fold(fuccess(none[lila.relation.Relation]))(uid => api.fetchRelation(uid, u.id)) map {

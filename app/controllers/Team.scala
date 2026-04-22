@@ -48,7 +48,7 @@ final class Team(
   def search(text: String, page: Int) =
     OpenBody { implicit ctx =>
       Reasonable(page) {
-        if text.trim.isEmpty then paginator.popularTeams(page) map { html.team.list.all(_) }
+        if (text.trim.isEmpty) paginator.popularTeams(page) map { html.team.list.all(_) }
         else env.teamSearch(text, page) map { html.team.list.search(text, _) }
       }
     }
@@ -85,7 +85,7 @@ final class Team(
     api.teamEnabled(teamId) flatMap {
       _ so { team =>
         val canView: Fu[Boolean] =
-          if team.publicMembers then fuccess(true)
+          if (team.publicMembers) fuccess(true)
           else
             me match {
               case Some(user) => api.belongsTo(team.id, user.id)
@@ -158,7 +158,7 @@ final class Team(
     Scoped(_.Team.Write) { _ => me =>
       api.teamEnabled(teamId) flatMap {
         _ so { team =>
-          if team leaders me.id then api.kick(team, userId, me) inject jsonOkResult
+          if (team leaders me.id) api.kick(team, userId, me) inject jsonOkResult
           else Forbidden(jsonError("Not your team")).fuccess
         }
       }
@@ -213,7 +213,7 @@ final class Team(
   def create =
     AuthBody { implicit ctx => implicit me =>
       api.hasJoinedTooManyTeams(me) flatMap { tooMany =>
-        if tooMany then tooManyTeams(me)
+        if (tooMany) tooManyTeams(me)
         else
           LimitPerWeek(me) {
             implicit val req = ctx.body
@@ -258,7 +258,7 @@ final class Team(
           api.teamEnabled(id) flatMap {
             _ so { team =>
               api.hasJoinedTooManyTeams(me) flatMap { tooMany =>
-                if tooMany then
+                if (tooMany)
                   negotiate(
                     html = tooManyTeams(me),
                     api = _ => BadRequest(jsonError("You have joined too many teams")).fuccess
@@ -351,7 +351,7 @@ final class Team(
           .fold(
             err => BadRequest(html.team.request.requestForm(team, err)).fuccess,
             setup =>
-              if team.open then webJoin(team, me, request = none, password = setup.password)
+              if (team.open) webJoin(team, me, request = none, password = setup.password)
               else
                 setup.message so { msg =>
                   api.createRequest(team, me, msg) inject Redirect(routes.Team.show(team.id)).flashSuccess
@@ -502,7 +502,7 @@ final class Team(
       import env.team.jsonView.*
       import lila.common.paginator.PaginatorJson.*
       JsonOk {
-        if text.trim.isEmpty then paginator.popularTeams(page)
+        if (text.trim.isEmpty) paginator.popularTeams(page)
         else env.teamSearch(text, page)
       }
     }
@@ -554,13 +554,13 @@ You received this because you are subscribed to messages of the team $url."""
           (isGranted(_.Verified) && count < 100) ||
           (isGranted(_.Teacher) && count < 10) ||
           count < 3
-      if allow then a
+      if (allow) a
       else Forbidden(views.html.site.message.teamCreateLimit).fuccess
     }
 
   private def WithOwnedTeam(teamId: String)(f: TeamModel => Fu[Result])(implicit ctx: Context): Fu[Result] =
     OptionFuResult(api.team(teamId)) { team =>
-      if ctx.userId.exists(team.leaders.contains) || isGranted(_.ManageTeam) then f(team)
+      if (ctx.userId.exists(team.leaders.contains) || isGranted(_.ManageTeam)) f(team)
       else renderTeam(team) map { Forbidden(_) }
     }
 
@@ -568,7 +568,7 @@ You received this because you are subscribed to messages of the team $url."""
       teamId: String
   )(f: TeamModel => Fu[Result])(implicit ctx: Context): Fu[Result] =
     WithOwnedTeam(teamId) { team =>
-      if team.enabled || isGranted(_.ManageTeam) then f(team)
+      if (team.enabled || isGranted(_.ManageTeam)) f(team)
       else notFound
     }
 }

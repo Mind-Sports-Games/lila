@@ -23,7 +23,7 @@ final class Search(env: Env) extends LilaController(env) {
   def index(p: Int) =
     OpenBody { implicit ctx =>
       env.game.cached.nbTotal flatMap { nbGames =>
-        if ctx.isAnon then
+        if (ctx.isAnon)
           negotiate(
             html = Unauthorized(html.search.login(nbGames)).fuccess,
             api = _ => Unauthorized(jsonError("Login required")).fuccess

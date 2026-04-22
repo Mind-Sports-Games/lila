@@ -29,7 +29,7 @@ final class ErrorHandler(
       val client     = HTTPRequest.clientName(req)
       lila.mon.http.error(actionName, client, req.method, 500).increment()
       lila.log("http").error(s"ERROR 500 $actionName", exception)
-      if canShowErrorPage(req) then
+      if (canShowErrorPage(req))
         InternalServerError(
           views.html.site.bits.errorPage(using
             lila.api.Context.error(

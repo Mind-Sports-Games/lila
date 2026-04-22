@@ -7,7 +7,7 @@ import lila.app.ui.ScalatagsTemplate.*
 object topnav {
 
   private def linkTitle(url: String, name: Frag)(implicit ctx: Context) =
-    if ctx.blind then h3(name) else a(href := url)(name)
+    if (ctx.blind) h3(name) else a(href := url)(name)
 
   private def canSeeClasMenu(implicit ctx: Context) =
     ctx.hasClas || ctx.me.exists(u => u.hasTitle || u.roles.contains("ROLE_COACH"))

@@ -73,7 +73,7 @@ object actions {
         )
       } getOrElse {
         // Allow anonymous users to challenge bots
-        if isBot then
+        if (isBot)
           a(
             titleOrText(trans.challenge.challengeToPlay.txt()),
             href     := s"${routes.Lobby.home}?user=$userId#game",

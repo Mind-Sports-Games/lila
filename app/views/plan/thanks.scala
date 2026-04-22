@@ -33,7 +33,7 @@ object thanks {
               }
             else {
               frag(
-                if pat.isLifetime then
+                if (pat.isLifetime)
                   p(
                     nowLifetime(),
                     br,

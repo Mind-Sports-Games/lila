@@ -64,8 +64,8 @@ object event {
         e.description.map { d =>
           div(cls := "desc")(views.html.base.markdown(d))
         },
-        if e.isFinished then p(cls := "desc")("The event is finished.")
-        else if e.isNow then
+        if (e.isFinished) p(cls := "desc")("The event is finished.")
+        else if (e.isNow)
           a(href := e.url, cls := "button button-fat")(
             e.duringMessage.fold(trans.eventInProgress())(m => raw(m))
           )

@@ -24,7 +24,7 @@ object form {
       main(cls := "page-small")(
         div(cls := "tour__form box box-pad")(
           h1(
-            if fields.isTeamBattle then "New Team Battle"
+            if (fields.isTeamBattle) "New Team Battle"
             else trans.createANewTournament()
           ),
           postForm(cls := "form3", action := routes.Tournament.create)(
@@ -81,7 +81,7 @@ object form {
             fields.clockRow2,
             fields.clockRow3,
             form3.split(
-              if (TournamentForm.minutes contains tour.minutes) || tour.isMedley then
+              if ((TournamentForm.minutes contains tour.minutes) || tour.isMedley)
                 form3.split(fields.minutes)
               else
                 form3.group(form("minutes"), trans.duration(), half = true)(
@@ -112,7 +112,7 @@ object form {
 
   private def autoField(auto: Boolean, field: Field)(visible: Field => Frag) =
     frag(
-      if auto then form3.hidden(field) else visible(field)
+      if (auto) form3.hidden(field) else visible(field)
     )
 
   def condition(
@@ -237,7 +237,7 @@ final private class TourFields(form: Form[?], tour: Option[Tournament])(implicit
       div(
         form3.input(f),
         " ",
-        if isTeamBattle then "Team Battle" else "Arena",
+        if (isTeamBattle) "Team Battle" else "Arena",
         br,
         small(cls := "form-help")(
           trans.safeTournamentName(),

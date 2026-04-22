@@ -45,7 +45,7 @@ object show {
           ),
           ctx.noKid.option(
             div(cls := "footer")(
-              if prismic.maybeRef.isEmpty then {
+              if (prismic.maybeRef.isEmpty) {
                 doc
                   .getDate("blog.date")
                   .exists(d =>

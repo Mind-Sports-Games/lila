@@ -26,7 +26,7 @@ object dashboard {
       path = "dashboard",
       variant = variant,
       title =
-        if ctx.is(user) then trans.puzzle.puzzleDashboard.txt()
+        if (ctx.is(user)) trans.puzzle.puzzleDashboard.txt()
         else s"${user.username} puzzle dashboard",
       subtitle = "Train, analyse, improve",
       dashOpt = dashOpt,
@@ -76,7 +76,7 @@ object dashboard {
       "improvementAreas",
       variant = variant,
       title =
-        if ctx.is(user) then trans.puzzle.improvementAreas.txt()
+        if (ctx.is(user)) trans.puzzle.improvementAreas.txt()
         else s"${user.username} improvement areas",
       subtitle = "Train these to optimize your progress!",
       dashOpt = dashOpt
@@ -96,7 +96,7 @@ object dashboard {
       "strengths",
       variant = variant,
       title =
-        if ctx.is(user) then trans.puzzle.strengths.txt()
+        if (ctx.is(user)) trans.puzzle.strengths.txt()
         else s"${user.username} puzzle strengths",
       subtitle = "You perform the best in these themes",
       dashOpt = dashOpt
@@ -210,7 +210,7 @@ object dashboard {
             span("to replay")
           )
         ),
-        iconTag(if results.canReplay then 'G' else 'E')
+        iconTag(if (results.canReplay) 'G' else 'E')
       )
     )
 }

@@ -28,14 +28,14 @@ object widgets {
           div(cls := "header", dataIcon := bits.gameIcon(g))(
             div(cls := "header__text")(
               strong(
-                if g.imported then
+                if (g.imported)
                   frag(
                     span("IMPORT"),
                     g.pgnImport.flatMap(_.user).map { user =>
                       frag(" ", trans.by(userIdLink(user.some, None, withOnline = false)))
                     },
                     separator,
-                    if g.variant.exotic then
+                    if (g.variant.exotic)
                       bits.variantLink(
                         g.variant,
                         VariantKeys.variantName(g.variant).toUpperCase,
@@ -51,8 +51,8 @@ object widgets {
                       strategygames.chess.variant.FromPosition.name
                     )(_.trans),
                     separator,
-                    if g.fromHandicappedTournament then trans.handicapped.txt()
-                    else if g.rated then trans.rated.txt()
+                    if (g.fromHandicappedTournament) trans.handicapped.txt()
+                    else if (g.rated) trans.rated.txt()
                     else trans.casual.txt()
                   )
               ),
@@ -77,10 +77,10 @@ object widgets {
             gamePlayer(g.p2Player)
           ),
           div(cls := "result")(
-            if g.isBeingPlayed then trans.playingRightNow()
+            if (g.isBeingPlayed) trans.playingRightNow()
             else {
-              if g.finishedOrAborted then
-                span(cls := g.winner.flatMap(w => fromPlayer.map(p => if p == w then "win" else "loss")))(
+              if (g.finishedOrAborted)
+                span(cls := g.winner.flatMap(w => fromPlayer.map(p => if (p == w) "win" else "loss")))(
                   gameEndStatus(g),
                   g.winner.map { winner =>
                     frag(
@@ -92,7 +92,7 @@ object widgets {
               else trans.playerIndexPlays(g.playerTrans(g.turnPlayerIndex))
             }
           ),
-          if g.actionStrs.length > 0 then
+          if (g.actionStrs.length > 0)
             div(cls := "opening")(
               (!g.fromPosition so g.opening) map { opening =>
                 strong(opening.opening.toString())
@@ -123,7 +123,7 @@ object widgets {
       game.daysPerTurn
         .map { days =>
           span(title := trans.correspondence.txt())(
-            if days == 1 then trans.oneDay()
+            if (days == 1) trans.oneDay()
             else trans.nbDays.pluralSame(days)
           )
         }

@@ -44,7 +44,7 @@ final class KeyPages(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
   }
 
   def p2listed(implicit ctx: Context): Result =
-    if lila.api.Mobile.Api.requested(ctx.req) then
+    if (lila.api.Mobile.Api.requested(ctx.req))
       Results.Unauthorized(
         Json.obj(
           "error" -> html.site.message.p2listedMessage

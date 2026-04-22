@@ -126,7 +126,7 @@ object storm {
                 history,
                 np =>
                   addQueryParameter(
-                    if ctx.is(user) then routes.Storm.dashboard().url
+                    if (ctx.is(user)) routes.Storm.dashboard().url
                     else routes.Storm.dashboardOf(user.username).url,
                     "page",
                     np

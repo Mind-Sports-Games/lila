@@ -26,7 +26,7 @@ final class Fishnet(env: Env) extends LilaController(env) {
     ClientAction[JsonApi.Request.PostAnalysisLexicalUci] { data => client =>
       import lila.fishnet.FishnetApi.*
       def onComplete =
-        if stop then fuccess(Left(NoContent))
+        if (stop) fuccess(Left(NoContent))
         else api.acquire(client, slow) map Right.apply
       api
         .postAnalysis(Work.Id(workId), client, data)

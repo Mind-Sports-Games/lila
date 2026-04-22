@@ -42,7 +42,7 @@ object bits {
   def gamePerDayForVariant(data: List[MonthlyGameData], variant: Variant): Option[Double] =
     firstGamePlayedForVariant(data, variant).map { first =>
       val days = Days.daysBetween(first, DateTime.now).getDays
-      if days > 0 then totalGamesForVariant(data, variant).toDouble / days.toDouble
+      if (days > 0) totalGamesForVariant(data, variant).toDouble / days.toDouble
       else totalGamesForVariant(data, variant).toDouble
     }
 

@@ -165,12 +165,12 @@ final class Mod(
 
   def impersonate(username: String) =
     Auth { implicit ctx => me =>
-      if username == "-" && env.mod.impersonate.isImpersonated(me) then
+      if (username == "-" && env.mod.impersonate.isImpersonated(me))
         fuccess {
           env.mod.impersonate.stop(me)
           Redirect(routes.User.show(me.username))
         }
-      else if isGranted(_.Impersonate) || (isGranted(_.Admin) && username.toLowerCase == "playstrategy") then
+      else if (isGranted(_.Impersonate) || (isGranted(_.Admin) && username.toLowerCase == "playstrategy"))
         OptionFuRedirect(env.user.repo.named(username)) { user =>
           env.mod.impersonate.start(me, user)
           fuccess(routes.User.show(user.username))
@@ -227,7 +227,7 @@ final class Mod(
 
   private def communications(username: String, priv: Boolean) =
     Secure { perms =>
-      if priv then perms.ViewPrivateComms else perms.Shadowban
+      if (priv) perms.ViewPrivateComms else perms.Shadowban
     } { implicit ctx => me =>
       OptionFuOk(env.user.repo.named(username)) { user =>
         implicit val renderIp = env.mod.ipRender(me)
@@ -235,12 +235,12 @@ final class Mod(
           .recentPovsByUserFromSecondary(user, 80)
           .mon(_.mod.comm.segment("recentPovs"))
           .flatMap { povs =>
-            (if priv then
+            (if (priv)
                env.chat.api.playerChat
                  .optionsByOrderedIds(povs.map(_.gameId).map(Chat.Id.apply))
                  .mon(_.mod.comm.segment("playerChats"))
              else fuccess(Nil)) zip
-              (if priv then
+              (if (priv)
                  env.msg.api
                    .recentByForMod(user, 30)
                    .mon(_.mod.comm.segment("pms"))
@@ -260,10 +260,10 @@ final class Mod(
               env.security.userLogins(user, 100).flatMap {
                 userC.loginsTableData(user, _, 100)
               } flatMap { case ((((((chats, convos), publicLines), notes), history), inquiry), logins) =>
-                if priv then {
-                  if !inquiry.so(_.isRecentCommOf(Suspect(user))) then {
+                if (priv) {
+                  if (!inquiry.so(_.isRecentCommOf(Suspect(user)))) {
                     env.irc.slack.commlog(mod = me, user = user, inquiry.map(_.oldestAtom.by.value))
-                    if isGranted(_.MonitoredMod) then
+                    if (isGranted(_.MonitoredMod))
                       env.irc.slack.monitorMod(
                         me.id,
                         "eyes",
@@ -316,10 +316,10 @@ final class Mod(
       OptionFuResult(env.user.repo.named(username)) { user =>
         env.appeal.api.exists(user) flatMap { isAppeal =>
           val f =
-            if isAppeal then (m: Holder, s: Suspect) => env.report.api.inquiries.appeal(m, s)
+            if (isAppeal) (m: Holder, s: Suspect) => env.report.api.inquiries.appeal(m, s)
             else (m: Holder, s: Suspect) => env.report.api.inquiries.spontaneous(m, s)
           f(me, Suspect(user)) inject {
-            if isAppeal then Redirect(s"${routes.Appeal.show(user.username)}#appeal-actions")
+            if (isAppeal) Redirect(s"${routes.Appeal.show(user.username)}#appeal-actions")
             else redirect(user.username, mod = true)
           }
         }
@@ -393,10 +393,10 @@ final class Mod(
   def singleIpBan(v: Boolean, ip: String) =
     Secure(_.IpBan) { ctx => _ =>
       val op =
-        if v then (a: IpAddress) => env.security.firewall.blockIps(List(a))
+        if (v) (a: IpAddress) => env.security.firewall.blockIps(List(a))
         else (a: IpAddress) => env.security.firewall.unblockIps(List(a))
       IpAddress.from(ip).fold(funit)(op) inject {
-        if HTTPRequest.isXhr(ctx.req) then jsonOkResult
+        if (HTTPRequest.isXhr(ctx.req)) jsonOkResult
         else Redirect(routes.Mod.singleIp(ip))
       }
     }
@@ -540,6 +540,6 @@ final class Mod(
   private def actionResult(
       username: String
   )(ctx: Context)(@nowarn("msg=unused") user: Holder)(@nowarn("msg=unused") res: Any) =
-    if HTTPRequest.isSynchronousHttp(ctx.req) then fuccess(redirect(username))
+    if (HTTPRequest.isSynchronousHttp(ctx.req)) fuccess(redirect(username))
     else userC.renderModZoneActions(username)(using ctx)
 }

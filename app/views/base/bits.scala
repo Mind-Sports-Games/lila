@@ -59,14 +59,14 @@ z-index: 99;
 
   def pagination(url: Int => String, page: Int, nbPages: Int, showPost: Boolean): Tag =
     st.nav(cls := "pagination")(
-      if page > 1 then a(href := url(page - 1), dataIcon := "I")
+      if (page > 1) a(href := url(page - 1), dataIcon := "I")
       else span(cls           := "disabled", dataIcon    := "I"),
       sliding(page, nbPages, 3, showPost = showPost).map {
         case None                 => raw(" &hellip; ")
         case Some(p) if p == page => span(cls := "current")(p)
         case Some(p)              => a(href := url(p))(p)
       },
-      if page < nbPages then a(rel := "next", href         := url(page + 1), dataIcon := "H")
+      if (page < nbPages) a(rel := "next", href         := url(page + 1), dataIcon := "H")
       else span(cls                := "disabled", dataIcon := "H")
     )
 

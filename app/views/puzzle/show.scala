@@ -17,7 +17,7 @@ object show {
   )(implicit ctx: Context) = {
     val isStreak = data.value.contains("streak")
     views.html.base.layout(
-      title = if isStreak then "Puzzle Streak" else trans.puzzles.txt(),
+      title = if (isStreak) "Puzzle Streak" else trans.puzzles.txt(),
       moreCss = cssTag("puzzle"),
       moreJs = frag(
         jsModule("puzzle"),
@@ -38,11 +38,11 @@ object show {
         .OpenGraph(
           image = cdnUrl(routes.Export.puzzleThumbnail(puzzle.id.value).url).some,
           title =
-            if isStreak then "Puzzle Streak"
+            if (isStreak) "Puzzle Streak"
             else s"Chess tactic #${puzzle.id} - ${puzzle.playerIndex.name.capitalize} to play",
           url = s"$netBaseUrl${routes.Puzzle.show(puzzle.variant.key, puzzle.id.value).url}",
           description =
-            if isStreak then trans.puzzle.streakDescription.txt()
+            if (isStreak) trans.puzzle.streakDescription.txt()
             else
               s"PlayStrategy tactic trainer: ${trans.puzzle
                   .findTheBestMoveForPlayerIndex(

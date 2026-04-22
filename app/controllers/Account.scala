@@ -169,7 +169,7 @@ final class Account(
 
   def email =
     Auth { implicit ctx => me =>
-      if getBool("check") then Ok(renderCheckYourEmail).fuccess
+      if (getBool("check")) Ok(renderCheckYourEmail).fuccess
       else
         emailForm(me) map { form =>
           Ok(html.account.email(form))
@@ -215,11 +215,11 @@ final class Account(
       env.security.emailChange.confirm(token) flatMap {
         case None                    => Redirect(routes.Account.email).fuccess
         case Some((user, prevEmail)) =>
-          (if prevEmail.exists(_.isNoReply) then env.clas.api.student.release(user) else funit) >>
+          (if (prevEmail.exists(_.isNoReply)) env.clas.api.student.release(user) else funit) >>
             auth.authenticateUser(
               user,
               result =
-                if prevEmail.exists(_.isNoReply) then
+                if (prevEmail.exists(_.isNoReply))
                   Some(_ => Redirect(routes.User.show(user.username)).flashSuccess)
                 else Some(_ => Redirect(routes.Account.email).flashSuccess)
             )
@@ -250,7 +250,7 @@ final class Account(
 
   def twoFactor =
     Auth { implicit ctx => me =>
-      if me.totpSecret.isDefined then
+      if (me.totpSecret.isDefined)
         env.security.forms.disableTwoFactor(me) map { form =>
           html.account.twoFactor.disable(me, form)
         }
@@ -366,7 +366,7 @@ final class Account(
 
   def signout(sessionId: String) =
     Auth { implicit _ctx => me =>
-      if sessionId == "all" then refreshSessionId(me, Redirect(routes.Account.security).flashSuccess)
+      if (sessionId == "all") refreshSessionId(me, Redirect(routes.Account.security).flashSuccess)
       else
         env.security.store.closeUserAndSessionId(me.id, sessionId) >>
           env.push.webSubscriptionApi.unsubscribeBySession(sessionId)
@@ -388,7 +388,7 @@ final class Account(
     OpenBody { implicit ctx =>
       implicit val req = ctx.body
       env.security.hcaptcha.verify() flatMap { captcha =>
-        if captcha.ok then
+        if (captcha.ok)
           env.security.forms.reopen.form
             .bindFromRequest()
             .fold(
@@ -440,7 +440,7 @@ final class Account(
         .filter(id => me.id == id || isGranted(_.Impersonate)) | me.id
       env.user.repo.byId(userId) map {
         case Some(user) =>
-          if getBool("text") then
+          if (getBool("text"))
             apiC.GlobalConcurrencyLimitUser(me.id)(
               env.api.personalDataExport(user)
             ) { source =>

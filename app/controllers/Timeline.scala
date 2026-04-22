@@ -15,7 +15,7 @@ final class Timeline(env: Env) extends LilaController(env) {
     Auth { implicit ctx => me =>
       negotiate(
         html =
-          if HTTPRequest.isXhr(ctx.req) then
+          if (HTTPRequest.isXhr(ctx.req))
             env.timeline.entryApi
               .userEntries(me.id)
               .logTimeIfGt(s"timeline site entries for ${me.id}", 10.seconds)

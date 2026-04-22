@@ -51,7 +51,7 @@ object clas {
           dataIcon := "O"
         )
       ),
-      if classes.isEmpty then frag(hr, p(cls := "box__pad classes__empty")(trans.clas.noClassesYet()))
+      if (classes.isEmpty) frag(hr, p(cls := "box__pad classes__empty")(trans.clas.noClassesYet()))
       else renderClasses(classes)
     )
 

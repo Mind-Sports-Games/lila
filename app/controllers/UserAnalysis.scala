@@ -92,7 +92,7 @@ final class UserAnalysis(
           val pov = Pov(game, PlayerIndex.fromName(playerIndex) | P1)
           negotiate(
             html =
-              if game.replayable then Redirect(routes.Round.watcher(game.id, playerIndex)).fuccess
+              if (game.replayable) Redirect(routes.Round.watcher(game.id, playerIndex)).fuccess
               else {
                 val owner = isMyPov(pov)
                 for {
@@ -180,7 +180,7 @@ final class UserAnalysis(
     AuthBody(parse.json) { implicit ctx => _ =>
       import lila.round.Forecast
       OptionFuResult(env.round.proxyRepo.pov(fullId)) { pov =>
-        if isTheft(pov) then fuccess(theftResponse)
+        if (isTheft(pov)) fuccess(theftResponse)
         else
           ctx.body.body
             .validate[Forecast.Steps]
@@ -201,7 +201,7 @@ final class UserAnalysis(
     AuthBody(parse.json) { implicit ctx => _ =>
       import lila.round.Forecast
       OptionFuResult(env.round.proxyRepo.pov(fullId)) { pov =>
-        if isTheft(pov) then fuccess(theftResponse)
+        if (isTheft(pov)) fuccess(theftResponse)
         else
           ctx.body.body
             .validate[Forecast.Steps]

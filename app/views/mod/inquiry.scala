@@ -29,7 +29,7 @@ object inquiry {
           case _            => s"/${m.group("tpe")}/$id"
         }
         val link     = a(href := s"$path")(path)
-        val userText = if highlight then communication.highlightBad(m group "text") else frag(m group "text")
+        val userText = if (highlight) communication.highlightBad(m group "text") else frag(m group "text")
         Regex.quoteReplacement(s"${link.render} ${userText.render}")
       }
     )
@@ -182,7 +182,7 @@ object inquiry {
           div(cls := "dropper shadowban buttons")(
             postForm(
               action := url,
-              title  := (if in.user.marks.troll then "Un-shadowban" else "Shadowban"),
+              title  := (if (in.user.marks.troll) "Un-shadowban" else "Shadowban"),
               cls    := "main"
             )(
               markButton(in.user.marks.troll)(dataIcon := "c"),
@@ -251,7 +251,7 @@ object inquiry {
   }
 
   private def snoozeUrl(report: Report, duration: String): String =
-    if report.isAppeal then routes.Appeal.snooze(report.user, duration).url
+    if (report.isAppeal) routes.Appeal.snooze(report.user, duration).url
     else routes.Report.snooze(report.id, duration).url
 
   private def boostOpponents(report: Report): Option[NonEmptyList[User.ID]] =

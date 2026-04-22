@@ -32,7 +32,7 @@ object indexStripe {
         h1(
           userLink(me),
           " • ",
-          if patron.isLifetime then strong(lifetimePatron())
+          if (patron.isLifetime) strong(lifetimePatron())
           else patronForMonths(me.plan.months)
         ),
         table(cls := "all")(

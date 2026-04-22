@@ -70,7 +70,7 @@ final class Export(env: Env) extends LilaController(env) {
 
   private def gameImageCacheSeconds(game: lila.game.Game)(res: Result): Result = {
     val cacheSeconds =
-      if game.finishedOrAborted then 3600 * 24
+      if (game.finishedOrAborted) 3600 * 24
       else 10
     res.withHeaders(CACHE_CONTROL -> s"max-age=$cacheSeconds")
   }

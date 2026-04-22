@@ -25,7 +25,7 @@ object irwin {
           div(cls := "box__top")(
             h1(
               "Irwin status: ",
-              if dashboard.seenRecently then span(cls := "up")("Operational")
+              if (dashboard.seenRecently) span(cls := "up")("Operational")
               else
                 span(cls := "down")(
                   dashboard.lastSeenAt.map { seenAt =>

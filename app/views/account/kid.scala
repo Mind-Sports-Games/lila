@@ -19,7 +19,7 @@ object kid {
         br,
         br,
         br,
-        if managed then p("Your account is managed. Ask your chess teacher about lifting kid mode.")
+        if (managed) p("Your account is managed. Ask your chess teacher about lifting kid mode.")
         else
           postForm(cls := "form3", action := s"${routes.Account.kidPost}?v=${!u.kid}")(
             form3.passwordModified(form("passwd"), trans.password())(autofocus, autocomplete := "off"),
@@ -28,7 +28,7 @@ object kid {
                 "button"     -> true,
                 "button-red" -> u.kid
               )
-            )(if u.kid then trans.disableKidMode.txt() else trans.enableKidMode.txt())
+            )(if (u.kid) trans.disableKidMode.txt() else trans.enableKidMode.txt())
           )
         ,
         br,

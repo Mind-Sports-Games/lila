@@ -19,7 +19,7 @@ object bits {
     views.html.board.bits.miniForVariant(fen, p.variant, p.playerIndex, lastMove)(span)
 
   def jsI18n(streak: Boolean)(implicit lang: Lang) =
-    if streak then i18nJsObject(streakI18nKeys)
+    if (streak) i18nJsObject(streakI18nKeys)
     else
       i18nJsObject(trainingI18nKeys) + (PuzzleTheme.enPassant.key.value -> JsString(
         PuzzleTheme.enPassant.name.txt()(using lila.i18n.defaultLang)
@@ -41,7 +41,7 @@ object bits {
   def variantSelector(variant: Variant, link: Variant => String)(implicit lang: Lang) =
     div(cls := s"variant_group")(
       Puzzle.puzzleVariants.map { v =>
-        button(cls := s"variant ${if v.key == variant.key then "selected" else ""}")(
+        button(cls := s"variant ${if (v.key == variant.key) "selected" else ""}")(
           a(
             href     := link(v),
             dataIcon := v.perfIcon

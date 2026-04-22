@@ -118,10 +118,10 @@ object topic {
           }
         ),
         div(cls := "forum-topic__actions")(
-          if posts.hasNextPage then emptyFrag
-          else if topic.isOld then p(trans.thisTopicIsArchived())
-          else if formWithCaptcha.isDefined then h2(id := "reply")(trans.replyToThisTopic())
-          else if topic.closed then p(trans.thisTopicIsNowClosed())
+          if (posts.hasNextPage) emptyFrag
+          else if (topic.isOld) p(trans.thisTopicIsArchived())
+          else if (formWithCaptcha.isDefined) h2(id := "reply")(trans.replyToThisTopic())
+          else if (topic.closed) p(trans.thisTopicIsNowClosed())
           else
             teamOnly.map { teamId =>
               p(
@@ -130,14 +130,14 @@ object topic {
                 )
               )
             } orElse {
-              if ctx.me.exists(_.isBot) then p("Bots cannot post in the forum.").some
+              if (ctx.me.exists(_.isBot)) p("Bots cannot post in the forum.").some
               else ctx.isAuth.option(p(trans.youCannotPostYetPlaySomeGames()))
             }
           ,
           div(
             unsub.map { uns =>
               postForm(
-                cls    := s"unsub ${if uns then "on" else "off"}",
+                cls    := s"unsub ${if (uns) "on" else "off"}",
                 action := routes.Timeline.unsub(s"forum:${topic.id}")
               )(
                 button(cls := "button button-empty text on", dataIcon := "v", bits.dataUnsub := "off")(
@@ -151,21 +151,21 @@ object topic {
             isGranted(_.ModerateForum).option(
               postForm(action := routes.ForumTopic.hide(categ.slug, topic.slug))(
                 button(cls := "button button-empty button-green")(
-                  if topic.hidden then "Feature" else "Un-feature"
+                  if (topic.hidden) "Feature" else "Un-feature"
                 )
               )
             ),
             canModCateg.option(
               postForm(action := routes.ForumTopic.close(categ.slug, topic.slug))(
                 button(cls := "button button-empty button-red")(
-                  if topic.closed then "Reopen" else "Close"
+                  if (topic.closed) "Reopen" else "Close"
                 )
               )
             ),
             canModCateg.option(
               postForm(action := routes.ForumTopic.sticky(categ.slug, topic.slug))(
                 button(cls := "button button-empty button-brag")(
-                  if topic.isSticky then "Unsticky" else "Sticky"
+                  if (topic.isSticky) "Unsticky" else "Sticky"
                 )
               )
             )

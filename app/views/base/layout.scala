@@ -47,7 +47,7 @@ object layout {
       s"""<link rel="preload" href="${assetUrl(
           s"font/playstrategy.woff2"
         )}" as="font" type="font/woff2" crossorigin>""" + (
-        if !ctx.pref.pieceNotationIsLetter then
+        if (!ctx.pref.pieceNotationIsLetter)
           s"""<link rel="preload" href="${assetUrl(
               s"font/playstrategy.chess.woff2"
             )}" as="font" type="font/woff2" crossorigin>"""
@@ -77,12 +77,10 @@ object layout {
   }
   private def blindModeForm(implicit ctx: Context) =
     raw(s"""<form id="blind-mode" action="${routes.Main.toggleBlindMode}" method="POST"><input type="hidden" name="enable" value="${
-        if ctx.blind
-        then 0
+        if (ctx.blind) 0
         else 1
       }"><input type="hidden" name="redirect" value="${ctx.req.path}"><button type="submit">Accessibility: ${
-        if ctx.blind
-        then "Disable"
+        if (ctx.blind) "Disable"
         else "Enable"
       } blind mode</button></form>""")
 
@@ -138,7 +136,7 @@ object layout {
     )
 
   private def current2dTheme(implicit ctx: Context) =
-    if ctx.pref.is3d && ctx.pref.theme == List("horsey") then lila.pref.Theme.default
+    if (ctx.pref.is3d && ctx.pref.theme == List("horsey")) lila.pref.Theme.default
     else ctx.currentTheme.map(t => t.cssClass).mkString(" ")
 
   private def botImage =
@@ -230,8 +228,8 @@ object layout {
           metaCsp(csp),
           metaThemePlayerIndex,
           st.headTitle {
-            if ctx.blind then "playstrategy"
-            else if netConfig.isProd then fullTitle | s"$title • playstrategy.org"
+            if (ctx.blind) "playstrategy"
+            else if (netConfig.isProd) fullTitle | s"$title • playstrategy.org"
             else s"[dev] ${fullTitle | s"$title • playstrategy.dev"}"
           },
           cssTag("site"),
@@ -341,7 +339,7 @@ object layout {
     )
 
     private def reports(implicit ctx: Context) =
-      if isGranted(_.SeeReport) then
+      if (isGranted(_.SeeReport))
         {
           blockingReportScores match {
             case (score, mid, high) =>
@@ -384,11 +382,11 @@ object layout {
         div(cls := "site-title-nav")(
           (!ctx.isAppealUser).option(topnavToggle),
           h1(cls := "site-title")(
-            if ctx.kid then span(title := trans.kidMode.txt(), cls := "kiddo")(":)")
+            if (ctx.kid) span(title := trans.kidMode.txt(), cls := "kiddo")(":)")
             else ctx.isBot.option(botImage),
             a(href := "/")(
               "playstrategy",
-              span(if netConfig.isProd then ".org" else ".dev")
+              span(if (netConfig.isProd) ".org" else ".dev")
             )
           ),
           ctx.blind.option(h2("Navigation")),
@@ -398,7 +396,7 @@ object layout {
           (!ctx.isAppealUser).option(clinput),
           reports,
           teamRequests,
-          if ctx.isAppealUser then
+          if (ctx.isAppealUser)
             postForm(action := routes.Auth.logout)(
               submitButton(cls := "button button-red link")(trans.logOut())
             )

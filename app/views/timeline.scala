@@ -35,7 +35,7 @@ object timeline {
     entries.filter(e => e.typ != "blog-post")
 
   private def filterEntries(entries: Vector[lila.timeline.Entry])(implicit ctx: Context) =
-    if ctx.noKid then entries
+    if (ctx.noKid) entries
     else entries.filter(e => e.okForKid)
 
   private def entry(e: lila.timeline.Entry)(implicit ctx: Context) =

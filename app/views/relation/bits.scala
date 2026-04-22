@@ -63,7 +63,7 @@ object bits {
 
   private def pagTable(pager: Paginator[Related], call: Call)(implicit ctx: Context) =
     table(cls := "slist")(
-      if pager.nbResults > 0 then
+      if (pager.nbResults > 0)
         tbody(cls := "infinite-scroll")(
           pager.currentPageResults.map { r =>
             tr(cls := "paginated")(

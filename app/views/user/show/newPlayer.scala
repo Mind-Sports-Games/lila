@@ -22,7 +22,7 @@ object newPlayer {
         )
       ),
       p(
-        if u.kid then trans.onboarding.kidModeEnabled.txt()
+        if (u.kid) trans.onboarding.kidModeEnabled.txt()
         else
           frag(
             trans.onboarding.willAChildUse(

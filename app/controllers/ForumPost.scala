@@ -13,7 +13,7 @@ final class ForumPost(env: Env) extends LilaController(env) with ForumController
   def search(text: String, page: Int) =
     OpenBody { implicit ctx =>
       NotForKids {
-        if text.trim.isEmpty then Redirect(routes.ForumCateg.index).fuccess
+        if (text.trim.isEmpty) Redirect(routes.ForumCateg.index).fuccess
         else env.forumSearch(text, page, ctx.troll) map { html.forum.search(text, _) }
       }
     }
@@ -24,8 +24,8 @@ final class ForumPost(env: Env) extends LilaController(env) with ForumController
         CategGrantWrite(categSlug) {
           implicit val req = ctx.body
           OptionFuResult(topicApi.show(categSlug, slug, page, ctx.me)) { case (categ, topic, posts) =>
-            if topic.closed then fuccess(BadRequest("This topic is closed"))
-            else if topic.isOld then fuccess(BadRequest("This topic is archived"))
+            if (topic.closed) fuccess(BadRequest("This topic is closed"))
+            else if (topic.isOld) fuccess(BadRequest("This topic is archived"))
             else
               categ.team.fold(fuFalse) { t => env.team.cached.isLeader(t, me.id) } flatMap { inOwnTeam =>
                 forms
@@ -79,7 +79,7 @@ final class ForumPost(env: Env) extends LilaController(env) with ForumController
     Auth { implicit ctx => me =>
       postApi.getPost(id) flatMap {
         _ so { post =>
-          if me.id == ~post.userId && !post.erased then
+          if (me.id == ~post.userId && !post.erased)
             postApi.erasePost(post) inject Redirect(routes.ForumPost.redirect(id))
           else
             isGrantedMod(categSlug) flatMap { granted =>

@@ -20,9 +20,9 @@ object captcha {
   def apply(form: lila.common.Form.FormLike, captcha: lila.common.Captcha)(implicit ctx: Context) =
     frag(
       form3.hidden(form("gameId"), captcha.gameId.some),
-      if ctx.blind then form3.hidden(form("move"), captcha.solutions.head.some)
+      if (ctx.blind) form3.hidden(form("move"), captcha.solutions.head.some)
       else {
-        val url = netBaseUrl + routes.Round.watcher(captcha.gameId, if captcha.p1 then "p1" else "p2")
+        val url = netBaseUrl + routes.Round.watcher(captcha.gameId, if (captcha.p1) "p1" else "p2")
         div(
           cls := List(
             "captcha form-group" -> true,
@@ -44,7 +44,7 @@ object captcha {
           ),
           div(cls := "captcha-explanation")(
             label(cls := "form-label")(
-              if captcha.p1 then trans.playerIndexCheckmatesInOneMove(trans.white.txt())
+              if (captcha.p1) trans.playerIndexCheckmatesInOneMove(trans.white.txt())
               else trans.playerIndexCheckmatesInOneMove(trans.black.txt())
             ),
             br,

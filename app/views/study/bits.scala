@@ -13,8 +13,8 @@ object bits {
 
   def orderSelect(order: lila.study.Order, active: String, url: String => Call)(implicit ctx: Context) = {
     val orders =
-      if active == "all" then Order.withoutSelector
-      else if active.startsWith("topic") then Order.allWithMine
+      if (active == "all") Order.withoutSelector
+      else if (active.startsWith("topic")) Order.allWithMine
       else Order.all
     views.html.base.bits.mselect(
       "orders",
@@ -58,7 +58,7 @@ object bits {
                 " "
               )
             ),
-            iconTag(if s.liked then "" else ""),
+            iconTag(if (s.liked) "" else ""),
             " ",
             s.study.likes.value,
             " • ",
@@ -78,7 +78,7 @@ object bits {
           s.study.members.members.values
             .take(4)
             .map { m =>
-              li(cls := "text", dataIcon := (if m.canContribute then "" else "v"))(usernameOrId(m.id))
+              li(cls := "text", dataIcon := (if (m.canContribute) "" else "v"))(usernameOrId(m.id))
             }
             .toList
         )

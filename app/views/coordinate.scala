@@ -35,7 +35,7 @@ object coordinate {
         div(cls := "coord-trainer__side")(
           div(cls := "box")(
             h1(trans.coordinates.coordinates()),
-            if ctx.isAuth then
+            if (ctx.isAuth)
               scoreOption.map { score =>
                 div(cls := "scores")(scoreCharts(score))
               }

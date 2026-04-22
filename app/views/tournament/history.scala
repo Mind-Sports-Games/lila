@@ -37,7 +37,7 @@ object history {
       )
     }
 
-  private def nameOf(f: Freq) = if f == Freq.Weekend then "Elite" else f.display
+  private def nameOf(f: Freq) = if (f == Freq.Weekend) "Elite" else f.display
 
   private val allFreqs = List(
     Freq.Annual,

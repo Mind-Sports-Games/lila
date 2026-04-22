@@ -82,7 +82,7 @@ final class Clas(
             Ok(views.html.clas.studentDashboard(clas, wall, teachers, students))
           },
         orDefault = _ =>
-          if isGranted(_.UserModView) then
+          if (isGranted(_.UserModView))
             env.clas.api.clas.byId(lila.clas.Clas.Id(id)) flatMap {
               _ so { clas =>
                 env.clas.api.student.allWithUsers(clas) flatMap { students =>
@@ -101,14 +101,14 @@ final class Clas(
       forStudent: (lila.clas.Clas, List[lila.clas.Student.WithUser]) => Fu[Result],
       orDefault: Context => Fu[Result] = notFound(using _)
   )(implicit ctx: Context): Fu[Result] =
-    (if isGranted(_.Teacher) then env.clas.api.clas.isTeacherOf(me, lila.clas.Clas.Id(id))
+    (if (isGranted(_.Teacher)) env.clas.api.clas.isTeacherOf(me, lila.clas.Clas.Id(id))
      else fuFalse) flatMap {
       case true => forTeacher
       case _    =>
         env.clas.api.clas.byId(lila.clas.Clas.Id(id)) flatMap {
           _ so { clas =>
             env.clas.api.student.activeWithUsers(clas) flatMap { students =>
-              if students.exists(_.student.is(me)) then forStudent(clas, students)
+              if (students.exists(_.student.is(me))) forStudent(clas, students)
               else orDefault(ctx)
             }
           }
@@ -179,7 +179,7 @@ final class Clas(
               env.clas.api.student.activeWithUsers(clas) flatMap { students =>
                 Reasonable(clas, students, "notify") {
                   val url  = routes.Clas.show(clas.id.value).url
-                  val full = if text.contains(url) then text else s"$text\n\n${env.net.baseUrl}$url"
+                  val full = if (text.contains(url)) text else s"$text\n\n${env.net.baseUrl}$url"
                   env.msg.api
                     .multiPost(me, Source(students.map(_.user.id)), full)
                     .addEffect { nb =>
@@ -274,7 +274,7 @@ final class Clas(
 
   def studentForm(id: String) =
     Secure(_.Teacher) { implicit ctx => me =>
-      if getBool("gen") then
+      if (getBool("gen"))
         env.clas.nameGenerator() map {
           Ok(_)
         }
@@ -502,7 +502,7 @@ final class Clas(
     Secure(_.Teacher) { implicit ctx => me =>
       WithClassAndStudents(me, id) { (clas, students) =>
         WithStudent(clas, username) { s =>
-          if s.student.managed then
+          if (s.student.managed)
             Ok(views.html.clas.student.release(clas, students, s, env.clas.forms.student.release)).fuccess
           else Redirect(routes.Clas.studentShow(clas.id.value, s.user.username)).fuccess
         }
@@ -513,7 +513,7 @@ final class Clas(
     SecureBody(_.Teacher) { implicit ctx => me =>
       WithClassAndStudents(me, id) { (clas, students) =>
         WithStudent(clas, username) { s =>
-          if s.student.managed then
+          if (s.student.managed)
             env.security.forms.preloadEmailDns(using ctx.body, formBinding) >> env.clas.forms.student.release
               .bindFromRequest()(using ctx.body, formBinding)
               .fold(
@@ -570,7 +570,7 @@ final class Clas(
           _ => Redirect(routes.Clas.invitation(id)).fuccess,
           v => {
             val inviteId = lila.clas.ClasInvite.Id(id)
-            if v then
+            if (v)
               env.clas.api.invite.accept(inviteId, me) map {
                 _ so { student =>
                   Redirect(routes.Clas.show(student.clasId.value))
@@ -597,7 +597,7 @@ final class Clas(
   private def Reasonable(clas: lila.clas.Clas, students: List[lila.clas.Student.WithUser], active: String)(
       f: => Fu[Result]
   )(implicit ctx: Context): Fu[Result] =
-    if students.sizeIs <= lila.clas.Clas.maxStudents then f
+    if (students.sizeIs <= lila.clas.Clas.maxStudents) f
     else Unauthorized(views.html.clas.teacherDashboard.unreasonable(clas, students, active)).fuccess
 
   private def WithClass(me: Holder, clasId: String)(
@@ -622,6 +622,6 @@ final class Clas(
     }
 
   private def SafeTeacher(f: => Fu[Result])(implicit ctx: Context): Fu[Result] =
-    if ctx.me.exists(!_.lameOrTroll) then f
+    if (ctx.me.exists(!_.lameOrTroll)) f
     else Redirect(routes.Clas.index).fuccess
 }

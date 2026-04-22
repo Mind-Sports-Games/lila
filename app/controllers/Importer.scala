@@ -60,7 +60,7 @@ final class Importer(env: Env) extends LilaController(env) {
 
   def apiSendGame = {
     def commonImport(req: Request[?], me: Option[lila.user.User]): Fu[Result] =
-      ImportRateLimitPerIP(HTTPRequest.ipAddress(req), cost = if me.isDefined then 1 else 2) {
+      ImportRateLimitPerIP(HTTPRequest.ipAddress(req), cost = if (me.isDefined) 1 else 2) {
         env.importer.forms.importForm
           .bindFromRequest()(using req, formBinding)
           .fold(

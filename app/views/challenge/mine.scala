@@ -32,7 +32,7 @@ object mine {
         c.status match {
           case Status.Created | Status.Offline =>
             div(id := "ping-challenge")(
-              h1(if c.isOpen then c.name | "Open challenge" else trans.challenge.challengeToPlay.txt()),
+              h1(if (c.isOpen) c.name | "Open challenge" else trans.challenge.challengeToPlay.txt()),
               bits.details(c, playerIndex),
               c.destUserId.map { destId =>
                 div(cls := "waiting")(
@@ -41,7 +41,7 @@ object mine {
                   p(trans.waitingForOpponent())
                 )
               } getOrElse {
-                if c.isOpen then
+                if (c.isOpen)
                   div(cls := "waiting")(
                     spinner,
                     p(trans.waitingForOpponent())

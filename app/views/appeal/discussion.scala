@@ -49,7 +49,7 @@ object discussion {
               )
             case Some(Inquiry(mod, _)) if ctx.userId.has(mod) =>
               postForm(action := routes.Appeal.mute(modData.suspect.user.username))(
-                if appeal.isMuted then
+                if (appeal.isMuted)
                   submitButton("Un-mute")(
                     title := "Be notified about user replies again",
                     cls   := "button button-green button-thin"
@@ -103,7 +103,7 @@ object discussion {
       standardFlash(),
       div(cls := "body")(
         appeal.msgs.map { msg =>
-          div(cls := s"appeal__msg appeal__msg--${if appeal `isByMod` msg then "mod" else "suspect"}")(
+          div(cls := s"appeal__msg appeal__msg--${if (appeal `isByMod` msg) "mod" else "suspect"}")(
             div(cls := "appeal__msg__header")(
               renderUser(appeal, msg.by, modData.isDefined),
               momentFromNowOnce(msg.at)
@@ -111,7 +111,7 @@ object discussion {
             div(cls := "appeal__msg__text")(richText(msg.text))
           )
         },
-        if modData.isEmpty && !appeal.canAddMsg then p("Please wait for a moderator to reply.")
+        if (modData.isEmpty && !appeal.canAddMsg) p("Please wait for a moderator to reply.")
         else
           modData
             .fold(true)(_.inquiry.isDefined)
@@ -119,7 +119,7 @@ object discussion {
               renderForm(
                 textForm,
                 action =
-                  if modData.isDefined then routes.Appeal.reply(appeal.id).url
+                  if (modData.isDefined) routes.Appeal.reply(appeal.id).url
                   else routes.Appeal.post.url,
                 isNew = false,
                 presets = modData.map(_.presets)
@@ -129,7 +129,7 @@ object discussion {
     )
 
   private def renderUser(appeal: Appeal, userId: User.ID, asMod: Boolean)(implicit ctx: Context) =
-    if appeal.isAbout(userId) then userIdLink(userId.some, params = if asMod then "?mod" else "")
+    if (appeal.isAbout(userId)) userIdLink(userId.some, params = if (asMod) "?mod" else "")
     else
       span(
         userIdLink(User.playstrategyId.some),
@@ -149,7 +149,7 @@ object discussion {
       form3.globalError(form),
       form3.group(
         form("text"),
-        if isNew then "Create an appeal" else "Add something to the appeal",
+        if (isNew) "Create an appeal" else "Add something to the appeal",
         help = (!isGranted(_.Appeals)).option(frag("Please be concise. Maximum 1000 chars."))
       )(
         form3.textarea(_)(rows := 6)

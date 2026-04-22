@@ -36,14 +36,14 @@ object crosstable {
       },
       matchup map { m =>
         div(cls := "crosstable__matchup", title := trans.currentMatchScore.txt())(ct.users.toList.map { u =>
-          span(cls := m.users.winnerId.map(w => if w == u.id then "win" else "loss"))(m.users.showScore(u.id))
+          span(cls := m.users.winnerId.map(w => if (w == u.id) "win" else "loss"))(m.users.showScore(u.id))
         })
       },
       div(cls := "crosstable__users")(ct.users.toList.map { u =>
         userIdLink(u.id.some, withOnline = false)
       }),
       div(cls := "crosstable__score", title := trans.lifetimeScore.txt())(ct.users.toList.map { u =>
-        span(cls := ct.users.winnerId.map(w => if w == u.id then "win" else "loss"))(ct.showScore(u.id))
+        span(cls := ct.users.winnerId.map(w => if (w == u.id) "win" else "loss"))(ct.showScore(u.id))
       })
     )
   }

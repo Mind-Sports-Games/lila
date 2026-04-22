@@ -12,7 +12,7 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
     extends LilaController(env) {
 
   private def form(implicit ctx: Context) =
-    if isGranted(_.Appeals) then lila.appeal.Appeal.modForm
+    if (isGranted(_.Appeals)) lila.appeal.Appeal.modForm
     else lila.appeal.Appeal.form
 
   def home =
@@ -22,7 +22,7 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
 
   def landing =
     Auth { implicit ctx => _ =>
-      if ctx.isAppealUser || isGranted(_.Appeals) then {
+      if (ctx.isAppealUser || isGranted(_.Appeals)) {
         pageHit
         OptionOk(prismicC.getPage("appeal-landing")) { case (doc, resolver) =>
           views.html.site.page.lone(doc, resolver): scalatags.Text.Frag

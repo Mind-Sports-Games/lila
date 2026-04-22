@@ -41,7 +41,7 @@ object ofPlayer {
           div(cls := "puzzle-of-player__results")(
             (user, puzzles) match {
               case (Some(u), Some(pager)) =>
-                if pager.nbResults == 0 && ctx.is(u) then
+                if (pager.nbResults == 0 && ctx.is(u))
                   frag(
                     bits.variantSelector(
                       variant,

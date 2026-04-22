@@ -36,12 +36,12 @@ final class Analyse(
     }
 
   def replay(pov: Pov, userTv: Option[lila.user.User])(implicit ctx: Context) =
-    if HTTPRequest.isCrawler(ctx.req) then replayBot(pov)
+    if (HTTPRequest.isCrawler(ctx.req)) replayBot(pov)
     else
       env.game.gameRepo.initialFen(pov.gameId) flatMap { initialFen =>
         gameC.preloadUsers(pov.game) >> redirectAtFen(pov, initialFen) {
           (env.analyse.analyser.get(pov.game)) zip
-            (if !pov.game.metadata.analysed then env.fishnet.api.userAnalysisExists(pov.gameId)
+            (if (!pov.game.metadata.analysed) env.fishnet.api.userAnalysisExists(pov.gameId)
              else fuccess(false)) zip
             (pov.game.simulId.fold(fuccess(none[lila.simul.Simul]))(env.simul.repo.find)) zip
             roundC.getWatcherChat(pov.game) zip

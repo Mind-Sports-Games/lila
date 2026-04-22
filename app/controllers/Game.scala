@@ -25,7 +25,7 @@ final class Game(
   def delete(gameId: String) =
     Auth { implicit ctx => me =>
       OptionFuResult(env.game.gameRepo.game(gameId)) { game =>
-        if game.pgnImport.flatMap(_.user) so (me.id.==) then {
+        if (game.pgnImport.flatMap(_.user) so (me.id.==)) {
           env.hub.bookmark ! lila.hub.actorApi.bookmark.Remove(game.id)
           (env.game.gameRepo.remove(game.id)) >>
             (env.analyse.analysisRepo.remove(game.id)) >>
@@ -46,8 +46,8 @@ final class Game(
       case Some(game) =>
         lila.mon.`export`.pgn.game.increment()
         val config = GameApiV2.OneConfig(
-          format = if HTTPRequest.acceptsJson(req) then { GameApiV2.Format.JSON }
-          else if game.gameRecordFormat == "pgn" then { GameApiV2.Format.PGN }
+          format = if (HTTPRequest.acceptsJson(req)) { GameApiV2.Format.JSON }
+          else if (game.gameRecordFormat == "pgn") { GameApiV2.Format.PGN }
           else { GameApiV2.Format.SGF },
           imported = getBool("imported", req),
           flags = requestPgnFlags(req, extended = true),
@@ -195,8 +195,8 @@ final class Game(
           case Some(spg) => {
             val config = GameApiV2.ByIdsConfig(
               ids = spg.allGameIds.toSeq,
-              format = if HTTPRequest.acceptsJson(req) then { GameApiV2.Format.JSON }
-              else if game.gameRecordFormat == "pgn" then { GameApiV2.Format.PGN }
+              format = if (HTTPRequest.acceptsJson(req)) { GameApiV2.Format.JSON }
+              else if (game.gameRecordFormat == "pgn") { GameApiV2.Format.PGN }
               else { GameApiV2.Format.SGF },
               flags = requestPgnFlags(req, extended = false),
               perSecond = MaxPerSecond(30),

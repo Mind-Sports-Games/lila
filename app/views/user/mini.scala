@@ -34,7 +34,7 @@ object mini {
           ),
           ping map bits.signalBars
         ),
-        if u.lame && !ctx.me.contains(u) && !isGranted(_.UserModView) then
+        if (u.lame && !ctx.me.contains(u) && !isGranted(_.UserModView))
           div(cls := "upt__info__warning")(trans.thisAccountViolatedTos())
         else div(cls := "upt__info__ratings")(u.best8Perfs map { showPerfRating(u, _) })
       ),

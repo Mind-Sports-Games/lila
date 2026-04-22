@@ -57,7 +57,7 @@ object studentDashboard {
           }
         )
       ),
-      if c.wall.nonEmpty then div(cls := "box__pad clas-wall")(wall),
+      if (c.wall.nonEmpty) div(cls := "box__pad clas-wall")(wall),
       div(cls := "students")(studentList(students))
     )
 
@@ -98,7 +98,7 @@ object studentDashboard {
     )
 
   private def challengeTd(user: lila.user.User)(implicit ctx: Context) =
-    if ctx.is(user) then td
+    if (ctx.is(user)) td
     else {
       val online = isOnline(user.id)
       td(

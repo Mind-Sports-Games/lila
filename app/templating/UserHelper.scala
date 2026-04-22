@@ -13,8 +13,8 @@ import lila.user.{ Title, User }
 trait UserHelper { self: I18nHelper & StringHelper & NumberHelper =>
 
   def ratingProgress(progress: Int): Option[Frag] =
-    if progress > 0 then goodTag(cls := "rp")(progress).some
-    else if progress < 0 then badTag(cls := "rp")(math.abs(progress)).some
+    if (progress > 0) goodTag(cls := "rp")(progress).some
+    else if (progress < 0) badTag(cls := "rp")(math.abs(progress)).some
     else none
 
   val topBarSortedPerfTypes: List[PerfType] =
@@ -31,7 +31,7 @@ trait UserHelper { self: I18nHelper & StringHelper & NumberHelper =>
       dataIcon := icon,
       cls      := "text"
     )(
-      if clueless then frag(nbsp, nbsp, nbsp, if nb < 1 then "-" else "?")
+      if (clueless) frag(nbsp, nbsp, nbsp, if (nb < 1) "-" else "?")
       else frag(rating, provisional.option("?"))
     )
 
@@ -145,7 +145,7 @@ trait UserHelper { self: I18nHelper & StringHelper & NumberHelper =>
       href := userUrl(username, params = params)
     )(
       dataIcon.map(iconTag),
-      withOnline so (if modIcon then moderatorIcon else lineIcon(isPatron)),
+      withOnline so (if (modIcon) moderatorIcon else lineIcon(isPatron)),
       titleTag(title),
       truncate.fold(username)(username.take)
     )
@@ -231,9 +231,9 @@ trait UserHelper { self: I18nHelper & StringHelper & NumberHelper =>
       withOnline: Boolean,
       withPowerTip: Boolean = true
   ): List[(String, Boolean)] =
-    if userId == "ghost" then List("user-link" -> true, ~cssClass -> cssClass.isDefined)
+    if (userId == "ghost") List("user-link" -> true, ~cssClass -> cssClass.isDefined)
     else
-      (withOnline so List((if isOnline(userId) then "online" else "offline") -> true)) ::: List(
+      (withOnline so List((if (isOnline(userId)) "online" else "offline") -> true)) ::: List(
         "user-link" -> true,
         ~cssClass   -> cssClass.isDefined,
         "ulpt"      -> withPowerTip
@@ -242,7 +242,7 @@ trait UserHelper { self: I18nHelper & StringHelper & NumberHelper =>
   def userGameFilterTitle(u: User, nbs: UserInfo.NbGames, filter: GameFilter)(implicit
       lang: Lang
   ): Frag =
-    if filter == GameFilter.Search then frag(br, trans.search.advancedSearch())
+    if (filter == GameFilter.Search) frag(br, trans.search.advancedSearch())
     else splitNumber(userGameFilterTitleNoTag(u, nbs, filter))
 
   private def transLocalize(key: I18nKey, number: Int)(implicit lang: Lang) =
@@ -281,9 +281,9 @@ trait UserHelper { self: I18nHelper & StringHelper & NumberHelper =>
   def patronIcon(implicit lang: Lang): Frag =
     i(cls := "line patron", title := trans.patron.playstrategyPatron.txt())
   val moderatorIcon: Frag = i(cls := "line moderator", title := "PlayStrategy Mod")
-  private def lineIcon(patron: Boolean)(implicit lang: Lang): Frag = if patron then patronIcon else lineIcon
+  private def lineIcon(patron: Boolean)(implicit lang: Lang): Frag = if (patron) patronIcon else lineIcon
   private def lineIcon(user: Option[LightUser])(implicit lang: Lang): Frag = lineIcon(user.so(_.isPatron))
   def lineIcon(user: LightUser)(implicit lang: Lang): Frag                 = lineIcon(user.isPatron)
   def lineIcon(user: User)(implicit lang: Lang): Frag                      = lineIcon(user.isPatron)
-  def lineIconChar(user: User): Frag = if user.isPatron then patronIconChar else lineIconChar
+  def lineIconChar(user: User): Frag = if (user.isPatron) patronIconChar else lineIconChar
 }

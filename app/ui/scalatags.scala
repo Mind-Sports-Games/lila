@@ -144,7 +144,7 @@ trait ScalatagsExtensions {
   implicit val classesAttr: AttrValue[List[(String, Boolean)]] = new AttrValue[List[(String, Boolean)]] {
     def apply(t: scalatags.text.Builder, a: Attr, m: List[(String, Boolean)]): Unit = {
       val cls = m collect { case (s, true) => s } mkString " "
-      if cls.nonEmpty then t.setAttr(a.name, scalatags.text.Builder.GenericAttrValueSource(cls))
+      if (cls.nonEmpty) t.setAttr(a.name, scalatags.text.Builder.GenericAttrValueSource(cls))
     }
   }
 
@@ -169,7 +169,7 @@ trait ScalatagsExtensions {
   }
 
   def titleOrText(blind: Boolean, v: String): Modifier = (t: Builder) =>
-    if blind then t.addChild(scalatags.Text.StringFrag(v))
+    if (blind) t.addChild(scalatags.Text.StringFrag(v))
     else t.setAttr("title", Builder.GenericAttrValueSource(v))
 
   def titleOrText(v: String)(implicit ctx: Context): Modifier = titleOrText(ctx.blind, v)

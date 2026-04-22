@@ -60,7 +60,7 @@ object list {
                 td(
                   r.inquiry match {
                     case None =>
-                      if r.processedBy.isDefined then
+                      if (r.processedBy.isDefined)
                         postForm(action := routes.Report.inquiry(r.id), cls := "reopen")(
                           submitButton(dataIcon := "G", cls := "text button button-metal")("Reopen")
                         )

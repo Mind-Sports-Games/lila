@@ -78,7 +78,7 @@ final class Editor(env: Env) extends LilaController(env) {
     Open { implicit ctx =>
       OptionResult(env.game.gameRepo.game(id)) { game =>
         Redirect(
-          if game.playable then routes.Round.watcher(game.id, game.variant.startPlayer.name).url
+          if (game.playable) routes.Round.watcher(game.id, game.variant.startPlayer.name).url
           else
             editorUrl(
               get("fen").fold(Forsyth.>>(game.variant.gameLogic, game.stratGame))(fen =>
@@ -91,6 +91,6 @@ final class Editor(env: Env) extends LilaController(env) {
     }
 
   private[controllers] def editorUrl(fen: FEN, variant: Variant): String =
-    if fen.value == ChessForsyth.initial.value && variant.key == "standard" then routes.Editor.index.url
+    if (fen.value == ChessForsyth.initial.value && variant.key == "standard") routes.Editor.index.url
     else routes.Editor.load(fen.value).url + s"?variant=${variant.key}"
 }

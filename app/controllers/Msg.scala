@@ -18,7 +18,7 @@ final class Msg(
         },
         api = v =>
           {
-            if v >= 5 then inboxJson(me)
+            if (v >= 5) inboxJson(me)
             else env.msg.compat.inbox(me, getInt("page"))
           } map { Ok(_) }
       )
@@ -26,7 +26,7 @@ final class Msg(
 
   def convo(username: String, before: Option[Long] = None) =
     Auth { implicit ctx => me =>
-      if username == "new" then Redirect(get("user").fold(routes.Msg.home)(routes.Msg.convo(_))).fuccess
+      if (username == "new") Redirect(get("user").fold(routes.Msg.home)(routes.Msg.convo(_))).fuccess
       else
         env.msg.api.convoWith(me, username, before).flatMap {
           case None =>
@@ -42,7 +42,7 @@ final class Msg(
               },
               api = v =>
                 {
-                  if v >= 5 then newJson
+                  if (v >= 5) newJson
                   else fuccess(env.msg.compat.thread(me, c))
                 } map { Ok(_) }
             )

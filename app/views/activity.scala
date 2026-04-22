@@ -44,13 +44,13 @@ object activity {
       }
     )
 
-  private def subCount(count: Int) = if count >= maxSubEntries then s"$count+" else s"$count"
+  private def subCount(count: Int) = if (count >= maxSubEntries) s"$count+" else s"$count"
 
   private def renderPatron(p: Patron)(implicit ctx: Context) =
     div(cls := "entry plan")(
       iconTag(""),
       div(
-        if p.months == 0 then a(href := routes.Plan.index)("Lifetime Patron!")
+        if (p.months == 0) a(href := routes.Plan.index)("Lifetime Patron!")
         else
           trans.activity.supportedNbMonths.plural(p.months, p.months, a(href := routes.Plan.index)("Patron"))
       )
@@ -208,7 +208,7 @@ object activity {
       div(
         List(all.in.map(_ -> true), all.out.map(_ -> false)).flatten map { case (f, in) =>
           frag(
-            if in then trans.activity.gainedNbFollowers.pluralSame(f.actualNb)
+            if (in) trans.activity.gainedNbFollowers.pluralSame(f.actualNb)
             else trans.activity.followedNbPlayers.pluralSame(f.actualNb),
             subTag(
               fragList(f.ids.map(id => userIdLink(id.some))),
@@ -227,7 +227,7 @@ object activity {
       div(
         simuls.groupBy(_.isHost(u.some)).toSeq.map { case (isHost, simuls) =>
           frag(
-            if isHost then trans.activity.hostedNbSimuls.pluralSame(simuls.size)
+            if (isHost) trans.activity.hostedNbSimuls.pluralSame(simuls.size)
             else trans.activity.joinedNbSimuls.pluralSame(simuls.size),
             subTag(
               simuls.map { s =>
@@ -355,7 +355,7 @@ object activity {
     ratingTag(r.after.value, ratingProgress(r.diff))
 
   private def scoreStr(tag: String, p: Int, name: lila.i18n.I18nKey)(implicit ctx: Context) =
-    if p == 0 then ""
+    if (p == 0) ""
     else s"""<$tag>${wrapNumber(name.pluralSameTxt(p))}</$tag>"""
 
   private val wrapNumberRegex         = """(\d++)""".r

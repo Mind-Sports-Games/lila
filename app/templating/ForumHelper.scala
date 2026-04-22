@@ -27,6 +27,6 @@ trait ForumHelper { self: UserHelper & StringHelper & HasEnv =>
       withOnline: Boolean = true,
       modIcon: Boolean = false
   )(implicit lang: Lang): Frag =
-    if post.erased then span(cls := "author")("<erased>")
+    if (post.erased) span(cls := "author")("<erased>")
     else userIdLink(post.userId, cssClass = cssClass, withOnline = withOnline, modIcon = modIcon)
 }

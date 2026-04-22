@@ -71,7 +71,7 @@ final class Auth(
   private def authRecovery(implicit ctx: Context): PartialFunction[Throwable, Fu[Result]] = {
     case lila.security.SecurityApi.MustConfirmEmail(_) =>
       fuccess {
-        if HTTPRequest.isXhr(ctx.req) then Ok(s"ok:${routes.Auth.checkYourEmail}")
+        if (HTTPRequest.isXhr(ctx.req)) Ok(s"ok:${routes.Auth.checkYourEmail}")
         else BadRequest(accountC.renderCheckYourEmail)
       }
   }
@@ -89,7 +89,7 @@ final class Auth(
 
   def authenticate =
     OpenBody { implicit ctx =>
-      def redirectTo(url: String) = if HTTPRequest.isXhr(ctx.req) then Ok(s"ok:$url") else Redirect(url)
+      def redirectTo(url: String) = if (HTTPRequest.isXhr(ctx.req)) Ok(s"ok:$url") else Redirect(url)
       Firewall {
         implicit val req = ctx.body
         val referrer     = get("referrer").filterNot(env.api.referrerRedirect.sillyLoginReferrers.contains)
@@ -221,7 +221,7 @@ final class Auth(
       ctx: Context
   ): Funit = {
     garbageCollect(user, email)
-    if sendWelcomeEmail then env.security.automaticEmail.welcome(user, email)
+    if (sendWelcomeEmail) env.security.automaticEmail.welcome(user, email)
     env.pref.api.saveNewUserPrefs(user, ctx.req)
   }
 
@@ -317,7 +317,7 @@ final class Auth(
           for {
             otherIds <- api.recentUserIdsByFingerHash(hash).map(_.filter(me.id.!=))
             _        <-
-              if otherIds.sizeIs >= 2 then
+              if (otherIds.sizeIs >= 2)
                 env.user.repo.countLameOrTroll(otherIds).flatMap {
                   case nb if nb >= 2 && nb >= otherIds.size / 2 => env.report.api.autoAltPrintReport(me.id)
                   case _                                        => funit
@@ -342,7 +342,7 @@ final class Auth(
     OpenBody { implicit ctx =>
       implicit val req = ctx.body
       env.security.hcaptcha.verify() flatMap { captcha =>
-        if captcha.ok then
+        if (captcha.ok)
           forms.passwordReset.form
             .bindFromRequest()
             .fold(
@@ -428,7 +428,7 @@ final class Auth(
       Firewall {
         implicit val req = ctx.body
         env.security.hcaptcha.verify() flatMap { captcha =>
-          if captcha.ok then
+          if (captcha.ok)
             forms.magicLink.form
               .bindFromRequest()
               .fold(
@@ -497,7 +497,7 @@ final class Auth(
 
   def loginWithToken(token: String) =
     Open { implicit ctx =>
-      if ctx.isAuth then Redirect(getReferrer).fuccess
+      if (ctx.isAuth) Redirect(getReferrer).fuccess
       else
         Firewall {
           consumingToken(token) { user =>
@@ -510,7 +510,7 @@ final class Auth(
 
   def loginWithTokenPost(token: String, @annotation.nowarn("msg=unused") referrer: Option[String]) =
     Open { implicit ctx =>
-      if ctx.isAuth then Redirect(getReferrer).fuccess
+      if (ctx.isAuth) Redirect(getReferrer).fuccess
       else
         Firewall {
           consumingToken(token) { authenticateUser(_) }

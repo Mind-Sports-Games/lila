@@ -188,7 +188,7 @@ object tree {
             ),
             p("A few things we can suggest are:"),
             ul(
-              li("Don't send a challenge if you don't want to play and then abort the game."),
+              li("Don't send a challenge if (you don't want to play and) abort the game."),
               li(
                 "If you don't want to face lower or higher rated opponents, set a rating range on your seek."
               ),
@@ -238,18 +238,18 @@ object tree {
 
   def apply(me: User, playban: Boolean)(implicit ctx: Context) =
     bits.layout("Appeal a moderation decision") {
-      val query = if isGranted(_.Appeals) then ctx.req.queryString.toMap else Map.empty[String, Seq[String]]
+      val query = if (isGranted(_.Appeals)) ctx.req.queryString.toMap else Map.empty[String, Seq[String]]
       main(cls := "page page-small box box-pad appeal")(
         h1("Appeal"),
         div(cls := "nav-tree")(
-          if me.disabled || query.contains("alt") then altScreen
+          if (me.disabled || query.contains("alt")) altScreen
           else
             renderNode(
               {
-                if playban || query.contains("playban") then playbanMenu
-                else if me.marks.engine || query.contains("engine") then engineMenu
-                else if me.marks.boost || query.contains("boost") then boostMenu
-                else if me.marks.troll || query.contains("shadowban") then muteMenu
+                if (playban || query.contains("playban")) playbanMenu
+                else if (me.marks.engine || query.contains("engine")) engineMenu
+                else if (me.marks.boost || query.contains("boost")) boostMenu
+                else if (me.marks.troll || query.contains("shadowban")) muteMenu
                 else cleanMenu
               },
               none

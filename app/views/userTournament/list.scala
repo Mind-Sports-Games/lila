@@ -18,7 +18,7 @@ object list {
       count: String,
       shieldLeaderboard: Boolean = false
   )(implicit lang: Lang) =
-    if pager.nbResults == 0 then div(cls := "box-pad")(u.username, " hasn't played in any tournament yet!")
+    if (pager.nbResults == 0) div(cls := "box-pad")(u.username, " hasn't played in any tournament yet!")
     else
       div(cls := "tournament-list")(
         table(cls := "slist")(
@@ -28,7 +28,7 @@ object list {
               th(
                 h1(
                   userLink(u, withOnline = true),
-                  if shieldLeaderboard then a(href := routes.Tournament.shields)(" shield leaderboard"),
+                  if (shieldLeaderboard) a(href := routes.Tournament.shields)(" shield leaderboard"),
                   " tournaments"
                 )
               ),
@@ -47,7 +47,7 @@ object list {
                     span(cls := "setup")(
                       e.tour.clock.show,
                       " • ",
-                      if e.tour.variant.exotic then VariantKeys.variantName(e.tour.variant)
+                      if (e.tour.variant.exotic) VariantKeys.variantName(e.tour.variant)
                       else e.tour.perfType.trans,
                       " • ",
                       momentFromNow(e.tour.startsAt)
@@ -55,7 +55,7 @@ object list {
                   )
                 ),
                 td(cls := "games")(e.entry.nbGames),
-                td(cls := "score")(if shieldLeaderboard then e.entry.metaPoints else e.entry.score),
+                td(cls := "score")(if (shieldLeaderboard) e.entry.metaPoints else e.entry.score),
                 td(cls := "rank")(strong(e.entry.rank), " / ", e.tour.nbPlayers)
               )
             },

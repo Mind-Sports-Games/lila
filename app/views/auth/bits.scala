@@ -15,14 +15,14 @@ object bits {
       ctx: Context
   ) =
     frag(
-      form3.group(username, if register then trans.username() else trans.usernameOrEmail()) { f =>
+      form3.group(username, if (register) trans.username() else trans.usernameOrEmail()) { f =>
         frag(
           form3.input(f)(autofocus, required, autocomplete := "username"),
           p(cls := "error username-exists none")(trans.usernameAlreadyUsed())
         )
       },
       form3.passwordModified(password, trans.password())(
-        autocomplete := (if register then "new-password" else "current-password")
+        autocomplete := (if (register) "new-password" else "current-password")
       ),
       register.option(form3.passwordComplexityMeter(trans.newPasswordStrength())),
       emailOption.map { email =>

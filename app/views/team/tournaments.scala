@@ -60,10 +60,10 @@ object tournaments {
                   span(cls := "setup")(
                     t.clock.show,
                     " • ",
-                    if t.variant.exotic then VariantKeys.variantName(t.variant) else t.perfType.trans,
+                    if (t.variant.exotic) VariantKeys.variantName(t.variant) else t.perfType.trans,
                     t.position.isDefined.option(frag(" • ", trans.thematic())),
                     " • ",
-                    if t.handicapped then trans.handicappedTournament()
+                    if (t.handicapped) trans.handicappedTournament()
                     else t.mode.fold(trans.casualTournament, trans.ratedTournament)(),
                     " • ",
                     t.durationString
@@ -75,16 +75,16 @@ object tournaments {
                   span(cls := "setup")(
                     s.clock.show,
                     " • ",
-                    if s.isMedley then trans.medley.txt()
-                    else if s.variant.exotic then
+                    if (s.isMedley) trans.medley.txt()
+                    else if (s.variant.exotic)
                       s.settings.backgammonPoints.fold("")(p => s"${p}pt ") + VariantKeys.variantName(
                         s.variant
                       )
                     else s.perfType.trans,
                     " • ",
-                    if s.settings.handicapped then trans.handicappedTournament()
-                    else if s.settings.mcmahon then trans.mcmahon()
-                    else if s.settings.rated then trans.ratedTournament()
+                    if (s.settings.handicapped) trans.handicappedTournament()
+                    else if (s.settings.mcmahon) trans.mcmahon()
+                    else if (s.settings.rated) trans.ratedTournament()
                     else trans.casualTournament()
                   )
                 )
@@ -115,6 +115,6 @@ object tournaments {
     )
 
   private def renderStartsAt(any: TeamInfo.AnyTour)(implicit lang: Lang): Frag =
-    if any.isEnterable && any.startsAt.isBeforeNow then trans.playingRightNow()
+    if (any.isEnterable && any.startsAt.isBeforeNow) trans.playingRightNow()
     else momentFromNowOnce(any.startsAt)
 }

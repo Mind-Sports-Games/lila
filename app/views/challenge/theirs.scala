@@ -25,7 +25,7 @@ object theirs {
           case Status.Created | Status.Offline =>
             frag(
               h1(
-                if c.isOpen then c.name | "Open Challenge"
+                if (c.isOpen) c.name | "Open Challenge"
                 else
                   user.fold[Frag]("Anonymous")(u =>
                     frag(
@@ -43,12 +43,12 @@ object theirs {
                   views.html.board.bits.miniForVariant(fen, c.variant, !c.finalPlayerIndex)(div)
                 )
               },
-              if playerIndex.map(Challenge.PlayerIndexChoice.apply).contains(c.playerIndexChoice) then
+              if (playerIndex.map(Challenge.PlayerIndexChoice.apply).contains(c.playerIndexChoice))
                 badTag(
                   // very rare message, don't translate
                   s"You have the wrong playerIndex link for this open challenge. The ${playerIndex.so(_.name)} player has already joined."
                 )
-              else if !c.mode.rated || ctx.isAuth then {
+              else if (!c.mode.rated || ctx.isAuth) {
                 frag(
                   (c.mode.rated && c.unlimited).option(badTag(trans.bewareTheGameIsRatedButHasNoClock())),
                   postForm(cls := "accept", action := routes.Challenge.accept(c.id, playerIndex.map(_.name)))(

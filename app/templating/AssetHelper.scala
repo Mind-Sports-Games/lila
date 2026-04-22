@@ -24,7 +24,7 @@ trait AssetHelper { self: I18nHelper & SecurityHelper =>
   def manifest: AssetManifest
   def assetVersion = AssetVersion.current
 
-  def updateManifest() = if !env.net.isProd then env.web.manifest.update()
+  def updateManifest() = if (!env.net.isProd) env.web.manifest.update()
 
   def assetUrl(path: String): String =
     s"$assetBaseUrl/assets/${manifest.hashed(path).getOrElse(s"_$assetVersion/$path")}"
@@ -42,7 +42,7 @@ trait AssetHelper { self: I18nHelper & SecurityHelper =>
   private def cssAt(path: String): Frag =
     link(href := s"$assetBaseUrl/assets/${path}", rel := "stylesheet")
   private def cssNameFromManifest(name: String, theme: String = ""): String =
-    if !theme.isEmpty() then s"${manifest.css(s"$name.$theme").getOrElse(s"$name.$theme")}"
+    if (!theme.isEmpty()) s"${manifest.css(s"$name.$theme").getOrElse(s"$name.$theme")}"
     else s"${manifest.css(s"$name").getOrElse(s"$name")}"
 
   private def jsNameFromManifest(key: String): String = manifest.js(key).fold(key)(_.name)
@@ -115,9 +115,9 @@ trait AssetHelper { self: I18nHelper & SecurityHelper =>
     }
 
   def basicCsp(implicit req: RequestHeader): ContentSecurityPolicy = {
-    val assets  = if req.secure then s"https://$assetDomain" else assetDomain.value
+    val assets  = if (req.secure) s"https://$assetDomain" else assetDomain.value
     val sockets = socketDomains map { socketDomain =>
-      val protocol = if req.secure then "wss://" else "ws://"
+      val protocol = if (req.secure) "wss://" else "ws://"
       s"$protocol$socketDomain"
     }
     ContentSecurityPolicy(

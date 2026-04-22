@@ -50,14 +50,14 @@ final class Challenge(
       val mine = justCreated || isMine(c)
       import lila.challenge.Direction
       val direction: Option[Direction] =
-        if mine then Direction.Out.some
-        else if isForMe(c) then Direction.In.some
+        if (mine) Direction.Out.some
+        else if (isForMe(c)) Direction.In.some
         else none
       val json = env.challenge.jsonView.show(c, version, direction)
       negotiate(
         html = {
           val playerIndex = get("playerIndex") flatMap strategygames.Player.fromName
-          if mine then
+          if (mine)
             fuccess {
               error match {
                 case Some(e) => BadRequest(html.challenge.mine(c, json, e.some, playerIndex))
@@ -113,7 +113,7 @@ final class Challenge(
       api.onlineByIdFor(id, me) flatMap {
         _ so { api.accept(_, me.some, none) }
       } flatMap { res =>
-        if res.isDefined then jsonOkResult.fuccess
+        if (res.isDefined) jsonOkResult.fuccess
         else
           env.bot.player.rematchAccept(id, me) flatMap {
             case true => jsonOkResult.fuccess
@@ -130,7 +130,7 @@ final class Challenge(
         _ map { game =>
           env.lilaCookie.cookie(
             AnonCookie.name,
-            game.player(if owner then c.finalPlayerIndex else !c.finalPlayerIndex).id,
+            game.player(if (owner) c.finalPlayerIndex else !c.finalPlayerIndex).id,
             maxAge = AnonCookie.maxAge.some,
             httpOnly = false.some
           )
@@ -175,7 +175,7 @@ final class Challenge(
   def cancel(id: String) =
     Open { implicit ctx =>
       OptionFuResult(api byId id) { c =>
-        if isMine(c) then api.cancel(c)
+        if (isMine(c)) api.cancel(c)
         else notFound
       }
     }
@@ -253,7 +253,7 @@ final class Challenge(
       import play.api.data.Forms.*
       implicit def req: play.api.mvc.Request[?] = ctx.body
       OptionFuResult(api byId id) { c =>
-        if isMine(c) then
+        if (isMine(c))
           Form(
             single(
               "username" -> lila.user.UserForm.historicalUsernameField
@@ -287,7 +287,7 @@ final class Challenge(
         .fold(
           newJsonFormError,
           config => {
-            val cost = if me.isApiHog then 0 else 1
+            val cost = if (me.isApiHog) 0 else 1
             ChallengeIpRateLimit(HTTPRequest.ipAddress(req), cost = cost) {
               ChallengeUserRateLimit(me.id, cost = cost) {
                 env.user.repo.enabledById(userId.toLowerCase) flatMap { destUser =>
@@ -392,7 +392,7 @@ final class Challenge(
       _.fold(
         err => BadRequest(jsonError(err.message)).fuccess,
         scoped =>
-          if scoped.user.is(dest) then acceptOauthChallenge(dest, challenge)(managedBy, message)
+          if (scoped.user.is(dest)) acceptOauthChallenge(dest, challenge)(managedBy, message)
           else BadRequest(jsonError("dest and accept user don't match")).fuccess
       )
     }

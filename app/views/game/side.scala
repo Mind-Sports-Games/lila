@@ -51,14 +51,14 @@ object side {
               div(cls := "header")(
                 div(cls := "setup")(
                   views.html.bookmark.toggle(game, bookmarked),
-                  if game.imported then
+                  if (game.imported)
                     div(
                       a(href := routes.Importer.importGame, title := trans.importGame.txt())("IMPORT"),
                       separator,
-                      if game.variant.exotic then
+                      if (game.variant.exotic)
                         bits.variantLink(
                           game.variant,
-                          (if game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill) then
+                          (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
                              VariantKeys.variantShortName(game.variant)
                            else VariantKeys.variantName(game.variant)).toUpperCase,
                           initialFen = initialFen,
@@ -75,20 +75,20 @@ object side {
                         target := "_blank"
                       )(widgets.showClock(game)),
                       separator,
-                      if game.fromHandicappedTournament then {
+                      if (game.fromHandicappedTournament) {
                         a(
                           cls    := "remove_color",
                           title  := "Handicap info",
                           href   := s"${routes.Page.lonePage("handicaps")}",
                           target := "_blank"
                         )(trans.handicapped.txt())
-                      } else if game.rated then trans.rated.txt()
+                      } else if (game.rated) trans.rated.txt()
                       else trans.casual.txt(),
                       separator,
-                      if game.variant.exotic then
+                      if (game.variant.exotic)
                         bits.variantLink(
                           game.variant,
-                          (if game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill) then
+                          (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
                              VariantKeys.variantShortName(game.variant)
                            else VariantKeys.variantName(game.variant)).toUpperCase,
                           initialFen = initialFen,
@@ -102,7 +102,7 @@ object side {
                 ),
                 game.pgnImport.flatMap(_.date).map(frag(_)) getOrElse {
                   frag(
-                    if game.isBeingPlayed then trans.playingRightNow()
+                    if (game.isBeingPlayed) trans.playingRightNow()
                     else momentFromNowWithPreload(game.createdAt)
                   )
                 }
@@ -145,7 +145,7 @@ object side {
         },
         (initialFen orElse {
           // Chess960 games at position 518 (standard chess start) don't store initialFen
-          if game.variant.key == "chess960" then
+          if (game.variant.key == "chess960")
             Some(FEN.Chess(strategygames.chess.variant.Standard.initialFen))
           else None
         })
@@ -185,7 +185,7 @@ object side {
         tour.map { t =>
           st.section(cls := "game__tournament")(
             a(cls := "text", dataIcon := "g", href := routes.Tournament.show(t.tour.id))(t.tour.name()),
-            if t.tour.isMedley && !t.tour.finalMedleyVariant then {
+            if (t.tour.isMedley && !t.tour.finalMedleyVariant) {
               div(cls := "medley-interval")(
                 span(cls := "clock", dataTime := t.tour.secondsToFinish)(t.tour.clockStatus),
                 span(cls := "text medley-text")(" ("),
@@ -208,14 +208,14 @@ object side {
           )
         },
         swissPairingGames.flatMap { spg =>
-          if spg.nbGamesPerRound > 1 || spg.isMultiPoint then {
+          if (spg.nbGamesPerRound > 1 || spg.isMultiPoint) {
             Some(
               st.section(cls := "game__multi-match")(
                 frag(
-                  if spg.nbGamesPerRound > 1 then trans.multiMatch()
+                  if (spg.nbGamesPerRound > 1) trans.multiMatch()
                   else s"${spg.game.metadata.multiPointState.map(_.target).getOrElse(0)}pt Match",
-                  if spg.isBestOfX then s" (best of ${spg.nbGamesPerRound})"
-                  else if spg.isPlayX then s" (play ${spg.nbGamesPerRound} games)"
+                  if (spg.isBestOfX) s" (best of ${spg.nbGamesPerRound})"
+                  else if (spg.isPlayX) s" (play ${spg.nbGamesPerRound} games)"
                   else "",
                   s" : ${spg.game.p1Player.userId.getOrElse("?")} (${spg.strResultOf(P1)}) vs ${spg.game.p2Player.userId
                       .getOrElse("?")} (${spg.strResultOf(P2)}) : ",
@@ -224,7 +224,7 @@ object side {
                     .zipWithIndex
                     .map {
                       case (mmGame, index) => {
-                        val current = if mmGame.id == game.id then " current" else ""
+                        val current = if (mmGame.id == game.id) " current" else ""
                         a(
                           cls  := s"text glpt${current} mm_game_link",
                           href := routes.Round.watcher(mmGame.id, (!pov.playerIndex).name)

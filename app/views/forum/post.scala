@@ -56,7 +56,7 @@ object post {
             ),
             (!post.erased && ctx.userId.exists(post.shouldShowEditForm))
               .option(a(cls := "mod edit button button-empty text", dataIcon := "m")("Edit")),
-            if !post.erased && ctx.userId.has(~post.userId) then
+            if (!post.erased && ctx.userId.has(~post.userId))
               postForm(action := routes.ForumPost.delete(categ.slug, post.id))(
                 submitButton(
                   cls      := "mod delete button button-empty confirm",
@@ -64,7 +64,7 @@ object post {
                   title    := "Delete"
                 )
               )
-            else if canModCateg then
+            else if (canModCateg)
               a(
                 cls      := "mod delete button button-empty",
                 href     := routes.ForumPost.delete(categ.slug, post.id),
@@ -89,7 +89,7 @@ object post {
         a(cls := "anchor", href := url)(s"#${post.number}")
       ),
       p(cls := "forum-post__message")(
-        if post.erased then "<Comment deleted by user>"
+        if (post.erased) "<Comment deleted by user>"
         else richText(post.text)
       ),
       (!post.erased).option(reactions(post, canReact)),
@@ -130,9 +130,9 @@ object post {
           dataHref := canActuallyReact.option(routes.ForumPost.react(post.id, r, !mine(r)).url),
           cls      := List("mine" -> mine(r), "yes" -> (size > 0), "no" -> (size < 1)),
           title    := {
-            if size > 0 then {
+            if (size > 0) {
               val who =
-                if size > 10 then s"${users take 8 mkString ", "} and ${size - 8} others"
+                if (size > 10) s"${users take 8 mkString ", "} and ${size - 8} others"
                 else users mkString ", "
               s"$who reacted with $r"
             } else r

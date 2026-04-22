@@ -29,7 +29,7 @@ object home {
     views.html.base.layout(
       title = "",
       fullTitle = Some {
-        s"playstrategy.${if netConfig.isProd then "org" else "dev"} • ${trans.playstrategySiteTitleShort.txt()}"
+        s"playstrategy.${if (netConfig.isProd) "org" else "dev"} • ${trans.playstrategySiteTitleShort.txt()}"
       },
       moreJs = frag(
         jsModule("lobby"),
@@ -118,7 +118,7 @@ object home {
         ),
         currentGame.map(bits.currentGameInfo) orElse
           playban.map(bits.playbanInfo) getOrElse {
-            if ctx.blind then blindLobby(blindGames)
+            if (ctx.blind) blindLobby(blindGames)
             else bits.lobbyApp
           },
         div(cls := "lobby__side")(
@@ -145,7 +145,7 @@ object home {
               )
             )
           ),
-          if ctx.isAuth then
+          if (ctx.isAuth)
             div(cls := "timeline")(
               ctx.blind.option(h2("Timeline")),
               views.html.timeline.entries(userTimeline),

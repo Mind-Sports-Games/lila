@@ -169,7 +169,7 @@ final class LilaComponents(
   // eagerly wire up all controllers
   val router: Router = wire[_root_.router.router.Routes]
 
-  if configuration.get[Boolean]("kamon.enabled") then {
+  if (configuration.get[Boolean]("kamon.enabled")) {
     lila.log("boot").info("Kamon is enabled")
     kamon.Kamon.loadModules()
   }

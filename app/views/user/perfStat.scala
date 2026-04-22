@@ -79,7 +79,7 @@ object perfStat {
       h2(
         trans.perfRatingX(
           strong(
-            if perf.glicko.clueless then "?"
+            if (perf.glicko.clueless) "?"
             else decimal(perf.glicko.rating).toString
           )
         ),
@@ -95,7 +95,7 @@ object perfStat {
         ". ",
         percentile.filter(_ != 0.0 && !perf.glicko.provisional).map { percentile =>
           span(cls := "details")(
-            if ctx.is(u) then {
+            if (ctx.is(u)) {
               trans.youAreBetterThanPercentOfPerfTypePlayers(
                 a(href := routes.Stat.ratingDistribution(perfType.key))(strong(percentile, "%")),
                 a(href := routes.Stat.ratingDistribution(perfType.key))(perfType.trans)
@@ -114,8 +114,8 @@ object perfStat {
         progressOverLastXGames(12),
         " ",
         span(cls := "progress")(
-          if perf.progress > 0 then tag("green")(dataIcon := "N")(perf.progress)
-          else if perf.progress < 0 then tag("red")(dataIcon := "M")(-perf.progress)
+          if (perf.progress > 0) tag("green")(dataIcon := "N")(perf.progress)
+          else if (perf.progress < 0) tag("red")(dataIcon := "M")(-perf.progress)
           else "-"
         ),
         ". ",
@@ -190,7 +190,7 @@ object perfStat {
             ),
             tr(cls := "full")(
               th(disconnections()),
-              td(if count.disconnects > count.all * 100 / 15 then tag("red") else emptyFrag)(
+              td(if (count.disconnects > count.all * 100 / 15) tag("red") else emptyFrag)(
                 count.disconnects
               ),
               td(pct(count.disconnects, count.all))
@@ -238,7 +238,7 @@ object perfStat {
     div(cls := "streak")(
       h3(
         title(
-          if s.v > 0 then tag(playerIndex)(trans.nbGames.plural(s.v, strong(s.v)))
+          if (s.v > 0) tag(playerIndex)(trans.nbGames.plural(s.v, strong(s.v)))
           else "-"
         )
       ),
@@ -290,7 +290,7 @@ object perfStat {
       div(cls := "streak")(
         h3(
           title(
-            if s.v > 0 then trans.nbGames.plural(s.v, strong(s.v))
+            if (s.v > 0) trans.nbGames.plural(s.v, strong(s.v))
             else "-"
           )
         ),

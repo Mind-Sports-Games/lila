@@ -176,7 +176,7 @@ final class Api(
         import lila.user.User.normalize
         val (u1, u2) = (normalize(name1), normalize(name2))
         env.game.crosstableApi(u1, u2) flatMap { ct =>
-          (if ct.results.nonEmpty && getBool("matchup", req) then env.game.crosstableApi.getMatchup(u1, u2)
+          (if (ct.results.nonEmpty && getBool("matchup", req)) env.game.crosstableApi.getMatchup(u1, u2)
            else fuccess(none)) map { matchup =>
             toApiResult {
               lila.game.JsonView.crosstable(ct, matchup).some
@@ -242,9 +242,9 @@ final class Api(
             env.tournament.api
               .resultStream(tour, MaxPerSecond(40), getInt("nb", req) | Int.MaxValue)
           val result =
-            if csv then csvStream(lila.tournament.TournamentCsv(source))
+            if (csv) csvStream(lila.tournament.TournamentCsv(source))
             else jsonStream(source.map(lila.tournament.JsonView.playerResultWrites.writes))
-          result.pipe(asAttachment(env.api.gameApiV2.filename(tour, if csv then "csv" else "ndjson")))
+          result.pipe(asAttachment(env.api.gameApiV2.filename(tour, if (csv) "csv" else "ndjson")))
         case None => NotFound
       }
     }
@@ -268,7 +268,7 @@ final class Api(
   def tournamentsByOwner(name: String) =
     Action.async { implicit req =>
       implicit val lang: play.api.i18n.Lang = reqLang
-      (if name != "playstrategy" then env.user.repo.named(name) else fuccess(none)) flatMap {
+      (if (name != "playstrategy") env.user.repo.named(name) else fuccess(none)) flatMap {
         case Some(user) =>
           val nb = getInt("nb", req) | Int.MaxValue
           jsonStream {
@@ -312,9 +312,9 @@ final class Api(
             env.user.lightUserApi.asyncFallback(p.player.userId) map p.withUser
           }
         val result =
-          if csv then csvStream(lila.swiss.SwissCsv(source))
+          if (csv) csvStream(lila.swiss.SwissCsv(source))
           else jsonStream(source.map(env.swiss.json.playerResult))
-        result.pipe(asAttachment(env.api.gameApiV2.filename(swiss, if csv then "csv" else "ndjson")))
+        result.pipe(asAttachment(env.api.gameApiV2.filename(swiss, if (csv) "csv" else "ndjson")))
       case None => NotFound
     }
   }
@@ -322,7 +322,7 @@ final class Api(
   def gamesByUsersStream =
     AnonOrScopedBody(parse.tolerantText)()(
       anon = gamesByUsers(300),
-      scoped = req => u => gamesByUsers(if u.id == "playstrategy4545" then 900 else 500)(req)
+      scoped = req => u => gamesByUsers(if (u.id == "playstrategy4545") 900 else 500)(req)
     )
 
   def cloudEval =
@@ -407,7 +407,7 @@ final class Api(
     }
   def MobileApiRequest(js: RequestHeader => Fu[ApiResult]) =
     Action.async { req =>
-      if lila.api.Mobile.Api.requested(req) then js(req) map toHttp
+      if (lila.api.Mobile.Api.requested(req)) js(req) map toHttp
       else fuccess(NotFound)
     }
 

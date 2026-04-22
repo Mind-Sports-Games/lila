@@ -166,7 +166,7 @@ object bits {
       br,
       postForm(action := routes.Round.resign(current.pov.fullId))(
         button(cls := "text button button-red", dataIcon := "L")(
-          if current.pov.game.abortable then "Abort" else "Resign",
+          if (current.pov.game.abortable) "Abort" else "Resign",
           " the game"
         )
       ),
@@ -185,20 +185,20 @@ object bits {
   def spotlight(e: lila.event.Event)(implicit ctx: Context) =
     div(
       a(
-        href := (if e.isNow || !e.countdown then e.url else routes.Event.show(e.id).url),
+        href := (if (e.isNow || !e.countdown) e.url else routes.Event.show(e.id).url),
         cls  := List(
           s"tour-spotlight event-spotlight id_${e.id} ${ctx.currentSelectedColor}" -> true,
           "invert"                                                                 -> e.isNowOrSoon,
           "highlighted" -> (e.isNow || !e.countdown)
         )
       )(
-        if e.isNow || !e.countdown then span(cls := "ribbon")(span("live")),
+        if (e.isNow || !e.countdown) span(cls := "ribbon")(span("live")),
         views.html.event.iconOf(e),
         span(cls := "content")(
           span(cls := "name")(e.title),
           span(cls := "headline")(e.headline),
           span(cls := "more")(
-            if e.isNow then e.duringMessage.fold(trans.eventInProgress())(m => raw(m))
+            if (e.isNow) e.duringMessage.fold(trans.eventInProgress())(m => raw(m))
             else e.beforeMessage.fold[Frag](momentFromNow(e.startsAt))(m => raw(m))
           )
         )

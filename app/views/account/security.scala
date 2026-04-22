@@ -40,8 +40,8 @@ object security {
         tr(
           td(cls := "icon")(
             span(
-              cls := curSessionId.map { cur => s"is-${if cur == s.session.id then "gold" else "green"}" },
-              dataIcon := (if s.session.isMobile then "" else "")
+              cls := curSessionId.map { cur => s"is-${if (cur == s.session.id) "gold" else "green"}" },
+              dataIcon := (if (s.session.isMobile) "" else "")
             )
           ),
           td(cls := "info")(

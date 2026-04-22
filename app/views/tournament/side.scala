@@ -33,12 +33,12 @@ object side {
                 target := "_blank"
               )(tour.clock.show),
               separator,
-              if tour.isMedley then {
+              if (tour.isMedley) {
                 views.html.game.bits.medleyLink
-              } else if tour.variant.exotic then {
+              } else if (tour.variant.exotic) {
                 views.html.game.bits.variantLink(
                   tour.variant,
-                  if tour.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill) then
+                  if (tour.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
                     VariantKeys.variantShortName(tour.variant)
                   else VariantKeys.variantName(tour.variant)
                 )
@@ -47,7 +47,7 @@ object side {
               separator,
               tour.durationString
             ),
-            if tour.handicapped then
+            if (tour.handicapped)
               a(href := routes.Page.lonePage("handicaps"), target := "_blank")(
                 trans.handicappedTournament()
               )
@@ -89,7 +89,7 @@ object side {
         tour.looksLikePrize.option(bits.userPrizeDisclaimer(tour.createdBy)),
         verdicts.relevant.option(
           st.section(
-            dataIcon := (if ctx.isAuth && verdicts.accepted then "E"
+            dataIcon := (if (ctx.isAuth && verdicts.accepted) "E"
                          else "L"),
             cls := List(
               "conditions" -> true,

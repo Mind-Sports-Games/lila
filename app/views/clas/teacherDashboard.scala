@@ -62,7 +62,7 @@ object teacherDashboard {
           )(trans.clas.addStudent())
         )
       ),
-      if students.isEmpty then p(cls := "box__pad students__empty")(trans.clas.noStudents())
+      if (students.isEmpty) p(cls := "box__pad students__empty")(trans.clas.noStudents())
       else studentList(c, students)
     )
 
@@ -74,7 +74,7 @@ object teacherDashboard {
     layout(c, all.filter(_.student.isActive), "students") {
       val archived  = all.filter(_.student.isArchived)
       val inviteBox =
-        if invites.isEmpty then div(cls := "box__pad invites__empty")(h2(trans.clas.nbPendingInvitations(0)))
+        if (invites.isEmpty) div(cls := "box__pad invites__empty")(h2(trans.clas.nbPendingInvitations(0)))
         else
           div(cls := "box__pad invites")(
             h2(trans.clas.nbPendingInvitations.pluralSame(invites.size)),
@@ -85,7 +85,7 @@ object teacherDashboard {
                     td(userIdLink(i.userId.some)),
                     td(i.realName),
                     td(
-                      if i.accepted.has(false) then "Declined" else "Pending"
+                      if (i.accepted.has(false)) "Declined" else "Pending"
                     ),
                     td(momentFromNow(i.created.at)),
                     td(
@@ -99,7 +99,7 @@ object teacherDashboard {
             )
           )
       val archivedBox =
-        if archived.isEmpty then div(cls := "box__pad students__empty")(h2(trans.clas.noRemovedStudents()))
+        if (archived.isEmpty) div(cls := "box__pad students__empty")(h2(trans.clas.noRemovedStudents()))
         else
           div(cls := "box__pad")(
             h2(trans.clas.removedStudents()),
@@ -139,8 +139,8 @@ object teacherDashboard {
                 trans.clas.variantXOverLastY(progress.perfType.trans, trans.nbDays.txt(progress.days)),
                 dataSortNumberTh(trans.rating()),
                 dataSortNumberTh(trans.clas.progress()),
-                dataSortNumberTh(if progress.isPuzzle then trans.puzzles() else trans.games()),
-                if progress.isPuzzle then dataSortNumberTh(trans.clas.winrate())
+                dataSortNumberTh(if (progress.isPuzzle) trans.puzzles() else trans.games()),
+                if (progress.isPuzzle) dataSortNumberTh(trans.clas.winrate())
                 else dataSortNumberTh(trans.clas.timePlaying())
               )
             ),
@@ -156,7 +156,7 @@ object teacherDashboard {
                     ratingProgress(prog.ratingProgress) | trans.clas.na.txt()
                   ),
                   td(prog.nb),
-                  if progress.isPuzzle then td(dataSort := prog.winRate)(prog.winRate, "%")
+                  if (progress.isPuzzle) td(dataSort := prog.winRate)(prog.winRate, "%")
                   else td(dataSort := prog.millis)(showPeriod(prog.period))
                 )
               }
@@ -266,7 +266,7 @@ object teacherDashboard {
               td(user.perfs.perfsPuzzleMap.values.map(_.nb).sum.localize),
               td(dataSort := user.seenAt.map(_.getMillis.toString))(user.seenAt.map(momentFromNowOnce)),
               td(
-                dataSort := (if student.managed then 1 else 0),
+                dataSort := (if (student.managed) 1 else 0),
                 student.managed.option(iconTag("5")(title := trans.clas.managed.txt()))
               )
             )
