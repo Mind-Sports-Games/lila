@@ -2,7 +2,7 @@ package controllers
 
 import play.api.libs.json.Json
 
-import lila.app.{ *, given }
+import lila.app.*
 import lila.setup.SetupBulk
 
 final class BulkPairing(env: Env) extends LilaController(env) {

@@ -26,7 +26,6 @@ object Environment
 
   // Provide Zero instances needed for `.so` and `.option` extension methods in Scala 3 templates
   // Using implicit val (not given) so they're importable via `import Environment._`
-  import alleycats.Zero
   implicit val zeroString: Zero[String]                        = Zero("")
   implicit def zeroOption[A]: Zero[Option[A]]                  = Zero(None)
   implicit def zeroList[A]: Zero[List[A]]                      = Zero(Nil)

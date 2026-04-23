@@ -3,7 +3,7 @@ package controllers
 import play.api.data.*, Forms.*
 import views.*
 
-import lila.app.{ *, given }
+import lila.app.*
 
 final class Dev(env: Env) extends LilaController(env) {
 

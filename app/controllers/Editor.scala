@@ -7,7 +7,7 @@ import play.api.libs.json.*
 import views.*
 import strategygames.chess.format.Forsyth as ChessForsyth
 
-import lila.app.{ *, given }
+import lila.app.*
 import lila.common.Json.*
 
 final class Editor(env: Env) extends LilaController(env) {

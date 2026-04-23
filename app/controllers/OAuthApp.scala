@@ -1,6 +1,6 @@
 package controllers
 
-import lila.app.{ *, given }
+import lila.app.*
 import lila.oauth.{ AccessToken, OAuthApp as App }
 import views.*
 

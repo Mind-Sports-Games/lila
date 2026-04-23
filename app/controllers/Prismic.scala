@@ -1,7 +1,7 @@
 package controllers
 
 import io.prismic.{ Api as PrismicApi, * }
-import lila.app.{ *, given }
+import lila.app.*
 
 final class Prismic(
     env: Env

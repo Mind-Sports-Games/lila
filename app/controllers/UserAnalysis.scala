@@ -9,7 +9,7 @@ import play.api.mvc.*
 import views.*
 
 import lila.api.Context
-import lila.app.{ *, given }
+import lila.app.*
 import lila.game.Pov
 import lila.round.Forecast.{ forecastJsonWriter, forecastStepJsonFormat }
 import lila.round.JsonView.WithFlags

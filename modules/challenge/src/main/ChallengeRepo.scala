@@ -1,6 +1,5 @@
 package lila.challenge
 
-import scala.annotation.nowarn
 import org.joda.time.DateTime
 
 import lila.common.config.Max
@@ -63,7 +62,7 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
       x ::: y
     }
 
-  @nowarn("cat=unused") def like(c: Challenge) =
+  def like(c: Challenge) =
     ~(for {
       challengerId <- c.challengerUserId
       destUserId   <- c.destUserId
