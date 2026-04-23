@@ -4,7 +4,7 @@ import play.api.libs.json.*
 import scala.annotation.nowarn
 
 import lila.api.Context
-import lila.app.*
+import lila.app.{ *, given }
 import lila.practice.JsonView.*
 import lila.practice.{ PracticeSection, PracticeStudy, UserStudy }
 import lila.study.Study.WithChapter
@@ -145,7 +145,8 @@ final class Practice(
         FormFuResult(form) { err =>
           api.structure.get map { html.practice.config(_, err) }
         } { text =>
-          { val r = api.config.set(text).toOption; api.structure.clear(); r.getOrElse(funit) } >>
+          ~api.config.set(text).toOption >>-
+            api.structure.clear() >>
             env.mod.logApi.practiceConfig(me.id) inject Redirect(routes.Practice.config)
         }
       }

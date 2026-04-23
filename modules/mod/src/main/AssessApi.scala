@@ -218,12 +218,12 @@ final class AssessApi(
     lazy val p1SuspCoefVariation = suspCoefVariation(P1)
     lazy val p2SuspCoefVariation = suspCoefVariation(P2)
 
-    def isUpset = (for {
+    def isUpset = ~(for {
       winner <- game.winner
       loser  <- game.loser
       wR     <- winner.stableRating
       lR     <- loser.stableRating
-    } yield wR <= lR - 300).getOrElse(false)
+    } yield wR <= lR - 300)
 
     // Shared eligibility guard: conditions common to both assessment paths
     def isEligibleForAssessment: Boolean =

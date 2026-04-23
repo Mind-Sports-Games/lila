@@ -2,7 +2,7 @@ package controllers
 
 import play.api.libs.json.*
 
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.LightUser.lightUserWrites
 
 final class Msg(

@@ -299,10 +299,8 @@ object mod {
                 " ",
                 b(e.showAction),
                 " ",
-                e.gameId.fold[Frag](e.details.getOrElse("")) { gameId =>
-                  a(href := s"${routes.Round.watcher(gameId, "p1").url}?pov=${e.user.getOrElse("")}")(
-                    e.details.getOrElse("")
-                  )
+                e.gameId.fold[Frag]((~e.details: String)) { gameId =>
+                  a(href := s"${routes.Round.watcher(gameId, "p1").url}?pov=${~e.user}")(~e.details: String)
                 },
                 " ",
                 momentFromNowServer(e.date)
@@ -593,7 +591,7 @@ object mod {
                   .mkString(", ")
               ),
               td(dataSort := o.count.game)(o.count.game.localize),
-              markTd(bans.getOrElse(o.id, 0), playban(cls := "text")(bans.getOrElse(o.id, 0))),
+              markTd(~bans.get(o.id): Int, playban(cls := "text")(~bans.get(o.id): Int)),
               markTd(o.marks.alt so 1, alt),
               markTd(o.marks.troll so 1, shadowban),
               markTd(o.marks.boost so 1, boosting),

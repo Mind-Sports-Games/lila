@@ -3,7 +3,7 @@ package controllers
 import play.api.mvc.*
 
 import lila.api.Context
-import lila.app.*
+import lila.app.{ *, given }
 import lila.blog.BlogApi
 import lila.common.config.MaxPerPage
 

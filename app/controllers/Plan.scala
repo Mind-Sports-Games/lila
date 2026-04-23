@@ -4,7 +4,7 @@ import play.api.libs.json.*
 import play.api.mvc.*
 
 import lila.api.Context
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.{ EmailAddress, HTTPRequest }
 import lila.plan.StripeClient.StripeException
 import lila.plan.{

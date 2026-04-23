@@ -39,7 +39,7 @@ object twoFactor {
           qrCode,
           div(cls := "form-group")(
             ifYouCannotScanEnterX(
-              span(style := "background:p2;playerIndex:p2;")(form("secret").value.getOrElse(""))
+              span(style := "background:p2;playerIndex:p2;")(~form("secret").value: String)
             )
           ),
           div(cls := "form-group explanation")(enterPassword()),

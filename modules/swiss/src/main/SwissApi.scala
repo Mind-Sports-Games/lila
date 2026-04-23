@@ -2,7 +2,6 @@ package lila.swiss
 
 import akka.stream.scaladsl.*
 import org.joda.time.DateTime
-import alleycats.Zero
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.*
 import reactivemongo.api.bson.*

@@ -7,7 +7,7 @@ import views.html
 
 import lila.api.AnnounceStore
 import lila.api.Context
-import lila.app.*
+import lila.app.{ *, given }
 import lila.security.SecurityForm.Reopen
 import lila.user.{ Holder, TotpSecret, User as UserModel }
 
@@ -33,11 +33,11 @@ final class Account(
       FormFuResult(env.user.forms.profile)(err => fuccess(html.account.profile(me, err))) { profile =>
         val spamReport = profile.bio
           .exists(env.security.spam.detect)
-          .option("profile.bio" -> profile.bio.getOrElse(""))
+          .option("profile.bio" -> ~profile.bio)
           .orElse {
             profile.links
               .exists(env.security.spam.detect)
-              .option("profile.links" -> profile.links.getOrElse(""))
+              .option("profile.links" -> ~profile.links)
           }
         (spamReport match {
           case Some((resource, text)) =>
@@ -354,7 +354,7 @@ final class Account(
     }
 
   private def currentSessionId(implicit ctx: Context) =
-    env.security.api.reqSessionId(ctx.req).getOrElse("")
+    ~env.security.api.reqSessionId(ctx.req)
 
   def security =
     Auth { implicit ctx => me =>

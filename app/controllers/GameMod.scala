@@ -5,7 +5,7 @@ import play.api.data.Forms.*
 
 import lila.api.Context
 import lila.api.GameApiV2
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.config
 import lila.common.HTTPRequest
 import lila.db.dsl.*
@@ -123,8 +123,7 @@ object GameMod {
       opponents: Option[String]
   ) {
     def opponentIds: List[lila.user.User.ID] =
-      opponents
-        .getOrElse("")
+      (~opponents)
         .take(800)
         .replace(",", " ")
         .split(' ')

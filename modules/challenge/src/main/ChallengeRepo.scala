@@ -1,5 +1,6 @@
 package lila.challenge
 
+import scala.annotation.nowarn
 import org.joda.time.DateTime
 
 import lila.common.config.Max
@@ -62,8 +63,8 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
       x ::: y
     }
 
-  def like(c: Challenge) =
-    (for {
+  @nowarn("cat=unused") def like(c: Challenge) =
+    ~(for {
       challengerId <- c.challengerUserId
       destUserId   <- c.destUserId
       if c.active
@@ -72,7 +73,7 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
         "challenger.id" -> challengerId,
         "destUser.id"   -> destUserId
       )
-    )).getOrElse(fuccess(none))
+    ))
 
   private[challenge] def countCreatedByDestId(userId: String): Fu[Int] =
     coll.countSel(selectCreated ++ $doc("destUser.id" -> userId))

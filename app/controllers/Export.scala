@@ -5,7 +5,7 @@ import akka.util.ByteString
 import strategygames.Player as PlayerIndex
 import play.api.mvc.Result
 
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.HTTPRequest
 import lila.game.Pov
 import lila.puzzle.Puzzle.Id

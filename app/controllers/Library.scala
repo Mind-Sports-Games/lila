@@ -2,7 +2,7 @@ package controllers
 
 import strategygames.variant.Variant
 
-import lila.app.*
+import lila.app.{ *, given }
 import lila.memo.CacheApi.*
 import lila.puzzle.Puzzle
 

@@ -8,7 +8,7 @@ import scala.annotation.nowarn
 import views.*
 
 import lila.api.Context
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.{ EmailAddress, HTTPRequest }
 import lila.memo.RateLimit
 import lila.security.SecurityForm.{ MagicLink, PasswordReset }
@@ -146,7 +146,7 @@ final class Auth(
 
   def logout =
     Open { implicit ctx =>
-      val currentSessionId = env.security.api.reqSessionId(ctx.req).getOrElse("")
+      val currentSessionId = ~env.security.api.reqSessionId(ctx.req)
       env.security.store.delete(currentSessionId) >>
         env.push.webSubscriptionApi.unsubscribeBySession(currentSessionId) >>
         negotiate(

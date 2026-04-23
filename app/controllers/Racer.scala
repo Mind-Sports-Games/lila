@@ -4,7 +4,7 @@ import play.api.mvc.*
 import views.*
 
 import lila.api.Context
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.HTTPRequest
 import lila.racer.RacerPlayer
 import lila.racer.RacerRace

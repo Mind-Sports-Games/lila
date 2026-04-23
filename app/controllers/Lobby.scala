@@ -3,7 +3,7 @@ package controllers
 import play.api.libs.json.*
 import play.api.mvc.*
 
-import lila.app.*
+import lila.app.{ *, given }
 import views.*
 
 final class Lobby(

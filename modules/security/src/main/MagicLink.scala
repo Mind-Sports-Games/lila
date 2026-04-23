@@ -55,7 +55,6 @@ object MagicLink {
 
   import scala.concurrent.duration.*
   import play.api.mvc.RequestHeader
-  import alleycats.Zero
   import lila.memo.RateLimit
   import lila.common.{ HTTPRequest, IpAddress }
 

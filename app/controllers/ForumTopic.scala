@@ -4,7 +4,7 @@ import cats.implicits.*
 import play.api.libs.json.*
 import views.*
 
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.{ HTTPRequest, IpAddress }
 import lila.user.Holder
 
@@ -64,11 +64,9 @@ final class ForumTopic(env: Env) extends LilaController(env) with ForumControlle
           for {
             unsub     <- unsubFu
             canWrite  <- isGrantedWrite(categSlug)
-            inOwnTeam <- (categ.team, ctx.me)
-              .mapN { case (teamId, me) =>
-                env.team.cached.isLeader(teamId, me.id)
-              }
-              .getOrElse(fuFalse)
+            inOwnTeam <- ~(categ.team, ctx.me).mapN { case (teamId, me) =>
+              env.team.cached.isLeader(teamId, me.id)
+            }
             form <- ctx.me.ifTrue(
               !posts.hasNextPage && canWrite && topic.open && !topic.isOld
             ) match {

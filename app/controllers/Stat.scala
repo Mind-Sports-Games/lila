@@ -1,6 +1,6 @@
 package controllers
 
-import lila.app.*
+import lila.app.{ *, given }
 import views.*
 
 final class Stat(env: Env) extends LilaController(env) {

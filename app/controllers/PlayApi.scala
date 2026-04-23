@@ -3,7 +3,7 @@ package controllers
 import play.api.mvc.*
 import play.api.i18n.Lang
 
-import lila.app.*
+import lila.app.{ *, given }
 import lila.game.Pov
 import lila.user.User as UserModel
 import strategygames.Pos

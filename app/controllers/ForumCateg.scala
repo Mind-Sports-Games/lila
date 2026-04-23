@@ -1,6 +1,6 @@
 package controllers
 
-import lila.app.*
+import lila.app.{ *, given }
 import views.*
 
 final class ForumCateg(env: Env) extends LilaController(env) with ForumController {

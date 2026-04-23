@@ -6,7 +6,7 @@ import play.api.libs.json.*
 import play.api.mvc.*
 import scala.annotation.nowarn
 
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.HTTPRequest
 import lila.hub.actorApi.captcha.ValidCaptcha
 implicit private val defaultTimeout: akka.util.Timeout = makeTimeout.large
@@ -51,7 +51,7 @@ final class Main(
 
   def captchaCheck(id: String) =
     Open { implicit ctx =>
-      env.hub.captcher.actor ? ValidCaptcha(id, get("solution").getOrElse("")) map { case valid: Boolean =>
+      env.hub.captcher.actor ? ValidCaptcha(id, ~get("solution")) map { case valid: Boolean =>
         Ok(if (valid) 1 else 0)
       }
     }

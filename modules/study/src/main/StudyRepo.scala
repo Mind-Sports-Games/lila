@@ -103,7 +103,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
             "name"        -> s.name,
             "settings"    -> s.settings,
             "visibility"  -> s.visibility,
-            "description" -> s.description.getOrElse(""),
+            "description" -> ~s.description,
             "updatedAt"   -> DateTime.now
           )
         )
@@ -233,7 +233,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
       )
         .cursor[Bdoc]()
         .foldWhileM(0) { (count, doc) =>
-          (for {
+          ~(for {
             id        <- doc.getAsOpt[Study.Id]("_id")
             likes     <- doc.getAsOpt[Study.Likes](F.likes)
             createdAt <- doc.getAsOpt[DateTime](F.createdAt)
@@ -243,7 +243,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
                 $id(id),
                 $set(F.rank -> Study.Rank.compute(likes, createdAt))
               )
-          }.void).getOrElse(funit) inject Cursor.Cont(count + 1)
+          }.void) inject Cursor.Cont(count + 1)
         }
     }
 

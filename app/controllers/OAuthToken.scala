@@ -2,7 +2,7 @@ package controllers
 
 import views.*
 
-import lila.app.*
+import lila.app.{ *, given }
 
 final class OAuthToken(env: Env) extends LilaController(env) {
 
@@ -20,8 +20,8 @@ final class OAuthToken(env: Env) extends LilaController(env) {
       val form = env.oAuth.forms.token.create.fill(
         lila.oauth.OAuthForm.token
           .Data(
-            description = get("description").getOrElse(""),
-            scopes = ctx.req.queryString.getOrElse("scopes[]", Nil).toList
+            description = ~get("description"),
+            scopes = (~ctx.req.queryString.get("scopes[]")).toList
           )
       )
       Ok(html.oAuth.token.create(form, me)).fuccess

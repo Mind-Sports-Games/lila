@@ -6,7 +6,7 @@ import play.api.mvc.*
 import views.*
 
 import lila.api.Context
-import lila.app.*
+import lila.app.{ *, given }
 import lila.insight.{ Dimension, Metric }
 
 final class Insight(env: Env) extends LilaController(env) {

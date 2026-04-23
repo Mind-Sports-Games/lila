@@ -22,7 +22,7 @@ private object bits {
 
     def dataReqs =
       List("winner", "loser", "p1", "p2").map { f =>
-        data(s"req-$f") := form("players")(f).value.getOrElse("")
+        data(s"req-$f") := ~form("players")(f).value
       }
 
     def playerIndexs(hide: Boolean) =

@@ -1,7 +1,5 @@
 package lila.study
 
-import alleycats.Zero
-
 import lila.common.extensions.*
 import lila.hub.DuctSequencers
 

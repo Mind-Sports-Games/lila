@@ -6,7 +6,7 @@ import scala.annotation.nowarn
 import views.html
 
 import lila.api.Context
-import lila.app.*
+import lila.app.{ *, given }
 import lila.challenge.Challenge as ChallengeModel
 import lila.common.{ HTTPRequest, IpAddress }
 import lila.game.{ AnonCookie, Pov }

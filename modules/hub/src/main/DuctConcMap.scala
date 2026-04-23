@@ -2,7 +2,6 @@ package lila.hub
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Function
-import alleycats.Zero
 import scala.concurrent.{ ExecutionContext, Promise }
 import scala.jdk.CollectionConverters.*
 

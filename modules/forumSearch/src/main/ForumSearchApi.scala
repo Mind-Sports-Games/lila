@@ -34,7 +34,7 @@ final class ForumSearchApi(
     Json.obj(
       Fields.body    -> view.post.text.take(10000),
       Fields.topic   -> view.topic.name,
-      Fields.author  -> view.post.userId.orElse(view.post.author).map(_.toLowerCase).getOrElse(""),
+      Fields.author  -> (view.post.userId orElse view.post.author map (_.toLowerCase)).getOrElse(""),
       Fields.topicId -> view.topic.id,
       Fields.troll   -> view.post.troll,
       Fields.date    -> view.post.createdAt

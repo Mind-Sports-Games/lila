@@ -2,7 +2,7 @@ package controllers
 
 import scala.annotation.nowarn
 
-import lila.app.*
+import lila.app.{ *, given }
 import lila.app.http.ResponseHeaders.allowMethods
 import lila.common.HTTPRequest.isApiOrApp
 

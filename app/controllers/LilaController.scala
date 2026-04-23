@@ -1,6 +1,5 @@
 package controllers
 
-import alleycats.Zero
 import play.api.data.Form
 import play.api.data.FormBinding
 import play.api.http.*
@@ -35,16 +34,7 @@ abstract private[controllers] class LilaController(val env: Env)
   implicit def scheduler: Scheduler = env.scheduler
 
   implicit protected val LilaResultZero: Zero[Result] = Zero[Result](Results.NotFound)
-
-  // Provide Zero instances needed by `.so` extension method in Scala 3
-  protected given zeroFuUnit: Zero[Fu[Unit]]     = Zero(scala.concurrent.Future.unit)
-  protected given [A]: Zero[Fu[Option[A]]]       = Zero(scala.concurrent.Future.successful(None))
-  protected given zeroString: Zero[String]       = Zero("")
-  protected given [A]: Zero[Option[A]]           = Zero(None)
-  protected given [A]: Zero[List[A]]             = Zero(Nil)
-  protected given zeroBoolean: Zero[Boolean]     = Zero(false)
-  protected given zeroInt: Zero[Int]             = Zero(0)
-  protected given zeroFuResult: Zero[Fu[Result]] = Zero(scala.concurrent.Future.successful(Results.NotFound))
+  protected given zeroFuResult: Zero[Fu[Result]]      = Zero(scala.concurrent.Future.successful(Results.NotFound))
 
   implicit final protected class LilaPimpedResult(result: Result) {
     def fuccess                           = scala.concurrent.Future successful result

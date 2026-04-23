@@ -33,6 +33,8 @@ trait CoreExports {
       scalalib.SecureRandom.shuffle(xs)
   }
 
+  export alleycats.Zero
+
   export cats.syntax.all.*
   export cats.{ Eq, Show }
   export cats.data.NonEmptyList

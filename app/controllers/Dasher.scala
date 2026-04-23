@@ -3,7 +3,7 @@ package controllers
 import play.api.libs.json.*
 
 import lila.api.Context
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.LightUser.lightUserWrites
 import lila.i18n.{ enLang, I18nKeys as trans, I18nLangPicker, LangList }
 import strategygames.GameFamily

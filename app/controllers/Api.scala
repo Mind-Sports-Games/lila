@@ -8,7 +8,7 @@ import play.api.libs.json.*
 import play.api.mvc.*
 
 import lila.api.{ Context, GameApiV2 }
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.config.{ MaxPerPage, MaxPerSecond }
 import lila.common.{ HTTPRequest, IpAddress }
 
@@ -108,7 +108,7 @@ final class Api(
   private def UserGamesRateLimit(cost: Int, req: RequestHeader)(run: => Fu[ApiResult]) = {
     val ip = HTTPRequest.ipAddress(req)
     UserGamesRateLimitPerIP(ip, cost = cost) {
-      UserGamesRateLimitPerUA(HTTPRequest.userAgent(req).getOrElse(""), cost = cost, msg = ip.value) {
+      UserGamesRateLimitPerUA(~HTTPRequest.userAgent(req), cost = cost, msg = ip.value) {
         UserGamesRateLimitGlobal("-", cost = cost, msg = ip.value) {
           run
         }(fuccess(Limited))
@@ -328,7 +328,7 @@ final class Api(
   def cloudEval =
     Action.async { req =>
       {
-        val variant = Variant.orDefault(get("variant", req).getOrElse(""))
+        val variant = Variant.orDefault(~get("variant", req))
         get("fen", req).fold(notFoundJson("Missing FEN")) { fen =>
           JsonOptionOk(
             env.evalCache.api.getEvalJson(

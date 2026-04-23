@@ -4,7 +4,7 @@ import play.api.mvc.{ AnyContentAsFormUrlEncoded, Result }
 import views.*
 
 import lila.api.{ BodyContext, Context }
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.HTTPRequest
 import lila.report.{ Mod as AsMod, Report as ReportModel, Reporter, Room, Suspect }
 import lila.user.{ Holder, User as UserModel }

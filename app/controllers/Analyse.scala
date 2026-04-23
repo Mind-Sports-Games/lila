@@ -6,7 +6,7 @@ import play.api.mvc.*
 import views.*
 
 import lila.api.Context
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.HTTPRequest
 import lila.game.{ PgnDump, Pov }
 import lila.round.JsonView.WithFlags

@@ -224,7 +224,7 @@ final private class StudySocket(
         case "relaySync" =>
           who foreach { w =>
             Bus.publish(
-              actorApi.RelayToggle(studyId, (o \ "d").asOpt[Boolean].getOrElse(false), w),
+              actorApi.RelayToggle(studyId, ~(o \ "d").asOpt[Boolean], w),
               "relayToggle"
             )
           }

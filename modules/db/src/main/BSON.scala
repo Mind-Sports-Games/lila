@@ -1,7 +1,6 @@
 package lila.db
 
 import org.joda.time.DateTime
-import alleycats.Zero
 import reactivemongo.api.bson.*
 
 import scala.util.{ Success, Try }

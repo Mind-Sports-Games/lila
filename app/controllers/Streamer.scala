@@ -5,7 +5,7 @@ import views.*
 
 import lila.api.Context
 import play.api.libs.json.*
-import lila.app.*
+import lila.app.{ *, given }
 import lila.streamer.{ Streamer as StreamerModel, StreamerForm }
 
 final class Streamer(

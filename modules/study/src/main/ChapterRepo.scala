@@ -100,7 +100,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
     }
 
   def nextOrderByStudy(studyId: Study.Id): Fu[Int] =
-    coll(_.primitiveOne[Int]($studyId(studyId), $sort.desc("order"), "order")) dmap { _.getOrElse(0) + 1 }
+    coll(_.primitiveOne[Int]($studyId(studyId), $sort.desc("order"), "order")) dmap { ~_ + 1 }
 
   def setConceal(chapterId: Chapter.Id, conceal: Chapter.Ply) =
     coll(_.updateField($id(chapterId), "conceal", conceal)).void
@@ -243,7 +243,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
             hash get studyId match {
               case Some(chapters) if chapters.sizeIs >= nbChaptersPerStudy => hash
               case maybe                                                   =>
-                val chapters = maybe.getOrElse(Vector.empty)
+                val chapters = ~maybe
                 hash + (studyId -> readIdName(doc).fold(chapters)(chapters :+ _))
             }
           }

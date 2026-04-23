@@ -298,7 +298,7 @@ private object RelayFetch {
       def toPgn(extraTags: Tags = Tags.empty) = {
         val strTurns = turns.map(_ split ' ') map { turn =>
           Turn(
-            san = turn.headOption.getOrElse(""),
+            san = ~turn.headOption,
             secondsLeft = turn.lift(1).map(_.takeWhile(_.isDigit)) flatMap (_.toIntOption)
           )
         } mkString " "

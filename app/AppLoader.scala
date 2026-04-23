@@ -46,8 +46,8 @@ final class LilaComponents(
   lila.log("boot").info {
     val java             = System.getProperty("java.version")
     val mem              = Runtime.getRuntime.maxMemory() / 1024 / 1024
-    val appVersionCommit = configuration.getOptional[String]("app.version.commit").getOrElse("")
-    val appVersionDate   = configuration.getOptional[String]("app.version.date").getOrElse("")
+    val appVersionCommit = ~configuration.getOptional[String]("app.version.commit")
+    val appVersionDate   = ~configuration.getOptional[String]("app.version.date")
     s"lila ${environment.mode} $appVersionCommit $appVersionDate / java $java, memory: ${mem}MB"
   }
 

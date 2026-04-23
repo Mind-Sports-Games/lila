@@ -2,7 +2,7 @@ package controllers
 
 import views.*
 
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.{ HTTPRequest, IpAddress }
 
 final class ForumPost(env: Env) extends LilaController(env) with ForumController {

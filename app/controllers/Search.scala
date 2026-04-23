@@ -2,7 +2,7 @@ package controllers
 
 import views.*
 
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.{ HTTPRequest, IpAddress }
 
 final class Search(env: Env) extends LilaController(env) {

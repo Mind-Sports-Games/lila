@@ -5,7 +5,7 @@ import org.joda.time.format.DateTimeFormat
 import play.api.mvc.*
 
 import lila.api.GameApiV2
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.config.MaxPerSecond
 import lila.common.HTTPRequest
 import lila.game.Game as GameModel
