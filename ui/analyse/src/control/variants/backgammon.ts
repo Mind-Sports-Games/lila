@@ -1,9 +1,14 @@
+import type { Key as CgKey, Piece as CgPiece, PlayerIndex as CgPlayerIndex } from 'chessground/types';
+import {
+  backgammonPosDiff as CgBackgammonPosDiff,
+  orientationForBackgammon as CgOrientationForBackgammon,
+  oppositeOrientationForBackgammon as CgOppositeOrientationForBackgammon,
+} from 'chessground/util';
+
 import type AnalyseCtrl from '../../ctrl';
-import { path as treePath } from 'tree';
-import { backgammonPosDiff, orientationForBackgammon, oppositeOrientationForBackgammon } from 'chessground/util';
-import * as cg from 'chessground/types';
-import * as stratUtils from 'stratutils';
 import type { AnaRoll, AnaEndTurn } from '../../study/interfaces';
+import { readDice } from 'stratutils';
+import { path as treePath } from 'tree';
 
 export const configure = (ctrl: AnalyseCtrl): void => {
   ctrl.controlConfig.next = ctrl => {
@@ -29,8 +34,8 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   };
 
   ctrl.controlConfig.getOrientation = () => {
-    const c = ctrl.data.player.playerIndex as cg.PlayerIndex;
-    return ctrl.flipped ? oppositeOrientationForBackgammon(c) : orientationForBackgammon(c);
+    const c = ctrl.data.player.playerIndex as CgPlayerIndex;
+    return ctrl.flipped ? CgOppositeOrientationForBackgammon(c) : CgOrientationForBackgammon(c);
   };
 
   let areDiceDescending = true;
@@ -182,7 +187,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   };
 
   ctrl.controlConfig.mutateCgOpts = (node, config) => {
-    const playerIndex = ctrl.turnPlayerIndex() as cg.PlayerIndex;
+    const playerIndex = ctrl.turnPlayerIndex() as CgPlayerIndex;
     const variantKey = ctrl.data.game.variant.key;
 
     config.myPlayerIndex = playerIndex;
@@ -192,7 +197,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
       lastRollPath = ctrl.path;
     }
 
-    const dice = stratUtils.readDice(node.fen, variantKey, false, areDiceDescending);
+    const dice = readDice(node.fen, variantKey, false, areDiceDescending);
     config.dice = dice;
 
     const activeDiceValue = (dice as { value: number; isAvailable: boolean }[]).find(d => d.isAvailable)?.value;
@@ -203,8 +208,8 @@ export const configure = (ctrl: AnalyseCtrl): void => {
           orig,
           [...destKeys].sort(
             (a, b) =>
-              Math.abs(backgammonPosDiff(orig as cg.Key, a as cg.Key) - activeDiceValue) -
-              Math.abs(backgammonPosDiff(orig as cg.Key, b as cg.Key) - activeDiceValue),
+              Math.abs(CgBackgammonPosDiff(orig as CgKey, a as CgKey) - activeDiceValue) -
+              Math.abs(CgBackgammonPosDiff(orig as CgKey, b as CgKey) - activeDiceValue),
           ),
         );
       });
@@ -237,7 +242,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     },
     onUserLift: (dest: string) => {
       playstrategy.sound.play('move');
-      ctrl.sendAnaLift(dest as cg.Key);
+      ctrl.sendAnaLift(dest as CgKey);
     },
   };
 
@@ -246,7 +251,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
 
   ctrl.controlConfig.showDropDestsInDropMode = () => false;
 
-  ctrl.controlConfig.dropSoundOverride = (_piece: cg.Piece, _pos: cg.Key, captured?: cg.Piece) =>
+  ctrl.controlConfig.dropSoundOverride = (_piece: CgPiece, _pos: CgKey, captured?: CgPiece) =>
     captured ? 'capture' : undefined;
 
   ctrl.controlConfig.nodeSoundOverride = (node: Tree.Node) => {

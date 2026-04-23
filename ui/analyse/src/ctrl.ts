@@ -1,5 +1,16 @@
-import * as cg from 'chessground/types';
-import { oppositeOrientation } from 'chessground/util';
+import type { Key as CgKey, Piece as CgPiece, PlayerIndex as CgPlayerIndex, Role as CgRole } from 'chessground/types';
+import { oppositeOrientation as CgOppositeOrientation } from 'chessground/util';
+import { type Api as CgApi } from 'chessground/api';
+import { type Config as CgConfig } from 'chessground/config';
+import { type DrawShape as CgDrawShape } from 'chessground/draw';
+import { setDropMode as CgSetDropMode, cancelDropMode as CgCancelDropMode } from 'chessground/drop';
+
+import { Position, PositionError } from 'stratops/chess';
+import { parseFen } from 'stratops/fen';
+import { SquareSet } from 'stratops/squareSet';
+import { PLAYERINDEXES, Outcome, isNormal } from 'stratops/types';
+import { opposite, parseUci, makeSquare, roleToChar } from 'stratops/util';
+
 import * as stratUtils from 'stratutils';
 import * as game from 'game';
 import * as keyboard from './keyboard';
@@ -13,17 +24,13 @@ import GamebookPlayCtrl from './study/gamebook/gamebookPlayCtrl';
 import makeStudy from './study/studyCtrl';
 import throttle from 'common/throttle';
 import { AnalyseOpts, AnalyseData, ServerEvalData, Key, JustCaptured, NvuiPlugin, Redraw } from './interfaces';
-import { Api as ChessgroundApi } from 'chessground/api';
 import { Autoplay, AutoplayDelay } from './autoplay';
 import { build as makeTree, path as treePath, ops as treeOps, TreeWrapper } from 'tree';
 import { compute as computeAutoShapes } from './autoShape';
-import { Config as ChessgroundConfig } from 'chessground/config';
-import { setDropMode, cancelDropMode } from 'chessground/drop';
 import { ActionMenuCtrl } from './actionMenu';
 import { ctrl as cevalCtrl, isEvalBetter, sanIrreversible, CevalCtrl, Work as CevalWork, CevalOpts } from 'ceval';
 import { ctrl as treeViewCtrl, TreeView } from './treeView/treeView';
 import { defined, prop, Prop } from 'common';
-import { DrawShape } from 'chessground/draw';
 import { ExplorerCtrl } from './explorer/interfaces';
 import { ForecastCtrl } from './forecast/interfaces';
 import { make as makeEvalCache, EvalCache } from './evalCache';
@@ -33,11 +40,6 @@ import { make as makePractice, PracticeCtrl } from './practice/practiceCtrl';
 import { make as makeRetro, RetroCtrl } from './retrospect/retroCtrl';
 import { make as makeSocket, Socket } from './socket';
 import { nextGlyphSymbol } from './nodeFinder';
-import { opposite, parseUci, makeSquare, roleToChar } from 'stratops/util';
-import { PLAYERINDEXES, Outcome, isNormal } from 'stratops/types';
-import { SquareSet } from 'stratops/squareSet';
-import { parseFen } from 'stratops/fen';
-import { Position, PositionError } from 'stratops/chess';
 import { Result } from '@badrap/result';
 import { storedProp, StoredBooleanProp } from 'common/storage';
 import { AnaMove, AnaDrop, AnaPass, StudyCtrl } from './study/interfaces';
@@ -54,7 +56,7 @@ export default class AnalyseCtrl {
 
   tree: TreeWrapper;
   socket: Socket;
-  chessground: ChessgroundApi;
+  chessground: CgApi;
   trans: Trans;
   ceval: CevalCtrl;
   evalCache: EvalCache;
@@ -257,7 +259,7 @@ export default class AnalyseCtrl {
   getOrientation(): Orientation {
     if (this.controlConfig.getOrientation) return this.controlConfig.getOrientation() as Orientation;
     const o = this.data.orientation;
-    return this.flipped ? oppositeOrientation(o) : o;
+    return this.flipped ? CgOppositeOrientation(o) : o;
   }
   getNode(): Tree.Node {
     // required by ui/ceval
@@ -282,13 +284,13 @@ export default class AnalyseCtrl {
     return [pos[0], pos[1]] as Key[];
   }
 
-  setDropMode(cg: ChessgroundApi) {
-    const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
+  setDropMode(cg: CgApi) {
+    const playerIndex = cg.state.movable.playerIndex as CgPlayerIndex;
     const variantKey = this.data.game.variant.key as VariantKey;
     const dropDests = stratUtils.readDropsByRole(this.node.dropsByRole);
     const isDropPly = isOnlyDropsPly(this.node, variantKey, this.data.onlyDropsVariant);
     if (isDropPly) {
-      setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(variantKey, playerIndex));
+      CgSetDropMode(cg.state, stratUtils.onlyDropsVariantPiece(variantKey, playerIndex));
     }
     cg.set({
       // when bar pieces must be entered, treat as onlyDropsVariant so drop mode isn't cancelled on invalid clicks
@@ -309,7 +311,7 @@ export default class AnalyseCtrl {
       if (this.controlConfig.needsFullRedrawAfterGround?.()) cg.redrawAll();
       this.setAutoShapes();
       this.setDropMode(cg);
-      if (this.node.shapes) cg.setShapes(this.node.shapes as DrawShape[]);
+      if (this.node.shapes) cg.setShapes(this.node.shapes as CgDrawShape[]);
     });
   }
 
@@ -323,7 +325,7 @@ export default class AnalyseCtrl {
       });
   });
 
-  makeCgOpts(): ChessgroundConfig {
+  makeCgOpts(): CgConfig {
     const node = this.node,
       playerIndex = this.turnPlayerIndex(),
       variantKey = this.data.game.variant.key,
@@ -343,7 +345,7 @@ export default class AnalyseCtrl {
                 dropsByRole.size > 0)
             ? playerIndex
             : undefined,
-      config: ChessgroundConfig = {
+      config: CgConfig = {
         fen: this.controlConfig.cgFen ? this.controlConfig.cgFen(node.fen) : node.fen,
         turnPlayerIndex: playerIndex,
         dice: stratUtils.readDice(node.fen, variantKey, false, true),
@@ -524,14 +526,14 @@ export default class AnalyseCtrl {
       encodeURIComponent(fen).replace(/%20/g, '_').replace(/%2F/g, '/');
   }
 
-  userNewPiece = (piece: cg.Piece, pos: Key, captured?: cg.Piece): void => {
+  userNewPiece = (piece: CgPiece, pos: Key, captured?: CgPiece): void => {
     if (crazyValid(this.chessground, this.data, this.node.drops, this.node.dropsByRole, piece, pos)) {
       const roleChar = roleToChar(piece.role);
       this.justPlayed = roleChar.toUpperCase() + '@' + pos;
       this.justDropped = piece.role;
       this.justCaptured = undefined;
       this.sound[
-        this.controlConfig.dropSoundOverride?.(piece, pos as cg.Key, captured) ?? (captured ? 'capture' : 'move')
+        this.controlConfig.dropSoundOverride?.(piece, pos as CgKey, captured) ?? (captured ? 'capture' : 'move')
       ]?.();
       const drop: AnaDrop = {
         role: piece.role,
@@ -547,7 +549,7 @@ export default class AnalyseCtrl {
       this.redraw();
     } else this.jump(this.path);
     if (!this.data.onlyDropsVariant || this.controlConfig.alwaysCancelDropMode?.()) {
-      cancelDropMode(this.chessground.state);
+      CgCancelDropMode(this.chessground.state);
       this.redraw();
     }
   };
@@ -561,10 +563,10 @@ export default class AnalyseCtrl {
       (this.data.game.gameFamily !== 'breakthroughtroyka' && piece && piece.role == 'p-piece' && orig[0] != dest[0]);
     this.sound[isCapture ? 'capture' : 'move']();
     if (!promotion.start(this, orig, dest, capture, this.sendMove)) this.sendMove(orig, dest, capture);
-    if (!this.data.onlyDropsVariant) cancelDropMode(this.chessground.state);
+    if (!this.data.onlyDropsVariant) CgCancelDropMode(this.chessground.state);
   };
 
-  sendMove = (orig: Key, dest: Key, capture?: JustCaptured, prom?: cg.Role): void => {
+  sendMove = (orig: Key, dest: Key, capture?: JustCaptured, prom?: CgRole): void => {
     const move: AnaMove = {
       orig,
       dest,
@@ -619,9 +621,9 @@ export default class AnalyseCtrl {
   // @TODO: check what happens when we have a move in several parts (eg GAbalone or monster)
   private preparePremoving(): void {
     this.chessground.set({
-      turnPlayerIndex: this.chessground.state.movable.playerIndex as cg.PlayerIndex,
+      turnPlayerIndex: this.chessground.state.movable.playerIndex as CgPlayerIndex,
       movable: {
-        playerIndex: opposite(this.chessground.state.movable.playerIndex as cg.PlayerIndex),
+        playerIndex: opposite(this.chessground.state.movable.playerIndex as CgPlayerIndex),
       },
       premovable: {
         enabled: true,
@@ -1049,7 +1051,7 @@ export default class AnalyseCtrl {
 
   isGamebook = (): boolean => !!(this.study && this.study.data.chapter.gamebook);
 
-  withCg<A>(f: (cg: ChessgroundApi) => A): A | undefined {
+  withCg<A>(f: (cg: CgApi) => A): A | undefined {
     if (this.chessground && this.cgVersion.js === this.cgVersion.dom) return f(this.chessground);
     return undefined;
   }
