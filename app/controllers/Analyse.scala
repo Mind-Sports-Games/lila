@@ -43,7 +43,7 @@ final class Analyse(
           (env.analyse.analyser.get(pov.game)) zip
             (if (!pov.game.metadata.analysed) env.fishnet.api.userAnalysisExists(pov.gameId)
              else fuccess(false)) zip
-            (pov.game.simulId.fold(fuccess(none[lila.simul.Simul]))(env.simul.repo.find)) zip
+            pov.game.simulId.so(env.simul.repo.find) zip
             roundC.getWatcherChat(pov.game) zip
             (ctx.noBlind so env.game.crosstableApi.withMatchup(pov.game)) zip
             env.bookmark.api.exists(pov.game, ctx.me) zip
@@ -149,7 +149,7 @@ final class Analyse(
     for {
       initialFen <- env.game.gameRepo.initialFen(pov.gameId)
       analysis   <- env.analyse.analyser.get(pov.game)
-      simul      <- pov.game.simulId.fold(fuccess(none[lila.simul.Simul]))(env.simul.repo.find)
+      simul      <- pov.game.simulId.so(env.simul.repo.find)
       crosstable <- env.game.crosstableApi.withMatchup(pov.game)
       pgn        <- env.api.pgnDump(pov.game, initialFen, analysis, PgnDump.WithFlags(clocks = false))
       sgf        <- env.api.sgfDump(pov.game, initialFen, PgnDump.WithFlags(clocks = false))

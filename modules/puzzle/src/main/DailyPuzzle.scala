@@ -34,8 +34,7 @@ final private[puzzle] class DailyPuzzle(
     variantCache.get(variant.key)
 
   private def findLastForVariantKey(key: String): Fu[Option[DailyPuzzle.WithHtml]] =
-    strategygames.variant.Variant.all.find(_.key == key).fold(fuccess(none[DailyPuzzle.WithHtml])) {
-      variant =>
+    strategygames.variant.Variant.all.find(_.key == key).so { variant =>
         colls.puzzle {
           _.find($doc(F.day `$exists` true, F.lib -> variant.gameLogic.id, F.variant -> variant.id))
             .sort($doc(F.day -> -1))

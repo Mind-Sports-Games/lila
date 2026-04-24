@@ -104,16 +104,16 @@ final class SecurityApi(
   def restoreUser(req: RequestHeader): Fu[Option[Either[AppealUser, FingerPrintedUser]]] =
     if (!firewall.accepts(req)) fuccess(none)
     else
-      reqSessionId(req).fold(fuccess(none[Either[AppealUser, FingerPrintedUser]])) { sessionId =>
-        appeal.authenticate(sessionId) match {
+      reqSessionId(req).so { sessionId =>
+        (appeal.authenticate(sessionId) match {
           case Some(userId) => userRepo.byId(userId).map2 { u => Left(AppealUser(u)) }
           case None         =>
             store.authInfo(sessionId) flatMap {
-              _.fold(fuccess(none[Either[AppealUser, FingerPrintedUser]])) { d =>
+              _.so { d =>
                 userRepo.byId(d.user).dmap { _.map { u => Right(FingerPrintedUser(u, d.hasFp)) } }
               }
             }
-        }
+        }): Fu[Option[Either[AppealUser, FingerPrintedUser]]]
       }
 
   def oauthScoped(

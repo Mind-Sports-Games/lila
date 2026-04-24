@@ -19,7 +19,7 @@ final class Relation(
   val api = env.relation.api
 
   private def renderActions(userId: String, mini: Boolean)(implicit ctx: Context) =
-    (ctx.userId.fold(fuccess(none[Boolean]))(uid => api.fetchRelation(uid, userId))) zip
+    ctx.userId.so { api.fetchRelation(_, userId) } zip
       (if (ctx.isAuth) env.pref.api.followable(userId) else fuFalse) zip
       (ctx.userId.fold(fuFalse)(uid => api.fetchBlocks(userId, uid))) flatMap {
         case ((relation, followable), blocked) =>
@@ -174,7 +174,7 @@ final class Relation(
       (if (ctx.isAuth) env.pref.api.followableIds(users map (_.id))
        else fuccess(Set.empty[String])) flatMap { followables =>
         Future.sequence(users.map { u =>
-          ctx.userId.fold(fuccess(none[lila.relation.Relation]))(uid => api.fetchRelation(uid, u.id)) map {
+          ctx.userId.so { api.fetchRelation(_, u.id) } map {
             rel =>
               lila.relation.Related(u, none, followables(u.id), rel)
           }

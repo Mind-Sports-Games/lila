@@ -166,7 +166,7 @@ final class JsonView(
       .add("winner" -> g.winnerPlayerIndex.map(_.name))
 
   private def pairingJson(games: List[Game], hostId: String)(p: SimulPairing): Fu[Option[JsObject]] =
-    games.find(_.id == p.gameId).fold(fuccess(none[JsObject])) { game =>
+    games.find(_.id == p.gameId).so { game =>
       playerJson(p.player) map { player =>
         Json
           .obj(
