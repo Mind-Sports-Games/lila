@@ -69,10 +69,7 @@ final class ForumTopic(env: Env) extends LilaController(env) with ForumControlle
             }
             form <- ctx.me.ifTrue(
               !posts.hasNextPage && canWrite && topic.open && !topic.isOld
-            ) match {
-              case Some(me) => forms.postWithCaptcha(me, inOwnTeam) map (Some(_))
-              case None     => fuccess(None)
-            }
+            ).so { me => forms.postWithCaptcha(me, inOwnTeam) map some }
             canModCateg <- isGrantedMod(categ.slug)
             _           <- env.user.lightUserApi preloadMany posts.currentPageResults.flatMap(_.userId)
           } yield html.forum.topic.show(categ, topic, posts, form, unsub, canModCateg = canModCateg)

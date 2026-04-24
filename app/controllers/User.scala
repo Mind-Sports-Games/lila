@@ -53,8 +53,7 @@ final class User(
       env.game.cached
         .lastPlayedPlayingId(userId)
         .orElse(env.game.gameRepo.quickLastPlayedId(userId)) flatMap {
-        case None         => NotFound("No ongoing game").fuccess
-        case Some(gameId) => gameC.exportGame(gameId, req)
+        _.so { gameId => gameC.exportGame(gameId, req) }
       }
     }
 

@@ -4,7 +4,7 @@ import play.api.mvc.Result
 import views.*
 
 import lila.api.Context
-import lila.app.*
+import lila.app.{ *, given }
 import lila.report.Suspect
 import play.api.data.Form
 
@@ -148,12 +148,11 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
       username: String
   )(f: (lila.appeal.Appeal, Suspect) => Fu[Result])(implicit ctx: Context): Fu[Result] =
     env.user.repo.named(username) flatMap {
-      case Some(user) =>
+      _.so { user =>
         env.appeal.api.get(user) flatMap {
-          case Some(appeal) => f(appeal, Suspect(user)).dmap(some)
-          case None         => fuccess(none)
+          _.so { appeal => f(appeal, Suspect(user)).dmap(some) }
         }
-      case None => fuccess(none)
+      }
     } flatMap {
       _.fold(notFound)(fuccess)
     }

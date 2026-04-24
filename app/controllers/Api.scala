@@ -1,5 +1,6 @@
 package controllers
 
+import alleycats.Zero
 import strategygames.variant.Variant
 import strategygames.format.FEN
 
@@ -135,7 +136,7 @@ final class Api(
       UserGamesRateLimit(cost, req) {
         lila.mon.api.userGames.increment(cost.toLong)
         env.user.repo.named(name) flatMap {
-          case Some(user) =>
+          _.so { user =>
             gameApi.byUser(
               user = user,
               rated = getBoolOpt("rated", req),
@@ -145,7 +146,7 @@ final class Api(
               nb = nb,
               page = page
             ) map some
-          case None => fuccess(none)
+          }
         } map toApiResult
       }
     }
@@ -196,7 +197,7 @@ final class Api(
   def tournament(id: String) =
     ApiRequest { implicit req =>
       env.tournament.tournamentRepo.byId(id) flatMap {
-        case Some(tour) =>
+        _.so { tour =>
           val page = (getInt("page", req) | 1).atLeast(1).atMost(200)
           env.tournament.jsonView(
             tour = tour,
@@ -208,14 +209,14 @@ final class Api(
             socketVersion = none,
             partial = false
           )(using reqLang) map some
-        case None => fuccess(none)
+        }
       } map toApiResult
     }
 
   def tournamentGames(id: String) =
     Action.async { req =>
       env.tournament.tournamentRepo.byId(id) flatMap {
-        case Some(tour) =>
+        _.so { tour =>
           val config = GameApiV2.ByTournamentConfig(
             tournamentId = tour.id,
             format = GameApiV2.Format.byRequest(req),
@@ -229,7 +230,7 @@ final class Api(
               .pipe(asAttachmentStream(env.api.gameApiV2.filename(tour, config.format)))
               .as(gameC.gameContentType(config))
           }.fuccess
-        case None => fuccess(NotFound)
+        }
       }
     }
 
@@ -237,7 +238,7 @@ final class Api(
     Action.async { implicit req =>
       val csv = HTTPRequest.acceptsCsv(req) || get("as", req).has("csv")
       env.tournament.tournamentRepo.byId(id) map {
-        case Some(tour) =>
+        _.so { tour =>
           val source =
             env.tournament.api
               .resultStream(tour, MaxPerSecond(40), getInt("nb", req) | Int.MaxValue)
@@ -245,14 +246,14 @@ final class Api(
             if (csv) csvStream(lila.tournament.TournamentCsv(source))
             else jsonStream(source.map(lila.tournament.JsonView.playerResultWrites.writes))
           result.pipe(asAttachment(env.api.gameApiV2.filename(tour, if (csv) "csv" else "ndjson")))
-        case None => NotFound
+        }
       }
     }
 
   def tournamentTeams(id: String) =
     Action.async {
       env.tournament.tournamentRepo.byId(id) flatMap {
-        case Some(tour) =>
+        _.so { tour =>
           env.tournament.jsonView.apiTeamStanding(tour) map { arr =>
             JsonOk(
               Json.obj(
@@ -261,7 +262,7 @@ final class Api(
               )
             )
           }
-        case None => fuccess(NotFound)
+        }
       }
     }
 
@@ -269,21 +270,21 @@ final class Api(
     Action.async { implicit req =>
       implicit val lang: play.api.i18n.Lang = reqLang
       (if (name != "playstrategy") env.user.repo.named(name) else fuccess(none)) flatMap {
-        case Some(user) =>
+        _.so { user =>
           val nb = getInt("nb", req) | Int.MaxValue
           jsonStream {
             env.tournament.api
               .byOwnerStream(user, MaxPerSecond(20), nb)
               .mapAsync(1)(env.tournament.apiJsonView.fullJson)
           }.fuccess
-        case None => fuccess(NotFound)
+        }
       }
     }
 
   def swissGames(id: String) =
     Action.async { req =>
       env.swiss.api.byId(lila.swiss.Swiss.Id(id)) flatMap {
-        case Some(swiss) =>
+        _.so { swiss =>
           val config = GameApiV2.BySwissConfig(
             swissId = swiss.id,
             format = GameApiV2.Format.byRequest(req),
@@ -298,14 +299,14 @@ final class Api(
               .pipe(asAttachmentStream(filename))
               .as(gameC.gameContentType(config))
           }.fuccess
-        case None => fuccess(NotFound)
+        }
       }
     }
 
   def swissResults(id: String) = Action.async { implicit req =>
     val csv = HTTPRequest.acceptsCsv(req) || get("as", req).has("csv")
     env.swiss.api.byId(lila.swiss.Swiss.Id(id)) map {
-      case Some(swiss) =>
+      _.so { swiss =>
         val source = env.swiss.api
           .resultStream(swiss, MaxPerSecond(50), getInt("nb", req) | Int.MaxValue)
           .mapAsync(8) { p =>
@@ -315,7 +316,7 @@ final class Api(
           if (csv) csvStream(lila.swiss.SwissCsv(source))
           else jsonStream(source.map(env.swiss.json.playerResult))
         result.pipe(asAttachment(env.api.gameApiV2.filename(swiss, if (csv) "csv" else "ndjson")))
-      case None => NotFound
+      }
     }
   }
 
@@ -369,11 +370,11 @@ final class Api(
       UserActivityRateLimitPerIP(HTTPRequest.ipAddress(req), cost = 1) {
         lila.mon.api.activity.increment(1)
         env.user.repo.named(name) flatMap {
-          case Some(user) =>
+          _.so { user =>
             env.activity.read.recent(user) flatMap { activities =>
               Future.sequence(activities.map { env.activity.jsonView(_, user) })
             } map { js => toApiResult(js: Seq[play.api.libs.json.JsValue]) }
-          case None => fuccess(NoData)
+          }
         }
       }(fuccess(Limited))
     }
@@ -492,4 +493,6 @@ private[controllers] object Api {
   case object NoData                extends ApiResult
   case object Limited               extends ApiResult
   case class Custom(result: Result) extends ApiResult
+
+  given Zero[ApiResult] = Zero(NoData)
 }

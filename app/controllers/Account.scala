@@ -39,11 +39,9 @@ final class Account(
               .exists(env.security.spam.detect)
               .option("profile.links" -> ~profile.links)
           }
-        (spamReport match {
-          case Some((resource, text)) =>
-            env.report.api.autoCommFlag(lila.report.Suspect(me).id, resource, text)
-          case None => funit
-        }) >> env.user.repo.setProfile(me.id, profile) inject Redirect(routes.Account.profile).flashSuccess
+        spamReport.so { case (resource, text) =>
+          env.report.api.autoCommFlag(lila.report.Suspect(me).id, resource, text)
+        } >> env.user.repo.setProfile(me.id, profile) inject Redirect(routes.Account.profile).flashSuccess
       }
     }
 
@@ -178,10 +176,7 @@ final class Account(
 
   def apiEmail =
     Scoped(_.Email.Read) { _ => me =>
-      env.user.repo.email(me.id) map {
-        case Some(email) => JsonOk(Json.obj("email" -> email.value))
-        case None        => NotFound
-      }
+      env.user.repo.email(me.id) map { _.so { email => JsonOk(Json.obj("email" -> email.value)) } }
     }
 
   def renderCheckYourEmail(implicit ctx: Context) =
@@ -213,8 +208,7 @@ final class Account(
   def emailConfirm(token: String) =
     Open { implicit ctx =>
       env.security.emailChange.confirm(token) flatMap {
-        case None                    => Redirect(routes.Account.email).fuccess
-        case Some((user, prevEmail)) =>
+        _.so { case (user, prevEmail) =>
           (if (prevEmail.exists(_.isNoReply)) env.clas.api.student.release(user) else funit) >>
             auth.authenticateUser(
               user,
@@ -223,6 +217,7 @@ final class Account(
                   Some(_ => Redirect(routes.User.show(user.username)).flashSuccess)
                 else Some(_ => Redirect(routes.Account.email).flashSuccess)
             )
+        }
       }
     }
 
@@ -439,7 +434,7 @@ final class Account(
         .map(lila.user.User.normalize)
         .filter(id => me.id == id || isGranted(_.Impersonate)) | me.id
       env.user.repo.byId(userId) map {
-        case Some(user) =>
+        _.so { user =>
           if (getBool("text"))
             apiC.GlobalConcurrencyLimitUser(me.id)(
               env.api.personalDataExport(user)
@@ -448,7 +443,7 @@ final class Account(
                 .pipe(asAttachmentStream(s"playstrategy_${user.username}.txt"))
             }
           else Ok(html.account.bits.data(user))
-        case None => NotFound
+        }
       }
     }
 }

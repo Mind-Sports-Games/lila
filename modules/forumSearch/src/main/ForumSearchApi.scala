@@ -26,8 +26,7 @@ final class ForumSearchApi(
 
   def store(post: Post) =
     postApi.liteView(post) flatMap {
-      case Some(view) => client.store(Id(view.post.id), toDoc(view))
-      case None       => funit
+      _.so { view => client.store(Id(view.post.id), toDoc(view)) }
     }
 
   private def toDoc(view: PostLiteView) =

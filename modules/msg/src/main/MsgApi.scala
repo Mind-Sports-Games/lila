@@ -55,14 +55,14 @@ final class MsgApi(
     }
     if (userId != me.id)
       lightUserApi.async(userId).flatMap {
-        case None          => fuccess(none)
-        case Some(contact) =>
+        _.so { contact =>
           for {
             _         <- setReadBy(threadId, me, userId)
             msgs      <- threadMsgsFor(threadId, me, before)
             relations <- relationApi.fetchRelations(me.id, userId)
             postable  <- security.may.post(me.id, userId, isNew = msgs.headOption.isEmpty)
           } yield MsgConvo(contact, msgs, relations, postable).some
+        }
       }
     else fuccess(none)
   }
