@@ -1,6 +1,6 @@
 package controllers
 
-import lila.app.*
+import lila.app.{ *, given }
 import views.*
 
 final class ForumCateg(env: Env) extends LilaController(env) with ForumController {
@@ -10,7 +10,7 @@ final class ForumCateg(env: Env) extends LilaController(env) with ForumControlle
       pageHit
       NotForKids {
         for {
-          teamIds <- ctx.userId.fold(fuccess(List.empty[String]))(teamCache.teamIdsList)
+          teamIds <- ctx.userId.so(teamCache.teamIdsList)
           categs  <- categApi.list(teamIds, ctx.me)
           _       <- env.user.lightUserApi preloadMany categs.flatMap(_.lastPostUserId)
         } yield html.forum.categ.index(categs)

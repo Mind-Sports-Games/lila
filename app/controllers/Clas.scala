@@ -551,7 +551,7 @@ final class Clas(
     ctx.me match {
       case None             => fuTrue
       case _ if ctx.hasClas => fuTrue
-      case Some(me)         => env.mod.logApi.wasUnteachered(me.id).not
+      case Some(me)         => (!env.mod.logApi.wasUnteachered(me.id))
     }
 
   def invitation(id: String) =

@@ -3,7 +3,7 @@ package controllers
 import play.api.libs.json.*
 
 import lila.api.Context
-import lila.app.*
+import lila.app.{ *, given }
 import lila.common.LightUser.lightUserWrites
 import lila.i18n.{ enLang, I18nKeys as trans, I18nLangPicker, LangList }
 import strategygames.GameFamily
@@ -55,7 +55,7 @@ final class Dasher(env: Env) extends LilaController(env) {
       negotiate(
         html = notFound,
         api = _ =>
-          ctx.me.fold(fuFalse)(env.streamer.api.isPotentialStreamer) map { isStreamer =>
+          ctx.me.so(env.streamer.api.isPotentialStreamer) map { isStreamer =>
             Ok {
               Json.obj(
                 "user" -> ctx.me.map(_.light),
