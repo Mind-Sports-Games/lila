@@ -504,14 +504,31 @@ body .variant-grandabalone .game-score piece.hole-piece {
       width: calc(100% - 2 * #{$pocket-height-mobile});
       height: $pocket-height-mobile;
       margin-left: $pocket-height-mobile;
-      display: grid;
-      padding: 0.5em;
-      align-content: space-between;
-      .p2 {
-        text-align: right;
+      overflow: hidden;
+      display: inline-flex;
+      padding: 0 0.5em;
+      justify-content: space-around;
+      align-items: center;
+      text-align: center;
+      .p1 {
+        order: 3;
+        width: 40%;
+        min-width: 0;
+        &.flipped {
+          order: 1;
+        }
       }
       .vs {
-        justify-self: center;
+        order: 2;
+        width: 20%;
+      }
+      .p2 {
+        order: 1;
+        width: 40%;
+        min-width: 0;
+        &.flipped {
+          order: 3;
+        }
       }
     }
     &-player-name {
