@@ -521,6 +521,12 @@ export default class RoundController {
   setTitle = () => title.set(this);
 
   actualSendMove = (tpe: string, data: any, meta: MoveMetadata = {}) => {
+    // Guard: refuse to send if it's not our turn — catches stale dest state where apiAction was dropped
+    // unlikely edge case where player just made a move but CG didn't update dests yet
+    if (!meta.premove && !game.isPlayerTurn(this.data)) {
+      playstrategy.reload();
+      return;
+    }
     const socketOpts: SocketOpts = {
       sign: this.sign,
       ackable: true,
@@ -539,6 +545,8 @@ export default class RoundController {
       }
     }
     this.socket.send(tpe, data, socketOpts);
+    // Watchdog: if apiAction confirmation never arrives (dropped packet), reload after 10s
+    this.transientMove.register();
 
     this.justDropped = meta.justDropped;
     this.justCaptured = meta.justCaptured;
@@ -781,7 +789,11 @@ export default class RoundController {
       blur.onMove();
       playstrategy.pubsub.emit('ply', this.ply);
 
-      if (['backgammon', 'hyper', 'nackgammon'].includes(d.game.variant.key)) {
+      // Resync pieces from server FEN so togyzkumalakUpdatePiecesFromMove drift never accumulates
+      if (['togyzkumalak', 'bestemshe'].includes(d.game.variant.key)) {
+        this.chessground.set({ fen: o.fen });
+      }
+      if (['backgammon', 'hyper', 'nackgammon', 'togyzkumalak', 'bestemshe'].includes(d.game.variant.key)) {
         this.chessground.redrawAll(); //dice, extra button updates etc.
       }
     }
