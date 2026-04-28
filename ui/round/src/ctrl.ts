@@ -787,11 +787,14 @@ export default class RoundController {
       blur.onMove();
       playstrategy.pubsub.emit('ply', this.ply);
 
-      // Resync pieces from server FEN so togyzkumalakUpdatePiecesFromMove drift never accumulates
+      // Resync pieces from server FEN only when togyzkumalakUpdatePiecesFromMove drifted from authoritative state
       if (['togyzkumalak', 'bestemshe'].includes(d.game.variant.key)) {
-        this.chessground.set({ fen: o.fen });
+        if (this.chessground.getFen() !== o.fen.split(' ')[0]) {
+          this.chessground.set({ fen: o.fen });
+          this.chessground.redrawAll();
+        }
       }
-      if (['backgammon', 'hyper', 'nackgammon', 'togyzkumalak', 'bestemshe'].includes(d.game.variant.key)) {
+      if (['backgammon', 'hyper', 'nackgammon'].includes(d.game.variant.key)) {
         this.chessground.redrawAll(); //dice, extra button updates etc.
       }
     }
