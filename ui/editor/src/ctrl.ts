@@ -4,7 +4,7 @@ import { NormalMove, Rules, Square } from 'stratops/types';
 import { SquareSet } from 'stratops/squareSet';
 import { Setup, Material, RemainingChecks } from 'stratops/setup';
 import { Board, Castles, makeSquare } from 'stratops';
-import { makeFen, parseCastlingFen } from 'stratops/fen';
+import { parseCastlingFen } from 'stratops/fen';
 import * as fp from 'stratops/fp';
 import { defined, prop, Prop } from 'common';
 import { replacePocketsInFen } from 'common/editor';
@@ -17,6 +17,7 @@ export default class EditorCtrl {
   options: Editor.Options;
   trans: Trans;
   extraPositions: Editor.OpeningPosition[];
+  positions: Editor.OpeningPosition[];
   chessground: CgApi | undefined;
   redraw: Redraw;
 
@@ -55,6 +56,10 @@ export default class EditorCtrl {
     this.standardInitialPosition = cfg.standardInitialPosition;
     this.turn = cfg.playerIndex || 'p1';
 
+    const posKey = variant.family === 'chess' ? 'chess' : this.variantKey;
+    const initPositions = cfg.positionsByVariant?.[posKey] || [];
+    initPositions.forEach(p => (p.epd = p.epd || p.fen.split(' ').splice(0, 4).join(' ')));
+    const extraFromPositions = initPositions.filter(p => p.eco?.startsWith('X'));
     this.extraPositions = [
       {
         fen: variant.getInitialBoardFen(),
@@ -65,7 +70,9 @@ export default class EditorCtrl {
         fen: 'prompt',
         name: this.trans('loadPosition'),
       },
+      ...extraFromPositions,
     ];
+    this.positions = initPositions.filter(p => !p.eco?.startsWith('X'));
 
     this.replaceState = throttle(500, (state: any, url: string) => {
       try {
@@ -74,10 +81,6 @@ export default class EditorCtrl {
         console.error('Failed to update history state:', e);
       }
     });
-
-    if (cfg.positions) {
-      cfg.positions.forEach(p => (p.epd = p.fen.split(' ').splice(0, 4).join(' ')));
-    }
 
     window.Mousetrap.bind('f', () => {
       if (this.chessground) this.chessground.toggleOrientation();
@@ -131,16 +134,17 @@ export default class EditorCtrl {
         this.lastAction && 'from' in this.lastAction && 'to' in this.lastAction
           ? { from: this.lastAction.from, to: this.lastAction.to }
           : undefined,
+      ...(variant as any).computeCaptureSetup?.(board),
     };
   }
 
   private getLegalFen(): string | undefined {
+    const setup = this.getSetup();
+    const variant = variantClassFromKey(this.variantKey);
     return variantClass(this.rules)
-      .fromSetup(this.getSetup())
+      .fromSetup(setup)
       .unwrap(
-        pos => {
-          return makeFen(this.rules)(pos.toSetup(), { promoted: pos.rules == 'crazyhouse' });
-        },
+        pos => variant.toFen(pos.toSetup()),
         _ => undefined,
       );
   }
@@ -198,7 +202,8 @@ export default class EditorCtrl {
   }
 
   getFenFromSetup(): string {
-    return replacePocketsInFen(makeFen(this.rules)(this.getSetup(), { promoted: this.rules == 'crazyhouse' }));
+    const variant = variantClassFromKey(this.variantKey);
+    return replacePocketsInFen(variant.toFen(this.getSetup()));
   }
 
   makeAnalysisUrl(legalFen: string): string {
@@ -324,17 +329,17 @@ export default class EditorCtrl {
     const variant = variantClassFromKey(variantKey);
     this.turn = 'p1';
     this.initialFen = variant.getInitialFen(this.turn);
-    this.extraPositions = [
-      {
-        fen: variant.getInitialFen(this.turn),
-        epd: `${variant.getInitialBoardFen()} ${variant.getInitialEpd(this.turn)}`,
-        name: this.trans('startPosition'),
-      },
-      {
-        fen: 'prompt',
-        name: this.trans('loadPosition'),
-      },
-    ];
+    const posKey = variant.family === 'chess' ? 'chess' : variantKey;
+    const newPositions = this.cfg.positionsByVariant?.[posKey] || [];
+    newPositions.forEach(p => (p.epd = p.epd || p.fen.split(' ').splice(0, 4).join(' ')));
+    const extraFromPositions = newPositions.filter(p => p.eco?.startsWith('X'));
+    const startPos = {
+      fen: variant.getInitialFen(this.turn),
+      epd: `${variant.getInitialBoardFen()} ${variant.getInitialEpd(this.turn)}`,
+      name: this.trans('startPosition'),
+    };
+    this.extraPositions = [startPos, { fen: 'prompt', name: this.trans('loadPosition') }, ...extraFromPositions];
+    this.positions = newPositions.filter(p => !p.eco?.startsWith('X'));
     this.setRules(variantKeyToRules(variantKey));
   }
 

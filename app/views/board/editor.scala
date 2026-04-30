@@ -16,6 +16,7 @@ object editor {
       fen: FEN,
       variant: strategygames.variant.Variant,
       positionsJson: String,
+      positionsByVariantJson: String,
       orientation: Option[String] = None
     )(implicit ctx: Context) =
     views.html.base.layout(
@@ -23,7 +24,7 @@ object editor {
       moreJs = frag(
         jsModule("editor"),
         embedJsUnsafeLoadThen(
-          s"""const data=${safeJsonValue(bits.jsData(sit, fen, variant))};data.positions=$positionsJson;
+          s"""const data=${safeJsonValue(bits.jsData(sit, fen, variant))};data.positions=$positionsJson;data.positionsByVariant=$positionsByVariantJson;
           data.options = data.options || {};
           ${orientation.fold("")(o => s"data.options.orientation='${o}';\n")}
       PlayStrategyEditor(document.getElementById('board-editor'), data);"""

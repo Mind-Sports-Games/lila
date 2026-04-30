@@ -224,6 +224,7 @@ declare namespace Editor {
     };
     embed: boolean;
     positions?: OpeningPosition[];
+    positionsByVariant?: Record<string, OpeningPosition[]>;
     i18n: I18nDict;
     standardInitialPosition: boolean;
     playerIndex?: PlayerIndex;

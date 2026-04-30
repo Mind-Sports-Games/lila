@@ -27,6 +27,12 @@
         margin-left: 1rem;
         flex: 1 1 100%;
       }
+
+      button.copy {
+        margin-left: 0.3rem;
+        flex: 0 0 auto;
+        padding: 0 0.5em;
+      }
     }
   }
 }
