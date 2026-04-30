@@ -12,15 +12,18 @@ case class AnaRoll(
     variant: Variant,
     fen: FEN,
     path: String,
-    chapterId: Option[String]
+    chapterId: Option[String],
+    dice: Option[List[Int]]
 ) extends AnaAny {
 
   private lazy val lib = variant.gameLogic
 
-  def branch: Validated[String, Branch] =
-    Game(lib, variant.some, fen.some)
-      .randomizeAndApplyDiceRoll(MoveMetrics())
-      .flatMap { case (game, diceRoll) =>
+  def branch: Validated[String, Branch] = {
+    val game = Game(lib, variant.some, fen.some)
+    (dice match {
+      case Some(d) => game.diceRoll(d, MoveMetrics())
+      case None    => game.randomizeAndApplyDiceRoll(MoveMetrics())
+    }).flatMap { case (game, diceRoll) =>
         game.actionStrs.flatten.lastOption toValid "Rolled but no last action!" map { lastAction =>
           val gameRecordNotation =
             strategygames.format.sgf.Dumper(variant, Vector(Vector(lastAction)))
@@ -45,6 +48,7 @@ case class AnaRoll(
           )
         }
       }
+  }
 }
 
 object AnaRoll {
@@ -63,6 +67,7 @@ object AnaRoll {
       variant = v,
       fen = fen,
       path = path,
-      chapterId = d str "ch"
+      chapterId = d str "ch",
+      dice = (d \ "dice").asOpt[List[Int]]
     )
 }

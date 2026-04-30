@@ -308,6 +308,7 @@ export interface AnaRoll {
   fen: Fen;
   path: string;
   ch?: string;
+  dice?: number[];
 }
 
 export interface AnaEndTurn {

@@ -52,7 +52,8 @@ import { variantKeyToRules } from 'stratops/variants/util';
 
 function renderResult(ctrl: AnalyseCtrl): VNode[] {
   let result: string | undefined;
-  if (ctrl.data.game.status.id >= 30)
+  let statusNodes: (string | VNode | null)[] | undefined;
+  if (ctrl.data.game.status.id >= 30) {
     switch (ctrl.data.game.winner) {
       case 'p1':
         result = '1-0';
@@ -63,13 +64,19 @@ function renderResult(ctrl: AnalyseCtrl): VNode[] {
       default:
         result = '½-½';
     }
-  const tags: VNode[] = [];
-  if (result) {
-    tags.push(h('div.result', result));
     const winner = ctrl.data.game.winnerPlayer;
-    tags.push(
-      h('div.status', [statusView(ctrl), winner ? ', ' + ctrl.trans('playerIndexIsVictorious', winner) : null]),
-    );
+    statusNodes = [statusView(ctrl), winner ? ', ' + ctrl.trans('playerIndexIsVictorious', winner) : null];
+  } else {
+    const outcome = ctrl.outcome();
+    if (outcome) {
+      result = outcome.winner === 'p1' ? '1-0' : outcome.winner === 'p2' ? '0-1' : '½-½';
+      statusNodes = [ctrl.trans.noarg('gameFinished')];
+    }
+  }
+  const tags: VNode[] = [];
+  if (result && statusNodes) {
+    tags.push(h('div.result', result));
+    tags.push(h('div.status', statusNodes));
   }
   return tags;
 }
@@ -666,6 +673,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
               chessground.render(ctrl),
               playerBars ? playerBars[ctrl.bottomIsP1() ? 0 : 1] : null,
               renderPromotion(ctrl),
+              ctrl.controlConfig.renderBoardOverlay?.() ?? null,
             ],
           ),
         gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,

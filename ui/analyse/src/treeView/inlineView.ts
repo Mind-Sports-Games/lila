@@ -149,6 +149,7 @@ function renderFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode 
   const notation = variantClassFromKey(variant.key).getNotationStyle();
   const fullTurnNodes: Tree.ParentedNode[] = fullTurnNodesFromNode(node);
   const path = opts.parentPath + node.id,
+    fullTurnPath = opts.parentPath + fullTurnNodes.map(n => n.id).join(''),
     content: MaybeVNodes = [
       opts.withIndex || node.playedPlayerIndex === 'p1' ? moveView.renderIndex(node, true) : null,
       // TODO: the || '' are probably not correct
@@ -169,7 +170,7 @@ function renderFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode 
     'move',
     {
       attrs: { p: path },
-      class: nodeClasses(ctx, node, path),
+      class: nodeClasses(ctx, node, path, fullTurnPath),
     },
     content,
   );

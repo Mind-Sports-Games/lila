@@ -37,6 +37,7 @@ import {
   StudyChapterRelay,
 } from './interfaces';
 import GamebookPlayCtrl from './gamebook/gamebookPlayCtrl';
+import { configureVariantControl } from '../control/configure';
 import { DescriptionCtrl } from './description';
 import RelayCtrl from './relay/relayCtrl';
 import { RelayData } from './relay/interfaces';
@@ -263,6 +264,7 @@ export default function (
 
     const merge = !vm.mode.write && sameChapter;
     ctrl.reloadData(d.analysis, merge);
+    configureVariantControl(ctrl);
     vm.gamebookOverride = undefined;
     configureAnalysis();
     vm.loading = false;

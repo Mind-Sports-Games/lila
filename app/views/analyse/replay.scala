@@ -2,6 +2,7 @@ package views.html.analyse
 
 import bits.dataPanel
 import strategygames.format.FEN
+import strategygames.GameFamily
 import controllers.routes
 import play.api.i18n.Lang
 import play.api.libs.json.Json
@@ -89,6 +90,9 @@ object replay {
         cssTag("analyse.round"),
         (pov.game.variant.hasDetachedPocket) option cssTag(
           "analyse.zh"
+        ),
+        (pov.game.variant.gameFamily == GameFamily.Backgammon()) option cssTag(
+          "analyse.backgammon"
         ),
         ctx.blind option cssTag("round.nvui")
       ),

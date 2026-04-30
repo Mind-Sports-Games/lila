@@ -1,0 +1,53 @@
+.analyse__board {
+  .dice-picker {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+
+    cg-dice {
+      position: absolute;
+      width: calc(100% * 4 / 15);
+      top: 47.4%;
+      transform: translateY(-50%);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3%;
+      align-items: center;
+      justify-items: center;
+      pointer-events: auto;
+
+      &.die-1 {
+        left: calc(100% * 2 / 15);
+      }
+
+      &.die-2 {
+        left: calc(100% * 9 / 15);
+      }
+
+      dice {
+        width: 100%;
+        aspect-ratio: 1;
+        cursor: pointer;
+        background-size: cover;
+        opacity: 0.75;
+        transition: opacity 0.15s ease;
+
+        &:hover {
+          opacity: 1;
+        }
+
+        &.selected {
+          outline: 3px solid $c-accent;
+          opacity: 1;
+        }
+      }
+
+      &:has(.selected) {
+        dice:not(.selected) {
+          opacity: 0.2;
+        }
+      }
+    }
+  }
+}

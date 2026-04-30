@@ -10,13 +10,13 @@ importers:
     dependencies:
       ab:
         specifier: github:lichess-org/ab-stub
-        version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
+        version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/e391b56a82b7c71e7663082a797f6fc21b18776d
       chessground:
         specifier: github:Mind-Sports-Games/chessground#pla-1023-support-backgammon-in-analysis-and-studies
         version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/29d9f9e64ed05d86ed4ec5bd8ededa0276c66b10
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.28
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/3ab9da347d5a551dc05935130ef1b5b83f8b574c
+        specifier: github:Mind-Sports-Games/stratops#pla-1023-support-backgammon-in-analysis-and-studies
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/e75dc1aca9e6bfd2dab3391ddae7a46d04de6506
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -376,7 +376,7 @@ importers:
     dependencies:
       ab:
         specifier: https://github.com/lichess-org/ab-stub
-        version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
+        version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/e391b56a82b7c71e7663082a797f6fc21b18776d
       chat:
         specifier: workspace:*
         version: link:../chat
@@ -744,8 +744,8 @@ packages:
       react: '*'
       react-dom: '*'
 
-  ab@https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0:
-    resolution: {tarball: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0}
+  ab@https://codeload.github.com/lichess-org/ab-stub/tar.gz/e391b56a82b7c71e7663082a797f6fc21b18776d:
+    resolution: {tarball: https://codeload.github.com/lichess-org/ab-stub/tar.gz/e391b56a82b7c71e7663082a797f6fc21b18776d}
     version: 1.0.0
 
   acorn-jsx@5.3.2:
@@ -758,8 +758,8 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  ajv@6.14.0:
-    resolution: {integrity: sha512-IWrosm/yrn43eiKqkfkHis7QioDleaXQHdDVPKg0FSwwd/DuvyX79TZnFOnYpB7dcsFAMmtFztZuXPDvSePkFw==}
+  ajv@6.15.0:
+    resolution: {integrity: sha512-fgFx7Hfoq60ytK2c7DhnF8jIvzYgOMxfugjLOSMHjLIPgenqa7S7oaagATUq99mV6IYvN2tRmC0wnTYX6iPbMw==}
 
   ansi-escapes@7.3.0:
     resolution: {integrity: sha512-BvU8nYgGQBxcmMuEeUEmNTvrMVjJNSH7RgW24vXexN4Ven6qCvy4TntnvlnwnMLTVlcRQQdbRY8NKnaIoeWDNg==}
@@ -1400,8 +1400,8 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/3ab9da347d5a551dc05935130ef1b5b83f8b574c:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/3ab9da347d5a551dc05935130ef1b5b83f8b574c}
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/e75dc1aca9e6bfd2dab3391ddae7a46d04de6506:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/e75dc1aca9e6bfd2dab3391ddae7a46d04de6506}
     version: 0.8.1-pstrat5.28
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1538,7 +1538,7 @@ snapshots:
 
   '@eslint/eslintrc@2.1.4':
     dependencies:
-      ajv: 6.14.0
+      ajv: 6.15.0
       debug: 4.4.3
       espree: 9.6.1
       globals: 13.24.0
@@ -1703,7 +1703,7 @@ snapshots:
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
 
-  ab@https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0: {}
+  ab@https://codeload.github.com/lichess-org/ab-stub/tar.gz/e391b56a82b7c71e7663082a797f6fc21b18776d: {}
 
   acorn-jsx@5.3.2(acorn@8.16.0):
     dependencies:
@@ -1711,7 +1711,7 @@ snapshots:
 
   acorn@8.16.0: {}
 
-  ajv@6.14.0:
+  ajv@6.15.0:
     dependencies:
       fast-deep-equal: 3.1.3
       fast-json-stable-stringify: 2.1.0
@@ -1881,7 +1881,7 @@ snapshots:
       '@humanwhocodes/module-importer': 1.0.1
       '@nodelib/fs.walk': 1.2.8
       '@ungap/structured-clone': 1.3.0
-      ajv: 6.14.0
+      ajv: 6.15.0
       chalk: 4.1.2
       cross-spawn: 7.0.6
       debug: 4.4.3
@@ -2332,7 +2332,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/3ab9da347d5a551dc05935130ef1b5b83f8b574c:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/e75dc1aca9e6bfd2dab3391ddae7a46d04de6506:
     dependencies:
       '@badrap/result': 0.2.13
 

@@ -3,6 +3,7 @@ package views.html.board
 import play.api.libs.json.{ JsObject, Json }
 
 import strategygames.variant.Variant
+import strategygames.GameFamily
 import strategygames.GameLogic
 
 import lila.api.Context
@@ -40,6 +41,9 @@ object userAnalysis {
         cssTag("analyse.free"),
         (pov.game.variant.hasDetachedPocket) option cssTag(
           "analyse.zh"
+        ),
+        (pov.game.variant.gameFamily == GameFamily.Backgammon()) option cssTag(
+          "analyse.backgammon"
         ),
         withForecast option cssTag("analyse.forecast"),
         ctx.blind option cssTag("round.nvui")

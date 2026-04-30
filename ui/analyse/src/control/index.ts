@@ -1,3 +1,4 @@
+import type { VNode } from 'snabbdom';
 import type AnalyseCtrl from '../ctrl';
 import type { Config as CgConfig } from 'chessground/config';
 import type { Piece as CgPiece, Key as CgKey } from 'chessground/types';
@@ -22,6 +23,7 @@ export interface ControlConfig {
   onAfterAddNode?(node: Tree.Node): void;
   onUserAction?(): void;
   afterJump?(): void;
+  onStepFailure?(): void;
 
   // Chessground config
   cgFen?(fen: string): string;
@@ -47,6 +49,12 @@ export interface ControlConfig {
   // Sound
   nodeSoundOverride?(node: Tree.Node): string | false | undefined;
   dropSoundOverride?(piece: CgPiece, pos: CgKey, captured?: CgPiece): string | undefined;
+
+  // Board overlay (e.g. dice picker)
+  renderBoardOverlay?(): VNode | null;
+
+  // Redirect tree-click jump paths (e.g. skip to end-of-turn for backgammon roll nodes)
+  redirectJumpPath?(path: string): string;
 }
 
 export function canGoForward(ctrl: AnalyseCtrl): boolean {

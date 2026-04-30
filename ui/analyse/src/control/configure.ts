@@ -31,5 +31,6 @@ const byKey: Partial<Record<VariantKey, Configure>> = {
 };
 
 export const configureVariantControl = (ctrl: AnalyseCtrl): void => {
+  ctrl.controlConfig = {};
   (byFamily[ctrl.data.game.gameFamily] ?? byKey[ctrl.data.game.variant.key])?.(ctrl);
 };

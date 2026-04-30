@@ -1,3 +1,4 @@
+import { h } from 'snabbdom';
 import type { Key as CgKey, Piece as CgPiece, PlayerIndex as CgPlayerIndex } from 'chessground/types';
 import {
   backgammonPosDiff as CgBackgammonPosDiff,
@@ -9,30 +10,11 @@ import type AnalyseCtrl from '../../ctrl';
 import type { AnaRoll, AnaEndTurn } from '../../study/interfaces';
 import { readDice } from 'stratutils';
 import { path as treePath } from 'tree';
+import { bind } from '../../util';
+
+const diceNames = ['one', 'two', 'three', 'four', 'five', 'six'];
 
 export const configure = (ctrl: AnalyseCtrl): void => {
-  ctrl.controlConfig.next = ctrl => {
-    const child = ctrl.node.children[0];
-    if (!child) return;
-    if (child.uci === 'endturn') {
-      const grandchild = child.children[0];
-      if (grandchild) ctrl.userJumpIfCan(ctrl.path + child.id + grandchild.id);
-    } else {
-      ctrl.userJumpIfCan(ctrl.path + child.id);
-    }
-  };
-  ctrl.controlConfig.prev = ctrl => {
-    const parentPath = treePath.init(ctrl.path);
-    if (ctrl.nodeList.length >= 2) {
-      const parent = ctrl.nodeList[ctrl.nodeList.length - 2];
-      if (parent.uci === 'endturn') {
-        ctrl.userJumpIfCan(treePath.init(parentPath));
-        return;
-      }
-    }
-    ctrl.userJumpIfCan(parentPath);
-  };
-
   ctrl.controlConfig.getOrientation = () => {
     const c = ctrl.data.player.playerIndex as CgPlayerIndex;
     return ctrl.flipped ? CgOppositeOrientationForBackgammon(c) : CgOrientationForBackgammon(c);
@@ -45,27 +27,56 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   let actionSent = false;
   let endTurnSent = false;
 
+  // Dice picker state
+  let dicePickerActive = false;
+  let die1Pick: number | null | undefined = undefined; // undefined=not chosen, null=random(?), 1-6=specific
+  let die2Pick: number | null | undefined = undefined;
+
   const diceRollUci = /^[1-6](\/[1-6])+$/;
 
-  const sendRollDice = () => {
-    if (rollPending) return;
-    // fix 2 successive rolls: If another session already rolled, navigate to the node instead of creating a duplicate
-    const existingRoll = ctrl.node.children.find(c => diceRollUci.test(c.uci ?? ''));
-    if (existingRoll) {
-      ctrl.userJumpIfCan(ctrl.path + existingRoll.id);
-      return;
-    }
+  const doSendRoll = (dice: number[]) => {
+    rollPending = true;
+    rollSent = true;
     const roll: AnaRoll = {
       variant: ctrl.data.game.variant.key,
       lib: ctrl.data.game.variant.lib,
       fen: ctrl.node.fen,
       path: ctrl.path,
+      dice,
     };
     if (ctrl.practice) ctrl.practice.onUserMove();
-    rollPending = true;
-    rollSent = true;
     ctrl.socket.sendAnaRoll(roll);
     ctrl.redraw();
+  };
+
+  const triggerRoll = () => {
+    if (rollPending) return;
+    // If another session already rolled, pre-fill the picker with those values
+    const existingRoll = ctrl.node.children.find(c => diceRollUci.test(c.uci ?? ''));
+    if (existingRoll) {
+      const parts = (existingRoll.uci ?? '').split('/').map(Number);
+      die1Pick = parts[0] ?? undefined;
+      die2Pick = parts[1] ?? undefined;
+    } else {
+      die1Pick = undefined;
+      die2Pick = undefined;
+    }
+    dicePickerActive = true;
+    ctrl.redraw();
+  };
+
+  const onDiePick = (die: 1 | 2, value: number | null) => {
+    if (die === 1) die1Pick = die1Pick === value ? undefined : value;
+    else die2Pick = die2Pick === value ? undefined : value;
+
+    if (die1Pick !== undefined && die2Pick !== undefined) {
+      dicePickerActive = false;
+      const d1 = die1Pick !== null ? (die1Pick as number) : Math.ceil(Math.random() * 6);
+      const d2 = die2Pick !== null ? (die2Pick as number) : Math.ceil(Math.random() * 6);
+      doSendRoll([d1, d2]);
+    } else {
+      ctrl.redraw();
+    }
   };
 
   const findEquivalentEndTurn = (): { endTurnPath: string; branchRootPath: string | null } | null => {
@@ -118,7 +129,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
         if (ctrl.study) ctrl.study.deleteNode(pathToDelete);
         ctrl.redraw();
       }
-      sendRollDice();
+      triggerRoll();
       return;
     }
     const endTurn: AnaEndTurn = {
@@ -137,7 +148,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     // Auto-roll only at chapter root with no existing moves and no dice in FEN.
     if (ctrl.path !== treePath.root || ctrl.node.children.length > 0) return;
     const fenParts = ctrl.node.fen.split(' ');
-    if (fenParts.length >= 3 && fenParts[1] === '-' && fenParts[2] === '-') sendRollDice();
+    if (fenParts.length >= 3 && fenParts[1] === '-' && fenParts[2] === '-') triggerRoll();
   };
 
   const maybeAutoEndTurn = (node: Tree.Node): void => {
@@ -152,13 +163,14 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     if (node.uci === 'endturn') {
       if (endTurnSent || !ctrl.study) {
         endTurnSent = false;
-        sendRollDice();
+        if (!ctrl.outcome(node)) triggerRoll();
       }
       return;
     }
     const allDiceConsumed = unusedDice === '-' && usedDice !== '-';
     const noMovesAfterRoll =
       unusedDice !== '-' &&
+      node.lifts != null &&
       (!node.dests || node.dests === '') &&
       (!node.dropsByRole || node.dropsByRole === '') &&
       (!node.lifts || node.lifts === '');
@@ -186,6 +198,34 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     actionSent = true;
   };
 
+  ctrl.controlConfig.afterJump = () => {
+    dicePickerActive = false;
+    die1Pick = undefined;
+    die2Pick = undefined;
+
+    if (rollPending) return;
+
+    // Always show picker at any pre-roll position (root or endturn node with - - FEN).
+    // This makes afterJump idempotent: study re-jumps and "last"/"first" buttons all
+    // correctly restore the picker without relying on endTurnSent sequencing.
+    const fenParts = ctrl.node.fen.split(' ');
+    if (fenParts.length < 3 || fenParts[1] !== '-' || fenParts[2] !== '-') return;
+    if (ctrl.outcome()) return;
+    const existingRoll = ctrl.node.children.find(c => diceRollUci.test(c.uci ?? ''));
+    if (existingRoll) {
+      const parts = (existingRoll.uci ?? '').split('/').map(Number);
+      die1Pick = parts[0] ?? undefined;
+      die2Pick = parts[1] ?? undefined;
+    }
+    dicePickerActive = true;
+  };
+
+  ctrl.controlConfig.onStepFailure = () => {
+    rollPending = false;
+    rollSent = false;
+    triggerRoll();
+  };
+
   ctrl.controlConfig.mutateCgOpts = (node, config) => {
     const playerIndex = ctrl.turnPlayerIndex() as CgPlayerIndex;
     const variantKey = ctrl.data.game.variant.key;
@@ -197,10 +237,14 @@ export const configure = (ctrl: AnalyseCtrl): void => {
       lastRollPath = ctrl.path;
     }
 
-    const dice = readDice(node.fen, variantKey, false, areDiceDescending);
+    const rawDice = readDice(node.fen, variantKey, false, areDiceDescending) as {
+      value: number;
+      isAvailable: boolean;
+    }[];
+    const dice = ctrl.outcome(node) ? rawDice.map(d => ({ ...d, isAvailable: false })) : rawDice;
     config.dice = dice;
 
-    const activeDiceValue = (dice as { value: number; isAvailable: boolean }[]).find(d => d.isAvailable)?.value;
+    const activeDiceValue = dice.find(d => d.isAvailable)?.value;
     if (activeDiceValue !== undefined && config.movable?.dests) {
       const sorted = new Map<string, string[]>();
       (config.movable.dests as Map<string, string[]>).forEach((destKeys, orig) => {
@@ -238,7 +282,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
       ctrl.reset();
     },
     onButtonClick: (button: string) => {
-      if (button === 'roll') sendRollDice();
+      if (button === 'roll') triggerRoll();
     },
     onUserLift: (dest: string) => {
       playstrategy.sound.play('move');
@@ -267,5 +311,54 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     }
     if (node.uci === 'endturn') return false;
     return undefined;
+  };
+
+  ctrl.controlConfig.renderBoardOverlay = () => {
+    if (!dicePickerActive) return null;
+    const playerIndex = ctrl.turnPlayerIndex() as CgPlayerIndex;
+
+    const renderGroup = (die: 1 | 2, currentPick: number | null | undefined) =>
+      h(`cg-dice.${playerIndex}.die-${die}`, [
+        h(`dice.random${currentPick === null ? '.selected' : ''}`, {
+          hook: bind('click', e => {
+            e.stopPropagation();
+            onDiePick(die, null);
+          }),
+        }),
+        ...[1, 2, 3].map(val =>
+          h(`dice.${diceNames[val - 1]}${currentPick === val ? '.selected' : ''}`, {
+            hook: bind('click', e => {
+              e.stopPropagation();
+              onDiePick(die, val);
+            }),
+          }),
+        ),
+        h('div.dice-picker__spacer'),
+        ...[4, 5, 6].map(val =>
+          h(`dice.${diceNames[val - 1]}${currentPick === val ? '.selected' : ''}`, {
+            hook: bind('click', e => {
+              e.stopPropagation();
+              onDiePick(die, val);
+            }),
+          }),
+        ),
+      ]);
+
+    return h('div.dice-picker', [renderGroup(1, die1Pick), renderGroup(2, die2Pick)]);
+  };
+
+  ctrl.controlConfig.redirectJumpPath = (path: string) => {
+    const node = ctrl.tree.nodeAtPath(path);
+    if (!node || !diceRollUci.test(node.uci ?? '')) return path;
+    // Advance to the last piece-move node before endTurn
+    let advancedPath = path;
+    let current: Tree.Node = node;
+    while (current.children.length > 0) {
+      const firstChild = current.children[0];
+      if (firstChild.uci === 'endturn') break;
+      advancedPath += firstChild.id;
+      current = firstChild;
+    }
+    return advancedPath;
   };
 };

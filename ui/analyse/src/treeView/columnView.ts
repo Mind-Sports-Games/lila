@@ -194,7 +194,12 @@ function renderFullMoveOf(
 
 function renderMainlineFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   const path = opts.parentPath + node.id,
-    classes = nodeClasses(ctx, node, path);
+    fullTurnPath =
+      opts.parentPath +
+      fullTurnNodesFromNode(node)
+        .map(n => n.id)
+        .join(''),
+    classes = nodeClasses(ctx, node, path, fullTurnPath);
   if (opts.conceal) classes[opts.conceal as string] = true;
   return h(
     'move',
@@ -224,6 +229,11 @@ function renderVariationFullMoveOf(
   const notation = variantClass.getNotationStyle();
   const withIndex = opts.withIndex || node.playedPlayerIndex === 'p1',
     path = opts.parentPath + node.id,
+    fullTurnPath =
+      opts.parentPath +
+      fullTurnNodesFromNode(node)
+        .map(n => n.id)
+        .join(''),
     content: MaybeVNodes = [
       withIndex ? moveView.renderIndex(node, true) : null,
       // TODO: the || '' are probably not correct
@@ -239,7 +249,7 @@ function renderVariationFullMoveOf(
         notation,
       ),
     ],
-    classes = nodeClasses(ctx, node, path);
+    classes = nodeClasses(ctx, node, path, fullTurnPath);
   if (opts.conceal) classes[opts.conceal as string] = true;
   if (node.glyphs) node.glyphs.forEach(g => content.push(moveView.renderGlyph(g)));
   return h(

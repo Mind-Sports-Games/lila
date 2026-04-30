@@ -109,8 +109,6 @@ function hiddenInput(name: string, value: string) {
 }
 
 function studyButton(ctrl: AnalyseCtrl) {
-  const canStudyFromHere = isChess(ctrl.data.game.variant.key) || !ctrl.synthetic;
-  if (!canStudyFromHere) return;
   if (ctrl.study && ctrl.embed && !ctrl.ongoing)
     return h(
       'a.button.button-empty',
@@ -134,7 +132,7 @@ function studyButton(ctrl: AnalyseCtrl) {
       },
       hook: bind('submit', e => {
         const pgnInput = (e.target as HTMLElement).querySelector('input[name=pgn]') as HTMLInputElement;
-        if (pgnInput) pgnInput.value = pgnExport.renderFullTxt(ctrl);
+        if (pgnInput && isChess(ctrl.data.game.variant.key)) pgnInput.value = pgnExport.renderFullTxt(ctrl);
       }),
     },
     [

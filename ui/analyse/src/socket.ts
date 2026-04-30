@@ -149,6 +149,7 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     stepFailure() {
       clearTimeout(anaMoveTimeout);
       ctrl.reset();
+      ctrl.controlConfig.onStepFailure?.();
     },
     dests(data: AnaDests) {
       clearTimeout(anaDestsTimeout);

@@ -460,6 +460,11 @@ export default class AnalyseCtrl {
     } else this.jump(path);
   };
 
+  userJumpFromTree = (path: Tree.Path): void => {
+    const finalPath = this.controlConfig.redirectJumpPath?.(path) ?? path;
+    this.userJump(finalPath);
+  };
+
   private canJumpTo(path: Tree.Path): boolean {
     return !this.study || this.study.canJumpTo(path);
   }
@@ -795,8 +800,9 @@ export default class AnalyseCtrl {
   }
 
   position(node: Tree.Node): Result<Position, PositionError> {
-    const setup = parseFen(variantKeyToRules(this.data.game.variant.key))(node.fen).unwrap();
-    return variantClassFromKey(this.data.game.variant.key).fromSetup(setup);
+    return parseFen(variantKeyToRules(this.data.game.variant.key))(node.fen).chain(setup =>
+      variantClassFromKey(this.data.game.variant.key).fromSetup(setup),
+    );
   }
 
   canUseCeval(): boolean {
