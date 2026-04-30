@@ -125,15 +125,15 @@ function renderPlayerScore(
   }
 }
 
-function renderPlayerScoreNames(player: Player, opponent: Player): VNode | undefined {
+function renderPlayerScoreNames(player: Player, opponent: Player, topPlayerIndex: string): VNode | undefined {
   const children: VNode[] = [];
-  const playerNames = {
-    p1: player.user ? player.user.username : player.playerName,
-    p2: opponent.user ? opponent.user.username : opponent.playerName,
-  };
-  children.push(h('div.game-score-name.p1.text', playerNames.p1));
+  const leftPlayer = player.playerIndex === topPlayerIndex ? opponent : player;
+  const rightPlayer = player.playerIndex === topPlayerIndex ? player : opponent;
+  const leftName = leftPlayer.user ? leftPlayer.user.username : leftPlayer.playerName;
+  const rightName = rightPlayer.user ? rightPlayer.user.username : rightPlayer.playerName;
+  children.push(h('div.game-score-name.p1.text', leftName));
   children.push(h('div.game-score-name.vs.text', 'vs'));
-  children.push(h('div.game-score-name.p2.text', playerNames.p2));
+  children.push(h('div.game-score-name.p2.text', rightName));
   return h('div.game-score-names', children);
 }
 
@@ -312,7 +312,7 @@ export function main(ctrl: RoundController): VNode {
             [renderGround(ctrl), promotion.view(ctrl)],
           ),
           ctrl.data.hasGameScore ? renderPlayerScore(topScore, 'top', topPlayerIndex, variantKey, captures) : null,
-          ctrl.data.hasGameScore ? renderPlayerScoreNames(ctrl.data.player, ctrl.data.opponent) : null,
+          ctrl.data.hasGameScore ? renderPlayerScoreNames(ctrl.data.player, ctrl.data.opponent, topPlayerIndex) : null,
           crazyView(ctrl, topPlayerIndex, 'top') ||
             renderMaterial(material[topPlayerIndex], -score, 'top', d.hasGameScore, checks[topPlayerIndex]),
           ...renderTable(ctrl),
