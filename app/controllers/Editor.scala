@@ -107,7 +107,9 @@ final class Editor(env: Env) extends LilaController(env) {
       .filter(_.nonEmpty)
       .map(s => FEN.clean(variant.gameLogic, s))
       .flatMap(f => Forsyth.<<<@(variant.gameLogic, variant, f))
-      .map(_.situation) | Situation(variant.gameLogic, variant)
+      .map(_.situation) | Forsyth
+        .<<<@(variant.gameLogic, variant, variant.initialFen)
+        .fold(Situation(variant.gameLogic, variant))(_.situation)
 
   // If the game is not playable and the FEN is not passed, redirect to the editor based on the state after the last move.
   def game(id: String) =
