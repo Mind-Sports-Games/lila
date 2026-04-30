@@ -223,7 +223,10 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   ctrl.controlConfig.onStepFailure = () => {
     rollPending = false;
     rollSent = false;
-    triggerRoll();
+    // Only show picker if we're at a pre-roll state (both dice fields empty).
+    // If there are dice already (roll node), the endturn failed but pieces can still move.
+    const fenParts = ctrl.node.fen.split(' ');
+    if (fenParts.length >= 3 && fenParts[1] === '-' && fenParts[2] === '-') triggerRoll();
   };
 
   ctrl.controlConfig.mutateCgOpts = (node, config) => {

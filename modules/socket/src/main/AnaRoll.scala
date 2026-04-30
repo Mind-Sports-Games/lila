@@ -20,8 +20,13 @@ case class AnaRoll(
 
   def branch: Validated[String, Branch] = {
     val game = Game(lib, variant.some, fen.some)
+    // If provided dice are invalid (e.g. doubles on the opening roll), fall back to random.
     (dice match {
-      case Some(d) => game.diceRoll(d, MoveMetrics())
+      case Some(d) =>
+        game.diceRoll(d, MoveMetrics()).fold(
+          _   => game.randomizeAndApplyDiceRoll(MoveMetrics()),
+          gdr => Validated.valid(gdr)
+        )
       case None    => game.randomizeAndApplyDiceRoll(MoveMetrics())
     }).flatMap { case (game, diceRoll) =>
         game.actionStrs.flatten.lastOption toValid "Rolled but no last action!" map { lastAction =>
