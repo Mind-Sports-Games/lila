@@ -146,8 +146,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   };
 
   const maybeAutoRollOnLoad = (): void => {
-    // Auto-roll only at chapter root with no existing moves and no dice in FEN.
-    if (ctrl.path !== treePath.root || ctrl.node.children.length > 0) return;
+    if (ctrl.path !== treePath.root) return;
     const fenParts = ctrl.node.fen.split(' ');
     if (fenParts.length >= 3 && fenParts[1] === '-' && fenParts[2] === '-') triggerRoll();
   };
