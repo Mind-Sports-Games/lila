@@ -16,7 +16,7 @@ importers:
         version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/cbbbf6099e025d0d0fd23ba017b54a3df12ba3a7
       stratops:
         specifier: github:Mind-Sports-Games/stratops#pla-1023-support-backgammon-in-analysis-and-studies
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/51792ab5f9c484d431d60178a64875255328233f
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/1713bd5b47a035b36ab0a71d63db631764b166c2
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -1400,8 +1400,8 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/51792ab5f9c484d431d60178a64875255328233f:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/51792ab5f9c484d431d60178a64875255328233f}
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/1713bd5b47a035b36ab0a71d63db631764b166c2:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/1713bd5b47a035b36ab0a71d63db631764b166c2}
     version: 0.8.1-pstrat5.28
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -2332,7 +2332,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/51792ab5f9c484d431d60178a64875255328233f:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/1713bd5b47a035b36ab0a71d63db631764b166c2:
     dependencies:
       '@badrap/result': 0.2.13
 
