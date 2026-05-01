@@ -25,7 +25,7 @@ final private class SandbagWatch(
     (records getIfPresent userId, outcomeOf(game, loser, userId)) match {
       case (None, Good)         =>
       case (Some(record), Good) => setRecord(userId, record + Good, game)
-      case (record, outcome)    => setRecord(userId, (record.getOrElse(emptyRecord)) + outcome, game)
+      case (record, outcome)    => setRecord(userId, (record | emptyRecord) + outcome, game)
     }
 
   private def setRecord(userId: User.ID, record: Record, game: Game): Funit =

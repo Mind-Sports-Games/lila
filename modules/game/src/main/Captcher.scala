@@ -32,10 +32,7 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
 
     def get(id: String): Fu[Captcha] =
       find(id) match {
-        case None =>
-          getFromDb(id) map { c =>
-            val result = c | Captcha.default; add(result); result
-          }
+        case None    => getFromDb(id).dmap(_ | Captcha.default).addEffect(Impl.add)
         case Some(c) => fuccess(c)
       }
 

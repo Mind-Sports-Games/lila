@@ -118,8 +118,7 @@ object Chat {
   }
 
   import BSONFields.*
-  import reactivemongo.api.bson.{ BSONArray, BSONDocument }
-  import Line.{ lineBSONHandler, userLineBSONHandler }
+  import reactivemongo.api.bson.BSONDocument
 
   implicit val chatIdIso: lila.common.Iso[String, Id] = lila.common.Iso.string[Id](Id.apply, _.value)
   implicit val chatIdBSONHandler: BSONHandler[Id]     = lila.db.BSON.stringIsoHandler(using chatIdIso)
@@ -138,6 +137,7 @@ object Chat {
   }
 
   implicit val userChatBSONHandler: BSON[UserChat] = new BSON[UserChat] {
+    import Line.userLineBSONHandler
     def reads(r: BSON.Reader): UserChat =
       UserChat(
         id = r.get[Id](id),
@@ -146,7 +146,7 @@ object Chat {
     def writes(w: BSON.Writer, o: UserChat) =
       BSONDocument(
         id    -> o.id,
-        lines -> BSONArray(o.lines.flatMap(userLineBSONHandler.writeOpt))
+        lines -> o.lines
       )
   }
 }

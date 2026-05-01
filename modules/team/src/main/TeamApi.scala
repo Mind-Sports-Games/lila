@@ -86,8 +86,9 @@ final class TeamApi(
         hideForum = Some(e.hideForum)
       ) pipe { team =>
         teamRepo.coll.update.one($id(team.id), team).void >>
-          (if (!team.leaders(me.id)) modLog.teamEdit(me.id, team.createdBy, team.name)
-           else funit).andDo(indexer ! InsertTeam(team))
+          (!team.leaders(me.id)).so {
+            modLog.teamEdit(me.id, team.createdBy, team.name)
+          }.andDo(indexer ! InsertTeam(team))
       }
     }
 
@@ -273,9 +274,9 @@ final class TeamApi(
     }
 
   def toggleEnabled(team: Team, by: User): Funit =
-    if lila.security.Granter(_.ManageTeam)(by) || team.createdBy == by.id ||
+    if (lila.security.Granter(_.ManageTeam)(by) || team.createdBy == by.id ||
       (team.leaders(by.id) && !team.leaders(team.createdBy))
-    then
+    )
       if (team.enabled)
         teamRepo.disable(team).void >>
           memberRepo.userIdsByTeam(team.id).map { _ foreach cached.invalidateTeamIds } >>

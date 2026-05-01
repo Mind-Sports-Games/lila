@@ -244,8 +244,8 @@ final class PostApi(
         "userId",
         $doc(
           "topicId" -> topic.id,
-          "number" `$gt` (newPostNumber - 10),
-          "createdAt" `$gt` DateTime.now.minusDays(5)
+          "number".$gt((newPostNumber - 10)),
+          "createdAt".$gt(DateTime.now.minusDays(5))
         ),
         ReadPreference.secondaryPreferred
       )

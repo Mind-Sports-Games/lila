@@ -536,7 +536,7 @@ final private[round] class RoundDuct(
   private def recordLag(pov: Pov): Unit =
     if (((pov.game.playedTurns & 30) == 10) && pov.game.actionStrs.lastOption.map(_.size) == Some(1))
       // Triggers on the first action of every 32 turns, starting on turn 10.
-      // i.e. if (single action per turn,) this triggers on ply: 10, 11, 42, 43, 74, 75, ...
+      // i.e. if single action per turn, then this triggers on ply: 10, 11, 42, 43, 74, 75, ...
       for {
         user  <- pov.player.userId
         clock <- pov.game.clock
@@ -592,11 +592,11 @@ final private[round] class RoundDuct(
           Protocol.Out.tellVersion(roomId, version, e)
         }
       }
-      if events exists {
+      if (events exists {
           case e: Event.Move => e.threefold
           case _             => false
         }
-      then this ! Threefold
+      ) this ! Threefold
     }
 
   private def errorHandler(name: String): PartialFunction[Throwable, Unit] = {

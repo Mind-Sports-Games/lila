@@ -32,6 +32,8 @@ final private class TournamentScheduler(
   // )
   private[tournament] def allWithConflicts(rightNow: DateTime): List[Plan] = {
     val today = rightNow.withTimeAtStartOfDay
+    //val tomorrow    = rightNow plusDays 1
+    //val startOfYear = today.dayOfYear.withMinimumValue
 
     class OfMonth(fromNow: Int) {
       val firstDay = today.plusMonths(fromNow).dayOfMonth.withMinimumValue
@@ -79,6 +81,52 @@ final private class TournamentScheduler(
 
     def nextMonthWeekAndDayOfWeek(weekOfMonth: Int, dayOfWeek: Int) =
       monthOfWithWeekAndDayOfWeek(nextMonth, weekOfMonth, dayOfWeek)
+
+    // def secondWeekOf(month: Int) = {
+    //   val start = orNextYear(startOfYear.withMonthOfYear(month))
+    //   start.plusDays(15 - start.getDayOfWeek)
+    // }
+
+    // def orTomorrow(date: DateTime) = if (date isBefore rightNow) date plusDays 1 else date
+    // def orNextWeek(date: DateTime) = if (date isBefore rightNow) date plusWeeks 1 else date
+    // def orNextYear(date: DateTime) = if (date isBefore rightNow) date plusYears 1 else date
+
+    // val isHalloween = today.getDayOfMonth == 31 && today.getMonthOfYear == OCTOBER
+
+    // def opening(offset: Int) = {
+    //   val positions = StartingPosition.featurable
+    //   positions((today.getDayOfYear + offset) % positions.size)
+    // }
+
+    // val farFuture = today plusMonths 7
+
+    // val birthday = new DateTime(2021, 7, 21, 12, 0, 0)
+
+    // val fss  = List(nextFriday, nextSaturday, nextSunday)
+    // val mwfs = List(nextMonday, nextWednesday, nextFriday, nextSunday)
+    // val tts  = List(nextTuesday, nextThursday, nextSaturday)
+
+    // def schedule10(hour: Int, v: Variant)(day: DateTime) =
+    //   at(day, hour) map { date =>
+    //     Schedule(Weekly, Bullet, v, none, date).plan
+    //   }
+
+    // def schedule32(hour: Int, v: Variant)(day: DateTime) =
+    //   at(day, hour) map { date =>
+    //     Schedule(Weekly, Blitz32, v, none, date).plan
+    //   }
+
+    // def schedule51(hour: Int, v: Variant)(day: DateTime) =
+    //   at(day, hour) map { date =>
+    //     Schedule(Weekly, Blitz51, v, none, date).plan
+    //   }
+
+    // def scheduleUnique(hour: Int, speed: Schedule.Speed, variant: Variant, duration: Int)(
+    //     day: DateTime
+    // ) =
+    //   at(day, hour) map { date =>
+    //     Schedule(Unique, speed, variant, none, date, Some(duration)).plan
+    //   }
 
     def scheduleMedleyShield(medleyShield: TournamentShield.MedleyShield)(
         day: DateTime

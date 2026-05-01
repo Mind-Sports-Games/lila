@@ -159,7 +159,7 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
         frag(
           (if (link) a else span) (
             cls  := userClass(user.id, cssClass, withOnline),
-            href := s"${routes.User `show` user.name}${if (mod) "?mod" else ""}"
+            href := s"${routes.User.show(user.name)}${if (mod) "?mod" else ""}"
           )(
             withOnline.option(frag(lineIcon(user), " ")),
             playerUsername(player, withRating),

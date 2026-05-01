@@ -34,7 +34,7 @@ final class EventApi(
       .find(
         $doc(
           "enabled" -> true,
-          "startsAt" `$gt` DateTime.now.minusDays(50) `$lt` DateTime.now.plusDays(4)
+          "startsAt".$gt(DateTime.now.minusDays(50)).$lt(DateTime.now.plusDays(4))
         )
       )
       .sort($sort.asc("startsAt"))

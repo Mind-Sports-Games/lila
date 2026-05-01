@@ -81,9 +81,9 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
     coll
       .find(
         $doc(
-          "seenAt" `$lt` date,
+          "seenAt".$lt(date),
           "status" -> Status.Created.id,
-          "timeControl" `$exists` true
+          "timeControl".$exists(true)
         )
       )
       .hint(coll hint $doc("seenAt" -> 1)) // partial index
@@ -91,7 +91,7 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
       .list(max)
 
   private[challenge] def expired(max: Int): Fu[List[Challenge]] =
-    coll.list[Challenge]($doc("expiresAt" `$lt` DateTime.now), max)
+    coll.list[Challenge]($doc("expiresAt".$lt(DateTime.now)), max)
 
   def setSeenAgain(id: Challenge.ID) =
     coll.update

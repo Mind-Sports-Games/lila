@@ -196,9 +196,8 @@ object Event {
         dest = move.dest,
         san = Dumper(situation.board.variant.gameLogic, move),
         fen =
-          if situation.board.variant.gameLogic == GameLogic
-              .Draughts() && situation.board.variant.frisianVariant
-          then
+          if (situation.board.variant.gameLogic == GameLogic
+              .Draughts() && situation.board.variant.frisianVariant)
             situation.board match {
               case Board.Draughts(board) =>
                 Forsyth.exportBoard(GameLogic.Draughts(), situation.board) + ":" +

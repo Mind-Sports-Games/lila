@@ -142,6 +142,7 @@ object BSONHandlers {
     x => BSONString(x.id)
   )
 
+  // These handlers changed in scala2->3 port. They should be equivalent but its possible they are not
   implicit private val DbMemberBSONHandler: BSONDocumentHandler[DbMember] =
     new BSONDocumentHandler[DbMember] {
       def readDocument(doc: BSONDocument) = doc.getAsTry[StudyMember.Role]("role").map(DbMember.apply)
@@ -158,6 +159,7 @@ object BSONHandlers {
         }),
       _.members.view.mapValues(m => DbMember(m.role)).toMap
     )
+
   import Study.Visibility
   implicit private[study] val VisibilityHandler: BSONHandler[Visibility] = tryHandler[Visibility](
     { case BSONString(v) => Visibility.byKey.get(v).toTry(s"Invalid visibility $v") },

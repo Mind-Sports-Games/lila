@@ -39,7 +39,7 @@ final class GameStateStream(
     blueprint mapMaterializedValue { queue =>
       val actor = system.actorOf(
         Props(mkActor(init, as, User(u.id, u.isBot), queue)),
-        name = s"GameStateStream:${init.game.id}:${lila.common.ThreadLocalRandom `nextString` 8}"
+        name = s"GameStateStream:${init.game.id}:${lila.common.ThreadLocalRandom.nextString(8)}"
       )
       queue.watchCompletion().foreach { _ =>
         actor ! PoisonPill

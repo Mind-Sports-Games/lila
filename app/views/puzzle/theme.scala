@@ -50,13 +50,14 @@ object theme {
                         )
                       }
                     },
-                    cat.key == "puzzle:origin" `option`
+                    (cat.key == "puzzle:origin").option(
                       a(cls := "puzzle-themes__link", href := routes.Puzzle.ofPlayer(variant.key))(
                         span(
                           h3("Player games"),
                           span("Lookup puzzles generated from your games, or from another player's games.")
                         )
                       )
+                    )
                   )
                 )
               }

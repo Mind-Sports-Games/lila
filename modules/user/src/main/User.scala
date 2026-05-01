@@ -361,5 +361,17 @@ object User {
   implicit val speakerHandler: BSONDocumentHandler[Speaker] = reactivemongo.api.bson.Macros.handler[Speaker]
   implicit val contactHandler: BSONDocumentHandler[Contact] = reactivemongo.api.bson.Macros.handler[Contact]
 
+
+  // private val firstRow: List[PerfType] = PerfType.standard
+
+  // private val secondRow: List[PerfType] =
+  //   PerfType.all.filter(_.key == "ultraBullet") :::
+  //     PerfType.variants.filter(p =>
+  //       (p.category match {
+  //         case Left(Right(v)) => v.gameLogic
+  //         case _              => GameLogic.Chess()
+  //       }) == GameLogic.Chess()
+  //     )
+
   val topPerfTrophiesEnabled = false
 }

@@ -112,7 +112,7 @@ object SetupForm {
       .verifying("Invalid clock", _.validClock)
       .verifying(
         "Invalid time control",
-        hook => hook.makeClock.forall(lila.game.Game.isBoardCompatible)
+        hook => hook.makeClock.so(lila.game.Game.isBoardCompatible)
       )
   )
 

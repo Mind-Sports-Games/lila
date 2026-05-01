@@ -264,9 +264,9 @@ object SwissJson {
                 "rating"        -> p.player.player.rating,
                 "inputRating"   -> p.player.player.inputRating,
                 "ratingDisplay" -> (
-                  if swiss.variant.gameFamily == GameFamily
+                  if (swiss.variant.gameFamily == GameFamily
                       .Go() && (swiss.settings.handicapped || swiss.settings.mcmahon)
-                  then p.player.player.inputRating.map(goRatingDisplay(_))
+                      ) p.player.player.inputRating.map(goRatingDisplay(_))
                   else None
                 )
               )

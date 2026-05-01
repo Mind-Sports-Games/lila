@@ -2,6 +2,7 @@ package lila.setup
 
 import strategygames.{ ByoyomiClock, GameFamily, GameLogic, Mode, Speed }
 import strategygames.variant.Variant
+import lila.game.Game
 import lila.lobby.PlayerIndex
 import lila.lobby.{ Hook, Seek }
 import lila.rating.RatingRange
@@ -39,10 +40,8 @@ case class HookConfig(
   def fixPlayerIndex =
     copy(
       playerIndex =
-        if mode == Mode.Rated &&
-          lila.game.Game.variantsWhereP1IsBetter(variant) &&
-          playerIndex != PlayerIndex.Random
-        then PlayerIndex.Random
+        if (mode == Mode.Rated && Game.variantsWhereP1IsBetter(variant) && playerIndex != PlayerIndex.Random)
+          PlayerIndex.Random
         else playerIndex
     )
 

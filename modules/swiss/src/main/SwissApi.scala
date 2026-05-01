@@ -169,10 +169,10 @@ final class SwissApi(
             forbiddenPairings = ~data.forbiddenPairings,
             minutesBeforeStartToJoin = data.realMinutesBeforeStartToJoin,
             medleyVariants =
-              if old.medleyGameGroups != Some(
+              if (old.medleyGameGroups != Some(
                   data.medleyGameFamilies.ggList.sortWith(_.name < _.name)
                 ) || old.settings.nbRounds < data.nbRounds
-              then data.medleyVariants
+              ) data.medleyVariants
               else old.settings.medleyVariants
           )
         ) pipe { s =>
@@ -629,7 +629,7 @@ final class SwissApi(
   private[swiss] def rematchForMultiGame(spgame: SwissPairingGames): Funit =
     getSwissPairingForGame(spgame.game) map { pairing =>
       {
-        pairing.map { pairing =>
+        val _ = pairing.map { pairing =>
           SwissPlayer.fields { f =>
             colls.player.list[SwissPlayer]($doc(f.swissId -> pairing.swissId)) map { players =>
               val playerMap = SwissPlayer.toMap(players)
@@ -658,7 +658,6 @@ final class SwissApi(
             }
           }
         }
-        ()
       }
     }
 

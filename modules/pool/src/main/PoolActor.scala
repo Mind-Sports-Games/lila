@@ -85,10 +85,7 @@ final private class PoolActor(
       members = members.diff(pairedMembers).map(_.incMisses)
 
       if (pairings.nonEmpty) gameStarter(config, pairings)
-      else if candidates
-          .filter(!_.lame)
-          .size == 1
-      then
+      else if (candidates.filter(!_.lame).size == 1)
         candidates
           .filter(c => !c.lame && c.misses >= 1)
           .headOption

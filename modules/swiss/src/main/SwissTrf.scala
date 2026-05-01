@@ -42,7 +42,7 @@ final class SwissTrf(
         s"012 ${swiss.name}",
         s"022 $baseUrl/swiss/${swiss.id}",
         s"032 PlayStrategy",
-        s"042 ${dateFormatter `print` swiss.startsAt}",
+        s"042 ${dateFormatter.print(swiss.startsAt)}",
         s"052 ${swiss.finishedAt so dateFormatter.print}",
         s"062 ${swiss.nbPlayers}",
         s"092 Individual: Swiss-System",

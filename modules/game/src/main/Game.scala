@@ -1446,7 +1446,7 @@ case class FischerClockHistory(
       val pairs = clocks.iterator zip clocks.iterator.drop(1)
 
       // We need to determine if this playerIndex's last clock had grace applied.
-      // if (finished and history.size == playedPlies) game was ended
+      // if finished and history.size == playedPlies then game was ended
       // by a players ply, such as with mate or autodraw. In this case,
       // the last ply of the game, and the only one without grace, is the
       // last entry of the clock history for !turnPlayerIndex.

@@ -35,9 +35,9 @@ final class SgfDump(
     "(;" ++ tags.toString ++ "\n\n" ++ validSgf(variant, actionStrs, initialFen) ++ ")"
 
   def validSgf(variant: Variant, actionStrs: ActionStrs, initialFen: Option[FEN]): String =
-    if variant.gameLogic == GameLogic.FairySF() || variant.gameLogic == GameLogic
-        .Go() || variant.gameLogic == GameLogic.Backgammon()
-    then Dumper(variant, actionStrs, initialFen)
+    if (variant.gameLogic == GameLogic.FairySF() || variant.gameLogic == GameLogic
+        .Go() || variant.gameLogic == GameLogic.Backgammon())
+      Dumper(variant, actionStrs, initialFen)
     else "SGF NOT SUPPORTED"
 
   private val fileR = """[\s,]""".r

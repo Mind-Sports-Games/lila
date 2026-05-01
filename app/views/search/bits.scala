@@ -14,7 +14,7 @@ private object bits {
   import trans.search.*
 
   private val dateFormatter              = DateTimeFormat.forPattern("yyyy-MM-dd")
-  private val dateMin                    = "2011-01-01"
+  private val dateMin                    = "2021-01-01"
   private def dateMinMax: List[Modifier] =
     List(min := dateMin, max := dateFormatter.print(DateTime.now.plusDays(1)))
 

@@ -108,7 +108,7 @@ trait AssetHelper { self: I18nHelper & SecurityHelper =>
 
   def prismicJs(implicit ctx: Context): Frag =
     raw {
-      isGranted(_.Prismic) so { // @TODO: check why lichess prismic is used here
+      isGranted(_.Prismic) so {
         embedJsUnsafe("""window.prismic={endpoint:'https://playstrategy.prismic.io/api/v2'}""").render ++
           """<script src="//static.cdn.prismic.io/prismic.min.js"></script>"""
       }

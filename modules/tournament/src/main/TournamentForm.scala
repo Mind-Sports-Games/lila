@@ -412,13 +412,13 @@ private[tournament] case class TournamentSetup(
           if (handicaps.handicapped.contains(true)) handicaps.inputPlayerRatings else None,
         variant = newVariant,
         medleyVariantsAndIntervals =
-          if old.medleyGameGroups != medleyGameFamilies.ggList
+          if (old.medleyGameGroups != medleyGameFamilies.ggList
               .sortWith(_.name < _.name)
               .some
             || old.medleyMinutes != medleyIntervalOptions.medleyMinutes
             || old.medleyIsBalanced != medleyIntervalOptions.balanceIntervals.fold(Some(false))(x => Some(x))
             || old.medleyNumIntervals != medleyIntervalOptions.numIntervals
-          then medleyVariantsAndIntervals
+          ) medleyVariantsAndIntervals
           else old.medleyVariantsAndIntervals,
         medleyMinutes = medleyIntervalOptions.medleyMinutes,
         startsAt = startDate | old.startsAt,

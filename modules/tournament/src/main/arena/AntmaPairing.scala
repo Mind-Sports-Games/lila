@@ -22,9 +22,9 @@ private object AntmaPairing {
           lastOpponents.hash.get(u2).contains(u1)
 
       def pairScore(a: RPlayer, b: RPlayer): Option[Int] =
-        if justPlayedTogether(a.player.userId, b.player.userId) ||
+        if (justPlayedTogether(a.player.userId, b.player.userId) ||
           !a.playerIndexHistory.couldPlay(b.playerIndexHistory, maxStrike)
-        then None
+        ) None
         else
           Some {
             Math.abs(a.rank - b.rank) * rankFactor(a, b) +

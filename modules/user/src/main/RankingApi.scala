@@ -256,8 +256,7 @@ final class RankingApi(
 
     // from 600 to 2800 by Stat.group
     private def compute(perfId: Perf.ID): Fu[List[NbUsers]] =
-      if (!lila.rating.PerfType(perfId).exists(lila.rating.PerfType.leaderboardable.contains)) fuccess(Nil)
-      else
+      lila.rating.PerfType(perfId).exists(lila.rating.PerfType.leaderboardable.contains).so {
         coll
           .aggregateWith[Bdoc](
             readPreference = ReadPreference.secondaryPreferred
@@ -294,6 +293,7 @@ final class RankingApi(
             }.toList
           }
           .addEffect(monitorRatingDistribution(perfId))
+      }
 
     /* monitors cumulated ratio of players in each rating group, for a perf
      *

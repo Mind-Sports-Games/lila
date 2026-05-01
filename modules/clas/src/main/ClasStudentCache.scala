@@ -30,7 +30,7 @@ final class ClasStudentCache(colls: ClasColls, @annotation.nowarn("msg=unused") 
     colls.student.countAll foreach { count =>
       val nextBloom = BloomFilter[User.ID](count + 1, falsePositiveRate)
       colls.student
-        .find($doc("archived" `$exists` false), $doc("userId" -> true).some)
+        .find($doc("archived".$exists(false)), $doc("userId" -> true).some)
         .cursor[Bdoc](ReadPreference.secondaryPreferred)
         .documentSource()
         .toMat(Sink.fold[Int, Bdoc](0) { case (total, doc) =>

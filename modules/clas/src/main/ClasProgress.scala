@@ -84,8 +84,8 @@ final class ClasProgressApi(
         List(
           Match(
             $doc(
-              PuzzleRound.BSONFields.user `$in` userIds,
-              PuzzleRound.BSONFields.date `$gt` DateTime.now.minusDays(days)
+              PuzzleRound.BSONFields.user.$in(userIds),
+              PuzzleRound.BSONFields.date.$gt(DateTime.now.minusDays(days))
             )
           ),
           GroupField("u")(
@@ -125,7 +125,7 @@ final class ClasProgressApi(
         List(
           Match(
             $doc(
-              F.playerUids `$in` userIds,
+              F.playerUids.$in(userIds),
               Query.createdSince(DateTime.now.minusDays(days)),
               F.perfType -> perfType.id
             )
@@ -139,7 +139,7 @@ final class ClasProgressApi(
             )
           ),
           UnwindField(F.playerUids),
-          Match($doc(F.playerUids `$in` userIds)),
+          Match($doc(F.playerUids.$in(userIds))),
           GroupField(F.playerUids)(
             "nb"  -> SumAll,
             "win" -> Sum(

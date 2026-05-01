@@ -60,11 +60,11 @@ final class ChallengeBulkApi(
 
   def startClocks(id: String, me: User): Fu[Boolean] =
     coll
-      .updateField($doc("_id" -> id, "by" -> me.id, "pairedAt" `$exists` true), "startClocksAt", DateTime.now)
+      .updateField($doc("_id" -> id, "by" -> me.id, "pairedAt".$exists(true)), "startClocksAt", DateTime.now)
       .map(_.n == 1)
 
   def schedule(bulk: ScheduledBulk): Fu[Either[String, ScheduledBulk]] = workQueue(bulk.by) {
-    coll.list[ScheduledBulk]($doc("by" -> bulk.by, "pairedAt" `$exists` false)) flatMap { bulks =>
+    coll.list[ScheduledBulk]($doc("by" -> bulk.by, "pairedAt".$exists(false))) flatMap { bulks =>
       if (bulks.sizeIs >= 10) fuccess(Left("Already too many bulks queued"))
       else if (bulks.map(_.games.size).sum >= 1000) fuccess(Left("Already too many games queued"))
       else if (bulks.exists(_.collidesWith(bulk)))
@@ -77,7 +77,7 @@ final class ChallengeBulkApi(
     checkForPairing >> checkForClocks
 
   private def checkForPairing: Funit =
-    coll.one[ScheduledBulk]($doc("pairAt" `$lte` DateTime.now, "pairedAt" `$exists` false)) flatMap {
+    coll.one[ScheduledBulk]($doc("pairAt".$lte(DateTime.now), "pairedAt".$exists(false))) flatMap {
       _ so { bulk =>
         workQueue(bulk.by) {
           makePairings(bulk).void
@@ -86,7 +86,7 @@ final class ChallengeBulkApi(
     }
 
   private def checkForClocks: Funit =
-    coll.one[ScheduledBulk]($doc("startClocksAt" `$lte` DateTime.now, "pairedAt" `$exists` true)) flatMap {
+    coll.one[ScheduledBulk]($doc("startClocksAt".$lte(DateTime.now), "pairedAt".$exists(true))) flatMap {
       _ so { bulk =>
         workQueue(bulk.by) {
           startClocksNow(bulk)

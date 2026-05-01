@@ -187,9 +187,9 @@ object SgfDump {
       game.multiPointState.fold(1)(mps => mps.target - (if (isWinnerP1) mps.p1Points else mps.p2Points))
     val points = Math.min(game.pointValue.getOrElse(1), game.multiPointState.fold(1)(_ => maxPoints))
     val resign =
-      if (Status.resigned ++ List(Status.Outoftime, Status.OutoftimeGammon, Status.OutoftimeBackgammon))
-          .contains(game.status)
-      then "R"
+      if ((Status.resigned ++ List(Status.Outoftime, Status.OutoftimeGammon, Status.OutoftimeBackgammon))
+          .contains(game.status))
+        "R"
       else ""
     return s"$winner+$points$resign"
   }

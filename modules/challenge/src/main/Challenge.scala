@@ -277,6 +277,15 @@ object Challenge {
       case "p2" => PlayerIndexChoice.P2     -> P2
       case _    => PlayerIndexChoice.Random -> randomPlayerIndex
     }
+    // val finalVariant = fenVariant match {
+    //   case Some(v) if draughtsFenVariants(variant) =>
+    //     if (variant.fromPositionVariant && v.standardVariant)
+    //       Variant
+    //         .byName(GameLogic.Draughts(), "From Position")
+    //         .getOrElse(Variant.orDefault(GameLogic.Draughts(), 3))
+    //     else v
+    //   case _ => variant
+    // }
     // val finalInitialFen = finalVariant match {
     //  case Variant.Draughts(v) =>
     //    draughtsFenVariants(v) so {
@@ -297,9 +306,9 @@ object Challenge {
       status = Status.Created,
       variant = variant,
       initialFen =
-        if variant.fromPositionVariant || variant.gameFamily == GameFamily
-            .Go() || variant.gameFamily == GameFamily.Backgammon()
-        then initialFen
+        if (variant.fromPositionVariant || variant.gameFamily == GameFamily
+            .Go() || variant.gameFamily == GameFamily.Backgammon())
+          initialFen
         else if (variant == Variant.Chess(Chess960))
           initialFen filter { fen =>
             fen.chessFen.map(fen => Chess960.positionNumber(fen).isDefined).getOrElse(false)

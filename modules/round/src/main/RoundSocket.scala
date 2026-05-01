@@ -200,17 +200,15 @@ final class RoundSocket(
       }
   }
 
-  locally {
-    import lila.chat.actorApi.*
-    Bus.subscribeFun(BusChan.Round.chan, BusChan.Global.chan) {
-      case ChatLine(Chat.Id(id), l) =>
-        val line = RoundLine(l, id.endsWith("/w"))
-        rounds.tellIfPresent(if (line.watcher) id take Game.gameIdSize else id, line)
-      case OnTimeout(Chat.Id(id), userId) =>
-        send(RP.Out.tellRoom(RoomId(id take Game.gameIdSize), makeMessage("chat_timeout", userId)))
-      case OnReinstate(Chat.Id(id), userId) =>
-        send(RP.Out.tellRoom(RoomId(id take Game.gameIdSize), makeMessage("chat_reinstate", userId)))
-    }
+  import lila.chat.actorApi.*
+  Bus.subscribeFun(BusChan.Round.chan, BusChan.Global.chan) {
+    case ChatLine(Chat.Id(id), l) =>
+      val line = RoundLine(l, id.endsWith("/w"))
+      rounds.tellIfPresent(if (line.watcher) id take Game.gameIdSize else id, line)
+    case OnTimeout(Chat.Id(id), userId) =>
+      send(RP.Out.tellRoom(RoomId(id take Game.gameIdSize), makeMessage("chat_timeout", userId)))
+    case OnReinstate(Chat.Id(id), userId) =>
+      send(RP.Out.tellRoom(RoomId(id take Game.gameIdSize), makeMessage("chat_reinstate", userId)))
   }
 
   system.scheduler.scheduleWithFixedDelay(25 seconds, tickInterval) { () =>

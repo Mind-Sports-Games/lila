@@ -53,8 +53,8 @@ final class User(
       env.game.cached
         .lastPlayedPlayingId(userId)
         .orElse(env.game.gameRepo.quickLastPlayedId(userId)) flatMap {
-        _.so { gameId => gameC.exportGame(gameId, req) }
-      }
+          _.fold(NotFound("No ongoing game").fuccess)(gameId => gameC.exportGame(gameId, req))
+        }
     }
 
   private def apiGames(u: UserModel, filter: String, page: Int)(implicit ctx: BodyContext[?]) = {

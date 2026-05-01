@@ -129,4 +129,66 @@ object side {
     )
   }
 
+/*
+  private def showStorm(storm: lila.rating.Perf.Storm, user: User)(implicit lang: Lang) =
+    a(
+      dataIcon := '~',
+      cls := List(
+        "empty" -> !storm.nonEmpty
+      ),
+      href := routes.Storm.dashboardOf(user.username),
+      span(
+        h3("Puzzle Storm"),
+        st.rating(
+          strong(storm.score),
+          storm.nonEmpty option frag(
+            " ",
+            span(trans.storm.xRuns.plural(storm.runs, storm.runs.localize))
+          )
+        )
+      ),
+      iconTag("G")
+    )
+
+  private def showRacer(racer: lila.rating.Perf.Racer, user: User)(implicit lang: Lang) =
+    a(
+      dataIcon := ',',
+      cls := List(
+        "empty" -> !racer.nonEmpty
+      ),
+      href := routes.Racer.home,
+      span(
+        h3("Puzzle Racer"),
+        st.rating(
+          strong(racer.score),
+          racer.nonEmpty option frag(
+            " ",
+            span(trans.storm.xRuns.plural(racer.runs, racer.runs.localize))
+          )
+        )
+      ),
+      iconTag("G")
+    )
+
+  private def showStreak(streak: lila.rating.Perf.Streak, user: User)(implicit lang: Lang) =
+    a(
+      dataIcon := '}',
+      cls := List(
+        "empty" -> !streak.nonEmpty
+      ),
+      href := routes.Puzzle.streak,
+      span(
+        h3("Puzzle Streak"),
+        st.rating(
+          strong(streak.score),
+          streak.nonEmpty option frag(
+            " ",
+            span(trans.storm.xRuns.plural(streak.runs, streak.runs.localize))
+          )
+        )
+      ),
+      iconTag("G")
+    )
+*/
+
 }

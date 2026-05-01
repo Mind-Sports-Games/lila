@@ -79,7 +79,7 @@ final class EmailAddressValidator(
 
   // the DNS emails should have been preloaded
   private[security] val withAcceptableDns = Constraint[String]("constraint.email_acceptable") { e =>
-    if EmailAddress.from(e).exists { email =>
+    if (EmailAddress.from(e).exists { email =>
         hasAcceptableDns(email).awaitOrElse(
           90.millis,
           "dns", {
@@ -90,7 +90,7 @@ final class EmailAddressValidator(
           }
         )
       }
-    then Valid
+    ) Valid
     else Invalid(ValidationError("error.email_acceptable"))
   }
 }

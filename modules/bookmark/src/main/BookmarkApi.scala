@@ -30,14 +30,14 @@ final class BookmarkApi(
       val candidateIds = games collect { case g if g.bookmarks > 0 => g.id }
       candidateIds.nonEmpty so
         coll.secondaryPreferred
-          .distinctEasy[Game.ID, Set]("g", userIdQuery(u.id) ++ $doc("g" `$in` candidateIds))
+          .distinctEasy[Game.ID, Set]("g", userIdQuery(u.id) ++ $doc("g".$in(candidateIds)))
     }
 
   def removeByGameId(gameId: Game.ID): Funit =
     coll.delete.one($doc("g" -> gameId)).void
 
   def removeByGameIds(gameIds: List[Game.ID]): Funit =
-    coll.delete.one($doc("g" `$in` gameIds)).void
+    coll.delete.one($doc("g".$in(gameIds))).void
 
   def remove(gameId: Game.ID, userId: User.ID): Funit = coll.delete.one(selectId(gameId, userId)).void
 

@@ -1,6 +1,15 @@
 package views.html
 package coach
 
+/*
+import lila.api.Context
+import lila.app.templating.Environment._
+import lila.app.ui.ScalatagsTemplate._
+import lila.common.String.html.richText
+
+import controllers.routes
+*/
+
 object show {
   /*
   import trans.coach._

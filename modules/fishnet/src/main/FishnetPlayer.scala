@@ -2,6 +2,8 @@ package lila.fishnet
 
 import scala.concurrent.duration.*
 
+import scalalib.ThreadLocalRandom
+
 import strategygames.{ Clock, P1, P2 }
 import strategygames.format.Uci
 
@@ -43,9 +45,7 @@ final class FishnetPlayer(
         sleep = (delay * accel).atMost(500)
         if sleep > 25
         millis     = sleep * 10
-        randomized = millis + (millis * (java.util.concurrent.ThreadLocalRandom
-          .current()
-          .nextFloat() - 0.5f)).toLong
+        randomized = millis + millis * (ThreadLocalRandom.nextDouble() - 0.5)
         divided = randomized / (if (g.turnCount > 9) 1 else 2)
       } yield divided.toLong.millis
 

@@ -255,7 +255,7 @@ object Fixtures {
 
 <p><em>Illustrative Game:</em> <a href="http://lichess.org/LTdPNcHW">lichess.org/LTdPNcHW</a></p>
 
-<p><em>Themes:</em> Focus on the pin on the h4-d8 diagonal. Sometimes exchange for a second bishop which you can place behind the first on h4. Pile up on the pin. Option of trading on f6 for a pocket knight or on e7 for a pocket bishop. Try to advance e4-e5 if (given the chance and claim space. If the p2 bishop goes to f5, challenge it with Bd3 and re-capture with the c pawn for a strong center; if it goes to g4, block the pin with Be2. If given the chance, exchange pawns in the center and place p@h6. In completely passive or dubious p2 systems where they're generating little or no counterplay it can be explosive to play e4, d4, and) after the minor pieces are deployed f4!? followed by 0-0 and f5.</p>
+<p><em>Themes:</em> Focus on the pin on the h4-d8 diagonal. Sometimes exchange for a second bishop which you can place behind the first on h4. Pile up on the pin. Option of trading on f6 for a pocket knight or on e7 for a pocket bishop. Try to advance e4-e5 if given the chance and claim space. If the p2 bishop goes to f5, challenge it with Bd3 and re-capture with the c pawn for a strong center; if it goes to g4, block the pin with Be2. If given the chance, exchange pawns in the center and place p@h6. In completely passive or dubious p2 systems where they're generating little or no counterplay it can be explosive to play e4, d4, and then after the minor pieces are deployed f4!? followed by 0-0 and f5.</p>
 
 <h4>e4 systems</h4>
 

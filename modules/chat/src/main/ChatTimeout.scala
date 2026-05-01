@@ -42,7 +42,7 @@ final class ChatTimeout(
       $doc(
         "chat" -> chatId,
         "user" -> userId,
-        "expiresAt" `$exists` true
+        "expiresAt".$exists(true)
       )
     )
 

@@ -121,7 +121,7 @@ final class ClasApi(
                   )
                 )
               ),
-              Match("clas" `$ne` $arr()),
+              Match("clas".$ne($arr())),
               Limit(1),
               Project($id(true))
             )
@@ -353,7 +353,7 @@ ${clas.desc}""",
 
     def listPending(clas: Clas): Fu[List[ClasInvite]] =
       colls.invite
-        .find($doc("clasId" -> clas.id, "accepted" `$ne` true))
+        .find($doc("clasId" -> clas.id, "accepted".$ne(true)))
         .sort($sort.desc("created.at"))
         .cursor[ClasInvite]()
         .list(100)
@@ -387,5 +387,5 @@ $url""",
     }
   }
 
-  private def selectArchived(v: Boolean) = $doc("archived" `$exists` v)
+  private def selectArchived(v: Boolean) = $doc("archived".$exists(v))
 }

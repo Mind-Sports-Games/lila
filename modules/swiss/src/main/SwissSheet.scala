@@ -96,10 +96,10 @@ private object SwissSheet {
                   if (pairing(c) == player.userId) Win else Loss
                 } // multimatch Backgammon games require players to keep colour/player for display same pieces
                 case _ => {
-                  if (pairing(c) == player.userId && index % 2 == 0) || (pairing(
+                  if ((pairing(c) == player.userId && index % 2 == 0) || (pairing(
                       c
                     ) != player.userId && index % 2 == 1)
-                  then Win
+                  ) Win
                   else Loss
                 }
               }

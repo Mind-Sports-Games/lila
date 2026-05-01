@@ -102,9 +102,9 @@ private[tournament] object Pairing {
       if (p1.player.actualRating <= p2.player.actualRating)
         Prep(tour.id, p1.player.userId, p2.player.userId)
       else Prep(tour.id, p2.player.userId, p1.player.userId)
-    else if p1.playerIndexHistory.firstGetsP1(p2.playerIndexHistory)(() =>
+    else if (p1.playerIndexHistory.firstGetsP1(p2.playerIndexHistory)(() =>
         lila.common.ThreadLocalRandom.nextBoolean()
       )
-    then Prep(tour.id, p1.player.userId, p2.player.userId)
+    ) Prep(tour.id, p1.player.userId, p2.player.userId)
     else Prep(tour.id, p2.player.userId, p1.player.userId)
 }

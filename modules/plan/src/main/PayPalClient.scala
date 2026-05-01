@@ -115,18 +115,14 @@ final private class PayPalClient(
 
   private val plansPerPage = 20
 
-  implicit private val plansReads: Reads[List[PayPalPlan]] =
-    (__ \ "plans").read[List[PayPalPlan]](using Reads.list[PayPalPlan])
-
   def getPlans(page: Int = 1): Fu[List[PayPalPlan]] =
     get[List[PayPalPlan]](
       s"${path.plans}?product_id=$patronMonthProductId&page_size=$plansPerPage&page=$page"
-    )
+    )(using (__ \ "plans").read[List[PayPalPlan]])
       .flatMap { plans =>
         if (plans.size == plansPerPage) getPlans(page + 1).map(plans ::: _)
         else fuccess(plans)
-      }
-      .map(_.filter(_.active))
+      }.map(_.filter(_.active))
 
   def createPlan: Fu[PayPalPlan] =
     postOne[PayPalPlan](
@@ -227,6 +223,12 @@ final private class PayPalClient(
     }
   }
 
+  // private def fixInput(in: Seq[(String, Any)]): Seq[(String, String)] =
+  // in flatMap {
+  //   case (name, Some(x)) => Some(name -> x.toString)
+  //   case (_, None)       => None
+  //   case (name, x)       => Some(name -> x.toString)
+  // }
   // private def debugInput(data: Seq[(String, Any)]) =
   //   fixInput(data) map { case (k, v) => s"$k=$v" } mkString " "
 }

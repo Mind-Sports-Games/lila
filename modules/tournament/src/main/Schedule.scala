@@ -511,6 +511,7 @@ object Schedule {
     if (s.conditions.relevant) s.conditions
     else {
 
+      //import Freq._, Speed._
       // No rated games required, because no-one has them.
       val nbRatedGame = 0 /*(s.freq, s.speed) match {
 

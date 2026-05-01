@@ -97,7 +97,7 @@ final private class RelayFetch(
         }
         .recover { case e: Exception =>
           (e match {
-            case _: lila.core.lilaism.LilaTimeout =>
+            case SyncResult.Timeout =>
               if (rt.tour.official) logger.info(s"Sync timeout ${rt.round}")
               SyncResult.Timeout
             case _ =>

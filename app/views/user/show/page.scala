@@ -62,7 +62,7 @@ object page {
       moreJs = moreJs(info, filters.current.name == "search"),
       moreCss = frag(
         cssTag("user.show"),
-        filters.current.name == "search" `option` cssTag("user.show.search"),
+        (filters.current.name == "search").option(cssTag("user.show.search")),
         isGranted(_.UserModView).option(cssTag("mod.user"))
       ),
       robots = u.count.game >= 10

@@ -70,7 +70,7 @@ object ServerEval {
                           parent.addChild(subTree) -> subTree
                         }
                       }
-                      .fold(funit) { case (newParent, subTree) =>
+                      .so { case (newParent, subTree) =>
                         chapterRepo.addSubTree(subTree, newParent, path)(chapter)
                       } >> {
                       import BSONHandlers.*

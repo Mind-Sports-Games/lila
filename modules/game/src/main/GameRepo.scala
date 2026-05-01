@@ -307,8 +307,8 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   object holdAlert {
     private val holdAlertSelector = $or(
-      holdAlertField(P1) `$exists` true,
-      holdAlertField(P2) `$exists` true
+      holdAlertField(P1).$exists(true),
+      holdAlertField(P2).$exists(true)
     )
     private val holdAlertProjection = $doc(
       holdAlertField(P1) -> true,
@@ -354,7 +354,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll.exists(
       $doc(
         $id(pov.gameId),
-        holdAlertField(pov.playerIndex) `$exists` true
+        holdAlertField(pov.playerIndex).$exists(true)
       )
     )
 
@@ -502,7 +502,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
             )
           ),
           UnwindField(F.playerUids),
-          Match($doc(F.playerUids `$ne` userId)),
+          Match($doc(F.playerUids.$ne(userId))),
           GroupField(F.playerUids)("gs" -> SumAll),
           Sort(Descending("gs")),
           Limit(opponentLimit)
@@ -540,8 +540,8 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def lastGameBetween(u1: String, u2: String, since: DateTime): Fu[Option[Game]] =
     coll.one[Game](
       $doc(
-        F.playerUids `$all` List(u1, u2),
-        F.createdAt `$gt` since
+        F.playerUids.$all(List(u1, u2)),
+        F.createdAt.$gt(since)
       )
     )
 
@@ -549,8 +549,8 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     List(u1, u2).forall(_.count.game > 0) so
       coll.secondaryPreferred.list[Game](
         $doc(
-          F.playerUids `$all` List(u1.id, u2.id),
-          F.createdAt `$gt` since
+          F.playerUids.$all(List(u1.id, u2.id)),
+          F.createdAt.$gt(since)
         ),
         nb
       )

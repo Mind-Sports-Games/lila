@@ -180,7 +180,7 @@ final class StudyApi(
     }
 
   private def scheduleTimeline(studyId: Study.Id): Unit = {
-    scheduler
+    val _ = scheduler
       .scheduleOnce(1 minute) {
         byId(studyId) foreach {
           _.withFilter(_.isPublic) foreach { study =>
@@ -190,7 +190,6 @@ final class StudyApi(
           }
         }
       }
-    ()
   }
 
   def talk(userId: User.ID, studyId: Study.Id, text: String) =

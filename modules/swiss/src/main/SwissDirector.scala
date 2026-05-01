@@ -67,9 +67,9 @@ final private class SwissDirector(
       )
     else if (mcMahonHandicapped)
       (mmp1Id, mmp2Id, Handicaps.startingFenMcMahon(swiss.roundVariant.some, scoreDiff))
-    else if swiss.settings.backgammonPoints.getOrElse(1) > 1 && swiss.variant.gameFamily == GameFamily
-        .Backgammon()
-    then (w, b, Some(FEN(swiss.variant.gameLogic, swiss.variant.toBackgammon.fenFromSetupConfig(true).value)))
+    else if (swiss.settings.backgammonPoints.getOrElse(1) > 1 && swiss.variant.gameFamily == GameFamily
+        .Backgammon())
+      (w, b, Some(FEN(swiss.variant.gameLogic, swiss.variant.toBackgammon.fenFromSetupConfig(true).value)))
     else (w, b, None)
   }
 
@@ -205,10 +205,10 @@ final private class SwissDirector(
           P1,
           players
             .get(
-              if prevGame.nonEmpty && pairing.multiMatchGameIds
+              if (prevGame.nonEmpty && pairing.multiMatchGameIds
                   .fold(false)(ids => ids.size % 2 == 1) && swiss.roundVariant.gameLogic != GameLogic
-                  .Backgammon() && !swiss.settings.handicapped
-              then pairing.p2
+                  .Backgammon() && !swiss.settings.handicapped)
+                pairing.p2
               else pairing.p1
             )
             .err(s"Missing pairing p1 $pairing")
@@ -217,10 +217,10 @@ final private class SwissDirector(
           P2,
           players
             .get(
-              if prevGame.nonEmpty && pairing.multiMatchGameIds
+              if (prevGame.nonEmpty && pairing.multiMatchGameIds
                   .fold(false)(ids => ids.size % 2 == 1) && swiss.roundVariant.gameLogic != GameLogic
-                  .Backgammon() && !swiss.settings.handicapped
-              then pairing.p1
+                  .Backgammon() && !swiss.settings.handicapped)
+                pairing.p1
               else pairing.p2
             )
             .err(s"Missing pairing p2 $pairing")

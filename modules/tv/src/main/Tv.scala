@@ -846,6 +846,8 @@ object Tv {
     game.finished && !game.olderThan(7)
   } // rematch time
 
+  // private def hasMinRating(g: Game, min: Int) = g.players.exists(_.rating.exists(_ >= min))
+
   private[tv] val titleScores = Map(
     "GM"  -> 500,
     "WGM" -> 500,

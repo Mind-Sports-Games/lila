@@ -182,14 +182,14 @@ object home {
         br,
         "The winner will be the player who won the most games and the final result will be recorded as normal e.g. 1-0.",
         br,
-        "In best of x, players will also play x rounds, but if (one player gets too far ahead) the remaining games will not get played."
+        "In best of x, players will also play x rounds, but if one player gets too far ahead then the remaining games will not get played."
       )
     ),
     div(cls := "faq", id := "faqMatchScore")(
       i("?"),
       p(
         strong("In a Swiss tournament what does it mean by using match score?"),
-        "In a swiss tournament, if (there is more than 1 game per round (see above),) the match score between the players is used instead of the usual scoring system.",
+        "In a swiss tournament, if there is more than 1 game per round (see above), then the match score between the players is used instead of the usual scoring system.",
         br,
         "For example, if you won 2.5-1.5 (in a best of 4), you would score 2.5 (and opponent 1.5) instead of the usual 1 (and opponent 0)",
         br,

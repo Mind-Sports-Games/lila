@@ -55,14 +55,14 @@ object SimulForm {
         else validation.Valid
       },
       Constraint[String] { (t: String) =>
-        if t.toUpperCase.split(' ').exists { word =>
+        if (t.toUpperCase.split(' ').exists { word =>
             lila.user.Title.all.exists { case (title, name) =>
               !host.title.contains(title) && {
                 title.value == word || name.toUpperCase == word
               }
             }
           }
-        then validation.Invalid(validation.ValidationError("Must not contain a title"))
+        ) validation.Invalid(validation.ValidationError("Must not contain a title"))
         else validation.Valid
       }
     )

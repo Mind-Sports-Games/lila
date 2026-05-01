@@ -41,7 +41,7 @@ final private class FishnetRepo(
   def allRecentClients =
     clientColl.list[Client](
       $doc(
-        "instance.seenAt" `$gt` Client.Instance.recentSince
+        "instance.seenAt".$gt(Client.Instance.recentSince)
       )
     )
 
@@ -91,8 +91,8 @@ final private class FishnetRepo(
     clientColl
       .primitiveOne[String](
         $or(
-          "_id" `$eq` keyOrUser,
-          "userId" `$eq` lila.user.User.normalize(keyOrUser)
+          "_id".$eq(keyOrUser),
+          "userId".$eq(lila.user.User.normalize(keyOrUser))
         ),
         "_id"
       )

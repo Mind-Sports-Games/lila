@@ -40,7 +40,7 @@ final class CoordinateApi(scoreColl: Coll)(implicit ec: scala.concurrent.Executi
       .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework.*
         List(
-          Match($doc("_id" `$in` userIds)),
+          Match($doc("_id".$in(userIds))),
           Project(
             $doc(
               "p1" -> $doc("$max" -> "$p1"),

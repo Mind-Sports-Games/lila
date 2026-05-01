@@ -102,8 +102,7 @@ final class SecurityApi(
   }
 
   def restoreUser(req: RequestHeader): Fu[Option[Either[AppealUser, FingerPrintedUser]]] =
-    if (!firewall.accepts(req)) fuccess(none)
-    else
+    firewall.accepts(req).so {
       reqSessionId(req).so { sessionId =>
         (appeal.authenticate(sessionId) match {
           case Some(userId) => userRepo.byId(userId).map2 { u => Left(AppealUser(u)) }
@@ -115,6 +114,7 @@ final class SecurityApi(
             }
         }): Fu[Option[Either[AppealUser, FingerPrintedUser]]]
       }
+    }
 
   def oauthScoped(
       req: RequestHeader,

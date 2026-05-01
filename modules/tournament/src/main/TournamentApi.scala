@@ -141,10 +141,10 @@ final class TournamentApi(
     )
 
   private def processHandicappedChanges(tour: Tournament, old: Tournament): Funit =
-    if (tour.handicapped && tour.inputPlayerRatings != old.inputPlayerRatings) ||
+    if ((tour.handicapped && tour.inputPlayerRatings != old.inputPlayerRatings) ||
       (!tour.handicapped && old.handicapped)
-    then updateAllPlayersInputRating(tour).andDo(socket.reload(tour.id)).andDo(publish())
-    else { funit }
+    ) updateAllPlayersInputRating(tour).andDo(socket.reload(tour.id)).andDo(publish())
+    else funit
 
   private def updateAllPlayersInputRating(tour: Tournament): Funit =
     playerRepo.unsetInputRating(tour.id) >>
@@ -707,25 +707,21 @@ final class TournamentApi(
     Sequencing(tourId, "ejectPlayerAndRewriteHistory")(tournamentRepo.finishedById) { tour =>
       ejectFromLeaderboard(tourId, userId, disqualify, updateLeaderboard) >>
         ejectPlayer(tourId, userId, disqualify) >> {
-          (if (tour.winnerId.contains(userId)) {
+          tour.winnerId.contains(userId).so {
              playerRepo.winner(tour.id) flatMap { winner =>
-               winner
-                 .fold(funit) { (p: Player) =>
-                   tournamentRepo.setWinnerId(tour.id, p.userId)
-                 }
-                 .andDo(callbacks.clearWinnersCache(tour))
+               winner.so { (p: Player) =>
+                 tournamentRepo.setWinnerId(tour.id, p.userId)
+               }.andDo(callbacks.clearWinnersCache(tour))
              }
-           } else funit) >>
+           } >>
             trophyApi
               .trophiesByUrl(Tournament.tournamentUrl(tour.id))
               .map(_.filter(_.user == userId))
               .flatMap { trophyList =>
-                trophyList.headOption
-                  .fold(funit) { (trophy: lila.user.Trophy) =>
-                    trophyApi.removeTrophiesByUrl(Tournament.tournamentUrl(tour.id)) >>
-                      awardTrophies(tour, trophy.date)
-                  }
-                  .andDo(callbacks.clearTrophyCache(tour))
+                trophyList.headOption.so { (trophy: lila.user.Trophy) =>
+                  trophyApi.removeTrophiesByUrl(Tournament.tournamentUrl(tour.id)) >>
+                    awardTrophies(tour, trophy.date)
+                }.andDo(callbacks.clearTrophyCache(tour))
               }
         }.andDo(socket.reload(tour.id)).andDo(publish())
     }

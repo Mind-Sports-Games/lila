@@ -45,7 +45,7 @@ object ofPlayer {
                   frag(
                     bits.variantSelector(
                       variant,
-                      v => s"${routes.Puzzle.ofPlayer(v.key)}${!(ctx `is` u) so s"?name=${u.username}"}"
+                      v => s"${routes.Puzzle.ofPlayer(v.key)}${!(ctx.is(u)) so s"?name=${u.username}"}"
                     ),
                     p(
                       "You have no puzzles in the database, but PlayStrategy still loves you very much.",
@@ -57,7 +57,7 @@ object ofPlayer {
                   frag(
                     bits.variantSelector(
                       variant,
-                      v => s"${routes.Puzzle.ofPlayer(v.key)}${!(ctx `is` u) so s"?name=${u.username}"}"
+                      v => s"${routes.Puzzle.ofPlayer(v.key)}${!(ctx.is(u)) so s"?name=${u.username}"}"
                     ),
                     p(strong(pager.nbResults), " puzzles found in ", userLink(u), " games."),
                     div(cls := "puzzle-of-player__pager infinite-scroll")(
