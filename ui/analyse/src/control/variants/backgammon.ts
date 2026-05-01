@@ -30,8 +30,9 @@ export const configure = (ctrl: AnalyseCtrl): void => {
 
   // Dice picker state
   let dicePickerActive = false;
-  let die1Pick: number | null | undefined = undefined; // undefined=not chosen, null=random(?), 1-6=specific
+  let die1Pick: number | null | undefined = undefined; // undefined=not chosen, null=random(?)
   let die2Pick: number | null | undefined = undefined;
+  let diceWasPreFilled = false;
 
   const diceRollUci = /^[1-6](\/[1-6])+$/;
 
@@ -52,21 +53,27 @@ export const configure = (ctrl: AnalyseCtrl): void => {
 
   const triggerRoll = () => {
     if (rollPending) return;
-    // If another session already rolled, pre-fill the picker with those values
     const existingRoll = ctrl.node.children.find(c => diceRollUci.test(c.uci ?? ''));
     if (existingRoll) {
       const parts = (existingRoll.uci ?? '').split('/').map(Number);
       die1Pick = parts[0] ?? undefined;
       die2Pick = parts[1] ?? undefined;
+      diceWasPreFilled = true;
     } else {
       die1Pick = undefined;
       die2Pick = undefined;
+      diceWasPreFilled = false;
     }
     dicePickerActive = true;
     ctrl.redraw();
   };
 
   const onDiePick = (die: 1 | 2, value: number | null) => {
+    if (diceWasPreFilled) {
+      diceWasPreFilled = false;
+      if (die === 1) die2Pick = undefined;
+      else die1Pick = undefined;
+    }
     if (die === 1) die1Pick = die1Pick === value ? undefined : value;
     else die2Pick = die2Pick === value ? undefined : value;
 
@@ -216,6 +223,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     dicePickerActive = false;
     die1Pick = undefined;
     die2Pick = undefined;
+    diceWasPreFilled = false;
     pendingNoMovesCheck = false;
 
     if (rollPending) return;
@@ -231,6 +239,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
       const parts = (existingRoll.uci ?? '').split('/').map(Number);
       die1Pick = parts[0] ?? undefined;
       die2Pick = parts[1] ?? undefined;
+      diceWasPreFilled = true;
     }
     dicePickerActive = true;
   };
