@@ -56,6 +56,10 @@ export interface ControlConfig {
 
   // Redirect tree-click jump paths (e.g. skip to end-of-turn for backgammon roll nodes)
   redirectJumpPath?(path: string): string;
+
+  // Study annotation permissions per node
+  isNodeCommentable?(node: Tree.Node): boolean;
+  isNodeAnnotatable?(node: Tree.Node): boolean;
 }
 
 export function canGoForward(ctrl: AnalyseCtrl): boolean {

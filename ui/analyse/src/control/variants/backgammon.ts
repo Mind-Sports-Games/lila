@@ -366,6 +366,10 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     return h('div.dice-picker', [renderGroup(1, die1Pick), renderGroup(2, die2Pick)]);
   };
 
+  ctrl.controlConfig.isNodeCommentable = (node: Tree.Node) => diceRollUci.test(node.uci ?? '');
+  ctrl.controlConfig.isNodeAnnotatable = (node: Tree.Node) =>
+    !diceRollUci.test(node.uci ?? '') && node.uci !== 'endturn';
+
   ctrl.controlConfig.redirectJumpPath = (path: string) => {
     const node = ctrl.tree.nodeAtPath(path);
     if (!node || !diceRollUci.test(node.uci ?? '')) return path;
