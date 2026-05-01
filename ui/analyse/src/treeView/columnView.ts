@@ -49,7 +49,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
   if (opts.isMainline) {
     // isContinuation: main is a mid-turn continuation (same player played node and plays main).
     // Used to suppress the P1 turn index before main.
-    const isContinuation = node.playedPlayerIndex === node.playerIndex;
+    const isContinuation = !!node.parent && node.playedPlayerIndex === node.playerIndex;
     const isP1 = main.playedPlayerIndex === 'p1' && !isContinuation;
     const commentTags = renderMainlineCommentsOf(ctx, main, conceal, true).filter(nonEmpty);
     if (!cs[1] && isEmpty(commentTags) && !main.forceVariation)
