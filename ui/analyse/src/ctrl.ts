@@ -670,6 +670,7 @@ export default class AnalyseCtrl {
     if (path === this.path) {
       this.showGround();
       if (this.outcome()) this.ceval.stop();
+      this.controlConfig.onAfterAddDests?.();
     }
     this.withCg(cg => cg.playPremove());
   }

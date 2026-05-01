@@ -26,6 +26,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   let rollSent = false;
   let actionSent = false;
   let endTurnSent = false;
+  let pendingNoMovesCheck = false;
 
   // Dice picker state
   let dicePickerActive = false;
@@ -186,6 +187,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
         sendEndTurn();
       }
     } else if (isRollNode) {
+      if (node.lifts == null) pendingNoMovesCheck = true;
       rollSent = false;
     }
   };
@@ -194,6 +196,19 @@ export const configure = (ctrl: AnalyseCtrl): void => {
 
   ctrl.controlConfig.onInit = () => setTimeout(() => maybeAutoRollOnLoad(), 0);
   ctrl.controlConfig.onAfterAddNode = (node: Tree.Node) => maybeAutoEndTurn(node);
+  ctrl.controlConfig.onAfterAddDests = () => {
+    if (!pendingNoMovesCheck) return;
+    pendingNoMovesCheck = false;
+    const node = ctrl.node;
+    const fenParts = node.fen.split(' ');
+    if (fenParts.length < 3 || fenParts[1] === '-') return;
+    const noMovesAfterRoll =
+      node.lifts != null &&
+      (!node.dests || node.dests === '') &&
+      (!node.dropsByRole || node.dropsByRole === '') &&
+      (!node.lifts || node.lifts === '');
+    if (noMovesAfterRoll) sendEndTurn();
+  };
   ctrl.controlConfig.onUserAction = () => {
     actionSent = true;
   };
@@ -202,6 +217,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     dicePickerActive = false;
     die1Pick = undefined;
     die2Pick = undefined;
+    pendingNoMovesCheck = false;
 
     if (rollPending) return;
 

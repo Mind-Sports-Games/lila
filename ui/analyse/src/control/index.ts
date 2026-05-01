@@ -21,6 +21,7 @@ export interface ControlConfig {
   // Lifecycle
   onInit?(): void;
   onAfterAddNode?(node: Tree.Node): void;
+  onAfterAddDests?(): void;
   onUserAction?(): void;
   afterJump?(): void;
   onStepFailure?(): void;
