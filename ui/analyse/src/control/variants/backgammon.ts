@@ -341,7 +341,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   };
 
   ctrl.controlConfig.renderBoardOverlay = () => {
-    if (!dicePickerActive) return null;
+    if (!dicePickerActive || ctrl.embed) return null;
     const playerIndex = ctrl.turnPlayerIndex() as CgPlayerIndex;
 
     const renderGroup = (die: 1 | 2, currentPick: number | null | undefined) =>
