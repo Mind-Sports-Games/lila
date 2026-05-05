@@ -48,18 +48,20 @@ cg-board {
 .variant-hyper,
 .variant-backgammon {
   cg-multi-point-score {
-    font-size: 100%;
     border: thin solid !important;
   }
 
   cg-multi-point-target,
   cg-crawford-game {
-    font-size: 75%;
     border: thin solid;
   }
 
   cg-buttons {
-    font-size: 75%;
+    font-size: 40%;
+
+    cg-button {
+      border-width: thin !important;
+    }
   }
 }
 
