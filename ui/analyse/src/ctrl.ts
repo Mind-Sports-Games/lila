@@ -160,7 +160,6 @@ export default class AnalyseCtrl {
     configureVariantControl(this);
 
     this.showGround();
-    this.controlConfig.onInit?.();
     this.onToggleComputer();
     this.startCeval();
     this.explorer.setNode();

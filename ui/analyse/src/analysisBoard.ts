@@ -1,4 +1,4 @@
-import { attributesModule, classModule, init } from 'snabbdom';
+import { type VNode, attributesModule, classModule, init } from 'snabbdom';
 import boot from './boot';
 import PlayStrategyChat from 'chat';
 // eslint-disable-next-line no-duplicate-imports
@@ -15,14 +15,18 @@ export function PlayStrategyAnalyse(opts: AnalyseOpts): AnalyseApi {
   opts.element = document.querySelector('main.analyse') as HTMLElement;
   opts.trans = playstrategy.trans(opts.i18n);
 
+  let vnode: VNode | undefined;
+
   const ctrl = (playstrategy.analysis = new makeCtrl(opts, redraw));
 
   const blueprint = view(ctrl);
   opts.element.innerHTML = '';
-  let vnode = patch(opts.element, blueprint);
+  vnode = patch(opts.element, blueprint);
+
+  ctrl.controlConfig.onInit?.();
 
   function redraw() {
-    vnode = patch(vnode, view(ctrl));
+    if (vnode) vnode = patch(vnode, view(ctrl));
   }
 
   menuHover();
