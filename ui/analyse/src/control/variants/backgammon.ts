@@ -36,7 +36,37 @@ export const configure = (ctrl: AnalyseCtrl): void => {
 
   const diceRollUci = /^[1-6](\/[1-6])+$/;
 
+  type CgCubeAction = 'offer' | 'reject' | 'accept';
+  const readCubeActionsFromFen = (fen: string): CgCubeAction[] => {
+    const parts = fen.split(' ');
+    if (parts.length < 8) return [];
+    if (parts[1] !== '-' || parts[2] !== '-') return [];
+    const player = parts[3];
+    const cube = parts[6];
+    if (cube === '-') return [];
+    if (cube === '0') return ['offer'];
+    if (cube.length < 2) return [];
+    const letter = cube[1];
+    if (letter === 'w' || letter === 'b') {
+      if (cube.endsWith('x')) return [];
+      return player !== letter ? ['reject', 'accept'] : [];
+    }
+    const ownerLetter = letter.toLowerCase();
+    return player === ownerLetter ? ['offer'] : [];
+  };
+
   const doSendRoll = (dice: number[]) => {
+    const sortedValues = [...dice].sort((a, b) => a - b).join('/');
+    const existingMatch = ctrl.node.children.find(c => {
+      if (!diceRollUci.test(c.uci ?? '')) return false;
+      const childSorted = (c.uci ?? '').split('/').map(Number).sort((a, b) => a - b).join('/');
+      return childSorted === sortedValues;
+    });
+    if (existingMatch) {
+      ctrl.userJumpIfCan(ctrl.path + existingMatch.id);
+      ctrl.redraw();
+      return;
+    }
     rollPending = true;
     rollSent = true;
     const roll: AnaRoll = {
@@ -51,8 +81,9 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     ctrl.redraw();
   };
 
-  const triggerRoll = () => {
+  const triggerRoll = (fromUserRoll = false) => {
     if (rollPending) return;
+    if (!fromUserRoll && ctrl.node.uci !== 'cubey' && readCubeActionsFromFen(ctrl.node.fen).length > 0) return;
     const existingRoll = ctrl.node.children.find(c => diceRollUci.test(c.uci ?? ''));
     if (existingRoll) {
       const parts = (existingRoll.uci ?? '').split('/').map(Number);
@@ -65,7 +96,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
       diceWasPreFilled = false;
     }
     dicePickerActive = true;
-    ctrl.redraw();
+    ctrl.reset();
   };
 
   const onDiePick = (die: 1 | 2, value: number | null) => {
@@ -79,10 +110,25 @@ export const configure = (ctrl: AnalyseCtrl): void => {
 
     if (die1Pick !== undefined && die2Pick !== undefined) {
       dicePickerActive = false;
-      const d1 = die1Pick !== null ? (die1Pick as number) : Math.ceil(Math.random() * 6);
-      const d2 = die2Pick !== null ? (die2Pick as number) : Math.ceil(Math.random() * 6);
-      doSendRoll([d1, d2]);
+      let d1 = die1Pick !== null ? (die1Pick as number) : Math.ceil(Math.random() * 6);
+      let d2 = die2Pick !== null ? (die2Pick as number) : Math.ceil(Math.random() * 6);
+      // Opening roll cannot be a double — mirrors the Study page server-side fallback
+      if (ctrl.path === treePath.root && d1 === d2) {
+        do {
+          d1 = Math.ceil(Math.random() * 6);
+          d2 = Math.ceil(Math.random() * 6);
+        } while (d1 === d2);
+      }
+      doSendRoll([d1, d2].sort((a, b) => b - a));
     } else {
+      ctrl.redraw();
+    }
+  };
+
+  const sendCubeAction = (uci: 'cubeo' | 'cubey' | 'cuben') => {
+    const existing = ctrl.node.children.find(c => c.uci === uci);
+    if (existing) {
+      ctrl.userJumpIfCan(ctrl.path + existing.id);
       ctrl.redraw();
     }
   };
@@ -174,6 +220,11 @@ export const configure = (ctrl: AnalyseCtrl): void => {
       }
       return;
     }
+    if (node.uci === 'cubey') {
+      if (!ctrl.study && !ctrl.outcome(node)) triggerRoll();
+      return;
+    }
+    if (node.uci === 'cubeo' || node.uci === 'cuben') return;
     const allDiceConsumed = unusedDice === '-' && usedDice !== '-';
     const noMovesAfterRoll =
       unusedDice !== '-' &&
@@ -220,11 +271,16 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   };
 
   ctrl.controlConfig.afterJump = () => {
+    const wasDicePickerActive = dicePickerActive;
     dicePickerActive = false;
     die1Pick = undefined;
     die2Pick = undefined;
     diceWasPreFilled = false;
     pendingNoMovesCheck = false;
+
+    // If we landed on a roll node, the roll is resolved regardless of whether addNode
+    // called onAfterAddNode (it skips it for duplicate nodes, leaving rollPending dirty).
+    if (diceRollUci.test(ctrl.node.uci ?? '')) rollPending = false;
 
     if (rollPending) return;
 
@@ -234,14 +290,11 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     const fenParts = ctrl.node.fen.split(' ');
     if (fenParts.length < 3 || fenParts[1] !== '-' || fenParts[2] !== '-') return;
     if (ctrl.outcome()) return;
-    const existingRoll = ctrl.node.children.find(c => diceRollUci.test(c.uci ?? ''));
-    if (existingRoll) {
-      const parts = (existingRoll.uci ?? '').split('/').map(Number);
-      die1Pick = parts[0] ?? undefined;
-      die2Pick = parts[1] ?? undefined;
-      diceWasPreFilled = true;
+    if (ctrl.node.uci !== 'cubey' && readCubeActionsFromFen(ctrl.node.fen).length > 0) {
+      if (wasDicePickerActive) ctrl.reset();
+      return;
     }
-    dicePickerActive = true;
+    triggerRoll();
   };
 
   ctrl.controlConfig.onStepFailure = () => {
@@ -289,6 +342,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
 
     const rawLifts: string[] = (node.lifts?.match(/[a-l][1-2]/g) as string[]) ?? [];
     (config as Record<string, unknown>).liftable = { liftDests: rawLifts };
+    (config as Record<string, unknown>).cubeActions = dicePickerActive ? [] : readCubeActionsFromFen(node.fen);
   };
 
   ctrl.controlConfig.cgHooks = {
@@ -309,7 +363,10 @@ export const configure = (ctrl: AnalyseCtrl): void => {
       ctrl.reset();
     },
     onButtonClick: (button: string) => {
-      if (button === 'roll') triggerRoll();
+      if (button === 'roll') triggerRoll(true);
+      else if (button === 'double') sendCubeAction('cubeo');
+      else if (button === 'take') sendCubeAction('cubey');
+      else if (button === 'drop') sendCubeAction('cuben');
     },
     onUserLift: (dest: string) => {
       playstrategy.sound.play('move');
@@ -372,6 +429,31 @@ export const configure = (ctrl: AnalyseCtrl): void => {
       ]);
 
     return h('div.dice-picker', [renderGroup(1, die1Pick), renderGroup(2, die2Pick)]);
+  };
+
+  ctrl.controlConfig.getActivePath = () => {
+    if (dicePickerActive) {
+      const existingRoll = ctrl.node.children.find(c => diceRollUci.test(c.uci ?? ''));
+      if (existingRoll) return ctrl.path + existingRoll.id;
+      return null;
+    }
+    if (['cubey', 'cuben'].includes(ctrl.node.uci ?? '')) return undefined;
+    const cubeActions = readCubeActionsFromFen(ctrl.node.fen);
+    if (cubeActions.includes('offer')) {
+      const cubeoChild = ctrl.node.children.find(c => c.uci === 'cubeo');
+      if (cubeoChild) return ctrl.path + cubeoChild.id;
+      const rollChild = ctrl.node.children.find(c => diceRollUci.test(c.uci ?? ''));
+      if (rollChild) return ctrl.path + rollChild.id;
+      return null;
+    }
+    if (cubeActions.includes('accept') || cubeActions.includes('reject')) {
+      const takeChild = ctrl.node.children.find(c => c.uci === 'cubey');
+      const dropChild = ctrl.node.children.find(c => c.uci === 'cuben');
+      if (takeChild && !dropChild) return ctrl.path + takeChild.id;
+      if (dropChild && !takeChild) return ctrl.path + dropChild.id;
+      return null;
+    }
+    return undefined;
   };
 
   ctrl.controlConfig.isNodeCommentable = (node: Tree.Node) => diceRollUci.test(node.uci ?? '');
