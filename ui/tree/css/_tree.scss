@@ -12,6 +12,7 @@ $c-bg-interesting-hover: c-dimmer($c-interesting, 70%);
 
   &-column {
     @extend %flex-wrap;
+    align-content: flex-start;
   }
 
   &-inline {
@@ -150,6 +151,12 @@ $c-bg-interesting-hover: c-dimmer($c-interesting, 70%);
     font-size: 1.185em;
     line-height: 1.75em;
     padding: 0 0.3em 0 0.5em;
+  }
+
+  &-column > move > move {
+    min-width: 0;
+    white-space: normal;
+    overflow: visible;
   }
 
   &-column > index + move {
