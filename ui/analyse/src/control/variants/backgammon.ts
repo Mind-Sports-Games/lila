@@ -466,7 +466,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
 
   ctrl.controlConfig.redirectJumpPath = (path: string) => {
     const node = ctrl.tree.nodeAtPath(path);
-    if (!node || !diceRollUci.test(node.uci ?? '')) return path;
+    if (!node || node.uci === 'endturn') return path;
     // Advance to the last piece-move node before endTurn
     let advancedPath = path;
     let current: Tree.Node = node;
