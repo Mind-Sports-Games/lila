@@ -123,6 +123,8 @@ function studyButton(ctrl: AnalyseCtrl) {
       ctrl.trans.noarg('openStudy'),
     );
   if (ctrl.study || ctrl.ongoing || ctrl.embed) return;
+  if (ctrl.synthetic && !isChess(ctrl.data.game.variant.key)) return;
+  if (ctrl.data.game.multiPointState) return;
   return h(
     'form',
     {
