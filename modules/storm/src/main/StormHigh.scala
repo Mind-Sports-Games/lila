@@ -57,10 +57,10 @@ final class StormHighApi(coll: Coll, cacheApi: CacheApi)(implicit ctx: Execution
     coll
       .aggregateWith[Bdoc]() { framework =>
         import framework.*
-        def matchSince(sinceId: User.ID => StormDay.Id) = Match($doc("_id" `$gte` sinceId(userId)))
+        def matchSince(sinceId: User.ID => StormDay.Id) = Match($doc("_id".$gte(sinceId(userId))))
         val scoreSort                                   = Sort(Descending("score"))
         List(
-          Match($doc("_id" `$lte` StormDay.Id.today(userId) `$gt` StormDay.Id.allTime(userId))),
+          Match($doc("_id".$lte(StormDay.Id.today(userId)).$gt(StormDay.Id.allTime(userId)))),
           Project($doc("score" -> true)),
           Sort(Descending("_id")),
           Facet(

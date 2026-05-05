@@ -145,7 +145,7 @@ final private class MsgSecurity(
     private def reply(contacts: User.Contacts): Fu[Boolean] =
       colls.thread.exists(
         $id(MsgThread.id(contacts.orig.id, contacts.dest.id)) ++
-          $doc("del" `$ne` contacts.dest.id)
+          $doc("del".$ne(contacts.dest.id))
       )
 
     private def kidCheck(contacts: User.Contacts, isNew: Boolean): Fu[Boolean] =

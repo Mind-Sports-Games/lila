@@ -35,7 +35,7 @@ final class MsgApi(
 
   def threadsOf(me: User): Fu[List[MsgThread]] =
     colls.thread
-      .find($doc("users" -> me.id, "del" `$ne` me.id))
+      .find($doc("users" -> me.id, "del".$ne(me.id)))
       .sort($sort.desc("lastMsg.date"))
       .cursor[MsgThread]()
       .list(50)
@@ -116,7 +116,7 @@ final class MsgApi(
                       else
                         $pull(
                           // unset "deleted by receiver" unless the message is muted
-                          "del" `$in` (orig :: (!send.mute).option(dest).toList)
+                          "del".$in((orig :: (!send.mute).option(dest).toList))
                         )
                     }
                   )
@@ -201,7 +201,7 @@ final class MsgApi(
   def deleteAllBy(user: User): Funit =
     colls.thread.list[MsgThread]($doc("users" -> user.id)) flatMap { threads =>
       colls.thread.delete.one($doc("users" -> user.id)) >>
-        colls.msg.delete.one($doc("tid" `$in` threads.map(_.id))) >>
+        colls.msg.delete.one($doc("tid".$in(threads.map(_.id)))) >>
         notifier.deleteAllBy(threads, user)
     }
 
@@ -210,8 +210,8 @@ final class MsgApi(
   private def threadMsgsFor(threadId: MsgThread.Id, me: User, before: Option[DateTime]): Fu[List[Msg]] =
     colls.msg
       .find(
-        $doc("tid" -> threadId, "del" `$ne` me.id) ++ before.so { b =>
-          $doc("date" `$lt` b)
+        $doc("tid" -> threadId, "del".$ne(me.id)) ++ before.so { b =>
+          $doc("date".$lt(b))
         },
         msgProjection
       )
@@ -222,7 +222,7 @@ final class MsgApi(
   private def setReadBy(threadId: MsgThread.Id, me: User, contactId: User.ID): Funit =
     colls.thread.updateField(
       $id(threadId) ++ $doc(
-        "lastMsg.user" `$ne` me.id,
+        "lastMsg.user".$ne(me.id),
         "lastMsg.read" -> false
       ),
       "lastMsg.read",

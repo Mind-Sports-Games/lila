@@ -64,7 +64,7 @@ final private class CorresAlarm(
 
   private def run(): Funit =
     coll
-      .find($doc("ringsAt" `$lt` DateTime.now))
+      .find($doc("ringsAt".$lt(DateTime.now)))
       .cursor[Alarm]()
       .documentSource(200)
       .mapAsyncUnordered(4)(alarm => proxyGame(alarm._id))

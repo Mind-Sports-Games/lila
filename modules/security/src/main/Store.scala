@@ -144,8 +144,8 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
       .find(
         $doc(
           "user" -> user.id,
-          "date" `$gt` (if (user.createdAt.isAfter(DateTime.now.minusYears(1))) user.createdAt
-                        else DateTime.now.minusYears(1))
+          "date".$gt((if (user.createdAt.isAfter(DateTime.now.minusYears(1))) user.createdAt
+                        else DateTime.now.minusYears(1)))
         ),
         $doc("_id" -> false, "ip" -> true, "ua" -> true, "fp" -> true, "date" -> true).some
       )
@@ -155,7 +155,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
 
   // remains of never-confirmed accounts that got cleaned up
   private[security] def deletePreviousSessions(user: User) =
-    coll.delete.one($doc("user" -> user.id, "date" `$lt` user.createdAt)).void
+    coll.delete.one($doc("user" -> user.id, "date".$lt(user.createdAt))).void
 
   private case class DedupInfo(_id: String, ip: String, ua: String) {
     def compositeKey = s"$ip $ua"
@@ -194,7 +194,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
       ) { framework =>
         import framework.*
         List(
-          Match($doc("user" `$in` List(u1, u2))),
+          Match($doc("user".$in(List(u1, u2)))),
           Limit(500),
           Project(
             $doc(
@@ -207,8 +207,8 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
           GroupField("x")("users" -> AddFieldToSet("user")),
           Match(
             $doc(
-              "_id" `$ne` BSONNull,
-              "users.1" `$exists` true
+              "_id".$ne(BSONNull),
+              "users.1".$exists(true)
             )
           ),
           Limit(1)

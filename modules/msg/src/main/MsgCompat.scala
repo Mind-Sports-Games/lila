@@ -61,10 +61,10 @@ final class MsgCompat(
           .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
             import framework.*
             List(
-              Match($doc("users" -> userId, "del" `$ne` userId)),
+              Match($doc("users" -> userId, "del".$ne(userId))),
               Sort(Descending("lastMsg.date")),
               Limit(maxPerPage.value),
-              Match($doc("lastMsg.read" -> false, "lastMsg.user" `$ne` userId)),
+              Match($doc("lastMsg.read" -> false, "lastMsg.user".$ne(userId))),
               Count("nb")
             )
           }

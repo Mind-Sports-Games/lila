@@ -83,7 +83,7 @@ final class PostRepo(val coll: Coll, filter: Filter = Safe)(implicit
   def selectCategs(categIds: List[String]) = $doc("categId".$in(categIds)) ++ trollFilter
 
   val selectNotHidden = $doc("hidden" -> false)
-  val selectNotErased = $doc("erasedAt" `$exists` false)
+  val selectNotErased = $doc("erasedAt".$exists(false))
 
   def selectLangs(langs: List[String]) =
     if (langs.isEmpty) $empty

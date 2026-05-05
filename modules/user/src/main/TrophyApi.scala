@@ -32,9 +32,9 @@ final class TrophyApi(
 
   implicit private val trophyBSONHandler: BSONDocumentHandler[Trophy] = Macros.handler[Trophy]
 
-  private def permanent = $doc("expiry" `$exists` false)
+  private def permanent = $doc("expiry".$exists(false))
 
-  private def relevant = $doc("expiry" `$gt` DateTime.now)
+  private def relevant = $doc("expiry".$gt(DateTime.now))
 
   private def nonExpired = $doc("$or" -> List(permanent, relevant))
 

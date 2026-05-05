@@ -299,7 +299,7 @@ final class TeamApi(
     teamRepo.leads(teamId, userId)
 
   def filterExistingIds(ids: Set[String]): Fu[Set[Team.ID]] =
-    teamRepo.coll.distinctEasy[Team.ID, Set]("_id", $doc("_id" `$in` ids), ReadPreference.secondaryPreferred)
+    teamRepo.coll.distinctEasy[Team.ID, Set]("_id", $doc("_id".$in(ids)), ReadPreference.secondaryPreferred)
 
   def fetchAllWithChat: Fu[List[Team]] =
     teamRepo.allWithChat

@@ -467,7 +467,7 @@ final class PlanApi(
             .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
               import framework.*
               List(
-                Match($doc("userId" `$exists` true)),
+                Match($doc("userId".$exists(true))),
                 GroupField("userId")("total" -> SumField("cents")),
                 Sort(Descending("total")),
                 Limit(topPatronUserIdsNb * 3 / 2)

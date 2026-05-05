@@ -117,5 +117,5 @@ final class StormDayApi(coll: Coll, highApi: StormHighApi, userRepo: UserRepo, s
       .cursor[StormDay](ReadPreference.secondaryPreferred)
       .list(days)
 
-  private def idRegexFor(userId: User.ID) = $doc("_id" `$startsWith` s"${userId}:")
+  private def idRegexFor(userId: User.ID) = $doc("_id".$startsWith(s"${userId}:"))
 }

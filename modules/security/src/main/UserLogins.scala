@@ -92,7 +92,7 @@ final class UserLoginsApi(
     }
 
   private[security] def userHasPrint(u: User): Fu[Boolean] =
-    store.coll.secondaryPreferred.exists($doc("user" -> u.id, "fp" `$exists` true))
+    store.coll.secondaryPreferred.exists($doc("user" -> u.id, "fp".$exists(true)))
 
   private def fetchOtherUsers(
       user: User,
@@ -108,11 +108,11 @@ final class UserLoginsApi(
           Match(
             $doc(
               $or(
-                "ip" `$in` ipSet,
-                "fp" `$in` fpSet
+                "ip".$in(ipSet),
+                "fp".$in(fpSet)
               ),
-              "user" `$ne` user.id,
-              "date" `$gt` DateTime.now.minusYears(1)
+              "user".$ne(user.id),
+              "date".$gt(DateTime.now.minusYears(1))
             )
           ),
           GroupField("user")(
@@ -164,9 +164,9 @@ final class UserLoginsApi(
       users <- (ips.nonEmpty && fps.nonEmpty) so store.coll.secondaryPreferred.distinctEasy[User.ID, Set](
         "user",
         $doc(
-          "ip" `$in` ips,
-          "fp" `$in` fps,
-          "user" `$ne` userId
+          "ip".$in(ips),
+          "fp".$in(fps),
+          "user".$ne(userId)
         )
       )
     } yield users

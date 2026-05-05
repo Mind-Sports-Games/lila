@@ -41,9 +41,9 @@ final class LeaderboardApi(
       page,
       $doc(
         "u" -> user.id,
-        "d" `$gt` DateTime.now().plusMonths(lastXMonths * -1) `$lt` DateTime.now(),
-        "mp" `$exists` true,
-        "k" `$exists` true
+        "d".$gt(DateTime.now().plusMonths(lastXMonths * -1)).$lt(DateTime.now()),
+        "mp".$exists(true),
+        "k".$exists(true)
       ),
       $sort.desc("d")
     )
@@ -53,7 +53,7 @@ final class LeaderboardApi(
       .find(
         $doc(
           "u" -> userId,
-          "d" `$gt` range._1 `$lt` range._2
+          "d".$gt(range._1).$lt(range._2)
         )
       )
       .sort($sort.desc("d"))
@@ -97,7 +97,7 @@ final class LeaderboardApi(
     repo.coll.list[Entry](
       $doc(
         "u" -> userId,
-        "d" `$gt` since
+        "d".$gt(since)
       )
     ) flatMap { entries =>
       (entries.nonEmpty so ejectEntries(entries.map(_.id), disqualify)) inject entries.map(_.tourId)
@@ -134,8 +134,8 @@ final class LeaderboardApi(
 
   private def findByCategory(lastXMonths: Int, category: ShieldTableApi.Category) =
     $doc(
-      "d" `$gt` DateTime.now().plusMonths(lastXMonths * -1) `$lt` DateTime.now(),
-      "mp" `$exists` true,
+      "d".$gt(DateTime.now().plusMonths(lastXMonths * -1)).$lt(DateTime.now()),
+      "mp".$exists(true),
       "k" -> $doc(
         "$regex" -> BSONRegex(s"^${category.id - 1}_|${category.medleyShieldCode}", "")
       )
@@ -143,9 +143,9 @@ final class LeaderboardApi(
 
   private def findAll(lastXMonths: Int) =
     $doc(
-      "d" `$gt` DateTime.now().plusMonths(lastXMonths * -1) `$lt` DateTime.now(),
-      "mp" `$exists` true,
-      "k" `$exists` true
+      "d".$gt(DateTime.now().plusMonths(lastXMonths * -1)).$lt(DateTime.now()),
+      "mp".$exists(true),
+      "k".$exists(true)
     )
 
   def shieldLeaderboardMetaPoints(lastXMonths: Int, category: ShieldTableApi.Category) =

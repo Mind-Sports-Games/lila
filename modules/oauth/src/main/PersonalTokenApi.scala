@@ -30,7 +30,7 @@ final class PersonalTokenApi(colls: OauthColls)(implicit ec: scala.concurrent.Ex
         $doc(
           F.userId   -> u.id,
           F.clientId -> clientId,
-          F.scopes `$all` scopes.toSeq
+          F.scopes.$all(scopes.toSeq)
         )
       )
     }

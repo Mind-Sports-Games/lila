@@ -81,7 +81,7 @@ final class ClasApi(
           .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
             import framework.*
             List(
-              Match($doc("userId" `$in` List(kid1.id, kid2.id))),
+              Match($doc("userId".$in(List(kid1.id, kid2.id)))),
               GroupField("clasId")("nb" -> SumAll),
               Match($doc("nb" -> 2)),
               Limit(1)

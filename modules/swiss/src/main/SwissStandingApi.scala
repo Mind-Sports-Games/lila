@@ -75,7 +75,7 @@ final class SwissStandingApi(
       rankedPlayers <- bestWithRankByPage(swiss.id, 10, page.atLeast(1))
       pairings      <- !swiss.isCreated so SwissPairing.fields { f =>
         colls.pairing
-          .find($doc(f.swissId -> swiss.id, f.players `$in` rankedPlayers.map(_.player.userId)))
+          .find($doc(f.swissId -> swiss.id, f.players.$in(rankedPlayers.map(_.player.userId))))
           .sort($sort.asc(f.round))
           .cursor[SwissPairing]()
           .list()

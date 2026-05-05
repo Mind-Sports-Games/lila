@@ -28,7 +28,7 @@ final class StreamerPager(
           $doc(
             "approval.granted" -> true,
             "listed"           -> Streamer.Listed(true),
-            "_id" `$nin` live.streams.map(_.streamer.id)
+            "_id".$nin(live.streams.map(_.streamer.id))
           )
       ,
       projection = none,

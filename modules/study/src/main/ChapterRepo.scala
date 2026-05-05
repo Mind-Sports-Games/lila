@@ -24,7 +24,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
 
   def deleteByStudy(s: Study): Funit = coll(_.delete.one($studyId(s.id))).void
 
-  def deleteByStudyIds(ids: List[Study.Id]): Funit = coll(_.delete.one($doc("studyId" `$in` ids))).void
+  def deleteByStudyIds(ids: List[Study.Id]): Funit = coll(_.delete.one($doc("studyId".$in(ids)))).void
 
   def byIdAndStudy(id: Chapter.Id, studyId: Study.Id): Fu[Option[Chapter]] =
     coll(_.byId[Chapter, Chapter.Id](id)).dmap { _.filter(_.studyId == studyId) }
@@ -195,7 +195,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   )(chapter: Chapter, path: Path): Funit =
     coll {
       _.updateOrUnsetField(
-        $id(chapter.id) ++ $doc(path.toDbField `$exists` true),
+        $id(chapter.id) ++ $doc(path.toDbField.$exists(true)),
         pathToField(path, field),
         value
       ).void
@@ -214,7 +214,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
         coll {
           _.update
             .one(
-              $id(chapter.id) ++ $doc(path.toDbField `$exists` true),
+              $id(chapter.id) ++ $doc(path.toDbField.$exists(true)),
               $set($doc(sets))
             )
             .void
@@ -230,7 +230,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   ): Fu[Map[Study.Id, Vector[Chapter.IdName]]] =
     studyIds.nonEmpty so coll(
       _.find(
-        $doc("studyId" `$in` studyIds),
+        $doc("studyId".$in(studyIds)),
         $doc("studyId" -> true, "_id" -> true, "name" -> true).some
       )
         .sort($sort.asc("order"))

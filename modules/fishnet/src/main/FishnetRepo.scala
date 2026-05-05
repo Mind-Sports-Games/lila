@@ -55,7 +55,7 @@ final private class FishnetRepo(
 
   object status {
     private def system(v: Boolean)                      = $doc("sender.system" -> v)
-    private def acquired(v: Boolean)                    = $doc("acquired" `$exists` v)
+    private def acquired(v: Boolean)                    = $doc("acquired".$exists(v))
     private def oldestSeconds(system: Boolean): Fu[Int] =
       analysisColl
         .find($doc("sender.system" -> system) ++ acquired(false), $doc("createdAt" -> true).some)

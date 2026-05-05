@@ -50,7 +50,7 @@ final class MsgSearch(
             $eq(me.id),
             "$regex" -> BSONRegex(s"^${java.util.regex.Pattern.quote(q)}", "")
           ),
-          "del" `$ne` me.id
+          "del".$ne(me.id)
         )
       )
       .sort($sort.desc("lastMsg.date"))

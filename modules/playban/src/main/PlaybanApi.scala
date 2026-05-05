@@ -165,7 +165,7 @@ final class PlaybanApi(
     !cleanUserIds.get(userId) so {
       coll
         .find(
-          $doc("_id" -> userId, "b.0" `$exists` true),
+          $doc("_id" -> userId, "b.0".$exists(true)),
           $doc("_id" -> false, "b" -> $doc("$slice" -> -1)).some
         )
         .one[Bdoc]
@@ -194,7 +194,7 @@ final class PlaybanApi(
       .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework.*
         List(
-          Match($inIds(userIds) ++ $doc("b" `$exists` true)),
+          Match($inIds(userIds) ++ $doc("b".$exists(true))),
           Project($doc("bans" -> $doc("$size" -> "$b")))
         )
       }
@@ -212,7 +212,7 @@ final class PlaybanApi(
   private val rageSitCache = cacheApi[User.ID, RageSit](32768, "playban.ragesit") {
     _.expireAfterAccess(20 minutes)
       .buildAsyncFuture { userId =>
-        coll.primitiveOne[RageSit]($doc("_id" -> userId, "c" `$exists` true), "c").map(_ | RageSit.empty)
+        coll.primitiveOne[RageSit]($doc("_id" -> userId, "c".$exists(true)), "c").map(_ | RageSit.empty)
       }
   }
 

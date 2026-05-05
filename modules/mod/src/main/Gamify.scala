@@ -134,7 +134,7 @@ final class Gamify(
           Match(
             $doc(
               "atoms.0.at" -> dateRange(after, before),
-              "room" `$in` Room.all, // required to make use of the mongodb index room+atoms.0.at
+              "room".$in(Room.all), // required to make use of the mongodb index room+atoms.0.at
               "processedBy" -> $nin(hidden)
             )
           ),

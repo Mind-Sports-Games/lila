@@ -128,8 +128,8 @@ final class RelayApi(
   private[relay] def toSync: Fu[List[RelayRound.WithTour]] =
     fetchWithTours(
       $doc(
-        "sync.until" `$exists` true,
-        "sync.nextAt" `$lt` DateTime.now
+        "sync.until".$exists(true),
+        "sync.nextAt".$lt(DateTime.now)
       ),
       20
     )
@@ -281,10 +281,10 @@ final class RelayApi(
   private[relay] def autoStart: Funit =
     roundRepo.coll.list[RelayRound](
       $doc(
-        "startsAt" `$lt` DateTime.now.plusMinutes(30) // start 30 minutes early to fetch boards
-          `$gt` DateTime.now.minusDays(1),            // bit late now
-        "startedAt" `$exists` false,
-        "sync.until" `$exists` false
+        "startsAt".$lt(DateTime.now.plusMinutes(30)) // start 30 minutes early to fetch boards
+          .$gt(DateTime.now.minusDays(1)),            // bit late now
+        "startedAt".$exists(false),
+        "sync.until".$exists(false)
       )
     ) flatMap { relays =>
       Future
@@ -298,12 +298,12 @@ final class RelayApi(
   private[relay] def autoFinishNotSyncing: Funit =
     roundRepo.coll.list[RelayRound](
       $doc(
-        "sync.until" `$exists` false,
+        "sync.until".$exists(false),
         "finished" -> false,
-        "startedAt" `$lt` DateTime.now.minusHours(3),
+        "startedAt".$lt(DateTime.now.minusHours(3)),
         $or(
-          "startsAt" `$exists` false,
-          "startsAt" `$lt` DateTime.now
+          "startsAt".$exists(false),
+          "startsAt".$lt(DateTime.now)
         )
       )
     ) flatMap { relays =>

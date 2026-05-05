@@ -68,7 +68,7 @@ final private class PuzzlePathApi(
                 actualTier,
                 (rating - ratingFlex) to (rating + ratingFlex)
               ) ++
-                ((compromise != 5 && previousPaths.nonEmpty) so $doc("_id" `$nin` previousPaths))
+                ((compromise != 5 && previousPaths.nonEmpty) so $doc("_id".$nin(previousPaths)))
             ),
             Sample(1),
             Project($id(true))
@@ -95,7 +95,7 @@ final private class PuzzlePathApi(
   def select(variant: Variant, theme: PuzzleTheme.Key, tier: PuzzleTier, rating: Range) = $doc(
     "l" -> variant.gameLogic.id,
     "v" -> variant.id,
-    "min" `$lte` f"${variant.gameLogic.id}${sep}${variant.id}${sep}${theme}${sep}${tier}${sep}${rating.max}%04d",
-    "max" `$gte` f"${variant.gameLogic.id}${sep}${variant.id}${sep}${theme}${sep}${tier}${sep}${rating.min}%04d"
+    "min".$lte(f"${variant.gameLogic.id}${sep}${variant.id}${sep}${theme}${sep}${tier}${sep}${rating.max}%04d"),
+    "max".$gte(f"${variant.gameLogic.id}${sep}${variant.id}${sep}${theme}${sep}${tier}${sep}${rating.min}%04d")
   )
 }

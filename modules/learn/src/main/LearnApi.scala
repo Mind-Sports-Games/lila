@@ -31,7 +31,7 @@ final class LearnApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext)
       .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework.*
         List(
-          Match($doc("_id" `$in` userIds)),
+          Match($doc("_id".$in(userIds))),
           Project($doc("stages" -> $doc("$objectToArray" -> "$stages"))),
           UnwindField("stages"),
           Project(

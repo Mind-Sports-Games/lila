@@ -131,7 +131,7 @@ final class SwissJson(
     swiss.isFinished so {
       SwissPlayer.fields { f =>
         colls.player
-          .find($doc(f.swissId -> swiss.id, f.disqualified `$ne` true))
+          .find($doc(f.swissId -> swiss.id, f.disqualified.$ne(true)))
           .sort($sort.desc(f.score))
           .cursor[SwissPlayer]()
           .list(3) flatMap { top3 =>

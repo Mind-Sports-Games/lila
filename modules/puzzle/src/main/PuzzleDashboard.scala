@@ -141,7 +141,7 @@ final class PuzzleDashboardApi(
           "rating" -> AvgField("puzzle.rating")
         )
         List(
-          Match($doc("u" -> userId, "d" `$gt` DateTime.now.minusDays(days))),
+          Match($doc("u" -> userId, "d".$gt(DateTime.now.minusDays(days)))),
           Sort(Descending("d")),
           Limit(10_000),
           PipelineOperator(
@@ -242,6 +242,6 @@ final class PuzzleDashboardApi(
   } yield Results(nb, wins, fixes, rating.toInt)
 
   val relevantThemesSelect = $doc(
-    "puzzle.themes" `$nin` irrelevantThemes.map(_.value)
+    "puzzle.themes".$nin(irrelevantThemes.map(_.value))
   )
 }

@@ -32,13 +32,13 @@ final private class SwissCache(
       val max = 5
       for {
         enterable <- colls.swiss.primitive[Swiss.Id](
-          $doc("teamId" -> teamId, "finishedAt" `$exists` false),
+          $doc("teamId" -> teamId, "finishedAt".$exists(false)),
           $sort.asc("startsAt"),
           nb = max,
           "_id"
         )
         finished <- colls.swiss.primitive[Swiss.Id](
-          $doc("teamId" -> teamId, "finishedAt" `$exists` true),
+          $doc("teamId" -> teamId, "finishedAt".$exists(true)),
           $sort.desc("startsAt"),
           nb = max - enterable.size,
           "_id"

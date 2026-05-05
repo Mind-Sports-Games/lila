@@ -36,7 +36,7 @@ final private[puzzle] class DailyPuzzle(
   private def findLastForVariantKey(key: String): Fu[Option[DailyPuzzle.WithHtml]] =
     strategygames.variant.Variant.all.find(_.key == key).fold(fuccess(none[DailyPuzzle.WithHtml])) { variant =>
       colls.puzzle {
-        _.find($doc(F.day `$exists` true, F.lib -> variant.gameLogic.id, F.variant -> variant.id))
+        _.find($doc(F.day.$exists(true), F.lib -> variant.gameLogic.id, F.variant -> variant.id))
           .sort($doc(F.day -> -1))
           .one[Puzzle]
       } flatMap { _ so makeDaily }
@@ -61,7 +61,7 @@ final private[puzzle] class DailyPuzzle(
 
   private def findCurrent =
     colls.puzzle {
-      _.find($doc(F.day `$gt` DateTime.now.minusDays(1)))
+      _.find($doc(F.day.$gt(DateTime.now.minusDays(1))))
         .one[Puzzle]
     }
 
@@ -93,7 +93,7 @@ final private[puzzle] class DailyPuzzle(
                     ),
                     $doc(
                       "$match" -> $doc(
-                        Puzzle.BSONFields.day `$exists` false
+                        Puzzle.BSONFields.day.$exists(false)
                       )
                     )
                   )

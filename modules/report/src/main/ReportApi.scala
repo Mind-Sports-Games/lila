@@ -289,7 +289,7 @@ final class ReportApi(
       .flatMap { inquiry =>
         val relatedSelector = $doc(
           "user" -> sus.user.id,
-          "room" `$in` rooms,
+          "room".$in(rooms),
           "open" -> true
         )
         val reportSelector = reportId.orElse(inquiry.map(_.id)).fold(relatedSelector) { id =>
@@ -340,17 +340,17 @@ final class ReportApi(
   private val sortLastAtomAt     = $doc("atoms.0.at" -> -1)
 
   private def roomSelect(room: Option[Room]): Bdoc =
-    room.fold($doc("room" `$in` Room.allButXfiles)) { r =>
+    room.fold($doc("room".$in(Room.allButXfiles))) { r =>
       $doc("room" -> r)
     }
 
   private def selectOpenInRoom(room: Option[Room], exceptIds: Iterable[Report.ID]) =
     $doc("open" -> true) ++ roomSelect(room) ++ {
-      exceptIds.nonEmpty so $doc("_id" `$nin` exceptIds)
+      exceptIds.nonEmpty so $doc("_id".$nin(exceptIds))
     }
 
   private def selectOpenAvailableInRoom(room: Option[Room], exceptIds: Iterable[Report.ID]) =
-    selectOpenInRoom(room, exceptIds) ++ $doc("inquiry" `$exists` false)
+    selectOpenInRoom(room, exceptIds) ++ $doc("inquiry".$exists(false))
 
   private val maxScoreCache = cacheApi.unit[Room.Scores] {
     _.refreshAfterWrite(5 minutes)
@@ -394,7 +394,7 @@ final class ReportApi(
 
   def moreLike(report: Report, nb: Int): Fu[List[Report]] =
     coll
-      .find($doc("user" -> report.user, "_id" `$ne` report.id))
+      .find($doc("user" -> report.user, "_id".$ne(report.id)))
       .sort(sortLastAtomAt)
       .cursor[Report]()
       .list(nb)
@@ -437,7 +437,7 @@ final class ReportApi(
         "atoms.by",
         $doc(
           "user" -> sus.user.id,
-          "atoms.0.at" `$gt` DateTime.now.minusDays(3)
+          "atoms.0.at".$gt(DateTime.now.minusDays(3))
         ),
         ReadPreference.secondaryPreferred
       )
@@ -530,7 +530,7 @@ final class ReportApi(
 
   private def selectRecent(suspect: SuspectId, reason: Reason): Bdoc =
     $doc(
-      "atoms.0.at" `$gt` DateTime.now.minusDays(7),
+      "atoms.0.at".$gt(DateTime.now.minusDays(7)),
       "user"   -> suspect.value,
       "reason" -> reason
     )
@@ -545,7 +545,7 @@ final class ReportApi(
       )
 
     def allBySuspect: Fu[Map[User.ID, Report.Inquiry]] =
-      coll.list[Report]($doc("inquiry.mod" `$exists` true)) map {
+      coll.list[Report]($doc("inquiry.mod".$exists(true))) map {
         _.view
           .flatMap { r =>
             r.inquiry map { i =>
@@ -558,7 +558,7 @@ final class ReportApi(
     def ofModId(modId: User.ID): Fu[Option[Report]] = coll.one[Report]($doc("inquiry.mod" -> modId))
 
     def ofSuspectId(suspectId: User.ID): Fu[Option[Report.Inquiry]] =
-      coll.primitiveOne[Report.Inquiry]($doc("inquiry.mod" `$exists` true, "user" -> suspectId), "inquiry")
+      coll.primitiveOne[Report.Inquiry]($doc("inquiry.mod".$exists(true), "user" -> suspectId), "inquiry")
 
     /*
      * If the mod has no current inquiry, just start this one.
@@ -577,7 +577,7 @@ final class ReportApi(
           .byId[Report](id)
           .orElse(
             coll.one[Report](
-              $doc("user" -> id, "inquiry.mod" `$exists` true)
+              $doc("user" -> id, "inquiry.mod".$exists(true))
             )
           )
           .orFail(s"No report $id found")
@@ -640,8 +640,8 @@ final class ReportApi(
     private[report] def expire: Funit =
       workQueue {
         val selector = $doc(
-          "inquiry.mod" `$exists` true,
-          "inquiry.seenAt" `$lt` DateTime.now.minusMinutes(20)
+          "inquiry.mod".$exists(true),
+          "inquiry.seenAt".$lt(DateTime.now.minusMinutes(20))
         )
         coll.delete.one(selector ++ $doc("text" -> Report.spontaneousText)) >>
           coll.update.one(selector, $unset("inquiry"), multi = true).void

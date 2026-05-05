@@ -131,7 +131,7 @@ final private class SwissDirector(
             byes = pendings.collect { case Left(bye) => bye.player }
             _ <- SwissPlayer.fields { f =>
               colls.player.update
-                .one($doc(f.userId `$in` byes, f.swissId -> swiss.id), $addToSet(f.byes -> swiss.round))
+                .one($doc(f.userId.$in(byes), f.swissId -> swiss.id), $addToSet(f.byes -> swiss.round))
                 .void
             }
             _ <- colls.pairing.insert.many(pairings).void

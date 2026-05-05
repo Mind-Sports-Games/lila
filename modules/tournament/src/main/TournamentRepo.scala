@@ -18,20 +18,20 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
 ) {
   import BSONHandlers.*
 
-  private val enterableSelect                  = $doc("status" `$lt` Status.Finished.id)
+  private val enterableSelect                  = $doc("status".$lt(Status.Finished.id))
   private val createdSelect                    = $doc("status" -> Status.Created.id)
   private val startedSelect                    = $doc("status" -> Status.Started.id)
   private[tournament] val finishedSelect       = $doc("status" -> Status.Finished.id)
-  private val unfinishedSelect                 = $doc("status" `$ne` Status.Finished.id)
-  private[tournament] val scheduledSelect      = $doc("schedule" `$exists` true)
+  private val unfinishedSelect                 = $doc("status".$ne(Status.Finished.id))
+  private[tournament] val scheduledSelect      = $doc("schedule".$exists(true))
   private def forTeamSelect(id: TeamID)        = $doc("forTeams" -> id)
-  private def forTeamsSelect(ids: Seq[TeamID]) = $doc("forTeams" `$in` ids)
-  private def sinceSelect(date: DateTime)      = $doc("startsAt" `$gt` date)
+  private def forTeamsSelect(ids: Seq[TeamID]) = $doc("forTeams".$in(ids))
+  private def sinceSelect(date: DateTime)      = $doc("startsAt".$gt(date))
   private def libSelect(lib: GameLogic)        = $doc("lib" -> lib.id)
   private def variantSelect(variant: Variant)  =
-    if (variant.standardVariant) $doc("variant" `$exists` false)
+    if (variant.standardVariant) $doc("variant".$exists(false))
     else $doc("variant" -> variant.id)
-  private val nonEmptySelect           = $doc("nbPlayers" `$ne` 0)
+  private val nonEmptySelect           = $doc("nbPlayers".$ne(0))
   private[tournament] val selectUnique = $doc("schedule.freq" -> "unique")
 
   def byId(id: Tournament.ID): Fu[Option[Tournament]] = coll.byId[Tournament](id)
@@ -82,8 +82,8 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
   def standardPublicStartedFromSecondary: Fu[List[Tournament]] =
     coll.list[Tournament](
       startedSelect ++ $doc(
-        "password" `$exists` false,
-        "variant" `$exists` false
+        "password".$exists(false),
+        "variant".$exists(false)
       ),
       ReadPreference.secondaryPreferred
     )
@@ -139,7 +139,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
               )
             )
           ),
-          Match("player" `$ne` $arr()),
+          Match("player".$ne($arr())),
           Sort(Ascending("startsAt")),
           Limit(max)
         )
@@ -173,7 +173,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
     (nb > 0) so coll
       .find(
         forTeamSelect(teamId) ++ enterableSelect ++ $doc(
-          "startsAt" `$gt` DateTime.now.minusDays(1)
+          "startsAt".$gt(DateTime.now.minusDays(1))
         )
       )
       .sort($sort.asc("startsAt"))
@@ -224,7 +224,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
               )
             )
           ),
-          Match("player" `$ne` $arr()),
+          Match("player".$ne($arr())),
           Project($id(true))
         )
       }
@@ -261,13 +261,13 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
     coll.primitiveOne[TeamBattle]($id(tourId), "teamBattle")
 
   def isTeamBattle(tourId: Tournament.ID): Fu[Boolean] =
-    coll.exists($id(tourId) ++ $doc("teamBattle" `$exists` true))
+    coll.exists($id(tourId) ++ $doc("teamBattle".$exists(true)))
 
   def featuredGameId(tourId: Tournament.ID) = coll.primitiveOne[Game.ID]($id(tourId), "featured")
 
   private def startingSoonSelect(aheadMinutes: Int) =
     createdSelect ++
-      $doc("startsAt" `$lt` (DateTime.now.plusMinutes(aheadMinutes)))
+      $doc("startsAt".$lt((DateTime.now.plusMinutes(aheadMinutes))))
 
   def scheduledCreated(aheadMinutes: Int): Fu[List[Tournament]] =
     coll.list[Tournament](startingSoonSelect(aheadMinutes) ++ scheduledSelect)
@@ -290,7 +290,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
 
   private[tournament] def shouldStartCursor =
     coll
-      .find($doc("startsAt" `$lt` DateTime.now) ++ createdSelect)
+      .find($doc("startsAt".$lt(DateTime.now)) ++ createdSelect)
       .batchSize(1)
       .cursor[Tournament]()
 
@@ -347,7 +347,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
 
   private[tournament] def byScheduleCategory(cats: List[Schedule.Freq]): Fu[List[Tournament]] =
     coll
-      .find(createdSelect ++ $doc("schedule.freq" `$in` cats.map(_.name)))
+      .find(createdSelect ++ $doc("schedule.freq".$in(cats.map(_.name))))
       .cursor[Tournament]()
       .list()
 
@@ -400,7 +400,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
           Variant.libStandard(lib)
         ) ++ $doc(
           "schedule.freq" -> freq.name,
-          "schedule.speed" `$in` Schedule.Speed.mostPopular.map(_.key)
+          "schedule.speed".$in(Schedule.Speed.mostPopular.map(_.key))
         )
       )
       .sort($sort.desc("startsAt"))
@@ -458,8 +458,8 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
     coll
       .find(
         $doc(
-          "startsAt" `$gte` from `$lte` to,
-          "schedule.freq" `$in` Schedule.Freq.all.filter(_.isWeeklyOrBetter)
+          "startsAt".$gte(from).$lte(to),
+          "schedule.freq".$in(Schedule.Freq.all.filter(_.isWeeklyOrBetter))
         )
       )
       .sort($sort.asc("startsAt"))
@@ -479,14 +479,14 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
 
   def winnersByTrophy(trophy: String): Fu[List[Tournament]] =
     coll
-      .find($doc("trophy1st" -> trophy, "winner" `$exists` true))
+      .find($doc("trophy1st" -> trophy, "winner".$exists(true)))
       .sort($sort.desc("startsAt"))
       .cursor[Tournament]()
       .list()
 
   def nextByTrophy(trophy: String): Fu[Option[Tournament]] =
     coll
-      .find($doc("trophy1st" -> trophy, "winner" `$exists` false))
+      .find($doc("trophy1st" -> trophy, "winner".$exists(false)))
       .sort($sort.asc("startsAt"))
       .cursor[Tournament]()
       .headOption

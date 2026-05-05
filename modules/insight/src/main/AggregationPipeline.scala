@@ -160,8 +160,8 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
           combineDocs(extraMatcher :: question.filters.collect {
             case f if f.dimension.isInMove => f.matcher
           } ::: (dimension match {
-            case D.TimeVariance => List($doc(F.moves("v") `$exists` true))
-            case D.CplRange     => List($doc(F.moves("c") `$exists` true))
+            case D.TimeVariance => List($doc(F.moves("v").$exists(true)))
+            case D.CplRange     => List($doc(F.moves("c").$exists(true)))
             case _              => List.empty[Bdoc]
           })).some.filterNot(_.isEmpty) map Match.apply
 
@@ -175,10 +175,10 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
         val pipeline = Match(
           selectUserId(user.id) ++
             gameMatcher ++
-            (dimension == Dimension.Opening).so($doc(F.eco `$exists` true)) ++
+            (dimension == Dimension.Opening).so($doc(F.eco.$exists(true))) ++
             Metric.requiresAnalysis(metric).so($doc(F.analysed -> true)) ++
             (Metric.requiresStableRating(metric) || Dimension.requiresStableRating(dimension)).so {
-              $doc(F.provisional `$ne` true)
+              $doc(F.provisional.$ne(true))
             }
         ) :: /* sortDate :: */ {
           sampleGames :: ((metric match {
@@ -213,7 +213,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
               List(
                 projectForMove,
                 unwindMoves,
-                matchMoves($doc(F.moves("o") `$exists` true)),
+                matchMoves($doc(F.moves("o").$exists(true))),
                 sampleMoves
               ) :::
                 group(dimension, GroupFunction("$push", $doc("$cond" -> $arr("$" + F.moves("o"), 1, 0)))) :::
@@ -222,7 +222,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
               List(
                 projectForMove,
                 unwindMoves,
-                matchMoves($doc(F.moves("l") `$exists` true)),
+                matchMoves($doc(F.moves("l").$exists(true))),
                 sampleMoves
               ) :::
                 group(dimension, GroupFunction("$push", $doc("$cond" -> $arr("$" + F.moves("l"), 1, 0)))) :::
@@ -292,7 +292,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
               List(
                 projectForMove,
                 unwindMoves,
-                matchMoves($doc(F.moves("v") `$exists` true)),
+                matchMoves($doc(F.moves("v").$exists(true))),
                 sampleMoves
               ) :::
                 group(

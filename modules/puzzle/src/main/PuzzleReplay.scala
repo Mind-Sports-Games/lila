@@ -81,8 +81,8 @@ final class PuzzleReplayApi(
             Match(
               $doc(
                 "u" -> user.id,
-                "d" `$gt` DateTime.now.minusDays(days),
-                "w" `$ne` true
+                "d".$gt(DateTime.now.minusDays(days)),
+                "w".$ne(true)
               )
             ),
             Sort(Ascending("d")),

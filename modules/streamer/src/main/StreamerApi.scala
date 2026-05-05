@@ -56,7 +56,7 @@ final class StreamerApi(
     }
 
   def setLiveNow(ids: List[Streamer.Id]): Funit =
-    coll.update.one($doc("_id" `$in` ids), $set("liveAt" -> DateTime.now), multi = true) >>
+    coll.update.one($doc("_id".$in(ids)), $set("liveAt" -> DateTime.now), multi = true) >>
       cache.candidateIds.getUnit.map { candidateIds =>
         if (ids.exists(candidateIds.contains)) cache.candidateIds.invalidateUnit()
       }
@@ -129,9 +129,9 @@ final class StreamerApi(
     coll.update
       .one(
         $doc(
-          "liveAt" `$exists` false,
+          "liveAt".$exists(false),
           "approval.granted" -> true,
-          "approval.lastGrantedAt" `$lt` DateTime.now.minusWeeks(4)
+          "approval.lastGrantedAt".$lt(DateTime.now.minusWeeks(4))
         ),
         $set(
           "approval.granted" -> false,
@@ -171,7 +171,7 @@ final class StreamerApi(
               $doc("youTube.channelId" -> t)
             }
           ).flatten,
-          "_id" `$ne` streamer.userId
+          "_id".$ne(streamer.userId)
         )
       )
       .sort($sort.desc("createdAt"))
@@ -201,7 +201,7 @@ final class StreamerApi(
         .buildAsyncFuture { _ =>
           coll.secondaryPreferred.distinctEasy[Streamer.Id, Set](
             "_id",
-            selectListedApproved ++ $doc("liveAt" `$exists` false)
+            selectListedApproved ++ $doc("liveAt".$exists(false))
           )
         }
     }

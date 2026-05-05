@@ -15,16 +15,16 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
 
   private def selectId(id: Tournament.ID)                            = $doc("_id" -> id)
   private def selectTour(tourId: Tournament.ID)                      = $doc("tid" -> tourId)
-  private def selectTourNoDQ(tourId: Tournament.ID)                  = $doc("tid" -> tourId, "dq" `$ne` true)
+  private def selectTourNoDQ(tourId: Tournament.ID)                  = $doc("tid" -> tourId, "dq".$ne(true))
   private def selectTourUser(tourId: Tournament.ID, userId: User.ID) =
     $doc(
       "tid" -> tourId,
       "uid" -> userId
     )
-  private val selectActive      = $doc("w" `$ne` true)
+  private val selectActive      = $doc("w".$ne(true))
   private val selectWithdraw    = $doc("w" -> true)
   private val selectInputRating = $doc("ir" -> true)
-  private val selectNonBot      = $doc("b" `$ne` true)
+  private val selectNonBot      = $doc("b".$ne(true))
   // _id is added as a secondary sort to ensure the same order is returned for the paginator
   private val bestSort = $doc("m" -> -1, "_id" -> 1)
 
@@ -170,7 +170,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
 
   def teamsOfPlayers(tourId: Tournament.ID, userIds: Seq[User.ID]): Fu[List[(User.ID, TeamID)]] =
     coll
-      .find($doc("tid" -> tourId, "uid" `$in` userIds), $doc("_id" -> false, "uid" -> true, "t" -> true).some)
+      .find($doc("tid" -> tourId, "uid".$in(userIds)), $doc("_id" -> false, "uid" -> true, "t" -> true).some)
       .cursor[Bdoc]()
       .list()
       .map {
@@ -245,7 +245,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
 
   private[tournament] def withPoints(tourId: Tournament.ID): Fu[List[Player]] =
     coll.list[Player](
-      selectTour(tourId) ++ $doc("m" `$gt` 0)
+      selectTour(tourId) ++ $doc("m".$gt(0))
     )
 
   private[tournament] def nbActiveUserIds(tourId: Tournament.ID): Fu[Int] =
@@ -279,7 +279,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
     }
 
   def computeRankOf(player: Player): Fu[Int] =
-    coll.countSel(selectTour(player.tourId) ++ $doc("m" `$gt` player.magicScore))
+    coll.countSel(selectTour(player.tourId) ++ $doc("m".$gt(player.magicScore)))
 
   // expensive, cache it
   private[tournament] def averageRating(tourId: Tournament.ID): Fu[Int] =
@@ -294,7 +294,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
 
   def byTourAndUserIds(tourId: Tournament.ID, userIds: Iterable[User.ID]): Fu[List[Player]] =
     coll
-      .list[Player](selectTour(tourId) ++ $doc("uid" `$in` userIds))
+      .list[Player](selectTour(tourId) ++ $doc("uid".$in(userIds)))
       .chronometer
       .logIfSlow(200, logger) { players =>
         s"PlayerRepo.byTourAndUserIds $tourId ${userIds.size} user IDs, ${players.size} players"
@@ -323,7 +323,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
 
   def nonActivePlayers(tourId: Tournament.ID, userIds: Iterable[User.ID]): Fu[List[Player]] =
     coll
-      .list[Player](selectTour(tourId) ++ selectActive ++ selectNonBot ++ $doc("uid" `$nin` userIds))
+      .list[Player](selectTour(tourId) ++ selectActive ++ selectNonBot ++ $doc("uid".$nin(userIds)))
       .chronometer
       .logIfSlow(200, logger) { players =>
         s"PlayerRepo.nonActivePlayers $tourId ${userIds.size} user IDs, ${players.size} players"
@@ -365,7 +365,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
       coll.primitive[User.ID](
         selector = $doc(
           "tid" -> tourId,
-          "uid" `$startsWith` valid
+          "uid".$startsWith(valid)
         ),
         sort = $sort.desc("m"),
         nb = nb,

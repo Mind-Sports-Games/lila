@@ -23,8 +23,8 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
       "tid" -> tourId,
       "u"   -> userId
     )
-  private val selectPlaying  = $doc("s" `$lt` strategygames.Status.Mate.id)
-  private val selectFinished = $doc("s" `$gte` strategygames.Status.Mate.id)
+  private val selectPlaying  = $doc("s".$lt(strategygames.Status.Mate.id))
+  private val selectFinished = $doc("s".$gte(strategygames.Status.Mate.id))
   private val recentSort     = $doc("d" -> -1)
   private val chronoSort     = $doc("d" -> 1)
 
@@ -42,7 +42,7 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
         val nbUsers = userIds.size
         coll
           .find(
-            selectTour(tourId) ++ $doc("u" `$in` userIds),
+            selectTour(tourId) ++ $doc("u".$in(userIds)),
             $doc("_id" -> false, "u" -> true).some
           )
           .sort(recentSort)
@@ -197,7 +197,7 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
   def justFinishedUsers(tourId: Tournament.ID, waitSeconds: Int): Fu[Set[User.ID]] =
     coll
       .find(
-        selectTour(tourId) ++ $doc("f" `$gte` DateTime.now.minusSeconds(waitSeconds))
+        selectTour(tourId) ++ $doc("f".$gte(DateTime.now.minusSeconds(waitSeconds)))
       )
       .cursor[Bdoc]()
       .list()
@@ -212,7 +212,7 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
   def inPlayUsers(tourId: Tournament.ID): Fu[Set[User.ID]] =
     coll
       .find(
-        selectTour(tourId) ++ $doc("f" `$exists` false)
+        selectTour(tourId) ++ $doc("f".$exists(false))
       )
       .cursor[Bdoc]()
       .list()

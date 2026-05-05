@@ -188,7 +188,7 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
     }
 
   def wasUnteachered(user: User.ID): Fu[Boolean] =
-    coll.exists($doc("user" -> user, "details" `$regex` s"-${Permission.Teacher.toString}"))
+    coll.exists($doc("user" -> user, "details".$regex(s"-${Permission.Teacher.toString}")))
 
   def reportban(mod: Mod, sus: Suspect, v: Boolean) =
     add {
@@ -262,7 +262,7 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
       $doc(
         "user"   -> userId,
         "action" -> Modlog.cheatDetected,
-        "date" `$gte` DateTime.now.minusMonths(6)
+        "date".$gte(DateTime.now.minusMonths(6))
       )
     )
 

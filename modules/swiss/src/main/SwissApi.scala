@@ -60,14 +60,14 @@ final class SwissApi(
   def startedById(id: Swiss.Id)     = byId(id).dmap(_.filter(_.isStarted))
 
   def fetchAllVisibleTournaments: Fu[List[Swiss]] =
-    colls.swiss.list[Swiss]($doc("round" `$gt` 0, "finishedAt" `$exists` false)) zip
+    colls.swiss.list[Swiss]($doc("round".$gt(0), "finishedAt".$exists(false))) zip
       colls.swiss
-        .find($doc("finishedAt" `$gte` DateTime.now.minusHours(24 * 7)))
+        .find($doc("finishedAt".$gte(DateTime.now.minusHours(24 * 7))))
         .sort($sort.desc("finishedAt"))
         .cursor[Swiss]()
         .list(100) zip
       colls.swiss.list[Swiss](
-        $doc("round" -> 0, "finishedAt" `$exists` false, "startsAt" `$lt` DateTime.now.plusMinutes(6 * 60))
+        $doc("round" -> 0, "finishedAt".$exists(false), "startsAt".$lt(DateTime.now.plusMinutes(6 * 60)))
       ) map { case ((started, finished), created) =>
         created ::: started ::: finished
       }
@@ -305,14 +305,14 @@ final class SwissApi(
   def visibleByTeam(teamId: TeamID, nbPast: Int, nbSoon: Int): Fu[Swiss.PastAndNext] =
     (nbPast > 0).so {
       colls.swiss
-        .find($doc("teamId" -> teamId, "finishedAt" `$exists` true))
+        .find($doc("teamId" -> teamId, "finishedAt".$exists(true)))
         .sort($sort.desc("startsAt"))
         .cursor[Swiss]()
         .list(nbPast)
     } zip
       (nbSoon > 0).so {
         colls.swiss
-          .find($doc("teamId" -> teamId, "finishedAt" `$exists` false))
+          .find($doc("teamId" -> teamId, "finishedAt".$exists(false)))
           .sort($sort.asc("startsAt"))
           .cursor[Swiss]()
           .list(nbSoon)
@@ -334,7 +334,7 @@ final class SwissApi(
               pairingViews(_, player)
             } flatMap { pairings =>
               SwissPlayer.fields { f =>
-                colls.player.countSel($doc(f.swissId -> swiss.id, f.score `$gt` player.score)).dmap(1.+)
+                colls.player.countSel($doc(f.swissId -> swiss.id, f.score.$gt(player.score))).dmap(1.+)
               } map { rank =>
                 val pairingMap = pairings.view.map { p =>
                   p.pairing.round -> p
@@ -398,7 +398,7 @@ final class SwissApi(
         colls.player.primitive[User.ID](
           selector = $doc(
             f.swissId -> id,
-            f.userId `$startsWith` valid
+            f.userId.$startsWith(valid)
           ),
           sort = $sort.desc(f.score),
           nb = nb,
@@ -457,7 +457,7 @@ final class SwissApi(
           .aggregateWith[Bdoc]() { framework =>
             import framework.*
             List(
-              Match($doc("teamId" `$in` teamIds, "featurable" -> true)),
+              Match($doc("teamId".$in(teamIds), "featurable" -> true)),
               PipelineOperator(
                 $doc(
                   "$lookup" -> $doc(
@@ -479,7 +479,7 @@ final class SwissApi(
                   )
                 )
               ),
-              Match("player" `$ne` $arr()),
+              Match("player".$ne($arr())),
               Project($id(true))
             )
           }
@@ -785,7 +785,7 @@ final class SwissApi(
     SwissPlayer
       .fields { f =>
         colls.player.primitiveOne[User.ID](
-          $doc(f.swissId -> id, f.disqualified `$ne` true),
+          $doc(f.swissId -> id, f.disqualified.$ne(true)),
           $sort.desc(f.score),
           f.userId
         )
@@ -834,7 +834,7 @@ final class SwissApi(
     SwissPlayer
       .fields { f =>
         colls.player.primitive[User.ID](
-          $doc(f.swissId -> swiss.id, f.disqualified `$ne` true),
+          $doc(f.swissId -> swiss.id, f.disqualified.$ne(true)),
           $sort.desc(f.score),
           3,
           f.userId
@@ -859,14 +859,14 @@ final class SwissApi(
 
   def winnersByTrophy(trophy: String): Fu[List[Swiss]] =
     colls.swiss
-      .find($doc("trophy1st" -> trophy, "finishedAt" `$exists` true))
+      .find($doc("trophy1st" -> trophy, "finishedAt".$exists(true)))
       .sort($sort.desc("startsAt"))
       .cursor[Swiss]()
       .list()
 
   def nextByTrophy(trophy: String): Fu[Option[Swiss]] =
     colls.swiss
-      .find($doc("trophy1st" -> trophy, "finishedAt" `$exists` false))
+      .find($doc("trophy1st" -> trophy, "finishedAt".$exists(false)))
       .sort($sort.asc("startsAt"))
       .cursor[Swiss]()
       .headOption
@@ -893,7 +893,7 @@ final class SwissApi(
 
   private[swiss] def startPendingRounds: Funit =
     colls.swiss
-      .find($doc("nextRoundAt" `$lt` DateTime.now), $id(true).some)
+      .find($doc("nextRoundAt".$lt(DateTime.now)), $id(true).some)
       .cursor[Bdoc]()
       .list(10)
       .map(_.flatMap(_.getAsOpt[Swiss.Id]("_id")))
@@ -996,7 +996,7 @@ final class SwissApi(
       .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework.*
         List(
-          Match($doc("finishedAt" `$exists` false, "nbPlayers" `$gt` 0, "teamId" `$in` teamIds)),
+          Match($doc("finishedAt".$exists(false), "nbPlayers".$gt(0), "teamId".$in(teamIds))),
           PipelineOperator(
             $doc(
               "$lookup" -> $doc(
@@ -1018,7 +1018,7 @@ final class SwissApi(
               )
             )
           ),
-          Match("player" `$ne` $arr()),
+          Match("player".$ne($arr())),
           Project($id(true))
         )
       }
@@ -1029,17 +1029,17 @@ final class SwissApi(
       }
 
   def isUnfinished(id: Swiss.Id): Fu[Boolean] =
-    colls.swiss.exists($id(id) ++ $doc("finishedAt" `$exists` false))
+    colls.swiss.exists($id(id) ++ $doc("finishedAt".$exists(false)))
 
   def filterPlaying(id: Swiss.Id, userIds: Seq[User.ID]): Fu[List[User.ID]] =
     userIds.nonEmpty so
-      colls.swiss.exists($id(id) ++ $doc("finishedAt" `$exists` false)) flatMap {
+      colls.swiss.exists($id(id) ++ $doc("finishedAt".$exists(false))) flatMap {
         _ so SwissPlayer.fields { f =>
           colls.player.distinctEasy[User.ID, List](
             f.userId,
             $doc(
-              f.id `$in` userIds.map(SwissPlayer.makeId(id, _)),
-              f.absent `$ne` true
+              f.id.$in(userIds.map(SwissPlayer.makeId(id, _))),
+              f.absent.$ne(true)
             )
           )
         }

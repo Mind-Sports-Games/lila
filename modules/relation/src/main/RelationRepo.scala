@@ -46,7 +46,7 @@ final private class RelationRepo(coll: Coll, userRepo: lila.user.UserRepo)(impli
               )
             )
           ),
-          Match("follower" `$ne` $arr()),
+          Match("follower".$ne($arr())),
           Group(BSONNull)(
             "ids" -> PushField("u1")
           )
@@ -62,7 +62,7 @@ final private class RelationRepo(coll: Coll, userRepo: lila.user.UserRepo)(impli
         "u2",
         $doc(
           "u1" -> userId,
-          "u2" `$startsWith` valid,
+          "u2".$startsWith(valid),
           "r" -> Follow
         )
       )

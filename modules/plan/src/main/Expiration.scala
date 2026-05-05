@@ -34,8 +34,8 @@ final private class Expiration(
   private def getExpired =
     patronColl.list[Patron](
       $doc(
-        "expiresAt" `$lt` DateTime.now,
-        "lifetime" `$ne` true
+        "expiresAt".$lt(DateTime.now),
+        "lifetime".$ne(true)
       ),
       50
     )

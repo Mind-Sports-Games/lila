@@ -162,7 +162,7 @@ final class StudyTopicApi(topicRepo: StudyTopicRepo, userTopicRepo: StudyUserTop
         List(
           Match(
             $doc(
-              "topics" `$exists` true,
+              "topics".$exists(true),
               "visibility" -> "public"
             )
           ),

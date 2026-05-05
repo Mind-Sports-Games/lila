@@ -60,13 +60,12 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
   private[study] val selectPublic                      = $doc(
     "visibility" -> VisibilityHandler.writeTry(Study.Visibility.Public).get
   )
-  private[study] val selectPrivateOrUnlisted = "visibility" `$ne` VisibilityHandler
-    .writeTry(Study.Visibility.Public)
-    .get
+  private[study] val selectPrivateOrUnlisted =
+    "visibility".$ne(VisibilityHandler.writeTry(Study.Visibility.Public).get)
   private[study] def selectLiker(userId: User.ID)         = $doc(F.likers -> userId)
   private[study] def selectContributorId(userId: User.ID) =
     selectMemberId(userId) ++ // use the index
-      $doc("ownerId" `$ne` userId) ++
+      $doc("ownerId".$ne(userId)) ++
       $doc(s"members.$userId.role" -> "w")
   private[study] def selectTopic(topic: StudyTopic) = $doc(F.topics -> topic)
 
@@ -198,7 +197,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
     coll(_.exists($id(studyId) ++ $doc(s"members.$userId.role" -> "w")))
 
   def isMember(studyId: Study.Id, userId: User.ID) =
-    coll(_.exists($id(studyId) ++ (s"members.$userId" `$exists` true)))
+    coll(_.exists($id(studyId) ++ (s"members.$userId".$exists(true))))
 
   def like(studyId: Study.Id, userId: User.ID, v: Boolean): Fu[Study.Likes] =
     countLikes(studyId).flatMap {

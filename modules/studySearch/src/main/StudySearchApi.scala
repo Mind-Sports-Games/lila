@@ -125,7 +125,7 @@ final class StudySearchApi(
             .futureSource {
               studyRepo
                 .sortedCursor(
-                  $doc("createdAt" `$gte` since),
+                  $doc("createdAt".$gte(since)),
                   sort = $sort.asc("createdAt")
                 )
                 .map(_.documentSource())

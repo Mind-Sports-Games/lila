@@ -81,7 +81,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
     coll
       .find(
         createdSelect ++
-          $doc("hostId" `$in` hostIds, "team" `$in` List(BSONString(teamId)))
+          $doc("hostId".$in(hostIds), "team".$in(List(BSONString(teamId))))
       )
       .hint(coll hint $doc("hostId" -> 1))
       .cursor[Simul]()
@@ -91,7 +91,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
     coll.primitiveOne[User.ID]($id(id), "hostId")
 
   private val featurableSelect         = $doc("featurable" -> true)
-  private val manyPairings             = $doc("pairings.3" `$exists` true)
+  private val manyPairings             = $doc("pairings.3".$exists(true))
   private val featurableOrManyPairings = $doc("$or" -> List(featurableSelect, manyPairings))
 
   def allCreatedFeaturable: Fu[List[Simul]] =
@@ -100,7 +100,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
         // hits partial index hostSeenAt_-1
         createdSelect ++ featurableSelect ++ $doc(
           // "hostSeenAt" $gte DateTime.now.minusSeconds(12),
-          "createdAt" `$gte` DateTime.now.minusDays(30)
+          "createdAt".$gte(DateTime.now.minusDays(30))
         )
       )
       .sort(createdSort)
@@ -117,7 +117,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
     coll
       .find(
         createdSelect ++ $doc(
-          "createdAt" `$gte` DateTime.now.minusDays(30)
+          "createdAt".$gte(DateTime.now.minusDays(30))
         )
       )
       .sort(createdSort)
@@ -146,7 +146,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
       .list(max)
 
   def allNotFinished =
-    coll.list[Simul]($doc("status" `$ne` SimulStatus.Finished.id))
+    coll.list[Simul]($doc("status".$ne(SimulStatus.Finished.id)))
 
   def create(simul: Simul): Funit =
     coll.insert

@@ -56,7 +56,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       email: NormalizedEmailAddress,
       since: DateTime = DateTime.now.minusWeeks(1)
   ): Fu[Int] =
-    coll.countSel($doc(F.prevEmail -> email, F.createdAt `$gt` since))
+    coll.countSel($doc(F.prevEmail -> email, F.createdAt.$gt(since)))
 
   def pair(x: Option[ID], y: Option[ID]): Fu[(Option[User], Option[User])] =
     coll.byIds[User](List(x, y).flatten) map { users =>
@@ -116,8 +116,8 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .find(
         $doc(
           F.enabled -> true,
-          F.marks `$nin` List(UserMark.Engine.key, UserMark.Boost.key),
-          "perfs.standard.gl.d" `$lt` Glicko.provisionalDeviation
+          F.marks.$nin(List(UserMark.Engine.key, UserMark.Boost.key)),
+          "perfs.standard.gl.d".$lt(Glicko.provisionalDeviation)
         ) ++ $inIds(ids) ++ botSelect(false)
       )
       .sort($sort.desc("perfs.standard.gl.r"))
@@ -191,7 +191,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll
       .update(ordered = false, WriteConcern.Unacknowledged)
       .one(
-        $id(userId) ++ (value < 0).so($doc(F.playerIndexIt `$gt` -3)),
+        $id(userId) ++ (value < 0).so($doc(F.playerIndexIt.$gt(-3))),
         $inc(F.playerIndexIt -> value)
       )
       .discard
@@ -257,7 +257,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def setUsernameCased(id: ID, username: String): Funit = {
     if (id == username.toLowerCase) {
       coll.update.one(
-        $id(id) ++ (F.changedCase `$exists` false),
+        $id(id) ++ (F.changedCase.$exists(false)),
         $set(F.username -> username, F.changedCase -> true)
       ) flatMap { result =>
         if (result.n == 0) fufail(s"You have already changed your username")
@@ -279,17 +279,17 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   val disabledSelect                               = $doc(F.enabled -> false)
   def markSelect(mark: UserMark)(v: Boolean): Bdoc =
     if (v) $doc(F.marks -> mark.key)
-    else F.marks `$ne` mark.key
+    else F.marks.$ne(mark.key)
   def engineSelect = markSelect(UserMark.Engine)
   def trollSelect  = markSelect(UserMark.Troll)
-  val lame         = $doc(F.marks `$in` List(UserMark.Engine.key, UserMark.Boost.key))
+  val lame         = $doc(F.marks.$in(List(UserMark.Engine.key, UserMark.Boost.key)))
   val lameOrTroll  = $or(
     $doc(F.marks -> UserMark.Engine.key),
     $doc(F.marks -> UserMark.Boost.key),
     $doc(F.marks -> UserMark.Troll.key)
   )
-  val notLame                        = $doc(F.marks `$nin` List(UserMark.Engine.key, UserMark.Boost.key))
-  val enabledNoBotSelect             = enabledSelect ++ $doc(F.title `$ne` Title.BOT)
+  val notLame                        = $doc(F.marks.$nin(List(UserMark.Engine.key, UserMark.Boost.key)))
+  val enabledNoBotSelect             = enabledSelect ++ $doc(F.title.$ne(Title.BOT))
   def stablePerfSelect(perf: String) =
     $doc(s"perfs.$perf.gl.d" -> $lt(lila.rating.Glicko.provisionalDeviation))
   val patronSelect = $doc(s"${F.plan}.active" -> true)
@@ -379,7 +379,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     User.couldBeUsername(text) so {
       coll
         .find(
-          $doc(F.id `$startsWith` normalize(text)) ++ enabledSelect ++ filter,
+          $doc(F.id.$startsWith(normalize(text))) ++ enabledSelect ++ filter,
           $doc(F.id -> true).some
         )
         .sort($doc("len" -> 1))
@@ -414,7 +414,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def isTroll(id: ID): Fu[Boolean] = coll.exists($id(id) ++ trollSelect(true))
 
   def isCreatedSince(id: ID, since: DateTime): Fu[Boolean] =
-    coll.exists($id(id) ++ $doc(F.createdAt `$lt` since))
+    coll.exists($id(id) ++ $doc(F.createdAt.$lt(since)))
 
   def setRoles(id: ID, roles: List[String]): Funit =
     coll.updateField($id(id), F.roles, roles).void
@@ -424,7 +424,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def setupTwoFactor(id: ID, totp: TotpSecret): Funit =
     coll.update
       .one(
-        $id(id) ++ (F.totpSecret `$exists` false), // never overwrite existing secret
+        $id(id) ++ (F.totpSecret.$exists(false)), // never overwrite existing secret
         $set(F.totpSecret -> totp.secret)
       )
       .void
@@ -433,7 +433,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll.updateField($id(id), F.enabled, true) >>
       coll.update
         .one(
-          $id(id) ++ $doc(F.email `$exists` false),
+          $id(id) ++ $doc(F.email.$exists(false)),
           $doc("$rename" -> $doc(F.prevEmail -> F.email))
         )
         .void
@@ -642,7 +642,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll.distinctEasy[String, Set](F.id, $inIds(userIds) ++ enabledSelect, ReadPreference.secondaryPreferred)
 
   def userIdsWithRoles(roles: List[String]): Fu[Set[User.ID]] =
-    coll.distinctEasy[String, Set]("_id", $doc("roles" `$in` roles))
+    coll.distinctEasy[String, Set]("_id", $doc("roles".$in(roles)))
 
   def countEngines(userIds: List[User.ID]): Fu[Int] =
     coll.secondaryPreferred.countSel($inIds(userIds) ++ engineSelect(true))
@@ -654,10 +654,10 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll.exists($inIds(userIds) ++ engineSelect(true))
 
   def mustConfirmEmail(id: User.ID): Fu[Boolean] =
-    coll.exists($id(id) ++ $doc(F.mustConfirmEmail `$exists` true))
+    coll.exists($id(id) ++ $doc(F.mustConfirmEmail.$exists(true)))
 
   def setEmailConfirmed(id: User.ID): Fu[Option[EmailAddress]] =
-    coll.update.one($id(id) ++ $doc(F.mustConfirmEmail `$exists` true), $unset(F.mustConfirmEmail)) flatMap {
+    coll.update.one($id(id) ++ $doc(F.mustConfirmEmail.$exists(true)), $unset(F.mustConfirmEmail)) flatMap {
       res =>
         (res.nModified == 1) so email(id)
     }
@@ -680,15 +680,15 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def isErased(user: User): Fu[User.Erased] =
     user.disabled so {
-      coll.exists($id(user.id) ++ $doc(F.erasedAt `$exists` true))
+      coll.exists($id(user.id) ++ $doc(F.erasedAt.$exists(true)))
     } map User.Erased.apply
 
-  def byIdNotErased(id: ID): Fu[Option[User]] = coll.one[User]($id(id) ++ $doc(F.erasedAt `$exists` false))
+  def byIdNotErased(id: ID): Fu[Option[User]] = coll.one[User]($id(id) ++ $doc(F.erasedAt.$exists(false)))
 
   def filterClosedOrInactiveIds(since: DateTime)(ids: Iterable[ID]): Fu[List[ID]] =
     coll.distinctEasy[ID, List](
       F.id,
-      $inIds(ids) ++ $or(disabledSelect, F.seenAt `$lt` since),
+      $inIds(ids) ++ $or(disabledSelect, F.seenAt.$lt(since)),
       ReadPreference.secondaryPreferred
     )
 

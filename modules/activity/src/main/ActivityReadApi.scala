@@ -142,7 +142,7 @@ final class ActivityReadApi(
 
   def recentSwissRanks(userId: User.ID): Fu[List[(Swiss.IdName, Int)]] =
     coll
-      .find(regexId(userId) ++ $doc(BSONHandlers.ActivityFields.swisses `$exists` true))
+      .find(regexId(userId) ++ $doc(BSONHandlers.ActivityFields.swisses.$exists(true)))
       .sort($sort.desc("_id"))
       .cursor[Activity](ReadPreference.secondaryPreferred)
       .list(10)

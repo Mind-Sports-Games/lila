@@ -122,8 +122,8 @@ final class WinnersApi(
       .find(
         $doc(
           "schedule.freq" -> freq.name,
-          "startsAt" `$gt` since.minusHours(12),
-          "winner" `$exists` true
+          "startsAt".$gt(since.minusHours(12)),
+          "winner".$exists(true)
         )
       )
       .sort($sort.desc("startsAt"))

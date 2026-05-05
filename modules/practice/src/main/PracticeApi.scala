@@ -118,7 +118,7 @@ final class PracticeApi(
         .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
           import framework.*
           List(
-            Match($doc("_id" `$in` userIds)),
+            Match($doc("_id".$in(userIds))),
             Project(
               $doc(
                 "nb" -> $doc(

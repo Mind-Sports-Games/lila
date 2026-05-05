@@ -66,13 +66,13 @@ final class AppealApi(
   private def queue(exceptIds: Iterable[User.ID]): Fu[List[Appeal]] =
     coll
       .find($doc("status" -> Appeal.Status.Unread.key) ++ {
-        exceptIds.nonEmpty so $doc("_id" `$nin` exceptIds)
+        exceptIds.nonEmpty so $doc("_id".$nin(exceptIds))
       })
       .sort($doc("firstUnrepliedAt" -> 1))
       .cursor[Appeal]()
       .list(30) flatMap { unreads =>
       coll
-        .find($doc("status" `$ne` Appeal.Status.Unread.key))
+        .find($doc("status".$ne(Appeal.Status.Unread.key)))
         .sort($doc("firstUnrepliedAt" -> -1))
         .cursor[Appeal]()
         .list(40 - unreads.size) map {

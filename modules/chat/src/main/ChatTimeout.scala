@@ -52,7 +52,7 @@ final class ChatTimeout(
   def checkExpired: Fu[List[Reinstate]] =
     coll.list[Reinstate](
       $doc(
-        "expiresAt" `$lt` DateTime.now
+        "expiresAt".$lt(DateTime.now)
       )
     ) flatMap {
       case Nil  => fuccess(Nil)

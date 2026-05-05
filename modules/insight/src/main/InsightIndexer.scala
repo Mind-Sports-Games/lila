@@ -90,7 +90,7 @@ final private class InsightIndexer(
               logger.warn(e.getMessage, e)
             } map (_.toOption)
           }
-        val query = gameQuery(user) ++ $doc(Game.BSONFields.createdAt `$gte` from)
+        val query = gameQuery(user) ++ $doc(Game.BSONFields.createdAt.$gte(from))
         gameRepo
           .sortedCursor(query, Query.sortChronological)
           .documentSource(maxGames)

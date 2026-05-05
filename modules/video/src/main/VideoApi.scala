@@ -77,7 +77,7 @@ final private[video] class VideoApi(
         .void
 
     def removeNotIn(ids: List[Video.ID]) =
-      videoColl.delete.one($doc("_id" `$nin` ids)).void
+      videoColl.delete.one($doc("_id".$nin(ids))).void
 
     def setMetadata(id: Video.ID, metadata: Youtube.Metadata) =
       videoColl.update
@@ -110,7 +110,7 @@ final private[video] class VideoApi(
         Paginator(
           adapter = new Adapter[Video](
             collection = videoColl,
-            selector = $doc("tags" `$all` tags),
+            selector = $doc("tags".$all(tags)),
             projection = none,
             sort = $doc("metadata.likes" -> -1),
             readPreference = ReadPreference.secondaryPreferred
@@ -139,8 +139,8 @@ final private[video] class VideoApi(
           List(
             Match(
               $doc(
-                "tags" `$in` video.tags,
-                "_id" `$ne` video.id
+                "tags".$in(video.tags),
+                "_id".$ne(video.id)
               )
             ),
             AddFields(
@@ -226,7 +226,7 @@ final private[video] class VideoApi(
                 .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
                   import framework.*
                   List(
-                    Match($doc("tags" `$all` filterTags)),
+                    Match($doc("tags".$all(filterTags))),
                     Project($doc("tags" -> true)),
                     UnwindField("tags"),
                     GroupField("tags")("nb" -> SumAll)

@@ -39,7 +39,7 @@ final private class CheckMail(
       .distinctEasy[String, List](
         "_id",
         $doc(
-          "_id" `$regex` s"^$prefix:",
+          "_id".$regex(s"^$prefix:"),
           "v" -> false
         ),
         ReadPreference.secondaryPreferred

@@ -67,7 +67,7 @@ final class StudyPager(
 
   def mineMember(me: User, order: Order, page: Int) =
     paginator(
-      selectMemberId(me.id) ++ $doc("ownerId" `$ne` me.id),
+      selectMemberId(me.id) ++ $doc("ownerId".$ne(me.id)),
       me.some,
       order,
       page
@@ -75,7 +75,7 @@ final class StudyPager(
 
   def mineLikes(me: User, order: Order, page: Int) =
     paginator(
-      selectLiker(me.id) ++ accessSelect(me.some) ++ $doc("ownerId" `$ne` me.id),
+      selectLiker(me.id) ++ accessSelect(me.some) ++ $doc("ownerId".$ne(me.id)),
       me.some,
       order,
       page

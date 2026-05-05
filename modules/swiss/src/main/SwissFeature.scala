@@ -58,9 +58,9 @@ final class SwissFeature(
       .find(
         $doc(
           "featurable" -> true,
-          "settings.i" `$lte` 600, // hits the partial index
+          "settings.i".$lte(600), // hits the partial index
           "startsAt" -> startsAtRange,
-          "garbage" `$ne` true
+          "garbage".$ne(true)
         )
       )
       .sort($sort.desc("nbPlayers"))
