@@ -144,8 +144,8 @@ object GameMod {
       $doc(lila.game.Game.BSONFields.swissId -> id)
     } ++ (filter.opponentIds match {
       case Nil      => $empty
-      case List(id) => $and(lila.game.Game.BSONFields.playerUids `$eq` id)
-      case ids      => $and(lila.game.Game.BSONFields.playerUids `$in` ids)
+      case List(id) => $and(lila.game.Game.BSONFields.playerUids.$eq(id))
+      case ids      => $and(lila.game.Game.BSONFields.playerUids.$in(ids))
     })
 
   val filterForm =
