@@ -57,6 +57,9 @@ export interface ControlConfig {
   // Redirect tree-click jump paths (e.g. skip to end-of-turn for backgammon roll nodes)
   redirectJumpPath?(path: string): string;
 
+  // Active path override for tree highlighting (e.g. while dice picker is shown)
+  getActivePath?(): Tree.Path | null;
+
   // Study annotation permissions per node
   isNodeCommentable?(node: Tree.Node): boolean;
   isNodeAnnotatable?(node: Tree.Node): boolean;

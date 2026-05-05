@@ -72,8 +72,10 @@ export function render(ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
 
 export function nodeClasses(ctx: Ctx, node: Tree.Node, path: Tree.Path, fullTurnPath: Tree.Path = path): NodeClasses {
   const glyphIds = ctx.showGlyphs && node.glyphs ? node.glyphs.map(g => g.id) : [];
+  const rawActivePath = ctx.ctrl.controlConfig.getActivePath?.();
+  const activePath = rawActivePath === undefined ? ctx.ctrl.path : rawActivePath;
   return {
-    active: ctx.ctrl.path.startsWith(path) && ctx.ctrl.path.length <= fullTurnPath.length,
+    active: activePath !== null && activePath.startsWith(path) && activePath.length <= fullTurnPath.length,
     'context-menu': path === ctx.ctrl.contextMenuPath,
     current: path === ctx.currentPath,
     nongame:
