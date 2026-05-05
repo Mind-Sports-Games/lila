@@ -59,7 +59,11 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     const sortedValues = [...dice].sort((a, b) => a - b).join('/');
     const existingMatch = ctrl.node.children.find(c => {
       if (!diceRollUci.test(c.uci ?? '')) return false;
-      const childSorted = (c.uci ?? '').split('/').map(Number).sort((a, b) => a - b).join('/');
+      const childSorted = (c.uci ?? '')
+        .split('/')
+        .map(Number)
+        .sort((a, b) => a - b)
+        .join('/');
       return childSorted === sortedValues;
     });
     if (existingMatch) {
