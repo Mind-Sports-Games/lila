@@ -392,4 +392,56 @@ trait dsl {
 //   }
 // }
 
-object dsl extends dsl with CollExt with QueryBuilderExt with CursorExt with Handlers
+object dsl extends dsl with CollExt with QueryBuilderExt with CursorExt with Handlers {
+
+  import reactivemongo.api.{ CursorProducer, ReadPreference }
+
+  // aggregateList/One/Exists must be Scala 3 extension methods (not in the implicit class ExtendColl)
+  // because `coll.PipelineOperator` in the callback type is only a stable path when `coll` is an
+  // extension receiver; in an implicit class, `coll` is a val field, which Scala 3 treats as a type
+  // projection (ExtendColl#coll) and cannot unify with `framework.PipelineOperator` at call sites.
+  extension (coll: Coll)(using scala.concurrent.ExecutionContext) {
+
+    def aggregateList(
+        maxDocs: Int,
+        readPreference: ReadPreference = ReadPreference.primary,
+        allowDiskUse: Boolean = false
+    )(
+        f: coll.AggregationFramework => (coll.PipelineOperator, List[coll.PipelineOperator])
+    )(implicit cp: CursorProducer[Bdoc]): Fu[List[Bdoc]] =
+      coll
+        .aggregateWith[Bdoc](allowDiskUse = allowDiskUse, readPreference = readPreference) { agg =>
+          val (head, tail) = f(agg)
+          head +: tail
+        }
+        .collect[List](maxDocs = maxDocs)
+
+    def aggregateOne(
+        readPreference: ReadPreference = ReadPreference.primary,
+        allowDiskUse: Boolean = false
+    )(
+        f: coll.AggregationFramework => (coll.PipelineOperator, List[coll.PipelineOperator])
+    )(implicit cp: CursorProducer[Bdoc]): Fu[Option[Bdoc]] =
+      coll
+        .aggregateWith[Bdoc](allowDiskUse = allowDiskUse, readPreference = readPreference) { agg =>
+          val (head, tail) = f(agg)
+          head +: tail
+        }
+        .collect[List](maxDocs = 1)
+        .dmap(_.headOption)
+
+    def aggregateExists(
+        readPreference: ReadPreference = ReadPreference.primary,
+        allowDiskUse: Boolean = false
+    )(
+        f: coll.AggregationFramework => (coll.PipelineOperator, List[coll.PipelineOperator])
+    )(implicit cp: CursorProducer[Bdoc]): Fu[Boolean] =
+      coll
+        .aggregateWith[Bdoc](allowDiskUse = allowDiskUse, readPreference = readPreference) { agg =>
+          val (head, tail) = f(agg)
+          head +: tail
+        }
+        .headOption
+        .dmap(_.isDefined)
+  }
+}

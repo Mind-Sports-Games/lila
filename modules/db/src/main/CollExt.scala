@@ -202,56 +202,6 @@ trait CollExt { self: dsl & QueryBuilderExt =>
         }
       }
 
-    def aggregateList(
-        maxDocs: Int,
-        readPreference: ReadPreference = ReadPreference.primary,
-        allowDiskUse: Boolean = false
-    )(
-        f: coll.AggregationFramework => (coll.PipelineOperator, List[coll.PipelineOperator])
-    )(implicit cp: CursorProducer[Bdoc]): Fu[List[Bdoc]] =
-      coll
-        .aggregateWith[Bdoc](
-          allowDiskUse = allowDiskUse,
-          readPreference = readPreference
-        )(agg => {
-          val nonEmpty = f(agg)
-          nonEmpty._1 +: nonEmpty._2
-        })
-        .collect[List](maxDocs = maxDocs)
-
-    def aggregateOne(
-        readPreference: ReadPreference = ReadPreference.primary,
-        allowDiskUse: Boolean = false
-    )(
-        f: coll.AggregationFramework => (coll.PipelineOperator, List[coll.PipelineOperator])
-    )(implicit cp: CursorProducer[Bdoc]): Fu[Option[Bdoc]] =
-      coll
-        .aggregateWith[Bdoc](
-          allowDiskUse = allowDiskUse,
-          readPreference = readPreference
-        )(agg => {
-          val nonEmpty = f(agg)
-          nonEmpty._1 +: nonEmpty._2
-        })
-        .collect[List](maxDocs = 1)
-        .dmap(_.headOption) // .one[Bdoc] ?
-
-    def aggregateExists(
-        readPreference: ReadPreference = ReadPreference.primary,
-        allowDiskUse: Boolean = false
-    )(
-        f: coll.AggregationFramework => (coll.PipelineOperator, List[coll.PipelineOperator])
-    )(implicit cp: CursorProducer[Bdoc]): Fu[Boolean] =
-      coll
-        .aggregateWith[Bdoc](
-          allowDiskUse = allowDiskUse,
-          readPreference = readPreference
-        )(agg => {
-          val nonEmpty = f(agg)
-          nonEmpty._1 +: nonEmpty._2
-        })
-        .headOption
-        .dmap(_.isDefined)
 
     def distinctEasy[T, M[_] <: Iterable[?]](
         key: String,

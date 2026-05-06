@@ -26,10 +26,9 @@ final class PaginatorBuilder(
 
     def slice(offset: Int, length: Int): Fu[Seq[Game]] =
       coll
-        .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+        .aggregateList(length, readPreference = ReadPreference.secondaryPreferred) { framework =>
           import framework.*
-          List(
-            Match(selector),
+          Match(selector) -> List(
             Sort(Descending("d")),
             Skip(offset),
             Limit(length),
@@ -48,7 +47,6 @@ final class PaginatorBuilder(
             ReplaceRootField("game")
           )
         }
-        .collect[List](maxDocs = length)
         .map {
           _.flatMap(lila.game.BSONHandlers.gameBSONHandler.readOpt)
         }
