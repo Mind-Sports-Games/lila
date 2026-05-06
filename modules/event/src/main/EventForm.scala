@@ -43,26 +43,7 @@ object EventForm {
       },
       "icon"      -> stringIn(icon.choices),
       "countdown" -> boolean
-    )(Data.apply)(d =>
-      Some(
-        (
-          d.title,
-          d.headline,
-          d.beforeMessage,
-          d.duringMessage,
-          d.description,
-          d.homepageHours,
-          d.url,
-          d.lang,
-          d.enabled,
-          d.startsAt,
-          d.finishesAt,
-          d.hostedBy,
-          d.icon,
-          d.countdown
-        )
-      )
-    )
+    )(Data.apply)(unapply)
   ).fill(
     Data(
       title = "",

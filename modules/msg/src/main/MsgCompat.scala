@@ -105,7 +105,7 @@ final class MsgCompat(
           ),
         "subject" -> text(minLength = 3, maxLength = 100),
         "text"    -> text(minLength = 3, maxLength = 8000)
-      )(ThreadData.apply)(d => Some((d.user, d.subject, d.text)))
+      )(ThreadData.apply)(unapply)
     ).bindFromRequest()
       .fold(
         err => Left(err),

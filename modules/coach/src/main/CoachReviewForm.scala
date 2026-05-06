@@ -9,7 +9,7 @@ object CoachReviewForm {
     mapping(
       "text"  -> text(minLength = 3, maxLength = 2010),
       "score" -> number(min = 1, max = 5)
-    )(Data.apply)(d => Some((d.text, d.score)))
+    )(Data.apply)(unapply)
   )
 
   case class Data(text: String, score: Int)

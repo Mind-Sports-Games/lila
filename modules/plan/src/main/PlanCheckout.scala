@@ -55,6 +55,8 @@ object Switch {
       "amount" -> bigDecimal(precision = 10, scale = 2)
         .verifying(_ >= 1)
         .verifying(_ <= 10000)
-    )(Switch.apply)(d => Some(d.amount))
+    // scala3 upgrade, copying how lichess handle this function uses `_ => None`
+    // instead of `unapply` equivalent which would be `_.amount.some`
+    )(Switch.apply)(_ => None)
   )
 }

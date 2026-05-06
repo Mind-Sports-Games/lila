@@ -76,7 +76,7 @@ final class SecurityForm(
       "nice"       -> agreementBool,
       "account"    -> agreementBool,
       "policy"     -> agreementBool
-    )(AgreementData.apply)(d => Some((d.assistance, d.nice, d.account, d.policy)))
+    )(AgreementData.apply)(unapply)
 
     val emailField = withAcceptableDns(acceptableUniqueEmail(none))
 
@@ -125,7 +125,7 @@ final class SecurityForm(
     mapping(
       "newPasswd1" -> nonEmptyText(minLength = passwordMinLength),
       "newPasswd2" -> nonEmptyText(minLength = passwordMinLength)
-    )(PasswordResetConfirm.apply)(d => Some((d.newPasswd1, d.newPasswd2))).verifying(
+    )(PasswordResetConfirm.apply)(unapply).verifying(
       "newPasswordsDontMatch",
       _.samePasswords
     )
@@ -148,7 +148,7 @@ final class SecurityForm(
           "email"  -> withAcceptableDns {
             acceptableUniqueEmail(candidate.user.some).verifying(emailValidator.differentConstraint(old))
           }
-        )(ChangeEmail.apply)(d => Some((d.passwd, d.email)))
+        )(ChangeEmail.apply)(unapply)
       ).fill(
         ChangeEmail(
           passwd = "",
@@ -164,7 +164,7 @@ final class SecurityForm(
           "secret" -> nonEmptyText,
           "passwd" -> passwordMapping(candidate),
           "token"  -> nonEmptyText
-        )(TwoFactor.apply)(d => Some((d.secret, d.passwd, d.token))).verifying(
+        )(TwoFactor.apply)(unapply).verifying(
           "invalidAuthenticationCode",
           _.tokenValid
         )

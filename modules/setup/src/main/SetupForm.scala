@@ -123,7 +123,7 @@ object SetupForm {
       mapping(
         "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains),
         "increment" -> increment
-      )(strategygames.Clock.Config.apply)(c => Some((c.limitSeconds, c.incrementSeconds)))
+      )(strategygames.Clock.Config.apply)(unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
 
     lazy val fischerClock = "clock" -> optional(fischerClockMapping)
@@ -132,7 +132,7 @@ object SetupForm {
       mapping(
         "limit" -> number.verifying(ApiConfig.clockLimitSeconds.contains),
         "delay" -> increment
-      )(strategygames.Clock.BronsteinConfig.apply)(c => Some((c.limitSeconds, c.delaySeconds)))
+      )(strategygames.Clock.BronsteinConfig.apply)(unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
     lazy val bronsteinDelayClock = "clock" -> optional(bronsteinDelayClockMapping)
 
@@ -140,7 +140,7 @@ object SetupForm {
       mapping(
         "limit" -> number.verifying(ApiConfig.clockLimitSeconds.contains),
         "delay" -> increment
-      )(strategygames.Clock.SimpleDelayConfig.apply)(c => Some((c.limitSeconds, c.delaySeconds)))
+      )(strategygames.Clock.SimpleDelayConfig.apply)(unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
     lazy val simpleDelayClock = "clock" -> optional(simpleDelayMapping)
 
@@ -150,9 +150,7 @@ object SetupForm {
         "increment" -> increment,
         "byoyomi"   -> byoyomi,
         "periods"   -> periods
-      )(strategygames.ByoyomiClock.Config.apply)(c =>
-        Some((c.limitSeconds, c.incrementSeconds, c.byoyomiSeconds, c.periods))
-      )
+      )(strategygames.ByoyomiClock.Config.apply)(unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
     lazy val byoyomiClock = "clock" -> optional(byoyomiClockMapping)
 

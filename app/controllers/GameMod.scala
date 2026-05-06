@@ -155,7 +155,7 @@ object GameMod {
         "swiss"     -> optional(nonEmptyText),
         "speed"     -> optional(nonEmptyText),
         "opponents" -> optional(nonEmptyText)
-      )(Filter.apply)(f => Some((f.arena, f.swiss, f.speed, f.opponents)))
+      )(Filter.apply)(unapply)
     )
 
   val actionForm =

@@ -36,7 +36,7 @@ final class SwissForm(implicit mode: Mode) {
           "onePerGameFamily"    -> optional(boolean),
           "exoticChessVariants" -> optional(boolean),
           "draughts64Variants"  -> optional(boolean)
-        )(MedleyDefaults.apply)(d => Some((d.onePerGameFamily, d.exoticChessVariants, d.draughts64Variants))),
+        )(MedleyDefaults.apply)(unapply),
         "medleyGameFamilies" -> mapping(
           "chess"              -> optional(boolean),
           "draughts"           -> optional(boolean),
@@ -50,36 +50,19 @@ final class SwissForm(implicit mode: Mode) {
           "go"                 -> optional(boolean),
           "backgammon"         -> optional(boolean),
           "abalone"            -> optional(boolean)
-        )(MedleyGameFamilies.apply)(d =>
-          Some(
-            (
-              d.chess,
-              d.draughts,
-              d.shogi,
-              d.xiangqi,
-              d.loa,
-              d.flipello,
-              d.mancala,
-              d.amazons,
-              d.breakthroughtroyka,
-              d.go,
-              d.backgammon,
-              d.abalone
-            )
-          )
-        ),
+        )(MedleyGameFamilies.apply)(unapply),
         "rated"   -> optional(boolean),
         "mcmahon" -> mapping(
           "mcmahon"       -> optional(boolean),
           "mcmahonCutoff" -> optional(cleanNonEmptyText)
-        )(McMahon.apply)(d => Some((d.mcmahon, d.mcmahonCutoff))),
+        )(McMahon.apply)(unapply),
         "variantSettings" -> mapping(
           "handicaps" -> mapping(
             "handicapped"        -> optional(boolean),
             "inputPlayerRatings" -> optional(cleanNonEmptyText)
-          )(Handicaps.apply)(d => Some((d.handicapped, d.inputPlayerRatings))),
+          )(Handicaps.apply)(unapply),
           "backgammonPoints" -> optional(numberIn(backgammonPoints))
-        )(VariantSettings.apply)(d => Some((d.handicaps, d.backgammonPoints))),
+        )(VariantSettings.apply)(unapply),
         "xGamesChoice" -> mapping(
           "bestOfX"         -> optional(boolean),
           "playX"           -> optional(boolean),
@@ -88,11 +71,11 @@ final class SwissForm(implicit mode: Mode) {
             min = SwissBounds.defaultGamesPerRound,
             max = SwissBounds.maxGamesPerRound
           )
-        )(XGamesChoice.apply)(d => Some((d.bestOfX, d.playX, d.matchScore, d.nbGamesPerRound))),
+        )(XGamesChoice.apply)(unapply),
         "drawTables" -> mapping(
           "drawTables"           -> optional(boolean),
           "perPairingDrawTables" -> optional(boolean)
-        )(DrawTables.apply)(d => Some((d.drawTables, d.perPairingDrawTables))),
+        )(DrawTables.apply)(unapply),
         "nbRounds"                 -> number(min = minRounds, max = SwissBounds.maxRounds),
         "description"              -> optional(cleanNonEmptyText),
         "position"                 -> optional(lila.common.Form.fen.playableStrict),
@@ -103,34 +86,7 @@ final class SwissForm(implicit mode: Mode) {
         "conditions"               -> SwissCondition.DataForm.all,
         "forbiddenPairings"        -> optional(cleanNonEmptyText),
         "minutesBeforeStartToJoin" -> optional(numberIn(timeBeforeStartToJoinOptions))
-      )(SwissData.apply)(d =>
-        Some(
-          (
-            d.name,
-            d.clock,
-            d.startsAt,
-            d.variant,
-            d.medley,
-            d.medleyDefaults,
-            d.medleyGameFamilies,
-            d.rated,
-            d.mcmahon,
-            d.variantSettings,
-            d.xGamesChoice,
-            d.drawTables,
-            d.nbRounds,
-            d.description,
-            d.position,
-            d.chatFor,
-            d.roundInterval,
-            d.halfwayBreak,
-            d.password,
-            d.conditions,
-            d.forbiddenPairings,
-            d.minutesBeforeStartToJoin
-          )
-        )
-      )
+      )(SwissData.apply)(unapply)
         .verifying("Invalid clock", _.validClock)
         .verifying("15s and 0+1 variant games cannot be rated", _.validRatedVariant)
         .verifying(

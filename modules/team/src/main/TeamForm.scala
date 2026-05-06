@@ -51,22 +51,7 @@ final private[team] class TeamForm(
         Fields.move,
         Fields.hideMembers,
         Fields.hideForum
-      )(TeamSetup.apply)(d =>
-        Some(
-          (
-            d.name,
-            d.location,
-            d.password,
-            d.description,
-            d.descPrivate,
-            d.request,
-            d.gameId,
-            d.move,
-            d.hideMembers,
-            d.hideForum
-          )
-        )
-      )
+      )(TeamSetup.apply)(unapply)
         .verifying("team:teamAlreadyExists", d => !teamExists(d).await(2 seconds, "teamExists"))
         .verifying("team:teamLameName", d => !lameName(d))
         .verifying(captchaFailMessage, validateCaptcha)
@@ -83,20 +68,7 @@ final private[team] class TeamForm(
         Fields.chat,
         Fields.hideMembers,
         Fields.hideForum
-      )(TeamEdit.apply)(d =>
-        Some(
-          (
-            d.location,
-            d.password,
-            d.description,
-            d.descPrivate,
-            d.request,
-            d.chat,
-            d.hideMembers,
-            d.hideForum
-          )
-        )
-      )
+      )(TeamEdit.apply)(unapply)
     ).fill(
       TeamEdit(
         location = team.location,
@@ -114,7 +86,7 @@ final private[team] class TeamForm(
     mapping(
       Fields.requestMessage(team),
       Fields.passwordCheck(team)
-    )(RequestSetup.apply)(d => Some((d.message, d.password)))
+    )(RequestSetup.apply)(unapply)
   ).fill(
     RequestSetup(
       message = "Hello, I would like to join the team!".some,
@@ -126,7 +98,7 @@ final private[team] class TeamForm(
     mapping(
       Fields.requestMessage(team),
       Fields.passwordCheck(team)
-    )(RequestSetup.apply)(d => Some((d.message, d.password)))
+    )(RequestSetup.apply)(unapply)
   )
 
   val processRequest = Form(

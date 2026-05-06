@@ -18,7 +18,7 @@ final class ImporterForm {
     mapping(
       "pgn"     -> nonEmptyText.verifying("invalidPgn", p => checkPgn(p).isValid),
       "analyse" -> optional(nonEmptyText)
-    )(ImportData.apply)(d => Some((d.pgn, d.analyse)))
+    )(ImportData.apply)(unapply)
   )
 
   def checkPgn(pgn: String): Validated[String, Preprocessed] = ImporterForm.catchOverflow { () =>

@@ -37,11 +37,9 @@ object StreamerForm {
           "ignored"   -> boolean,
           "chat"      -> boolean,
           "quick"     -> optional(nonEmptyText)
-        )(ApprovalData.apply)(d => Some((d.granted, d.tier, d.requested, d.ignored, d.chat, d.quick)))
+        )(ApprovalData.apply)(unapply)
       )
-    )(UserData.apply)(d =>
-      Some((d.name, d.headline, d.description, d.twitch, d.youTube, d.listed, d.approval))
-    )
+    )(UserData.apply)(unapply)
       .verifying(
         "Must specify a Twitch and/or YouTube channel.",
         u => u.twitch.isDefined || u.youTube.isDefined

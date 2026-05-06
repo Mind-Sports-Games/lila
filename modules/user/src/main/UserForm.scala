@@ -14,7 +14,7 @@ final class UserForm(authenticator: Authenticator) {
       "text" -> cleanText(minLength = 3, maxLength = 2000),
       "mod"  -> boolean,
       "dox"  -> optional(boolean)
-    )(NoteData.apply)(n => Some((n.text, n.mod, n.dox)))
+    )(NoteData.apply)(unapply)
   )
 
   case class NoteData(text: String, mod: Boolean, dox: Option[Boolean])
@@ -45,24 +45,7 @@ final class UserForm(authenticator: Authenticator) {
       "cfcRating"  -> optional(number(min = 0, max = 3000)),
       "dsbRating"  -> optional(number(min = 0, max = 3000)),
       "links"      -> optional(cleanNonEmptyText(maxLength = 3000))
-    )(Profile.apply)(p =>
-      Some(
-        (
-          p.country,
-          p.location,
-          p.bio,
-          p.firstName,
-          p.lastName,
-          p.fideRating,
-          p.uscfRating,
-          p.ecfRating,
-          p.rcfRating,
-          p.cfcRating,
-          p.dsbRating,
-          p.links
-        )
-      )
-    )
+    )(Profile.apply)(unapply)
   )
 
   def profileOf(user: User) = profile.fill(user.profileOrDefault)
@@ -84,7 +67,7 @@ final class UserForm(authenticator: Authenticator) {
           "oldPasswd"  -> nonEmptyText.verifying("incorrectPassword", p => candidate.check(ClearPassword(p))),
           "newPasswd1" -> text(minLength = 2),
           "newPasswd2" -> text(minLength = 2)
-        )(Passwd.apply)(p => Some((p.oldPasswd, p.newPasswd1, p.newPasswd2)))
+        )(Passwd.apply)(unapply)
           .verifying("newPasswordsDontMatch", _.samePasswords)
       )
     }

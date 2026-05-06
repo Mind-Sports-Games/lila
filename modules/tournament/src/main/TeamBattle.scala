@@ -60,7 +60,7 @@ object TeamBattle {
     val fields = mapping(
       "teams"     -> nonEmptyText,
       "nbLeaders" -> number(min = 1, max = 20)
-    )(Setup.apply)(d => Some((d.teams, d.nbLeaders)))
+    )(Setup.apply)(lila.core.lilaism.Lilaism.unapply)
       .verifying("We need at least 2 teams", s => s.potentialTeamIds.sizeIs > 1)
       .verifying(
         s"In this version of team battles, no more than $maxTeams teams can be allowed.",

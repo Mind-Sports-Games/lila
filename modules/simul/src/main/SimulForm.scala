@@ -120,22 +120,7 @@ object SimulForm {
         "estimatedStartAt" -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
         "team"             -> optional(nonEmptyText.verifying(id => teams.exists(_.id == id))),
         "featured"         -> optional(boolean)
-      )(Setup.apply)(d =>
-        Some(
-          (
-            d.name,
-            d.clockConfig,
-            d.clockExtra,
-            d.variants,
-            d.position,
-            d.playerIndex,
-            d.text,
-            d.estimatedStartAt,
-            d.team,
-            d.featured
-          )
-        )
-      )
+      )(Setup.apply)(unapply)
         .verifying("Only allowed a different starting fen if only playing standard chess", _.validUsePosition)
     )
 

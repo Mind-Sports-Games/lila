@@ -247,7 +247,7 @@ object Condition {
     val nbRatedGame = mapping(
       "perf" -> optional(text.verifying(perfKeys.contains)),
       "nb"   -> numberIn(nbRatedGameChoices)
-    )(NbRatedGameSetup.apply)(d => Some((d.perf, d.nb)))
+    )(NbRatedGameSetup.apply)(unapply)
     case class NbRatedGameSetup(perf: Option[String], nb: Int) {
       def convert(tourPerf: PerfType): Option[NbRatedGame] =
         (nb > 0).option(
@@ -277,7 +277,7 @@ object Condition {
     val maxRating = mapping(
       "perf"   -> optional(text.verifying(perfKeys.contains)),
       "rating" -> optional(numberIn(maxRatings))
-    )(RatingSetup.apply)(d => Some((d.perf, d.rating)))
+    )(RatingSetup.apply)(unapply)
     val minRatings = List(1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300,
       2400, 2500, 2600)
     val minRatingChoices = ("", "No restriction") ::
@@ -285,11 +285,11 @@ object Condition {
     val minRating = mapping(
       "perf"   -> optional(text.verifying(perfKeys.contains)),
       "rating" -> optional(numberIn(minRatings))
-    )(RatingSetup.apply)(d => Some((d.perf, d.rating)))
+    )(RatingSetup.apply)(unapply)
     def teamMember(leaderTeams: List[LeaderTeam]) =
       mapping(
         "teamId" -> optional(text.verifying(id => leaderTeams.exists(_.id == id)))
-      )(TeamMemberSetup.apply)(d => Some(d.teamId))
+      )(TeamMemberSetup.apply)(_.teamId.some)
     case class TeamMemberSetup(teamId: Option[TeamID]) {
       def convert(teams: Map[TeamID, TeamName]): Option[TeamMember] =
         teamId flatMap { id =>
@@ -306,7 +306,7 @@ object Condition {
         "minRating"   -> minRating,
         "titled"      -> optional(boolean),
         "teamMember"  -> optional(teamMember(leaderTeams))
-      )(AllSetup.apply)(d => Some((d.nbRatedGame, d.maxRating, d.minRating, d.titled, d.teamMember)))
+      )(AllSetup.apply)(unapply)
         .verifying("Invalid ratings", _.validRatings)
 
     case class AllSetup(

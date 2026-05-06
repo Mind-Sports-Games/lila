@@ -4,6 +4,10 @@ object Lilaism extends LilaLibraryExtensions {
 
   def some[A](a: A): Option[A] = Some(a)
 
+  // replaces Product.unapply in play forms
+  def unapply[P <: Product](p: P)(using m: scala.deriving.Mirror.ProductOf[P]): Option[m.MirroredElemTypes] =
+    Some(Tuple.fromProductTyped(p))
+
   trait StringValue extends Any {
     def value: String
     override def toString = value

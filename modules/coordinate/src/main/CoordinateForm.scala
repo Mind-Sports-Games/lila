@@ -15,7 +15,7 @@ object CoordinateForm {
     mapping(
       "playerIndex" -> text.verifying(Set("p1", "p2") contains _),
       "score"       -> number(min = 0, max = 100)
-    )(ScoreData.apply)(d => Some((d.playerIndex, d.score)))
+    )(ScoreData.apply)(unapply)
   )
 
   case class ScoreData(playerIndex: String, score: Int) {

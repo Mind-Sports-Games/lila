@@ -23,7 +23,7 @@ object PuzzleForm {
       "replayDays"  -> optional(numberIn(PuzzleDashboard.dayChoices)),
       "streakId"    -> optional(nonEmptyText),
       "streakScore" -> optional(number(min = 0, max = 250))
-    )(RoundData.apply)(d => Some((d.win, d.replayDays, d.streakId, d.streakScore)))
+    )(RoundData.apply)(unapply)
   )
 
   val vote = Form(

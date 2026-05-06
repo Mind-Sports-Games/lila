@@ -19,7 +19,7 @@ final private[forum] class ForumForm(
       "gameId"  -> text,
       "move"    -> text,
       "modIcon" -> optional(boolean)
-    )(PostData.apply)(d => Some((d.text, d.gameId, d.move, d.modIcon)))
+    )(PostData.apply)(unapply)
       .verifying(captchaFailMessage, validateCaptcha)
 
   def post(user: User, inOwnTeam: Boolean) = Form(postMapping(user, inOwnTeam))
@@ -28,7 +28,7 @@ final private[forum] class ForumForm(
     Form(
       mapping(
         "changes" -> userTextMapping(user, inOwnTeam)
-      )(PostEdit.apply)(d => Some(d.changes))
+      )(PostEdit.apply)(_.changes.some)
     )
 
   def postWithCaptcha(user: User, inOwnTeam: Boolean) = withCaptcha(post(user, inOwnTeam))
@@ -38,7 +38,7 @@ final private[forum] class ForumForm(
       mapping(
         "name" -> cleanText(minLength = 3, maxLength = 100),
         "post" -> postMapping(user, inOwnTeam)
-      )(TopicData.apply)(d => Some((d.name, d.post)))
+      )(TopicData.apply)(unapply)
     )
 
   private def userTextMapping(user: User, inOwnTeam: Boolean) =

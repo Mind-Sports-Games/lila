@@ -30,7 +30,7 @@ final class ClasForm(
             }
           }
         )
-      )(ClasData.apply)(d => Some((d.name, d.desc, d.teachers)))
+      )(ClasData.apply)(unapply)
     )
 
     def create = form
@@ -56,7 +56,7 @@ final class ClasForm(
         mapping(
           "create-username" -> securityForms.signup.username,
           "create-realName" -> cleanNonEmptyText(maxLength = 100)
-        )(NewStudent.apply)(d => Some((d.username, d.realName)))
+        )(NewStudent.apply)(unapply)
       )
 
     def generate: Fu[Form[NewStudent]] =
@@ -76,7 +76,7 @@ final class ClasForm(
             .verifying("Unknown username", { blockingFetchUser(_).isDefined })
             .verifying("This is a teacher", u => !c.teachers.toList.contains(u.toLowerCase)),
           "realName" -> cleanNonEmptyText
-        )(NewStudent.apply)(d => Some((d.username, d.realName)))
+        )(NewStudent.apply)(unapply)
       )
 
     def edit(s: Student) =
@@ -84,7 +84,7 @@ final class ClasForm(
         mapping(
           "realName" -> cleanNonEmptyText,
           "notes"    -> text(maxLength = 20000)
-        )(StudentData.apply)(d => Some((d.realName, d.notes)))
+        )(StudentData.apply)(unapply)
       ).fill(StudentData(s.realName, s.notes))
 
     def release =
@@ -98,7 +98,7 @@ final class ClasForm(
       Form(
         mapping(
           "realNames" -> cleanNonEmptyText
-        )(ManyNewStudent.apply)(d => Some(d.realNamesText)).verifying(
+        )(ManyNewStudent.apply)(_.realNamesText.some).verifying(
           s"There can't be more than ${lila.clas.Clas.maxStudents} per class. Split the students into more classes.",
           _.realNames.lengthIs <= max
         )

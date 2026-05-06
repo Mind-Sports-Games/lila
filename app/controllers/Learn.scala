@@ -10,6 +10,7 @@ import views.html
 final class Learn(env: Env) extends LilaController(env) {
 
   import lila.learn.JSONHandlers.*
+  import lila.core.lilaism.Lilaism.unapply
 
   def index =
     Open { implicit ctx =>
@@ -28,7 +29,7 @@ final class Learn(env: Env) extends LilaController(env) {
       "stage" -> nonEmptyText,
       "level" -> number,
       "score" -> number
-    )(Tuple3.apply)(t => Some((t._1, t._2, t._3)))
+    )(Tuple3.apply)(unapply)
   )
 
   def score =

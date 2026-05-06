@@ -209,7 +209,7 @@ object SwissCondition {
     }
     val nbRatedGame = mapping(
       "nb" -> number(min = 0, max = ~nbRatedGames.lastOption)
-    )(NbRatedGame.apply)(d => Some(d.nb))
+    )(NbRatedGame.apply)(_.nb.some)
     case class RatingSetup(rating: Option[Int]) {
       def actualRating = rating.filter(r => r > 600 && r < 3000)
     }
@@ -219,21 +219,21 @@ object SwissCondition {
       options(maxRatings, "Max rating of %d").toList.map { case (k, v) => k.toString -> v }
     val maxRating = mapping(
       "rating" -> optional(numberIn(maxRatings))
-    )(RatingSetup.apply)(d => Some(d.rating))
+    )(RatingSetup.apply)(_.rating.some)
     val minRatings = List(1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300,
       2400, 2500, 2600)
     val minRatingChoices = ("", "No restriction") ::
       options(minRatings, "Min rating of %d").toList.map { case (k, v) => k.toString -> v }
     val minRating = mapping(
       "rating" -> optional(numberIn(minRatings))
-    )(RatingSetup.apply)(d => Some(d.rating))
+    )(RatingSetup.apply)(_.rating.some)
     def all =
       mapping(
         "nbRatedGame" -> optional(nbRatedGame),
         "maxRating"   -> maxRating,
         "minRating"   -> minRating,
         "titled"      -> optional(boolean)
-      )(AllSetup.apply)(d => Some((d.nbRatedGame, d.maxRating, d.minRating, d.titled)))
+      )(AllSetup.apply)(unapply)
         .verifying("Invalid ratings", _.validRatings)
 
     case class AllSetup(
