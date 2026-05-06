@@ -20,7 +20,7 @@ final private class RelationRepo(coll: Coll, userRepo: lila.user.UserRepo)(impli
 
   def freshFollowersFromSecondary(userId: ID): Fu[List[User.ID]] =
     coll
-      .aggregateOne(ReadPreference.secondaryPreferred) { framework =>
+      .aggregateOne(readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework.*
         Match($doc("u2" -> userId, "r" -> Follow)) -> List(
           PipelineOperator(

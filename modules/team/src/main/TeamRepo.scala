@@ -112,7 +112,7 @@ final class TeamRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def countRequestsOfLeader(userId: User.ID, requestColl: Coll): Fu[Int] =
     coll
-      .aggregateOne(ReadPreference.secondaryPreferred) { framework =>
+      .aggregateOne(readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework.*
         Match($doc("leaders" -> userId)) -> List(
           PipelineOperator(

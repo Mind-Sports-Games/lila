@@ -157,20 +157,21 @@ final class StudyTopicApi(topicRepo: StudyTopicRepo, userTopicRepo: StudyUserTop
 
   private def recomputeNow: Funit =
     studyRepo.coll {
-      _.aggregateOne() { framework =>
+      _.aggregateWith[Bdoc]() { framework =>
         import framework.*
-        Match(
-          $doc(
-            "topics".$exists(true),
-            "visibility" -> "public"
-          )
-        ) -> List(
+        List(
+          Match(
+            $doc(
+              "topics".$exists(true),
+              "visibility" -> "public"
+            )
+          ),
           Project($doc("topics" -> true, "_id" -> false)),
           UnwindField("topics"),
           SortByFieldCount("topics"),
           Project($doc("_id" -> true)),
           Out(topicRepo.coll.name.value)
         )
-      }
+      }.headOption
     }.void
 }
