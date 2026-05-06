@@ -37,10 +37,12 @@ final class CoordinateApi(scoreColl: Coll)(implicit ec: scala.concurrent.Executi
 
   def bestScores(userIds: List[User.ID]): Fu[Map[User.ID, PlayerIndex.Map[Int]]] =
     scoreColl
-      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+      .aggregateList(
+        maxDocs = Int.MaxValue,
+        readPreference = ReadPreference.secondaryPreferred
+      ) { framework =>
         import framework.*
-        List(
-          Match($doc("_id".$in(userIds))),
+        Match($doc("_id".$in(userIds))) -> List(
           Project(
             $doc(
               "p1" -> $doc("$max" -> "$p1"),
@@ -49,7 +51,6 @@ final class CoordinateApi(scoreColl: Coll)(implicit ec: scala.concurrent.Executi
           )
         )
       }
-      .collect[List](maxDocs = Int.MaxValue)
       .map {
         _.flatMap { doc =>
           doc.string("_id") map {

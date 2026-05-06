@@ -132,7 +132,7 @@ final class PuzzleDashboardApi(
   // TODO maybe remove bytheme query and data as no longer required?
   private def compute(userId: User.ID, days: Days): Fu[Option[PuzzleDashboard]] =
     colls.round {
-      _.aggregateWith[Bdoc]() { framework =>
+      _.aggregateOne() { framework =>
         import framework.*
         val resultsGroup = List(
           "nb"     -> SumAll,
@@ -140,8 +140,7 @@ final class PuzzleDashboardApi(
           "fixes"  -> Sum(countField("f")),
           "rating" -> AvgField("puzzle.rating")
         )
-        List(
-          Match($doc("u" -> userId, "d".$gt(DateTime.now.minusDays(days)))),
+        Match($doc("u" -> userId, "d".$gt(DateTime.now.minusDays(days)))) -> List(
           Sort(Descending("d")),
           Limit(10_000),
           PipelineOperator(
@@ -184,8 +183,6 @@ final class PuzzleDashboardApi(
           )
         )
       }
-        .collect[List](maxDocs = 1)
-        .dmap(_.headOption)
         .map { r =>
           for {
             result     <- r

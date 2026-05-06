@@ -105,20 +105,18 @@ final class Gamify(
 
   private def actionLeaderboard(after: DateTime, before: Option[DateTime]): Fu[List[ModCount]] =
     logRepo.coll
-      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+      .aggregateList(maxDocs = 100, ReadPreference.secondaryPreferred) { framework =>
         import framework.*
-        List(
-          Match(
-            $doc(
-              "date" -> dateRange(after, before),
-              "mod"  -> $nin(hidden)
-            )
-          ),
+        Match(
+          $doc(
+            "date" -> dateRange(after, before),
+            "mod"  -> $nin(hidden)
+          )
+        ) -> List(
           GroupField("mod")("nb" -> SumAll),
           Sort(Descending("nb"))
         )
       }
-      .collect[List](maxDocs = 100)
       .map {
         _.flatMap { obj =>
           import cats.implicits.*
@@ -128,16 +126,15 @@ final class Gamify(
 
   private def reportLeaderboard(after: DateTime, before: Option[DateTime]): Fu[List[ModCount]] =
     reportApi.coll
-      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+      .aggregateList(maxDocs = Int.MaxValue, ReadPreference.secondaryPreferred) { framework =>
         import framework.*
-        List(
-          Match(
-            $doc(
-              "atoms.0.at" -> dateRange(after, before),
-              "room".$in(Room.all), // required to make use of the mongodb index room+atoms.0.at
-              "processedBy" -> $nin(hidden)
-            )
-          ),
+        Match(
+          $doc(
+            "atoms.0.at" -> dateRange(after, before),
+            "room".$in(Room.all), // required to make use of the mongodb index room+atoms.0.at
+            "processedBy" -> $nin(hidden)
+          )
+        ) -> List(
           GroupField("processedBy")(
             "nb" -> Sum(
               $doc(
@@ -148,7 +145,6 @@ final class Gamify(
           Sort(Descending("nb"))
         )
       }
-      .collect[List](maxDocs = Int.MaxValue)
       .map {
         _.flatMap { obj =>
           import cats.implicits.*

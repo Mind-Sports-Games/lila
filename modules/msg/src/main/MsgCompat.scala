@@ -58,18 +58,15 @@ final class MsgCompat(
     _.expireAfterWrite(10 seconds)
       .buildAsyncFuture[User.ID, Int] { userId =>
         colls.thread
-          .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+          .aggregateOne(ReadPreference.secondaryPreferred) { framework =>
             import framework.*
-            List(
-              Match($doc("users" -> userId, "del".$ne(userId))),
+            Match($doc("users" -> userId, "del".$ne(userId))) -> List(
               Sort(Descending("lastMsg.date")),
               Limit(maxPerPage.value),
               Match($doc("lastMsg.read" -> false, "lastMsg.user".$ne(userId))),
               Count("nb")
             )
           }
-          .collect[List](maxDocs = 1)
-          .dmap(_.headOption)
           .map(~_.flatMap(_.getAsOpt[Int]("nb")))
       }
   }

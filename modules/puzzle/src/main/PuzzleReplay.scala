@@ -75,16 +75,15 @@ final class PuzzleReplayApi(
   ): Fu[PuzzleReplay] =
     colls
       .round {
-        _.aggregateWith[Bdoc]() { framework =>
+        _.aggregateOne() { framework =>
           import framework.*
-          List(
-            Match(
-              $doc(
-                "u" -> user.id,
-                "d".$gt(DateTime.now.minusDays(days)),
-                "w".$ne(true)
-              )
-            ),
+          Match(
+            $doc(
+              "u" -> user.id,
+              "d".$gt(DateTime.now.minusDays(days)),
+              "w".$ne(true)
+            )
+          ) -> List(
             Sort(Ascending("d")),
             PipelineOperator(
               $doc(
@@ -129,8 +128,6 @@ final class PuzzleReplayApi(
             Group(BSONNull)("ids" -> PushField("puzzle._id"))
           )
         }
-          .collect[List](maxDocs = 1)
-          .dmap(_.headOption)
       }
       .map {
         ~_.flatMap(_.getAsOpt[Vector[Puzzle.Id]]("ids"))

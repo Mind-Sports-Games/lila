@@ -134,15 +134,14 @@ final private[video] class VideoApi(
 
     def similar(user: Option[User], video: Video, max: Int): Fu[Seq[VideoView]] =
       videoColl
-        .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+        .aggregateList(maxDocs = max, ReadPreference.secondaryPreferred) { framework =>
           import framework.*
-          List(
-            Match(
-              $doc(
-                "tags".$in(video.tags),
-                "_id".$ne(video.id)
-              )
-            ),
+          Match(
+            $doc(
+              "tags".$in(video.tags),
+              "_id".$ne(video.id)
+            )
+          ) -> List(
             AddFields(
               $doc(
                 "int" -> $doc(
@@ -159,7 +158,6 @@ final private[video] class VideoApi(
             Limit(max)
           )
         }
-        .collect[List](maxDocs = max)
         .map(_.flatMap(_.asOpt[Video])) flatMap videoViews(user)
 
     object count {
@@ -223,16 +221,14 @@ final private[video] class VideoApi(
               }
             else
               videoColl
-                .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+                .aggregateList(maxDocs = Int.MaxValue, ReadPreference.secondaryPreferred) { framework =>
                   import framework.*
-                  List(
-                    Match($doc("tags".$all(filterTags))),
+                  Match($doc("tags".$all(filterTags))) -> List(
                     Project($doc("tags" -> true)),
                     UnwindField("tags"),
                     GroupField("tags")("nb" -> SumAll)
                   )
                 }
-                .collect[List](maxDocs = Int.MaxValue)
                 .dmap { _.flatMap(_.asOpt[TagNb]) }
 
           allPopular zip allPaths map { case (all, paths) =>
@@ -257,16 +253,14 @@ final private[video] class VideoApi(
       _.refreshAfterWrite(1.day)
         .buildAsyncFuture { _ =>
           videoColl
-            .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+            .aggregateList(maxDocs = Int.MaxValue, ReadPreference.secondaryPreferred) { framework =>
               import framework.*
-              List(
-                Project($doc("tags" -> true)),
+              Project($doc("tags" -> true)) -> List(
                 UnwindField("tags"),
                 GroupField("tags")("nb" -> SumAll),
                 Sort(Descending("nb"))
               )
             }
-            .collect[List](maxDocs = Int.MaxValue)
             .dmap {
               _.flatMap(_.asOpt[TagNb])
             }

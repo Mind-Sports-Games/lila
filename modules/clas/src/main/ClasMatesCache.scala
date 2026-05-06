@@ -25,10 +25,9 @@ final class ClasMatesCache(colls: ClasColls, cacheApi: CacheApi, studentCache: C
 
   private def fetchMatesAndTeachers(studentId: User.ID): Fu[Set[User.ID]] =
     colls.student
-      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+      .aggregateOne(ReadPreference.secondaryPreferred) { framework =>
         import framework.*
-        List(
-          Match($doc("userId" -> studentId)),
+        Match($doc("userId" -> studentId)) -> List(
           Group(BSONNull)("classes" -> PushField("clasId")),
           Facet(
             List(
@@ -100,8 +99,6 @@ final class ClasMatesCache(colls: ClasColls, cacheApi: CacheApi, studentCache: C
           )
         )
       }
-      .collect[List](maxDocs = 1)
-      .dmap(_.headOption)
       .map { docO =>
         for {
           doc      <- docO

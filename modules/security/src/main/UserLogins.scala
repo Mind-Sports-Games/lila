@@ -101,20 +101,19 @@ final class UserLoginsApi(
       max: Int
   ): Fu[List[OtherUser]] =
     ipSet.nonEmpty so store.coll
-      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
+      .aggregateList(maxDocs = max, ReadPreference.secondaryPreferred) { framework =>
         import framework.*
         import FingerHash.fingerHashHandler
-        List(
-          Match(
-            $doc(
-              $or(
-                "ip".$in(ipSet),
-                "fp".$in(fpSet)
-              ),
-              "user".$ne(user.id),
-              "date".$gt(DateTime.now.minusYears(1))
-            )
-          ),
+        Match(
+          $doc(
+            $or(
+              "ip".$in(ipSet),
+              "fp".$in(fpSet)
+            ),
+            "user".$ne(user.id),
+            "date".$gt(DateTime.now.minusYears(1))
+          )
+        ) -> List(
           GroupField("user")(
             "ips" -> AddFieldToSet("ip"),
             "fps" -> AddFieldToSet("fp")
@@ -147,7 +146,6 @@ final class UserLoginsApi(
           UnwindField("user")
         )
       }
-      .collect[List](maxDocs = max)
       .map { docs =>
         import lila.user.User.userBSONHandler
         for {

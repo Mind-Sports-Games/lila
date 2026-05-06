@@ -58,10 +58,9 @@ final class PuzzleAnon(
             val ratingRange: Range = 0 to 9999
             val pathSampleSize     = 15
             colls.path {
-              _.aggregateWith[Bdoc]() { framework =>
+              _.aggregateList(maxDocs = poolSize) { framework =>
                 import framework.*
-                List(
-                  Match(pathApi.select(variant, theme, tier, ratingRange)),
+                Match(pathApi.select(variant, theme, tier, ratingRange)) -> List(
                   Sample(pathSampleSize),
                   Project($doc("puzzleId" -> "$ids", "_id" -> false)),
                   Unwind("puzzleId"),
@@ -83,7 +82,6 @@ final class PuzzleAnon(
                   )
                 )
               }
-                .collect[List](maxDocs = poolSize)
                 .map {
                   _.view.flatMap(PuzzleBSONReader.readOpt).toVector
                 }

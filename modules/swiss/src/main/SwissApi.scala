@@ -454,10 +454,9 @@ final class SwissApi(
       .ask[List[TeamID]]("teamJoinedBy")(lila.hub.actorApi.team.TeamIdsJoinedBy(userId, _))
       .flatMap { teamIds =>
         colls.swiss
-          .aggregateWith[Bdoc]() { framework =>
+          .aggregateList(maxDocs = 100) { framework =>
             import framework.*
-            List(
-              Match($doc("teamId".$in(teamIds), "featurable" -> true)),
+            Match($doc("teamId".$in(teamIds), "featurable" -> true)) -> List(
               PipelineOperator(
                 $doc(
                   "$lookup" -> $doc(
@@ -483,7 +482,6 @@ final class SwissApi(
               Project($id(true))
             )
           }
-          .collect[List](maxDocs = 100)
       }
       .map(_.flatMap(_.getAsOpt[Swiss.Id]("_id")))
       .flatMap { kickFromSwissIds(userId, _) }
@@ -933,10 +931,9 @@ final class SwissApi(
     SwissPairing
       .fields { f =>
         colls.pairing
-          .aggregateWith[Bdoc]() { framework =>
+          .aggregateList(maxDocs = 100) { framework =>
             import framework.*
-            List(
-              Match($doc(f.status -> SwissPairing.ongoing)),
+            Match($doc(f.status -> SwissPairing.ongoing)) -> List(
               GroupField(f.swissId)(
                 "ids" -> Push(
                   $doc(
@@ -951,7 +948,6 @@ final class SwissApi(
               )
             )
           }
-          .collect[List](maxDocs = 100)
       }
       .map {
         _.flatMap { doc =>
@@ -993,10 +989,9 @@ final class SwissApi(
 
   def withdrawAll(user: User, teamIds: List[TeamID]): Funit =
     colls.swiss
-      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+      .aggregateList(maxDocs = Int.MaxValue, ReadPreference.secondaryPreferred) { framework =>
         import framework.*
-        List(
-          Match($doc("finishedAt".$exists(false), "nbPlayers".$gt(0), "teamId".$in(teamIds))),
+        Match($doc("finishedAt".$exists(false), "nbPlayers".$gt(0), "teamId".$in(teamIds))) -> List(
           PipelineOperator(
             $doc(
               "$lookup" -> $doc(
@@ -1022,7 +1017,6 @@ final class SwissApi(
           Project($id(true))
         )
       }
-      .collect[List](maxDocs = Int.MaxValue)
       .map(_.flatMap(_.getAsOpt[Swiss.Id]("_id")))
       .flatMap { ids =>
         Future.sequence(ids.map { withdraw(_, user.id) }).void

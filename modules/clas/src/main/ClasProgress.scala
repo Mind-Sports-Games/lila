@@ -79,15 +79,17 @@ final class ClasProgressApi(
   // TODO should we split this by variant?
   private def getPuzzleStats(userIds: List[User.ID], days: Int): Fu[Map[User.ID, PlayStats]] =
     puzzleColls.round {
-      _.aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+      _.aggregateList(
+        maxDocs = Int.MaxValue,
+        ReadPreference.secondaryPreferred
+      ) { framework =>
         import framework.*
-        List(
-          Match(
-            $doc(
-              PuzzleRound.BSONFields.user.$in(userIds),
-              PuzzleRound.BSONFields.date.$gt(DateTime.now.minusDays(days))
-            )
-          ),
+        Match(
+          $doc(
+            PuzzleRound.BSONFields.user.$in(userIds),
+            PuzzleRound.BSONFields.date.$gt(DateTime.now.minusDays(days))
+          )
+        ) -> List(
           GroupField("u")(
             "nb"  -> SumAll,
             "win" -> Sum(
@@ -97,19 +99,17 @@ final class ClasProgressApi(
             )
           )
         )
+      }.map {
+        _.flatMap { obj =>
+          obj.string("_id") map { id =>
+            id -> PlayStats(
+              nb = ~obj.int("nb"),
+              wins = ~obj.int("win"),
+              millis = 0
+            )
+          }
+        }.toMap
       }
-        .collect[List](maxDocs = Int.MaxValue)
-        .map {
-          _.flatMap { obj =>
-            obj.string("_id") map { id =>
-              id -> PlayStats(
-                nb = ~obj.int("nb"),
-                wins = ~obj.int("win"),
-                millis = 0
-              )
-            }
-          }.toMap
-        }
     }
 
   private def getGameStats(
@@ -120,16 +120,18 @@ final class ClasProgressApi(
     import Game.BSONFields as F
     import lila.game.Query
     gameRepo.coll
-      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+      .aggregateList(
+        maxDocs = Int.MaxValue,
+        ReadPreference.secondaryPreferred
+      ) { framework =>
         import framework.*
-        List(
-          Match(
-            $doc(
-              F.playerUids.$in(userIds),
-              Query.createdSince(DateTime.now.minusDays(days)),
-              F.perfType -> perfType.id
-            )
-          ),
+        Match(
+          $doc(
+            F.playerUids.$in(userIds),
+            Query.createdSince(DateTime.now.minusDays(days)),
+            F.perfType -> perfType.id
+          )
+        ) -> List(
           Project(
             $doc(
               F.playerUids -> true,
@@ -151,7 +153,6 @@ final class ClasProgressApi(
           )
         )
       }
-      .collect[List](maxDocs = Int.MaxValue)
       .map {
         _.flatMap { obj =>
           obj.string(F.id) map { id =>

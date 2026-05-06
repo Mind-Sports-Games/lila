@@ -51,7 +51,7 @@ final private class PuzzlePathApi(
       else tier
     colls
       .path {
-        _.aggregateWith[Bdoc]() { framework =>
+        _.aggregateOne() { framework =>
           import framework.*
           val rating =
             Perfs
@@ -60,22 +60,19 @@ final private class PuzzlePathApi(
               .map(_.intRating)
               .getOrElse(1500) + difficulty.ratingDelta
           val ratingFlex = (333 + math.abs(1500 - rating) / 4) * compromise.atMost(4)
-          List(
-            Match(
-              select(
-                variant,
-                theme,
-                actualTier,
-                (rating - ratingFlex) to (rating + ratingFlex)
-              ) ++
-                ((compromise != 5 && previousPaths.nonEmpty) so $doc("_id".$nin(previousPaths)))
-            ),
+          Match(
+            select(
+              variant,
+              theme,
+              actualTier,
+              (rating - ratingFlex) to (rating + ratingFlex)
+            ) ++
+              ((compromise != 5 && previousPaths.nonEmpty) so $doc("_id".$nin(previousPaths)))
+          ) -> List(
             Sample(1),
             Project($id(true))
           )
         }
-          .collect[List](maxDocs = 1)
-          .dmap(_.headOption)
           .dmap(_.flatMap(_.getAsOpt[Id]("_id")))
       }
       .flatMap {

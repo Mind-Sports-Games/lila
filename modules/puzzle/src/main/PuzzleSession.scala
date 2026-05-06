@@ -99,10 +99,9 @@ final class PuzzleSessionApi(
   private def nextPuzzleResult(user: User, session: PuzzleSession): Fu[NextPuzzleResult] =
     colls
       .path {
-        _.aggregateWith[Bdoc]() { framework =>
+        _.aggregateOne() { framework =>
           import framework.*
-          List(
-            Match($id(session.path)),
+          Match($id(session.path)) -> List(
             // get the puzzle ID from session position
             Project($doc("puzzleId" -> $doc("$arrayElemAt" -> $arr("$ids", session.positionInPath)))),
             Project(
@@ -135,8 +134,6 @@ final class PuzzleSessionApi(
             )
           )
         }
-          .collect[List](maxDocs = 1)
-          .dmap(_.headOption)
       }
       .map { docOpt =>
         import NextPuzzleResult.*

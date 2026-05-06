@@ -62,14 +62,12 @@ final class LeaderboardApi(
 
   def chart(user: User): Fu[ChartData] =
     repo.coll
-      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+      .aggregateList(maxDocs = Int.MaxValue, ReadPreference.secondaryPreferred) { framework =>
         import framework.*
-        List(
-          Match($doc("u" -> user.id)),
+        Match($doc("u" -> user.id)) -> List(
           GroupField("v")("nb" -> SumAll, "points" -> PushField("s"), "ratios" -> PushField("w"))
         )
       }
-      .collect[List](maxDocs = Int.MaxValue)
       .map {
         _ flatMap leaderboardAggregationResultBSONHandler.readOpt
       }

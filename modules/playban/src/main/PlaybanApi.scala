@@ -191,14 +191,12 @@ final class PlaybanApi(
 
   def bans(userIds: List[User.ID]): Fu[Map[User.ID, Int]] =
     coll
-      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+      .aggregateList(maxDocs = Int.MaxValue, ReadPreference.secondaryPreferred) { framework =>
         import framework.*
-        List(
-          Match($inIds(userIds) ++ $doc("b".$exists(true))),
+        Match($inIds(userIds) ++ $doc("b".$exists(true))) -> List(
           Project($doc("bans" -> $doc("$size" -> "$b")))
         )
       }
-      .collect[List](maxDocs = Int.MaxValue)
       .map {
         _.flatMap { obj =>
           obj.getAsOpt[User.ID]("_id") flatMap { id =>

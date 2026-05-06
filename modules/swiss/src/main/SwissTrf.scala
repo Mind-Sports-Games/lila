@@ -147,16 +147,13 @@ final class SwissTrf(
       .fields { p =>
         import BsonHandlers.*
         colls.player
-          .aggregateWith[Bdoc]() { framework =>
+          .aggregateOne() { framework =>
             import framework.*
-            List(
-              Match($doc(p.swissId -> swiss.id)),
+            Match($doc(p.swissId -> swiss.id)) -> List(
               Sort(Descending(p.inputRating), Descending(p.rating)),
               Group(BSONNull)("us" -> PushField(p.userId))
             )
           }
-          .collect[List](maxDocs = 1)
-          .dmap(_.headOption)
           .map {
             ~_.flatMap(_.getAsOpt[List[User.ID]]("us"))
           }

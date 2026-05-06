@@ -42,10 +42,9 @@ object PuzzleHistory {
     def slice(offset: Int, length: Int): Fu[Seq[PuzzleSession]] =
       colls
         .round {
-          _.aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+          _.aggregateList(maxDocs = length, ReadPreference.secondaryPreferred) { framework =>
             import framework.*
-            List(
-              Match($doc("u" -> user.id)),
+            Match($doc("u" -> user.id)) -> List(
               Sort(Descending("d")),
               Skip(offset),
               Limit(length),
@@ -53,7 +52,6 @@ object PuzzleHistory {
               Unwind("puzzle")
             )
           }
-            .collect[List](maxDocs = length)
         }
         .map { r =>
           for {

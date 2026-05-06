@@ -46,22 +46,21 @@ final private class Storage(val coll: AsyncColl)(implicit ec: scala.concurrent.E
 
   def nbByPerf(userId: String): Fu[Map[PerfType, Int]] =
     coll {
-      _.aggregateWith[Bdoc]() { framework =>
+      _.aggregateList(
+        maxDocs = 50
+      ) { framework =>
         import framework.*
-        List(
-          Match(BSONDocument(F.userId -> userId)),
+        Match(BSONDocument(F.userId -> userId)) -> List(
           GroupField(F.perf)("nb" -> SumAll)
         )
+      }.map {
+        _.flatMap { doc =>
+          for {
+            perfType <- doc.getAsOpt[PerfType]("_id")
+            nb       <- doc.int("nb")
+          } yield perfType -> nb
+        }.toMap
       }
-        .collect[List](maxDocs = 50)
-        .map {
-          _.flatMap { doc =>
-            for {
-              perfType <- doc.getAsOpt[PerfType]("_id")
-              nb       <- doc.int("nb")
-            } yield perfType -> nb
-          }.toMap
-        }
     }
 }
 

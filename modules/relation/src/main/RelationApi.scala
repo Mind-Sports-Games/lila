@@ -44,17 +44,14 @@ final class RelationApi(
 
   def fetchFriends(userId: ID) =
     coll
-      .aggregateWith[Bdoc](
-        readPreference = ReadPreference.secondaryPreferred
-      ) { framework =>
+      .aggregateOne(ReadPreference.secondaryPreferred) { framework =>
         import framework.*
-        List(
-          Match(
-            $doc(
-              "$or" -> $arr($doc("u1" -> userId), $doc("u2" -> userId)),
-              "r"   -> Follow
-            )
-          ),
+        Match(
+          $doc(
+            "$or" -> $arr($doc("u1" -> userId), $doc("u2" -> userId)),
+            "r"   -> Follow
+          )
+        ) -> List(
           Group(BSONNull)(
             "u1" -> AddFieldToSet("u1"),
             "u2" -> AddFieldToSet("u2")
@@ -62,7 +59,6 @@ final class RelationApi(
           Project($id($doc("$setIntersection" -> $arr("$u1", "$u2"))))
         )
       }
-      .headOption
       .map {
         ~_.flatMap(_.getAsOpt[Set[String]]("_id")) - userId
       }

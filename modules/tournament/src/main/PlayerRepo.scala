@@ -70,10 +70,9 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
   ): Fu[List[TeamBattle.RankedTeam]] = {
     import TeamBattle.{ RankedTeam, TeamLeader }
     coll
-      .aggregateWith[Bdoc]() { framework =>
+      .aggregateList(maxDocs = TeamBattle.maxTeams) { framework =>
         import framework.*
-        List(
-          Match(selectTourNoDQ(tourId)),
+        Match(selectTourNoDQ(tourId)) -> List(
           Sort(Descending("m")),
           GroupField("t")(
             "m" -> Push(
@@ -92,7 +91,6 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
           )
         )
       }
-      .collect[List](maxDocs = TeamBattle.maxTeams)
       .map {
         _.flatMap { doc =>
           for {
@@ -127,10 +125,9 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
       teamId: TeamID
   ): Fu[TeamBattle.TeamInfo] =
     coll
-      .aggregateWith[Bdoc]() { framework =>
+      .aggregateOne() { framework =>
         import framework.*
-        List(
-          Match(selectTourNoDQ(tourId) ++ $doc("t" -> teamId)),
+        Match(selectTourNoDQ(tourId) ++ $doc("t" -> teamId)) -> List(
           Sort(Descending("m")),
           Facet(
             List(
@@ -147,7 +144,6 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
           )
         )
       }
-      .headOption
       .map {
         _.flatMap { doc =>
           for {
@@ -257,11 +253,10 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
   // freaking expensive (marathons)
   private[tournament] def computeRanking(tourId: Tournament.ID): Fu[Ranking] =
     coll
-      .aggregateWith[Bdoc]() { framework =>
+      .aggregateOne() { framework =>
         import framework.*
-        List(Match(selectTour(tourId)), Sort(Descending("m")), Group(BSONNull)("uids" -> PushField("uid")))
-      }
-      .headOption map {
+        Match(selectTour(tourId)) -> List(Sort(Descending("m")), Group(BSONNull)("uids" -> PushField("uid")))
+      } map {
       _ so {
         _ get "uids" match {
           case Some(BSONArray(uids)) =>
@@ -284,11 +279,10 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
   // expensive, cache it
   private[tournament] def averageRating(tourId: Tournament.ID): Fu[Int] =
     coll
-      .aggregateWith[Bdoc]() { framework =>
+      .aggregateOne() { framework =>
         import framework.*
-        List(Match(selectTour(tourId)), Group(BSONNull)("rating" -> AvgField("r")))
-      }
-      .headOption map {
+        Match(selectTour(tourId)) -> List(Group(BSONNull)("rating" -> AvgField("r")))
+      } map {
       ~_.flatMap(_.double("rating").map(_.toInt))
     }
 

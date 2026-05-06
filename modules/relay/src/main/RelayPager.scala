@@ -20,10 +20,9 @@ final class RelayPager(tourRepo: RelayTourRepo, roundRepo: RelayRoundRepo)(impli
 
         def slice(offset: Int, length: Int): Fu[List[RelayTour.WithLastRound]] =
           tourRepo.coll
-            .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+            .aggregateList(maxDocs = length, ReadPreference.secondaryPreferred) { framework =>
               import framework.*
-              List(
-                Match(tourRepo.selectors.official ++ tourRepo.selectors.inactive),
+              Match(tourRepo.selectors.official ++ tourRepo.selectors.inactive) -> List(
                 Sort(Descending("syncedAt")),
                 PipelineOperator(
                   $doc(
@@ -55,7 +54,6 @@ final class RelayPager(tourRepo: RelayTourRepo, roundRepo: RelayRoundRepo)(impli
                 UnwindField("round")
               )
             }
-            .collect[List](maxDocs = length)
             .map { docs =>
               for {
                 doc   <- docs

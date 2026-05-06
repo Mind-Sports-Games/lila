@@ -41,59 +41,57 @@ final class PuzzleStreakApi(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec:
       .buildAsyncFuture { _ =>
         colls
           .path {
-            _.aggregateWith[Bdoc]() { framework =>
+            _.aggregateList(maxDocs = poolSize) { framework =>
               import framework.*
-              List(
-                Facet(
-                  buckets.map { case (rating, nbPuzzles) =>
-                    val (tier, samples, deviation) =
-                      if (rating > 2300) (PuzzleTier.Good, 5, 110) else (PuzzleTier.Top, 1, 85)
-                    rating.toString -> List(
-                      Match(
-                        $doc(
-                          "min".$lte(f"${theme}_${tier}_${rating}%04d"),
-                          "max".$gte(f"${theme}_${tier}_${rating}%04d")
-                        )
-                      ),
-                      Sample(samples),
-                      Project($doc("_id" -> false, "ids" -> true)),
-                      UnwindField("ids"),
-                      // ensure we have enough after filtering deviation
-                      Sample(nbPuzzles * 4),
-                      PipelineOperator(
-                        $doc(
-                          "$lookup" -> $doc(
-                            "from"     -> colls.puzzle.name.value,
-                            "as"       -> "puzzle",
-                            "let"      -> $doc("id" -> "$ids"),
-                            "pipeline" -> $arr(
-                              $doc(
-                                "$match" -> $doc(
-                                  "$expr" -> $doc(
-                                    "$and" -> $arr(
-                                      $doc("$eq"  -> $arr("$_id", "$$id")),
-                                      $doc("$lte" -> $arr("$glicko.d", deviation))
-                                    )
+              Facet(
+                buckets.map { case (rating, nbPuzzles) =>
+                  val (tier, samples, deviation) =
+                    if (rating > 2300) (PuzzleTier.Good, 5, 110) else (PuzzleTier.Top, 1, 85)
+                  rating.toString -> List(
+                    Match(
+                      $doc(
+                        "min".$lte(f"${theme}_${tier}_${rating}%04d"),
+                        "max".$gte(f"${theme}_${tier}_${rating}%04d")
+                      )
+                    ),
+                    Sample(samples),
+                    Project($doc("_id" -> false, "ids" -> true)),
+                    UnwindField("ids"),
+                    // ensure we have enough after filtering deviation
+                    Sample(nbPuzzles * 4),
+                    PipelineOperator(
+                      $doc(
+                        "$lookup" -> $doc(
+                          "from"     -> colls.puzzle.name.value,
+                          "as"       -> "puzzle",
+                          "let"      -> $doc("id" -> "$ids"),
+                          "pipeline" -> $arr(
+                            $doc(
+                              "$match" -> $doc(
+                                "$expr" -> $doc(
+                                  "$and" -> $arr(
+                                    $doc("$eq"  -> $arr("$_id", "$$id")),
+                                    $doc("$lte" -> $arr("$glicko.d", deviation))
                                   )
                                 )
                               )
                             )
                           )
                         )
-                      ),
-                      UnwindField("puzzle"),
-                      Sample(nbPuzzles),
-                      ReplaceRootField("puzzle")
-                    )
-                  }
-                ),
+                      )
+                    ),
+                    UnwindField("puzzle"),
+                    Sample(nbPuzzles),
+                    ReplaceRootField("puzzle")
+                  )
+                }
+              ) -> List(
                 Project($doc("all" -> $doc("$setUnion" -> buckets.map(r => s"$$${r._1}")))),
                 UnwindField("all"),
                 ReplaceRootField("all"),
                 Sort(Ascending("glicko.r"))
               )
             }
-              .collect[List](maxDocs = poolSize)
               .map {
                 _.flatMap(PuzzleBSONReader.readOpt)
               }

@@ -26,16 +26,15 @@ final private class PuzzleCountApi(
 
   private val mixCounts = colls
     .puzzle {
-      _.aggregateWith[Bdoc]() { framework =>
+      _.aggregateList(maxDocs = Int.MaxValue) { framework =>
         import framework.*
         import Puzzle.BSONFields.*
-        List(
-          Project(
-            $doc(
-              variant -> true,
-              lib     -> true
-            )
-          ),
+        Project(
+          $doc(
+            variant -> true,
+            lib     -> true
+          )
+        ) -> List(
           Group(
             $doc(
               "variant" -> s"$$v",
@@ -44,7 +43,6 @@ final private class PuzzleCountApi(
           )("nb" -> SumAll)
         )
       }
-        .collect[List](maxDocs = Int.MaxValue)
     }
     .map { docs =>
       docs.flatMap { doc =>
@@ -64,16 +62,15 @@ final private class PuzzleCountApi(
           import Puzzle.BSONFields.*
           for {
             themeDocs <- colls.puzzle {
-              _.aggregateWith[Bdoc]() { framework =>
+              _.aggregateList(maxDocs = Int.MaxValue) { framework =>
                 import framework.*
-                List(
-                  Project(
-                    $doc(
-                      themes  -> true,
-                      variant -> true,
-                      lib     -> true
-                    )
-                  ),
+                Project(
+                  $doc(
+                    themes  -> true,
+                    variant -> true,
+                    lib     -> true
+                  )
+                ) -> List(
                   Unwind(themes),
                   Group(
                     $doc(
@@ -84,7 +81,6 @@ final private class PuzzleCountApi(
                   )("nb" -> SumAll)
                 )
               }
-                .collect[List](maxDocs = Int.MaxValue)
             }
             mixCountsMap <- mixCounts
           } yield themeDocs
@@ -114,15 +110,13 @@ final private class PuzzleCountApi(
         .buildAsyncFuture { _ =>
           import Puzzle.BSONFields.*
           colls.puzzle {
-            _.aggregateWith[Bdoc]() { framework =>
+            _.aggregateList(maxDocs = Int.MaxValue) { framework =>
               import framework.*
-              List(
-                Project($doc(themes -> true)),
+              Project($doc(themes -> true)) -> List(
                 Unwind(themes),
                 GroupField(themes)("nb" -> SumAll)
               )
             }
-              .collect[List](maxDocs = Int.MaxValue)
               .map {
                 _.flatMap { obj =>
                   for {

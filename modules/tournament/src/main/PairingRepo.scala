@@ -131,17 +131,15 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
 
   private[tournament] def countByTourIdAndUserIds(tourId: Tournament.ID): Fu[Map[User.ID, Int]] =
     coll
-      .aggregateWith[Bdoc]() { framework =>
+      .aggregateList(maxDocs = 10000) { framework =>
         import framework.*
-        List(
-          Match(selectTour(tourId)),
+        Match(selectTour(tourId)) -> List(
           Project($doc("u" -> true, "_id" -> false)),
           UnwindField("u"),
           GroupField("u")("nb" -> SumAll),
           Sort(Descending("nb"))
         )
       }
-      .collect[List](maxDocs = 10000)
       .map {
         _.view
           .flatMap { doc =>
@@ -250,10 +248,9 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
 
   private[tournament] def rawStats(tourId: Tournament.ID): Fu[List[Bdoc]] =
     coll
-      .aggregateWith[Bdoc]() { framework =>
+      .aggregateList(maxDocs = 3) { framework =>
         import framework.*
-        List(
-          Match(selectTour(tourId)),
+        Match(selectTour(tourId)) -> List(
           Project(
             $doc(
               "_id" -> false,
@@ -289,5 +286,4 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
           )
         )
       }
-      .collect[List](maxDocs = 3)
 }

@@ -28,10 +28,9 @@ final class LearnApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext)
 
   def completionPercent(userIds: List[User.ID]): Fu[Map[User.ID, Int]] =
     coll
-      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+      .aggregateList(maxDocs = Int.MaxValue, ReadPreference.secondaryPreferred) { framework =>
         import framework.*
-        List(
-          Match($doc("_id".$in(userIds))),
+        Match($doc("_id".$in(userIds))) -> List(
           Project($doc("stages" -> $doc("$objectToArray" -> "$stages"))),
           UnwindField("stages"),
           Project(
@@ -52,7 +51,6 @@ final class LearnApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext)
           GroupField("_id")("nb" -> SumField("stages"))
         )
       }
-      .collect[List](maxDocs = Int.MaxValue)
       .map {
         _.view
           .flatMap { obj =>

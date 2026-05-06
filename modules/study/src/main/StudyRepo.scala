@@ -251,10 +251,9 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
 
   private def countLikes(studyId: Study.Id): Fu[Option[(Study.Likes, DateTime)]] =
     coll {
-      _.aggregateWith[Bdoc]() { framework =>
+      _.aggregateOne() { framework =>
         import framework.*
-        List(
-          Match($id(studyId)),
+        Match($id(studyId)) -> List(
           Project(
             $doc(
               "_id"       -> false,
@@ -263,7 +262,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
             )
           )
         )
-      }.headOption
+      }
     }.map { docOption =>
       for {
         doc       <- docOption

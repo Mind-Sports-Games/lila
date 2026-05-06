@@ -77,26 +77,22 @@ final class ClasApi(
 
     def areKidsInSameClass(kid1: KidId, kid2: KidId): Fu[Boolean] =
       fuccess(studentCache.isStudent(kid1.id) && studentCache.isStudent(kid2.id)) >>&
-        colls.student
-          .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+        colls.student.aggregateExists(readPreference = ReadPreference.secondaryPreferred) {
+          implicit framework =>
             import framework.*
-            List(
-              Match($doc("userId".$in(List(kid1.id, kid2.id)))),
+            Match($doc("userId".$in(List(kid1.id, kid2.id)))) -> List(
               GroupField("clasId")("nb" -> SumAll),
               Match($doc("nb" -> 2)),
               Limit(1)
             )
-          }
-          .collect[List](maxDocs = 1)
-          .dmap(_.nonEmpty)
+        }
 
     def isTeacherOf(teacher: User.ID, student: User.ID): Fu[Boolean] =
       fuccess(studentCache.isStudent(student)) >>&
         colls.student
-          .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+          .aggregateExists(readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
             import framework.*
-            List(
-              Match($doc("userId" -> student)),
+            Match($doc("userId" -> student)) -> List(
               Project($doc("clasId" -> true)),
               PipelineOperator(
                 $doc(
@@ -126,8 +122,6 @@ final class ClasApi(
               Project($id(true))
             )
           }
-          .collect[List](maxDocs = 1)
-          .dmap(_.nonEmpty)
 
     def archive(c: Clas, t: User, v: Boolean): Funit =
       coll.update
@@ -150,10 +144,9 @@ final class ClasApi(
 
     def allWithUsers(clas: Clas, selector: Bdoc = $empty): Fu[List[Student.WithUser]] =
       colls.student
-        .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+        .aggregateList(Int.MaxValue, ReadPreference.secondaryPreferred) { framework =>
           import framework.*
-          List(
-            Match($doc("clasId" -> clas.id) ++ selector),
+          Match($doc("clasId" -> clas.id) ++ selector) -> List(
             PipelineOperator(
               $doc(
                 "$lookup" -> $doc(
@@ -167,7 +160,6 @@ final class ClasApi(
             UnwindField("user")
           )
         }
-        .collect[List](maxDocs = Int.MaxValue)
         .map { docs =>
           for {
             doc     <- docs

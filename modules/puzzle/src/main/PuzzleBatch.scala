@@ -32,10 +32,9 @@ final class PuzzleBatch(colls: PuzzleColls, anonApi: PuzzleAnon, pathApi: Puzzle
             )
             .orFail(s"No puzzle path for ${user.id} $tier") flatMap { pathId =>
             colls.path {
-              _.aggregateWith[Bdoc]() { framework =>
+              _.aggregateList(maxDocs = nb) { framework =>
                 import framework.*
-                List(
-                  Match($id(pathId)),
+                Match($id(pathId)) -> List(
                   Project($doc("puzzleId" -> "$ids", "_id" -> false)),
                   Unwind("puzzleId"),
                   Sample(nb),
@@ -56,7 +55,6 @@ final class PuzzleBatch(colls: PuzzleColls, anonApi: PuzzleAnon, pathApi: Puzzle
                   )
                 )
               }
-                .collect[List](maxDocs = nb)
                 .map {
                   _.view.flatMap(PuzzleBSONReader.readOpt).toVector
                 }

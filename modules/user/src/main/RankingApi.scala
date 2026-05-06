@@ -258,12 +258,9 @@ final class RankingApi(
     private def compute(perfId: Perf.ID): Fu[List[NbUsers]] =
       lila.rating.PerfType(perfId).exists(lila.rating.PerfType.leaderboardable.contains).so {
         coll
-          .aggregateWith[Bdoc](
-            readPreference = ReadPreference.secondaryPreferred
-          ) { framework =>
+          .aggregateList(maxDocs = Int.MaxValue, ReadPreference.secondaryPreferred) { framework =>
             import framework.*
-            List(
-              Match($doc("perf" -> perfId)),
+            Match($doc("perf" -> perfId)) -> List(
               Project(
                 $doc(
                   "_id" -> false,
@@ -278,7 +275,6 @@ final class RankingApi(
               GroupField("r")("nb" -> SumAll)
             )
           }
-          .collect[List](maxDocs = Int.MaxValue)
           .map { res =>
             val hash: Map[Int, NbUsers] = res.view
               .flatMap { obj =>

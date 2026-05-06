@@ -189,12 +189,9 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
 
   def shareAnIpOrFp(u1: User.ID, u2: User.ID): Fu[Boolean] =
     coll
-      .aggregateWith[Bdoc](
-        readPreference = ReadPreference.secondaryPreferred
-      ) { framework =>
+      .aggregateExists(ReadPreference.secondaryPreferred) { framework =>
         import framework.*
-        List(
-          Match($doc("user".$in(List(u1, u2)))),
+        Match($doc("user".$in(List(u1, u2)))) -> List(
           Limit(500),
           Project(
             $doc(
@@ -214,8 +211,6 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
           Limit(1)
         )
       }
-      .collect[List](maxDocs = 1)
-      .dmap(_.nonEmpty)
 
   def ips(user: User): Fu[Set[IpAddress]] =
     coll.distinctEasy[IpAddress, Set]("ip", $doc("user" -> user.id))

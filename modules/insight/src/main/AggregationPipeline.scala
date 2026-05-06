@@ -9,7 +9,8 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
 
   def aggregate[X](question: Question[X], user: User): Fu[List[Bdoc]] =
     store.coll {
-      _.aggregateWith[Bdoc](
+      _.aggregateList(
+        maxDocs = Int.MaxValue,
         allowDiskUse = true
       ) { framework =>
         import framework.*
@@ -180,7 +181,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
             (Metric.requiresStableRating(metric) || Dimension.requiresStableRating(dimension)).so {
               $doc(F.provisional.$ne(true))
             }
-        ) :: /* sortDate :: */ {
+        ) -> /* sortDate :: */ {
           sampleGames :: ((metric match {
             case M.MeanCpl =>
               List(
@@ -310,6 +311,5 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
         }
         pipeline
       }
-        .collect[List](maxDocs = Int.MaxValue)
     }
 }

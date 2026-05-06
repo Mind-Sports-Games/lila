@@ -29,10 +29,9 @@ final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.Executi
     colls.app { appColl =>
       import OAuthApp.AppBSONHandler
       colls.token {
-        _.aggregateWith[Bdoc]() { implicit framework =>
+        _.aggregateList(maxDocs = 100) { framework =>
           import framework.*
-          List(
-            Match($doc("user_id" -> user.id)),
+          Match($doc("user_id" -> user.id)) -> List(
             Sort(Descending("used_at")),
             PipelineOperator(
               $doc(
@@ -46,7 +45,6 @@ final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.Executi
             )
           )
         }
-          .collect[List](maxDocs = 100)
           .map { docs =>
             for {
               doc   <- docs

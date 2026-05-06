@@ -17,10 +17,12 @@ final class LibraryStats(
 
   def finishedGameClockStats: Fu[(Int, Int, Int)] =
     gameColl
-      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
-        import framework._
-        List(
-          Match(Query.finished),
+      .aggregateList(
+        maxDocs = 1,
+        ReadPreference.secondaryPreferred
+      ) { framework =>
+        import framework.*
+        Match(Query.finished) -> List(
           Project(
             $doc(
               "clock"   -> $doc("$cond" -> $arr($doc("$ifNull" -> $arr(s"$$${F.clock}", false)), 1, 0)),
@@ -34,7 +36,6 @@ final class LibraryStats(
           )
         )
       }
-      .collect[List](maxDocs = 1)
       .map { docs =>
         docs.headOption.flatMap { doc =>
           for {
