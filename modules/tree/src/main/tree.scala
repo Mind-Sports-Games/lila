@@ -79,9 +79,9 @@ case class Root(
   def comp           = false
   def forceVariation = false
 
-  def addChild(branch: Branch)     = copy(children = children :+ branch)
-  def prependChild(branch: Branch) = copy(children = branch :: children)
-  def dropFirstChild               = copy(children = if (children.isEmpty) children else children.tail)
+  def addChild(branch: Branch): Root     = copy(children = children :+ branch)
+  def prependChild(branch: Branch): Root = copy(children = branch :: children)
+  def dropFirstChild                     = copy(children = if (children.isEmpty) children else children.tail)
 }
 
 case class Branch(
@@ -115,9 +115,9 @@ case class Branch(
   def idOption   = Some(id)
   def moveOption = Some(move)
 
-  def addChild(branch: Branch)     = copy(children = children :+ branch)
-  def prependChild(branch: Branch) = copy(children = branch :: children)
-  def dropFirstChild               = copy(children = if (children.isEmpty) children else children.tail)
+  def addChild(branch: Branch): Branch     = copy(children = children :+ branch)
+  def prependChild(branch: Branch): Branch = copy(children = branch :: children)
+  def dropFirstChild                       = copy(children = if (children.isEmpty) children else children.tail)
 
   def setComp = copy(comp = true)
 }

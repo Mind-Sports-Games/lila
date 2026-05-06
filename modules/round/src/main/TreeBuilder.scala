@@ -185,11 +185,10 @@ object TreeBuilder {
               .addChild(
                 rest
                   .foldLeft(makeBranch(g, m))((branch, gm) =>
-                    makeBranch(gm._1, gm._2).addChild(branch).asInstanceOf[Branch]
+                    makeBranch(gm._1, gm._2).addChild(branch)
                   )
                   .setComp
               )
-              .asInstanceOf[Branch]
         }
     }
   }

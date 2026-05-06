@@ -61,7 +61,7 @@ case class Node(
 
   def withoutChildren = copy(children = Node.emptyChildren)
 
-  def addChild(child: Node) = copy(children = children.addNode(child))
+  def addChild(child: Node): Node = copy(children = children.addNode(child))
 
   def withClock(centis: Option[Centis])  = copy(clock = centis)
   def withForceVariation(force: Boolean) = copy(forceVariation = force)
@@ -262,7 +262,7 @@ object Node {
 
     def withoutChildren = copy(children = Node.emptyChildren)
 
-    def addChild(child: Node) = copy(children = children.addNode(child))
+    def addChild(child: Node): Root = copy(children = children.addNode(child))
 
     def nodeAt(path: Path): Option[RootOrNode] =
       if (path.isEmpty) this.some else children.nodeAt(path)

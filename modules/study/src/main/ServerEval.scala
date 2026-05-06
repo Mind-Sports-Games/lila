@@ -152,7 +152,7 @@ object ServerEval {
             case (g, m) :: rest =>
               rest
                 .foldLeft(makeBranch(g, m)) { case (node, (g, m)) =>
-                  makeBranch(g, m).addChild(node).asInstanceOf[Node]
+                  makeBranch(g, m).addChild(node)
                 } some
           }
       }
