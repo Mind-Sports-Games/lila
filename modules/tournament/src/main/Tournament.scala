@@ -113,9 +113,9 @@ case class Tournament(
 
   def finishesAt = startsAt.plusMinutes(minutes)
 
-  def secondsToStart = (startsAt.getMillis / 1000 - nowSeconds).toInt.atLeast(0)
+  def secondsToStart = (startsAt.getSeconds - nowSeconds).toInt.atLeast(0)
 
-  def secondsToFinish = (finishesAt.getMillis / 1000 - nowSeconds).toInt.atLeast(0)
+  def secondsToFinish = (finishesAt.getSeconds - nowSeconds).toInt.atLeast(0)
 
   def pairingsClosedSeconds = math.max(30, math.min(clock.limitSeconds / 2, 120))
 
@@ -129,7 +129,7 @@ case class Tournament(
 
   // start at 0 as it's actually an index for medley variants in front end
   def medleyRound: Int = {
-    val cutoff = (nowSeconds - startsAt.getMillis / 1000).toInt
+    val cutoff = (nowSeconds - startsAt.getSeconds).toInt
     medleyIntervalSeconds
       .map(_.scanLeft(0)(_ + _).count(_ <= cutoff) - 1)
       .getOrElse(0)
@@ -153,9 +153,9 @@ case class Tournament(
     medleyVariants
       .map(v => v.take(medleyNumIntervals.getOrElse(medleyVariants.map(_.size).getOrElse(0))))
 
-  def isRecentlyFinished = isFinished && (nowSeconds - finishesAt.getMillis / 1000) < 30 * 60
+  def isRecentlyFinished = isFinished && (nowSeconds - finishesAt.getSeconds) < 30 * 60
 
-  def isRecentlyStarted = isStarted && (nowSeconds - startsAt.getMillis / 1000) < 15
+  def isRecentlyStarted = isStarted && (nowSeconds - startsAt.getSeconds) < 15
 
   def isNowOrSoon = startsAt.isBefore(DateTime.now.plusMinutes(15)) && !isFinished
 

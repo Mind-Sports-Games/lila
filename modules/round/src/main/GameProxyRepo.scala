@@ -53,7 +53,7 @@ final class GameProxyRepo(
       }) map { povs =>
         try
           povs sortWith Pov.priority
-        catch { case _: IllegalArgumentException => povs.sortBy(-_.game.updatedAt.getMillis / 1000) }
+        catch { case _: IllegalArgumentException => povs.sortBy(-_.game.updatedAt.getSeconds) }
       }
     }
 }

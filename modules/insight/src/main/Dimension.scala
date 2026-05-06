@@ -274,7 +274,7 @@ object Dimension {
 
   def valueJson[X](d: Dimension[X])(v: X)(implicit lang: Lang): JsValue =
     d match {
-      case Date                    => JsNumber(v.min.getMillis / 1000)
+      case Date                    => JsNumber(v.min.getSeconds)
       case Period                  => JsString(v.toString)
       case Perf                    => JsString(v.trans)
       case Phase                   => JsString(v.name)

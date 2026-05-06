@@ -323,7 +323,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
     scheduledStillWorthEntering zip scheduledCreated(crud.CrudForm.maxHomepageHours * 60) map {
       case (started, created) =>
         (started ::: created)
-          .sortBy(_.startsAt.getMillis / 1000)
+          .sortBy(_.startsAt.getSeconds)
           .foldLeft(List.empty[Tournament]) {
             case (acc, tour) if !canShowOnHomepage(tour)      => acc
             case (acc, tour) if acc.exists(_.similarTo(tour)) => acc
@@ -337,7 +337,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       List(Schedule.Freq.Weekly, Schedule.Freq.Shield, Schedule.Freq.MedleyShield, Schedule.Freq.Yearly)
     ) map { case (started, created) =>
       (started ::: created)
-        .sortBy(_.startsAt.getMillis / 1000)
+        .sortBy(_.startsAt.getSeconds)
         .foldLeft(List.empty[Tournament]) {
           case (acc, tour) if acc.exists(_.sameFreqAndVariant(tour)) => acc
           case (acc, tour)                                           => tour :: acc

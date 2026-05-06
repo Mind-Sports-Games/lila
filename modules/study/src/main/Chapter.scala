@@ -138,7 +138,7 @@ object Chapter {
       path: Path,
       lastMoveAt: DateTime
   ) {
-    def secondsSinceLastMove: Int = (nowSeconds - (lastMoveAt.getMillis / 1000)).toInt
+    def secondsSinceLastMove: Int = (nowSeconds - lastMoveAt.getSeconds).toInt
   }
 
   case class ServerEval(path: Path, done: Boolean)

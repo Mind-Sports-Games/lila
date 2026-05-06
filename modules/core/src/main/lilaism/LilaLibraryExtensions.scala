@@ -80,6 +80,11 @@ trait LilaLibraryExtensions extends CoreExports {
     def abs      = if (d.length < 0) -d else d
   }
 
+  extension (date: org.joda.time.DateTime) {
+    def getSeconds: Long = date.getMillis / 1000
+    def getCentis: Long  = date.getMillis / 10
+  }
+
   extension [A](list: List[A]) {
     def sortLike[B](other: Seq[B], f: A => B): List[A] =
       list.sortWith { (x, y) =>

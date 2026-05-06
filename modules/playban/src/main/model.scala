@@ -78,7 +78,7 @@ case class TempBan(
 
   def endsAt = date.plusMinutes(mins)
 
-  def remainingSeconds: Int = ((endsAt.getMillis / 1000) - nowSeconds).toInt.atLeast(0)
+  def remainingSeconds: Int = (endsAt.getSeconds - nowSeconds).toInt.atLeast(0)
 
   def remainingMinutes: Int = (remainingSeconds / 60).atLeast(1)
 

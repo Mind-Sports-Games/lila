@@ -230,7 +230,7 @@ object SwissJson {
       .add("nextRound" -> swiss.nextRoundAt.map { next =>
         Json.obj(
           "at" -> formatDate(next),
-          "in" -> (next.getMillis / 1000 - nowSeconds).toInt.atLeast(0)
+          "in" -> (next.getSeconds - nowSeconds).toInt.atLeast(0)
         )
       })
 

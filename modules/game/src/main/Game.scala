@@ -151,7 +151,7 @@ case class Game(
   // we can't rely on the clock, because if moretime was given,
   // elapsed time is no longer representing the game duration
   def durationSeconds: Option[Int] =
-    (updatedAt.getMillis / 1000) - (createdAt.getMillis / 1000) match {
+    updatedAt.getSeconds - createdAt.getSeconds match {
       case seconds if seconds > 60 * 60 * 12 => none // no way it lasted more than 12 hours, come on.
       case seconds                           => seconds.toInt.some
     }
@@ -263,7 +263,7 @@ case class Game(
         BinaryFormat.plyTime.write {
           binaryPlyTimes.so { t =>
             BinaryFormat.plyTime.read(t, playedPlies)
-          } :+ Centis(nowCentis - (updatedAt.getMillis / 10).toInt).nonNeg
+          } :+ Centis(nowCentis - updatedAt.getCentis.toInt).nonNeg
         }
       },
       loadClockHistory = action match {
@@ -435,7 +435,7 @@ case class Game(
   def correspondenceClock: Option[CorrespondenceClock] =
     daysPerTurn map { days =>
       val increment   = days * 24 * 60 * 60
-      val secondsLeft = ((updatedAt.getMillis / 1000) + increment - nowSeconds).toInt max 0
+      val secondsLeft = (updatedAt.getSeconds + increment - nowSeconds).toInt max 0
       CorrespondenceClock(
         increment = increment,
         p1Time = activePlayerIndex.fold(secondsLeft, increment).toFloat,
@@ -1039,7 +1039,7 @@ case class Game(
 
   def setAnalysed = copy(metadata = metadata.copy(analysed = true))
 
-  def secondsSinceCreation = (nowSeconds - (createdAt.getMillis / 1000)).toInt
+  def secondsSinceCreation = (nowSeconds - createdAt.getSeconds).toInt
 
   override def toString = s"""Game($id)"""
 }

@@ -87,7 +87,7 @@ final class GarbageCollector(
 
   private def badOtherAccounts(accounts: List[User]): Option[List[User]] = {
     val others = accounts
-      .sortBy(-_.createdAt.getMillis / 1000)
+      .sortBy(-_.createdAt.getSeconds)
       .takeWhile(_.createdAt.isAfter(DateTime.now.minusDays(10)))
       .take(4)
     (others.sizeIs > 1 && others.forall(isBadAccount) && others.headOption.exists(_.disabled)).option(others)
