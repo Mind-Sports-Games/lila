@@ -14,7 +14,7 @@ lazy val root = Project("lila", file("."))
 
 // shorter prod classpath
 scriptClasspath             := Seq("*")
-maintainer                  := "matt@watkinsmedia.org"
+maintainer                  := "contact@playstrategy.org"
 Compile / resourceDirectory := baseDirectory.value / "conf"
 Compile / sourceDirectory   := baseDirectory.value / "app"
 Compile / scalaSource       := baseDirectory.value / "app"
