@@ -78,7 +78,7 @@ final private[tv] class TvTrouper(
       )
       Bus.publish(lila.hub.actorApi.tv.TvSelect(game.id, game.speed, data), "tvSelect")
       if (channel == Tv.Channel.AllGames) {
-        implicit val timeout: akka.util.Timeout = makeTimeout(100 millis)
+        given akka.util.Timeout = akka.util.Timeout(100.millis)
         actorAsk(renderer.actor, actorApi.RenderFeaturedJs(game)) foreach { case html: String =>
           val pov   = Pov.naturalOrientation(game)
           val event = lila.round.ChangeFeatured(

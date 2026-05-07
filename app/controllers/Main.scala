@@ -9,7 +9,7 @@ import scala.annotation.nowarn
 import lila.app.{ *, given }
 import lila.common.HTTPRequest
 import lila.hub.actorApi.captcha.ValidCaptcha
-implicit private val defaultTimeout: akka.util.Timeout = makeTimeout.large
+private given akka.util.Timeout = akka.util.Timeout(5.seconds)
 import views.*
 
 final class Main(

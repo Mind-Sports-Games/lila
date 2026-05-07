@@ -9,7 +9,7 @@ import lila.common.Captcha
 
 trait CaptchedForm {
 
-  given akka.util.Timeout = makeTimeout.large
+  given akka.util.Timeout = akka.util.Timeout(5.seconds)
 
   type CaptchedData = {
     def gameId: String

@@ -81,7 +81,7 @@ final class Tv(
 
   def feed =
     Action.async { req =>
-      implicit val timeout: akka.util.Timeout = makeTimeout.short
+      given akka.util.Timeout = akka.util.Timeout(1.second)
       import akka.pattern.ask
       import lila.round.TvBroadcast
       import play.api.libs.EventSource

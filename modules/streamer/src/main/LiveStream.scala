@@ -2,7 +2,6 @@ package lila.streamer
 
 import akka.actor.*
 import akka.pattern.ask
-import makeTimeout.given
 import play.api.mvc.RequestHeader
 import scala.concurrent.duration.*
 
@@ -71,6 +70,8 @@ final class LiveStreamApi(
     cacheApi: lila.memo.CacheApi,
     streamingActor: ActorRef
 )(implicit ec: scala.concurrent.ExecutionContext) {
+
+  private given akka.util.Timeout = akka.util.Timeout(1.second)
 
   private val cache = cacheApi.unit[LiveStreams] {
     _.refreshAfterWrite(2 seconds)

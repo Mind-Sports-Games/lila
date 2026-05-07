@@ -49,7 +49,7 @@ final private[puzzle] class DailyPuzzle(
     } flatMap { _ so makeDaily }
 
   private def makeDaily(puzzle: Puzzle): Fu[Option[DailyPuzzle.WithHtml]] = {
-    given akka.util.Timeout = makeTimeout.short
+    given akka.util.Timeout = akka.util.Timeout(1.second)
     (renderer.actor ? DailyPuzzle.Render(puzzle, puzzle.fenAfterInitialMove, puzzle.line.head.uci))
       .mapTo[String] map { html =>
       DailyPuzzle.WithHtml(puzzle, html).some
