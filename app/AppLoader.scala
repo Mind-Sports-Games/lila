@@ -37,11 +37,11 @@ final class LilaComponents(
     executionContext
   )
 
-  implicit val ec: scala.concurrent.ExecutionContext =
+  implicit val ec: scala.concurrent.ExecutionContextExecutor =
     scala.concurrent.ExecutionContext.getClass
       .getDeclaredMethod("opportunistic")
       .invoke(scala.concurrent.ExecutionContext)
-      .asInstanceOf[scala.concurrent.ExecutionContext]
+      .asInstanceOf[scala.concurrent.ExecutionContextExecutor]
 
   lila.log("boot").info {
     val java             = System.getProperty("java.version")
