@@ -33,9 +33,11 @@ final class PublicChat(
             .map(chatApi.userChat.delete(_, suspect.user, _.Global))
         )
         .void
-    } >> deleteLobbyChat(suspect) >>- Bus.publish(
-      lila.hub.actorApi.security.DeletePublicChats(suspect.user.id),
-      "deleteTeamChats"
+    } >> deleteLobbyChat(suspect).andDo(
+      Bus.publish(
+        lila.hub.actorApi.security.DeletePublicChats(suspect.user.id),
+        "deleteTeamChats"
+      )
     )
 
   private def deleteLobbyChat(suspect: Suspect): Funit =

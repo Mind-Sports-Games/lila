@@ -16,8 +16,8 @@ final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal {
   @inline def dmap[B](f: A => B): Fu[B]       = fua.map(f)(using EC.parasitic)
   @inline def dforeach[B](f: A => Unit): Unit = fua.foreach(f)(using EC.parasitic)
 
-  def >>-(sideEffect: => Unit)(implicit ec: EC): Fu[A] = andDo(sideEffect)
 
+  // this was previous >>- in scala2 days
   def andDo(sideEffect: => Unit)(implicit ec: EC): Fu[A] =
     fua andThen { case _ =>
       sideEffect
