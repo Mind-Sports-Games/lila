@@ -2,12 +2,11 @@ package lila.plan
 
 import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
-import com.softwaremill.tagging.*
 import play.api.Configuration
 import play.api.libs.ws.StandaloneWSClient
-import scala.concurrent.duration.*
 
 import lila.common.config.*
+import lila.db.dsl.Coll
 
 @Module
 private class PlanConfig(
@@ -43,8 +42,8 @@ final class Env(
     text = "Use paypal checkout".some
   )
 
-  private lazy val patronColl = db(config.patronColl).taggedWith[PatronColl]
-  private lazy val chargeColl = db(config.chargeColl).taggedWith[ChargeColl]
+  private lazy val patronColl: Coll = db(config.patronColl)
+  private lazy val chargeColl: Coll = db(config.chargeColl)
 
   private lazy val stripeClient: StripeClient = wire[StripeClient]
 
@@ -63,7 +62,18 @@ final class Env(
     text = "Monthly donation goal in USD from https://playstrategy.org/costs".some
   )
 
-  lazy val api: PlanApi = wire[PlanApi]
+  lazy val api: PlanApi = new PlanApi(
+    stripeClient = stripeClient,
+    payPalClient = payPalClient,
+    patronColl = patronColl,
+    chargeColl = chargeColl,
+    notifier = notifier,
+    userRepo = userRepo,
+    lightUserApi = lightUserApi,
+    cacheApi = cacheApi,
+    mongoCache = mongoCache,
+    monthlyGoalApi = monthlyGoalApi
+  )
 
   lazy val webhook = wire[PlanWebhook]
 
@@ -94,5 +104,3 @@ final class Env(
     }
 }
 
-private trait PatronColl
-private trait ChargeColl

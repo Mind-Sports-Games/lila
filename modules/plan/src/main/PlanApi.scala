@@ -1,9 +1,7 @@
 package lila.plan
 
-import com.softwaremill.tagging.*
 import play.api.i18n.Lang
 import reactivemongo.api.*
-import scala.concurrent.duration.*
 import cats.syntax.all.*
 import org.joda.time.DateTime
 
@@ -16,8 +14,8 @@ import lila.common.EmailAddress
 final class PlanApi(
     stripeClient: StripeClient,
     payPalClient: PayPalClient,
-    patronColl: Coll @@ PatronColl,
-    chargeColl: Coll @@ ChargeColl,
+    patronColl: Coll,
+    chargeColl: Coll,
     notifier: PlanNotifier,
     userRepo: UserRepo,
     lightUserApi: lila.user.LightUserApi,
