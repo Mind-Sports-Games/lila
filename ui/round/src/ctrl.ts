@@ -1430,7 +1430,7 @@ export default class RoundController {
 
   private doForcedActions = (): void => {
     const d = this.data;
-    if (this.isPlaying() && !this.replaying()) {
+    if (this.isPlaying() && !this.replaying() && d.player.playerIndex === d.game.player) {
       //flipello pass
       if (
         ['flipello', 'flipello10', 'antiflipello', 'octagonflipello'].includes(d.game.variant.key) &&
