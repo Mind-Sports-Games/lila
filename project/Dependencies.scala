@@ -3,6 +3,14 @@ import sbt._, Keys._
 
 object Dependencies {
 
+  val arch     = if (System.getProperty("os.arch").toLowerCase.startsWith("aarch")) "aarch_64" else "x86_64"
+  val dashArch = arch.replace("_", "-")
+  val (os, notifier) =
+    if (System.getProperty("os.name").toLowerCase.startsWith("mac"))
+      ("osx", "kqueue")
+    else
+      ("linux", "epoll")
+
   val jitpack      = "jitpack".at("https://jitpack.io")
   val lilaMaven    = "lila-maven" at "https://raw.githubusercontent.com/Mind-Sports-Games/lila-maven/master"
   val lichessMaven = "lichess-maven" at "https://raw.githubusercontent.com/lichess-org/lila-maven/master"
@@ -34,7 +42,7 @@ object Dependencies {
   val scalaUri      = "io.lemonlabs"         %% "scala-uri"                       % "4.0.3"
   val scalatags     = "com.lihaoyi"          %% "scalatags"                       % "0.13.1"
   val lettuce       = "io.lettuce"            % "lettuce-core"                    % "6.1.2.RELEASE"
-  val epoll     = "io.netty"       % "netty-transport-native-epoll" % "4.1.58.Final" classifier "linux-x86_64"
+  val nettyTransport = ("io.netty" % s"netty-transport-native-$notifier" % "4.1.58.Final").classifier(s"$os-$arch")
   val scalatest = "org.scalatest" %% "scalatest"                    % "3.2.18" % Test
   val uaparser  = "org.uaparser"  %% "uap-scala"                    % "0.21.0"
   val apacheText  = "org.apache.commons"          % "commons-text"   % "1.12.0"
@@ -72,9 +80,10 @@ object Dependencies {
   object reactivemongo {
     val version = "1.1.0-RC20"
 
-    val driver = "org.reactivemongo" %% "reactivemongo"            % version
-    val stream = "org.reactivemongo" %% "reactivemongo-akkastream" % version
-    val kamon  = "org.reactivemongo" %% "reactivemongo-kamon"      % version
+    val driver = "org.reactivemongo" %% "reactivemongo"                          % version
+    val stream = "org.reactivemongo" %% "reactivemongo-akkastream"               % version
+    val kamon  = "org.reactivemongo" %% "reactivemongo-kamon"                    % version
+    val shaded = "org.reactivemongo"  % s"reactivemongo-shaded-native-$os-$dashArch" % version
     def bundle = Seq(driver, stream)
   }
 

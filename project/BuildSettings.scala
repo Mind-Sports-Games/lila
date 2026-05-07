@@ -9,9 +9,6 @@ object BuildSettings {
   val lilaVersion        = "3.2"
   val globalScalaVersion = "3.7.4"
 
-  val useEpoll = sys.props.get("epoll").fold(false)(_.toBoolean)
-  if (useEpoll) println("--- epoll build ---")
-
   def buildSettings =
     Defaults.coreDefaultSettings ++ Seq(
       version      := lilaVersion,

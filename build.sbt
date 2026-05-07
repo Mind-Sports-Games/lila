@@ -467,7 +467,7 @@ lazy val hub = smallModule("hub",
 
 lazy val web = module("web",
   Seq(common),
-  playWs.bundle ++ Seq(play.api, play.server, play.netty, play.logback, macwire.util)
+  playWs.bundle ++ Seq(play.api, play.server, play.netty, play.logback, macwire.util, nettyTransport, reactivemongo.shaded)
 )
 
 lazy val ui = smallModule("ui",
