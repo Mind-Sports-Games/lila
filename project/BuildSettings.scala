@@ -69,7 +69,9 @@ object BuildSettings {
     "-language:implicitConversions",
     "-release:21",
     "-Wimplausible-patterns",
-    "-Wunused:all"
+    "-Wunused:all",
+    // Warnings as errors!
+    "-Xfatal-warnings"
   )
 
   val srcMain = Seq(

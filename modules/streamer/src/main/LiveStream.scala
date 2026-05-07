@@ -3,7 +3,6 @@ package lila.streamer
 import akka.actor.*
 import akka.pattern.ask
 import play.api.mvc.RequestHeader
-import scala.concurrent.duration.*
 
 import lila.memo.CacheApi.*
 import lila.user.User
