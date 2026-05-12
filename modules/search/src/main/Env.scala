@@ -1,7 +1,7 @@
 package lila.search
 
-import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import com.softwaremill.macwire.*
+import lila.common.autoconfig.AutoConfig
 import play.api.Configuration
 import play.api.libs.ws.StandaloneWSClient
 
@@ -18,7 +18,7 @@ final class Env(
     ws: StandaloneWSClient
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  private val config = appConfig.get[SearchConfig]("search")(AutoConfig.loader)
+  private val config = appConfig.get[SearchConfig]("search")(using AutoConfig.loader)
 
   private def makeHttp(index: Index): ESClientHttp = wire[ESClientHttp]
 

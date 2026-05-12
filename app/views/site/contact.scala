@@ -1,17 +1,14 @@
 package views.html
 package site
 
-import controllers.routes
-import scala.util.chaining._
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object contact {
 
-  import trans.contact._
-  import views.html.base.navTree._
+  import trans.contact.*
+  import views.html.base.navTree.*
 
   private lazy val contactEmailBase64 = lila.common.String.base64.encode(contactEmailInClear)
 

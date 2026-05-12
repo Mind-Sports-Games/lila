@@ -1,10 +1,10 @@
 package lila.clas
 
 import org.joda.time.{ DateTime, Period }
-import reactivemongo.api._
-import reactivemongo.api.bson._
+import reactivemongo.api.*
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.{ Game, GameRepo }
 import lila.puzzle.PuzzleRound
 import lila.rating.PerfType
@@ -66,32 +66,32 @@ final class ClasProgressApi(
         users zip progresses map { case (u, rating) =>
           val playStat = playStats get u.id
           u.id -> StudentProgress(
-            nb = playStat.??(_.nb),
+            nb = playStat.so(_.nb),
             rating = rating,
-            wins = playStat.??(_.wins),
-            millis = playStat.??(_.millis)
+            wins = playStat.so(_.wins),
+            millis = playStat.so(_.millis)
           )
         } toMap
       )
     }
   }
 
-  //TODO should we split this by variant?
+  // TODO should we split this by variant?
   private def getPuzzleStats(userIds: List[User.ID], days: Int): Fu[Map[User.ID, PlayStats]] =
     puzzleColls.round {
       _.aggregateList(
         maxDocs = Int.MaxValue,
         ReadPreference.secondaryPreferred
       ) { framework =>
-        import framework._
+        import framework.*
         Match(
           $doc(
-            PuzzleRound.BSONFields.user $in userIds,
-            PuzzleRound.BSONFields.date $gt DateTime.now.minusDays(days)
+            PuzzleRound.BSONFields.user.$in(userIds),
+            PuzzleRound.BSONFields.date.$gt(DateTime.now.minusDays(days))
           )
         ) -> List(
           GroupField("u")(
-            "nb" -> SumAll,
+            "nb"  -> SumAll,
             "win" -> Sum(
               $doc(
                 "$cond" -> $arr("$w", 1, 0)
@@ -117,18 +117,18 @@ final class ClasProgressApi(
       userIds: List[User.ID],
       days: Int
   ): Fu[Map[User.ID, PlayStats]] = {
-    import Game.{ BSONFields => F }
+    import Game.BSONFields as F
     import lila.game.Query
     gameRepo.coll
       .aggregateList(
         maxDocs = Int.MaxValue,
         ReadPreference.secondaryPreferred
       ) { framework =>
-        import framework._
+        import framework.*
         Match(
           $doc(
-            F.playerUids $in userIds,
-            Query.createdSince(DateTime.now minusDays days),
+            F.playerUids.$in(userIds),
+            Query.createdSince(DateTime.now.minusDays(days)),
             F.perfType -> perfType.id
           )
         ) -> List(
@@ -141,9 +141,9 @@ final class ClasProgressApi(
             )
           ),
           UnwindField(F.playerUids),
-          Match($doc(F.playerUids $in userIds)),
+          Match($doc(F.playerUids.$in(userIds))),
           GroupField(F.playerUids)(
-            "nb" -> SumAll,
+            "nb"  -> SumAll,
             "win" -> Sum(
               $doc(
                 "$cond" -> $arr($doc("$eq" -> $arr("$us", "$wid")), 1, 0)

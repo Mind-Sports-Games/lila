@@ -1,11 +1,10 @@
 package lila.oauth
 
-import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import com.softwaremill.macwire.*
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
-import scala.concurrent.duration._
 
-import lila.common.config._
+import lila.common.config.*
 import lila.db.AsyncColl
 
 private case class OauthConfig(
@@ -25,7 +24,7 @@ final class Env(
     scheduler: akka.actor.Scheduler
 ) {
 
-  private val config = appConfig.get[OauthConfig]("oauth")(AutoConfig.loader)
+  private val config = appConfig.get[OauthConfig]("oauth")(using AutoConfig.loader)
 
   private lazy val db = mongo.asyncDb("oauth", config.mongoUri)
 

@@ -99,9 +99,9 @@ object Sheet {
       val streaks = streakable == Streaks
       val nexts   = (pairings drop 1 map some) :+ None
       pairings.zip(nexts).foldLeft(List.empty[Score]) { case (scores, (p, n)) =>
-        val berserk = if (p berserkOf userId) {
-          if (p.notSoQuickFinish) ValidBerserk else InvalidBerserk
-        } else NoBerserk
+        val berserk =
+          if (p.berserkOf(userId)) if (p.notSoQuickFinish) ValidBerserk else InvalidBerserk
+          else NoBerserk
         val statusScoreWin = (statusScoring, p.status) match {
           case (true, BackgammonWin | ResignBackgammon | GinBackgammon | OutoftimeBackgammon) =>
             SSBackgammon
@@ -110,7 +110,7 @@ object Sheet {
         }
         (p.winner match {
           case None if p.quickDraw => Score(ResDQ, Normal, berserk, SSNormal)
-          case None =>
+          case None                =>
             Score(
               ResDraw,
               if (streaks && isOnFire(scores)) Double
@@ -130,7 +130,8 @@ object Sheet {
                   case None                                 => StreakStarter
                   case Some(s) if s.winner.contains(userId) => StreakStarter
                   case _                                    => Normal
-                },
+                }
+              ,
               berserk,
               statusScoreWin
             )
@@ -142,7 +143,7 @@ object Sheet {
   private val v2date = new DateTime(2020, 4, 21, 0, 0, 0)
 
   def versionOf(date: DateTime) =
-    if (date isBefore v2date) V1 else V2
+    if (date.isBefore(v2date)) V1 else V2
 
   private def isOnFire(scores: List[Score]) =
     scores.headOption.exists(_.res == ResWin) &&
@@ -151,7 +152,7 @@ object Sheet {
   @scala.annotation.tailrec
   private def isDrawStreak(scores: List[Score]): Boolean =
     scores match {
-      case Nil => false
+      case Nil       => false
       case s :: more =>
         s.isWin match {
           case None        => true

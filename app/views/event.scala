@@ -1,11 +1,10 @@
 package views.html
 
-import controllers.routes
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.event.{ Event, EventForm }
 import lila.i18n.LangList
 
@@ -13,7 +12,7 @@ object event {
 
   private val dataSeconds = attr("data-seconds")
 
-  def create(form: Form[_])(implicit ctx: Context) =
+  def create(form: Form[?])(implicit ctx: Context) =
     layout(title = "New event", css = "mod.form") {
       div(cls := "crud page-menu__content box box-pad")(
         h1("New event"),
@@ -21,7 +20,7 @@ object event {
       )
     }
 
-  def edit(event: Event, form: Form[_])(implicit ctx: Context) =
+  def edit(event: Event, form: Form[?])(implicit ctx: Context) =
     layout(title = event.title, css = "mod.form") {
       div(cls := "crud edit page-menu__content box box-pad")(
         div(cls := "box__top")(
@@ -126,7 +125,7 @@ object event {
     }
   }
 
-  private def inForm(form: Form[_])(implicit ctx: Context) =
+  private def inForm(form: Form[?])(implicit ctx: Context) =
     frag(
       form3.split(
         form3.group(form("startsAt"), frag("Start date ", strong(utcLink)), half = true)(
@@ -194,7 +193,7 @@ object event {
           form3.select(
             _,
             lila.i18n.LangList.popularNoRegion.map { l =>
-              l.code -> s"${l.language.toUpperCase} ${LangList name l}"
+              l.code -> s"${l.language.toUpperCase} ${LangList `name` l}"
             }
           )
         ),
@@ -206,10 +205,10 @@ object event {
         ) { f =>
           div(cls := "complete-parent")(
             input(
-              cls := "form-control user-autocomplete",
-              name := f.name,
-              id := form3.id(f),
-              value := f.value,
+              cls     := "form-control user-autocomplete",
+              name    := f.name,
+              id      := form3.id(f),
+              value   := f.value,
               dataTag := "span"
             )
           )

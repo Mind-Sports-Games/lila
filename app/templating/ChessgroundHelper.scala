@@ -5,10 +5,10 @@ package templating
 import strategygames.Pos
 import strategygames.chess
 import strategygames.draughts
-import strategygames.{ Board, Player => PlayerIndex, History }
+import strategygames.{ Board, History, Player as PlayerIndex }
 import lila.api.Context
 
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 import lila.game.Pov
 
 trait ChessgroundHelper {
@@ -25,7 +25,7 @@ trait ChessgroundHelper {
         raw {
           if (ctx.pref.is3d) ""
           else {
-            //TODO we shouldn't be unwrapping Pos here. And does this work with different board sizes? Why a fixed 7?
+            // TODO we shouldn't be unwrapping Pos here. And does this work with different board sizes? Why a fixed 7?
             def top(p: Pos) = p match {
               case Pos.Chess(p)        => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case Pos.Dameo(p)        => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
@@ -34,7 +34,7 @@ trait ChessgroundHelper {
               case Pos.Togyzkumalak(p) => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case Pos.Go(p)           => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case Pos.Backgammon(p)   => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
-              case Pos.Abalone(p)      => orient.fold(8 - p.y, p.y-1) * 12.5
+              case Pos.Abalone(p)      => orient.fold(8 - p.y, p.y - 1) * 12.5
               case _                   => sys.error("Invalid Pos type")
             }
             def left(p: Pos) = p match {
@@ -45,16 +45,16 @@ trait ChessgroundHelper {
               case Pos.Togyzkumalak(p) => orient.fold(p.file.index, 7 - p.file.index) * 12.5
               case Pos.Go(p)           => orient.fold(p.file.index, 7 - p.file.index) * 12.5
               case Pos.Backgammon(p)   => orient.fold(p.file.index, 7 - p.file.index) * 12.5
-              case Pos.Abalone(p)      => orient.fold(p.x-1, 8 - p.x) * 12.5
+              case Pos.Abalone(p)      => orient.fold(p.x - 1, 8 - p.x) * 12.5
               case _                   => sys.error("Invalid Pos type")
             }
-            val highlights = ctx.pref.highlight ?? lastMove.distinct.map { pos =>
+            val highlights = ctx.pref.highlight so lastMove.distinct.map { pos =>
               s"""<square class="last-move" style="top:${top(pos)}%;left:${left(pos)}%"></square>"""
             } mkString ""
             val pieces =
               if (ctx.pref.isBlindfold) ""
               else
-                //note this doesnt seem to be used although it is passed through on round creation
+                // note this doesnt seem to be used although it is passed through on round creation
                 board.pieces.map { case (pos, (piece, count)) =>
                   val klass =
                     if (count > 1) s"${piece.player.name} ${piece.role.name}${count}"
@@ -75,7 +75,7 @@ trait ChessgroundHelper {
         def addX(p: draughts.PosMotion) = if (p.y % 2 != 0) -0.5 else -1.0
         def top(p: draughts.PosMotion)  = orient.fold(p.y - 1, 10 - p.y) * 10.0
         def left(p: draughts.PosMotion) = orient.fold(addX(p) + p.x, 4.5 - (addX(p) + p.x)) * 20.0
-        val highlights = ctx.pref.highlight ?? lastMove.distinct.map { pos =>
+        val highlights                  = ctx.pref.highlight so lastMove.distinct.map { pos =>
           val pm = board.posAt(pos)
           s"""<square class="last-move" style="top:${top(pm)}%;left:${left(pm)}%"></square>"""
         } mkString ""
@@ -98,16 +98,16 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
-      //is there a better way of duplicating the case for Chess/FairySF/Dameo etc?
+      // is there a better way of duplicating the case for Chess/FairySF/Dameo etc?
       case (board: Board.Dameo, history: History.Dameo) =>
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -115,7 +115,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -123,7 +123,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -131,7 +131,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -139,7 +139,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -147,7 +147,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -155,7 +155,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -163,7 +163,7 @@ trait ChessgroundHelper {
         draughtsground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastMove.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastMove.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )

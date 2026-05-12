@@ -1,15 +1,14 @@
 package views.html.base
 
-import controllers.routes
 import play.api.libs.json.Json
-import scala.language.reflectiveCalls
+import scala.reflect.Selectable.reflectiveSelectable
 
-import strategygames.{ Player => PlayerIndex, GameLogic }
+import strategygames.{ GameLogic, Player as PlayerIndex }
 import strategygames.format.FEN
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 
 object captcha {
@@ -38,7 +37,7 @@ object captcha {
               variantKey = "standard"
             ) {
               div(
-                dataMoves := safeJsonValue(Json.toJson(captcha.moves)),
+                dataMoves    := safeJsonValue(Json.toJson(captcha.moves)),
                 dataPlayable := 1
               )
             }

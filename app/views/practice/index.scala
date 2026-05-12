@@ -2,10 +2,8 @@ package views.html
 package practice
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
-import controllers.routes
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object index {
 
@@ -34,7 +32,7 @@ if (confirm('You will lose your practice progress!')) this.parentNode.submit();
             div(cls := "bar", style := s"width: ${data.progressPercent}%")
           ),
           postForm(action := routes.Practice.reset)(
-            if (ctx.isAuth) (data.nbDoneChapters > 0) option a(cls := "do-reset")("Reset my progress")
+            if (ctx.isAuth) (data.nbDoneChapters > 0).option(a(cls := "do-reset")("Reset my progress"))
             else a(href := routes.Auth.signup)("Sign up to save your progress")
           )
         ),
@@ -46,11 +44,13 @@ if (confirm('You will lose your practice progress!')) this.parentNode.submit();
                 section.studies.map { stud =>
                   val prog = data.progressOn(stud.id)
                   a(
-                    cls := s"study ${if (prog.complete) "done" else "ongoing"}",
+                    cls  := s"study ${if (prog.complete) "done" else "ongoing"}",
                     href := routes.Practice.show(section.id, stud.slug, stud.id.value)
                   )(
-                    ctx.isAuth option span(cls := "ribbon-wrapper")(
-                      span(cls := "ribbon")(prog.done, " / ", prog.total)
+                    ctx.isAuth.option(
+                      span(cls := "ribbon-wrapper")(
+                        span(cls := "ribbon")(prog.done, " / ", prog.total)
+                      )
                     ),
                     i(cls := s"${stud.id}"),
                     span(cls := "text")(

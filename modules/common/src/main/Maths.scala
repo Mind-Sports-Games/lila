@@ -1,13 +1,13 @@
 package lila.common
 
-import scala.Numeric.Implicits._
+import scala.Numeric.Implicits.*
 import scala.reflect.ClassTag
 import scala.util.Sorting
 
 object Maths {
 
   def mean[T](a: Iterable[T])(implicit n: Numeric[T]): Option[Double] =
-    a.nonEmpty option (n.toDouble(a.sum) / a.size)
+    a.nonEmpty.option(n.toDouble(a.sum) / a.size)
 
   def median[T: ClassTag](a: Iterable[T])(implicit n: Numeric[T]) =
     a.nonEmpty option {
@@ -19,9 +19,8 @@ object Maths {
       else n.toDouble(arr(mid))
     }
 
-  def roundAt(n: Double, p: Int): BigDecimal = {
+  def roundAt(n: Double, p: Int): BigDecimal =
     BigDecimal(n).setScale(p, BigDecimal.RoundingMode.HALF_UP)
-  }
 
   def closestMultipleOf(mult: Int, v: Int): Int =
     ((2 * v + mult) / (2 * mult)) * mult

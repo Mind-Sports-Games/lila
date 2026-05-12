@@ -6,7 +6,7 @@ case class DateRange(min: DateTime, max: DateTime)
 
 case class Period(days: Int) {
   def max = DateTime.now
-  def min = max minusDays days
+  def min = max.minusDays(days)
 
   override def toString =
     days match {

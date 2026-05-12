@@ -9,7 +9,7 @@ object MatchMaking {
   case class Couple(p1: PoolMember, p2: PoolMember) {
     def members    = Vector(p1, p2)
     def userIds    = members.map(_.userId)
-    def ratingDiff = p1 ratingDiff p2
+    def ratingDiff = p1.ratingDiff(p2)
   }
 
   def apply(members: Vector[PoolMember]): Vector[Couple] =
@@ -38,20 +38,20 @@ object MatchMaking {
     // quality of a potential pairing. Lower is better.
     // None indicates a forbidden pairing
     private def pairScore(a: PoolMember, b: PoolMember): Option[Int] =
-      !(rangeMalus(a, b) || rangeMalus(b, a) || blockMalus(a, b) || blockMalus(b, a)) ?? {
+      !(rangeMalus(a, b) || rangeMalus(b, a) || blockMalus(a, b) || blockMalus(b, a)) so {
         a.ratingDiff(b) - {
-          missBonus(a) atMost missBonus(b)
+          missBonus(a).atMost(missBonus(b))
         } - {
           rangeBonus(a, b)
         } - {
           ragesitBonus(a, b)
         }
-      }.some.filter(score => score <= ratingToMaxScore(a.rating atMost b.rating))
+      }.some.filter(score => score <= ratingToMaxScore(a.rating.atMost(b.rating)))
 
     // score bonus based on how many waves the member missed
     // when the user's sit counter is lower than -3, the maximum bonus becomes lower
     private def missBonus(p: PoolMember) =
-      (p.misses * 50) atMost ((760 + (p.rageSitCounter atMost -3) * 20) atLeast 0)
+      (p.misses * 50).atMost((760 + (p.rageSitCounter `atMost` -3) * 20).atLeast(0))
 
     // if players have conflicting rating ranges
     private def rangeMalus(a: PoolMember, b: PoolMember) =
@@ -59,7 +59,7 @@ object MatchMaking {
 
     // bonus if both players have rating ranges, and they're compatible
     private def rangeBonus(a: PoolMember, b: PoolMember) =
-      if (a.ratingRange.exists(_ contains b.rating) && b.ratingRange.exists(_ contains a.rating)) 200
+      if (a.ratingRange.exists(_.contains(b.rating)) && b.ratingRange.exists(_.contains(a.rating))) 200
       else 0
 
     // if players block each other
@@ -73,9 +73,9 @@ object MatchMaking {
       if (a.rageSitCounter >= -2 && b.rageSitCounter >= -2) 30        // good players
       else if (a.rageSitCounter <= -10 && b.rageSitCounter <= -10) 80 // very bad players
       else if (a.rageSitCounter <= -5 && b.rageSitCounter <= -5) 30   // bad players
-      else (abs(a.rageSitCounter - b.rageSitCounter) atMost 10) * -30 // match of good and bad player
+      else (abs(a.rageSitCounter - b.rageSitCounter).atMost(10)) * -30   // match of good and bad player
 
-    def apply(members: Vector[PoolMember]): Option[Vector[Couple]] = {
+    def apply(members: Vector[PoolMember]): Option[Vector[Couple]] =
       WMMatching(members.toArray, pairScore).fold(
         err => {
           logger.error("WMMatching", err)
@@ -86,7 +86,5 @@ object MatchMaking {
             pairs.view.map { case (a, b) => Couple(a, b) } to Vector
           }
       )
-    }
   }
-
 }

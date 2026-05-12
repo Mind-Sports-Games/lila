@@ -1,12 +1,10 @@
 package views.html.challenge
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.challenge.Challenge
 import lila.challenge.Challenge.Status
-
-import controllers.routes
 
 object theirs {
 
@@ -45,15 +43,14 @@ object theirs {
                   views.html.board.bits.miniForVariant(fen, c.variant, !c.finalPlayerIndex)(div)
                 )
               },
-              if (playerIndex.map(Challenge.PlayerIndexChoice.apply).has(c.playerIndexChoice))
+              if (playerIndex.map(Challenge.PlayerIndexChoice.apply).contains(c.playerIndexChoice))
                 badTag(
                   // very rare message, don't translate
-                  s"You have the wrong playerIndex link for this open challenge. The ${playerIndex.??(_.name)} player has already joined."
+                  s"You have the wrong playerIndex link for this open challenge. The ${playerIndex.so(_.name)} player has already joined."
                 )
               else if (!c.mode.rated || ctx.isAuth) {
                 frag(
-                  (c.mode.rated && c.unlimited) option
-                    badTag(trans.bewareTheGameIsRatedButHasNoClock()),
+                  (c.mode.rated && c.unlimited).option(badTag(trans.bewareTheGameIsRatedButHasNoClock())),
                   postForm(cls := "accept", action := routes.Challenge.accept(c.id, playerIndex.map(_.name)))(
                     submitButton(cls := "text button button-fat", dataIcon := "G")(trans.joinTheGame())
                   )
@@ -64,7 +61,7 @@ object theirs {
                   badTag(
                     p(trans.thisGameIsRated()),
                     a(
-                      cls := "button",
+                      cls  := "button",
                       href := s"${routes.Auth.login}?referrer=${routes.Round.watcher(c.id, "p1")}"
                     )(trans.signIn())
                   )
@@ -83,9 +80,9 @@ object theirs {
               h1(trans.challenge.challengeAccepted()),
               bits.details(c, playerIndex),
               a(
-                id := "challenge-redirect",
+                id   := "challenge-redirect",
                 href := routes.Round.watcher(c.id, "p1"),
-                cls := "button button-fat button-color-choice"
+                cls  := "button button-fat button-color-choice"
               )(
                 trans.joinTheGame()
               )

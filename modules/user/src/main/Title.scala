@@ -8,8 +8,10 @@ case class Title(value: String) extends AnyVal with StringValue
 
 object Title {
 
+  given cats.Eq[Title] = cats.Eq.fromUniversalEquals
+
   implicit val titleIso: Iso.StringIso[Title]       = lila.common.Iso.string[Title](Title.apply, _.value)
-  implicit val titleBsonHandler: BSONHandler[Title] = lila.db.dsl.stringIsoHandler(Title.titleIso)
+  implicit val titleBsonHandler: BSONHandler[Title] = lila.db.dsl.stringIsoHandler(using Title.titleIso)
   implicit val titleJsonWrites: Writes[Title]       = lila.common.Json.stringIsoWriter(Title.titleIso)
 
   val PM  = Title("PM")
@@ -62,7 +64,7 @@ object Title {
       }
 
     def apply(url: String)(implicit ws: StandaloneWSClient): Fu[Option[Title]] =
-      toFideId(url) ?? fromFideProfile
+      toFideId(url) so fromFideProfile
 
     private def fromFideProfile(id: Int)(implicit ws: StandaloneWSClient): Fu[Option[Title]] = {
       ws.url(s"""https://ratings.fide.com/profile/$id""").get().dmap(_.body) dmap {

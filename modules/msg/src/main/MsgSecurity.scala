@@ -1,10 +1,9 @@
 package lila.msg
 
 import org.joda.time.DateTime
-import scala.concurrent.duration._
 
 import lila.common.Bus
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.hub.actorApi.clas.{ AreKidsInSameClass, IsTeacherOf }
 import lila.hub.actorApi.report.AutoFlag
 import lila.hub.actorApi.team.IsLeaderOf
@@ -26,18 +25,18 @@ final private class MsgSecurity(
     scheduler: akka.actor.Scheduler
 ) {
 
-  import BsonHandlers._
-  import MsgSecurity._
+  import BsonHandlers.*
+  import MsgSecurity.*
 
   private object limitCost {
-    val normal   = 25
-    val verified = 5
-    val hog      = 1
+    val normal                 = 25
+    val verified               = 5
+    val hog                    = 1
     def apply(u: User.Contact) =
       if (u.isApiHog) hog
       else if (u.isVerified) verified
-      else if (u isDaysOld 3) normal
-      else if (u isHoursOld 3) normal * 2
+      else if (u.isDaysOld(3)) normal
+      else if (u.isHoursOld(3)) normal * 2
       else normal * 4
   }
 
@@ -66,12 +65,12 @@ final private class MsgSecurity(
       else
         may.post(contacts, isNew) flatMap {
           case false => fuccess(Block)
-          case _ =>
-            isLimited(contacts, isNew, unlimited) orElse
-              isSpam(text) orElse
-              isTroll(contacts) orElse
-              isDirt(contacts.orig, text, isNew) getOrElse
-              fuccess(Ok)
+          case _     =>
+            isLimited(contacts, isNew, unlimited)
+              .orElse(isSpam(text))
+              .orElse(isTroll(contacts))
+              .orElse(isDirt(contacts.orig, text, isNew))
+              .getOrElse(fuccess(Ok))
         } flatMap {
           case mute: Mute =>
             relationApi.fetchFollows(contacts.dest.id, contacts.orig.id) dmap { isFriend =>
@@ -92,40 +91,41 @@ final private class MsgSecurity(
 
     private def isLimited(contacts: User.Contacts, isNew: Boolean, unlimited: Boolean): Fu[Option[Verdict]] =
       if (unlimited) fuccess(none)
-      else if (isNew) {
-        isLeaderOf(contacts) >>| isTeacherOf(contacts)
-      } map {
-        case true => none
-        case _ =>
-          CreateLimitPerUser[Option[Verdict]](contacts.orig.id, limitCost(contacts.orig))(none)(Limit.some)
-      }
+      else if (isNew)
+        {
+          isLeaderOf(contacts) >>| isTeacherOf(contacts)
+        } map {
+          case true => none
+          case _    =>
+            CreateLimitPerUser[Option[Verdict]](contacts.orig.id, limitCost(contacts.orig))(none)(Limit.some)
+        }
       else
         fuccess {
           ReplyLimitPerUser[Option[Verdict]](contacts.orig.id, limitCost(contacts.orig))(none)(Limit.some)
         }
 
     private def isSpam(text: String): Fu[Option[Verdict]] =
-      spam.detect(text) ?? fuccess(Spam.some)
+      spam.detect(text) so fuccess(Spam.some)
 
     private def isTroll(contacts: User.Contacts): Fu[Option[Verdict]] =
-      (contacts.orig.isTroll && !contacts.dest.isTroll) ?? fuccess(Troll.some)
+      (contacts.orig.isTroll && !contacts.dest.isTroll) so fuccess(Troll.some)
 
     private def isDirt(user: User.Contact, text: String, isNew: Boolean): Fu[Option[Verdict]] =
-      (isNew && Analyser(text).dirty) ??
-        !userRepo.isCreatedSince(user.id, DateTime.now.minusDays(30)) dmap { _ option Dirt }
+      (isNew && Analyser(text).dirty) so
+        userRepo.isCreatedSince(user.id, DateTime.now.minusDays(30)).not dmap { _.option(Dirt) }
   }
 
   object may {
 
     def post(orig: User.ID, dest: User.ID, isNew: Boolean): Fu[Boolean] =
       userRepo.contacts(orig, dest) flatMap {
-        _ ?? { post(_, isNew) }
+        _ so { post(_, isNew) }
       }
 
     def post(contacts: User.Contacts, isNew: Boolean): Fu[Boolean] =
       fuccess(contacts.dest.id != User.playstrategyId) >>& {
         fuccess(Granter.byRoles(_.ModMessage)(~contacts.orig.roles)) >>| {
-          !relationApi.fetchBlocks(contacts.dest.id, contacts.orig.id) >>&
+          relationApi.fetchBlocks(contacts.dest.id, contacts.orig.id).not >>&
             (create(contacts) >>| reply(contacts)) >>&
             chatPanic.allowed(contacts.orig.id, userRepo.byId) >>&
             kidCheck(contacts, isNew)
@@ -145,7 +145,7 @@ final private class MsgSecurity(
     private def reply(contacts: User.Contacts): Fu[Boolean] =
       colls.thread.exists(
         $id(MsgThread.id(contacts.orig.id, contacts.dest.id)) ++
-          $doc("del" $ne contacts.dest.id)
+          $doc("del".$ne(contacts.dest.id))
       )
 
     private def kidCheck(contacts: User.Contacts, isNew: Boolean): Fu[Boolean] =

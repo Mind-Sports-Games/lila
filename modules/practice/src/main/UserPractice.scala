@@ -8,9 +8,9 @@ case class UserPractice(
 ) {
 
   def progressOn(studyId: Study.Id) = {
-    val chapterIds = structure.study(studyId).??(_.chapterIds)
+    val chapterIds = structure.study(studyId).so(_.chapterIds)
     Completion(
-      done = progress countDone chapterIds,
+      done = progress.countDone(chapterIds),
       total = chapterIds.size
     )
   }

@@ -2,7 +2,7 @@ package lila.challenge
 
 import play.api.i18n.Lang
 
-import lila.i18n.I18nKeys.{ challenge => trans }
+import lila.i18n.I18nKeys.challenge as trans
 import lila.pref.Pref
 import lila.rating.PerfType
 import lila.relation.{ Block, Follow }
@@ -33,9 +33,9 @@ object ChallengeDenied {
       case Reason.RatingOutsideRange(perf) =>
         trans.yourXRatingIsTooFarFromY.txt(perf.trans, d.dest.titleUsername)
       case Reason.RatingIsProvisional(perf) => trans.cannotChallengeDueToProvisionalXRating.txt(perf.trans)
-      case Reason.FriendsOnly               => trans.xOnlyAcceptsChallengesFromFriends.txt(d.dest.titleUsername)
-      case Reason.BotUltraBullet            => "Bots cannot play UltraBullet. Choose a slower time control."
-      case Reason.Yourself                  => trans.cannotChallengeYourself.txt()
+      case Reason.FriendsOnly    => trans.xOnlyAcceptsChallengesFromFriends.txt(d.dest.titleUsername)
+      case Reason.BotUltraBullet => "Bots cannot play UltraBullet. Choose a slower time control."
+      case Reason.Yourself       => trans.cannotChallengeYourself.txt()
     }
 }
 
@@ -44,7 +44,7 @@ final class ChallengeGranter(
     relationApi: lila.relation.RelationApi
 ) {
 
-  import ChallengeDenied.Reason._
+  import ChallengeDenied.Reason.*
 
   val ratingThreshold = 300
 
@@ -65,13 +65,12 @@ final class ChallengeGranter(
             case (_, _) if from.marks.engine && !dest.marks.engine => YouAreBlocked.some
             case (_, _) if from.id == dest.id                      => Yourself.some
             case (_, Pref.Challenge.FRIEND)                        => FriendsOnly.some
-            case (_, Pref.Challenge.RATING) =>
-              perfType ?? { pt =>
-                if (from.perfs(pt).provisional || dest.perfs(pt).provisional)
-                  RatingIsProvisional(pt).some
+            case (_, Pref.Challenge.RATING)                        =>
+              perfType so { pt =>
+                if (from.perfs(pt).provisional || dest.perfs(pt).provisional) RatingIsProvisional(pt).some
                 else {
                   val diff = math.abs(from.perfs(pt).intRating - dest.perfs(pt).intRating)
-                  (diff > ratingThreshold) option RatingOutsideRange(pt)
+                  (diff > ratingThreshold).option(RatingOutsideRange(pt))
                 }
               }
             case (_, Pref.Challenge.ALWAYS) => none
@@ -79,11 +78,11 @@ final class ChallengeGranter(
           }
       }
       .map {
-        case None if dest.isBot && perfType.has(PerfType.orDefaultSpeed("ultraBullet")) => BotUltraBullet.some
-        case res                                                                        => res
+        case None if dest.isBot && perfType.contains(PerfType.orDefaultSpeed("ultraBullet")) =>
+          BotUltraBullet.some
+        case res => res
       }
       .map {
         _.map { ChallengeDenied(dest, _) }
       }
-
 }

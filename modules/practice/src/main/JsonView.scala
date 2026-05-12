@@ -1,23 +1,23 @@
 package lila.practice
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
-import lila.common.Json._
-import lila.study.JsonView._
+import lila.common.Json.*
+import lila.study.JsonView.*
 
 object JsonView {
 
   case class JsData(study: JsObject, analysis: JsObject, practice: JsObject)
 
   implicit val nbMovesWrites: Writes[PracticeProgress.NbMoves] = intAnyValWriter(_.value)
-  implicit val practiceStudyWrites: Writes[PracticeStudy] = OWrites { ps =>
+  implicit val practiceStudyWrites: Writes[PracticeStudy]      = OWrites { ps =>
     Json.obj(
       "id"   -> ps.id,
       "name" -> ps.name,
       "desc" -> ps.desc
     )
   }
-  import PracticeGoal._
+  import PracticeGoal.*
   implicit val practiceGoalWrites: Writes[PracticeGoal] = OWrites {
     case Mate              => Json.obj("result" -> "mate")
     case MateIn(moves)     => Json.obj("result" -> "mateIn", "moves" -> moves)
@@ -29,8 +29,8 @@ object JsonView {
 
   def apply(us: UserStudy) =
     Json.obj(
-      "study" -> us.practiceStudy,
-      "url"   -> us.url,
+      "study"      -> us.practiceStudy,
+      "url"        -> us.url,
       "completion" -> JsObject {
         us.practiceStudy.chapters.flatMap { c =>
           us.practice.progress.chapters collectFirst {
@@ -40,8 +40,8 @@ object JsonView {
       },
       "structure" -> us.practice.structure.sections.map { sec =>
         Json.obj(
-          "id"   -> sec.id,
-          "name" -> sec.name,
+          "id"      -> sec.id,
+          "name"    -> sec.name,
           "studies" -> sec.studies.map { stu =>
             Json.obj(
               "id"   -> stu.id,

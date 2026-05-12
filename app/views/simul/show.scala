@@ -2,12 +2,11 @@ package views.html.simul
 
 import strategygames.format.FEN
 
-import controllers.routes
 import play.api.libs.json.Json
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 import lila.i18n.VariantKeys
 
@@ -27,23 +26,23 @@ object show {
       moreJs = frag(
         jsModule("simul"),
         embedJsUnsafeLoadThen(s"""PlayStrategySimul(${safeJsonValue(
-          Json.obj(
-            "data"          -> data,
-            "i18n"          -> bits.jsI18n(),
-            "socketVersion" -> socketVersion.value,
-            "userId"        -> ctx.userId,
-            "chat" -> chatOption.map { c =>
-              views.html.chat.json(
-                c.chat,
-                name = trans.chatRoom.txt(),
-                timeout = c.timeout,
-                public = true,
-                resourceId = lila.chat.Chat.ResourceId(s"simul/${c.chat.id}"),
-                localMod = ctx.userId has sim.hostId
-              )
-            }
-          )
-        )})""")
+            Json.obj(
+              "data"          -> data,
+              "i18n"          -> bits.jsI18n(),
+              "socketVersion" -> socketVersion.value,
+              "userId"        -> ctx.userId,
+              "chat"          -> chatOption.map { c =>
+                views.html.chat.json(
+                  c.chat,
+                  name = trans.chatRoom.txt(),
+                  timeout = c.timeout,
+                  public = true,
+                  resourceId = lila.chat.Chat.ResourceId(s"simul/${c.chat.id}"),
+                  localMod = ctx.userId `has` sim.hostId
+                )
+              }
+            )
+          )})""")
       )
     ) {
       main(cls := "simul")(
@@ -58,9 +57,11 @@ object show {
                     sim.variants.map(VariantKeys.variantName).mkString(", "),
                     " • ",
                     trans.casual(),
-                    (isGranted(_.ManageSimul) || ctx.userId.has(sim.hostId)) && sim.isCreated option frag(
-                      " • ",
-                      a(href := routes.Simul.edit(sim.id), title := "Edit simul")(iconTag("%"))
+                    ((isGranted(_.ManageSimul) || ctx.userId.has(sim.hostId)) && sim.isCreated).option(
+                      frag(
+                        " • ",
+                        a(href := routes.Simul.edit(sim.id), title := "Edit simul")(iconTag("%"))
+                      )
                     )
                   )
                 )
@@ -106,7 +107,7 @@ object show {
           stream.map { s =>
             views.html.streamer.bits.contextual(s.streamer.userId)
           },
-          chatOption.isDefined option views.html.chat.frag
+          chatOption.isDefined.option(views.html.chat.frag)
         ),
         div(cls := "simul__main box")(spinner)
       )

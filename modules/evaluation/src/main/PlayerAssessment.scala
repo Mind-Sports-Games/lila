@@ -6,7 +6,7 @@ import lila.analyse.{ Accuracy, Analysis }
 import lila.game.{ Game, Player, Pov }
 import lila.user.User
 
-import strategygames.{ GameFamily, Player => PlayerIndex, Speed }
+import strategygames.{ GameFamily, Player as PlayerIndex, Speed }
 
 case class PlayerAssessment(
     _id: String,
@@ -49,18 +49,18 @@ object PlayerAssessment {
 
   private def highlyConsistentMoveTimeStreaksOf(pov: Pov): Boolean =
     pov.game.clock.exists(_.estimateTotalSeconds > 60) && {
-      Statistics.slidingMoveTimesCvs(pov) ?? {
+      Statistics.slidingMoveTimesCvs(pov) so {
         _ exists Statistics.cvIndicatesHighlyFlatTimesForStreaks
       }
     }
 
   def makeBasics(pov: Pov, holdAlerts: Option[Player.HoldAlert]): PlayerAssessment.Basics = {
-    import Statistics._
+    import Statistics.*
     import pov.{ game, playerIndex }
 
     Basics(
       plyTimes = intAvgSd(~game.plyTimes(playerIndex) map (_.roundTenths)),
-      blurs = game playerBlurPercent playerIndex,
+      blurs = game.playerBlurPercent(playerIndex),
       hold = holdAlerts.exists(_.suspicious),
       blurStreak = highestChunkBlursOf(pov).some.filter(0 <),
       mtStreak = highlyConsistentMoveTimeStreaksOf(pov)
@@ -68,7 +68,7 @@ object PlayerAssessment {
   }
 
   def make(pov: Pov, analysis: Option[Analysis], holdAlerts: Option[Player.HoldAlert]): PlayerAssessment = {
-    import Statistics._
+    import Statistics.*
     import pov.{ game, playerIndex }
 
     val basics = makeBasics(pov, holdAlerts)
@@ -89,7 +89,7 @@ object PlayerAssessment {
 
     lazy val highlyConsistentPlyTimes: Boolean =
       game.clock.exists(_.estimateTotalSeconds > 60) && {
-        plyTimeCoefVariation(pov) ?? cvIndicatesHighlyFlatTimes
+        plyTimeCoefVariation(pov) so cvIndicatesHighlyFlatTimes
       }
 
     lazy val suspiciousErrorRate: Boolean =
@@ -117,7 +117,9 @@ object PlayerAssessment {
       alwaysHasAdvantage,
       highBlurRate || highChunkBlurRate,
       moderateBlurRate || moderateChunkBlurRate,
-      (highlyConsistentPlyTimes || highlyConsistentMoveTimeStreaksOf(pov)) && !fastActionVariantAndFastMoves(pov),
+      (highlyConsistentPlyTimes || highlyConsistentMoveTimeStreaksOf(pov)) && !fastActionVariantAndFastMoves(
+        pov
+      ),
       moderatelyConsistentPlyTimes(pov),
       noFastPlies(pov),
       basics.hold
@@ -127,7 +129,7 @@ object PlayerAssessment {
     val F = false
 
     def assessment: GameAssessment = {
-      import GameAssessment._
+      import GameAssessment.*
       val assessment = flags match {
         //               SF1 SF2 BLR1 BLR2 HCMT MCMT NFM Holds
         case PlayerFlags(T, _, T, _, _, _, T, _) => Cheating // high accuracy, high blurs, no fast moves

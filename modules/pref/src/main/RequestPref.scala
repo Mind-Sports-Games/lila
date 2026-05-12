@@ -1,7 +1,7 @@
 package lila.pref
 
 import play.api.mvc.RequestHeader
-import play.api.libs.json._
+import play.api.libs.json.*
 import lila.pref.JsonView.pieceSetsRead
 import lila.pref.JsonView.themesRead
 
@@ -19,24 +19,22 @@ object RequestPref {
     def paramOrSession(name: String): Option[String] =
       queryParam(req, name) orElse req.session.get(name)
 
-    def updateSessionWithParam(name: String): Option[List[PieceSet]] = {
-      //Session data is only used for guests it would seem...
+    def updateSessionWithParam(name: String): Option[List[PieceSet]] =
+      // Session data is only used for guests it would seem...
       req.session
         .get(name)
         .map(Json.parse)
-        .flatMap(_.validate(pieceSetsRead).asOpt)
+        .flatMap(_.validate(using pieceSetsRead).asOpt)
         .map { ps =>
           queryParam(req, name)
             .fold(ps)(v => PieceSet.updatePieceSet(ps, v))
         }
-    }
 
-    def updateSessionWithThemeParam(name: String): Option[List[Theme]] = {
+    def updateSessionWithThemeParam(name: String): Option[List[Theme]] =
       req.session
         .get(name)
         .map(Json.parse)
-        .flatMap(_.validate(themesRead).asOpt)
-    }
+        .flatMap(_.validate(using themesRead).asOpt)
 
     default.copy(
       bg = paramOrSession("bg").flatMap(Pref.Bg.fromString.get) | default.bg,
@@ -47,7 +45,7 @@ object RequestPref {
       pieceSet3d = paramOrSession("pieceSet3d") | default.pieceSet3d,
       soundSet = paramOrSession("soundSet") | default.soundSet,
       bgImg = paramOrSession("bgImg"),
-      is3d = paramOrSession("is3d") has "true"
+      is3d = paramOrSession("is3d").has("true")
     )
   }
 

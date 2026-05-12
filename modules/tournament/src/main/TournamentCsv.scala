@@ -4,7 +4,7 @@ import akka.stream.scaladsl.Source
 
 object TournamentCsv {
 
-  def apply(results: Source[Player.Result, _]): Source[String, _] =
+  def apply(results: Source[Player.Result, ?]): Source[String, ?] =
     Source(
       List(
         toCsv(
@@ -28,7 +28,7 @@ object TournamentCsv {
         user.name,
         player.actualRating.toString,
         player.score.toString,
-        player.performanceOption.??(_.toString),
+        player.performanceOption.so(_.toString),
         ~player.team
       )
   }

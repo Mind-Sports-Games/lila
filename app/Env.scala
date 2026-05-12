@@ -1,17 +1,17 @@
 package lila.app
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 import play.api.libs.ws.StandaloneWSClient
 import play.api.mvc.{ ControllerComponents, SessionCookieBaker }
 import play.api.{ Configuration, Environment }
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{ ExecutionContext, Future }
 
-import lila.common.config._
+import lila.common.config.*
 import lila.common.{ Bus, Strings, UserIds }
-import lila.memo.SettingStore.Strings._
-import lila.memo.SettingStore.UserIds._
+import lila.memo.SettingStore.Strings.*
+import lila.memo.SettingStore.UserIds.*
 import lila.user.{ Holder, User }
 import play.api.Mode
 import lila.game.IdGenerator
@@ -154,35 +154,36 @@ final class Env(
       _       <- challenge.api.removeByUserId(u.id)
       _       <- tournament.api.withdrawAll(u)
       _       <- swiss.api.withdrawAll(u, teamIds)
-      _       <- plan.api.cancel(u).nevermind
+      _       <- plan.api.cancel(u).recoverDefault
       _       <- lobby.seekApi.removeByUser(u)
       _       <- security.store.closeAllSessionsOf(u.id)
       _       <- push.webSubscriptionApi.unsubscribeByUser(u)
       _       <- streamer.api.demote(u.id)
       _       <- coach.api.remove(u.id)
       reports <- report.api.processAndGetBySuspect(lila.report.Suspect(u))
-      _       <- selfClose ?? mod.logApi.selfCloseAccount(u.id, reports)
+      _       <- selfClose so mod.logApi.selfCloseAccount(u.id, reports)
       _       <- appeal.api.onAccountClose(u)
-      _ <- u.marks.troll ?? relation.api.fetchFollowing(u.id).flatMap {
+      _       <- u.marks.troll so relation.api.fetchFollowing(u.id).flatMap {
         activity.write.unfollowAll(u, _)
       }
-      _ <- !selfClose ?? mod.logApi.closeAccount(by.id, u.id)
+      _ <- !selfClose so mod.logApi.closeAccount(by.id, u.id)
     } yield Bus.publish(lila.hub.actorApi.security.CloseAccount(u.id), "accountClose")
 
   Bus.subscribeFun("garbageCollect") { case lila.hub.actorApi.security.GarbageCollect(userId) =>
     // GC can be aborted by reverting the initial SB mark
     user.repo.isTroll(userId) foreach { troll =>
-      if (troll) scheduler.scheduleOnce(1.second) {
-        playstrategyClose(userId).unit
-      }
+      if (troll)
+        scheduler.scheduleOnce(1.second) {
+          playstrategyClose(userId).discard
+        }
     }
   }
   Bus.subscribeFun("rageSitClose") { case lila.hub.actorApi.playban.RageSitClose(userId) =>
-    playstrategyClose(userId).unit
+    playstrategyClose(userId).discard
   }
   private def playstrategyClose(userId: User.ID) =
     user.repo.playstrategyAnd(userId) flatMap {
-      _ ?? { case (playstrategy, user) =>
+      _ so { case (playstrategy, user) =>
         closeAccount(user, playstrategy)
       }
     }
@@ -289,5 +290,5 @@ final class EnvBoot(
     c.result
   }
 
-  templating.Environment setEnv env
+  templating.Environment.setEnv(env)
 }

@@ -1,7 +1,5 @@
 package lila.round
 
-import scala.concurrent.duration._
-
 import lila.game.{ Game, GameRepo }
 
 final class RecentTvGames(
@@ -14,6 +12,6 @@ final class RecentTvGames(
 
   def put(game: Game) = {
     gameRepo.setTv(game.id)
-    (if (game.speed <= strategygames.Speed.Bullet) fast else slow) put game.id
+    (if (game.speed <= strategygames.Speed.Bullet) fast else slow).put(game.id)
   }
 }

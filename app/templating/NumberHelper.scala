@@ -2,10 +2,8 @@ package lila.app
 package templating
 
 import java.text.NumberFormat
-import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import play.api.i18n.Lang
-import scala.collection.mutable
 
 trait NumberHelper { self: I18nHelper =>
 
@@ -20,10 +18,10 @@ trait NumberHelper { self: I18nHelper =>
   def showMillis(millis: Int)(implicit lang: Lang) = formatter.format((millis / 100).toDouble / 10)
 
   implicit final class RichInt(number: Int) {
-    def localize(implicit lang: Lang): String = formatter format number
+    def localize(implicit lang: Lang): String = formatter.format(number)
   }
 
   implicit final class RichLong(number: Long) {
-    def localize(implicit lang: Lang): String = formatter format number
+    def localize(implicit lang: Lang): String = formatter.format(number)
   }
 }

@@ -1,10 +1,10 @@
 package lila.coach
 
-import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import com.softwaremill.macwire.*
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.common.config._
+import lila.common.config.*
 import lila.security.Permission
 
 @Module
@@ -23,7 +23,7 @@ final class Env(
     imageRepo: lila.db.ImageRepo
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  private val config = appConfig.get[CoachConfig]("coach")(AutoConfig.loader)
+  private val config = appConfig.get[CoachConfig]("coach")(using AutoConfig.loader)
 
   private lazy val coachColl = db(config.coachColl)
 
@@ -49,20 +49,21 @@ final class Env(
   ) {
     case lila.hub.actorApi.mod.Shadowban(userId, true) =>
       api.toggleApproved(userId, value = false)
-      api.reviews.deleteAllBy(userId).unit
+      api.reviews.deleteAllBy(userId).discard
     case lila.hub.actorApi.mod.MarkCheater(userId, true) =>
       api.toggleApproved(userId, value = false)
-      api.reviews.deleteAllBy(userId).unit
+      api.reviews.deleteAllBy(userId).discard
     case lila.hub.actorApi.mod.MarkBooster(userId) =>
       api.toggleApproved(userId, value = false)
-      api.reviews.deleteAllBy(userId).unit
+      api.reviews.deleteAllBy(userId).discard
     case lila.hub.actorApi.mod.SetPermissions(userId, permissions) =>
-      api.toggleApproved(userId, permissions.has(Permission.Coach.dbKey)).unit
+      api.toggleApproved(userId, permissions.has(Permission.Coach.dbKey)).discard
     case lila.game.actorApi.FinishGame(game, p1, p2) if game.rated =>
-      if (game.perfType.exists(lila.rating.PerfType.standard.contains)) {
-        p1 ?? api.setRating
-        p2 ?? api.setRating
-      }.unit
+      if (game.perfType.exists(lila.rating.PerfType.standard.contains))
+        {
+          p1 so api.setRating
+          p2 so api.setRating
+        }.discard
   }
 
   def cli =

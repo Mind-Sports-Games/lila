@@ -5,7 +5,7 @@ import strategygames.Centis
 import strategygames.format.pgn.{ Dumper, Glyphs, ParsedPgn, San, Tags }
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
-import strategygames.{ Player => PlayerIndex, Game, Status }
+import strategygames.{ Game, Player as PlayerIndex, Status }
 
 import lila.common.LightUser
 import lila.importer.{ ImportData, Preprocessed }
@@ -58,7 +58,7 @@ object PgnImport {
                 ).fold(variations)(_ :: variations).toVector
               }
             )
-            val end: Option[End] = (game.finished option game.status).map { status =>
+            val end: Option[End] = game.finished.option(game.status).map { status =>
               End(
                 status = status,
                 winner = game.winnerPlayerIndex,
@@ -67,7 +67,7 @@ object PgnImport {
               )
             }
             val commented =
-              if (root.mainline.lastOption.??(_.isCommented)) root
+              if (root.mainline.lastOption.so(_.isCommented)) root
               else
                 end.map(endComment).fold(root) { comment =>
                   root updateMainlineLast { _.setComment(comment) }
@@ -82,7 +82,7 @@ object PgnImport {
     }
 
   private def findAnnotator(pgn: ParsedPgn, contributors: List[LightUser]): Option[Comment.Author] =
-    pgn tags "annotator" map { a =>
+    pgn.tags("annotator") map { a =>
       val lowered = a.toLowerCase
       contributors.find { c =>
         c.name == lowered || c.titleName == lowered || lowered.endsWith(s"/${c.id}")
@@ -93,13 +93,13 @@ object PgnImport {
 
   private def endComment(end: End): Comment = {
     import lila.tree.Node.Comment
-    import end._
+    import end.*
     val text = s"$resultText $statusText"
     Comment(Comment.Id.make, Comment.Text(text), Comment.Author.PlayStrategy)
   }
 
   private def makeVariations(sans: List[San], game: Game, annotator: Option[Comment.Author]) =
-    sans.headOption.?? {
+    sans.headOption.so {
       _.metas.variations.flatMap { variation =>
         makeNode(game, variation.value, annotator)
       }
@@ -116,7 +116,7 @@ object PgnImport {
             (shapes ++ s),
             c orElse clock,
             (str.trim match {
-              case "" => comments
+              case ""  => comments
               case com =>
                 comments + Comment(
                   Comment.Id.make,
@@ -129,9 +129,9 @@ object PgnImport {
     }
 
   private def makeNode(prev: Game, sans: List[San], annotator: Option[Comment.Author]): Option[Node] =
-    try {
+    try
       sans match {
-        case Nil => none
+        case Nil         => none
         case san :: rest =>
           san(prev.situation).fold(
             _ => none, // illegal move; stop here.
@@ -169,7 +169,7 @@ object PgnImport {
             }
           )
       }
-    } catch {
+    catch {
       case _: StackOverflowError =>
         logger.warn(s"study PgnImport.makeNode StackOverflowError")
         None

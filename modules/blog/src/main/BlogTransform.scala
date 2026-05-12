@@ -1,7 +1,6 @@
 package lila.blog
 
 import com.github.blemale.scaffeine.LoadingCache
-import scala.concurrent.duration._
 import scala.util.matching.Regex
 
 object BlogTransform {

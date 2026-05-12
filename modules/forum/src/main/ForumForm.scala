@@ -1,8 +1,8 @@
 package lila.forum
 
 import lila.common.Form.cleanText
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 import lila.user.User
 
 final private[forum] class ForumForm(
@@ -11,7 +11,7 @@ final private[forum] class ForumForm(
 )(implicit ec: scala.concurrent.ExecutionContext)
     extends lila.hub.CaptchedForm {
 
-  import ForumForm._
+  import ForumForm.*
 
   def postMapping(user: User, inOwnTeam: Boolean) =
     mapping(
@@ -19,8 +19,8 @@ final private[forum] class ForumForm(
       "gameId"  -> text,
       "move"    -> text,
       "modIcon" -> optional(boolean)
-    )(PostData.apply)(PostData.unapply)
-      .verifying(captchaFailMessage, validateCaptcha _)
+    )(PostData.apply)(unapply)
+      .verifying(captchaFailMessage, validateCaptcha)
 
   def post(user: User, inOwnTeam: Boolean) = Form(postMapping(user, inOwnTeam))
 
@@ -28,7 +28,7 @@ final private[forum] class ForumForm(
     Form(
       mapping(
         "changes" -> userTextMapping(user, inOwnTeam)
-      )(PostEdit.apply)(PostEdit.unapply)
+      )(PostEdit.apply)(_.changes.some)
     )
 
   def postWithCaptcha(user: User, inOwnTeam: Boolean) = withCaptcha(post(user, inOwnTeam))
@@ -38,7 +38,7 @@ final private[forum] class ForumForm(
       mapping(
         "name" -> cleanText(minLength = 3, maxLength = 100),
         "post" -> postMapping(user, inOwnTeam)
-      )(TopicData.apply)(TopicData.unapply)
+      )(TopicData.apply)(unapply)
     )
 
   private def userTextMapping(user: User, inOwnTeam: Boolean) =
@@ -71,7 +71,7 @@ object ForumForm {
 
   private def mostlyUpperCase(text: String) =
     text.lengthIs > 5 && {
-      import java.lang.Character._
+      import java.lang.Character.*
       // true if >2/3 of the latin letters are upper
       (text take 300).foldLeft(0) { (i, c) =>
         getType(c) match {

@@ -1,7 +1,7 @@
 package lila.coordinate
 
 import play.api.Configuration
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 
 import lila.common.config.CollName
 

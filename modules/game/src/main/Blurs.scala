@@ -1,6 +1,6 @@
 package lila.game
 
-import ornicar.scalalib.Zero
+import alleycats.Zero
 import scala.util.Success
 
 case class Blurs(bits: Long) extends AnyVal {
@@ -11,7 +11,7 @@ case class Blurs(bits: Long) extends AnyVal {
     if (moveIndex < 0 || moveIndex > 63) this
     else Blurs(bits | (1L << moveIndex))
 
-  def asInt = ((bits >>> 32) == 0) option bits.toInt
+  def asInt = ((bits >>> 32) == 0).option(bits.toInt)
 
   def binaryString = java.lang.Long.toBinaryString(bits).reverse
 
@@ -24,9 +24,9 @@ case class Blurs(bits: Long) extends AnyVal {
 
 object Blurs {
 
-  implicit val blursZero: Zero[Blurs] = Zero.instance(Blurs(0L))
+  implicit val blursZero: Zero[Blurs] = Zero(Blurs(0L))
 
-  import reactivemongo.api.bson._
+  import reactivemongo.api.bson.*
 
   implicit private[game] val BlursBSONHandler: BSONHandler[Blurs] = lila.db.dsl.tryHandler[Blurs](
     {

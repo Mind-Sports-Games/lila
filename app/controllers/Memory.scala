@@ -1,6 +1,6 @@
 package controllers
 
-import lila.app._
+import lila.app.*
 
 final class Memory(env: Env) extends LilaController(env) {
 

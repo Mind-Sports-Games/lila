@@ -1,10 +1,9 @@
 package lila.video
 
 import org.joda.time.DateTime
-import play.api.libs.json._
+import play.api.libs.json.*
 import play.api.libs.ws.StandaloneWSClient
-import play.api.libs.ws.JsonBodyReadables._
-import scala.annotation.nowarn
+import play.api.libs.ws.JsonBodyReadables.*
 import scala.concurrent.Future
 
 final private[video] class Sheet(
@@ -13,18 +12,18 @@ final private[video] class Sheet(
     api: VideoApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import Sheet._
+  import Sheet.*
 
-  implicit private val readGStr: Reads[GStr]   = Json.reads[GStr]
-  implicit private val readEntry: Reads[Entry] = Json.reads[Entry]
+  implicit private val readGStr: Reads[GStr]          = Json.reads[GStr]
+  implicit private val readEntry: Reads[Entry]        = Json.reads[Entry]
   implicit private val readEntries: Reads[Seq[Entry]] =
-    (__ \ "feed" \ "entry").read(Reads seq readEntry)
+    (__ \ "feed" \ "entry").read(using Reads.seq(using readEntry))
 
   def select(entry: Entry) =
     entry.include && entry.lang == "en"
 
   def fetchAll: Funit =
-    fetch dmap (_ filter select) flatMap { entries =>
+    fetch.dmap(_ filter select) flatMap { entries =>
       Future
         .traverse(entries) { entry =>
           api.video
@@ -40,7 +39,7 @@ final private[video] class Sheet(
                   ads = entry.ads,
                   startTime = entry.startTime
                 )
-                (video != updated) ?? {
+                (video != updated) so {
                   logger.info(s"sheet update $updated")
                   api.video.save(updated)
                 }
@@ -59,7 +58,6 @@ final private[video] class Sheet(
                 )
                 logger.info(s"sheet insert $video")
                 api.video.save(video)
-              case _ => funit
             }
             .recover { case e: Exception =>
               logger.warn("sheet update", e)
@@ -86,7 +84,7 @@ object Sheet {
     override def toString = `$t`
   }
 
-  @nowarn case class Entry(
+  case class Entry(
       `gsx$youtubeid`: GStr,
       `gsx$youtubeauthor`: GStr,
       `gsx$title`: GStr,
@@ -101,7 +99,7 @@ object Sheet {
     def author    = `gsx$youtubeauthor`.toString.trim
     def title     = `gsx$title`.toString.trim
     def targets   = `gsx$target`.toString.split(';').map(_.trim).toList flatMap (_.toIntOption)
-    def tags =
+    def tags      =
       `gsx$tags`.toString.split(';').map(_.trim.toLowerCase).toList.filter(_.nonEmpty) ::: {
         if (targets contains 1) List("beginner")
         else if (targets contains 3) List("advanced")

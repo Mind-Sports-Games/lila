@@ -1,11 +1,9 @@
 package controllers
 
-import io.prismic.Document
-import org.apache.commons.lang3.StringUtils
-import play.api.mvc._
+import play.api.mvc.*
 
 import lila.api.Context
-import lila.app._
+import lila.app.{ *, given }
 import lila.blog.BlogApi
 import lila.common.config.MaxPerPage
 
@@ -14,7 +12,7 @@ final class Blog(
     prismicC: Prismic
 )(implicit ws: play.api.libs.ws.StandaloneWSClient)
     extends LilaController(env) {
-  import prismicC._
+  import prismicC.*
 
   private def blogApi = env.blog.api
 
@@ -29,14 +27,18 @@ final class Blog(
       }
     }
 
-  def show(id: String, slug: String, ref: Option[String]) =
+  def show(
+      id: String,
+      @annotation.nowarn("msg=unused") slug: String,
+      @annotation.nowarn("msg=unused") ref: Option[String]
+  ) =
     WithPrismic { implicit ctx => implicit prismic =>
       pageHit
       blogApi.one(prismic, id) flatMap {
         case Some(doc) => fuccess(Ok(views.html.blog.show(doc)))
         case _         => notFound
       } recoverWith {
-        case e: RuntimeException if e.getMessage contains "Not Found" => notFound
+        case e: RuntimeException if e.getMessage.contains("Not Found") => notFound
       }
     }
 
@@ -56,14 +58,14 @@ final class Blog(
       }
     }
 
-  import scala.concurrent.duration._
-  import lila.memo.CacheApi._
+  import scala.concurrent.duration.*
+  import lila.memo.CacheApi.*
   private val atomCache = env.memo.cacheApi.unit[String] {
     _.refreshAfterWrite(30.minutes)
       .buildAsyncFuture { _ =>
         blogApi.masterContext flatMap { implicit prismic =>
           blogApi.recent(prismic.api, 1, MaxPerPage(50), none) map {
-            _ ?? { docs =>
+            _ so { docs =>
               views.html.blog.atom(docs, env.net.baseUrl).render
             }
           }
@@ -74,7 +76,7 @@ final class Blog(
   def atom =
     Action.async {
       atomCache.getUnit map { xml =>
-        Ok(xml) as XML
+        Ok(xml).as(XML)
       }
     }
 
@@ -96,7 +98,7 @@ final class Blog(
   def sitemapTxt =
     Action.async {
       sitemapCache.getUnit map { txt =>
-        Ok(txt) as TEXT
+        Ok(txt).as(TEXT)
       }
     }
 
@@ -121,17 +123,17 @@ final class Blog(
       val redirect  = Redirect(routes.ForumTopic.show(categSlug, topicSlug))
       env.forum.topicRepo.existsByTree(categSlug, topicSlug) flatMap {
         case true => fuccess(redirect)
-        case _ =>
+        case _    =>
           blogApi.one(prismic.api, none, id) flatMap {
-            _ ?? { doc =>
+            _ so { doc =>
               env.forum.categRepo.bySlug(categSlug) flatMap {
-                _ ?? { categ =>
+                _ so { categ =>
                   env.forum.topicApi.makeBlogDiscuss(
                     categ = categ,
                     slug = topicSlug,
                     name = doc.getText("blog.title") | "New blog post",
                     url = s"${env.net.baseUrl}${routes.Blog
-                      .show(doc.id, urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-")))}"
+                        .show(doc.id, urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-")))}"
                   )
                 }
               } inject redirect
@@ -142,7 +144,7 @@ final class Blog(
 
   private def WithPrismic(f: Context => BlogApi.Context => Fu[Result]): Action[Unit] =
     Open { ctx =>
-      blogApi context ctx.req flatMap { prismic =>
+      blogApi.context(ctx.req) flatMap { prismic =>
         f(ctx)(prismic)
       }
     }

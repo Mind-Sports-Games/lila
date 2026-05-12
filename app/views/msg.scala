@@ -1,10 +1,10 @@
 package views.html
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 
 object msg {
@@ -16,11 +16,11 @@ object msg {
         jsModule("msg"),
         embedJsUnsafeLoadThen(
           s"""PlayStrategyMsg(${safeJsonValue(
-            Json.obj(
-              "data" -> json,
-              "i18n" -> jsI18n
-            )
-          )})"""
+              Json.obj(
+                "data" -> json,
+                "i18n" -> jsI18n
+              )
+            )})"""
         )
       ),
       title = "PlayStrategy Inbox"

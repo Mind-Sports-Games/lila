@@ -4,14 +4,12 @@ package study
 import play.api.mvc.Call
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.study.{ Order, StudyTopic, StudyTopics }
 import lila.study.Study.WithChaptersAndLiked
 import lila.user.User
-
-import controllers.routes
 
 object list {
 
@@ -133,7 +131,7 @@ object list {
     val nonMineOrder = if (order == Order.Mine) Order.Hot else order
     st.aside(cls := "page-menu__menu subnav")(
       a(cls := active.active("all"), href := routes.Study.all(nonMineOrder.key))(trans.study.allStudies()),
-      ctx.isAuth option bits.authLinks(active, nonMineOrder),
+      ctx.isAuth.option(bits.authLinks(active, nonMineOrder)),
       a(cls := List("active" -> active.startsWith("topic")), href := routes.Study.topics)("Topics"),
       topics.map { topic =>
         a(cls := active.active(s"topic:$topic"), href := routes.Study.byTopic(topic.value, order.key))(
@@ -148,8 +146,8 @@ object list {
 
   private[study] def searchForm(placeholder: String, value: String) =
     form(cls := "search", action := routes.Study.search(), method := "get")(
-      input(name := "q", st.placeholder := placeholder, st.value := value),
-      submitButton(cls := "button", dataIcon := "y")
+      input(name       := "q", st.placeholder := placeholder, st.value := value),
+      submitButton(cls := "button", dataIcon  := "y")
     )
 
   private def layout(
@@ -168,10 +166,10 @@ object list {
       moreJs = infiniteScrollTag
     ) {
       main(cls := "page-menu")(
-        menu(active, order, topics.??(_.value)),
+        menu(active, order, topics.so(_.value)),
         main(cls := "page-menu__content study-index box")(
           div(cls := "box__top")(
-            searchForm(title, s"$searchFilter${searchFilter.nonEmpty ?? " "}"),
+            searchForm(title, s"$searchFilter${searchFilter.nonEmpty so " "}"),
             bits.orderSelect(order, active, url),
             bits.newForm()
           ),

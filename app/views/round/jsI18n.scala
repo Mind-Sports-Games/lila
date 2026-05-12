@@ -2,8 +2,8 @@ package views.html.round
 
 import play.api.i18n.Lang
 
-import lila.app.templating.Environment._
-import lila.i18n.{ I18nKeys => trans }
+import lila.app.templating.Environment.*
+import lila.i18n.I18nKeys as trans
 
 object jsI18n {
 
@@ -13,13 +13,13 @@ object jsI18n {
         if (g.isCorrespondence) correspondenceTranslations
         else realtimeTranslations
       } ++ {
-        g.variant.exotic ?? variantTranslations
+        g.variant.exotic so variantTranslations
       } ++ {
-        g.isTournament ?? tournamentTranslations
+        g.isTournament so tournamentTranslations
       } ++ {
-        g.isSwiss ?? swissTranslations
+        g.isSwiss so swissTranslations
       } ++ {
-        g.metadata.multiMatch.isDefined ?? multiMatchTranslations
+        g.metadata.multiMatch.isDefined so multiMatchTranslations
       }
     }
 

@@ -1,11 +1,11 @@
 package lila.mod
 
-import akka.actor._
-import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import akka.actor.*
+import com.softwaremill.macwire.*
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.common.config._
+import lila.common.config.*
 import lila.user.User
 
 @Module
@@ -47,7 +47,7 @@ final class Env(
     system: ActorSystem
 ) {
 
-  private val config = appConfig.get[ModConfig]("mod")(AutoConfig.loader)
+  private val config = appConfig.get[ModConfig]("mod")(using AutoConfig.loader)
 
   private def scheduler = system.scheduler
 
@@ -86,7 +86,7 @@ final class Env(
   lila.common.Bus.subscribeFuns(
     "finishGame" -> {
       case lila.game.actorApi.FinishGame(game, p1UserOption, p2UserOption) if !game.aborted =>
-        import cats.implicits._
+        import cats.implicits.*
         (p1UserOption, p2UserOption) mapN { (p1User, p2User) =>
           sandbagWatch(game)
           assessApi.onGameReady(game, p1User, p2User)
@@ -95,7 +95,7 @@ final class Env(
           game.loserUserId foreach { userId =>
             logApi.cheatDetected(userId, game.id) >>
               logApi.countRecentCheatDetected(userId) flatMap { count =>
-                (count >= 3) ?? {
+                (count >= 3) so {
                   if (game.hasClock)
                     api.autoMark(
                       lila.report.SuspectId(userId),
@@ -108,33 +108,33 @@ final class Env(
           }
     },
     "analysisReady" -> { case lila.analyse.actorApi.AnalysisReady(game, analysis) =>
-      assessApi.onAnalysisReady(game, analysis).unit
+      assessApi.onAnalysisReady(game, analysis).discard
     },
     "garbageCollect" -> {
       case lila.hub.actorApi.security.GCImmediateSb(userId) =>
-        reportApi getSuspect userId orFail s"No such suspect $userId" foreach { sus =>
+        reportApi.getSuspect(userId).orFail(s"No such suspect $userId") foreach { sus =>
           reportApi.getPlayStrategyMod foreach { mod =>
             api.setTroll(mod, sus, value = true)
           }
         }
       case lila.hub.actorApi.security.GarbageCollect(userId) =>
-        reportApi getSuspect userId orFail s"No such suspect $userId" foreach { sus =>
+        reportApi.getSuspect(userId).orFail(s"No such suspect $userId") foreach { sus =>
           api.garbageCollect(sus) >> publicChat.deleteAll(sus)
         }
     },
     "deletePublicChats" -> { case lila.hub.actorApi.security.DeletePublicChats(userId) =>
-      publicChat.deleteAll(userId).unit
+      publicChat.deleteAll(userId).discard
     },
     "autoWarning" -> { case lila.hub.actorApi.mod.AutoWarning(userId, subject) =>
-      logApi.modMessage(User.playstrategyId, userId, subject).unit
+      logApi.modMessage(User.playstrategyId, userId, subject).discard
     },
     "selfReportMark" -> { case lila.hub.actorApi.mod.SelfReportMark(suspectId, name) =>
       api
         .autoMark(lila.report.SuspectId(suspectId), lila.report.ModId.playstrategy, s"Self report: ${name}")
-        .unit
+        .discard
     },
     "chatTimeout" -> { case lila.hub.actorApi.mod.ChatTimeout(mod, user, reason, text) =>
-      logApi.chatTimeout(mod, user, reason, text).unit
+      logApi.chatTimeout(mod, user, reason, text).discard
     }
   )
 }

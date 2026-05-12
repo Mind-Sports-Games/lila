@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ GameLogic, Player => PlayerIndex, Status }
+import strategygames.{ GameLogic, Player as PlayerIndex, Status }
 import strategygames.variant.Variant
 
 import lila.user.User
@@ -26,7 +26,7 @@ case class LightGame(
 
 object LightGame {
 
-  import Game.{ BSONFields => F }
+  import Game.BSONFields as F
 
   def projection =
     lila.db.dsl.$doc(

@@ -6,13 +6,11 @@ import strategygames.variant.Variant
 import strategygames.GameLogic
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 import lila.rating.PerfType.iconByVariant
 import lila.i18n.VariantKeys
-
-import controllers.routes
 
 object userAnalysis {
 
@@ -40,25 +38,27 @@ object userAnalysis {
       title = trans.analysis.txt(),
       moreCss = frag(
         cssTag("analyse.free"),
-        (pov.game.variant.hasDetachedPocket) option cssTag(
-          "analyse.zh"
+        pov.game.variant.hasDetachedPocket.option(
+          cssTag(
+            "analyse.zh"
+          )
         ),
-        withForecast option cssTag("analyse.forecast"),
-        ctx.blind option cssTag("round.nvui")
+        withForecast.option(cssTag("analyse.forecast")),
+        ctx.blind.option(cssTag("round.nvui"))
       ),
       moreJs = frag(
         analyseTag,
         analyseNvuiTag,
         embedJsUnsafe(s"""playstrategy.userAnalysis=${safeJsonValue(
-          Json.obj(
-            "data" -> data,
-            "i18n" -> userAnalysisI18n(withForecast = withForecast),
-            "explorer" -> Json.obj(
-              "endpoint"          -> explorerEndpoint,
-              "tablebaseEndpoint" -> tablebaseEndpoint
+            Json.obj(
+              "data"     -> data,
+              "i18n"     -> userAnalysisI18n(withForecast = withForecast),
+              "explorer" -> Json.obj(
+                "endpoint"          -> explorerEndpoint,
+                "tablebaseEndpoint" -> tablebaseEndpoint
+              )
             )
-          )
-        )}""")
+          )}""")
       ),
       csp = defaultCsp.withWebAssembly.some,
       chessground = false,
@@ -72,19 +72,21 @@ object userAnalysis {
       zoomable = true
     ) {
       main(cls := "analyse")(
-        pov.game.synthetic option st.aside(cls := "analyse__side")(
-          views.html.base.bits.mselect(
-            "analyse-variant",
-            span(cls := "text", dataIcon := iconByVariant(pov.game.variant))(
-              VariantKeys.variantName(pov.game.variant)
-            ),
-            analysisVariants.map { v =>
-              a(
-                dataIcon := iconByVariant(v),
-                cls := (pov.game.variant == v).option("current"),
-                href := routes.UserAnalysis.parseArg(v.key)
-              )(VariantKeys.variantName(v))
-            }
+        pov.game.synthetic.option(
+          st.aside(cls := "analyse__side")(
+            views.html.base.bits.mselect(
+              "analyse-variant",
+              span(cls := "text", dataIcon := iconByVariant(pov.game.variant))(
+                VariantKeys.variantName(pov.game.variant)
+              ),
+              analysisVariants.map { v =>
+                a(
+                  dataIcon := iconByVariant(v),
+                  cls      := (pov.game.variant == v).option("current"),
+                  href     := routes.UserAnalysis.parseArg(v.key)
+                )(VariantKeys.variantName(v))
+              }
+            )
           )
         ),
         div(cls := "analyse__board main-board")(chessgroundBoard),

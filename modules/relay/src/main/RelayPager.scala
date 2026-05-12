@@ -4,13 +4,13 @@ import reactivemongo.api.ReadPreference
 
 import lila.common.config.MaxPerPage
 import lila.common.paginator.{ AdapterLike, Paginator }
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final class RelayPager(tourRepo: RelayTourRepo, roundRepo: RelayRoundRepo)(implicit
     ec: scala.concurrent.ExecutionContext
 ) {
 
-  import BSONHandlers._
+  import BSONHandlers.*
 
   def inactive(page: Int): Fu[Paginator[RelayTour.WithLastRound]] =
     Paginator(
@@ -20,16 +20,16 @@ final class RelayPager(tourRepo: RelayTourRepo, roundRepo: RelayRoundRepo)(impli
 
         def slice(offset: Int, length: Int): Fu[List[RelayTour.WithLastRound]] =
           tourRepo.coll
-            .aggregateList(length, readPreference = ReadPreference.secondaryPreferred) { framework =>
-              import framework._
+            .aggregateList(maxDocs = length, ReadPreference.secondaryPreferred) { framework =>
+              import framework.*
               Match(tourRepo.selectors.official ++ tourRepo.selectors.inactive) -> List(
                 Sort(Descending("syncedAt")),
                 PipelineOperator(
                   $doc(
                     "$lookup" -> $doc(
-                      "from" -> roundRepo.coll.name,
-                      "as"   -> "round",
-                      "let"  -> $doc("id" -> "$_id"),
+                      "from"     -> roundRepo.coll.name,
+                      "as"       -> "round",
+                      "let"      -> $doc("id" -> "$_id"),
                       "pipeline" -> $arr(
                         $doc(
                           "$match" -> $doc(

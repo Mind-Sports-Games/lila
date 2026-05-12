@@ -2,14 +2,12 @@ package views.html
 package account
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
-import controllers.routes
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object passwd {
 
-  def apply(form: play.api.data.Form[_])(implicit ctx: Context) =
+  def apply(form: play.api.data.Form[?])(implicit ctx: Context) =
     account.layout(
       title = trans.changePassword.txt(),
       active = "password",

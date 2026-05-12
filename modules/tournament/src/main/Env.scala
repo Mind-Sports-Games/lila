@@ -1,12 +1,12 @@
 package lila.tournament
 
-import akka.actor._
-import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import akka.actor.*
+import com.softwaremill.macwire.*
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-import lila.common.config._
+import lila.common.config.*
 import lila.socket.Socket.{ GetVersion, SocketVersion }
 import lila.user.User
 
@@ -36,7 +36,7 @@ final class Env(
     lightUserApi: lila.user.LightUserApi,
     onStart: lila.round.OnStart,
     historyApi: lila.history.HistoryApi,
-    //swissApi: lila.swiss.SwissApi,
+    // swissApi: lila.swiss.SwissApi,
     trophyApi: lila.user.TrophyApi,
     remoteSocketApi: lila.socket.RemoteSocket,
     discordApi: lila.irc.DiscordApi
@@ -49,7 +49,7 @@ final class Env(
     mode: play.api.Mode
 ) {
 
-  private val config = appConfig.get[TournamentConfig]("tournament")(AutoConfig.loader)
+  private val config = appConfig.get[TournamentConfig]("tournament")(using AutoConfig.loader)
 
   lazy val forms = wire[TournamentForm]
 
@@ -82,11 +82,12 @@ final class Env(
   private lazy val apiCallbacks = TournamentApi.Callbacks(
     clearJsonViewCache = jsonView.clearCache,
     clearWinnersCache = winners.clearCache,
-    clearTrophyCache = tour =>
-      {
-        if (tour.isShield) scheduler.scheduleOnce(10 seconds) { shieldApi.clear() }
-        else if (Revolution is tour) scheduler.scheduleOnce(10 seconds) { revolutionApi.clear() }.unit
-      }.unit,
+    clearTrophyCache = tour => {
+      if (tour.isShield) { val _ = scheduler.scheduleOnce(10 seconds) { shieldApi.clear() } }
+      else if (Revolution.is(tour)) {
+        val _ = scheduler.scheduleOnce(10 seconds) { revolutionApi.clear() }
+      }
+    },
     indexLeaderboard = leaderboardIndexer.indexOne
   )
 
@@ -128,7 +129,7 @@ final class Env(
   }
 
   def version(tourId: Tournament.ID): Fu[SocketVersion] =
-    socket.rooms.ask[SocketVersion](tourId)(GetVersion)
+    socket.rooms.ask[SocketVersion](tourId)(GetVersion.apply)
 
   // is that user playing a game of this tournament
   // or hanging out in the tournament lobby (joined or not)

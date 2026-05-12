@@ -2,7 +2,7 @@ package lila.app
 package templating
 
 import lila.api.Context
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 
 trait FlashHelper { self: I18nHelper =>
 
@@ -31,7 +31,7 @@ trait FlashHelper { self: I18nHelper =>
     }
 
   def flashMessage(modifiers: Seq[Modifier])(msg: Frag): Frag =
-    flashMessage(modifiers: _*)(msg)
+    flashMessage(modifiers*)(msg)
 
   def flashMessage(modifiers: Modifier*)(contentModifiers: Modifier*): Frag =
     div(modifiers)(cls := "flash")(

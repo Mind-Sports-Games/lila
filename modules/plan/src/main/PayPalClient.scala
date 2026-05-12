@@ -1,14 +1,15 @@
 package lila.plan
 
-import play.api.libs.json._
-import play.api.libs.ws.DefaultBodyWritables._
-import play.api.libs.ws.JsonBodyReadables._
-import play.api.libs.ws.JsonBodyWritables._
+import play.api.libs.json.*
+import play.api.libs.ws.DefaultBodyWritables.*
+import play.api.libs.ws.JsonBodyReadables.*
+import play.api.libs.ws.JsonBodyWritables.*
 import play.api.libs.ws.WSAuthScheme
 import play.api.libs.ws.{ StandaloneWSClient, StandaloneWSResponse }
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import lila.common.config
+import lila.common.extensions.*
 import lila.memo.CacheApi
 import lila.user.User
 import play.api.libs.ws.StandaloneWSRequest
@@ -20,9 +21,9 @@ final private class PayPalClient(
     cacheApi: CacheApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import PayPalClient._
-  import JsonHandlers._
-  import JsonHandlers.payPal._
+  import PayPalClient.*
+  import JsonHandlers.*
+  import JsonHandlers.payPal.*
 
   private object path {
     val orders                     = "v2/checkout/orders"
@@ -43,14 +44,14 @@ final private class PayPalClient(
   def createOrder(data: CreatePayPalOrder): Fu[PayPalOrderCreated] = postOne[PayPalOrderCreated](
     path.orders,
     Json.obj(
-      "intent" -> "CAPTURE",
+      "intent"         -> "CAPTURE",
       "purchase_units" -> List(
         Json.obj(
           "custom_id" -> data.makeCustomId,
-          "amount" -> Json.obj(
+          "amount"    -> Json.obj(
             "currency_code" -> "USD",
             "value"         -> data.checkout.amount.usd.value,
-            "breakdown" -> Json.obj(
+            "breakdown"     -> Json.obj(
               "item_total" -> Json.obj("currency_code" -> "USD", "value" -> data.checkout.amount.usd.value)
             )
           )
@@ -58,7 +59,7 @@ final private class PayPalClient(
       ),
       "items" -> List(
         Json.obj(
-          "name"        -> "One-time Patron",
+          "name" -> "One-time Patron",
           "description" -> "Support PlayStrategy and get the Patron wings for one month. Will not renew automatically.",
           "unit_amount" -> Json.obj("currency_code" -> "USD", "value" -> data.checkout.amount.usd.value),
           "quantity"    -> 1
@@ -74,11 +75,11 @@ final private class PayPalClient(
         Json.obj(
           "plan_id"   -> plan.id.value,
           "custom_id" -> user.id,
-          "plan" -> Json.obj(
+          "plan"      -> Json.obj(
             "billing_cycles" -> Json.arr(
               Json.obj(
-                "sequence"     -> 1,
-                "total_cycles" -> 0,
+                "sequence"       -> 1,
+                "total_cycles"   -> 0,
                 "pricing_scheme" -> Json.obj(
                   "fixed_price" -> Json.obj("currency_code" -> "USD", "value" -> checkout.amount.usd.value)
                 )
@@ -115,30 +116,31 @@ final private class PayPalClient(
   private val plansPerPage = 20
 
   def getPlans(page: Int = 1): Fu[List[PayPalPlan]] =
-    get(s"${path.plans}?product_id=$patronMonthProductId&page_size=$plansPerPage&page=$page") {
-      (__ \ "plans").read[List[PayPalPlan]]
-    }.flatMap { plans =>
-      if (plans.size == plansPerPage) getPlans(page + 1).map(plans ::: _)
-      else fuccess(plans)
-    }.map(_.filter(_.active))
+    get[List[PayPalPlan]](
+      s"${path.plans}?product_id=$patronMonthProductId&page_size=$plansPerPage&page=$page"
+    )(using (__ \ "plans").read[List[PayPalPlan]])
+      .flatMap { plans =>
+        if (plans.size == plansPerPage) getPlans(page + 1).map(plans ::: _)
+        else fuccess(plans)
+      }.map(_.filter(_.active))
 
   def createPlan: Fu[PayPalPlan] =
     postOne[PayPalPlan](
       path.plans,
       Json.obj(
-        "product_id"  -> patronMonthProductId,
-        "name"        -> s"Monthly Patron USD",
+        "product_id" -> patronMonthProductId,
+        "name"       -> s"Monthly Patron USD",
         "description" -> s"Support PlayStrategy and get Patron wings. The subscription is renewed every month. Currency: USD",
-        "status"      -> "ACTIVE",
+        "status"         -> "ACTIVE",
         "billing_cycles" -> Json.arr(
           Json.obj(
             "frequency" -> Json.obj(
               "interval_unit"  -> "MONTH",
               "interval_count" -> 1
             ),
-            "tenure_type"  -> "REGULAR",
-            "sequence"     -> 1,
-            "total_cycles" -> 0,
+            "tenure_type"    -> "REGULAR",
+            "sequence"       -> 1,
+            "total_cycles"   -> 0,
             "pricing_scheme" -> Json.obj(
               "fixed_price" -> Json.obj(
                 "value"         -> "1",
@@ -155,7 +157,7 @@ final private class PayPalClient(
     )
 
   private def getOne[A: Reads](url: String): Fu[Option[A]] =
-    get[A](url) dmap some recover { case _: NotFoundException =>
+    get[A](url).dmap(some) recover { case _: NotFoundException =>
       None
     }
 
@@ -176,7 +178,7 @@ final private class PayPalClient(
     request(url) flatMap { _.post(data) } void
   }
 
-  private val logger = lila.plan.logger branch "payPal"
+  private val logger = lila.plan.logger.branch("payPal")
 
   private def request(url: String) = tokenCache.get {} map { bearer =>
     ws.url(s"${config.endpoint}/$url")
@@ -210,10 +212,10 @@ final private class PayPalClient(
         .post(Map("grant_type" -> Seq("client_credentials")))
         .flatMap {
           case res if res.status != 200 =>
-            fufail(s"PayPal access token ${res.statusText} ${res.body take 200}")
+            fufail(s"PayPal access token ${res.statusText} ${res.body.toString.take(200)}")
           case res =>
             (res.body[JsValue] \ "access_token").validate[String] match {
-              case JsError(err)        => fufail(s"PayPal access token ${err} ${res.body take 200}")
+              case JsError(err)        => fufail(s"PayPal access token ${err} ${res.body.toString.take(200)}")
               case JsSuccess(token, _) => fuccess(AccessToken(token))
             }
         }
@@ -221,15 +223,14 @@ final private class PayPalClient(
     }
   }
 
-  private def fixInput(in: Seq[(String, Any)]): Seq[(String, String)] =
-    in flatMap {
-      case (name, Some(x)) => Some(name -> x.toString)
-      case (_, None)       => None
-      case (name, x)       => Some(name -> x.toString)
-    }
-
-  private def debugInput(data: Seq[(String, Any)]) =
-    fixInput(data) map { case (k, v) => s"$k=$v" } mkString " "
+  // private def fixInput(in: Seq[(String, Any)]): Seq[(String, String)] =
+  // in flatMap {
+  //   case (name, Some(x)) => Some(name -> x.toString)
+  //   case (_, None)       => None
+  //   case (name, x)       => Some(name -> x.toString)
+  // }
+  // private def debugInput(data: Seq[(String, Any)]) =
+  //   fixInput(data) map { case (k, v) => s"$k=$v" } mkString " "
 }
 
 object PayPalClient {
@@ -243,13 +244,13 @@ object PayPalClient {
   case class CantParseException(json: JsValue, err: JsError)
       extends PayPalException(s"[payPal] Can't parse $json --- ${err.errors}")
 
-  import io.methvin.play.autoconfig._
+  import lila.common.autoconfig.{ AutoConfig, ConfigName }
   private[plan] case class Config(
       endpoint: String,
       @ConfigName("products.monthly") monthly: String,
       @ConfigName("keys.public") publicKey: String,
       @ConfigName("keys.secret") secretKey: config.Secret
   )
-  //implicit private[plan] val productsLoader     = AutoConfig.loader[ProductIds]
+  // implicit private[plan] val productsLoader     = AutoConfig.loader[ProductIds]
   implicit private[plan] val payPalConfigLoader: ConfigLoader[Config] = AutoConfig.loader[Config]
 }

@@ -3,16 +3,14 @@ package views.html.auth
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
-import controllers.routes
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object checkYourEmail {
 
   def apply(
       userEmail: Option[lila.security.EmailConfirm.UserEmail],
-      form: Option[Form[_]] = None
+      form: Option[Form[?]] = None
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = "Check your email",
@@ -33,11 +31,11 @@ object checkYourEmail {
               br,
               postForm(action := routes.Auth.fixEmail)(
                 input(
-                  id := "new-email",
+                  id  := "new-email",
                   tpe := "email",
                   required,
-                  name := "email",
-                  value := form.flatMap(_("email").value).getOrElse(email.value),
+                  name    := "email",
+                  value   := form.flatMap(_("email").value).getOrElse(email.value),
                   pattern := s"^((?!^${email.value}$$).)*$$"
                 ),
                 embedJsUnsafeLoadThen("""

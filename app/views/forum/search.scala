@@ -1,12 +1,10 @@
 package views.html.forum
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.common.String.html.nl2br
-
-import controllers.routes
 
 object search {
 

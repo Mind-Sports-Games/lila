@@ -1,8 +1,8 @@
 package views.html
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object mobile {
 
@@ -47,18 +47,18 @@ object mobile {
             ),
             div(cls := "right-side")(
               img(
-                cls := "nexus5-playing",
-                width := "268",
+                cls    := "nexus5-playing",
+                width  := "268",
                 height := "513",
-                src := staticAssetUrl("images/mobile/nexus5-playing.png"),
-                alt := "PlayStrategy mobile on nexus 5"
+                src    := staticAssetUrl("images/mobile/nexus5-playing.png"),
+                alt    := "PlayStrategy mobile on nexus 5"
               ),
               img(
-                cls := "qrcode",
-                width := "200",
+                cls    := "qrcode",
+                width  := "200",
                 height := "200",
-                src := staticAssetUrl("images/mobile/dynamic-qrcode.png"),
-                alt := "Download QR code"
+                src    := staticAssetUrl("images/mobile/dynamic-qrcode.png"),
+                alt    := "Download QR code"
               )
             )
           )

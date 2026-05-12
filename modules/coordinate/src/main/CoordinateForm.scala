@@ -1,7 +1,7 @@
 package lila.coordinate
 
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
 object CoordinateForm {
 
@@ -15,7 +15,7 @@ object CoordinateForm {
     mapping(
       "playerIndex" -> text.verifying(Set("p1", "p2") contains _),
       "score"       -> number(min = 0, max = 100)
-    )(ScoreData.apply)(ScoreData.unapply)
+    )(ScoreData.apply)(unapply)
   )
 
   case class ScoreData(playerIndex: String, score: Int) {

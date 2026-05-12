@@ -1,16 +1,16 @@
 package controllers
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import scala.annotation.nowarn
 
 import lila.api.Context
-import lila.app._
-import lila.practice.JsonView._
+import lila.app.{ *, given }
+import lila.practice.JsonView.*
 import lila.practice.{ PracticeSection, PracticeStudy, UserStudy }
 import lila.study.Study.WithChapter
-import lila.study.{ Chapter, Study => StudyModel }
+import lila.study.{ Chapter, Study as StudyModel }
 import lila.tree.Node.partitionTreeJsonWriter
-import views._
+import views.*
 
 final class Practice(
     env: Env,
@@ -28,8 +28,8 @@ final class Practice(
     }
 
   def show(
-      @nowarn("cat=unused") sectionId: String,
-      @nowarn("cat=unused") studySlug: String,
+      @nowarn("msg=unused") sectionId: String,
+      @nowarn("msg=unused") studySlug: String,
       studyId: String
   ) =
     Open { implicit ctx =>
@@ -37,8 +37,8 @@ final class Practice(
     }
 
   def showChapter(
-      @nowarn("cat=unused") sectionId: String,
-      @nowarn("cat=unused") studySlug: String,
+      @nowarn("msg=unused") sectionId: String,
+      @nowarn("msg=unused") studySlug: String,
       studyId: String,
       chapterId: String
   ) =
@@ -56,7 +56,7 @@ final class Practice(
     Open { implicit ctx =>
       api.structure.get.flatMap { struct =>
         struct.sections.find(_.id == sectionId).fold(notFound) { section =>
-          select(section) ?? { study =>
+          select(section) so { study =>
             Redirect(routes.Practice.show(section.id, study.slug, study.id.value)).fuccess
           }
         }
@@ -101,7 +101,7 @@ final class Practice(
         env.study.jsonView(study, chapters, chapter, ctx.me) map { studyJson =>
           val initialFen = chapter.root.fen.some
           val pov        = userAnalysisC.makePov(initialFen, chapter.setup.variant)
-          val baseData = env.round.jsonView
+          val baseData   = env.round.jsonView
             .userAnalysisJson(
               pov,
               ctx.pref,
@@ -145,8 +145,7 @@ final class Practice(
         FormFuResult(form) { err =>
           api.structure.get map { html.practice.config(_, err) }
         } { text =>
-          ~api.config.set(text).toOption >>-
-            api.structure.clear() >>
+          (~api.config.set(text).toOption).andDo(api.structure.clear()) >>
             env.mod.logApi.practiceConfig(me.id) inject Redirect(routes.Practice.config)
         }
       }

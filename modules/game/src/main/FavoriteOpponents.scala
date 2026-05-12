@@ -1,7 +1,5 @@
 package lila.game
 
-import scala.concurrent.duration._
-
 import lila.user.{ User, UserRepo }
 
 final class FavoriteOpponents(
@@ -20,7 +18,7 @@ final class FavoriteOpponents(
 
   def apply(userId: String): Fu[List[(User, Int)]] =
     userIdsCache get userId flatMap { opponents =>
-      userRepo enabledByIds opponents.map(_._1) map {
+      userRepo.enabledByIds(opponents.map(_._1)) map {
         _ flatMap { user =>
           opponents find (_._1 == user.id) map { opponent =>
             user -> opponent._2

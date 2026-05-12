@@ -1,6 +1,6 @@
 package lila.api
 
-import cats.implicits._
+import cats.implicits.*
 import scala.concurrent.ExecutionContext
 
 import lila.chat.UserLine
@@ -33,10 +33,10 @@ final private class LinkCheck(
     studyRepo: StudyRepo
 )(implicit ec: ExecutionContext) {
 
-  import LinkCheck._
+  import LinkCheck.*
 
   def apply(line: UserLine, source: PublicSource): Fu[Boolean] =
-    if (multipleLinks find line.text) fuFalse
+    if (multipleLinks.find(line.text)) fuFalse
     else
       line.text match {
         case tournamentLinkR(id) => withSource(source, tourLink)(id, line)
@@ -52,15 +52,15 @@ final private class LinkCheck(
       f: (String, FullSource) => Fu[Boolean]
   )(id: String, line: UserLine): Fu[Boolean] = {
     source match {
-      case PublicSource.Tournament(id) => tournamentRepo byId id map2 FullSource.TournamentSource
-      case PublicSource.Simul(id)      => simulApi find id map2 FullSource.SimulSource
-      case PublicSource.Swiss(id)      => swissApi byId Swiss.Id(id) map2 FullSource.SwissSource
-      case PublicSource.Team(id)       => teamRepo byId id map2 FullSource.TeamSource
-      case PublicSource.Study(id)      => studyRepo byId Study.Id(id) map2 FullSource.StudySource
+      case PublicSource.Tournament(id) => tournamentRepo.byId(id).map2(FullSource.TournamentSource.apply)
+      case PublicSource.Simul(id)      => simulApi.find(id).map2(FullSource.SimulSource.apply)
+      case PublicSource.Swiss(id)      => swissApi.byId(Swiss.Id(id)).map2(FullSource.SwissSource.apply)
+      case PublicSource.Team(id)       => teamRepo.byId(id).map2(FullSource.TeamSource.apply)
+      case PublicSource.Study(id)      => studyRepo.byId(Study.Id(id)).map2(FullSource.StudySource.apply)
       case _                           => fuccess(none)
     }
   } flatMap {
-    _ ?? { source =>
+    _ so { source =>
       // the owners of a chat can post whichever link they like
       if (source.owners(line.userId)) fuTrue
       else f(id, source)
@@ -68,10 +68,10 @@ final private class LinkCheck(
   }
 
   private def tourLink(tourId: Tournament.ID, source: FullSource) =
-    tournamentRepo byId tourId flatMap {
-      _ ?? { tour =>
+    tournamentRepo.byId(tourId) flatMap {
+      _ so { tour =>
         fuccess(tour.isScheduled) >>| {
-          source.teamId ?? { sourceTeamId =>
+          source.teamId so { sourceTeamId =>
             fuccess(tour.conditions.teamMember.exists(_.teamId == sourceTeamId)) >>|
               tournamentRepo.isForTeam(tour.id, sourceTeamId)
           }
@@ -80,18 +80,20 @@ final private class LinkCheck(
     }
 
   private def simulLink(simulId: Tournament.ID, source: FullSource) =
-    simulApi teamOf simulId map {
+    simulApi.teamOf(simulId) map {
       _ exists source.teamId.has
     }
 
   private def swissLink(swissId: String, source: FullSource) =
-    swissApi teamOf Swiss.Id(swissId) map {
+    swissApi.teamOf(Swiss.Id(swissId)) map {
       _ exists source.teamId.has
     }
 
-  private def studyLink(studyId: String, source: FullSource) = fuFalse
+  @annotation.nowarn("msg=unused")
+  private def studyLink(_studyId: String, _source: FullSource) = fuFalse
 
-  private def teamLink(teamId: String, source: FullSource) = fuFalse
+  @annotation.nowarn("msg=unused")
+  private def teamLink(_teamId: String, _source: FullSource) = fuFalse
 
   private val multipleLinks   = s"(?i)$domain.+$domain".r.unanchored
   private val tournamentLinkR = s"(?i)$domain/tournament/(\\w+)".r.unanchored

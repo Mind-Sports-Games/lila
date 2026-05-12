@@ -1,8 +1,8 @@
 package lila.perfStat
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.rating.BSONHandlers.perfTypeIdHandler
 import lila.rating.PerfType
 
@@ -10,13 +10,13 @@ final class PerfStatStorage(coll: Coll)(implicit ec: scala.concurrent.ExecutionC
 
   implicit private val UserIdBSONHandler: BSONHandler[UserId] =
     stringAnyValHandler[UserId](_.value, UserId.apply)
-  implicit private val RatingAtBSONHandler: BSONDocumentHandler[RatingAt]     = Macros.handler[RatingAt]
-  implicit private val GameAtBSONHandler: BSONDocumentHandler[GameAt]         = Macros.handler[GameAt]
-  implicit private val ResultBSONHandler: BSONDocumentHandler[Result]         = Macros.handler[Result]
-  implicit private val ResultsBSONHandler: BSONDocumentHandler[Results]       = Macros.handler[Results]
-  implicit private val StreakBSONHandler: BSONDocumentHandler[Streak]         = Macros.handler[Streak]
-  implicit private val StreaksBSONHandler: BSONDocumentHandler[Streaks]       = Macros.handler[Streaks]
-  implicit private val PlayStreakBSONHandler: BSONDocumentHandler[PlayStreak] = Macros.handler[PlayStreak]
+  implicit private val RatingAtBSONHandler: BSONDocumentHandler[RatingAt]         = Macros.handler[RatingAt]
+  implicit private val GameAtBSONHandler: BSONDocumentHandler[GameAt]             = Macros.handler[GameAt]
+  implicit private val ResultBSONHandler: BSONDocumentHandler[Result]             = Macros.handler[Result]
+  implicit private val ResultsBSONHandler: BSONDocumentHandler[Results]           = Macros.handler[Results]
+  implicit private val StreakBSONHandler: BSONDocumentHandler[Streak]             = Macros.handler[Streak]
+  implicit private val StreaksBSONHandler: BSONDocumentHandler[Streaks]           = Macros.handler[Streaks]
+  implicit private val PlayStreakBSONHandler: BSONDocumentHandler[PlayStreak]     = Macros.handler[PlayStreak]
   implicit private val ResultStreakBSONHandler: BSONDocumentHandler[ResultStreak] =
     Macros.handler[ResultStreak]
   implicit private val AvgBSONHandler: BSONDocumentHandler[Avg]           = Macros.handler[Avg]
@@ -40,7 +40,7 @@ final class PerfStatStorage(coll: Coll)(implicit ec: scala.concurrent.ExecutionC
           resultsDiff(a, b)(_.worstLosses).map { set =>
             "worstLosses" -> set
           },
-          (a.worstLosses != b.worstLosses).??(ResultsBSONHandler.writeOpt(b.worstLosses)) map { worstLosses =>
+          (a.worstLosses != b.worstLosses).so(ResultsBSONHandler.writeOpt(b.worstLosses)) map { worstLosses =>
             "worstLosses" -> worstLosses
           },
           streakDiff(a, b)(_.resultStreak.win.cur).map { set =>
@@ -85,14 +85,14 @@ final class PerfStatStorage(coll: Coll)(implicit ec: scala.concurrent.ExecutionC
   }
 
   private def resultsDiff(a: PerfStat, b: PerfStat)(getter: PerfStat => Results): Option[Bdoc] =
-    (getter(a) != getter(b)) ?? ResultsBSONHandler.writeOpt(getter(b))
+    (getter(a) != getter(b)) so ResultsBSONHandler.writeOpt(getter(b))
 
   private def streakDiff(a: PerfStat, b: PerfStat)(getter: PerfStat => Streak): Option[Bdoc] =
-    (getter(a) != getter(b)) ?? StreakBSONHandler.writeOpt(getter(b))
+    (getter(a) != getter(b)) so StreakBSONHandler.writeOpt(getter(b))
 
   private def ratingAtDiff(a: PerfStat, b: PerfStat)(getter: PerfStat => Option[RatingAt]): Option[Bdoc] =
-    getter(b) ?? { r =>
-      getter(a).fold(true)(_ != r) ?? RatingAtBSONHandler.writeOpt(r)
+    getter(b) so { r =>
+      getter(a).fold(true)(_ != r) so RatingAtBSONHandler.writeOpt(r)
     }
 
   private def docDiff[T: BSONDocumentWriter](a: T, b: T): Map[String, BSONValue] = {

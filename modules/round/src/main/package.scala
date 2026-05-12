@@ -11,9 +11,9 @@ package object round extends PackageObject {
 
 package round {
 
-  trait BenignError                        extends lila.base.LilaException
-  case class ClientError(message: String)  extends BenignError
-  case class FishnetError(message: String) extends BenignError
+  trait BenignError                                  extends lila.base.LilaException
+  case class ClientError(message: String)            extends BenignError
+  case class FishnetError(message: String)           extends BenignError
   case class GameIsFinishedError(pov: lila.game.Pov) extends BenignError {
     val message = s"$pov game is finished"
   }

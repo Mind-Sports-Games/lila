@@ -1,23 +1,21 @@
 package views.html.swiss
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-import lila.i18n.{ I18nKeys => trans, VariantKeys }
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
+import lila.i18n.{ I18nKeys as trans, VariantKeys }
 import lila.swiss.Swiss
 import strategygames.variant.Variant
 
-import controllers.routes
-
 object bits {
 
-  def link(swiss: Swiss): Frag      = link(swiss.id, swiss.name)
-  def link(swissId: Swiss.Id): Frag = link(swissId, idToName(swissId))
+  def link(swiss: Swiss): Frag                    = link(swiss.id, swiss.name)
+  def link(swissId: Swiss.Id): Frag               = link(swissId, idToName(swissId))
   def link(swissId: Swiss.Id, name: String): Frag =
     a(
       dataIcon := "g",
-      cls := "text",
-      href := routes.Swiss.show(swissId.value).url
+      cls      := "text",
+      href     := routes.Swiss.show(swissId.value).url
     )(name)
 
   def idToName(id: Swiss.Id): String = env.swiss.getName(id) getOrElse "Tournament"
@@ -81,7 +79,7 @@ object bits {
       case Some(1)                         => frag("One round per day")
       case Some(d)                         => frag(s"One round every $d days")
       case None if s.settings.manualRounds => frag("Rounds are started manually")
-      case None =>
+      case None                            =>
         frag(
           if (s.settings.intervalSeconds < 60) pluralize("second", s.settings.intervalSeconds)
           else pluralize("minute", s.settings.intervalSeconds / 60),

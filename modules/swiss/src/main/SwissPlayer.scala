@@ -32,10 +32,9 @@ case class SwissPlayer(
   // If bhTieBreak is None, then there is no secondary tb, else its sb
   val tieBreak2 = bhTieBreak.map(_ => sbTieBreak.value)
 
-  def mcMahonStartingScore(mcmahonCutoff: Int): Double = {
+  def mcMahonStartingScore(mcmahonCutoff: Int): Double =
     if (actualRating > mcmahonCutoff) mcMahonScoreFromRating(mcmahonCutoff)
     else mcMahonScoreFromRating(actualRating)
-  }
 
   def recomputeScore =
     copy(
@@ -78,7 +77,7 @@ object SwissPlayer {
     ).recomputeScore
 
   case class WithRank(player: SwissPlayer, rank: Int) {
-    def is(other: WithRank)       = player is other.player
+    def is(other: WithRank)       = player.is(other.player)
     def withUser(user: LightUser) = WithUserAndRank(player, user, rank)
     override def toString         = s"$rank. ${player.userId}[${player.actualRating}]"
   }

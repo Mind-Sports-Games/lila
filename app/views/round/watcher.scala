@@ -7,8 +7,8 @@ import strategygames.format.FEN
 import strategygames.format.pgn.Pgn
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 import lila.game.Pov
 
@@ -33,7 +33,7 @@ object watcher {
         c.chat,
         name = trans.spectatorRoom.txt(),
         timeout = c.timeout,
-        withNoteAge = ctx.isAuth option pov.game.secondsSinceCreation,
+        withNoteAge = ctx.isAuth.option(pov.game.secondsSinceCreation),
         public = true,
         resourceId = lila.chat.Chat.ResourceId(s"game/${c.chat.id}"),
         palantir = ctx.me.exists(_.canPalantir)
@@ -47,12 +47,12 @@ object watcher {
         roundNvuiTag,
         roundTag(gameLogic),
         embedJsUnsafeLoadThen(s"""${roundPlayStrategyTag(gameLogic)}(${safeJsonValue(
-          Json.obj(
-            "data" -> data,
-            "i18n" -> jsI18n(pov.game),
-            "chat" -> chatJson
-          )
-        )})""")
+            Json.obj(
+              "data" -> data,
+              "i18n" -> jsI18n(pov.game),
+              "chat" -> chatJson
+            )
+          )})""")
       ),
       openGraph = povOpenGraph(pov).some,
       chessground = false
@@ -64,7 +64,7 @@ object watcher {
         ),
         bits.roundAppPreload(pov, controls = false),
         div(cls := "round__underboard")(bits.crosstable(cross, pov.game)),
-        div(cls := "round__underchat")(bits underchat pov.game)
+        div(cls := "round__underchat")(bits.underchat(pov.game))
       )
     )
   }

@@ -9,8 +9,10 @@ abstract class AdapterLike[A](implicit ec: scala.concurrent.ExecutionContext) {
 
   /** Returns a slice of the results.
     *
-    * @param   offset    The number of elements to skip, starting from zero
-    * @param   length    The maximum number of elements to return
+    * @param offset
+    *   The number of elements to skip, starting from zero
+    * @param length
+    *   The maximum number of elements to return
     */
   def slice(offset: Int, length: Int): Fu[Seq[A]]
 
@@ -29,7 +31,7 @@ abstract class AdapterLike[A](implicit ec: scala.concurrent.ExecutionContext) {
       def nbResults = AdapterLike.this.nbResults
 
       def slice(offset: Int, length: Int) =
-        AdapterLike.this.slice(offset, length) flatMap { _.map(f).sequenceFu }
+        AdapterLike.this.slice(offset, length) flatMap { r => Future.sequence(r.map(f)) }
     }
 
   def mapFutureList[B](f: Seq[A] => Fu[Seq[B]]): AdapterLike[B] =

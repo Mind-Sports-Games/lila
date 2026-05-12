@@ -1,7 +1,7 @@
 package lila.swiss
 
+import lila.base.IntValue
 import lila.user.User
-import lila.game.Game
 
 object SwissRound {
 
@@ -31,7 +31,7 @@ case class SwissFinish(id: Swiss.Id, ranking: Ranking)
 
 object SwissBounds {
   val maxRounds            = 100
-  val maxGamesPerRound     = 9 //assume single digit in other parts of the code.
+  val maxGamesPerRound     = 9 // assume single digit in other parts of the code.
   val defaultGamesPerRound = 1
   val maxScore             = maxRounds * 2
   val maxBuchholz          = maxRounds * maxScore
@@ -56,18 +56,17 @@ object SwissBounds {
   //       it fits, rather than overflows
   // in this case it is assumed the first value will be put
   // into the LSB, and the later values into the MORE SB
-  def encodeIntoLong(data: WithBounds*) = {
-    encodeIntoLongRecurse(1, data: _*)
-  }
+  def encodeIntoLong(data: WithBounds*) =
+    encodeIntoLongRecurse(1, data*)
 
   def encodeIntoLongRecurse(factor: Long, data: WithBounds*): Long =
     data match {
-      case Seq(first) => factor * first.value
-      case Seq(first, as @ _*) =>
-        ((factor * first.value) + encodeIntoLongRecurse(
+      case Seq(first)      => factor * first.value
+      case Seq(first, as*) =>
+        (factor * first.value) + encodeIntoLongRecurse(
           factor * first.totalValues,
-          as: _*
-        ))
+          as*
+        )
       case Seq() => 0
     }
 }

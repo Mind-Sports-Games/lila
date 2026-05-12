@@ -2,9 +2,8 @@ package lila.hub
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Function
-import ornicar.scalalib.Zero
 import scala.concurrent.{ ExecutionContext, Promise }
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 final class DuctConcMap[D <: Duct](
     mkDuct: String => D,
@@ -13,7 +12,7 @@ final class DuctConcMap[D <: Duct](
 
   def getOrMake(id: String): D = ducts.computeIfAbsent(id, loadFunction)
 
-  def getIfPresent(id: String): Option[D] = Option(ducts get id)
+  def getIfPresent(id: String): Option[D] = Option(ducts.get(id))
 
   def tell(id: String, msg: Any): Unit = getOrMake(id) ! msg
 
@@ -27,12 +26,12 @@ final class DuctConcMap[D <: Duct](
   def ask[A](id: String)(makeMsg: Promise[A] => Any): Fu[A] = getOrMake(id).ask(makeMsg)
 
   def askIfPresent[A](id: String)(makeMsg: Promise[A] => Any): Fu[Option[A]] =
-    getIfPresent(id) ?? {
-      _ ask makeMsg dmap some
+    getIfPresent(id) so {
+      _.ask(makeMsg).dmap(some)
     }
 
   def askIfPresentOrZero[A: Zero](id: String)(makeMsg: Promise[A] => Any): Fu[A] =
-    askIfPresent(id)(makeMsg) dmap (~_)
+    askIfPresent(id)(makeMsg).dmap(~_)
 
   def exists(id: String): Boolean = ducts.get(id) != null
 
@@ -40,30 +39,31 @@ final class DuctConcMap[D <: Duct](
     ducts.forEachKey(16, k => f(k))
 
   def tellAllWithAck(makeMsg: Promise[Unit] => Any)(implicit ec: ExecutionContext): Fu[Int] =
-    ducts.values.asScala
-      .map(_ ask makeMsg)
-      .sequenceFu
+    Future
+      .sequence(ducts.values.asScala.map(_.ask(makeMsg)))
       .map(_.size)
 
   def size: Int = ducts.size()
 
-  def terminate(id: String, lastWill: Duct => Unit): Unit =
-    ducts
+  def terminate(id: String, lastWill: Duct => Unit): Unit = {
+    val _ = ducts
       .computeIfPresent(
         id,
         (_, d) => {
           lastWill(d)
-          nullD
+          _nullD
         }
       )
-      .unit
+  }
 
-  private[this] val ducts = new ConcurrentHashMap[String, D](initialCapacity)
+  private val ducts = new ConcurrentHashMap[String, D](initialCapacity)
 
   private val loadFunction = new Function[String, D] {
     def apply(k: String) = mkDuct(k)
   }
 
   // used to remove entries
-  private[this] var nullD: D = _
+  import scala.compiletime.uninitialized
+  @annotation.nowarn("msg=unset private variable")
+  private var _nullD: D = uninitialized
 }

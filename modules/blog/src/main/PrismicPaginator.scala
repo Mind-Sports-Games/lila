@@ -1,9 +1,9 @@
 package lila.blog
 
-import io.prismic._
+import io.prismic.*
 
 import lila.common.config.MaxPerPage
-import lila.common.paginator._
+import lila.common.paginator.*
 
 private object PrismicPaginator {
 

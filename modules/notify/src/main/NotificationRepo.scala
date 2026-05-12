@@ -1,11 +1,11 @@
 package lila.notify
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import org.joda.time.DateTime
 
 final private class NotificationRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BSONHandlers._
+  import BSONHandlers.*
 
   def insert(notification: Notification) =
     coll.insert.one(notification).void
@@ -28,11 +28,11 @@ final private class NotificationRepo(val coll: Coll)(implicit ec: scala.concurre
   private def hasOld =
     $doc(
       "read" -> false,
-      "createdAt" $gt DateTime.now.minusDays(3)
+      "createdAt".$gt(DateTime.now.minusDays(3))
     )
   private def hasUnread =
     $doc( // recent, read
-      "createdAt" $gt DateTime.now.minusMinutes(10)
+      "createdAt".$gt(DateTime.now.minusMinutes(10))
     )
   private def hasOldOrUnread =
     $doc("$or" -> List(hasOld, hasUnread))
@@ -73,12 +73,11 @@ final private class NotificationRepo(val coll: Coll)(implicit ec: scala.concurre
   def exists(notifies: Notification.Notifies, selector: Bdoc): Fu[Boolean] =
     coll.exists(userNotificationsQuery(notifies) ++ selector)
 
-  val recentSort = $sort desc "createdAt"
+  val recentSort = $sort.desc("createdAt")
 
   def userNotificationsQuery(userId: Notification.Notifies) = $doc("notifies" -> userId)
 
   private def unreadOnlyQuery(userId: Notification.Notifies) = $doc("notifies" -> userId, "read" -> false)
   private def unreadOnlyQuery(userIds: Iterable[Notification.Notifies]) =
-    $doc("notifies" $in userIds, "read" -> false)
-
+    $doc("notifies".$in(userIds), "read" -> false)
 }

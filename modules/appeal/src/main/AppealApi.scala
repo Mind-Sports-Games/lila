@@ -2,7 +2,7 @@ package lila.appeal
 
 import org.joda.time.DateTime
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.{ Holder, NoteApi, User, UserRepo }
 
 final class AppealApi(
@@ -12,7 +12,7 @@ final class AppealApi(
     snoozer: lila.memo.Snoozer[Appeal.SnoozeKey]
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   def mine(me: User): Fu[Option[Appeal]] = coll.byId[Appeal](me.id)
 
@@ -51,9 +51,9 @@ final class AppealApi(
   def reply(text: String, prev: Appeal, mod: Holder, preset: Option[String]) = {
     val appeal = prev.post(text, mod.user)
     coll.update.one($id(appeal.id), appeal) >> {
-      preset ?? { note =>
+      preset so { note =>
         userRepo.byId(appeal.id) flatMap {
-          _ ?? { noteApi.write(_, s"Appeal reply: $note", mod.user, modOnly = true, dox = false) }
+          _ so { noteApi.write(_, s"Appeal reply: $note", mod.user, modOnly = true, dox = false) }
         }
       }
     } inject appeal
@@ -61,18 +61,18 @@ final class AppealApi(
 
   def countUnread = coll.countSel($doc("status" -> Appeal.Status.Unread.key))
 
-  def queueOf(mod: User) = queue(snoozer snoozedKeysOf mod.id map (_.appealId))
+  def queueOf(mod: User) = queue(snoozer.snoozedKeysOf(mod.id) map (_.appealId))
 
   private def queue(exceptIds: Iterable[User.ID]): Fu[List[Appeal]] =
     coll
       .find($doc("status" -> Appeal.Status.Unread.key) ++ {
-        exceptIds.nonEmpty ?? $doc("_id" $nin exceptIds)
+        exceptIds.nonEmpty so $doc("_id".$nin(exceptIds))
       })
       .sort($doc("firstUnrepliedAt" -> 1))
       .cursor[Appeal]()
       .list(30) flatMap { unreads =>
       coll
-        .find($doc("status" $ne Appeal.Status.Unread.key))
+        .find($doc("status".$ne(Appeal.Status.Unread.key)))
         .sort($doc("firstUnrepliedAt" -> -1))
         .cursor[Appeal]()
         .list(40 - unreads.size) map {
@@ -90,10 +90,10 @@ final class AppealApi(
     coll.update.one($id(appeal.id), appeal.toggleMute).void
 
   def setReadById(userId: User.ID) =
-    byId(userId) flatMap { _ ?? setRead }
+    byId(userId) flatMap { _ so setRead }
 
   def setUnreadById(userId: User.ID) =
-    byId(userId) flatMap { _ ?? setUnread }
+    byId(userId) flatMap { _ so setUnread }
 
   def onAccountClose(user: User) = setReadById(user.id)
 

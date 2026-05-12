@@ -1,8 +1,10 @@
 package lila.tournament
 
-import akka.actor._
-import akka.stream.scaladsl._
-import scala.concurrent.duration._
+import akka.actor.*
+import akka.stream.scaladsl.*
+import scala.concurrent.duration.*
+
+import lila.common.extensions.*
 
 final private class CreatedOrganizer(
     api: TournamentApi,
@@ -16,13 +18,14 @@ final private class CreatedOrganizer(
 
   override def preStart(): Unit = {
     context.setReceiveTimeout(15.seconds)
-    scheduler.scheduleOnce(10 seconds, self, Tick).unit
+    val _ = scheduler.scheduleOnce(10 seconds, self, Tick)
   }
 
   case object Tick
 
-  def scheduleNext(): Unit =
-    scheduler.scheduleOnce(2 seconds, self, Tick).unit
+  def scheduleNext(): Unit = {
+    { val _ = scheduler.scheduleOnce(2 seconds, self, Tick) }
+  }
 
   def receive = {
 
@@ -35,9 +38,9 @@ final private class CreatedOrganizer(
       tournamentRepo.shouldStartCursor
         .documentSource()
         .mapAsync(1) { tour =>
-          playerRepo count tour.id flatMap {
-            case 0 => api destroy tour
-            case _ => api start tour
+          playerRepo.count(tour.id) flatMap {
+            case 0 => api.destroy(tour)
+            case _ => api.start(tour)
           }
         }
         .log(getClass.getName)
@@ -45,6 +48,6 @@ final private class CreatedOrganizer(
         .run()
         .monSuccess(_.tournament.createdOrganizer.tick)
         .addEffectAnyway(scheduleNext())
-        .unit
+        .discard
   }
 }

@@ -1,10 +1,10 @@
 package lila.security
 
 import akka.actor.ActorSystem
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.AutoConfig
 import play.api.i18n.Lang
 import play.api.libs.mailer.{ Email, SMTPConfiguration, SMTPMailer }
-import scala.concurrent.duration.{ span => _, _ }
+import scala.concurrent.duration.span => _
 import scala.concurrent.{ blocking, Future }
 import scalatags.Text.all.{ html => htmlTag, _ }
 import scalatags.Text.tags2.{ title => titleTag }
@@ -34,12 +34,13 @@ final class Mailer(
     if (msg.to.isNoReply) {
       logger.warn(s"Can't send ${msg.subject} to noreply email ${msg.to}")
       funit
-    } else
+    }
+    else
       Future {
         Chronometer.syncMon(_.email.send.time) {
           blocking {
             val (client, config) = randomClient()
-            client
+            val _ = client
               .send(
                 Email(
                   subject = msg.subject,
@@ -49,7 +50,6 @@ final class Mailer(
                   bodyHtml = msg.htmlBody map { body => Mailer.html.wrap(msg.subject, body).render }
                 )
               )
-              .unit
           }
         }
       }

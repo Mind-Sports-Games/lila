@@ -2,12 +2,11 @@ package views.html
 package base
 
 import strategygames.format.FEN
-import controllers.routes
 import play.api.i18n.Lang
 import play.api.mvc.Call
 
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 
 object bits {
@@ -15,9 +14,9 @@ object bits {
   def mselect(id: String, current: Frag, items: List[Frag]) =
     div(cls := "mselect")(
       input(
-        tpe := "checkbox",
-        cls := "mselect__toggle fullscreen-toggle",
-        st.id := s"mselect-$id",
+        tpe          := "checkbox",
+        cls          := "mselect__toggle fullscreen-toggle",
+        st.id        := s"mselect-$id",
         autocomplete := "off"
       ),
       label(`for` := s"mselect-$id", cls := "mselect__label")(current),
@@ -26,7 +25,7 @@ object bits {
     )
 
   lazy val stage = a(
-    href := "https://playstrategy.org",
+    href  := "https://playstrategy.org",
     style := """
 background: #7f1010;
 playerIndex: #fff;
@@ -43,41 +42,42 @@ z-index: 99;
 
   val connectLinks =
     div(cls := "connect-links")(
-      //a(href := "https://twitter.com/mindsportsolymp", targetBlank, noFollow)("Twitter"),
+      // a(href := "https://twitter.com/mindsportsolymp", targetBlank, noFollow)("Twitter"),
       a(href := "https://discord.gg/bVRQzgSbPq", targetBlank, noFollow)("Discord"),
       a(href := "https://www.youtube.com/@PlayStrategyDotOrg", targetBlank, noFollow)("YouTube")
-      //a(href := "https://www.twitch.tv/mindsportsolympiad", targetBlank, noFollow)("Twitch")
+      // a(href := "https://www.twitch.tv/mindsportsolympiad", targetBlank, noFollow)("Twitch")
     )
 
   def fenAnalysisLink(fen: FEN)(implicit lang: Lang) =
     a(href := routes.UserAnalysis.parseArg(fen.value.replace(" ", "_")))(trans.analysis())
 
-  def paginationByQuery(route: Call, pager: Paginator[_], showPost: Boolean): Option[Frag] =
+  def paginationByQuery(route: Call, pager: Paginator[?], showPost: Boolean): Option[Frag] =
     pagination(page => s"$route?page=$page", pager, showPost)
 
-  def pagination(url: Int => String, pager: Paginator[_], showPost: Boolean): Option[Frag] =
-    pager.hasToPaginate option pagination(url, pager.currentPage, pager.nbPages, showPost)
+  def pagination(url: Int => String, pager: Paginator[?], showPost: Boolean): Option[Frag] =
+    pager.hasToPaginate.option(pagination(url, pager.currentPage, pager.nbPages, showPost))
 
   def pagination(url: Int => String, page: Int, nbPages: Int, showPost: Boolean): Tag =
     st.nav(cls := "pagination")(
       if (page > 1) a(href := url(page - 1), dataIcon := "I")
-      else span(cls := "disabled", dataIcon := "I"),
+      else span(cls           := "disabled", dataIcon    := "I"),
       sliding(page, nbPages, 3, showPost = showPost).map {
         case None                 => raw(" &hellip; ")
         case Some(p) if p == page => span(cls := "current")(p)
         case Some(p)              => a(href := url(p))(p)
       },
-      if (page < nbPages) a(rel := "next", href := url(page + 1), dataIcon := "H")
-      else span(cls := "disabled", dataIcon := "H")
+      if (page < nbPages) a(rel := "next", href         := url(page + 1), dataIcon := "H")
+      else span(cls                := "disabled", dataIcon := "H")
     )
 
-  private def sliding(pager: Paginator[_], length: Int, showPost: Boolean): List[Option[Int]] =
+  @annotation.nowarn("msg=unused")
+  private def sliding(pager: Paginator[?], length: Int, showPost: Boolean): List[Option[Int]] =
     sliding(pager.currentPage, pager.nbPages, length, showPost)
 
   private def sliding(page: Int, nbPages: Int, length: Int, showPost: Boolean): List[Option[Int]] = {
     val fromPage = 1 max (page - length)
     val toPage   = nbPages.min(page + length)
-    val pre = fromPage match {
+    val pre      = fromPage match {
       case 1 => Nil
       case 2 => List(1.some)
       case _ => List(1.some, none)

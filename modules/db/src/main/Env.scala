@@ -3,7 +3,7 @@ package lila.db
 import akka.actor.CoordinatedShutdown
 import com.typesafe.config.Config
 import play.api.Configuration
-import reactivemongo.api._
+import reactivemongo.api.*
 import scala.concurrent.ExecutionContext
 
 import lila.common.Lilakka

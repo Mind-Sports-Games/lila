@@ -1,7 +1,7 @@
 package lila.team
 
-import lila.room.RoomSocket.{ Protocol => RP, _ }
-import lila.socket.RemoteSocket.{ Protocol => P, _ }
+import lila.room.RoomSocket.{ Protocol as RP, * }
+import lila.socket.RemoteSocket.{ Protocol as P, * }
 
 final private class TeamSocket(
     remoteSocketApi: lila.socket.RemoteSocket,
@@ -23,14 +23,16 @@ final private class TeamSocket(
       logger,
       roomId => _.Team(roomId.value).some,
       localTimeout = Some { (roomId, modId, suspectId) =>
-        cached.isLeader(roomId.value, modId) >>& !cached.isLeader(roomId.value, suspectId)
+        cached.isLeader(roomId.value, modId) >>& cached.isLeader(roomId.value, suspectId).not
       },
       chatBusChan = _.Team
     )
 
-  private lazy val send: String => Unit = remoteSocketApi.makeSender("team-out").apply _
+  private lazy val send: String => Unit = remoteSocketApi.makeSender("team-out").apply
 
-  remoteSocketApi.subscribe("team-in", RP.In.reader)(
-    handler orElse remoteSocketApi.baseHandler
-  ) >>- send(P.Out.boot)
+  remoteSocketApi
+    .subscribe("team-in", RP.In.reader)(
+      handler orElse remoteSocketApi.baseHandler
+    )
+    .andDo(send(P.Out.boot))
 }

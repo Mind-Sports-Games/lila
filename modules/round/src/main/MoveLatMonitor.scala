@@ -2,7 +2,6 @@ package lila.round
 
 import akka.actor.Scheduler
 import java.util.concurrent.atomic.AtomicReference
-import scala.concurrent.duration._
 
 private object MoveLatMonitor {
 
@@ -20,5 +19,5 @@ private object MoveLatMonitor {
       )
     }
 
-  def record(micros: Int): Unit = latency.getAndUpdate(_ record micros).unit
+  def record(micros: Int): Unit = { val _ = latency.getAndUpdate(_.record(micros)) }
 }

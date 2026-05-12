@@ -1,11 +1,10 @@
 package controllers
 
 import play.api.libs.json.Json
-import play.api.mvc._
-import scala.concurrent.duration._
-import views._
+import play.api.mvc.*
+import views.*
 
-import lila.app._
+import lila.app.{ *, given }
 import lila.common.{ HTTPRequest, IpAddress }
 
 final class Importer(env: Env) extends LilaController(env) {
@@ -29,7 +28,7 @@ final class Importer(env: Env) extends LilaController(env) {
 
   def sendGame =
     OpenBody { implicit ctx =>
-      implicit def req = ctx.body
+      implicit def req: play.api.mvc.Request[?] = ctx.body
       env.importer.forms.importForm
         .bindFromRequest()
         .fold(
@@ -39,10 +38,10 @@ final class Importer(env: Env) extends LilaController(env) {
               api = _ => BadRequest(jsonError("Invalid PGN")).fuccess
             ),
           data =>
-            ImportRateLimitPerIP(HTTPRequest ipAddress req, cost = 1) {
+            ImportRateLimitPerIP(HTTPRequest.ipAddress(req), cost = 1) {
               doImport(data, req, ctx.me) flatMap {
                 case Some(game) =>
-                  ctx.me.ifTrue(data.analyse.isDefined && game.analysable) ?? { me =>
+                  ctx.me.ifTrue(data.analyse.isDefined && game.analysable) so { me =>
                     env.fishnet.analyser(
                       game,
                       lila.fishnet.Work.Sender(
@@ -60,10 +59,10 @@ final class Importer(env: Env) extends LilaController(env) {
     }
 
   def apiSendGame = {
-    def commonImport(req: Request[_], me: Option[lila.user.User]): Fu[Result] =
-      ImportRateLimitPerIP(HTTPRequest ipAddress req, cost = if (me.isDefined) 1 else 2) {
+    def commonImport(req: Request[?], me: Option[lila.user.User]): Fu[Result] =
+      ImportRateLimitPerIP(HTTPRequest.ipAddress(req), cost = if (me.isDefined) 1 else 2) {
         env.importer.forms.importForm
-          .bindFromRequest()(req, formBinding)
+          .bindFromRequest()(using req, formBinding)
           .fold(
             err => BadRequest(apiFormError(err)).fuccess,
             data =>
@@ -87,11 +86,11 @@ final class Importer(env: Env) extends LilaController(env) {
 
   private def doImport(
       data: lila.importer.ImportData,
-      req: RequestHeader,
+      @annotation.nowarn("msg=unused") req: RequestHeader,
       me: Option[lila.user.User]
   ): Fu[Option[lila.game.Game]] =
     env.importer.importer(data, me.map(_.id)) flatMap { game =>
-      me.map(_.id).??(env.game.cached.clearNbImportedByCache) inject game.some
+      me.map(_.id).so(env.game.cached.clearNbImportedByCache) inject game.some
     } recover { case e: Exception =>
       lila
         .log("importer")
@@ -102,9 +101,9 @@ final class Importer(env: Env) extends LilaController(env) {
   def masterGame(id: String, orientation: String) =
     Open { implicit ctx =>
       env.explorer.importer(id) map {
-        _ ?? { game =>
+        _ so { game =>
           val url      = routes.Round.watcher(game.id, orientation).url
-          val fenParam = get("fen").??(f => s"?fen=$f")
+          val fenParam = get("fen").so(f => s"?fen=$f")
           Redirect(s"$url$fenParam")
         }
       }

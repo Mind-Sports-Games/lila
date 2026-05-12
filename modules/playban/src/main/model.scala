@@ -1,7 +1,7 @@
 package lila.playban
 
 import org.joda.time.DateTime
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.common.Json.jodaWrites
 
@@ -47,14 +47,14 @@ case class UserRecord(
     rageSitRecidive || {
       outcomes.lastOption.exists(_ != Outcome.Good) && {
         // too many bad overall
-        badOutcomeScore >= (badOutcomeRatio * nbOutcomes atLeast minBadOutcomes.toFloat) || {
+        badOutcomeScore >= ((badOutcomeRatio * nbOutcomes).atLeast(minBadOutcomes.toFloat)) || {
           // bad result streak
           outcomes.sizeIs >= badOutcomesStreakSize &&
           outcomes.takeRight(badOutcomesStreakSize).forall(Outcome.Good !=)
         }
       }
     }
-  } option TempBan.make(bans, accountCreationDate)
+  }.option(TempBan.make(bans, accountCreationDate))
 
   def rageSitRecidive =
     outcomes.lastOption.exists(Outcome.rageSitLike.contains) && {
@@ -76,14 +76,13 @@ case class TempBan(
     mins: Int
 ) {
 
-  def endsAt = date plusMinutes mins
+  def endsAt = date.plusMinutes(mins)
 
-  def remainingSeconds: Int = (endsAt.getSeconds - nowSeconds).toInt atLeast 0
+  def remainingSeconds: Int = (endsAt.getSeconds - nowSeconds).toInt.atLeast(0)
 
-  def remainingMinutes: Int = (remainingSeconds / 60) atLeast 1
+  def remainingMinutes: Int = (remainingSeconds / 60).atLeast(1)
 
   def inEffect = endsAt.isAfterNow
-
 }
 
 object TempBan {
@@ -93,26 +92,26 @@ object TempBan {
   private def make(minutes: Int) =
     TempBan(
       DateTime.now,
-      minutes atMost 3 * 24 * 60
+      minutes.atMost(3 * 24 * 60)
     )
 
   private val baseMinutes = 10
 
-  /** Create a playban. First offense: 10 min.
-    * Multiplier of repeat offense after X days:
-    * - 0 days: 3x
-    * - 0 - 3 days: linear scale from 3x to 1x
-    * - >3 days quick drop off
-    * Account less than 3 days old --> 2x the usual time
+  /** Create a playban. First offense: 10 min. Multiplier of repeat offense after X days:
+    *   - 0 days: 3x
+    *   - 0 - 3 days: linear scale from 3x to 1x
+    *   - >3 days quick drop off Account less than 3 days old --> 2x the usual time
     */
   def make(bans: Vector[TempBan], accountCreationDate: DateTime): TempBan =
     make {
-      (bans.lastOption ?? { prev =>
-        prev.endsAt.toNow.getStandardHours.toSaturatedInt match {
-          case h if h < 72 => prev.mins * (132 - h) / 60
-          case h           => (55.6 * prev.mins / (Math.pow(5.56 * prev.mins - 54.6, h / 720) + 54.6)).toInt
+      (bans.lastOption
+        .so { prev =>
+          new org.joda.time.Duration(prev.endsAt, DateTime.now).getStandardHours.toSaturatedInt match {
+            case h if h < 72 => prev.mins * (132 - h) / 60
+            case h           => (55.6 * prev.mins / (Math.pow(5.56 * prev.mins - 54.6, h / 720) + 54.6)).toInt
+          }
         }
-      } atLeast baseMinutes) * (if (accountCreationDate.plusDays(3).isAfterNow) 2 else 1)
+        .atLeast(baseMinutes)) * (if (accountCreationDate.plusDays(3).isAfterNow) 2 else 1)
     }
 }
 

@@ -88,7 +88,7 @@ object Eval {
   val empty = Eval(None, None, None)
 
   object JsonHandlers {
-    import play.api.libs.json._
+    import play.api.libs.json.*
 
     implicit private val uciWrites: Writes[Uci] = Writes { uci =>
       JsString(uci.uci)

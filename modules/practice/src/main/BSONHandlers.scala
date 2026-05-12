@@ -2,7 +2,7 @@ package lila.practice
 
 import reactivemongo.api.bson.{ BSONHandler, Macros }
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.study.Chapter
 import reactivemongo.api.bson.BSONDocumentHandler
 

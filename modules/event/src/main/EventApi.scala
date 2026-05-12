@@ -2,10 +2,9 @@ package lila.event
 
 import org.joda.time.DateTime
 import play.api.mvc.RequestHeader
-import scala.concurrent.duration._
 
-import lila.db.dsl._
-import lila.memo.CacheApi._
+import lila.db.dsl.*
+import lila.memo.CacheApi.*
 import lila.user.User
 
 final class EventApi(
@@ -13,7 +12,7 @@ final class EventApi(
     cacheApi: lila.memo.CacheApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   def promoteTo(req: RequestHeader): Fu[List[Event]] =
     promotable.getUnit map {
@@ -35,10 +34,10 @@ final class EventApi(
       .find(
         $doc(
           "enabled" -> true,
-          "startsAt" $gt DateTime.now.minusDays(50) $lt DateTime.now.plusDays(4)
+          "startsAt".$gt(DateTime.now.minusDays(50)).$lt(DateTime.now.plusDays(4))
         )
       )
-      .sort($sort asc "startsAt")
+      .sort($sort.asc("startsAt"))
       .cursor[Event]()
       .list(50)
       .dmap {
@@ -53,22 +52,22 @@ final class EventApi(
 
   def editForm(event: Event) =
     EventForm.form fill {
-      EventForm.Data make event
+      EventForm.Data.make(event)
     }
 
   def update(old: Event, data: EventForm.Data, by: User): Fu[Int] =
-    (coll.update.one($id(old.id), data.update(old, by)) >>- promotable.invalidateUnit()).map(_.n)
+    coll.update.one($id(old.id), data.update(old, by)).andDo(promotable.invalidateUnit()).map(_.n)
 
   def createForm = EventForm.form
 
   def create(data: EventForm.Data, userId: String): Fu[Event] = {
-    val event = data make userId
-    coll.insert.one(event) >>- promotable.invalidateUnit() inject event
+    val event = data.make(userId)
+    coll.insert.one(event).andDo(promotable.invalidateUnit()) inject event
   }
 
   def clone(old: Event) =
     old.copy(
       title = s"${old.title} (clone)",
-      startsAt = DateTime.now plusDays 7
+      startsAt = DateTime.now.plusDays(7)
     )
 }

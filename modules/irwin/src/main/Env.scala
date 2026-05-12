@@ -1,10 +1,10 @@
 package lila.irwin
 
-import akka.actor._
-import com.softwaremill.macwire._
-import scala.concurrent.duration._
+import akka.actor.*
+import com.softwaremill.macwire.*
+import scala.concurrent.duration.*
 
-import lila.common.config._
+import lila.common.config.*
 import lila.tournament.TournamentApi
 
 final class Env(
@@ -25,16 +25,16 @@ final class Env(
 
   private lazy val reportColl = db(CollName("irwin_report"))
 
-  lazy val irwinThresholdsSetting = IrwinThresholds makeSetting settingStore
+  lazy val irwinThresholdsSetting = IrwinThresholds.makeSetting(settingStore)
 
   lazy val stream = wire[IrwinStream]
 
   lazy val api = wire[IrwinApi]
 
   scheduler.scheduleWithFixedDelay(5 minutes, 5 minutes) { () =>
-    tournamentApi.allCurrentLeadersInStandard.flatMap(api.requests.fromTournamentLeaders).unit
+    tournamentApi.allCurrentLeadersInStandard.flatMap(api.requests.fromTournamentLeaders).discard
   }
   scheduler.scheduleWithFixedDelay(15 minutes, 15 minutes) { () =>
-    userCache.getTop50Online.flatMap(api.requests.fromLeaderboard).unit
+    userCache.getTop50Online.flatMap(api.requests.fromLeaderboard).discard
   }
 }

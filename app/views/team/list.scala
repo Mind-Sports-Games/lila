@@ -1,15 +1,13 @@
 package views.html.team
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
-
-import controllers.routes
 
 object list {
 
-  import trans.team._
+  import trans.team.*
 
   def search(text: String, teams: Paginator[lila.team.Team])(implicit ctx: Context) =
     list(

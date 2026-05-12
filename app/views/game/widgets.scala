@@ -2,8 +2,8 @@ package views.html
 package game
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.game.{ Game, Player, Pov }
 import lila.i18n.VariantKeys
 
@@ -94,7 +94,7 @@ object widgets {
           ),
           if (g.actionStrs.length > 0)
             div(cls := "opening")(
-              (!g.fromPosition ?? g.opening) map { opening =>
+              (!g.fromPosition so g.opening) map { opening =>
                 strong(opening.opening.toString())
               },
               div(cls := "pgn")(
@@ -103,12 +103,12 @@ object widgets {
                   case (Vector(p1), i)     => s"${i + 1}. $p1"
                   case _                   => ""
                 } mkString " ",
-                g.actionStrs.length > 6 option s" ... ${1 + (g.actionStrs.length - 1) / 2} turns "
+                (g.actionStrs.length > 6).option(s" ... ${1 + (g.actionStrs.length - 1) / 2} turns ")
               )
             )
           else frag(br, br),
-          g.metadata.analysed option
-            div(cls := "metadata text", dataIcon := "")(trans.computerAnalysisAvailable()),
+          g.metadata.analysed
+            .option(div(cls := "metadata text", dataIcon := "")(trans.computerAnalysisAvailable())),
           g.pgnImport.flatMap(_.user).map { user =>
             div(cls := "metadata")("PGN import by ", userIdLink(user.some))
           }
@@ -140,10 +140,10 @@ object widgets {
         frag(
           userIdLink(playerUser.id.some, withOnline = false),
           br,
-          player.berserk option berserkIconSpan,
+          player.berserk.option(berserkIconSpan),
           playerUser.rating,
-          player.isInputRating option "*",
-          player.provisional option "?",
+          player.isInputRating.option("*"),
+          player.provisional.option("?"),
           playerUser.ratingDiff map { d =>
             frag(" ", showRatingDiff(d))
           }
@@ -156,14 +156,14 @@ object widgets {
             aiRating(level)
           )
         } getOrElse {
-          (player.nameSplit.fold[Frag](anonSpan) { case (name, rating) =>
+          player.nameSplit.fold[Frag](anonSpan) { case (name, rating) =>
             frag(
               span(name),
               rating.map { r =>
                 frag(br, r)
               }
             )
-          })
+          }
         }
       }
     )

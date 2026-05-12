@@ -1,9 +1,7 @@
 package lila.puzzle
 
-import scala.concurrent.duration._
-
 import strategygames.variant.Variant
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.memo.CacheApi
 
 final private class PuzzleCountApi(
@@ -28,9 +26,9 @@ final private class PuzzleCountApi(
 
   private val mixCounts = colls
     .puzzle {
-      _.aggregateList(Int.MaxValue) { framework =>
-        import framework._
-        import Puzzle.BSONFields._
+      _.aggregateList(maxDocs = Int.MaxValue) { framework =>
+        import framework.*
+        import Puzzle.BSONFields.*
         Project(
           $doc(
             variant -> true,
@@ -61,11 +59,11 @@ final private class PuzzleCountApi(
     cacheApi.unit[Map[String, Map[PuzzleTheme.Key, Int]]] {
       _.refreshAfterWrite(20 minutes)
         .buildAsyncFuture { _ =>
-          import Puzzle.BSONFields._
+          import Puzzle.BSONFields.*
           for {
             themeDocs <- colls.puzzle {
-              _.aggregateList(Int.MaxValue) { framework =>
-                import framework._
+              _.aggregateList(maxDocs = Int.MaxValue) { framework =>
+                import framework.*
                 Project(
                   $doc(
                     themes  -> true,
@@ -85,26 +83,24 @@ final private class PuzzleCountApi(
               }
             }
             mixCountsMap <- mixCounts
-          } yield {
-            themeDocs
-              .flatMap { doc =>
-                for {
-                  idDoc     <- doc.getAsOpt[Bdoc]("_id")
-                  variantId <- idDoc.int("variant")
-                  themeKey  <- idDoc.string("theme")
-                  libId     <- idDoc.int("lib")
-                  count     <- doc.int("nb")
-                } yield (s"${libId}_${variantId}", PuzzleTheme.Key(themeKey) -> count)
-              }
-              .groupBy(_._1)
-              .view
-              .mapValues { pairs =>
-                val themeMap = pairs.map(_._2).toMap
-                val total    = mixCountsMap.getOrElse(pairs.head._1, 0)
-                themeMap + (PuzzleTheme.mix.key -> total)
-              }
-              .toMap
-          }
+          } yield themeDocs
+            .flatMap { doc =>
+              for {
+                idDoc     <- doc.getAsOpt[Bdoc]("_id")
+                variantId <- idDoc.int("variant")
+                themeKey  <- idDoc.string("theme")
+                libId     <- idDoc.int("lib")
+                count     <- doc.int("nb")
+              } yield (s"${libId}_${variantId}", PuzzleTheme.Key(themeKey) -> count)
+            }
+            .groupBy(_._1)
+            .view
+            .mapValues { pairs =>
+              val themeMap = pairs.map(_._2).toMap
+              val total    = mixCountsMap.getOrElse(pairs.head._1, 0)
+              themeMap + (PuzzleTheme.mix.key -> total)
+            }
+            .toMap
         }
     }
 
@@ -112,26 +108,28 @@ final private class PuzzleCountApi(
     cacheApi.unit[Map[PuzzleTheme.Key, Int]] {
       _.refreshAfterWrite(20 minutes)
         .buildAsyncFuture { _ =>
-          import Puzzle.BSONFields._
+          import Puzzle.BSONFields.*
           colls.puzzle {
-            _.aggregateList(Int.MaxValue) { framework =>
-              import framework._
+            _.aggregateList(maxDocs = Int.MaxValue) { framework =>
+              import framework.*
               Project($doc(themes -> true)) -> List(
                 Unwind(themes),
                 GroupField(themes)("nb" -> SumAll)
               )
-            }.map {
-              _.flatMap { obj =>
-                for {
-                  key   <- obj string "_id"
-                  count <- obj int "nb"
-                } yield PuzzleTheme.Key(key) -> count
-              }.toMap
-            }.flatMap { themed =>
-              colls.puzzle(_.countAll) map { all =>
-                themed + (PuzzleTheme.mix.key -> all.toInt)
-              }
             }
+              .map {
+                _.flatMap { obj =>
+                  for {
+                    key   <- obj string "_id"
+                    count <- obj int "nb"
+                  } yield PuzzleTheme.Key(key) -> count
+                }.toMap
+              }
+              .flatMap { themed =>
+                colls.puzzle(_.countAll) map { all =>
+                  themed + (PuzzleTheme.mix.key -> all.toInt)
+                }
+              }
           }
         }
     }

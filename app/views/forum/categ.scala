@@ -2,11 +2,9 @@ package views.html
 package forum
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
-
-import controllers.routes
 
 object categ {
 
@@ -43,14 +41,15 @@ object categ {
       stickyPosts: List[lila.forum.TopicView]
   )(implicit ctx: Context) = {
 
-    val newTopicButton = canWrite option
+    val newTopicButton = canWrite.option(
       a(
-        href := routes.ForumTopic.form(categ.slug),
-        cls := "button button-empty button-green text",
+        href     := routes.ForumTopic.form(categ.slug),
+        cls      := "button button-empty button-green text",
         dataIcon := "m"
       )(
         trans.createANewTopic()
       )
+    )
     def showTopic(sticky: Boolean)(topic: lila.forum.TopicView) =
       tr(cls := List("sticky" -> sticky))(
         td(cls := "subject")(
@@ -88,9 +87,9 @@ object categ {
       main(cls := "forum forum-categ box")(
         h1(
           a(
-            href := categ.team.fold(routes.ForumCateg.index)(routes.Team.show(_)),
+            href     := categ.team.fold(routes.ForumCateg.index)(routes.Team.show(_)),
             dataIcon := "I",
-            cls := "text"
+            cls      := "text"
           ),
           categ.team.fold(frag(categ.name))(teamIdToName)
         ),

@@ -1,9 +1,8 @@
 package controllers
 
-import scala.concurrent.duration._
-import views._
+import views.*
 
-import lila.app._
+import lila.app.{ *, given }
 import lila.common.{ HTTPRequest, IpAddress }
 
 final class ForumPost(env: Env) extends LilaController(env) with ForumController {
@@ -28,7 +27,7 @@ final class ForumPost(env: Env) extends LilaController(env) with ForumController
             if (topic.closed) fuccess(BadRequest("This topic is closed"))
             else if (topic.isOld) fuccess(BadRequest("This topic is archived"))
             else
-              categ.team.?? { env.team.cached.isLeader(_, me.id) } flatMap { inOwnTeam =>
+              categ.team.so { env.team.cached.isLeader(_, me.id) } flatMap { inOwnTeam =>
                 forms
                   .post(me, inOwnTeam)
                   .bindFromRequest()
@@ -43,7 +42,7 @@ final class ForumPost(env: Env) extends LilaController(env) with ForumController
                           .show(categ, topic, posts, Some(err -> captcha), unsub, canModCateg = canModCateg)
                       ),
                     data =>
-                      CreateRateLimit(HTTPRequest ipAddress ctx.req) {
+                      CreateRateLimit(HTTPRequest.ipAddress(ctx.req)) {
                         postApi.makePost(categ, topic, data, me) map { post =>
                           Redirect(routes.ForumPost.redirect(post.id))
                         }
@@ -59,14 +58,14 @@ final class ForumPost(env: Env) extends LilaController(env) with ForumController
     AuthBody { implicit ctx => me =>
       implicit val req = ctx.body
       env.forum.postApi.teamIdOfPostId(postId) flatMap { teamId =>
-        teamId.?? { env.team.cached.isLeader(_, me.id) } flatMap { inOwnTeam =>
+        teamId.so { env.team.cached.isLeader(_, me.id) } flatMap { inOwnTeam =>
           forms
             .postEdit(me, inOwnTeam)
             .bindFromRequest()
             .fold(
               _ => Redirect(routes.ForumPost.redirect(postId)).fuccess,
               data =>
-                CreateRateLimit(HTTPRequest ipAddress ctx.req) {
+                CreateRateLimit(HTTPRequest.ipAddress(ctx.req)) {
                   postApi.editPost(postId, data.changes, me).map { post =>
                     Redirect(routes.ForumPost.redirect(post.id))
                   }
@@ -78,13 +77,13 @@ final class ForumPost(env: Env) extends LilaController(env) with ForumController
 
   def delete(categSlug: String, id: String) =
     Auth { implicit ctx => me =>
-      postApi getPost id flatMap {
-        _ ?? { post =>
+      postApi.getPost(id) flatMap {
+        _ so { post =>
           if (me.id == ~post.userId && !post.erased)
             postApi.erasePost(post) inject Redirect(routes.ForumPost.redirect(id))
           else
             isGrantedMod(categSlug) flatMap { granted =>
-              (granted | isGranted(_.ModerateForum)) ?? postApi.delete(categSlug, id, me) map { Ok(_) }
+              (granted | isGranted(_.ModerateForum)) so postApi.delete(categSlug, id, me) map { Ok(_) }
             }
         }
       }
@@ -93,7 +92,7 @@ final class ForumPost(env: Env) extends LilaController(env) with ForumController
   def react(id: String, reaction: String, v: Boolean) =
     Auth { implicit ctx => me =>
       postApi.react(id, me, reaction, v) map {
-        _ ?? { post =>
+        _ so { post =>
           Ok(views.html.forum.post.reactions(post, canReact = true))
         }
       }

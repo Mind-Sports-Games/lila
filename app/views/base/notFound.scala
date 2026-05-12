@@ -2,10 +2,8 @@ package views.html
 package base
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
-import controllers.routes
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object notFound {
 
@@ -14,7 +12,7 @@ object notFound {
       title = "Page not found",
       moreJs = prismicJs,
       moreCss = cssTag("not-found"),
-      csp = isGranted(_.Prismic) option defaultCsp.withPrismic(true)
+      csp = isGranted(_.Prismic).option(defaultCsp.withPrismic(true))
     ) {
       main(cls := "not-found page-small box box-pad")(
         header(
@@ -30,10 +28,10 @@ object notFound {
         ),
         div(cls := "game")(
           iframe(
-            src := staticAssetUrl(s"vendor/ChessPursuit/bin-release/index.html"),
+            src            := staticAssetUrl(s"vendor/ChessPursuit/bin-release/index.html"),
             st.frameborder := 0,
-            width := 400,
-            height := 500
+            width          := 400,
+            height         := 500
           ),
           p(cls := "credits")(
             a(href := "https://github.com/Saturnyn/ChessPursuit")("ChessPursuit"),

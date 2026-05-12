@@ -2,12 +2,13 @@ package lila.memo
 
 import com.github.blemale.scaffeine.AsyncLoadingCache
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
-import scala.concurrent.duration._
+import reactivemongo.api.bson.*
+import scala.concurrent.duration.*
 
-import CacheApi._
+import CacheApi.*
 import lila.db.BSON.BSONJodaDateTimeHandler
-import lila.db.dsl._
+import lila.db.dsl.*
+import lila.common.extensions.*
 
 /** To avoid recomputing very expensive values after deploy
   */
@@ -43,11 +44,10 @@ final class MongoCache[K, V: BSONHandler] private (
     }
   }
 
-  def get = cache.get _
+  def get = cache.get
 
   def invalidate(key: K): Funit =
-    coll.delete.one($id(makeDbKey(key))).void >>-
-      cache.invalidate(key)
+    coll.delete.one($id(makeDbKey(key))).void.andDo(cache.invalidate(key))
 
   private def makeDbKey(key: K) = s"$name:${keyToString(key)}"
 }

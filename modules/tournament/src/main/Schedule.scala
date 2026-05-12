@@ -2,7 +2,6 @@ package lila.tournament
 
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.GameLogic
 import strategygames.{ ByoyomiClock, Clock, ClockConfig }
 import org.joda.time.DateTime
 import play.api.i18n.Lang
@@ -24,13 +23,12 @@ case class Schedule(
 
   // Simpler naming for now.
   def name(full: Boolean = true)(implicit lang: Lang): String = {
-    import Schedule.Freq._
-    import Schedule.Speed._
-    import lila.i18n.I18nKeys.tourname._
+    import Schedule.Freq.*
+    import lila.i18n.I18nKeys.tourname.*
 
     freq match {
       case Weekly if full => weeklyXArena.txt(VariantKeys.variantName(variant))
-      case Weekly =>
+      case Weekly         =>
         weeklyX.txt(VariantKeys.variantName(variant))
       case Yearly if full => s"Yearly ${VariantKeys.variantName(variant)} Arena"
       case Yearly         => s"Yearly ${VariantKeys.variantName(variant)}"
@@ -134,9 +132,9 @@ case class Schedule(
 
   def sameConditions(other: Schedule) = conditions == other.conditions
 
-  def sameMaxRating(other: Schedule) = conditions sameMaxRating other.conditions
+  def sameMaxRating(other: Schedule) = conditions.sameMaxRating(other.conditions)
 
-  def similarConditions(other: Schedule) = conditions similar other.conditions
+  def similarConditions(other: Schedule) = conditions.similar(other.conditions)
 
   def sameDay(other: Schedule) = day == other.day
 
@@ -156,7 +154,7 @@ case class Schedule(
           .dayOfMonth
           .get() - 1) / 7) + 1) * 7
       }
-      case None => 7 //weekly
+      case None => 7 // weekly
     }
   )
 
@@ -171,7 +169,7 @@ object Schedule {
   def uniqueFor(tour: Tournament) =
     Schedule(
       freq = Freq.Unique,
-      speed = Speed fromClock tour.clock,
+      speed = Speed.fromClock(tour.clock),
       variant = tour.variant,
       position = tour.position,
       at = tour.startsAt,
@@ -182,7 +180,7 @@ object Schedule {
 
     def build: Tournament = {
       val t = Tournament.scheduleAs(addCondition(schedule), durationFor(schedule))
-      buildFunc.foldRight(t) { _(_) }
+      buildFunc.fold(t)(f => f(t))
     }
 
     def map(f: Tournament => Tournament) =
@@ -205,13 +203,13 @@ object Schedule {
   object Freq {
     case object Hourly extends Freq(10, 10)
     case object Daily  extends Freq(20, 20)
-    //case object Eastern  extends Freq(30, 15)
-    case object Weekly       extends Freq(40, 40)
-    case object Weekend      extends Freq(41, 41)
-    case object Monthly      extends Freq(50, 50)
-    case object Shield       extends Freq(51, 51)
-    case object MedleyShield extends Freq(52, 52)
-    case object Marathon     extends Freq(60, 60)
+    // case object Eastern  extends Freq(30, 15)
+    case object Weekly               extends Freq(40, 40)
+    case object Weekend              extends Freq(41, 41)
+    case object Monthly              extends Freq(50, 50)
+    case object Shield               extends Freq(51, 51)
+    case object MedleyShield         extends Freq(52, 52)
+    case object Marathon             extends Freq(60, 60)
     case object ExperimentalMarathon extends Freq(61, 55) { // for DB BC
       override val display = "Experimental Marathon"
     }
@@ -222,7 +220,7 @@ object Schedule {
     case object Annual       extends Freq(75, 80)
     case object Introductory extends Freq(80, 65)
     case object Unique       extends Freq(90, 59)
-    case object MSOWarmUp extends Freq(120, 41) {
+    case object MSOWarmUp    extends Freq(120, 41) {
       override val display = "MSO Warm-Up"
     }
     case object MSO21 extends Freq(121, 61) {
@@ -235,7 +233,7 @@ object Schedule {
     val all: List[Freq] = List(
       Hourly,
       Daily,
-      //Eastern,
+      // Eastern,
       Weekly,
       Weekend,
       Monthly,
@@ -260,7 +258,7 @@ object Schedule {
 
   sealed abstract class Speed(val id: Int) {
     val name = s"${toString} Chess"
-    val key  = lila.common.String lcfirst name
+    val key  = lila.common.String.lcfirst(name)
   }
   object Speed {
     case object UltraBullet  extends Speed(5)
@@ -325,8 +323,8 @@ object Schedule {
         Byoyomi510x5
       )
     val mostPopular: List[Speed] = List(Bullet, Blitz, Rapid, Classical)
-    def apply(key: String)       = all.find(_.key == key) orElse all.find(_.key.toLowerCase == key.toLowerCase)
-    def byId(id: Int)            = all find (_.id == id)
+    def apply(key: String) = all.find(_.key == key) orElse all.find(_.key.toLowerCase == key.toLowerCase)
+    def byId(id: Int)      = all find (_.id == id)
     def similar(s1: Speed, s2: Speed) =
       (s1, s2) match {
         case (a, b) if a == b                                        => true
@@ -335,8 +333,8 @@ object Schedule {
         case _                                                       => false
       }
     def fromClock(clock: ClockConfig) =
-      //TODO Rewrite this as basing on estimates isn't great. Also consider if we want to match
-      //specific Fischer clocks. We do for Byoyomi and Simple but not Fischer.
+      // TODO Rewrite this as basing on estimates isn't great. Also consider if we want to match
+      // specific Fischer clocks. We do for Byoyomi and Simple but not Fischer.
       clock match {
         case _: ByoyomiClock.Config => {
           val time = clock.estimateTotalSeconds
@@ -362,7 +360,7 @@ object Schedule {
       }
 
     def toPerfType(speed: Speed) =
-      //TODO Consider if we want to match against other clock types
+      // TODO Consider if we want to match against other clock types
       speed match {
         case UltraBullet                        => PerfType.orDefaultSpeed("ultraBullet")
         case HyperBullet | Bullet | HippoBullet => PerfType.orDefaultSpeed("bullet")
@@ -444,24 +442,23 @@ object Schedule {
     }
   }*/
 
-  private val standardIncHours         = Set(1, 7, 13, 19)
-  private def standardInc(s: Schedule) = standardIncHours(s.at.getHourOfDay)
-  private def zhInc(s: Schedule)       = s.at.getHourOfDay % 2 == 0
+  // private val standardIncHours         = Set(1, 7, 13, 19)
+  // private def standardInc(s: Schedule) = standardIncHours(s.at.getHourOfDay)
+  // private def zhInc(s: Schedule)       = s.at.getHourOfDay % 2 == 0
 
-  private def zhEliteTc(s: Schedule) = {
-    val TC = Clock.Config
-    s.at.getDayOfMonth / 7 match {
-      case 0 => TC(3 * 60, 0)
-      case 1 => TC(1 * 60, 1)
-      case 2 => TC(3 * 60, 2)
-      case 3 => TC(1 * 60, 0)
-      case _ => TC(2 * 60, 0) // for the sporadic 5th Saturday
-    }
-  }
+  // private def zhEliteTc(s: Schedule) = {
+  //   val TC = Clock.Config
+  //   s.at.getDayOfMonth / 7 match {
+  //     case 0 => TC(3 * 60, 0)
+  //     case 1 => TC(1 * 60, 1)
+  //     case 2 => TC(3 * 60, 2)
+  //     case 3 => TC(1 * 60, 0)
+  //     case _ => TC(2 * 60, 0) // for the sporadic 5th Saturday
+  //   }
+  // }
 
   private[tournament] def clockFor(s: Schedule) = {
-    import Freq._, Speed._
-    import strategygames.chess.variant._
+    import Freq.*, Speed.*
 
     val TC  = Clock.Config
     val BC  = ByoyomiClock.Config
@@ -469,10 +466,10 @@ object Schedule {
 
     (s.freq, s.variant, s.speed) match {
       // lichess Special cases.
-      //case (Weekend, strategygames.variant.Variant.Chess(Crazyhouse), Blitz)                 => zhEliteTc(s)
-      //case (Hourly, strategygames.variant.Variant.Chess(Crazyhouse), SuperBlitz) if zhInc(s) => TC(3 * 60, 1)
-      //case (Hourly, strategygames.variant.Variant.Chess(Crazyhouse), Blitz) if zhInc(s)      => TC(4 * 60, 2)
-      //case (Hourly, strategygames.variant.Variant.Chess(Standard), Blitz) if standardInc(s)  => TC(3 * 60, 2)
+      // case (Weekend, strategygames.variant.Variant.Chess(Crazyhouse), Blitz)                 => zhEliteTc(s)
+      // case (Hourly, strategygames.variant.Variant.Chess(Crazyhouse), SuperBlitz) if zhInc(s) => TC(3 * 60, 1)
+      // case (Hourly, strategygames.variant.Variant.Chess(Crazyhouse), Blitz) if zhInc(s)      => TC(4 * 60, 2)
+      // case (Hourly, strategygames.variant.Variant.Chess(Standard), Blitz) if standardInc(s)  => TC(3 * 60, 2)
 
       case (Shield, variant, Blitz) if variant.exotic => TC(3 * 60, 2)
 
@@ -513,8 +510,8 @@ object Schedule {
   private[tournament] def conditionFor(s: Schedule) =
     if (s.conditions.relevant) s.conditions
     else {
-      import Freq._, Speed._
 
+      //import Freq._, Speed._
       // No rated games required, because no-one has them.
       val nbRatedGame = 0 /*(s.freq, s.speed) match {
 

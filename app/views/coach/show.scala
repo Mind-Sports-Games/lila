@@ -1,12 +1,14 @@
 package views.html
 package coach
 
+/*
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.richText
 
 import controllers.routes
+*/
 
 object show {
   /*
@@ -27,7 +29,7 @@ object show {
       myReview: Option[lila.coach.CoachReview]
   )(implicit ctx: Context) = {
     val profile   = c.coach.profile
-    val coachName = s"${c.user.title.??(t => s"$t ")}${c.user.realNameOrUsername}"
+    val coachName = s"${c.user.title.so(t => s"$t ")}${c.user.realNameOrUsername}"
     val title     = xCoachesStudents.txt(coachName)
     views.html.base.layout(
       title = title,

@@ -1,9 +1,9 @@
 package lila.analyse
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.game.Game
-import lila.tree.Eval.JsonHandlers._
+import lila.tree.Eval.JsonHandlers.*
 
 import strategygames.Player.{ P1, P2 }
 

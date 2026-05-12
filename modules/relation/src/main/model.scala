@@ -26,7 +26,7 @@ case class Relations(
 
 object BSONHandlers {
 
-  import reactivemongo.api.bson._
+  import reactivemongo.api.bson.*
 
   implicit private[relation] val followerBSONHandler: BSONDocumentHandler[Follower] = Macros.handler[Follower]
   implicit private[relation] val followedBSONHandler: BSONDocumentHandler[Followed] = Macros.handler[Followed]

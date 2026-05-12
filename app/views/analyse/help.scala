@@ -1,8 +1,8 @@
 package views.html.analyse
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object help {
 
@@ -44,12 +44,14 @@ object help {
           row(frag(k("c")), "Focus chat"),
           row(frag(k("shift"), k("C")), trans.keyShowOrHideComments()),
           row(frag(k("?")), "Show this help dialog"),
-          isStudy option frag(
-            header("Study actions"),
-            row(frag(k("d")), trans.study.commentThisPosition()),
-            row(frag(k("g")), trans.study.annotateWithGlyphs()),
-            row(frag(k("n")), trans.study.nextChapter()),
-            row(frag(k("p")), trans.study.prevChapter())
+          isStudy.option(
+            frag(
+              header("Study actions"),
+              row(frag(k("d")), trans.study.commentThisPosition()),
+              row(frag(k("g")), trans.study.annotateWithGlyphs()),
+              row(frag(k("n")), trans.study.nextChapter()),
+              row(frag(k("p")), trans.study.prevChapter())
+            )
           ),
           header("Mouse tricks"),
           tr(

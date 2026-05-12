@@ -1,7 +1,7 @@
 package lila.forum
 
-import Filter._
-import lila.db.dsl._
+import Filter.*
+import lila.db.dsl.*
 import lila.user.User
 
 final class TopicRepo(val coll: Coll, filter: Filter = Safe)(implicit
@@ -17,14 +17,14 @@ final class TopicRepo(val coll: Coll, filter: Filter = Safe)(implicit
 
   import BSONHandlers.TopicBSONHandler
 
-  private val noTroll = $doc("troll" -> false)
+  private val noTroll     = $doc("troll" -> false)
   private val trollFilter = filter match {
     case Safe       => noTroll
     case SafeAnd(u) => $or(noTroll, $doc("userId" -> u))
     case Unsafe     => $empty
   }
 
-  private lazy val notStickyQuery = $doc("sticky" $ne true)
+  private lazy val notStickyQuery = $doc("sticky".$ne(true))
   private lazy val stickyQuery    = $doc("sticky" -> true)
 
   def close(id: String, value: Boolean): Funit =

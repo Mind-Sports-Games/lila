@@ -1,7 +1,7 @@
 package lila.plan
 
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
 case class PlanCheckout(
     email: Option[String],
@@ -55,6 +55,8 @@ object Switch {
       "amount" -> bigDecimal(precision = 10, scale = 2)
         .verifying(_ >= 1)
         .verifying(_ <= 10000)
-    )(Switch.apply)(Switch.unapply)
+    // scala3 upgrade, copying how lichess handle this function uses `_ => None`
+    // instead of `unapply` equivalent which would be `_.amount.some`
+    )(Switch.apply)(_ => None)
   )
 }

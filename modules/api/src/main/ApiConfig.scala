@@ -1,8 +1,6 @@
 package lila.api
 
-import scala.concurrent.duration._
-
-import lila.common.config._
+import lila.common.config.*
 
 final class ApiConfig(
     val apiToken: Secret,
@@ -21,9 +19,9 @@ object ApiConfig {
       val blindCookieName: String,
       blindCookieSalt: Secret
   ) {
-    val blindCookieMaxAge = 365 days
+    val blindCookieMaxAge                         = 365 days
     def hash(implicit ctx: lila.user.UserContext) = {
-      import com.roundeights.hasher.Implicits._
+      import com.roundeights.hasher.Implicits.*
       (ctx.userId | "anon").salt(blindCookieSalt.value).md5.hex
     }
   }

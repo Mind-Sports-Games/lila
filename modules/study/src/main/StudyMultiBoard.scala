@@ -1,19 +1,19 @@
 package lila.study
 
-import BSONHandlers._
-import strategygames.{ Player => PlayerIndex }
+import BSONHandlers.*
+import strategygames.Player as PlayerIndex
 import strategygames.format.pgn.Tags
 import strategygames.format.{ FEN, Uci }
 import com.github.blemale.scaffeine.AsyncLoadingCache
-import JsonView._
-import play.api.libs.json._
-import reactivemongo.api.bson._
-import scala.concurrent.duration._
+import JsonView.*
+import play.api.libs.json.*
+import reactivemongo.api.bson.*
+import scala.concurrent.duration.*
 
 import lila.common.config.MaxPerPage
 import lila.common.paginator.AdapterLike
 import lila.common.paginator.{ Paginator, PaginatorJson }
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final class StudyMultiBoard(
     chapterRepo: ChapterRepo,
@@ -22,8 +22,8 @@ final class StudyMultiBoard(
 
   private val maxPerPage = MaxPerPage(9)
 
-  import StudyMultiBoard._
-  import handlers._
+  import StudyMultiBoard.*
+  import handlers.*
 
   def json(studyId: Study.Id, page: Int, playing: Boolean): Fu[JsObject] = {
     if (page == 1 && !playing) firstPageCache.get(studyId)
@@ -38,7 +38,7 @@ final class StudyMultiBoard(
       .expireAfterAccess(10 minutes)
       .buildAsyncFuture[Study.Id, Paginator[ChapterPreview]] { fetch(_, 1, playing = false) }
 
-  private val playingSelector = $doc("tags" -> "Result:*", "relay.path" $ne "")
+  private val playingSelector = $doc("tags" -> "Result:*", "relay.path".$ne(""))
 
   private def fetch(studyId: Study.Id, page: Int, playing: Boolean): Fu[Paginator[ChapterPreview]] =
     Paginator[ChapterPreview](
@@ -50,15 +50,15 @@ final class StudyMultiBoard(
   final private class ChapterPreviewAdapter(studyId: Study.Id, playing: Boolean)
       extends AdapterLike[ChapterPreview] {
 
-    private val selector = $doc("studyId" -> studyId) ++ playing.??(playingSelector)
+    private val selector = $doc("studyId" -> studyId) ++ playing.so(playingSelector)
 
     def nbResults: Fu[Int] = chapterRepo.coll(_.countSel(selector))
 
     def slice(offset: Int, length: Int): Fu[Seq[ChapterPreview]] =
       chapterRepo
         .coll {
-          _.aggregateList(length, readPreference = readPref) { framework =>
-            import framework._
+          _.aggregateList(maxDocs = length, readPreference = readPref) { framework =>
+            import framework.*
             Match(selector) -> List(
               Sort(Ascending("order")),
               Skip(offset),

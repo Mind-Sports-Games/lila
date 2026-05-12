@@ -1,11 +1,9 @@
 package views.html.blog
 
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.common.config.BaseUrl
-
-import controllers.routes
 
 object atom {
 
@@ -22,23 +20,23 @@ object atom {
         """<feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">"""
       ),
       tag("id")(s"$baseUrl${routes.Blog.index()}"),
-      link(rel := "alternate", tpe := "text/html", href := s"$baseUrl${routes.Blog.index()}"),
-      link(rel := "self", tpe := "application/atom+xml", href := s"$baseUrl${routes.Blog.atom}"),
+      link(rel := "alternate", tpe := "text/html", href            := s"$baseUrl${routes.Blog.index()}"),
+      link(rel := "self", tpe      := "application/atom+xml", href := s"$baseUrl${routes.Blog.atom}"),
       tag("title")("playstrategy.org blog"),
       tag("updated")(pager.currentPageResults.headOption.flatMap(atomDate("blog.date"))),
       pager.currentPageResults.map { doc =>
         tag("entry")(
           tag("id")(
             s"$baseUrl${routes.Blog
-              .show(doc.id, urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-")))}"
+                .show(doc.id, urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-")))}"
           ),
           tag("published")(atomDate("blog.date")(doc)),
           tag("updated")(atomDate("blog.date")(doc)),
           link(
-            rel := "alternate",
-            tpe := "text/html",
+            rel  := "alternate",
+            tpe  := "text/html",
             href := s"$baseUrl${routes.Blog
-              .show(doc.id, urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-")))}"
+                .show(doc.id, urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-")))}"
           ),
           tag("title")(doc.getText("blog.title")),
           tag("category")(

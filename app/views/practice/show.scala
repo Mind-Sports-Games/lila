@@ -4,8 +4,8 @@ package practice
 import play.api.libs.json.Json
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 
 object show {
@@ -21,17 +21,17 @@ object show {
         analyseTag,
         analyseNvuiTag,
         embedJsUnsafe(s"""playstrategy.practice=${safeJsonValue(
-          Json.obj(
-            "practice" -> data.practice,
-            "study"    -> data.study,
-            "data"     -> data.analysis,
-            "i18n"     -> board.userAnalysisI18n(),
-            "explorer" -> Json.obj(
-              "endpoint"          -> explorerEndpoint,
-              "tablebaseEndpoint" -> tablebaseEndpoint
+            Json.obj(
+              "practice" -> data.practice,
+              "study"    -> data.study,
+              "data"     -> data.analysis,
+              "i18n"     -> board.userAnalysisI18n(),
+              "explorer" -> Json.obj(
+                "endpoint"          -> explorerEndpoint,
+                "tablebaseEndpoint" -> tablebaseEndpoint
+              )
             )
-          )
-        )}""")
+          )}""")
       ),
       csp = defaultCsp.withWebAssembly.some,
       chessground = false,

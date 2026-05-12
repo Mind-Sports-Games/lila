@@ -1,14 +1,13 @@
 package lila.game
 
-import akka.actor._
-import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import akka.actor.*
+import com.softwaremill.macwire.*
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import play.api.libs.ws.StandaloneWSClient
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-import lila.common.config._
-import lila.mon.user
+import lila.common.config.*
 
 final private class GameConfig(
     @ConfigName("collection.game") val gameColl: CollName,
@@ -35,7 +34,7 @@ final class Env(
     scheduler: Scheduler
 ) {
 
-  private val config = appConfig.get[GameConfig]("game")(AutoConfig.loader)
+  private val config = appConfig.get[GameConfig]("game")(using AutoConfig.loader)
 
   lazy val gameRepo = new GameRepo(db(config.gameColl))
 

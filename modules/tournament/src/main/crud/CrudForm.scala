@@ -2,20 +2,20 @@ package lila.tournament
 package crud
 
 import org.joda.time.DateTime
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, GameLogic }
+import strategygames.{ Clock, ClockConfig, GameFamily, GameLogic }
 
-import lila.common.Form._
-import lila.common.Clock._
+import lila.common.Form.*
+import lila.common.Clock.*
 
 object CrudForm {
 
-  import TournamentForm._
-  import lila.common.Form.ISODateTime._
+  import TournamentForm.*
+  import lila.common.Form.ISODateTime.*
 
   val maxHomepageHours = 168
 
@@ -23,7 +23,7 @@ object CrudForm {
     mapping(
       "name"          -> text(minLength = 3, maxLength = 40),
       "homepageHours" -> number(min = 0, max = maxHomepageHours),
-      "clock" -> clockConfigMappingsMinutes(clockTimes, clockByoyomi)
+      "clock"         -> clockConfigMappingsMinutes(clockTimes, clockByoyomi)
         .verifying("Invalid clock", _.estimateTotalSeconds > 0),
       "minutes" -> number(min = 20, max = 1440),
       "variant" -> optional(
@@ -43,27 +43,29 @@ object CrudForm {
       "statusScoring" -> boolean,
       "teamBattle"    -> boolean,
       "hasChat"       -> boolean
-    )(CrudForm.Data.apply)(CrudForm.Data.unapply)
+    )(CrudForm.Data.apply)(unapply)
       .verifying("Invalid clock", _.validClock)
       .verifying("Increase tournament duration, or decrease game clock", _.validTiming)
-  ) fill CrudForm.Data(
-    name = "",
-    homepageHours = 0,
-    clock = Clock.Config(180, 0),
-    minutes = minuteDefault,
-    variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
-    handicapped = false,
-    position = none,
-    date = DateTime.now plusDays 7,
-    image = "",
-    headline = "",
-    description = "",
-    conditions = Condition.DataForm.AllSetup.default,
-    berserkable = true,
-    streakable = true,
-    statusScoring = false,
-    teamBattle = false,
-    hasChat = true
+  ).fill(
+    CrudForm.Data(
+      name = "",
+      homepageHours = 0,
+      clock = Clock.Config(180, 0),
+      minutes = minuteDefault,
+      variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
+      handicapped = false,
+      position = none,
+      date = DateTime.now.plusDays(7),
+      image = "",
+      headline = "",
+      description = "",
+      conditions = Condition.DataForm.AllSetup.default,
+      berserkable = true,
+      streakable = true,
+      statusScoring = false,
+      teamBattle = false,
+      hasChat = true
+    )
   )
 
   case class Data(
@@ -95,7 +97,7 @@ object CrudForm {
       Variant.apply(gameLogic, v.split("_")(1).toInt)
     } getOrElse Variant.default(gameLogic)
 
-    def realPosition = position ifTrue realVariant.key == "standard"
+    def realPosition = position.ifTrue(realVariant.key == "standard")
 
     def validClock = (clock.limitSeconds + clock.graceSeconds) > 0
 

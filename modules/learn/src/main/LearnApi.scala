@@ -1,14 +1,14 @@
 package lila.learn
 
 import reactivemongo.api.ReadPreference
-import cats.implicits._
+import cats.implicits.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final class LearnApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BSONHandlers._
+  import BSONHandlers.*
 
   def get(user: User): Fu[LearnProgress] =
     coll.one[LearnProgress]($id(user.id)) dmap { _ | LearnProgress.empty(LearnProgress.Id(user.id)) }
@@ -28,12 +28,9 @@ final class LearnApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext)
 
   def completionPercent(userIds: List[User.ID]): Fu[Map[User.ID, Int]] =
     coll
-      .aggregateList(
-        maxDocs = Int.MaxValue,
-        readPreference = ReadPreference.secondaryPreferred
-      ) { framework =>
-        import framework._
-        Match($doc("_id" $in userIds)) -> List(
+      .aggregateList(maxDocs = Int.MaxValue, ReadPreference.secondaryPreferred) { framework =>
+        import framework.*
+        Match($doc("_id".$in(userIds))) -> List(
           Project($doc("stages" -> $doc("$objectToArray" -> "$stages"))),
           UnwindField("stages"),
           Project(
@@ -43,7 +40,7 @@ final class LearnApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext)
                   "$filter" -> $doc(
                     "input" -> "$stages.v",
                     "as"    -> "s",
-                    "cond" -> $doc(
+                    "cond"  -> $doc(
                       "$ne" -> $arr("$$s", 0)
                     )
                   )
@@ -55,10 +52,12 @@ final class LearnApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext)
         )
       }
       .map {
-        _.view.flatMap { obj =>
-          (obj string "_id", obj int "nb") mapN { (k, v) =>
-            k -> (v * 100f / maxCompletion).toInt
+        _.view
+          .flatMap { obj =>
+            (obj string "_id", obj int "nb") mapN { (k, v) =>
+              k -> (v * 100f / maxCompletion).toInt
+            }
           }
-        }.toMap
+          .toMap
       }
 }

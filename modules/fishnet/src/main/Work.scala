@@ -4,7 +4,6 @@ import org.joda.time.DateTime
 
 import strategygames.format.{ FEN, Uci }
 import strategygames.variant.Variant
-import strategygames.{ GameFamily, GameLogic }
 import lila.common.IpAddress
 
 sealed trait Work {
@@ -26,7 +25,7 @@ sealed trait Work {
   def nonAcquired                  = !isAcquired
   def canAcquire(client: Client)   = lastTryByKey.fold(true)(client.key !=)
 
-  def acquiredBefore(date: DateTime) = acquiredAt.??(_ isBefore date)
+  def acquiredBefore(date: DateTime) = acquiredAt.so(_.isBefore(date))
 }
 
 object Work {
@@ -53,7 +52,7 @@ object Work {
   ) {
 
     def uciList: List[Uci] =
-      ~(Uci.readList(variant.gameLogic, variant.gameFamily, moves))
+      ~Uci.readList(variant.gameLogic, variant.gameFamily, moves)
   }
 
   case class Sender(
@@ -115,5 +114,5 @@ object Work {
     override def toString = s"id:$id game:${game.id} tries:$tries requestedBy:$sender acquired:$acquired"
   }
 
-  def makeId = Id(lila.common.ThreadLocalRandom nextString 8)
+  def makeId = Id(lila.common.ThreadLocalRandom.nextString(8))
 }

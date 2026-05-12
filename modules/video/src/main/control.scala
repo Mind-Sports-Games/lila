@@ -26,17 +26,17 @@ case class UserControl(
 
   def toggleTag(tag: String) =
     copy(
-      filter = filter toggle tag,
+      filter = filter.toggle(tag),
       query = none
     )
 
   def queryString =
     List(
-      filter.tags.nonEmpty option s"tags=${filter.tags.sorted mkString "/"}".replace(' ', '+'),
+      filter.tags.nonEmpty.option(s"tags=${filter.tags.sorted mkString "/"}".replace(' ', '+')),
       query.map { q =>
         s"q=$q"
       }
     ).flatten mkString "&"
 
-  def queryStringUnlessBot = !bot ?? queryString
+  def queryStringUnlessBot = !bot so queryString
 }

@@ -1,12 +1,12 @@
 package views.html.site
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object lag {
 
-  import trans.lag._
+  import trans.lag.*
 
   def apply()(implicit ctx: Context) =
     page.layout(

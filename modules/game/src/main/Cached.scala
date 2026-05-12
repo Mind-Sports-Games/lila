@@ -1,9 +1,8 @@
 package lila.game
 
 import com.github.blemale.scaffeine.LoadingCache
-import scala.concurrent.duration._
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.memo.{ CacheApi, MongoCache }
 import lila.user.User
 
@@ -14,14 +13,14 @@ final class Cached(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def nbImportedBy(userId: User.ID): Fu[Int] = nbImportedCache.get(userId)
-  def clearNbImportedByCache                 = nbImportedCache invalidate _
+  def clearNbImportedByCache                 = (id: User.ID) => nbImportedCache.invalidate(id)
 
   def nbTotal: Fu[Long]                          = nbTotalCache.get {}
   def monthlyGames: Fu[List[MonthlyGameData]]    = monthlyGamesCache.get {}
   def gameWinRates: Fu[List[WinRatePercentages]] = gameWinRatesCache.get {}
 
-  def nbPlaying = nbPlayingCache.get _
-  //def nbCorrespondencePlaying = nbCorrespondencePlayingCache.get {}
+  def nbPlaying = nbPlayingCache.get
+  // def nbCorrespondencePlaying = nbCorrespondencePlayingCache.get {}
 
   def lastPlayedPlayingId(userId: User.ID): Fu[Option[Game.ID]] = lastPlayedPlayingIdCache get userId
 
@@ -37,7 +36,7 @@ final class Cached(
   private val nbPlayingCache = cacheApi[User.ID, Int](256, "game.nbPlaying") {
     _.expireAfterWrite(15 seconds)
       .buildAsyncFuture { userId =>
-        gameRepo.coll.countSel(Query nowPlaying userId)
+        gameRepo.coll.countSel(Query.nowPlaying(userId))
       }
   }
 
@@ -62,7 +61,7 @@ final class Cached(
     _.expireAfterAccess(10 minutes)
       .buildAsyncFuture {
         loader { userId =>
-          gameRepo.coll countSel Query.imported(userId)
+          gameRepo.coll.countSel(Query.imported(userId))
         }
       }
   }
@@ -92,5 +91,4 @@ final class Cached(
         gameRepo.calculateWinRatePercentages
       }
   }
-
 }

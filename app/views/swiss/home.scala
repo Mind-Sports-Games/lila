@@ -1,12 +1,10 @@
 package views.html.swiss
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.swiss.{ FeaturedSwisses, Swiss }
 import lila.i18n.VariantKeys
-
-import controllers.routes
 
 object home {
 
@@ -58,7 +56,7 @@ object home {
             ),
             td(cls := "infos")(
               span(cls := "rounds")(
-                s.isStarted option frag(s.round.value, " / "),
+                s.isStarted.option(frag(s.round.value, " / ")),
                 s.settings.nbRounds,
                 " rounds",
                 if (s.settings.isBestOfX) {
@@ -66,8 +64,8 @@ object home {
                 } else if (s.settings.isPlayX) {
                   s" (${s.settings.nbGamesPerRound} games per round"
                 },
-                if (s.settings.isMatchScore)
-                  " using match score",
+                if (s.settings.isMatchScore) " using match score"
+                else "",
                 if (s.settings.isBestOfX || s.settings.isPlayX) ")"
                 else ""
               ),

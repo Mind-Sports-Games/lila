@@ -1,8 +1,7 @@
 package lila.game
 
-import akka.stream.scaladsl._
-import play.api.libs.json._
-import scala.concurrent.duration._
+import akka.stream.scaladsl.*
+import play.api.libs.json.*
 
 import actorApi.{ FinishGame, StartGame }
 import strategygames.{ ByoyomiClock, Clock }
@@ -23,16 +22,16 @@ final class GamesByUsersStream(gameRepo: lila.game.GameRepo)(implicit
     .mapAsync(1)(gameRepo.withInitialFen)
     .map(gameWithInitialFenWriter.writes)
 
-  def apply(userIds: Set[User.ID]): Source[JsValue, _] =
+  def apply(userIds: Set[User.ID]): Source[JsValue, ?] =
     blueprint mapMaterializedValue { queue =>
       def matches(game: Game) =
         game.userIds match {
           case List(u1, u2) if u1 != u2 => userIds(u1) && userIds(u2)
           case _                        => false
         }
-      val sub = Bus.subscribeFun(chans: _*) {
-        case StartGame(game) if matches(game)        => queue.offer(game).unit
-        case FinishGame(game, _, _) if matches(game) => queue.offer(game).unit
+      val sub = Bus.subscribeFun(chans*) {
+        case StartGame(game) if matches(game)        => queue.offer(game).discard
+        case FinishGame(game, _, _) if matches(game) => queue.offer(game).discard
       }
       queue.watchCompletion().foreach { _ =>
         Bus.unsubscribe(sub, chans)
@@ -54,7 +53,7 @@ final class GamesByUsersStream(gameRepo: lila.game.GameRepo)(implicit
           "perf"      -> PerfPicker.key(g),
           "createdAt" -> g.createdAt,
           "status"    -> g.status.id,
-          "players" -> JsObject(g.players map { p =>
+          "players"   -> JsObject(g.players map { p =>
             p.playerIndex.name -> Json
               .obj(
                 "userId" -> p.userId,

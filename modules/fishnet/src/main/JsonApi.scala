@@ -2,16 +2,14 @@ package lila.fishnet
 
 import strategygames.format.{ FEN, LexicalUci, Uci, UciDump }
 import strategygames.variant.Variant
-import strategygames.{ GameFamily, GameLogic }
 import org.joda.time.DateTime
-import play.api.libs.json._
+import play.api.libs.json.*
 
-import lila.common.Json._
+import lila.common.Json.*
 import lila.common.{ IpAddress, Maths }
-import lila.fishnet.{ Work => W }
-import lila.tree.Eval.JsonHandlers._
+import lila.fishnet.Work as W
+import lila.tree.Eval.JsonHandlers.*
 import lila.tree.Eval.{ Cp, Mate }
-import akka.actor.typed.PostStop
 
 object JsonApi {
 
@@ -34,7 +32,7 @@ object JsonApi {
     case class Stockfish(
         flavor: Option[String]
     ) {
-      def isNnue = flavor.has("nnue")
+      def isNnue = flavor.contains("nnue")
     }
 
     case class Acquire(
@@ -53,10 +51,10 @@ object JsonApi {
           fishnet,
           stockfish,
           analysis.map(o =>
-            o.map({
+            o.map {
               case Right(e) => Right(Evaluation.toUci(e, variant))
               case Left(s)  => Left(s)
-            })
+            }
           )
         )
     }
@@ -69,7 +67,7 @@ object JsonApi {
         with Result {
 
       def completeOrPartial =
-        if (analysis.headOption.??(_.isDefined)) CompleteAnalysis(fishnet, stockfish, analysis.flatten)
+        if (analysis.headOption.so(_.isDefined)) CompleteAnalysis(fishnet, stockfish, analysis.flatten)
         else PartialAnalysis(fishnet, stockfish, analysis)
     }
 
@@ -117,9 +115,9 @@ object JsonApi {
 
       val cappedPv = pv take lila.analyse.Info.LineMaxTurns
 
-      def isCheckmate = score.mate has Mate(0)
+      def isCheckmate = score.mate.contains(Mate(0))
       def mateFound   = score.mate.isDefined
-      def deadDraw    = score.cp has Cp(0)
+      def deadDraw    = score.cp.contains(Cp(0))
     }
 
     object Evaluation {
@@ -165,7 +163,7 @@ object JsonApi {
       variant: Variant,
       moves: String
   ) {
-    def uciMoves = ~(Uci.readList(variant.gameLogic, variant.gameFamily, moves))
+    def uciMoves = ~Uci.readList(variant.gameLogic, variant.gameFamily, moves)
     def toUci    = UciGame(game_id, position, variant, uciMoves)
   }
 
@@ -201,14 +199,14 @@ object JsonApi {
     )
 
   object readers {
-    import play.api.libs.functional.syntax._
-    implicit val ClientVersionReads: Reads[Client.Version]   = Reads.of[String].map(Client.Version(_))
-    implicit val ClientPythonReads: Reads[Client.Python]     = Reads.of[String].map(Client.Python(_))
-    implicit val ClientKeyReads: Reads[Client.Key]           = Reads.of[String].map(Client.Key(_))
-    implicit val StockfishReads: Reads[Request.Stockfish]    = Json.reads[Request.Stockfish]
-    implicit val FishnetReads: Reads[Request.Fishnet]        = Json.reads[Request.Fishnet]
-    implicit val AcquireReads: Reads[Request.Acquire]        = Json.reads[Request.Acquire]
-    implicit val ScoreReads: Reads[Request.Evaluation.Score] = Json.reads[Request.Evaluation.Score]
+    import play.api.libs.functional.syntax.*
+    implicit val ClientVersionReads: Reads[Client.Version]         = Reads.of[String].map(Client.Version(_))
+    implicit val ClientPythonReads: Reads[Client.Python]           = Reads.of[String].map(Client.Python(_))
+    implicit val ClientKeyReads: Reads[Client.Key]                 = Reads.of[String].map(Client.Key(_))
+    implicit val StockfishReads: Reads[Request.Stockfish]          = Json.reads[Request.Stockfish]
+    implicit val FishnetReads: Reads[Request.Fishnet]              = Json.reads[Request.Fishnet]
+    implicit val AcquireReads: Reads[Request.Acquire]              = Json.reads[Request.Acquire]
+    implicit val ScoreReads: Reads[Request.Evaluation.Score]       = Json.reads[Request.Evaluation.Score]
     implicit val uciListReadsLexicalUcis: Reads[Array[LexicalUci]] = Reads.of[String] map { str =>
       str.split(" ").flatMap(LexicalUci.apply)
     }
@@ -226,8 +224,8 @@ object JsonApi {
     implicit val EvaluationOptionReads: Reads[Option[Request.Evaluation.OrSkipped[LexicalUci]]] =
       Reads[Option[Request.Evaluation.OrSkipped[LexicalUci]]] {
         case JsNull => JsSuccess(None)
-        case obj =>
-          if (~(obj boolean "skipped")) JsSuccess(Left(Request.Evaluation.Skipped).some)
+        case obj    =>
+          if (~obj.boolean("skipped")) JsSuccess(Left(Request.Evaluation.Skipped).some)
           else EvaluationReads reads obj map Right.apply map some
       }
     implicit val PostAnalysisReads: Reads[Request.PostAnalysisLexicalUci] =
@@ -236,7 +234,7 @@ object JsonApi {
 
   object writers {
     implicit val VariantWrites: Writes[Variant] = Writes[Variant] { v => JsString(v.fishnetKey) }
-    implicit val GameWrites: Writes[UciGame] = Writes[UciGame] { g =>
+    implicit val GameWrites: Writes[UciGame]    = Writes[UciGame] { g =>
       Json.obj(
         "game_id"  -> g.game_id,
         "position" -> FEN.fishnetFen(g.variant)(g.position),
@@ -252,8 +250,8 @@ object JsonApi {
         case a: Analysis =>
           Json.obj(
             "work" -> Json.obj(
-              "type" -> "analysis",
-              "id"   -> a.id,
+              "type"  -> "analysis",
+              "id"    -> a.id,
               "nodes" -> Json.obj(
                 "sf15"      -> a.nodes,
                 "sf14"      -> a.nodes * 14 / 10,

@@ -3,15 +3,13 @@ package views.html.report
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.user.User
-
-import controllers.routes
 
 object form {
 
-  def apply(form: Form[_], reqUser: Option[User] = None, captcha: lila.common.Captcha)(implicit
+  def apply(form: Form[?], reqUser: Option[User] = None, captcha: lila.common.Captcha)(implicit
       ctx: Context
   ) =
     views.html.base.layout(
@@ -22,8 +20,8 @@ object form {
       main(cls := "page-small box box-pad report")(
         h1(trans.reportAUser()),
         postForm(
-          cls := "form3",
-          action := s"${routes.Report.create}${reqUser.??(u => "?username=" + u.username)}"
+          cls    := "form3",
+          action := s"${routes.Report.create}${reqUser.so(u => "?username=" + u.username)}"
         )(
           div(cls := "form-group")(
             a(href := routes.Page.lonePage("report-faq"), dataIcon := "", cls := "text")(
@@ -61,9 +59,9 @@ object form {
       form3.hidden("resource", resource),
       form3.hidden("text", text take 140),
       submitButton(
-        cls := "button button-empty button-red confirm",
+        cls      := "button button-empty button-red confirm",
         dataIcon := "j",
-        title := "Report spam or offensive language"
+        title    := "Report spam or offensive language"
       )
     )
 }

@@ -1,7 +1,6 @@
 package lila.tournament
 
 import org.joda.time.DateTime
-import scala.concurrent.duration._
 
 import lila.user.User
 
@@ -14,7 +13,7 @@ import lila.user.User
  */
 final private class Pause {
 
-  import Pause._
+  import Pause.*
 
   private val cache = lila.memo.CacheApi.scaffeineNoScheduler
     .expireAfterWrite(20 minutes)
@@ -29,7 +28,7 @@ final private class Pause {
     Delay {
       // 10s for first pause
       // next ones increasing linearly until 120s
-      baseDelayOf(tour).seconds * (record.pauses - 1) atLeast 10 atMost 120
+      (baseDelayOf(tour).seconds * (record.pauses - 1)).atLeast(10).atMost(120)
     }
 
   def add(userId: User.ID): Unit =
@@ -41,7 +40,7 @@ final private class Pause {
   def remainingDelay(userId: User.ID, tour: Tournament): Option[Delay] =
     cache getIfPresent userId flatMap { record =>
       val seconds = record.pausedAt.getSeconds - nowSeconds + delayOf(record, tour).seconds
-      seconds > 1 option Delay(seconds.toInt)
+      (seconds > 1).option(Delay(seconds.toInt))
     }
 
   def canJoin(userId: User.ID, tour: Tournament): Boolean =

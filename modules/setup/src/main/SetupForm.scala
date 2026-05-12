@@ -4,24 +4,24 @@ import strategygames.format.FEN
 import strategygames.{ GameFamily, GameLogic }
 import strategygames.variant.Variant
 import strategygames.Centis
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
 import lila.rating.RatingRange
 import lila.user.{ User, UserContext }
 
 object SetupForm {
 
-  import Mappings._
+  import Mappings.*
 
   val filter = Form(single("local" -> text))
 
-  def filled(lib: GameLogic, fen: Option[FEN], variant: Option[Variant])(implicit
+  def filled(lib: GameLogic, fen: Option[FEN], variant: Option[Variant])(using
       ctx: UserContext
   ): Form[GameConfig] =
-    game(ctx) fill {
+    game(using ctx) fill {
       val baseConfig = GameConfig.default(lib.id)
-      val withFen = fen.fold(baseConfig) { f =>
+      val withFen    = fen.fold(baseConfig) { f =>
         baseConfig.copy(
           fen = Some(f),
           variant = lib match {
@@ -34,7 +34,7 @@ object SetupForm {
       variant.fold(withFen)(v => withFen.copy(variant = v))
     }
 
-  def game(ctx: UserContext) =
+  def game(using ctx: UserContext) =
     Form(
       mapping(
         "variant"          -> variant(Config.variantsWithFenAndVariants),
@@ -61,7 +61,7 @@ object SetupForm {
         .verifying("Invalid Points", _.validPoints)
     )
 
-  def hook(implicit ctx: UserContext) =
+  def hook(using ctx: UserContext) =
     Form(
       mapping(
         "variant"     -> variant(Config.variantsWithVariants),
@@ -112,7 +112,7 @@ object SetupForm {
       .verifying("Invalid clock", _.validClock)
       .verifying(
         "Invalid time control",
-        hook => hook.makeClock ?? lila.game.Game.isBoardCompatible
+        hook => hook.makeClock.so(lila.game.Game.isBoardCompatible)
       )
   )
 
@@ -121,51 +121,51 @@ object SetupForm {
     // TODO: There has to be a way to reduce this code.
     lazy val fischerClockMapping =
       mapping(
-        "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
+        "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains),
         "increment" -> increment
-      )(strategygames.Clock.Config.apply)(strategygames.Clock.Config.unapply)
+      )(strategygames.Clock.Config.apply)(unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
 
     lazy val fischerClock = "clock" -> optional(fischerClockMapping)
 
     lazy val bronsteinDelayClockMapping =
       mapping(
-        "limit" -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
+        "limit" -> number.verifying(ApiConfig.clockLimitSeconds.contains),
         "delay" -> increment
-      )(strategygames.Clock.BronsteinConfig.apply)(strategygames.Clock.BronsteinConfig.unapply)
+      )(strategygames.Clock.BronsteinConfig.apply)(unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
     lazy val bronsteinDelayClock = "clock" -> optional(bronsteinDelayClockMapping)
 
     lazy val simpleDelayMapping =
       mapping(
-        "limit" -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
+        "limit" -> number.verifying(ApiConfig.clockLimitSeconds.contains),
         "delay" -> increment
-      )(strategygames.Clock.SimpleDelayConfig.apply)(strategygames.Clock.SimpleDelayConfig.unapply)
+      )(strategygames.Clock.SimpleDelayConfig.apply)(unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
     lazy val simpleDelayClock = "clock" -> optional(simpleDelayMapping)
 
     lazy val byoyomiClockMapping =
       mapping(
-        "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
+        "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains),
         "increment" -> increment,
         "byoyomi"   -> byoyomi,
         "periods"   -> periods
-      )(strategygames.ByoyomiClock.Config.apply)(strategygames.ByoyomiClock.Config.unapply)
+      )(strategygames.ByoyomiClock.Config.apply)(unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
     lazy val byoyomiClock = "clock" -> optional(byoyomiClockMapping)
 
     lazy val variant =
-      "variant" -> optional(text.verifying(Variant.byKey.contains _))
+      "variant" -> optional(text.verifying(Variant.byKey.contains))
 
     lazy val message = optional(
       nonEmptyText.verifying(
         "The message must contain {game}, which will be replaced with the game URL.",
-        _ contains "{game}"
+        _.contains("{game}")
       )
     )
 
     def user(from: User) =
-      Form(challengeMapping.verifying("Invalid speed", _ validSpeed from.isBot))
+      Form(challengeMapping.verifying("Invalid speed", _.validSpeed(from.isBot)))
 
     def admin = Form(challengeMapping)
 

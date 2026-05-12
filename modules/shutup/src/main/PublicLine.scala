@@ -3,7 +3,7 @@ package lila.shutup
 import org.joda.time.DateTime
 import scala.util.Success
 
-import lila.hub.actorApi.shutup.{ PublicSource => Source }
+import lila.hub.actorApi.shutup.PublicSource as Source
 
 case class PublicLine(
     text: String,
@@ -16,8 +16,8 @@ object PublicLine {
   def make(text: String, from: Source): PublicLine =
     PublicLine(text, from.some, DateTime.now.some)
 
-  import reactivemongo.api.bson._
-  import lila.db.dsl._
+  import reactivemongo.api.bson.*
+  import lila.db.dsl.*
   implicit private val SourceHandler: BSONHandler[Source] = lila.db.dsl.tryHandler[Source](
     { case BSONString(v) =>
       v split ':' match {

@@ -1,10 +1,9 @@
 package lila.challenge
 
-import strategygames.{ P2, Player => PlayerIndex, GameLogic, Mode, Situation, P1 }
+import strategygames.{ GameLogic, Mode, P1, P2, Player as PlayerIndex, Situation }
 import strategygames.format.Forsyth
 import strategygames.format.Forsyth.SituationPlus
 import strategygames.variant.Variant
-import scala.util.chaining._
 
 import lila.game.{ Game, Player, Pov, Source }
 import lila.user.User
@@ -16,13 +15,14 @@ final private class ChallengeJoiner(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def apply(c: Challenge, destUser: Option[User], playerIndex: Option[PlayerIndex]): Fu[Option[Pov]] =
-    gameRepo exists c.id flatMap {
-      case true                                                                             => fuccess(None)
-      case _ if playerIndex.map(Challenge.PlayerIndexChoice.apply).has(c.playerIndexChoice) => fuccess(None)
+    gameRepo.exists(c.id) flatMap {
+      case true => fuccess(None)
+      case _ if playerIndex.map(Challenge.PlayerIndexChoice.apply).contains(c.playerIndexChoice) =>
+        fuccess(None)
       case _ =>
-        c.challengerUserId.??(userRepo.byId) flatMap { origUser =>
+        c.challengerUserId.so(userRepo.byId) flatMap { origUser =>
           val game = ChallengeJoiner.createGame(c, origUser, destUser, playerIndex)
-          (gameRepo.insertDenormalized(game, c.initialFen)) >>- onStart(game.id) inject Pov(
+          gameRepo.insertDenormalized(game, c.initialFen).andDo(onStart(game.id)) inject Pov(
             game,
             !c.finalPlayerIndex
           ).some
@@ -36,7 +36,7 @@ private object ChallengeJoiner {
       c: Challenge,
       origUser: Option[User],
       destUser: Option[User],
-      playerIndex: Option[PlayerIndex]
+      @annotation.nowarn("msg=unused") _playerIndex: Option[PlayerIndex]
   ): Game = {
     def makeStratGame(variant: Variant): strategygames.Game =
       strategygames.Game(
@@ -65,7 +65,7 @@ private object ChallengeJoiner {
         else game                                                 -> baseState
       }
     }
-    val multiMatch = c.isMultiMatch && c.customStartingPosition option "multiMatch"
+    val multiMatch = (c.isMultiMatch && c.customStartingPosition).option("multiMatch")
     val perfPicker = (perfs: lila.user.Perfs) => perfs(c.perfType)
     Game
       .make(

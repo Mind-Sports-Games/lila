@@ -1,9 +1,9 @@
 package lila.plan
 
 import play.api.i18n.Lang
-import play.api.libs.json._
-import play.api.libs.ws.DefaultBodyWritables._
-import play.api.libs.ws.JsonBodyReadables._
+import play.api.libs.json.*
+import play.api.libs.ws.DefaultBodyWritables.*
+import play.api.libs.ws.JsonBodyReadables.*
 import play.api.libs.ws.{ StandaloneWSClient, StandaloneWSResponse }
 
 import lila.common.config.Secret
@@ -16,11 +16,11 @@ final private class StripeClient(
     config: StripeClient.Config
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import StripeClient._
-  import JsonHandlers._
-  import JsonHandlers.stripe._
+  import StripeClient.*
+  import JsonHandlers.*
+  import JsonHandlers.stripe.*
 
-  private val STRIPE_VERSION = "2020-08-27" //do we need this?
+  private val STRIPE_VERSION = "2020-08-27" // do we need this?
 
   def sessionArgs(customerId: StripeCustomerId, urls: NextUrls): List[(String, Any)] =
     List(
@@ -37,13 +37,13 @@ final private class StripeClient(
       "line_items[0][price_data][currency]"    -> "USD",
       "line_items[0][price_data][unit_amount]" -> data.checkout.amount.value,
       "line_items[0][quantity]"                -> 1
-    ) ::: data.isLifetime.?? {
+    ) ::: data.isLifetime.so {
       List(
         "line_items[0][description]" ->
           lila.i18n.I18nKeys.patron.payLifetimeOnce.txt(data.checkout.amount.usd.toString)
       )
     }
-    postOne[StripeSession]("checkout/sessions", args: _*)
+    postOne[StripeSession]("checkout/sessions", args*)
   }
 
   private def recurringPriceArgs(name: String, amount: Cents) = List(
@@ -59,7 +59,7 @@ final private class StripeClient(
     val args = sessionArgs(data.customerId, data.urls) ++
       List("mode" -> "subscription") ++
       recurringPriceArgs("line_items", data.checkout.amount)
-    postOne[StripeSession]("checkout/sessions", args: _*)
+    postOne[StripeSession]("checkout/sessions", args*)
   }
 
   def createCustomer(user: User, data: PlanCheckout): Fu[StripeCustomer] =
@@ -80,7 +80,7 @@ final private class StripeClient(
     )
     postOne[StripeSubscription](
       s"subscriptions/${sub.id}",
-      args: _*
+      args*
     )
   }
 
@@ -100,7 +100,7 @@ final private class StripeClient(
     getList[StripeInvoice]("invoices", "customer" -> customerId.value)
 
   def getPaymentMethod(sub: StripeSubscription): Fu[Option[StripePaymentMethod]] =
-    sub.default_payment_method ?? { id =>
+    sub.default_payment_method so { id =>
       getOne[StripePaymentMethod](s"payment_methods/$id")
     }
 
@@ -109,7 +109,7 @@ final private class StripeClient(
       "mode"                                         -> "setup",
       "setup_intent_data[metadata][subscription_id]" -> sub.id
     )
-    postOne[StripeSession]("checkout/sessions", args: _*)
+    postOne[StripeSession]("checkout/sessions", args*)
   }
 
   def getSession(id: String): Fu[Option[StripeSessionWithIntent]] =
@@ -127,18 +127,18 @@ final private class StripeClient(
   def setSubscriptionPaymentMethod(subscription: StripeSubscription, paymentMethod: String): Funit =
     postOne[JsObject](s"subscriptions/${subscription.id}", "default_payment_method" -> paymentMethod).void
 
-  private val logger = lila.plan.logger branch "stripe"
+  private val logger = lila.plan.logger.branch("stripe")
 
   private def getOne[A: Reads](url: String, queryString: (String, Any)*): Fu[Option[A]] =
-    get[A](url, queryString) dmap some recover {
+    get[A](url, queryString).dmap(some) recover {
       case _: NotFoundException => None
-      case e: DeletedException =>
+      case e: DeletedException  =>
         logger.warn(e.getMessage)
         None
     }
 
   private def getList[A: Reads](url: String, queryString: (String, Any)*): Fu[List[A]] =
-    get[List[A]](url, queryString)(listReader[A])
+    get[List[A]](url, queryString)(using listReader[A])
 
   private def postOne[A: Reads](url: String, data: (String, Any)*): Fu[A] = post[A](url, data)
 
@@ -147,7 +147,7 @@ final private class StripeClient(
 
   private def get[A: Reads](url: String, queryString: Seq[(String, Any)]): Fu[A] = {
     logger.debug(s"GET $url ${debugInput(queryString)}")
-    request(url).withQueryStringParameters(fixInput(queryString): _*).get() flatMap response[A]
+    request(url).withQueryStringParameters(fixInput(queryString)*).get() flatMap response[A]
   }
 
   private def post[A: Reads](url: String, data: Seq[(String, Any)]): Fu[A] = {
@@ -157,7 +157,7 @@ final private class StripeClient(
 
   private def delete[A: Reads](url: String, data: Seq[(String, Any)]): Fu[A] = {
     logger.info(s"DELETE $url ${debugInput(data)}")
-    request(url).withQueryStringParameters(fixInput(data): _*).delete() flatMap response[A]
+    request(url).withQueryStringParameters(fixInput(data)*).delete() flatMap response[A]
   }
 
   private def request(url: String) =
@@ -214,7 +214,7 @@ object StripeClient {
   class NotFoundException(status: Int, msg: String)       extends StatusException(status, msg)
   class InvalidRequestException(status: Int, msg: String) extends StatusException(status, msg)
 
-  import io.methvin.play.autoconfig._
+  import lila.common.autoconfig.{ AutoConfig, ConfigName }
   private[plan] case class Config(
       endpoint: String,
       @ConfigName("keys.public") publicKey: String,

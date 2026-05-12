@@ -3,15 +3,13 @@ package views.html.learn
 import play.api.libs.json.Json
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
-
-import controllers.routes
 
 object index {
 
-  import trans.learn.{ play => _, _ }
+  import trans.learn.{ play as _, * }
 
   def apply(data: Option[play.api.libs.json.JsValue])(implicit ctx: Context) =
     views.html.base.layout(
@@ -19,11 +17,11 @@ object index {
       moreJs = frag(
         jsModule("learn"),
         embedJsUnsafeLoadThen(s"""PlayStrategyLearn(document.getElementById('learn-app'), ${safeJsonValue(
-          Json.obj(
-            "data" -> data,
-            "i18n" -> i18nJsObject(i18nKeys)
-          )
-        )})""")
+            Json.obj(
+              "data" -> data,
+              "i18n" -> i18nJsObject(i18nKeys)
+            )
+          )})""")
       ),
       moreCss = cssTag("learn"),
       openGraph = lila.app.ui

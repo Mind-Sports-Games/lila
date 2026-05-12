@@ -1,11 +1,10 @@
 package controllers
 
 import play.api.http.ContentTypes
-import scala.util.chaining._
-import views._
+import views.*
 
 import lila.api.Context
-import lila.app._
+import lila.app.{ *, given }
 import lila.game.Pov
 
 final class Tv(
@@ -22,7 +21,7 @@ final class Tv(
 
   def sides(gameId: String, playerIndex: String) =
     Open { implicit ctx =>
-      OptionFuResult(strategygames.Player.fromName(playerIndex) ?? { env.round.proxyRepo.pov(gameId, _) }) {
+      OptionFuResult(strategygames.Player.fromName(playerIndex) so { env.round.proxyRepo.pov(gameId, _) }) {
         pov =>
           env.game.crosstableApi.withMatchup(pov.game) map { ct =>
             Ok(html.tv.side.sides(pov, ct))
@@ -32,7 +31,7 @@ final class Tv(
 
   def channels =
     apiC.ApiRequest { _ =>
-      import play.api.libs.json._
+      import play.api.libs.json.*
       implicit val championWrites = Json.writes[lila.tv.Tv.Champion]
       env.tv.tv.getChampions map {
         _.channels map { case (chan, champ) => chan.name -> champ }
@@ -40,9 +39,9 @@ final class Tv(
     }
 
   private def playstrategyTv(channel: lila.tv.Tv.Channel)(implicit ctx: Context) =
-    OptionFuResult(env.tv.tv getGameAndHistory channel) { case (game, history) =>
+    OptionFuResult(env.tv.tv.getGameAndHistory(channel)) { case (game, history) =>
       val flip    = getBool("flip")
-      val natural = Pov naturalOrientation game
+      val natural = Pov.naturalOrientation(game)
       val pov     = if (flip) !natural else natural
       val onTv    = lila.round.OnPlayStrategyTv(channel.key, flip)
       negotiate(
@@ -63,7 +62,7 @@ final class Tv(
 
   def gamesChannel(chanKey: String) =
     Open { implicit ctx =>
-      (lila.tv.Tv.Channel.byKey get chanKey) ?? { channel =>
+      (lila.tv.Tv.Channel.byKey get chanKey) so { channel =>
         env.tv.tv.getChampions zip env.tv.tv.getGames(channel, 15) zip env.tv.tv.getCorrespondenceGames map {
           case ((champs, lGames), cGames) =>
             NoCache {
@@ -72,7 +71,7 @@ final class Tv(
                   channel,
                   (lGames ++ env.tv.tv.getNonLiveCorrespondenceGamesOfChannel(channel, cGames, 15, lGames))
                     .take(15) map Pov.naturalOrientation,
-                  env.tv.tv.getCorrespondenceChampions(cGames) combineWithAndFavour champs
+                  env.tv.tv.getCorrespondenceChampions(cGames).combineWithAndFavour(champs)
                 )
               )
             }
@@ -82,23 +81,24 @@ final class Tv(
 
   def feed =
     Action.async { req =>
-      import makeTimeout.short
+      given akka.util.Timeout = akka.util.Timeout(1.second)
       import akka.pattern.ask
       import lila.round.TvBroadcast
       import play.api.libs.EventSource
       val bc = getBool("bc", req)
-      env.round.tvBroadcast ? TvBroadcast.Connect(bc) mapTo
-        manifest[TvBroadcast.SourceType] map { source =>
-          if (bc) Ok.chunked(source via EventSource.flow).as(ContentTypes.EVENT_STREAM) pipe noProxyBuffer
-          else apiC.sourceToNdJson(source)
-        }
+      (env.round.tvBroadcast ? TvBroadcast.Connect(bc)).mapTo(using
+        scala.reflect.classTag[TvBroadcast.SourceType]
+      ) map { source =>
+        if (bc) Ok.chunked(source via EventSource.flow).as(ContentTypes.EVENT_STREAM).pipe(noProxyBuffer)
+        else apiC.sourceToNdJson(source)
+      }
     }
 
   def frame =
     Action.async { implicit req =>
       env.tv.tv.getBestGame map {
         case None       => NotFound
-        case Some(game) => Ok(views.html.tv.embed(Pov naturalOrientation game))
+        case Some(game) => Ok(views.html.tv.embed(Pov.naturalOrientation(game)))
       }
     }
 }

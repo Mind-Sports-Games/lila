@@ -1,11 +1,11 @@
 package lila.team
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final class RequestRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BSONHandlers._
+  import BSONHandlers.*
 
   type ID = String
 
@@ -22,11 +22,11 @@ final class RequestRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionC
     coll.list[Request](teamQuery(teamId))
 
   def findByTeams(teamIds: List[ID]): Fu[List[Request]] =
-    teamIds.nonEmpty ?? coll.list[Request](teamsQuery(teamIds))
+    teamIds.nonEmpty so coll.list[Request](teamsQuery(teamIds))
 
   def selectId(teamId: ID, userId: ID) = $id(Request.makeId(teamId, userId))
   def teamQuery(teamId: ID)            = $doc("team" -> teamId)
-  def teamsQuery(teamIds: List[ID])    = $doc("team" $in teamIds)
+  def teamsQuery(teamIds: List[ID])    = $doc("team".$in(teamIds))
 
   def getByUserId(userId: User.ID) =
     coll.list[Request]($doc("user" -> userId))

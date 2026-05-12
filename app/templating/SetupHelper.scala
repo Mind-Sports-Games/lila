@@ -5,7 +5,7 @@ import strategygames.{ GameFamily, GameGroup, Mode, Speed }
 import strategygames.variant.Variant
 import play.api.i18n.Lang
 
-import lila.i18n.{ I18nKeys => trans, VariantKeys }
+import lila.i18n.{ I18nKeys as trans, VariantKeys }
 import lila.pref.Pref
 import lila.report.Reason
 import lila.setup.TimeMode
@@ -140,7 +140,9 @@ trait SetupHelper { self: I18nHelper =>
       (Mode.Rated.id.toString, "\uE92B", trans.rated.txt().some)
     )
 
-  def translatedTimeModeIconChoices(implicit lang: Lang): List[SelectChoice] =
+  def translatedTimeModeIconChoices(implicit
+      @annotation.nowarn("msg=unused") lang: Lang
+  ): List[SelectChoice] =
     List(
       ("bullet", "\u0054", "1+0".some),
       ("blitz", "\u0029", "3+2".some),
@@ -164,10 +166,10 @@ trait SetupHelper { self: I18nHelper =>
 
   private val encodeId           = (v: Variant) => v.id.toString
   private val encodeGameFamilyId = (lib: GameFamily) => lib.id.toString
-  private val encodeGameGroupId = (g: GameGroup) =>
+  private val encodeGameGroupId  = (g: GameGroup) =>
     encodeGameFamilyId(g.variants.headOption.map(_.gameFamily).getOrElse(GameFamily.Chess()))
 
-  private def variantTupleId = variantTuple(encodeId) _
+  private def variantTupleId = variantTuple(encodeId)
 
   private def variantTuple(
       encode: Variant => String,
@@ -272,7 +274,7 @@ trait SetupHelper { self: I18nHelper =>
   private def translatedVariantChoicesByGameFamily(
       gameFamily: GameFamily,
       encode: Variant => String
-  )(implicit lang: Lang): List[SelectChoice] =
+  )(implicit @annotation.nowarn("msg=unused") lang: Lang): List[SelectChoice] =
     List(gameFamily.defaultVariant).map(variantTuple(encode))
 
   def translatedVariantChoicesWithVariants(implicit
@@ -358,14 +360,14 @@ trait SetupHelper { self: I18nHelper =>
       )
     )
 
-  //used in lidraughts but not in lila (yet?)
-  //private def fromPositionVariantTupleId(v: Variant)(implicit lang: Lang) =
+  // used in lidraughts but not in lila (yet?)
+  // private def fromPositionVariantTupleId(v: Variant)(implicit lang: Lang) =
   //  variantTuple(encodeId, v => fromPositionVariantName(VariantKeys.variantName(v)))(v)
 
-  //private def fromPositionVariantName(variantName: String) =
+  // private def fromPositionVariantName(variantName: String) =
   //  s"From Position | ${variantName}"
 
-  //def translatedDraughtsFromPositionVariantChoices(implicit lang: Lang) =
+  // def translatedDraughtsFromPositionVariantChoices(implicit lang: Lang) =
   //  List((
   //    encodeId(GameFamily.Draughts().defaultVariant),
   //    fromPositionVariantName(GameFamily.Draughts().defaultVariant.name),
@@ -396,7 +398,7 @@ trait SetupHelper { self: I18nHelper =>
       ("bot", "\uE933", trans.bot.txt().some)
     )
 
-  def translatedPSBotChoices(implicit lang: Lang): List[SelectChoice] =
+  def translatedPSBotChoices(implicit @annotation.nowarn("msg=unused") lang: Lang): List[SelectChoice] =
     LightUser.lobbyBotsIDs.map { id =>
       (
         id.toString(),
@@ -411,7 +413,7 @@ trait SetupHelper { self: I18nHelper =>
       )
     }
 
-  def translatedStockfishChoices(implicit lang: Lang): List[SelectChoice] =
+  def translatedStockfishChoices(implicit @annotation.nowarn("msg=unused") lang: Lang): List[SelectChoice] =
     LightUser.stockfishBotsIDs.map { id => (id.toString(), id.takeRight(1), none) }
 
   def translatedAnimationChoices(implicit lang: Lang) =
@@ -554,7 +556,7 @@ trait SetupHelper { self: I18nHelper =>
 
   def translatedStudyInviteChoices(implicit lang: Lang) = privacyBaseChoices
   def translatedPalantirChoices(implicit lang: Lang)    = privacyBaseChoices
-  private def privacyBaseChoices(implicit lang: Lang) =
+  private def privacyBaseChoices(implicit lang: Lang)   =
     List(
       (Pref.StudyInvite.NEVER, trans.never.txt()),
       (Pref.StudyInvite.FRIEND, trans.onlyFriends.txt()),

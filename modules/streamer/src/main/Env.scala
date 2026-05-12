@@ -1,12 +1,12 @@
 package lila.streamer
 
-import akka.actor._
-import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import akka.actor.*
+import com.softwaremill.macwire.*
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-import lila.common.config._
+import lila.common.config.*
 import play.api.ConfigLoader
 
 @Module
@@ -39,14 +39,14 @@ final class Env(
 
   implicit private val twitchLoader: ConfigLoader[TwitchConfig]    = AutoConfig.loader[TwitchConfig]
   implicit private val keywordLoader: ConfigLoader[Stream.Keyword] = strLoader(Stream.Keyword.apply)
-  private val config                                               = appConfig.get[StreamerConfig]("streamer")(AutoConfig.loader)
+  private val config = appConfig.get[StreamerConfig]("streamer")(using AutoConfig.loader)
 
   private lazy val streamerColl = db(config.streamerColl)
 
   private lazy val photographer = new lila.db.Photographer(imageRepo, "streamer")
 
   lazy val alwaysFeaturedSetting = {
-    import lila.memo.SettingStore.UserIds._
+    import lila.memo.SettingStore.UserIds.*
     import lila.common.UserIds
     settingStore[UserIds](
       "streamerAlwaysFeatured",
@@ -77,7 +77,7 @@ final class Env(
         isOnline = isOnline,
         timeline = timeline,
         keyword = config.keyword,
-        alwaysFeatured = alwaysFeaturedSetting.get _,
+        alwaysFeatured = () => alwaysFeaturedSetting.get(),
         googleApiKey = config.googleApiKey,
         twitchApi = twitchApi
       )
@@ -87,10 +87,10 @@ final class Env(
   lazy val liveStreamApi = wire[LiveStreamApi]
 
   lila.common.Bus.subscribeFun("adjustCheater") { case lila.hub.actorApi.mod.MarkCheater(userId, true) =>
-    api.demote(userId).unit
+    api.demote(userId).discard
   }
 
   scheduler.scheduleWithFixedDelay(1 hour, 1 day) { () =>
-    api.autoDemoteFakes.unit
+    api.autoDemoteFakes.discard
   }
 }

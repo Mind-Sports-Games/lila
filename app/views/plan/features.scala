@@ -4,10 +4,8 @@ package html.plan
 import play.api.i18n.Lang
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
-import controllers.routes
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object features {
 
@@ -25,7 +23,7 @@ object features {
     ) {
       main(cls := "box box-pad features")(
         table(
-          //header(h1(dataIcon := "")("Website")),
+          // header(h1(dataIcon := "")("Website")),
           header(h1("Website")),
           tbody(
             tr(check)(

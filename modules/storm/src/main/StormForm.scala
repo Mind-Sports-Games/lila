@@ -1,7 +1,7 @@
 package lila.storm
 
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
 object StormForm {
 
@@ -28,7 +28,7 @@ object StormForm {
       "highest"      -> number(min = lila.rating.Glicko.minRating, max = 4000),
       "notAnExploit" -> nonEmptyText.verifying(_ == notAnExploit),
       "signed"       -> optional(nonEmptyText)
-    )(RunData.apply)(RunData.unapply)
+    )(RunData.apply)(unapply)
   )
 
   val notAnExploit =

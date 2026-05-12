@@ -1,7 +1,6 @@
 package lila.history
 
-import play.api.libs.json._
-import scala.concurrent.duration._
+import play.api.libs.json.*
 
 import lila.rating.PerfType
 import lila.user.{ User, UserRepo }
@@ -15,7 +14,7 @@ final class RatingChartApi(
 
   def apply(user: User): Fu[Option[String]] =
     cache.get(user.id) dmap { chart =>
-      chart.nonEmpty option chart
+      chart.nonEmpty.option(chart)
     }
 
   def singlePerf(user: User, perfType: PerfType): Fu[JsArray] =
@@ -31,21 +30,25 @@ final class RatingChartApi(
       }
   }
 
-  private def ratingsMapToJson(userId: User.ID, createdAt: DateTime, ratingsMap: RatingsMap) =
+  private def ratingsMapToJson(
+      @annotation.nowarn("msg=unused") _userId: User.ID,
+      createdAt: DateTime,
+      ratingsMap: RatingsMap
+  ) =
     ratingsMap.map { case (days, rating) =>
-      val date = createdAt plusDays days
+      val date = createdAt.plusDays(days)
       Json.arr(date.getYear, date.getMonthOfYear - 1, date.getDayOfMonth, rating)
     }
 
   private def build(userId: User.ID): Fu[Option[String]] =
     userRepo.createdAtById(userId) flatMap {
-      _ ?? { createdAt =>
-        historyApi get userId map2 { (history: History) =>
+      _ so { createdAt =>
+        historyApi.get(userId) map2 { (history: History) =>
           lila.common.String.html.safeJsonValue {
             Json.toJson {
               PerfType.all.filter(_.key != "standard") map { pt =>
                 Json.obj(
-                  "name"   -> pt.trans(lila.i18n.defaultLang),
+                  "name"   -> pt.trans(using lila.i18n.defaultLang),
                   "points" -> ratingsMapToJson(userId, createdAt, history(pt))
                 )
               }

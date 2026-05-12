@@ -1,10 +1,9 @@
 package lila.swiss
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import play.api.Configuration
-import scala.concurrent.duration._
 
-import lila.common.config._
+import lila.common.config.*
 import lila.common.{ AtMost, Every, ResilientScheduler }
 import lila.socket.Socket.{ GetVersion, SocketVersion }
 
@@ -58,12 +57,12 @@ final class Env(
 
   lazy val roundPager = wire[SwissRoundPager]
 
-  private def teamOf = api.teamOf _
+  private def teamOf = api.teamOf
 
   private lazy val socket = wire[SwissSocket]
 
   def version(swissId: Swiss.Id): Fu[SocketVersion] =
-    socket.rooms.ask[SocketVersion](swissId.value)(GetVersion)
+    socket.rooms.ask[SocketVersion](swissId.value)(GetVersion.apply)
 
   lazy val standingApi = wire[SwissStandingApi]
 
@@ -83,10 +82,10 @@ final class Env(
     "adjustBooster",
     "teamKick"
   ) {
-    case lila.game.actorApi.FinishGame(game, _, _)           => api.updateMultiMatchProgress(game).unit
-    case lila.hub.actorApi.team.KickFromTeam(teamId, userId) => api.kickFromTeam(teamId, userId).unit
-    case lila.hub.actorApi.mod.MarkCheater(userId, true)     => api.kickLame(userId).unit
-    case lila.hub.actorApi.mod.MarkBooster(userId)           => api.kickLame(userId).unit
+    case lila.game.actorApi.FinishGame(game, _, _)           => api.updateMultiMatchProgress(game).discard
+    case lila.hub.actorApi.team.KickFromTeam(teamId, userId) => api.kickFromTeam(teamId, userId).discard
+    case lila.hub.actorApi.mod.MarkCheater(userId, true)     => api.kickLame(userId).discard
+    case lila.hub.actorApi.mod.MarkBooster(userId)           => api.kickLame(userId).discard
   }
 
   ResilientScheduler(

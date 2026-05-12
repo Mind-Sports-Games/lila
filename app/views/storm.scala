@@ -1,12 +1,11 @@
 package views.html
 
-import controllers.routes
 import play.api.i18n.Lang
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.common.String.html.safeJsonValue
 import lila.storm.{ StormDay, StormHigh }
@@ -21,12 +20,12 @@ object storm {
         jsModule("storm"),
         embedJsUnsafeLoadThen(
           s"""PlayStrategyStorm.start(${safeJsonValue(
-            Json.obj(
-              "data" -> data,
-              "pref" -> pref,
-              "i18n" -> i18nJsObject(i18nKeys)
-            )
-          )})"""
+              Json.obj(
+                "data" -> data,
+                "pref" -> pref,
+                "i18n" -> i18nJsObject(i18nKeys)
+              )
+            )})"""
         )
       ),
       title = "Puzzle Storm",
@@ -55,6 +54,7 @@ object storm {
       )
     }
 
+  @annotation.nowarn("msg=unused")
   private def renderHigh(high: StormHigh)(implicit lang: Lang) =
     frag(
       List(
@@ -81,9 +81,11 @@ object storm {
       main(cls := "storm-dashboard page-small")(
         div(cls := "storm-dashboard__high box box-pad")(
           h1(
-            !ctx.is(user) option frag(
-              userLink(user),
-              " • "
+            (!ctx.is(user)).option(
+              frag(
+                userLink(user),
+                " • "
+              )
             ),
             "Puzzle Storm • ",
             trans.storm.highscores()
@@ -124,7 +126,7 @@ object storm {
                 history,
                 np =>
                   addQueryParameter(
-                    if (ctx is user) routes.Storm.dashboard().url
+                    if (ctx.is(user)) routes.Storm.dashboard().url
                     else routes.Storm.dashboardOf(user.username).url,
                     "page",
                     np
@@ -137,7 +139,7 @@ object storm {
     )
 
   private val i18nKeys = {
-    import lila.i18n.I18nKeys.{ storm => s }
+    import lila.i18n.I18nKeys.storm as s
     List(
       s.moveToStart,
       s.puzzlesSolved,

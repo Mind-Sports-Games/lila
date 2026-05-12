@@ -1,10 +1,8 @@
 package views.html.blog
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
-import controllers.routes
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object show {
 
@@ -21,8 +19,8 @@ object show {
           image = doc.getImage("blog.image", "main").map(_.url),
           title = ~doc.getText("blog.title"),
           url = s"$netBaseUrl${routes.Blog
-            .show(doc.id, urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-")))
-            .url}",
+              .show(doc.id, urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-")))
+              .url}",
           description = ~doc.getText("blog.shortlede")
         )
         .some,
@@ -45,20 +43,25 @@ object show {
               .map(lila.blog.BlogTransform.markdown.apply)
               .map(raw)
           ),
-          ctx.noKid option
+          ctx.noKid.option(
             div(cls := "footer")(
               if (prismic.maybeRef.isEmpty) {
-                (doc
+                doc
                   .getDate("blog.date")
-                  .exists(
-                    _.value.toDateTimeAtStartOfDay isAfter org.joda.time.DateTime.now.minusWeeks(2)
-                  )) option
-                  a(href := routes.Blog.discuss(doc.id), cls := "button text discuss", dataIcon := "d")(
-                    "Discuss this blog post in the forum"
+                  .exists(d =>
+                    new org.joda.time.DateTime(
+                      d.value.atStartOfDay(java.time.ZoneOffset.UTC).toInstant.toEpochMilli
+                    ).isAfter(org.joda.time.DateTime.now.minusWeeks(2))
+                  )
+                  .option(
+                    a(href := routes.Blog.discuss(doc.id), cls := "button text discuss", dataIcon := "d")(
+                      "Discuss this blog post in the forum"
+                    )
                   )
               } else p("This is a preview."),
               views.html.base.bits.connectLinks
             )
+          )
         )
       )
     )

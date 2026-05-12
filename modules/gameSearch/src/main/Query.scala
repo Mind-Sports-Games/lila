@@ -52,8 +52,8 @@ case class Query(
 
 object Query {
 
-  import lila.common.Form._
-  import play.api.libs.json._
+  import lila.common.Form.*
+  import play.api.libs.json.*
 
   import Range.rangeJsonWriter
   implicit private val sortingJsonWriter: OWrites[Sorting]   = Json.writes[Sorting]
@@ -132,9 +132,9 @@ object Query {
     options(1 to 5, "y", "%d year{s} ago")
 
   val statuses = Status.finishedNotCheated.flatMap {
-    case s if s.is(_.Timeout)       => none
-    case s if s.is(_.NoStart)       => none
-    case s if s.is(_.UnknownFinish) => none
+    case s if s.is(_.Timeout)                                                             => none
+    case s if s.is(_.NoStart)                                                             => none
+    case s if s.is(_.UnknownFinish)                                                       => none
     case s if s.is(_.Outoftime) || s.is(_.OutoftimeGammon) || s.is(_.OutoftimeBackgammon) =>
       Some(s.id -> "Clock Flag")
     case s if s.is(_.RuleOfGin) || s.is(_.GinGammon) || s.is(_.GinBackgammon) =>

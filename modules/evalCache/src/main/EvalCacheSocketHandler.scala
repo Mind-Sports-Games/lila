@@ -4,9 +4,9 @@ import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.GameLogic
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
-import lila.socket._
+import lila.socket.*
 import lila.user.User
 
 final private class EvalCacheSocketHandler(
@@ -21,10 +21,10 @@ final private class EvalCacheSocketHandler(
       push: JsObject => Unit
   ): Unit =
     for {
-      fen <- d str "fen" map { fen => FEN.apply(GameLogic(~d.int("lib")), fen) }
+      fen <- d.str("fen") map { fen => FEN.apply(GameLogic(~d.int("lib")), fen) }
       variant = Variant.orDefault(GameLogic(~d.int("lib")), ~d.str("variant"))
-      multiPv = (d int "mpv") | 1
-      path <- d str "path"
+      multiPv = (d.int("mpv")) | 1
+      path <- d.str("path")
     } {
       def pushData(data: JsObject) = push(Socket.makeMessage("evalHit", data))
       api.getEvalJson(variant, fen, multiPv) foreach {
@@ -36,7 +36,7 @@ final private class EvalCacheSocketHandler(
     }
 
   def untrustedEvalPut(sri: Socket.Sri, userId: User.ID, data: JsObject): Unit =
-    truster cachedTrusted userId foreach {
+    truster.cachedTrusted(userId) foreach {
       _ foreach { tu =>
         JsonHandlers.readPutData(tu, data) foreach {
           api.put(tu, _, sri)

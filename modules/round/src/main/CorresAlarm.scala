@@ -1,14 +1,13 @@
 package lila.round
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import org.joda.time.DateTime
 import reactivemongo.akkastream.cursorProducer
 
-import scala.concurrent.duration._
-
 import lila.common.Bus
 import lila.common.LilaStream
-import lila.db.dsl._
+import lila.common.extensions.*
+import lila.db.dsl.*
 import lila.game.{ Game, Pov }
 import reactivemongo.api.bson.BSONDocumentHandler
 
@@ -30,21 +29,21 @@ final private class CorresAlarm(
 
   implicit private val AlarmHandler: BSONDocumentHandler[Alarm] = reactivemongo.api.bson.Macros.handler[Alarm]
 
-  private def scheduleNext(): Unit = scheduler.scheduleOnce(10 seconds) { run().unit }.unit
+  private def scheduleNext(): Unit = { val _ = scheduler.scheduleOnce(10 seconds) { run().discard } }
 
   scheduler.scheduleOnce(10 seconds) { scheduleNext() }
 
   Bus.subscribeFun("finishGame") { case lila.game.actorApi.FinishGame(game, _, _) =>
-    if (game.hasCorrespondenceClock && !game.hasAi) coll.delete.one($id(game.id)).unit
+    if (game.hasCorrespondenceClock && !game.hasAi) coll.delete.one($id(game.id)).discard
   }
 
   Bus.subscribeFun("moveEventCorres") {
     case lila.hub.actorApi.round.CorresMoveEvent(move, _, _, alarmable, _) if alarmable =>
       proxyGame(move.gameId) foreach {
         _ foreach { game =>
-          game.bothPlayersHaveMoved ?? {
-            game.playableCorrespondenceClock ?? { clock =>
-              val remainingTime = clock remainingTime game.turnPlayerIndex
+          game.bothPlayersHaveMoved so {
+            game.playableCorrespondenceClock so { clock =>
+              val remainingTime = clock.remainingTime(game.turnPlayerIndex)
               val ringsAt       = DateTime.now.plusSeconds(remainingTime.toInt * 8 / 10)
               coll.update
                 .one(
@@ -65,7 +64,7 @@ final private class CorresAlarm(
 
   private def run(): Funit =
     coll
-      .find($doc("ringsAt" $lt DateTime.now))
+      .find($doc("ringsAt".$lt(DateTime.now)))
       .cursor[Alarm]()
       .documentSource(200)
       .mapAsyncUnordered(4)(alarm => proxyGame(alarm._id))

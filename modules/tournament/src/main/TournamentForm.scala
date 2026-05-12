@@ -1,128 +1,132 @@
 package lila.tournament
 
-import cats.implicits._
+import cats.implicits.*
 import strategygames.format.FEN
-import strategygames.chess.{ StartingPosition }
+import strategygames.chess.StartingPosition
 import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, GameGroup, GameLogic, Mode }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 import play.api.data.validation
 import play.api.data.validation.Constraint
 
-import lila.common.Form._
-import lila.common.Clock._
+import lila.common.Form.*
+import lila.common.Clock.*
 import lila.hub.LeaderTeam
-import lila.hub.LightTeam._
+import lila.hub.LightTeam.*
 import lila.user.User
 
 final class TournamentForm {
 
-  import TournamentForm._
+  import TournamentForm.*
 
   def create(user: User, leaderTeams: List[LeaderTeam], teamBattleId: Option[TeamID] = None) =
-    form(user, leaderTeams) fill TournamentSetup(
-      name = teamBattleId.isEmpty option user.titleUsername,
-      clock = Clock.Config(180, 0),
-      minutes = minuteDefault,
-      waitMinutes = waitMinuteDefault.some,
-      startDate = none,
-      variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
-      medley = false.some,
-      medleyIntervalOptions = MedleyIntervalOptions(
-        medleyMinutes = medleyMinutesDefault.some,
-        balanceIntervals = true.some,
-        numIntervals = Some(5)
-      ),
-      medleyDefaults = MedleyDefaults(
-        onePerGameFamily = false.some,
-        exoticChessVariants = false.some,
-        draughts64Variants = false.some
-      ),
-      medleyGameFamilies = MedleyGameFamilies(
-        chess = true.some,
-        draughts = true.some,
-        shogi = true.some,
-        xiangqi = true.some,
-        loa = true.some,
-        flipello = true.some,
-        mancala = true.some,
-        amazons = true.some,
-        breakthroughtroyka = true.some,
-        go = true.some,
-        backgammon = true.some,
-        abalone = true.some
-      ),
-      variantSettings = VariantSettings(
-        handicaps = Handicaps(
-          handicapped = false.some,
-          inputPlayerRatings = None
-        )
-      ),
-      position = None,
-      password = None,
-      mode = none,
-      rated = true.some,
-      conditions = Condition.DataForm.AllSetup.default,
-      teamBattleByTeam = teamBattleId,
-      berserkable = true.some,
-      streakable = true.some,
-      statusScoring = false.some,
-      description = none,
-      hasChat = true.some
+    form(user, leaderTeams).fill(
+      TournamentSetup(
+        name = teamBattleId.isEmpty.option(user.titleUsername),
+        clock = Clock.Config(180, 0),
+        minutes = minuteDefault,
+        waitMinutes = waitMinuteDefault.some,
+        startDate = none,
+        variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
+        medley = false.some,
+        medleyIntervalOptions = MedleyIntervalOptions(
+          medleyMinutes = medleyMinutesDefault.some,
+          balanceIntervals = true.some,
+          numIntervals = Some(5)
+        ),
+        medleyDefaults = MedleyDefaults(
+          onePerGameFamily = false.some,
+          exoticChessVariants = false.some,
+          draughts64Variants = false.some
+        ),
+        medleyGameFamilies = MedleyGameFamilies(
+          chess = true.some,
+          draughts = true.some,
+          shogi = true.some,
+          xiangqi = true.some,
+          loa = true.some,
+          flipello = true.some,
+          mancala = true.some,
+          amazons = true.some,
+          breakthroughtroyka = true.some,
+          go = true.some,
+          backgammon = true.some,
+          abalone = true.some
+        ),
+        variantSettings = VariantSettings(
+          handicaps = Handicaps(
+            handicapped = false.some,
+            inputPlayerRatings = None
+          )
+        ),
+        position = None,
+        password = None,
+        mode = none,
+        rated = true.some,
+        conditions = Condition.DataForm.AllSetup.default,
+        teamBattleByTeam = teamBattleId,
+        berserkable = true.some,
+        streakable = true.some,
+        statusScoring = false.some,
+        description = none,
+        hasChat = true.some
+      )
     )
 
   def edit(user: User, leaderTeams: List[LeaderTeam], tour: Tournament) =
-    form(user, leaderTeams) fill TournamentSetup(
-      name = tour.name.some,
-      clock = tour.clock,
-      minutes = if (tour.isMedley) tour.medleyDurationMinutes else tour.minutes,
-      waitMinutes = none,
-      startDate = tour.startsAt.some,
-      variant = s"${tour.variant.gameFamily.id}_${tour.variant.id}".some,
-      medley = tour.isMedley.some,
-      medleyIntervalOptions = MedleyIntervalOptions(
-        medleyMinutes = tour.medleyMinutes,
-        balanceIntervals = tour.medleyIsBalanced,
-        numIntervals = tour.medleyNumIntervals
-      ),
-      medleyDefaults = MedleyDefaults(
-        onePerGameFamily = onePerGameGroupInMedley(tour.medleyVariants).some,
-        exoticChessVariants = exoticChessVariants(tour.medleyVariants).some,
-        draughts64Variants = draughts64Variants(tour.medleyVariants).some
-      ),
-      medleyGameFamilies = MedleyGameFamilies(
-        chess = gameGroupInMedley(tour.medleyVariants, GameGroup.Chess()).some,
-        draughts = gameGroupInMedley(tour.medleyVariants, GameGroup.Draughts()).some,
-        shogi = gameGroupInMedley(tour.medleyVariants, GameGroup.Shogi()).some,
-        xiangqi = gameGroupInMedley(tour.medleyVariants, GameGroup.Xiangqi()).some,
-        loa = gameGroupInMedley(tour.medleyVariants, GameGroup.LinesOfAction()).some,
-        flipello = gameGroupInMedley(tour.medleyVariants, GameGroup.Flipello()).some,
-        mancala = gameGroupInMedley(tour.medleyVariants, GameGroup.Mancala()).some,
-        amazons = gameGroupInMedley(tour.medleyVariants, GameGroup.Amazons()).some,
-        breakthroughtroyka = gameGroupInMedley(tour.medleyVariants, GameGroup.BreakthroughTroyka()).some,
-        go = gameGroupInMedley(tour.medleyVariants, GameGroup.Go()).some,
-        backgammon = gameGroupInMedley(tour.medleyVariants, GameGroup.Backgammon()).some,
-        abalone = gameGroupInMedley(tour.medleyVariants, GameGroup.Abalone()).some
-      ),
-      variantSettings = VariantSettings(handicaps =
-        Handicaps(
-          handicapped = tour.handicapped.some,
-          inputPlayerRatings = tour.inputPlayerRatings
-        )
-      ),
-      position = tour.position,
-      mode = none,
-      rated = tour.mode.rated.some,
-      password = tour.password,
-      conditions = Condition.DataForm.AllSetup(tour.conditions),
-      teamBattleByTeam = none,
-      berserkable = tour.berserkable.some,
-      streakable = tour.streakable.some,
-      statusScoring = tour.statusScoring.some,
-      description = tour.description,
-      hasChat = tour.hasChat.some
+    form(user, leaderTeams).fill(
+      TournamentSetup(
+        name = tour.name.some,
+        clock = tour.clock,
+        minutes = if (tour.isMedley) tour.medleyDurationMinutes else tour.minutes,
+        waitMinutes = none,
+        startDate = tour.startsAt.some,
+        variant = s"${tour.variant.gameFamily.id}_${tour.variant.id}".some,
+        medley = tour.isMedley.some,
+        medleyIntervalOptions = MedleyIntervalOptions(
+          medleyMinutes = tour.medleyMinutes,
+          balanceIntervals = tour.medleyIsBalanced,
+          numIntervals = tour.medleyNumIntervals
+        ),
+        medleyDefaults = MedleyDefaults(
+          onePerGameFamily = onePerGameGroupInMedley(tour.medleyVariants).some,
+          exoticChessVariants = exoticChessVariants(tour.medleyVariants).some,
+          draughts64Variants = draughts64Variants(tour.medleyVariants).some
+        ),
+        medleyGameFamilies = MedleyGameFamilies(
+          chess = gameGroupInMedley(tour.medleyVariants, GameGroup.Chess()).some,
+          draughts = gameGroupInMedley(tour.medleyVariants, GameGroup.Draughts()).some,
+          shogi = gameGroupInMedley(tour.medleyVariants, GameGroup.Shogi()).some,
+          xiangqi = gameGroupInMedley(tour.medleyVariants, GameGroup.Xiangqi()).some,
+          loa = gameGroupInMedley(tour.medleyVariants, GameGroup.LinesOfAction()).some,
+          flipello = gameGroupInMedley(tour.medleyVariants, GameGroup.Flipello()).some,
+          mancala = gameGroupInMedley(tour.medleyVariants, GameGroup.Mancala()).some,
+          amazons = gameGroupInMedley(tour.medleyVariants, GameGroup.Amazons()).some,
+          breakthroughtroyka = gameGroupInMedley(tour.medleyVariants, GameGroup.BreakthroughTroyka()).some,
+          go = gameGroupInMedley(tour.medleyVariants, GameGroup.Go()).some,
+          backgammon = gameGroupInMedley(tour.medleyVariants, GameGroup.Backgammon()).some,
+          abalone = gameGroupInMedley(tour.medleyVariants, GameGroup.Abalone()).some
+        ),
+        variantSettings = VariantSettings(handicaps =
+          Handicaps(
+            handicapped = tour.handicapped.some,
+            inputPlayerRatings = tour.inputPlayerRatings
+          )
+        ),
+        position = tour.position,
+        mode = none,
+        rated = tour.mode.rated.some,
+        password = tour.password,
+        conditions = Condition.DataForm.AllSetup(tour.conditions),
+        teamBattleByTeam = none,
+        berserkable = tour.berserkable.some,
+        streakable = tour.streakable.some,
+        statusScoring = tour.statusScoring.some,
+        description = tour.description,
+        hasChat = tour.hasChat.some
+      )
     )
 
   private val blockList = List("playstrategy", "lichess")
@@ -158,7 +162,7 @@ final class TournamentForm {
   private def form(user: User, leaderTeams: List[LeaderTeam]) =
     Form(
       mapping(
-        "name" -> optional(nameType(user)),
+        "name"  -> optional(nameType(user)),
         "clock" -> clockConfigMappingsMinutes(clockTimes, clockByoyomi)
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "minutes" -> {
@@ -167,22 +171,22 @@ final class TournamentForm {
         },
         "waitMinutes" -> optional(numberIn(waitMinuteChoices)),
         "startDate"   -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
-        "variant" -> optional(
+        "variant"     -> optional(
           nonEmptyText.verifying(v =>
             Variant(GameFamily(v.split("_")(0).toInt).gameLogic, v.split("_")(1).toInt).isDefined
           )
         ),
-        "medley" -> optional(boolean),
+        "medley"                -> optional(boolean),
         "medleyIntervalOptions" -> mapping(
           "medleyMinutes"    -> optional(numberIn(medleyMinutes)),
           "balanceIntervals" -> optional(boolean),
           "numIntervals"     -> optional(number(min = 2, max = maxMedleyIntervals))
-        )(MedleyIntervalOptions.apply)(MedleyIntervalOptions.unapply),
+        )(MedleyIntervalOptions.apply)(unapply),
         "medleyDefaults" -> mapping(
           "onePerGameFamily"    -> optional(boolean),
           "exoticChessVariants" -> optional(boolean),
           "draughts64Variants"  -> optional(boolean)
-        )(MedleyDefaults.apply)(MedleyDefaults.unapply),
+        )(MedleyDefaults.apply)(unapply),
         "medleyGameFamilies" -> mapping(
           "chess"              -> optional(boolean),
           "draughts"           -> optional(boolean),
@@ -196,25 +200,25 @@ final class TournamentForm {
           "go"                 -> optional(boolean),
           "backgammon"         -> optional(boolean),
           "abalone"            -> optional(boolean)
-        )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
+        )(MedleyGameFamilies.apply)(unapply),
         "variantSettings" -> mapping(
           "handicaps" -> mapping(
             "handicapped"        -> optional(boolean),
             "inputPlayerRatings" -> optional(cleanNonEmptyText)
-          )(Handicaps.apply)(Handicaps.unapply)
-        )(VariantSettings.apply)(VariantSettings.unapply),
-        "position"         -> optional(lila.common.Form.fen.playableStrict),
-        "mode"             -> optional(number.verifying(Mode.all.map(_.id) contains _)), // deprecated, use rated
-        "rated"            -> optional(boolean),
-        "password"         -> optional(cleanNonEmptyText),
-        "conditions"       -> Condition.DataForm.all(leaderTeams),
+          )(Handicaps.apply)(unapply)
+        )(VariantSettings.apply)(_.handicaps.some),
+        "position"   -> optional(lila.common.Form.fen.playableStrict),
+        "mode"       -> optional(number.verifying(Mode.all.map(_.id).contains)), // deprecated, use rated
+        "rated"      -> optional(boolean),
+        "password"   -> optional(cleanNonEmptyText),
+        "conditions" -> Condition.DataForm.all(leaderTeams),
         "teamBattleByTeam" -> optional(nonEmptyText.verifying(id => leaderTeams.exists(_.id == id))),
         "berserkable"      -> optional(boolean),
         "streakable"       -> optional(boolean),
         "statusScoring"    -> optional(boolean),
         "description"      -> optional(cleanNonEmptyText),
         "hasChat"          -> optional(boolean)
-      )(TournamentSetup.apply)(TournamentSetup.unapply)
+      )(TournamentSetup.apply)(unapply)
         .verifying("Invalid clock", _.validClock)
         .verifying("15s and 0+1 variant games cannot be rated", _.validRatedVariant)
         .verifying("Increase tournament duration, or decrease game clock", _.sufficientDuration)
@@ -258,7 +262,7 @@ object TournamentForm {
   val waitMinuteChoices = options(waitMinutes, "%d minute{s}")
   val waitMinuteDefault = 5
 
-  val positions = StartingPosition.allWithInitial.map(_.fen)
+  val positions       = StartingPosition.allWithInitial.map(_.fen)
   val positionChoices = StartingPosition.allWithInitial.map { p =>
     p.fen -> p.fullName
   }
@@ -278,7 +282,7 @@ object TournamentForm {
       mapping(
         "team"     -> optional(nonEmptyText),
         "password" -> optional(nonEmptyText)
-      )(TournamentJoin.apply)(TournamentJoin.unapply)
+      )(TournamentJoin.apply)(unapply)
     )
 
   case class TournamentJoin(team: Option[String], password: Option[String])
@@ -313,7 +317,7 @@ private[tournament] case class TournamentSetup(
     case fc: Clock.Config             => (fc.limitSeconds + fc.incrementSeconds) > 0
     case bc: Clock.BronsteinConfig    => (bc.limitSeconds + bc.delaySeconds) > 0 && bc.delaySeconds > 0
     case udc: Clock.SimpleDelayConfig => (udc.limitSeconds + udc.delaySeconds) > 0 && udc.delaySeconds > 0
-    case bc: ByoyomiClock.Config =>
+    case bc: ByoyomiClock.Config      =>
       (bc.limitSeconds + bc.incrementSeconds) > 0 || (bc.limitSeconds + bc.byoyomiSeconds) > 0
   }
 
@@ -330,7 +334,7 @@ private[tournament] case class TournamentSetup(
     Variant.apply(gameLogic, v.split("_")(1).toInt)
   } getOrElse Variant.default(gameLogic)
 
-  def realPosition = position ifTrue realVariant.standardVariant
+  def realPosition = position.ifTrue(realVariant.standardVariant)
 
   def validRatedVariant =
     realMode == Mode.Casual ||
@@ -339,7 +343,8 @@ private[tournament] case class TournamentSetup(
   def handicaps = variantSettings.handicaps
 
   def validHandicapSetup =
-    !handicaps.handicapped.has(true) || (gameLogic == GameLogic.Go() && !isMedley && realMode == Mode.Casual)
+    !handicaps.handicapped
+      .contains(true) || (gameLogic == GameLogic.Go() && !isMedley && realMode == Mode.Casual)
 
   def sufficientDuration = estimateNumberOfGamesOneCanPlay >= 3
   def excessiveDuration  = estimateNumberOfGamesOneCanPlay <= 150
@@ -358,12 +363,12 @@ private[tournament] case class TournamentSetup(
         clock = if (old.isCreated) clock else old.clock,
         minutes = if (isMedley) medleyDuration else minutes,
         mode = realMode,
-        handicapped = handicaps.handicapped.has(true),
-        inputPlayerRatings = if (handicaps.handicapped.has(true)) handicaps.inputPlayerRatings else None,
+        handicapped = handicaps.handicapped.contains(true),
+        inputPlayerRatings =
+          if (handicaps.handicapped.contains(true)) handicaps.inputPlayerRatings else None,
         variant = newVariant,
         medleyVariantsAndIntervals =
-          if (
-            old.medleyGameGroups != medleyGameFamilies.ggList
+          if (old.medleyGameGroups != medleyGameFamilies.ggList
               .sortWith(_.name < _.name)
               .some
             || old.medleyMinutes != medleyIntervalOptions.medleyMinutes
@@ -374,7 +379,7 @@ private[tournament] case class TournamentSetup(
         medleyMinutes = medleyIntervalOptions.medleyMinutes,
         startsAt = startDate | old.startsAt,
         password = password,
-        position = newVariant.standardVariant ?? {
+        position = newVariant.standardVariant so {
           if (old.isCreated || old.position.isDefined) realPosition
           else old.position
         },
@@ -398,13 +403,13 @@ private[tournament] case class TournamentSetup(
         minutes = minutes,
         mode = if (rated.isDefined) realMode else old.mode,
         handicapped = handicaps.handicapped | old.handicapped,
-        inputPlayerRatings = if (handicaps.handicapped.has(true)) {
+        inputPlayerRatings = if (handicaps.handicapped.contains(true)) {
           handicaps.inputPlayerRatings.fold(old.inputPlayerRatings)(_.some.filter(_.nonEmpty))
         } else None,
         variant = newVariant,
         startsAt = startDate | old.startsAt,
         password = password.fold(old.password)(_.some.filter(_.nonEmpty)),
-        position = newVariant.standardVariant ?? {
+        position = newVariant.standardVariant so {
           if (position.isDefined && (old.isCreated || old.position.isDefined)) realPosition
           else old.position
         },
@@ -446,12 +451,12 @@ private[tournament] case class TournamentSetup(
   def medleyDuration: Int =
     medleyIntervalOptions.medleyMinutes.getOrElse(0) * medleyIntervalOptions.numIntervals.getOrElse(0)
 
-  //We have to account for old medleys and their setup
+  // We have to account for old medleys and their setup
   def maxMedleyRounds = medleyIntervalOptions.numIntervals.fold(
     medleyIntervalOptions.medleyMinutes.map(mm => Math.ceil(minutes.toDouble / mm).toInt)
   )(Some(_))
 
-  //shuffle all variants from the selected game families
+  // shuffle all variants from the selected game families
   private lazy val generateNoDefaultsMedleyVariants: List[Variant] =
     scala.util.Random
       .shuffle(
@@ -460,7 +465,7 @@ private[tournament] case class TournamentSetup(
 
   private def generateMedleyVariants: List[Variant] =
     if (medleyDefaults.onePerGameFamily.getOrElse(false)) {
-      //take a shuffled list of all variants and pull the first for each game family to the front
+      // take a shuffled list of all variants and pull the first for each game family to the front
       val onePerGameGroupVariantList = scala.util.Random.shuffle(
         medleyGameFamilies.ggList.map(gg =>
           scala.util.Random.shuffle(gg.variants.filter(v => !v.fromPositionVariant)).head
@@ -479,7 +484,7 @@ private[tournament] case class TournamentSetup(
     if (isMedley) {
       val medleyList     = generateMedleyVariants
       var fullMedleyList = medleyList
-      while (fullMedleyList.size < maxMedleyRounds.getOrElse(0))
+      while fullMedleyList.size < maxMedleyRounds.getOrElse(0) do
         fullMedleyList = fullMedleyList ::: medleyList
       TournamentMedleyUtil
         .medleyVariantsAndIntervals(
@@ -490,7 +495,6 @@ private[tournament] case class TournamentSetup(
         )
         .some
     } else None
-
 }
 
 case class VariantSettings(
@@ -544,5 +548,4 @@ case class MedleyGameFamilies(
     .filterNot(gg => if (!go.getOrElse(false)) gg == GameGroup.Go() else false)
     .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
     .filterNot(gg => if (!abalone.getOrElse(false)) gg == GameGroup.Abalone() else false)
-
 }

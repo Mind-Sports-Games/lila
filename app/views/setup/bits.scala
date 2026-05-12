@@ -1,11 +1,10 @@
 package views.html.setup
 
-import controllers.routes
 import play.api.data.{ Field, Form }
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.user.User
 
 private object bits {
@@ -21,15 +20,15 @@ private object bits {
     div(cls := "fen_position optional_config")(
       frag(
         div(
-          cls := "fen_form",
-          dataValidateUrl := s"""${routes.Setup.validateFen}${strict.??("?strict=1")}"""
+          cls             := "fen_form",
+          dataValidateUrl := s"""${routes.Setup.validateFen}${strict.so("?strict=1")}"""
         )(
           form3.input(field)(st.placeholder := trans.pasteTheFenStringHere.txt()),
           a(
-            cls := "button button-empty board_editor_link",
+            cls      := "button button-empty board_editor_link",
             dataIcon := "m",
-            title := trans.boardEditor.txt(),
-            href := url
+            title    := trans.boardEditor.txt(),
+            href     := url
           )
         ),
         a(cls := "board_editor board_editor_link", href := url)(
@@ -43,7 +42,8 @@ private object bits {
     )
   }
 
-  def renderGameGroupOptions(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
+  @annotation.nowarn("msg=unused")
+  def renderGameGroupOptions(form: Form[?], libs: List[SelectChoice])(implicit ctx: Context) =
     div(cls := "gameGroup_choice buttons collapsible optional_config")(
       div(cls := "section_title")("Game Group"),
       div(id := "gameGroup_icons")(
@@ -52,15 +52,15 @@ private object bits {
       )
     )
 
-  def renderVariantOptions(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
+  def renderVariantOptions(form: Form[?], libs: List[SelectChoice])(implicit ctx: Context) =
     div(cls := "variant_choice buttons collapsible")(
       div(cls := "section_title")(
         a(
-          cls := "remove_color",
-          title := "More info",
-          href := s"${routes.Page.variantHome}",
+          cls      := "remove_color",
+          title    := "More info",
+          href     := s"${routes.Page.variantHome}",
           dataIcon := "",
-          target := "_blank"
+          target   := "_blank"
         )(),
         trans.variant()
       ),
@@ -79,9 +79,9 @@ private object bits {
           div(cls := perfType.key)(
             trans.perfRatingX(
               raw(s"""<strong>${me
-                .perfs(perfType.key)
-                .map(_.intRating)
-                .getOrElse("?")}</strong>""")
+                  .perfs(perfType.key)
+                  .map(_.intRating)
+                  .getOrElse("?")}</strong>""")
             )
           )
         }
@@ -89,16 +89,16 @@ private object bits {
     }
 
   def renderVariant(
-      form: Form[_],
+      form: Form[?],
       variants: List[(SelectChoice, List[SelectChoice])]
   )(implicit ctx: Context) =
     div(cls := "variant label_select")(
       renderLabel(
         form("Variant"),
         a(
-          cls := "remove_color",
-          title := "More info",
-          href := s"${routes.Page.variantHome}",
+          cls    := "remove_color",
+          title  := "More info",
+          href   := s"${routes.Page.variantHome}",
           target := "_blank"
         )(
           trans.variant()
@@ -139,6 +139,7 @@ private object bits {
       }
     )
 
+  @annotation.nowarn("msg=unused")
   private def renderOptions(
       field: Field,
       options: Seq[SelectChoice],
@@ -146,17 +147,17 @@ private object bits {
       optValuePrefix: String = ""
   ) =
     options.map { case (value, name, _) =>
-      option(
+      scalatags.Text.tags.option(
         st.value := optValuePrefix + value,
-        field.value.exists(v => compare(v, value)) option selected
+        field.value.exists(v => compare(v, value)).option(selected)
       )(name)
     }
 
   def renderSelectedChoice(field: Field, options: Seq[SelectChoice], userPart: Option[Tag] = None) =
     options.map { case (key, icon, hint) =>
       div(cls := s"${field.name}_$key choice", dataIcon := icon)(
-        userPart == None option hint,
-        (key == "bot" || key == "friend") option userPart
+        (userPart == None).option(hint),
+        (key == "bot" || key == "friend").option(userPart)
       )
     }
 
@@ -165,16 +166,16 @@ private object bits {
       options.map { case (key, icon, hint) =>
         div(
           input(
-            tpe := "radio",
-            id := s"$prefix${field.id}_$key",
+            tpe     := "radio",
+            id      := s"$prefix${field.id}_$key",
             st.name := field.name,
-            value := key,
-            field.value.has(key) option checked
+            value   := key,
+            field.value.has(key).option(checked)
           ),
           label(
-            cls := "required",
+            cls      := "required",
             dataIcon := icon,
-            `for` := s"$prefix${field.id}_$key"
+            `for`    := s"$prefix${field.id}_$key"
           )(hint)
         )
       }
@@ -185,14 +186,14 @@ private object bits {
       options.map { case (key, name, _) =>
         div(
           input(
-            tpe := "radio",
-            id := s"$prefix${field.id}_$key",
+            tpe     := "radio",
+            id      := s"$prefix${field.id}_$key",
             st.name := field.name,
-            value := key,
-            field.value.has(key) option checked
+            value   := key,
+            field.value.has(key).option(checked)
           ),
           label(
-            cls := "required",
+            cls   := "required",
             `for` := s"$prefix${field.id}_$key"
           )(name)
         )
@@ -204,7 +205,7 @@ private object bits {
 
   def renderDissociatedRange(field: Field) =
     frag(
-      renderInput(field)(cls := "range-value"),
+      renderInput(field)(cls                                    := "range-value"),
       input(name := s"${field.name}_range", tpe := "range")(cls := "range")
     )
 
@@ -218,12 +219,12 @@ private object bits {
     renderLabel(field, labelContent)
   )
 
-  def renderMultiMatch(form: Form[_])(implicit ctx: Context) =
+  def renderMultiMatch(form: Form[?])(implicit ctx: Context) =
     div(cls := "multi_match", title := trans.multiMatchDefinition.txt())(
       renderCheckbox(form("multiMatch"), trans.multiMatch())
     )
 
-  def renderGoOptions(form: Form[_])(implicit ctx: Context) =
+  def renderGoOptions(form: Form[?])(implicit ctx: Context) =
     div(cls := "go_config optional_config")(
       div(cls := "go_handicap_choice range")(
         trans.goHandicap(),
@@ -239,7 +240,7 @@ private object bits {
       )
     )
 
-  def renderBackgammonOptions(form: Form[_])(implicit ctx: Context) =
+  def renderBackgammonOptions(form: Form[?])(implicit ctx: Context) =
     div(cls := "backgammon_config optional_config")(
       div(cls := "backgammon_points_choice range")(
         trans.backgammonPoints(),
@@ -249,7 +250,7 @@ private object bits {
       )
     )
 
-  def renderOpponentOptions(form: Form[_], userPart: Option[Tag])(implicit ctx: Context) =
+  def renderOpponentOptions(form: Form[?], userPart: Option[Tag])(implicit ctx: Context) =
     div(cls := "opponent_choices buttons collapsible")(
       div(cls := "section_title")("Opponent"),
       renderIconRadios(form("opponent"), translatedOpponentChoices),
@@ -258,7 +259,7 @@ private object bits {
       renderRatingRange(form("ratingRange"))
     )
 
-  def renderBotChoice(form: Form[_])(implicit ctx: Context) =
+  def renderBotChoice(form: Form[?])(implicit ctx: Context) =
     div(cls := "bot_choice buttons")(
       div(cls := "bot_title")("PS Greedy Bot"),
       renderRadios(form("bot"), translatedPSBotChoices),
@@ -274,16 +275,16 @@ private object bits {
           renderInput(field),
           input(
             name := s"${field.name}_range_min",
-            tpe := "range",
-            cls := "range rating-range__min"
+            tpe  := "range",
+            cls  := "range rating-range__min"
           ),
           span(cls := "rating-min"),
           "/",
           span(cls := "rating-max"),
           input(
             name := s"${field.name}_range_max",
-            tpe := "range",
-            cls := "range rating-range__max"
+            tpe  := "range",
+            cls  := "range rating-range__max"
           )
         )
       }
@@ -297,14 +298,14 @@ private object bits {
           translatedSideChoices.map { case (key, name, _) =>
             div(
               input(
-                tpe := "radio",
-                id := s"$prefix${field.id}_$key",
+                tpe     := "radio",
+                id      := s"$prefix${field.id}_$key",
                 st.name := field.name,
-                value := key,
-                field.value.has(key) option checked
+                value   := key,
+                field.value.has(key).option(checked)
               ),
               label(
-                cls := s"playerIndex__button $key",
+                cls   := s"playerIndex__button $key",
                 `for` := s"$prefix${field.id}_$key"
               )(i, div(name))
             )
@@ -318,22 +319,22 @@ private object bits {
       )
     )
 
-  def renderModeOptions(form: Form[_])(implicit ctx: Context) =
+  def renderModeOptions(form: Form[?])(implicit ctx: Context) =
     div(cls := "mode_choice buttons collapsible optional_config")(
       div(cls := "section_title")("Mode"),
       renderIconRadios(form("mode"), translatedModeIconChoices),
       renderSelectedChoice(form("mode"), translatedModeIconChoices)
     )
 
-  def renderTimeModeOptions(form: Form[_])(implicit ctx: Context) =
+  def renderTimeModeOptions(form: Form[?])(implicit ctx: Context) =
     div(cls := "time_mode_defaults optional_config collapsible")(
       div(cls := "section_title")(
         a(
-          cls := "remove_color",
-          title := "More info",
-          href := s"${routes.Page.lonePage("clocks")}",
+          cls      := "remove_color",
+          title    := "More info",
+          href     := s"${routes.Page.lonePage("clocks")}",
           dataIcon := "",
-          target := "_blank"
+          target   := "_blank"
         )(),
         trans.timeControl()
       ),
@@ -341,7 +342,7 @@ private object bits {
       renderSelectedChoice(form("timeModeDefaults"), translatedTimeModeIconChoices)
     )
 
-  def renderTimeMode(form: Form[_], allowAnon: Boolean, allowCorrespondence: Boolean)(implicit ctx: Context) =
+  def renderTimeMode(form: Form[?], allowAnon: Boolean, allowCorrespondence: Boolean)(implicit ctx: Context) =
     div(cls := "time_mode_config optional_config")(
       div(
         cls := List(
@@ -352,9 +353,9 @@ private object bits {
         renderLabel(
           form("timeMode"),
           a(
-            cls := "remove_color",
-            title := "More info",
-            href := s"${routes.Page.lonePage("clocks")}",
+            cls    := "remove_color",
+            title  := "More info",
+            href   := s"${routes.Page.lonePage("clocks")}",
             target := "_blank"
           )(trans.timeControl())
         ),
@@ -387,7 +388,7 @@ private object bits {
             span(
               // NOTE:: I believe that the byoyomi and fischer calculations here will be
               //        the same.
-              //strategygames.ByoyomiClock
+              // strategygames.ByoyomiClock
               //  .Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0, 0, 1)
               //  .limitString
               strategygames.Clock
@@ -414,7 +415,8 @@ private object bits {
             span(form("increment").value),
             renderDissociatedRange(form("increment"))
           )
-        ),
+        )
+      ,
       div(cls := "correspondence")(
         if (ctx.blind)
           div(cls := "days_choice")(

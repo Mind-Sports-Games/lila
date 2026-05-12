@@ -1,13 +1,14 @@
 package controllers
 
-import play.api.mvc._
+import play.api.mvc.*
 import play.api.libs.json.Json
 import scalatags.Text.all.Frag
 
 import lila.api.Context
-import lila.app._
-import lila.memo.CacheApi._
-import views._
+import lila.app.{ *, given }
+import lila.common.extensions.*
+import lila.memo.CacheApi.*
+import views.*
 
 final class KeyPages(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
 
@@ -20,30 +21,30 @@ final class KeyPages(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
   def homeHtml(implicit ctx: Context): Fu[Frag] =
     env
       .preloader(
-        posts = env.forum.recent(ctx.me, env.team.cached.teamIdsList).nevermind,
-        tours = env.tournament.cached.onHomepage.getUnit.nevermind,
-        events = env.event.api.promoteTo(ctx.req).nevermind,
-        simuls = env.simul.allCreatedFeaturable.get {}.nevermind,
+        posts = env.forum.recent(ctx.me, env.team.cached.teamIdsList).recoverDefault,
+        tours = env.tournament.cached.onHomepage.getUnit.recoverDefault,
+        events = env.event.api.promoteTo(ctx.req).recoverDefault,
+        simuls = env.simul.allCreatedFeaturable.get {}.recoverDefault,
         streamerSpots = env.streamer.homepageMaxSetting.get(),
         weeklyChallenge = env.lobby.weeklyChallenge,
-        chatOption = ctx.noKid ?? env.chat.api.userChat.cached
+        chatOption = ctx.noKid so env.chat.api.userChat.cached
           .findMine(lila.chat.Chat.Id("lobbyhome"), ctx.me)
           .map(some),
-        chatVersion = ctx.noKid ?? env.lobby.version("lobbyhome").dmap(some)
+        chatVersion = ctx.noKid so env.lobby.version("lobbyhome").dmap(some)
       )
-      .mon(_.lobby segment "preloader.total")
+      .mon(_.lobby.segment("preloader.total"))
       .map { h =>
-        lila.mon.chronoSync(_.lobby segment "renderSync") {
+        lila.mon.chronoSync(_.lobby.segment("renderSync")) {
           html.lobby.home(h)
         }
       }
 
   def notFound(ctx: Context): Result = {
-    Results.NotFound(html.base.notFound()(ctx))
+    Results.NotFound(html.base.notFound()(using ctx))
   }
 
   def p2listed(implicit ctx: Context): Result =
-    if (lila.api.Mobile.Api requested ctx.req)
+    if (lila.api.Mobile.Api.requested(ctx.req))
       Results.Unauthorized(
         Json.obj(
           "error" -> html.site.message.p2listedMessage

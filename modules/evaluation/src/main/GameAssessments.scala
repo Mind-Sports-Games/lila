@@ -34,7 +34,7 @@ object GameAssessment {
     val emoticon: String    = ":D"
     val id                  = 1
   }
-  val all: List[GameAssessment] = List(NotCheating, UnlikelyCheating, Unclear, LikelyCheating, Cheating)
+  val all: List[GameAssessment]      = List(NotCheating, UnlikelyCheating, Unclear, LikelyCheating, Cheating)
   val byId: Map[Int, GameAssessment] = all.map { a =>
     a.id -> a
   }.toMap

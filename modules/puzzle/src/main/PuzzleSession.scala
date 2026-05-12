@@ -1,10 +1,9 @@
 package lila.puzzle
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
-import scala.util.chaining._
 
-import lila.db.dsl._
+import lila.common.extensions.*
+import lila.db.dsl.*
 import lila.memo.CacheApi
 import lila.user.{ Perfs, User, UserRepo }
 import strategygames.variant.Variant
@@ -31,10 +30,10 @@ final class PuzzleSessionApi(
     colls: PuzzleColls,
     pathApi: PuzzlePathApi,
     cacheApi: CacheApi,
-    userRepo: UserRepo
+    @annotation.nowarn("msg=unused") _userRepo: UserRepo
 )(implicit ec: ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   sealed abstract private class NextPuzzleResult(val name: String)
   private object NextPuzzleResult {
@@ -48,15 +47,16 @@ final class PuzzleSessionApi(
   def nextPuzzleFor(user: User, variant: Variant, theme: PuzzleTheme.Key, retries: Int = 0): Fu[Puzzle] =
     continueOrCreateSessionFor(user, variant, theme)
       .flatMap { session =>
-        import NextPuzzleResult._
+        import NextPuzzleResult.*
 
         def switchPath(tier: PuzzleTier) =
-          pathApi.nextFor(user, variant, theme, tier, session.difficulty, session.previousPaths) orFail
-            s"No puzzle path for ${user.id} ${variant.name} $theme $tier" flatMap { pathId =>
-              val newSession = session.switchTo(pathId)
-              sessions.put(user.id, fuccess(newSession))
-              nextPuzzleFor(user, variant, theme, retries = retries + 1)
-            }
+          pathApi
+            .nextFor(user, variant, theme, tier, session.difficulty, session.previousPaths)
+            .orFail(s"No puzzle path for ${user.id} ${variant.name} $theme $tier") flatMap { pathId =>
+            val newSession = session.switchTo(pathId)
+            sessions.put(user.id, fuccess(newSession))
+            nextPuzzleFor(user, variant, theme, retries = retries + 1)
+          }
 
         def serveAndMonitor(puzzle: Puzzle) = {
           val mon = lila.mon.puzzle.selector.user
@@ -74,15 +74,15 @@ final class PuzzleSessionApi(
               )
             )
           mon.ratingDev(theme.value).record(puzzle.glicko.intDeviation)
-          mon.tier(session.path.tier.key, theme.value, session.difficulty.key).increment().unit
+          val _ = mon.tier(session.path.tier.key, theme.value, session.difficulty.key).increment()
           puzzle
         }
 
         nextPuzzleResult(user, session)
           .flatMap {
             case PathMissing | PathEnded if retries < 10 => switchPath(session.path.tier)
-            case PathMissing | PathEnded                 => fufail(s"Puzzle path missing or ended for ${user.id}")
-            case PuzzleMissing(id) =>
+            case PathMissing | PathEnded => fufail(s"Puzzle path missing or ended for ${user.id}")
+            case PuzzleMissing(id)       =>
               logger.warn(s"Puzzle missing: $id")
               sessions.put(user.id, fuccess(session.next))
               nextPuzzleFor(user, variant, theme, retries)
@@ -100,7 +100,7 @@ final class PuzzleSessionApi(
     colls
       .path {
         _.aggregateOne() { framework =>
-          import framework._
+          import framework.*
           Match($id(session.path)) -> List(
             // get the puzzle ID from session position
             Project($doc("puzzleId" -> $doc("$arrayElemAt" -> $arr("$ids", session.positionInPath)))),
@@ -136,7 +136,7 @@ final class PuzzleSessionApi(
         }
       }
       .map { docOpt =>
-        import NextPuzzleResult._
+        import NextPuzzleResult.*
         docOpt.fold[NextPuzzleResult](PathMissing) { doc =>
           doc.getAsOpt[Puzzle.Id]("puzzleId").fold[NextPuzzleResult](PathEnded) { puzzleId =>
             doc
@@ -157,13 +157,16 @@ final class PuzzleSessionApi(
         )
       }
 
-  def onComplete(round: PuzzleRound, variant: Variant, theme: PuzzleTheme.Key): Funit =
-    sessions.getIfPresent(round.userId) ?? {
+  def onComplete(
+      round: PuzzleRound,
+      @annotation.nowarn("msg=unused") _variant: Variant,
+      theme: PuzzleTheme.Key
+  ): Funit =
+    sessions.getIfPresent(round.userId) so {
       _ map { session =>
         // yes, even if the completed puzzle was not the current session puzzle
         // in that case we just skip a puzzle on the path, which doesn't matter
-        if (session.path.theme == theme)
-          sessions.put(round.userId, fuccess(session.next))
+        if (session.path.theme == theme) sessions.put(round.userId, fuccess(session.next))
       }
     }
 

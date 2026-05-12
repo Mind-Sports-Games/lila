@@ -1,8 +1,8 @@
 package lila.app
 package http
 
-import play.api.mvc._
-import scala.concurrent.duration._
+import play.api.mvc.*
+import scala.concurrent.duration.*
 
 import lila.common.HTTPRequest
 import lila.api.Context
@@ -16,11 +16,10 @@ final class PageCache(cacheApi: lila.memo.CacheApi) {
   def apply(compute: () => Fu[Result])(implicit ctx: Context): Fu[Result] =
     if (ctx.isAnon && langs(ctx.lang.language) && defaultPrefs(ctx.req) && !hasCookies(ctx.req))
       cache.getFuture(cacheKey(ctx), _ => compute())
-    else
-      compute()
+    else compute()
 
   private def cacheKey(ctx: Context) =
-    s"${HTTPRequest actionName ctx.req}(${ctx.lang.language})"
+    s"${HTTPRequest `actionName` ctx.req}(${ctx.lang.language})"
 
   private def defaultPrefs(req: RequestHeader) =
     lila.pref.RequestPref.fromRequest(req) == lila.pref.Pref.default

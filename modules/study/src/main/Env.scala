@@ -1,10 +1,10 @@
 package lila.study
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import play.api.Configuration
 import play.api.libs.ws.StandaloneWSClient
 
-import lila.common.config._
+import lila.common.config.*
 import lila.socket.Socket.{ GetVersion, SocketVersion }
 import lila.user.User
 
@@ -38,7 +38,7 @@ final class Env(
   private lazy val studyDb = mongo.asyncDb("study", appConfig.get[String]("study.mongodb.uri"))
 
   def version(studyId: Study.Id): Fu[SocketVersion] =
-    socket.rooms.ask[SocketVersion](studyId.value)(GetVersion)
+    socket.rooms.ask[SocketVersion](studyId.value)(GetVersion.apply)
 
   def isConnected(studyId: Study.Id, userId: User.ID): Fu[Boolean] =
     socket.isPresent(studyId, userId)
@@ -93,6 +93,6 @@ final class Env(
 
   lila.common.Bus.subscribeFun("studyAnalysisProgress") {
     case lila.analyse.actorApi.StudyAnalysisProgress(analysis, complete) =>
-      serverEvalMerger(analysis, complete).unit
+      serverEvalMerger(analysis, complete).discard
   }
 }

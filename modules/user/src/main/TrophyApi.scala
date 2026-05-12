@@ -1,11 +1,11 @@
 package lila.user
 
 import lila.db.BSON.BSONJodaDateTimeHandler
-import lila.db.dsl._
-import lila.memo._
+import lila.db.dsl.*
+import lila.memo.*
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
-import scala.concurrent.duration._
+import reactivemongo.api.bson.*
+import scala.concurrent.duration.*
 
 final class TrophyApi(
     coll: Coll,
@@ -19,7 +19,7 @@ final class TrophyApi(
     name = "trophy.kind",
     initialCapacity = 32,
     compute = id =>
-      kindColl.byId(id)(trophyKindObjectBSONHandler) map { k =>
+      kindColl.byId(id)(using trophyKindObjectBSONHandler) map { k =>
         k.getOrElse(TrophyKind.Unknown)
       },
     default = _ => TrophyKind.Unknown,
@@ -32,9 +32,9 @@ final class TrophyApi(
 
   implicit private val trophyBSONHandler: BSONDocumentHandler[Trophy] = Macros.handler[Trophy]
 
-  private def permanent = $doc("expiry" $exists false)
+  private def permanent = $doc("expiry".$exists(false))
 
-  private def relevant = $doc("expiry" $gt DateTime.now)
+  private def relevant = $doc("expiry".$gt(DateTime.now))
 
   private def nonExpired = $doc("$or" -> List(permanent, relevant))
 
@@ -49,32 +49,38 @@ final class TrophyApi(
 
   def roleBasedTrophies(user: User, isPublicMod: Boolean, isDev: Boolean, isVerified: Boolean): List[Trophy] =
     List(
-      isPublicMod option Trophy(
-        _id = "",
-        user = user.id,
-        kind = kindCache sync TrophyKind.moderator,
-        date = DateTime.now,
-        url = none,
-        name = none,
-        expiry = none
+      isPublicMod.option(
+        Trophy(
+          _id = "",
+          user = user.id,
+          kind = kindCache.sync(TrophyKind.moderator),
+          date = DateTime.now,
+          url = none,
+          name = none,
+          expiry = none
+        )
       ),
-      isDev option Trophy(
-        _id = "",
-        user = user.id,
-        kind = kindCache sync TrophyKind.developer,
-        date = DateTime.now,
-        url = none,
-        name = none,
-        expiry = none
+      isDev.option(
+        Trophy(
+          _id = "",
+          user = user.id,
+          kind = kindCache.sync(TrophyKind.developer),
+          date = DateTime.now,
+          url = none,
+          name = none,
+          expiry = none
+        )
       ),
-      isVerified option Trophy(
-        _id = "",
-        user = user.id,
-        kind = kindCache sync TrophyKind.verified,
-        date = DateTime.now,
-        url = none,
-        name = none,
-        expiry = none
+      isVerified.option(
+        Trophy(
+          _id = "",
+          user = user.id,
+          kind = kindCache.sync(TrophyKind.verified),
+          date = DateTime.now,
+          url = none,
+          name = none,
+          expiry = none
+        )
       )
     ).flatten
 

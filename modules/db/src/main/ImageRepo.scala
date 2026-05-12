@@ -2,7 +2,7 @@ package lila.db
 
 import DbImage.DbImageBSONHandler
 
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final class ImageRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 

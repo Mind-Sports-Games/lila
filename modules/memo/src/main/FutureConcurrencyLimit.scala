@@ -25,16 +25,18 @@ final class FutureConcurrencyLimit[K](
       case c @ _ if c >= maxConcurrency =>
         monitor.increment()
         limited
-      case c @ _ =>
+      case _ =>
         inc(k)
         op addEffectAnyway {
           dec(k)
         }
     }
 
-  private def get(k: K): Int = ~storage.getIfPresent(toString(k))
-  private def inc(k: K): Unit =
-    concurrentMap.compute(toString(k), (_, c) => (~Option(c) + 1) atMost maxConcurrency).unit
-  private def dec(k: K): Unit =
-    concurrentMap.computeIfPresent(toString(k), (_, c) => (c - 1) atLeast 0).unit
+  private def get(k: K): Int  = ~storage.getIfPresent(toString(k))
+  private def inc(k: K): Unit = {
+    val _ = concurrentMap.compute(toString(k), (_, c) => (~Option(c) + 1).atMost(maxConcurrency))
+  }
+  private def dec(k: K): Unit = {
+    val _ = concurrentMap.computeIfPresent(toString(k), (_, c) => (c - 1).atLeast(0))
+  }
 }

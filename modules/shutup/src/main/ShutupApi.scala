@@ -1,8 +1,8 @@
 package lila.shutup
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.GameRepo
 import lila.hub.actorApi.shutup.PublicSource
 import lila.user.{ User, UserRepo }
@@ -33,8 +33,8 @@ final class ShutupApi(
 
   def privateChat(chatId: String, userId: User.ID, text: String) =
     gameRepo.getSourceAndUserIds(chatId) flatMap {
-      case (source, _) if source.has(lila.game.Source.Friend) => funit // ignore challenges
-      case (_, userIds) =>
+      case (source, _) if source.contains(lila.game.Source.Friend) => funit // ignore challenges
+      case (_, userIds)                                            =>
         record(userId, text, TextType.PrivateChat, none, userIds find (userId !=))
     }
 
@@ -48,14 +48,14 @@ final class ShutupApi(
       source: Option[PublicSource] = None,
       toUserId: Option[User.ID] = None
   ): Funit =
-    userRepo isTroll userId flatMap {
-      case true => funit
+    userRepo.isTroll(userId) flatMap {
+      case true  => funit
       case false =>
-        toUserId ?? { relationApi.fetchFollows(_, userId) } flatMap {
-          case true => funit
+        toUserId so { relationApi.fetchFollows(_, userId) } flatMap {
+          case true  => funit
           case false =>
-            val analysed = Analyser(text)
-            val pushPublicLine = source.ifTrue(analysed.nbBadWords > 0) ?? { source =>
+            val analysed       = Analyser(text)
+            val pushPublicLine = source.ifTrue(analysed.nbBadWords > 0) so { source =>
               $doc(
                 "pub" -> $doc(
                   "$each"  -> List(PublicLine.make(text, source)),
@@ -84,7 +84,7 @@ final class ShutupApi(
     }
 
   private def legiferate(userRecord: UserRecord): Funit =
-    userRecord.reports.exists(_.unacceptable) ?? {
+    userRecord.reports.exists(_.unacceptable) so {
       reporter ! lila.hub.actorApi.report.Shutup(userRecord.userId, reportText(userRecord))
       coll.update
         .one(

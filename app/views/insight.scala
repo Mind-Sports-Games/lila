@@ -3,12 +3,10 @@ package views.html
 import play.api.libs.json.Json
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 import lila.user.User
-
-import controllers.routes
 
 object insight {
 
@@ -30,31 +28,33 @@ object insight {
         jsTag("insight-refresh.js"),
         embedJsUnsafeLoadThen(
           s"""playstrategy.insight=PlayStrategyInsight(document.getElementById('insight'), ${safeJsonValue(
-            Json.obj(
-              "ui"              -> ui,
-              "initialQuestion" -> question,
-              "i18n"            -> Json.obj(),
-              "myUserId"        -> ctx.userId,
-              "user" -> Json.obj(
-                "id"      -> u.id,
-                "name"    -> u.username,
-                "nbGames" -> cache.count,
-                "stale"   -> stale,
-                "shareId" -> prefId
-              ),
-              "pageUrl" -> routes.Insight.index(u.username).url,
-              "postUrl" -> routes.Insight.json(u.username).url
-            )
-          )})"""
+              Json.obj(
+                "ui"              -> ui,
+                "initialQuestion" -> question,
+                "i18n"            -> Json.obj(),
+                "myUserId"        -> ctx.userId,
+                "user"            -> Json.obj(
+                  "id"      -> u.id,
+                  "name"    -> u.username,
+                  "nbGames" -> cache.count,
+                  "stale"   -> stale,
+                  "shareId" -> prefId
+                ),
+                "pageUrl" -> routes.Insight.index(u.username).url,
+                "postUrl" -> routes.Insight.json(u.username).url
+              )
+            )})"""
         )
       ),
       moreCss = cssTag("insight")
     )(
       frag(
         main(id := "insight"),
-        stale option div(cls := "insight-stale none")(
-          p("There are new games to learn from!"),
-          refreshForm(u, "Update insights")
+        stale.option(
+          div(cls := "insight-stale none")(
+            p("There are new games to learn from!"),
+            refreshForm(u, "Update insights")
+          )
         )
       )
     )

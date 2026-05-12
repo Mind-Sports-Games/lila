@@ -1,5 +1,5 @@
 package lila.pref
-import strategygames.{ GameFamily }
+import strategygames.GameFamily
 
 sealed class Theme private[pref] (val name: String, val colors: Theme.HexColors, val gameFamily: Int) {
 
@@ -27,7 +27,6 @@ sealed trait ThemeObject {
   def unapply(full: Theme): Some[(String, Int)] = Some((full.name, full.gameFamily))
 
   def contains(name: String) = all map (t => t.name) contains name
-
 }
 
 object Theme extends ThemeObject {
@@ -45,7 +44,13 @@ object Theme extends ThemeObject {
     "horsey" -> (HexColor("f1d9b6") -> HexColor("8e6547"))
   )
 
-  lazy val default = allByName(0) get "maple" err "Can't find default theme D:"
+  val all: List[Theme] = GameFamily.all
+    .map(gf =>
+      gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))
+    )
+    .flatten
+
+  val default = allByName(0) get "maple" `err` "Can't find default theme D:"
 
   val defaults = GameFamily.all.map(gf =>
     new Theme(
@@ -76,25 +81,15 @@ object Theme extends ThemeObject {
     }
   }
 
-  def addMissingDefaultsIfAny(currentThemes: List[Theme]): List[Theme] = {
+  def addMissingDefaultsIfAny(currentThemes: List[Theme]): List[Theme] =
     defaults.map { x =>
-      if (currentThemes.filter(t => t.gameFamily == x.gameFamily).size == 1) {
+      if (currentThemes.filter(t => t.gameFamily == x.gameFamily).size == 1)
         currentThemes.filter(t => t.gameFamily == x.gameFamily)(0)
-      } else {
-        x
-      }
+      else x
     }
-  }
-
-  val all: List[Theme] = GameFamily.all
-    .map(gf =>
-      gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))
-    )
-    .flatten
 
   def allOfFamily(gf: GameFamily): List[Theme] =
     gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))
-
 }
 
 object Theme3d extends ThemeObject {
@@ -123,5 +118,5 @@ object Theme3d extends ThemeObject {
     new Theme(name, Theme.defaultHexColors, 0)
   }
 
-  lazy val default = allByName(0) get "Woodi" err "Can't find default theme D:"
+  val default = allByName(0) get "Woodi" `err` "Can't find default theme D:"
 }

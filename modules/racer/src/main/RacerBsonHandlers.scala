@@ -2,9 +2,9 @@ package lila.racer
 
 import strategygames.chess.format.FEN
 import strategygames.chess.format.Uci
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.puzzle.BsonHandlers.PuzzleIdBSONHandler
 import lila.puzzle.Puzzle
 import lila.storm.StormPuzzle

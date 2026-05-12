@@ -1,10 +1,10 @@
 package lila.puzzle
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
 import lila.common.ThreadLocalRandom
-import lila.db.dsl._
+import lila.common.extensions.*
+import lila.db.dsl.*
 import lila.memo.CacheApi
 
 import strategygames.variant.Variant
@@ -16,7 +16,7 @@ final class PuzzleAnon(
     countApi: PuzzleCountApi
 )(implicit ec: ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   def getOneFor(variant: Variant, theme: PuzzleTheme.Key): Fu[Option[Puzzle]] =
     pool
@@ -39,8 +39,8 @@ final class PuzzleAnon(
     cacheApi[(Variant, PuzzleTheme.Key), Vector[Puzzle]](initialCapacity = 64, name = "puzzle.byTheme.anon") {
       _.expireAfterWrite(1 minute)
         .buildAsyncFuture { case (variant, theme) =>
-          countApi.byVariantTheme(variant, theme) flatMap { count =>
-            //TODO tailor selection criteria when more variety of puzzles available
+          countApi.byVariantTheme(variant, theme) flatMap { _ =>
+            // TODO tailor selection criteria when more variety of puzzles available
             // val tier =
             //   if (count > 5000) PuzzleTier.Top
             //   else if (count > 2000) PuzzleTier.Good
@@ -58,8 +58,8 @@ final class PuzzleAnon(
             val ratingRange: Range = 0 to 9999
             val pathSampleSize     = 15
             colls.path {
-              _.aggregateList(poolSize) { framework =>
-                import framework._
+              _.aggregateList(maxDocs = poolSize) { framework =>
+                import framework.*
                 Match(pathApi.select(variant, theme, tier, ratingRange)) -> List(
                   Sample(pathSampleSize),
                   Project($doc("puzzleId" -> "$ids", "_id" -> false)),
@@ -81,9 +81,10 @@ final class PuzzleAnon(
                     )
                   )
                 )
-              }.map {
-                _.view.flatMap(PuzzleBSONReader.readOpt).toVector
               }
+                .map {
+                  _.view.flatMap(PuzzleBSONReader.readOpt).toVector
+                }
             }
           }
         }

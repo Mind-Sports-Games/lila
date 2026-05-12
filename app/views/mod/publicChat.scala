@@ -1,10 +1,9 @@
 package views.html.mod
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
-import controllers.routes
 import play.api.mvc.Call
 import lila.chat.UserChat
 import lila.chat.ChatTimeout
@@ -24,7 +23,7 @@ object publicChat {
       main(cls := "page-menu")(
         views.html.mod.menu("public-chat"),
         div(id := "comm-wrap")(
-          div(id := "communication", cls := "page-menu__content public-chat box box-pad")({
+          div(id := "communication", cls := "page-menu__content public-chat box box-pad") {
             val (scheduledTourChats, teamTourChats) = tourChats.partition(_._1.isScheduled)
             frag(
               h2("Scheduled Tournament Chats"),
@@ -73,7 +72,7 @@ object publicChat {
                 )
               )
             )
-          })
+          }
         )
       )
     }

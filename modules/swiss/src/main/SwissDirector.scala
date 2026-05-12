@@ -1,13 +1,13 @@
 package lila.swiss
 
-import strategygames.{ P2, Player => PlayerIndex, P1, GameLogic, GameFamily, Centis, Status }
+import strategygames.{ Centis, GameFamily, GameLogic, P1, P2, Player as PlayerIndex, Status }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import org.joda.time.DateTime
-import scala.util.chaining._
 import scala.util.Random
 
-import lila.db.dsl._
+import lila.common.extensions.*
+import lila.db.dsl.*
 import lila.game.{ Game, Handicaps, MultiPointState }
 import lila.user.User
 
@@ -20,12 +20,12 @@ final private class SwissDirector(
     ec: scala.concurrent.ExecutionContext,
     idGenerator: lila.game.IdGenerator
 ) {
-  import BsonHandlers._
+  import BsonHandlers.*
 
   private def availableDrawTables(variant: Variant) =
     variant match {
       case Variant.Draughts(variant) =>
-        strategygames.draughts.OpeningTable.fensForVariant(variant).map(FEN.Draughts)
+        strategygames.draughts.OpeningTable.fensForVariant(variant).map(FEN.Draughts.apply)
       case _ => List()
     }
 
@@ -41,13 +41,13 @@ final private class SwissDirector(
       w: User.ID,
       b: User.ID
   ): (User.ID, User.ID, Option[FEN]) = {
-    //weaker player must be p1 in handicap go games
+    // weaker player must be p1 in handicap go games
     val wRating = players.filter(_.userId == w).map(_.actualRating).headOption.getOrElse(1500)
     val bRating = players.filter(_.userId == b).map(_.actualRating).headOption.getOrElse(1500)
     val p1Id    = if (wRating <= bRating) w else b
     val p2Id    = if (wRating <= bRating) b else w
 
-    //handle mcmahon handicaped games
+    // handle mcmahon handicaped games
     val wPoints: Float     = players.filter(_.userId == w).map(_.points.value).headOption.getOrElse(0)
     val bPoints: Float     = players.filter(_.userId == b).map(_.points.value).headOption.getOrElse(0)
     val scoreDiff          = Math.abs(wPoints - bPoints).toInt
@@ -55,7 +55,7 @@ final private class SwissDirector(
     val mmp1Id             = if (wPoints <= bPoints) w else b
     val mmp2Id             = if (wPoints <= bPoints) b else w
 
-    if (swiss.settings.handicapped) {
+    if (swiss.settings.handicapped)
       (
         p1Id,
         p2Id,
@@ -65,15 +65,12 @@ final private class SwissDirector(
           if (p2Id == w) wRating else bRating
         )
       )
-    } else if (mcMahonHandicapped) {
+    else if (mcMahonHandicapped)
       (mmp1Id, mmp2Id, Handicaps.startingFenMcMahon(swiss.roundVariant.some, scoreDiff))
-    } else if (
-      swiss.settings.backgammonPoints.getOrElse(1) > 1 && swiss.variant.gameFamily == GameFamily.Backgammon()
-    ) {
+    else if (swiss.settings.backgammonPoints.getOrElse(1) > 1 && swiss.variant.gameFamily == GameFamily
+        .Backgammon())
       (w, b, Some(FEN(swiss.variant.gameLogic, swiss.variant.toBackgammon.fenFromSetupConfig(true).value)))
-    } else {
-      (w, b, None)
-    }
+    else (w, b, None)
   }
 
   // sequenced by SwissApi
@@ -83,12 +80,12 @@ final private class SwissDirector(
         val pendingPairings = pendings.collect { case Right(p) => p }
         if (pendingPairings.isEmpty) fuccess(none) // terminate
         else {
-          val swiss            = from.startRound
-          val randomPos        = randomDrawForVariant(swiss.roundVariant) _
-          val randomPairingPos = swiss.settings.usePerPairingDrawTables
-          val randomRoundPos   = swiss.settings.useDrawTables && !randomPairingPos
-          val perSwissPos      = swiss.settings.position
-          val perRoundPos      = if (randomRoundPos) randomPos().orElse(perSwissPos) else perSwissPos
+          val swiss                        = from.startRound
+          val randomPos: () => Option[FEN] = () => randomDrawForVariant(swiss.roundVariant)()
+          val randomPairingPos             = swiss.settings.usePerPairingDrawTables
+          val randomRoundPos               = swiss.settings.useDrawTables && !randomPairingPos
+          val perSwissPos                  = swiss.settings.position
+          val perRoundPos = if (randomRoundPos) randomPos().orElse(perSwissPos) else perSwissPos
           for {
             players <- SwissPlayer.fields { f =>
               colls.player.list[SwissPlayer]($doc(f.swissId -> swiss.id))
@@ -134,19 +131,19 @@ final private class SwissDirector(
             byes = pendings.collect { case Left(bye) => bye.player }
             _ <- SwissPlayer.fields { f =>
               colls.player.update
-                .one($doc(f.userId $in byes, f.swissId -> swiss.id), $addToSet(f.byes -> swiss.round))
+                .one($doc(f.userId.$in(byes), f.swissId -> swiss.id), $addToSet(f.byes -> swiss.round))
                 .void
             }
             _ <- colls.pairing.insert.many(pairings).void
             games = pairings.map(makeGame(swiss, SwissPlayer.toMap(players)))
-            _ <- lila.common.Future.applySequentially(games) { game =>
-              gameRepo.insertDenormalized(game) >>- onStart(game.id)
+            _ <- lila.common.LilaFuture.applySequentially(games) { game =>
+              gameRepo.insertDenormalized(game).andDo(onStart(game.id))
             }
           } yield swiss.some
         }
       }
       .recover { case PairingSystem.BBPairingException(msg, input) =>
-        if (msg contains "The number of rounds is larger than the reported number of rounds.") none
+        if (msg.contains("The number of rounds is larger than the reported number of rounds.")) none
         else {
           logger.warn(s"BBPairing ${from.id} $msg")
           logger.info(s"BBPairing ${from.id} $input")
@@ -195,9 +192,9 @@ final private class SwissDirector(
           val turns = g.player.fold(0, 1)
           g.copy(
             clock = makeClock(swiss, prevGame),
-            //Its ok to set all of these to turns - we're just saying we're starting at a non standard
-            //place (if 1) and its all normal if 0. We don't necessarily know about how many turns/plies
-            //made up the history of a position but it doesnt really matter
+            // Its ok to set all of these to turns - we're just saying we're starting at a non standard
+            // place (if 1) and its all normal if 0. We don't necessarily know about how many turns/plies
+            // made up the history of a position but it doesnt really matter
             plies = turns,
             turnCount = turns,
             startedAtPly = turns,
@@ -206,25 +203,27 @@ final private class SwissDirector(
         },
         p1Player = makePlayer(
           P1,
-          players.get(
-            if (
-              prevGame.nonEmpty && pairing.multiMatchGameIds
-                .fold(false)(ids => ids.size % 2 == 1) && swiss.roundVariant.gameLogic != GameLogic
-                .Backgammon() && !swiss.settings.handicapped
-            ) pairing.p2
-            else pairing.p1
-          ) err s"Missing pairing p1 $pairing"
+          players
+            .get(
+              if (prevGame.nonEmpty && pairing.multiMatchGameIds
+                  .fold(false)(ids => ids.size % 2 == 1) && swiss.roundVariant.gameLogic != GameLogic
+                  .Backgammon() && !swiss.settings.handicapped)
+                pairing.p2
+              else pairing.p1
+            )
+            .err(s"Missing pairing p1 $pairing")
         ),
         p2Player = makePlayer(
           P2,
-          players.get(
-            if (
-              prevGame.nonEmpty && pairing.multiMatchGameIds
-                .fold(false)(ids => ids.size % 2 == 1) && swiss.roundVariant.gameLogic != GameLogic
-                .Backgammon() && !swiss.settings.handicapped
-            ) pairing.p1
-            else pairing.p2
-          ) err s"Missing pairing p2 $pairing"
+          players
+            .get(
+              if (prevGame.nonEmpty && pairing.multiMatchGameIds
+                  .fold(false)(ids => ids.size % 2 == 1) && swiss.roundVariant.gameLogic != GameLogic
+                  .Backgammon() && !swiss.settings.handicapped)
+                pairing.p1
+              else pairing.p2
+            )
+            .err(s"Missing pairing p2 $pairing")
         ),
         mode = strategygames.Mode(swiss.settings.rated),
         source = lila.game.Source.Swiss,

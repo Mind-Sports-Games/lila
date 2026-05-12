@@ -1,12 +1,10 @@
 package views.html.blog
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.blog.MiniPost
 import lila.common.paginator.Paginator
-
-import controllers.routes
 
 object index {
 
@@ -17,7 +15,7 @@ object index {
       pager: Paginator[io.prismic.Document]
   )(implicit ctx: Context, prismic: lila.blog.BlogApi.Context) = {
 
-    val primaryPost = (pager.currentPage == 1).??(pager.currentPageResults.headOption)
+    val primaryPost = (pager.currentPage == 1).so(pager.currentPageResults.headOption)
     views.html.base.layout(
       title = "Blog",
       moreCss = cssTag("blog"),
@@ -39,7 +37,7 @@ object index {
           },
           div(cls := "blog-cards list infinite-scroll")(
             pager.currentPageResults flatMap MiniPost.fromDocument("blog", "wide") map { post =>
-              primaryPost.fold(true)(_.id != post.id) option bits.postCard(post, "paginated".some, h3)
+              primaryPost.fold(true)(_.id != post.id).option(bits.postCard(post, "paginated".some, h3))
             },
             pagerNext(pager, np => routes.Blog.index(np).url)
           )
@@ -92,8 +90,8 @@ object index {
           },
           p(cls := "more")(
             a(
-              cls := "button",
-              href := routes.Blog.show(doc.id, urlEncodedTitle, ref = prismic.maybeRef),
+              cls      := "button",
+              href     := routes.Blog.show(doc.id, urlEncodedTitle, ref = prismic.maybeRef),
               dataIcon := "G"
             )(
               " Continue reading this post"

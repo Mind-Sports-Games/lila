@@ -1,14 +1,8 @@
 package views.html
 
-import play.api.libs.json.Json
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-import lila.common.String.html.safeJsonValue
-import play.api.i18n.Lang
-
-import controllers.routes
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object memory {
 
@@ -27,7 +21,7 @@ object memory {
       zoomable = true
     )(
       main(
-        id := "memory-app",
+        id  := "memory-app",
         cls := "memory-app init"
       )(
         h1(cls := "memory-title")(trans.findPairs()),

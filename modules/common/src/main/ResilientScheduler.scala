@@ -1,29 +1,21 @@
 package lila.common
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 object ResilientScheduler {
-
-  private case object Tick
-  private case object Done
 
   def apply(
       every: Every,
       atMost: AtMost,
       initialDelay: FiniteDuration
-  )(f: => Funit)(implicit ec: scala.concurrent.ExecutionContext, scheduler: akka.actor.Scheduler): Unit = {
-    val run = () => f
+  )(f: => Funit)(using ec: Executor, scheduler: Scheduler): Unit = {
+    val run                        = () => f
     def runAndScheduleNext(): Unit =
       run()
-        .withTimeout(atMost.value)
+        .withTimeout(atMost.value, "ResilientScheduler")
         .addEffectAnyway {
-          scheduler.scheduleOnce(every.value) { runAndScheduleNext() }.unit
+          scheduler.scheduleOnce(every.value) { runAndScheduleNext() }
         }
-        .unit
-    scheduler
-      .scheduleOnce(initialDelay) {
-        runAndScheduleNext()
-      }
-      .unit
+    scheduler.scheduleOnce(initialDelay) { runAndScheduleNext() }
   }
 }
