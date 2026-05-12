@@ -29,7 +29,9 @@ export function makeConfig(ctrl: RoundController): Config {
     dice = data.dice
       ? data.dice
       : stratUtils.backgammon.readDice(step.fen, data.game.variant.key, data.canEndTurn, ctrl.areDiceDescending),
-    doublingCube = data.doublingCube ? data.doublingCube : stratUtils.backgammon.readDoublingCube(step.fen, data.game.variant.key),
+    doublingCube = data.doublingCube
+      ? data.doublingCube
+      : stratUtils.backgammon.readDoublingCube(step.fen, data.game.variant.key),
     cubeActions = data.cubeActions ? data.cubeActions.split(',').map(a => a as cg.CubeAction) : [];
   const config: Config = {
     fen: step.fen,

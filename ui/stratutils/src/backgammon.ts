@@ -2,8 +2,7 @@ import type * as cg from 'chessground/types';
 import * as status from 'game/status';
 import type { BaseGame } from 'game';
 
-export const isBackgammonVariant = (key: string): boolean =>
-  ['backgammon', 'hyper', 'nackgammon'].includes(key);
+export const isBackgammonVariant = (key: string): boolean => ['backgammon', 'hyper', 'nackgammon'].includes(key);
 
 export const diceRollUci = /^[1-6](\/[1-6])+$/;
 

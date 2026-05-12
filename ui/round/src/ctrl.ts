@@ -386,7 +386,11 @@ export default class RoundController {
         this.data.game.multiPointState
       ) {
         this.chessground.set({
-          multiPointState: stratUtils.backgammon.finalMultiPointState(this.data.game, this.ply, round.lastPly(this.data)),
+          multiPointState: stratUtils.backgammon.finalMultiPointState(
+            this.data.game,
+            this.ply,
+            round.lastPly(this.data),
+          ),
         });
         this.chessground.redrawAll();
       }

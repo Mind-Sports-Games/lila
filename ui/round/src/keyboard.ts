@@ -1,5 +1,5 @@
 import RoundController from './ctrl';
-import { firstPly as roundFirstPly, lastPly as roundLastPly} from './round';
+import { firstPly as roundFirstPly, lastPly as roundLastPly } from './round';
 
 export const prev = (ctrl: RoundController) => ctrl.userJump(ctrl.ply - 1);
 
