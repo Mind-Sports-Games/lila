@@ -14,11 +14,11 @@ import { variantClassFromKey } from 'stratops/variants/util';
 import { GameFamily as BackgammonFamily } from 'stratops/variants/backgammon/GameFamily';
 import { GameFamily as DameoFamily } from 'stratops/variants/dameo/GameFamily';
 import { NotationStyle } from 'stratops/variants/types';
+import { backgammon as bgUtils } from 'stratutils';
 
 const scrollMax = 99999,
   moveTag = 'u8t',
   indexTag = 'i5z',
-  indexTagUC = indexTag.toUpperCase(),
   movesTag = 'l4x',
   rmovesTag = 'rm6';
 
@@ -63,44 +63,43 @@ function renderMultiActionMove(
   orEmpty: boolean,
   drawOffers: Set<number>,
 ) {
-  return step
-    ? h(
-        moveTag,
-        {
-          class: {
-            a1t: step.map(s => s && s.ply === curPly).includes(true),
-          },
-        },
-        [
-          combinedNotationOfTurn(
-            step.map(s =>
-              s
-                ? variantClassFromKey(variant.key).computeMoveNotation({
-                    san: s.san,
-                    uci: s.uci,
-                    fen: s.fen,
-                    prevFen: prevStepFen(s),
-                  })
-                : '',
-            ),
-            notation,
-          ),
-          step.map(s => drawOffers.has(s ? s.turnCount : -1)).includes(true) ? renderDrawOffer() : undefined,
-        ],
-      )
-    : orEmpty
-      ? h(moveTag, '…')
-      : undefined;
+  if (!step) return orEmpty ? h(moveTag, '…') : undefined;
+  const actions = step.filter((s): s is Step => s !== null);
+  const lastPieceMoveAction = bgUtils.isBackgammonVariant(variant.key)
+    ? [...actions].reverse().find(s => s.uci !== 'endturn' && !bgUtils.isDiceRollUci(s.uci ?? ''))
+    : undefined;
+  const targetPly = (lastPieceMoveAction ?? actions[actions.length - 1])?.ply;
+  return h(
+    moveTag,
+    {
+      class: { a1t: actions.some(s => s.ply === curPly) },
+      attrs: targetPly !== undefined ? { 'data-ply': targetPly } : {},
+    },
+    [
+      combinedNotationOfTurn(
+        step.map(s =>
+          s
+            ? variantClassFromKey(variant.key).computeMoveNotation({
+                san: s.san,
+                uci: s.uci,
+                fen: s.fen,
+                prevFen: prevStepFen(s),
+              })
+            : '',
+        ),
+        notation,
+      ),
+      actions.some(s => drawOffers.has(s.turnCount)) ? renderDrawOffer() : undefined,
+    ],
+  );
 }
 
 function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {
   switch (notation) {
     case NotationStyle.bkg:
       return BackgammonFamily.combinedNotation(actionNotations);
-      break;
     case NotationStyle.dmo:
       return DameoFamily.combinedNotation(actionNotations);
-      break;
     default:
       return actionNotations.join(' ');
   }
@@ -300,16 +299,12 @@ export function render(ctrl: RoundController): VNode | undefined {
         {
           hook: util.onInsert(el => {
             el.addEventListener('mousedown', e => {
-              let node = e.target as HTMLElement,
-                offset = -2;
+              const node = e.target as HTMLElement;
               if (node.tagName !== moveTag.toUpperCase()) return;
-              while ((node = node.previousSibling as HTMLElement)) {
-                offset++;
-                if (node.tagName === indexTagUC) {
-                  ctrl.userJumpToTurn(2 * parseInt(node.textContent || '') + offset);
-                  ctrl.redraw();
-                  break;
-                }
+              const ply = parseInt(node.getAttribute('data-ply') ?? '');
+              if (!isNaN(ply)) {
+                ctrl.userJumpToPly(ply);
+                ctrl.redraw();
               }
             });
             ctrl.autoScroll = () => autoScroll(el, ctrl);
