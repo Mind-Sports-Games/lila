@@ -347,9 +347,9 @@ export default class AnalyseCtrl {
       config: CgConfig = {
         fen: this.controlConfig.cgFen ? this.controlConfig.cgFen(node.fen) : node.fen,
         turnPlayerIndex: playerIndex,
-        dice: stratUtils.readDice(node.fen, variantKey, false, true),
-        doublingCube: stratUtils.readDoublingCube(node.fen, variantKey),
-        multiPointState: stratUtils.finalMultiPointState(this.data.game, node.ply, this.tree.lastPly()),
+        dice: stratUtils.backgammon.readDice(node.fen, variantKey, false, true),
+        doublingCube: stratUtils.backgammon.readDoublingCube(node.fen, variantKey),
+        multiPointState: stratUtils.backgammon.finalMultiPointState(this.data.game, node.ply, this.tree.lastPly()),
         movable: this.embed
           ? {
               playerIndex: undefined,

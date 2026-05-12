@@ -8,7 +8,7 @@ import {
 
 import type AnalyseCtrl from '../../ctrl';
 import type { AnaRoll, AnaEndTurn } from '../../study/interfaces';
-import { readDice } from 'stratutils';
+import { backgammon as bgUtils } from 'stratutils';
 import { path as treePath } from 'tree';
 import { bind } from '../../util';
 
@@ -34,7 +34,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   let die2Pick: number | null | undefined = undefined;
   let diceWasPreFilled = false;
 
-  const diceRollUci = /^[1-6](\/[1-6])+$/;
+  const diceRollUci = bgUtils.diceRollUci;
 
   type CgCubeAction = 'offer' | 'reject' | 'accept';
   const readCubeActionsFromFen = (fen: string): CgCubeAction[] => {
@@ -321,7 +321,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
       lastRollPath = ctrl.path;
     }
 
-    const rawDice = readDice(node.fen, variantKey, false, areDiceDescending) as {
+    const rawDice = bgUtils.readDice(node.fen, variantKey, false, areDiceDescending) as {
       value: number;
       isAvailable: boolean;
     }[];

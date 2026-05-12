@@ -386,7 +386,7 @@ export default class RoundController {
         this.data.game.multiPointState
       ) {
         this.chessground.set({
-          multiPointState: stratUtils.finalMultiPointState(this.data.game, this.ply, round.lastPly(this.data)),
+          multiPointState: stratUtils.backgammon.finalMultiPointState(this.data.game, this.ply, round.lastPly(this.data)),
         });
         this.chessground.redrawAll();
       }
@@ -413,12 +413,12 @@ export default class RoundController {
     const s = this.stepAt(ply);
     this.turnCount = s.turnCount;
     const turnPlayerIndex = util.turnPlayerIndexFromLastTurn(this.turnCount);
-    const dice = stratUtils.readDice(
+    const dice = stratUtils.backgammon.readDice(
       s.fen,
       this.data.game.variant.key,
       this.replaying() ? false : this.data.canEndTurn,
     );
-    const doublingCube = stratUtils.readDoublingCube(s.fen, this.data.game.variant.key);
+    const doublingCube = stratUtils.backgammon.readDoublingCube(s.fen, this.data.game.variant.key);
     const config: CgConfig = {
       fen: s.fen,
       lastMove: stratUtils.lastMove(this.data.onlyDropsVariant, s.uci),
@@ -428,7 +428,7 @@ export default class RoundController {
       doublingCube: doublingCube,
       showUndoButton: false,
       cubeActions: [], //we dont know what these are so dont want to display them
-      multiPointState: stratUtils.finalMultiPointState(this.data.game, this.ply, round.lastPly(this.data)),
+      multiPointState: stratUtils.backgammon.finalMultiPointState(this.data.game, this.ply, round.lastPly(this.data)),
     };
     if (this.replaying()) {
       cancelDropMode(this.chessground.state);
@@ -667,8 +667,8 @@ export default class RoundController {
     //set the right data from all backgammon actions
     this.areDiceDescending = activePlayerIndex ? this.areDiceDescending : true;
     d.canOnlyRollDice = activePlayerIndex ? o.canOnlyRollDice : false;
-    d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key, o.canEndTurn, this.areDiceDescending);
-    d.doublingCube = stratUtils.readDoublingCube(o.fen, this.data.game.variant.key);
+    d.dice = stratUtils.backgammon.readDice(o.fen, this.data.game.variant.key, o.canEndTurn, this.areDiceDescending);
+    d.doublingCube = stratUtils.backgammon.readDoublingCube(o.fen, this.data.game.variant.key);
     d.activeDiceValue = this.activeDiceValue(d.dice);
     ((d.cubeActions = o.cubeActions), (d.forcedAction = o.forcedAction));
 
