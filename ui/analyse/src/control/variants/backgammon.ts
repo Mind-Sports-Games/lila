@@ -87,6 +87,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
 
   const triggerRoll = (fromUserRoll = false) => {
     if (rollPending) return;
+    if (ctrl.outcome()) return; // based on current node.
     if (!fromUserRoll && ctrl.node.uci !== 'cubey' && readCubeActionsFromFen(ctrl.node.fen).length > 0) return;
     const existingRoll = ctrl.node.children.find(c => diceRollUci.test(c.uci ?? ''));
     if (existingRoll) {
