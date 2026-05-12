@@ -90,16 +90,16 @@ final private class StudySocket(
             who foreach gameAction(studyId, pass, MoveOpts.parse(o))
           }
         case "anaRoll" =>
-          AnaRoll parse o foreach { roll =>
-            who foreach gameAction(studyId, roll, MoveOpts parse o)
+          AnaRoll.parse(o) foreach { roll =>
+            who foreach gameAction(studyId, roll, MoveOpts.parse(o))
           }
         case "anaLift" =>
-          AnaLift parse o foreach { lift =>
-            who foreach gameAction(studyId, lift, MoveOpts parse o)
+          AnaLift.parse(o) foreach { lift =>
+            who foreach gameAction(studyId, lift, MoveOpts.parse(o))
           }
         case "anaEndTurn" =>
-          AnaEndTurn parse o foreach { endTurn =>
-            who foreach gameAction(studyId, endTurn, MoveOpts parse o)
+          AnaEndTurn.parse(o) foreach { endTurn =>
+            who foreach gameAction(studyId, endTurn, MoveOpts.parse(o))
           }
         case "deleteNode" =>
           reading[AtPosition](o) { position =>

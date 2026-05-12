@@ -42,9 +42,9 @@ object userAnalysis {
             "analyse.zh"
           )
         ),
-        (pov.game.variant.gameFamily == GameFamily.Backgammon()) option cssTag(
+        (pov.game.variant.gameFamily == GameFamily.Backgammon()).option(cssTag(
           "analyse.backgammon"
-        ),
+        )),
         withForecast.option(cssTag("analyse.forecast")),
         ctx.blind.option(cssTag("round.nvui"))
       ),
