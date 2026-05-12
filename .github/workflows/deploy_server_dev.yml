@@ -34,6 +34,7 @@ jobs:
           repository: Mind-Sports-Games/lila-maven
           ssh-key: ${{ secrets.MSO_CI_SSH_KEY }}
           path: deps/lila-maven
+          ref: dev
       - uses: actions/cache@v4
         with:
           path: |
@@ -47,6 +48,8 @@ jobs:
           cache: sbt
       - name: Setup sbt
         uses: sbt/setup-sbt@v1
+      - name: Use lila-maven dev branch
+        run: echo "LILA_MAVEN_RESOLVERS=https://raw.githubusercontent.com/Mind-Sports-Games/lila-maven/dev" >> $GITHUB_ENV
       - run: TZ=UTC git log -1 --date=iso-strict-local --pretty='format:app.version.commit = "%h"%napp.version.date = "%ad"%napp.version.message = """%s"""%n' | tee conf/version.conf
       - run: ./lila -Depoll=true "test;stage"
       - run: cp LICENSE COPYING.md README.md target/universal/stage && git log -n 1 --pretty=oneline > target/universal/stage/commit.txt
