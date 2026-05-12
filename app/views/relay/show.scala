@@ -4,11 +4,9 @@ package relay
 import play.api.libs.json.Json
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
-
-import controllers.routes
 
 object show {
 
@@ -26,32 +24,32 @@ object show {
         analyseTag,
         analyseNvuiTag,
         embedJsUnsafe(s"""playstrategy.relay=${safeJsonValue(
-          Json.obj(
-            "relay"    -> data.relay,
-            "study"    -> data.study.add("admin" -> isGranted(_.StudyAdmin)),
-            "data"     -> data.analysis,
-            "i18n"     -> bits.jsI18n,
-            "tagTypes" -> lila.study.PgnTags.typesToString,
-            "userId"   -> ctx.userId,
-            "chat" -> chatOption.map(c =>
-              chat.json(
-                c.chat,
-                name = trans.chatRoom.txt(),
-                timeout = c.timeout,
-                writeable = ctx.userId.??(rt.study.canChat),
-                public = false,
-                resourceId = lila.chat.Chat.ResourceId(s"relay/${c.chat.id}"),
-                localMod = ctx.userId.??(rt.study.canContribute)
-              )
-            ),
-            "explorer" -> Json.obj(
-              "endpoint"          -> explorerEndpoint,
-              "tablebaseEndpoint" -> tablebaseEndpoint
-            ),
-            "socketUrl"     -> views.html.study.show.socketUrl(rt.study.id.value),
-            "socketVersion" -> socketVersion.value
-          )
-        )}""")
+            Json.obj(
+              "relay"    -> data.relay,
+              "study"    -> data.study.add("admin" -> isGranted(_.StudyAdmin)),
+              "data"     -> data.analysis,
+              "i18n"     -> bits.jsI18n,
+              "tagTypes" -> lila.study.PgnTags.typesToString,
+              "userId"   -> ctx.userId,
+              "chat"     -> chatOption.map(c =>
+                chat.json(
+                  c.chat,
+                  name = trans.chatRoom.txt(),
+                  timeout = c.timeout,
+                  writeable = ctx.userId.so(rt.study.canChat),
+                  public = false,
+                  resourceId = lila.chat.Chat.ResourceId(s"relay/${c.chat.id}"),
+                  localMod = ctx.userId.so(rt.study.canContribute)
+                )
+              ),
+              "explorer" -> Json.obj(
+                "endpoint"          -> explorerEndpoint,
+                "tablebaseEndpoint" -> tablebaseEndpoint
+              ),
+              "socketUrl"     -> views.html.study.show.socketUrl(rt.study.id.value),
+              "socketVersion" -> socketVersion.value
+            )
+          )}""")
       ),
       chessground = false,
       zoomable = true,

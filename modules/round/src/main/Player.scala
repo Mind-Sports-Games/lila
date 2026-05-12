@@ -4,21 +4,18 @@ import strategygames.format.{ Forsyth, Uci }
 import strategygames.{
   Action,
   Centis,
+  CubeAction as StratCubeAction,
+  DiceRoll as StratDiceRoll,
+  Drop as StratDrop,
+  EndTurn as StratEndTurn,
+  Lift as StratLift,
+  Move as StratMove,
   MoveMetrics,
-  Pos,
-  Role,
+  Pass as StratPass,
+  SelectSquares as StratSelectSquares,
   Status,
-  Drop => StratDrop,
-  Move => StratMove,
-  Pass => StratPass,
-  Lift => StratLift,
-  EndTurn => StratEndTurn,
-  DiceRoll => StratDiceRoll,
-  CubeAction => StratCubeAction,
-  Undo => StratUndo,
-  SelectSquares => StratSelectSquares
+  Undo as StratUndo
 }
-import strategygames.chess
 
 import actorApi.round.{ DrawNo, ForecastPlay, HumanPlay, TakebackNo, TooManyPlies }
 import lila.game.actorApi.MoveGameEvent
@@ -52,12 +49,12 @@ final private class Player(
             fufail(
               ClientError(s"$pov game selected squares (${game.selectedSquares}) doesn't match uci ($uci)")
             )
-          case Pov(game, playerIndex) if game playableBy playerIndex =>
+          case Pov(game, playerIndex) if game.playableBy(playerIndex) =>
             applyUci(game, uci, blur, lag, finalSquare)
               .leftMap(e => s"$pov $e")
               .fold(errs => fufail(ClientError(errs)), fuccess)
               .flatMap {
-                case Flagged => finisher.outOfTime(game)
+                case Flagged                         => finisher.outOfTime(game)
                 case ActionApplied(progress, action) =>
                   proxy.save(progress) >>
                     postHumanOrBotPlay(round, pov, progress, action)
@@ -77,18 +74,18 @@ final private class Player(
         fuccess(Nil)
       case Pov(game, _) if game.selectedSquaresOfferDoesNotMatchUci(uci) =>
         fufail(ClientError(s"$pov game selected squares (${game.selectedSquares}) doesn't match uci ($uci)"))
-      case Pov(game, playerIndex) if game playableBy playerIndex =>
+      case Pov(game, playerIndex) if game.playableBy(playerIndex) =>
         applyUci(game, uci, blur = false, botLag)
           .fold(errs => fufail(ClientError(errs)), fuccess)
           .flatMap {
-            case Flagged => finisher.outOfTime(game)
+            case Flagged                         => finisher.outOfTime(game)
             case ActionApplied(progress, action) =>
               proxy.save(progress) >> postHumanOrBotPlay(round, pov, progress, action)
           }
       case Pov(game, _) if game.finished                       => fufail(GameIsFinishedError(pov))
       case Pov(game, _) if game.aborted                        => fufail(ClientError(s"$pov game is aborted"))
       case Pov(game, playerIndex) if !game.turnOf(playerIndex) => fufail(ClientError(s"$pov not your turn"))
-      case _                                                   => fufail(ClientError(s"$pov move refused for some reason"))
+      case _ => fufail(ClientError(s"$pov move refused for some reason"))
     }
 
   private def postHumanOrBotPlay(
@@ -104,14 +101,13 @@ final private class Player(
       if (progress.game.playableByAi) requestFishnet(progress.game, round)
       if (pov.opponent.isOfferingDraw) round ! DrawNo(PlayerId(pov.player.id))
       if (pov.player.isProposingTakeback) round ! TakebackNo(PlayerId(pov.player.id))
-      if (progress.game.forecastable) {
+      if (progress.game.forecastable)
         (action match {
           case m: StratMove => Some(m)
           case _            => None
         }).map { move =>
           round ! ForecastPlay(move)
         }
-      }
       scheduleExpiration(progress.game)
       if (progress.game.selectSquaresPossible) scheduleActionExpiration(progress.game)
       fuccess(progress.events)
@@ -119,22 +115,22 @@ final private class Player(
   }
 
   private[round] def fishnet(game: Game, ply: Int, uci: Uci)(implicit proxy: GameProxy): Fu[Events] =
-    if (game.playable && game.player.isAi && game.playedPlies == ply) {
+    if (game.playable && game.player.isAi && game.playedPlies == ply)
       applyUci(game, uci, blur = false, metrics = fishnetLag)
         .fold(errs => fufail(ClientError(errs)), fuccess)
         .flatMap {
-          case Flagged => finisher.outOfTime(game)
+          case Flagged                         => finisher.outOfTime(game)
           case ActionApplied(progress, action) =>
-            proxy.save(progress) >>-
-              uciMemo.add(progress.game, action) >>-
-              lila.mon.fishnet.move(~game.aiLevel).increment().unit >>-
-              notifyMove(action, progress.game) >> {
-                if (progress.game.finished) moveFinish(progress.game) dmap { progress.events ::: _ }
-                else
-                  fuccess(progress.events)
-              }
+            proxy
+              .save(progress)
+              .andDo(uciMemo.add(progress.game, action))
+              .andDo { val _ = lila.mon.fishnet.move(~game.aiLevel).increment() }
+              .andDo(notifyMove(action, progress.game)) >> {
+              if (progress.game.finished) moveFinish(progress.game) dmap { progress.events ::: _ }
+              else fuccess(progress.events)
+            }
         }
-    } else
+    else
       fufail(
         FishnetError(
           s"Not AI turn move: $uci id: ${game.id} playable: ${game.playable} player: ${game.player} hasAI: ${game.player.isAi} game.playedTurns: ${game.playedTurns} ply: $ply"
@@ -142,7 +138,7 @@ final private class Player(
       )
 
   private[round] def requestFishnet(game: Game, round: RoundDuct): Funit =
-    game.playableByAi ?? {
+    game.playableByAi so {
       if (game.turnCount <= fishnetPlayer.maxTurns) fishnetPlayer(game)
       else fuccess(round ! actorApi.round.ResignAi)
     }
@@ -159,7 +155,7 @@ final private class Player(
   ): Validated[String, ActionResult] =
     game.stratGame.applyUci(uci, metrics, finalSquare).map {
       case (nsg, _) if nsg.clock.exists(_.outOfTime(game.turnPlayerIndex, withGrace = false)) => Flagged
-      case (newStratGame, action) =>
+      case (newStratGame, action)                                                             =>
         ActionApplied(
           game.update(newStratGame, action, blur),
           action
@@ -169,7 +165,7 @@ final private class Player(
   private def notifyMove(action: Action, game: Game): Unit = {
     import lila.hub.actorApi.round.{ CorresMoveEvent, MoveEvent, SimulMoveEvent }
     val playerIndex = action.player
-    val moveEvent = MoveEvent(
+    val moveEvent   = MoveEvent(
       gameId = game.id,
       fen = Forsyth.exportBoard(game.board.variant.gameLogic, game.board),
       move = action match {
@@ -188,7 +184,7 @@ final private class Player(
     // I checked and the bus doesn't do much if there's no subscriber for a classifier,
     // so we should be good here.
     // also used for targeted TvBroadcast subscription
-    Bus.publish(MoveGameEvent(game, moveEvent.fen, moveEvent.move), MoveGameEvent makeChan game.id)
+    Bus.publish(MoveGameEvent(game, moveEvent.fen, moveEvent.move), MoveGameEvent.makeChan(game.id))
 
     // publish correspondence moves
     if (game.isCorrespondence && game.nonAi)

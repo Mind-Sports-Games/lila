@@ -1,14 +1,14 @@
 package lila.tournament
 
 import akka.stream.Materializer
-import akka.stream.scaladsl._
-import BSONHandlers._
+import akka.stream.scaladsl.*
+import BSONHandlers.*
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import reactivemongo.api.ReadPreference
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.Game
 import lila.user.User
 
@@ -16,15 +16,15 @@ import strategygames.Player
 
 final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext, mat: Materializer) {
 
-  def selectTour(tourId: Tournament.ID) = $doc("tid" -> tourId)
-  def selectUser(userId: User.ID)       = $doc("u" -> userId)
+  def selectTour(tourId: Tournament.ID)                              = $doc("tid" -> tourId)
+  def selectUser(userId: User.ID)                                    = $doc("u" -> userId)
   private def selectTourUser(tourId: Tournament.ID, userId: User.ID) =
     $doc(
       "tid" -> tourId,
       "u"   -> userId
     )
-  private val selectPlaying  = $doc("s" $lt strategygames.Status.Mate.id)
-  private val selectFinished = $doc("s" $gte strategygames.Status.Mate.id)
+  private val selectPlaying  = $doc("s".$lt(strategygames.Status.Mate.id))
+  private val selectFinished = $doc("s".$gte(strategygames.Status.Mate.id))
   private val recentSort     = $doc("d" -> -1)
   private val chronoSort     = $doc("d" -> 1)
 
@@ -37,34 +37,36 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
       userIds: Set[User.ID],
       max: Int
   ): Fu[Pairing.LastOpponents] =
-    userIds.nonEmpty.?? {
-      val nbUsers = userIds.size
-      coll
-        .find(
-          selectTour(tourId) ++ $doc("u" $in userIds),
-          $doc("_id" -> false, "u" -> true).some
-        )
-        .sort(recentSort)
-        .batchSize(20)
-        .cursor[Bdoc]()
-        .documentSource(Math.min(max, defaultLastOpponentsCap))
-        .mapConcat(_.getAsOpt[List[User.ID]]("u").toList)
-        .scan(Map.empty[User.ID, User.ID]) {
-          case (acc, List(u1, u2)) =>
-            val b1   = userIds.contains(u1)
-            val b2   = !b1 || userIds.contains(u2)
-            val acc1 = if (!b1 || acc.contains(u1)) acc else acc.updated(u1, u2)
-            if (!b2 || acc.contains(u2)) acc1 else acc1.updated(u2, u1)
-          case (acc, _) => acc
-        }
-        .takeWhile(
-          r => r.sizeIs < nbUsers,
-          inclusive = true
-        )
-        .toMat(Sink.lastOption)(Keep.right)
-        .run()
-        .dmap(~_)
-    } dmap Pairing.LastOpponents.apply
+    userIds.nonEmpty
+      .so {
+        val nbUsers = userIds.size
+        coll
+          .find(
+            selectTour(tourId) ++ $doc("u".$in(userIds)),
+            $doc("_id" -> false, "u" -> true).some
+          )
+          .sort(recentSort)
+          .batchSize(20)
+          .cursor[Bdoc]()
+          .documentSource(Math.min(max, defaultLastOpponentsCap))
+          .mapConcat(_.getAsOpt[List[User.ID]]("u").toList)
+          .scan(Map.empty[User.ID, User.ID]) {
+            case (acc, List(u1, u2)) =>
+              val b1   = userIds.contains(u1)
+              val b2   = !b1 || userIds.contains(u2)
+              val acc1 = if (!b1 || acc.contains(u1)) acc else acc.updated(u1, u2)
+              if (!b2 || acc.contains(u2)) acc1 else acc1.updated(u2, u1)
+            case (acc, _) => acc
+          }
+          .takeWhile(
+            r => r.sizeIs < nbUsers,
+            inclusive = true
+          )
+          .toMat(Sink.lastOption)(Keep.right)
+          .run()
+          .dmap(~_)
+      }
+      .dmap(Pairing.LastOpponents.apply)
 
   def opponentsOf(tourId: Tournament.ID, userId: User.ID): Fu[Set[User.ID]] =
     coll
@@ -75,9 +77,11 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
       .cursor[Bdoc]()
       .list()
       .dmap {
-        _.view.flatMap { doc =>
-          ~doc.getAsOpt[List[User.ID]]("u").find(userId !=)
-        }.toSet
+        _.view
+          .flatMap { doc =>
+            ~doc.getAsOpt[List[User.ID]]("u").find(userId !=)
+          }
+          .toSet
       }
 
   def recentIdsByTourAndUserId(tourId: Tournament.ID, userId: User.ID, nb: Int): Fu[List[Tournament.ID]] =
@@ -110,25 +114,25 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
   private[tournament] def forfeitByTourAndUserId(tourId: Tournament.ID, userId: User.ID): Funit =
     coll
       .list[Pairing](selectTourUser(tourId, userId))
-      .flatMap {
-        _.withFilter(_ notLostBy userId).map { p =>
+      .flatMap { pairings =>
+        Future.sequence(pairings.withFilter(_.notLostBy(userId)).map { p =>
           coll.update.one(
             $id(p.id),
             $set(
               "w" -> p.playerIndexOf(userId).map(_.p2)
             )
           )
-        }.sequenceFu
+        })
       }
       .void
 
   def count(tourId: Tournament.ID): Fu[Int] =
     coll.countSel(selectTour(tourId))
 
-  private[tournament] def countByTourIdAndUserIds(tourId: Tournament.ID): Fu[Map[User.ID, Int]] = {
+  private[tournament] def countByTourIdAndUserIds(tourId: Tournament.ID): Fu[Map[User.ID, Int]] =
     coll
       .aggregateList(maxDocs = 10000) { framework =>
-        import framework._
+        import framework.*
         Match(selectTour(tourId)) -> List(
           Project($doc("u" -> true, "_id" -> false)),
           UnwindField("u"),
@@ -137,13 +141,14 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
         )
       }
       .map {
-        _.view.flatMap { doc =>
-          doc.getAsOpt[User.ID]("_id") flatMap { uid =>
-            doc.int("nb") map { uid -> _ }
+        _.view
+          .flatMap { doc =>
+            doc.getAsOpt[User.ID]("_id") flatMap { uid =>
+              doc.int("nb") map { uid -> _ }
+            }
           }
-        }.toMap
+          .toMap
       }
-  }
 
   def removePlaying(tourId: Tournament.ID) = coll.delete.one(selectTour(tourId) ++ selectPlaying).void
 
@@ -177,9 +182,9 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
         .one(
           $id(g.id),
           $set(
-            "s" -> g.status.id,
-            "w" -> g.winnerPlayerIndex.map(_.p1),
-            "t" -> g.playedTurns,
+            "s"  -> g.status.id,
+            "w"  -> g.winnerPlayerIndex.map(_.p1),
+            "t"  -> g.playedTurns,
             "st" -> (if (g.startPlayerIndex == Player.P2 && g.variant.recalcStartPlayerForStats) Some(true)
                      else None),
             "f" -> DateTime.now
@@ -190,34 +195,38 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
   def justFinishedUsers(tourId: Tournament.ID, waitSeconds: Int): Fu[Set[User.ID]] =
     coll
       .find(
-        selectTour(tourId) ++ $doc("f" $gte DateTime.now.minusSeconds(waitSeconds))
+        selectTour(tourId) ++ $doc("f".$gte(DateTime.now.minusSeconds(waitSeconds)))
       )
       .cursor[Bdoc]()
       .list()
       .dmap {
-        _.view.flatMap { doc =>
-          ~doc.getAsOpt[List[User.ID]]("u")
-        }.toSet
+        _.view
+          .flatMap { doc =>
+            ~doc.getAsOpt[List[User.ID]]("u")
+          }
+          .toSet
       }
 
   def inPlayUsers(tourId: Tournament.ID): Fu[Set[User.ID]] =
     coll
       .find(
-        selectTour(tourId) ++ $doc("f" $exists false)
+        selectTour(tourId) ++ $doc("f".$exists(false))
       )
       .cursor[Bdoc]()
       .list()
       .dmap {
-        _.view.flatMap { doc =>
-          ~doc.getAsOpt[List[User.ID]]("u")
-        }.toSet
+        _.view
+          .flatMap { doc =>
+            ~doc.getAsOpt[List[User.ID]]("u")
+          }
+          .toSet
       }
 
   def setBerserk(pairing: Pairing, userId: User.ID) = {
     if (pairing.user1 == userId) "b1".some
     else if (pairing.user2 == userId) "b2".some
     else none
-  } ?? { field =>
+  } so { field =>
     coll.update
       .one(
         $id(pairing.id),
@@ -237,44 +246,44 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
       .batchSize(batchSize)
       .cursor[Pairing](readPreference)
 
-  private[tournament] def rawStats(tourId: Tournament.ID): Fu[List[Bdoc]] = {
-    coll.aggregateList(maxDocs = 3) { framework =>
-      import framework._
-      Match(selectTour(tourId)) -> List(
-        Project(
-          $doc(
-            "_id" -> false,
-            "w" -> $doc(
-              "$cond" -> $arr(
-                $doc("$eq" -> $arr("$st", true)), // Check if st is true
-                $doc(
-                  "$cond" -> $arr(
-                    $doc("$eq" -> $arr("$w", true)), // Check if w is true
-                    false, // Invert true to false
-                    $doc(
-                      "$cond" -> $arr(
-                        $doc("$eq" -> $arr("$w", false)), // Check if w is false
-                        true, // Invert false to true
-                        "$w"  // Keep w as it is if w doesn't exist
+  private[tournament] def rawStats(tourId: Tournament.ID): Fu[List[Bdoc]] =
+    coll
+      .aggregateList(maxDocs = 3) { framework =>
+        import framework.*
+        Match(selectTour(tourId)) -> List(
+          Project(
+            $doc(
+              "_id" -> false,
+              "w"   -> $doc(
+                "$cond" -> $arr(
+                  $doc("$eq" -> $arr("$st", true)), // Check if st is true
+                  $doc(
+                    "$cond" -> $arr(
+                      $doc("$eq" -> $arr("$w", true)), // Check if w is true
+                      false, // Invert true to false
+                      $doc(
+                        "$cond" -> $arr(
+                          $doc("$eq" -> $arr("$w", false)), // Check if w is false
+                          true, // Invert false to true
+                          "$w" // Keep w as it is if w doesn't exist
+                        )
                       )
                     )
-                  )
-                ),
-                "$w" // Keep w as it is if st is false
-              )
-            ),
-            "t"  -> true,
-            "b1" -> $doc("$cond" -> $arr("$b1", 1, 0)),
-            "b2" -> $doc("$cond" -> $arr("$b2", 1, 0))
+                  ),
+                  "$w" // Keep w as it is if st is false
+                )
+              ),
+              "t"  -> true,
+              "b1" -> $doc("$cond" -> $arr("$b1", 1, 0)),
+              "b2" -> $doc("$cond" -> $arr("$b2", 1, 0))
+            )
+          ),
+          GroupField("w")(
+            "games" -> SumAll,
+            "moves" -> SumField("t"),
+            "b1"    -> SumField("b1"),
+            "b2"    -> SumField("b2")
           )
-        ),
-        GroupField("w")(
-          "games" -> SumAll,
-          "moves" -> SumField("t"),
-          "b1"    -> SumField("b1"),
-          "b2"    -> SumField("b2")
         )
-      )
-    }
-  }
+      }
 }

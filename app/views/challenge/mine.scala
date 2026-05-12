@@ -1,11 +1,9 @@
 package views.html.challenge
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.challenge.Challenge.Status
-
-import controllers.routes
 
 object mine {
 
@@ -55,35 +53,37 @@ object mine {
                       br,
                       p(cls := "challenge-id-form")(
                         input(
-                          id := "challenge-id",
-                          cls := "copyable autoselect",
+                          id         := "challenge-id",
+                          cls        := "copyable autoselect",
                           spellcheck := "false",
                           readonly,
                           value := challengeLink,
-                          size := challengeLink.length
+                          size  := challengeLink.length
                         ),
                         button(
-                          title := "Copy URL",
-                          cls := "copy button",
-                          dataRel := "challenge-id",
+                          title    := "Copy URL",
+                          cls      := "copy button",
+                          dataRel  := "challenge-id",
                           dataIcon := "\""
                         )
                       ),
                       p(trans.theFirstPersonToComeOnThisUrlWillPlayWithYou())
                     ),
-                    ctx.isAuth option div(
-                      h2(cls := "ninja-title", "Or invite a PlayStrategy user:"),
-                      br,
-                      postForm(
-                        cls := "user-invite complete-parent",
-                        action := routes.Challenge.toFriend(c.id)
-                      )(
-                        input(
-                          name := "username",
-                          cls := "friend-autocomplete",
-                          placeholder := trans.search.search.txt()
-                        ),
-                        error.map { badTag(_) }
+                    ctx.isAuth.option(
+                      div(
+                        h2(cls := "ninja-title", "Or invite a PlayStrategy user:"),
+                        br,
+                        postForm(
+                          cls    := "user-invite complete-parent",
+                          action := routes.Challenge.toFriend(c.id)
+                        )(
+                          input(
+                            name        := "username",
+                            cls         := "friend-autocomplete",
+                            placeholder := trans.search.search.txt()
+                          ),
+                          error.map { badTag(_) }
+                        )
                       )
                     )
                   )
@@ -97,7 +97,7 @@ object mine {
                   )
                 )
               },
-              !c.isOpen option cancelForm
+              (!c.isOpen).option(cancelForm)
             )
           case Status.Declined =>
             div(cls := "follow-up")(

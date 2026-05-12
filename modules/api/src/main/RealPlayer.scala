@@ -1,8 +1,8 @@
 package lila.api
 
 import strategygames.format.pgn.{ Pgn, Tag, Tags }
+import play.api.libs.ws.DefaultBodyReadables.readableAsString
 import play.api.libs.ws.StandaloneWSClient
-import scala.concurrent.duration._
 
 import lila.user.User
 
@@ -24,8 +24,8 @@ final class RealPlayerApi(
               res.status == 200 &&
                 res.headers
                   .get("Content-Type")
-                  .exists(_.exists(_ startsWith "text/plain"))
-            valid ?? {
+                  .exists(_.exists(_.startsWith("text/plain")))
+            valid so {
               res.body.linesIterator
                 .take(9999)
                 .toList
@@ -38,7 +38,7 @@ final class RealPlayerApi(
                 }
                 .toMap
                 .some
-                .map(RealPlayers)
+                .map(RealPlayers.apply)
             }
           }
       }
@@ -58,7 +58,7 @@ case class RealPlayers(players: Map[User.ID, RealPlayer]) {
     pgn.copy(
       tags = pgn.tags ++ Tags {
         game.players.flatMap { player =>
-          player.userId.flatMap(players.get) ?? { rp =>
+          player.userId.flatMap(players.get) so { rp =>
             List(
               rp.name.map { name => Tag(player.playerIndex.fold(Tag.P1, Tag.P2), name) },
               rp.rating.map { rating => Tag(player.playerIndex.fold(Tag.P1Elo, Tag.P2Elo), rating.toString) }

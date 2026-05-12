@@ -1,21 +1,21 @@
 package lila.game
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 import lila.user.User
 
 case class Pov(game: Game, playerIndex: PlayerIndex) {
 
-  def player = game player playerIndex
+  def player = game.player(playerIndex)
 
   def playerId = player.id
 
   def typedPlayerId = Game.PlayerId(player.id)
 
-  def fullId = game fullIdOf playerIndex
+  def fullId = game.fullIdOf(playerIndex)
 
   def gameId = game.id
 
-  def opponent = game player !playerIndex
+  def opponent = game.player(!playerIndex)
 
   def unary_! = Pov(game, !playerIndex)
 
@@ -33,13 +33,13 @@ case class Pov(game: Game, playerIndex: PlayerIndex) {
       game.playableCorrespondenceClock.map(_.remainingTime(playerIndex).toInt)
     }
 
-  def hasMoved = game playerHasMoved playerIndex
+  def hasMoved = game.playerHasMoved(playerIndex)
 
-  def moves = game playerMoves playerIndex
+  def moves = game.playerMoves(playerIndex)
 
-  def win = game wonBy playerIndex
+  def win = game.wonBy(playerIndex)
 
-  def loss = game lostBy playerIndex
+  def loss = game.lostBy(playerIndex)
 
   def forecastable = game.forecastable && game.turnPlayerIndex != playerIndex
 
@@ -60,18 +60,18 @@ object Pov {
   def apply(game: Game, player: Player) = new Pov(game, player.playerIndex)
 
   def apply(game: Game, playerId: Player.ID): Option[Pov] =
-    game player playerId map { apply(game, _) }
+    game.player(playerId) map { apply(game, _) }
 
   def apply(game: Game, user: User): Option[Pov] =
-    game player user map { apply(game, _) }
+    game.player(user) map { apply(game, _) }
 
   def ofUserId(game: Game, userId: User.ID): Option[Pov] =
-    game playerByUserId userId map { apply(game, _) }
+    game.playerByUserId(userId) map { apply(game, _) }
 
   def opponentOfUserId(game: Game, userId: String): Option[Player] =
     ofUserId(game, userId) map (_.opponent)
 
-  private def orInf(i: Option[Int]) = i getOrElse Int.MaxValue
+  private def orInf(i: Option[Int])     = i getOrElse Int.MaxValue
   private def isFresher(a: Pov, b: Pov) = {
     val aDate = a.game.updatedAt.getSeconds
     val bDate = b.game.updatedAt.getSeconds
@@ -102,14 +102,14 @@ case class PlayerRef(gameId: Game.ID, playerId: String)
 
 object PlayerRef {
 
-  def apply(fullId: String): PlayerRef = PlayerRef(Game takeGameId fullId, Game takePlayerId fullId)
+  def apply(fullId: String): PlayerRef = PlayerRef(Game.takeGameId(fullId), Game.takePlayerId(fullId))
 }
 
 case class LightPov(game: LightGame, playerIndex: PlayerIndex) {
   def gameId   = game.id
-  def player   = game player playerIndex
-  def opponent = game player !playerIndex
-  def win      = game wonBy playerIndex
+  def player   = game.player(playerIndex)
+  def opponent = game.player(!playerIndex)
+  def win      = game.wonBy(playerIndex)
 }
 
 object LightPov {
@@ -117,5 +117,5 @@ object LightPov {
   def apply(game: LightGame, player: Player) = new LightPov(game, player.playerIndex)
 
   def ofUserId(game: LightGame, userId: User.ID): Option[LightPov] =
-    game playerByUserId userId map { apply(game, _) }
+    game.playerByUserId(userId) map { apply(game, _) }
 }

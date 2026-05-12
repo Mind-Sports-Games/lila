@@ -1,25 +1,25 @@
 package lila.swiss
 
-import strategygames.format.{ Forsyth }
-import strategygames.{ ByoyomiClock, Clock, GameFamily, Player => PlayerIndex, P1, P2 }
+import strategygames.format.Forsyth
+import strategygames.{ ByoyomiClock, Clock, GameFamily, P1, P2, Player as PlayerIndex }
 import strategygames.variant.Variant
-import strategygames.draughts.Board.BoardSize
 
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.i18n.Lang
-import play.api.libs.json._
+import play.api.libs.json.*
 import scala.concurrent.ExecutionContext
 
+import lila.common.extensions.*
 import lila.common.{ GreatPlayer, LightUser }
-import lila.db.dsl._
-import lila.game.{ Game, MultiPointState }
+import lila.db.dsl.*
+import lila.game.Game
 import lila.game.Handicaps.goRatingDisplay
 import lila.quote.Quote
 import lila.quote.Quote.quoteWriter
 import lila.socket.Socket.SocketVersion
 import lila.user.{ User, UserRepo }
-import lila.i18n.{ I18nKeys => trans, VariantKeys }
+import lila.i18n.{ I18nKeys as trans, VariantKeys }
 
 final class SwissJson(
     colls: SwissColls,
@@ -32,8 +32,8 @@ final class SwissJson(
     swissApi: SwissApi
 )(implicit ec: ExecutionContext) {
 
-  import SwissJson._
-  import BsonHandlers._
+  import SwissJson.*
+  import BsonHandlers.*
 
   def api(swiss: Swiss) =
     swissJsonBase(swiss) ++ Json.obj(
@@ -50,7 +50,7 @@ final class SwissJson(
       playerInfo: Option[SwissPlayer.ViewExt] = None
   )(implicit lang: Lang): Fu[JsObject] = {
     for {
-      myInfo <- me.?? { fetchMyInfo(swiss, _) }
+      myInfo <- me.so { fetchMyInfo(swiss, _) }
       page = reqPage orElse myInfo.map(_.page) getOrElse 1
       standing <- standingApi(swiss, page)
       podium   <- podiumJson(swiss)
@@ -66,7 +66,7 @@ final class SwissJson(
           } && verdicts.accepted
         },
         "standing" -> standing,
-        "boards"   -> boards.map(boardJson)
+        "boards"   -> boards.map(b => boardJson(b): JsObject)
       ) ++ Json.obj(
       "me"                 -> myInfo.map(myInfoJson),
       "joinTeam"           -> (!isInTeam).option(swiss.teamId),
@@ -76,7 +76,7 @@ final class SwissJson(
       "isRecentlyFinished" -> swiss.isRecentlyFinished,
       "password"           -> swiss.settings.password.isDefined,
       "stats"              -> stats,
-      "greatPlayer" -> GreatPlayer.wikiUrl(swiss.name).map { url =>
+      "greatPlayer"        -> GreatPlayer.wikiUrl(swiss.name).map { url =>
         Json.obj("name" -> swiss.name, "url" -> url)
       }
     )
@@ -84,11 +84,11 @@ final class SwissJson(
 
   def fetchMyInfo(swiss: Swiss, me: User): Fu[Option[MyInfo]] =
     colls.player.byId[SwissPlayer](SwissPlayer.makeId(swiss.id, me.id).value) flatMap {
-      _ ?? { player =>
+      _ so { player =>
         updatePlayerRating(swiss, player, me) >>
           SwissPairing.fields { f =>
             (swiss.nbOngoing > 0)
-              .?? {
+              .so {
                 colls.pairing
                   .find(
                     $doc(f.swissId -> swiss.id, f.players -> player.userId, f.status -> SwissPairing.ongoing),
@@ -114,9 +114,9 @@ final class SwissJson(
 
   private def updatePlayerRating(swiss: Swiss, player: SwissPlayer, user: User): Funit =
     swiss.settings.rated
-      .option(user perfs swiss.roundPerfType)
+      .option(user.perfs(swiss.roundPerfType))
       .filter(_.intRating != player.rating)
-      .?? { perf =>
+      .so { perf =>
         SwissPlayer.fields { f =>
           colls.player.update
             .one(
@@ -128,11 +128,11 @@ final class SwissJson(
       }
 
   private def podiumJson(swiss: Swiss): Fu[Option[JsArray]] =
-    swiss.isFinished ?? {
+    swiss.isFinished so {
       SwissPlayer.fields { f =>
         colls.player
-          .find($doc(f.swissId -> swiss.id, f.disqualified $ne true))
-          .sort($sort desc f.score)
+          .find($doc(f.swissId -> swiss.id, f.disqualified.$ne(true)))
+          .sort($sort.desc(f.score))
           .cursor[SwissPlayer]()
           .list(3) flatMap { top3 =>
           // check that the winner is still correctly denormalized
@@ -142,7 +142,6 @@ final class SwissJson(
             .foreach {
               colls.swiss.updateField($id(swiss.id), "winnerId", _).void
             }
-            .unit
           userRepo.filterEngine(top3.map(_.userId)) map { engines =>
             JsArray(
               top3.map { player =>
@@ -161,7 +160,7 @@ final class SwissJson(
   private def playerJson(swiss: Swiss, playerInfo: Option[SwissPlayer.ViewExt]): Fu[Option[JsObject]] =
     playerInfo.fold[Fu[Option[JsObject]]](fuccess(None)) { playerView =>
       swissApi.playerToPairingGames(playerView).flatMap { pairingsWithGames =>
-        fuccess(Some(playerJsonExt(swiss, playerView, swiss.settings.isMultiPoint option pairingsWithGames)))
+        fuccess(Some(playerJsonExt(swiss, playerView, swiss.settings.isMultiPoint.option(pairingsWithGames))))
       }
     }
 
@@ -187,7 +186,7 @@ final class SwissJson(
 
 object SwissJson {
 
-  private def formatDate(date: DateTime) = ISODateTimeFormat.dateTime print date
+  private def formatDate(date: DateTime) = ISODateTimeFormat.dateTime.print(date)
 
   private def swissJsonBase(swiss: Swiss)(implicit lang: Lang = lila.i18n.defaultLang) =
     Json
@@ -221,7 +220,7 @@ object SwissJson {
         "isPlayX"               -> swiss.settings.isPlayX,
         "nbGamesPerRound"       -> swiss.settings.nbGamesPerRound,
         "timeBeforeStartToJoin" -> swiss.settings.timeBeforeStartToJoin,
-        "status" -> {
+        "status"                -> {
           if (swiss.isStarted) "started"
           else if (swiss.isFinished) "finished"
           else "created"
@@ -246,9 +245,10 @@ object SwissJson {
           }
           .mkString("|")
       ) ++ Json.obj(
-      "mmStartingScore" -> (swiss.settings.mcmahon ?? view.player.mcMahonStartingScore(
-        swiss.settings.mcmahonCutoffGrade
-      ))
+      "mmStartingScore" -> JsNumber(
+        if (swiss.settings.mcmahon) view.player.mcMahonStartingScore(swiss.settings.mcmahonCutoffGrade)
+        else 0
+      )
     )
 
   private def commonPlayerJsonExt(swiss: Swiss, playerView: SwissPlayer.ViewExt): JsObject =
@@ -260,19 +260,24 @@ object SwissJson {
           playerView.pairings.get(round).fold[JsValue](JsString(outcomeJson(outcome))) { p =>
             pairingJson(playerView.player, p.pairing) ++
               Json.obj(
-                "user"        -> p.player.user,
-                "rating"      -> p.player.player.rating,
-                "inputRating" -> p.player.player.inputRating,
-                "ratingDisplay" -> (swiss.variant.gameFamily == GameFamily
-                  .Go() && (swiss.settings.handicapped || swiss.settings.mcmahon)) ?? p.player.player.inputRating
-                  .map(goRatingDisplay(_))
+                "user"          -> p.player.user,
+                "rating"        -> p.player.player.rating,
+                "inputRating"   -> p.player.player.inputRating,
+                "ratingDisplay" -> (
+                  if (swiss.variant.gameFamily == GameFamily
+                      .Go() && (swiss.settings.handicapped || swiss.settings.mcmahon)
+                      ) p.player.player.inputRating.map(goRatingDisplay(_))
+                  else None
+                )
               )
           }
         }
     ) ++ Json.obj(
-      "mmStartingScore" -> (swiss.settings.mcmahon ?? playerView.player.mcMahonStartingScore(
-        swiss.settings.mcmahonCutoffGrade
-      ))
+      "mmStartingScore" -> JsNumber(
+        if (swiss.settings.mcmahon)
+          playerView.player.mcMahonStartingScore(swiss.settings.mcmahonCutoffGrade)
+        else 0
+      )
     )
 
   def playerJsonExt(
@@ -289,7 +294,7 @@ object SwissJson {
       swissPairingGames.flatMap { pairingGame =>
         Seq(
           Json.obj(
-            "target" -> pairingGame.game.metadata.multiPointState.fold(0)(_.target),
+            "target"  -> pairingGame.game.metadata.multiPointState.fold(0)(_.target),
             "players" -> Json.obj(
               "p1" -> Json.obj(
                 "userId" -> pairingGame.game.p1Player.userId
@@ -301,8 +306,8 @@ object SwissJson {
             "games" -> JsArray(
               pairingGame.multiMatchGames.toList.flatten.reverse.map { game =>
                 Json.obj(
-                  "id"       -> game.id,
-                  "p1UserId" -> game.p1Player.userId,
+                  "id"            -> game.id,
+                  "p1UserId"      -> game.p1Player.userId,
                   "startingScore" -> Json.obj(
                     "p1" -> game.multiPointResult.fold(0)(_.p1Points),
                     "p2" -> game.multiPointResult.fold(0)(_.p2Points)
@@ -310,8 +315,8 @@ object SwissJson {
                 )
               } :+
                 Json.obj(
-                  "id"       -> pairingGame.game.id,
-                  "p1UserId" -> pairingGame.game.p1Player.userId,
+                  "id"            -> pairingGame.game.id,
+                  "p1UserId"      -> pairingGame.game.p1Player.userId,
                   "startingScore" -> Json.obj(
                     "p1" -> pairingGame.game.multiPointResult.fold(0)(_.p1Points),
                     "p2" -> pairingGame.game.multiPointResult.fold(0)(_.p2Points)
@@ -345,7 +350,7 @@ object SwissJson {
         "tieBreak"      -> p.tieBreak,
         "tieBreak2"     -> p.tieBreak2
       )
-      .add("performance" -> (performance ?? p.performance))
+      .add("performance" -> (performance so p.performance))
       .add("provisional" -> p.provisional)
       .add("absent" -> p.absent)
       .add("disqualified" -> p.disqualified)
@@ -363,7 +368,7 @@ object SwissJson {
       else pairing.resultFor(player.userId).fold("d") { r => if (r) "w" else "l" }
     val multiMatchIds = pairing.multiMatchGameIds.fold("")(l => "_" + l.mkString("_"))
     val useMatchScore = if (pairing.isMatchScore) "s" else ""
-    val matchScore =
+    val matchScore    =
       pairing.matchScoreFor(player.userId) // "" if isMatchScore is false, otherwise 2 digit string number
     val bestOfX    = if (pairing.isBestOfX) "x" else ""
     val playX      = if (pairing.isPlayX) "px" else ""
@@ -430,7 +435,7 @@ object SwissJson {
         "gameFamily"  -> g.variant.gameFamily.key,
         "variantKey"  -> g.variant.key,
         "fen"         -> Forsyth.>>(g.variant.gameLogic, g.stratGame).value,
-        "lastMove"    -> ~g.lastActionKeys,
+        "lastMove"    -> g.lastActionKeys.getOrElse(""),
         "orientation" -> g.naturalOrientation.name,
         "p1"          -> boardPlayerJson(p1),
         "p2"          -> boardPlayerJson(p2),
@@ -492,7 +497,7 @@ object SwissJson {
     JsNumber(n.value)
   }
   implicit private val pointsWriter: Writes[Swiss.Points] = Writes[Swiss.Points] { p =>
-    JsNumber(p.value)
+    JsNumber(BigDecimal(p.value.toDouble))
   }
   implicit private val performanceWriter: Writes[Swiss.Performance] = Writes[Swiss.Performance] { t =>
     JsNumber(t.value.toInt)

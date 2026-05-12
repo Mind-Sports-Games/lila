@@ -1,20 +1,16 @@
 package lila.relay
 
-import io.lemonlabs.uri.AbsoluteUrl
 import org.joda.time.DateTime
-import play.api.data._
-import play.api.data.Forms._
-import scala.util.chaining._
+import play.api.data.*
+import play.api.data.Forms.*
 
-import lila.common.Form.{ cleanNonEmptyText, cleanText }
-import lila.game.Game
+import lila.common.Form.cleanText
 import lila.security.Granter
-import lila.study.Study
 import lila.user.User
 
 final class RelayTourForm {
 
-  import RelayTourForm._
+  import RelayTourForm.*
 
   val form = Form(
     mapping(
@@ -22,12 +18,12 @@ final class RelayTourForm {
       "description" -> cleanText(minLength = 3, maxLength = 400),
       "markup"      -> optional(cleanText(maxLength = 20000)),
       "official"    -> optional(boolean)
-    )(Data.apply)(Data.unapply)
+    )(Data.apply)(unapply)
   )
 
   def create = form
 
-  def edit(t: RelayTour) = form fill Data.make(t)
+  def edit(t: RelayTour) = form.fill(Data.make(t))
 }
 
 object RelayTourForm {
@@ -68,7 +64,7 @@ object RelayTourForm {
         name = tour.name,
         description = tour.description,
         markup = tour.markup,
-        official = tour.official option true
+        official = tour.official.option(true)
       )
   }
 }

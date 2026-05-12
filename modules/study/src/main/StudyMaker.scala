@@ -12,7 +12,7 @@ final private class StudyMaker(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def apply(data: StudyMaker.ImportGame, user: User): Fu[Study.WithChapter] =
-    (data.form.gameId ?? gameRepo.gameWithInitialFen).flatMap {
+    (data.form.gameId so gameRepo.gameWithInitialFen).flatMap {
       case Some((game, initialFen)) if game.metadata.multiPointState.isEmpty =>
         createFromPov(data, Pov(game, data.form.orientation), initialFen, user)
       case Some(_) => createFromScratch(data, user)
@@ -39,7 +39,7 @@ final private class StudyMaker(
       order = 1,
       userId = user.id
     ) map { chapter =>
-      Study.WithChapter(study withChapter chapter, chapter)
+      Study.WithChapter(study.withChapter(chapter), chapter)
     }
   }
 
@@ -52,8 +52,10 @@ final private class StudyMaker(
     for {
       root <- chapterMaker.game2root(pov.game, initialFen)
       tags <- pgnDump.tags(pov.game, initialFen, none, withOpening = true)
-      name <- Namer.gameVsText(pov.game, withRatings = false)(lightUserApi.async) dmap Chapter.Name.apply
-      study = Study.make(user, Study.From.Game(pov.gameId), data.id, Study.Name("Game study").some)
+      name <- Namer
+        .gameVsText(pov.game, withRatings = false)(using lightUserApi.async)
+        .dmap(Chapter.Name.apply)
+      study   = Study.make(user, Study.From.Game(pov.gameId), data.id, Study.Name("Game study").some)
       chapter = Chapter.make(
         studyId = study.id,
         name = name,
@@ -70,9 +72,7 @@ final private class StudyMaker(
         gamebook = false,
         conceal = None
       )
-    } yield {
-      Study.WithChapter(study.withChapter(chapter), chapter)
-    }
+    } yield Study.WithChapter(study.withChapter(chapter), chapter)
   } addEffect { swc =>
     chapterMaker.notifyChat(swc.study, pov.game, user.id)
   }

@@ -2,11 +2,10 @@ package views.html.board
 
 import strategygames.format.FEN
 import strategygames.Situation
-import controllers.routes
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 
 object editor {
@@ -18,7 +17,7 @@ object editor {
       positionsJson: String,
       positionsByVariantJson: String,
       orientation: Option[String] = None
-    )(implicit ctx: Context) =
+  )(implicit ctx: Context) =
     views.html.base.layout(
       title = trans.boardEditor.txt(),
       moreJs = frag(

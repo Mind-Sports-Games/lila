@@ -1,10 +1,8 @@
 package views.html.report
 
-import controllers.routes
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.report.Report.WithSuspect
 import lila.user.Holder
 
@@ -57,7 +55,7 @@ object list {
                       )(shorten(atom.text, 200))
                     )
                   },
-                  r.atoms.size > 3 option i(cls := "more")("And ", r.atoms.size - 3, " more")
+                  (r.atoms.size > 3).option(i(cls := "more")("And ", r.atoms.size - 3, " more"))
                 ),
                 td(
                   r.inquiry match {
@@ -106,16 +104,16 @@ object list {
             span(cls := "tabs")(
               a(
                 href := routes.Report.listWithFilter("all"),
-                cls := List("active" -> (filter == "all"))
+                cls  := List("active" -> (filter == "all"))
               )(
                 "All",
                 scoreTag(scores.highest)
               ),
-              ctx.me ?? { me =>
+              ctx.me.fold(Nil: List[scalatags.Text.Frag]) { me =>
                 lila.report.Room.all.filter(lila.report.Room.isGrantedFor(Holder(me))).map { room =>
                   a(
                     href := routes.Report.listWithFilter(room.key),
-                    cls := List(
+                    cls  := List(
                       "active"            -> (filter == room.key),
                       s"room-${room.key}" -> true
                     )
@@ -125,21 +123,24 @@ object list {
                   )
                 }
               },
-              (appeals > 0 && isGranted(_.Appeals)) option a(
-                href := routes.Appeal.queue,
-                cls := List(
-                  "new"    -> true,
-                  "active" -> (filter == "appeal")
+              (appeals > 0 && isGranted(_.Appeals)).option(
+                a(
+                  href := routes.Appeal.queue,
+                  cls  := List(
+                    "new"    -> true,
+                    "active" -> (filter == "appeal")
+                  )
+                )(
+                  countTag(appeals),
+                  "Appeals"
                 )
-              )(
-                countTag(appeals),
-                "Appeals"
               ),
-              (isGranted(_.Streamers) && streamers > 0) option
+              (isGranted(_.Streamers) && streamers > 0).option(
                 a(href := s"${routes.Streamer.index()}?requests=1", cls := "new")(
                   countTag(streamers),
                   "Streamers"
                 )
+              )
             )
           ),
           body

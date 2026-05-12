@@ -1,10 +1,8 @@
 package views.html.mod
 
-import controllers.routes
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.richText
 import lila.hub.actorApi.shutup.PublicSource
 import lila.mod.IpRender.RenderIp
@@ -29,10 +27,10 @@ object communication {
       title = u.username + " communications",
       moreCss = frag(
         cssTag("mod.communication"),
-        isGranted(_.UserModView) option cssTag("mod.user")
+        isGranted(_.UserModView).option(cssTag("mod.user"))
       ),
       moreJs = frag(
-        isGranted(_.UserModView) option jsModule("mod.user")
+        isGranted(_.UserModView).option(jsModule("mod.user"))
       )
     ) {
       main(id := "communication", cls := "box box-pad")(
@@ -40,7 +38,7 @@ object communication {
           div(cls := "title")(userLink(u), " communications"),
           div(cls := "actions")(
             a(
-              cls := "button button-empty mod-zone-toggle",
+              cls  := "button button-empty mod-zone-toggle",
               href := routes.User.mod(u.username),
               titleOrText("Mod zone (Hotkey: m)"),
               dataIcon := ""
@@ -50,50 +48,57 @@ object communication {
                 a(cls := "priv button active", href := routes.Mod.communicationPublic(u.username))("PMs")
               else
                 a(
-                  cls := "priv button",
-                  href := routes.Mod.communicationPrivate(u.username),
+                  cls   := "priv button",
+                  href  := routes.Mod.communicationPrivate(u.username),
                   title := "View private messages. This will be logged in #commlog"
                 )("PMs")
             }
           )
         ),
-        isGranted(_.UserModView) option frag(
-          div(cls := "mod-zone mod-zone-full none"),
-          views.html.user.mod.otherUsers(mod, u, logins, appeals)(ctx, renderIp)(
-            cls := "mod-zone communication__logins"
+        isGranted(_.UserModView).option(
+          frag(
+            div(cls := "mod-zone mod-zone-full none"),
+            views.html.user.mod.otherUsers(mod, u, logins, appeals)(using ctx, renderIp)(
+              cls := "mod-zone communication__logins"
+            )
           )
         ),
-        history.nonEmpty option frag(
-          h2("Moderation history"),
-          div(cls := "history")(
-            history.map { e =>
-              div(
-                userIdLink(e.mod.some),
-                " ",
-                b(e.showAction),
-                " ",
-                u.username,
-                " ",
-                e.details,
-                " ",
-                momentFromNowOnce(e.date)
-              )
-            }
-          )
-        ),
-        notes.nonEmpty option frag(
-          h2("Notes from other users"),
-          div(cls := "notes")(
-            notes.map { note =>
-              (isGranted(_.Admin) || !note.dox) option
+        history.nonEmpty.option(
+          frag(
+            h2("Moderation history"),
+            div(cls := "history")(
+              history.map { e =>
                 div(
-                  userIdLink(note.from.some),
+                  userIdLink(e.mod.some),
                   " ",
-                  momentFromNowOnce(note.date),
-                  ": ",
-                  richText(note.text)
+                  b(e.showAction),
+                  " ",
+                  u.username,
+                  " ",
+                  e.details,
+                  " ",
+                  momentFromNowOnce(e.date)
                 )
-            }
+              }
+            )
+          )
+        ),
+        notes.nonEmpty.option(
+          frag(
+            h2("Notes from other users"),
+            div(cls := "notes")(
+              notes.map { note =>
+                (isGranted(_.Admin) || !note.dox).option(
+                  div(
+                    userIdLink(note.from.some),
+                    " ",
+                    momentFromNowOnce(note.date),
+                    ": ",
+                    richText(note.text)
+                  )
+                )
+              }
+            )
           )
         ),
         h2("Dubious public chats"),
@@ -117,60 +122,63 @@ object communication {
                 highlightBad(line.text)
               )
             }
-          ),
-        priv option frag(
-          h2("Recent private chats"),
-          div(cls := "player_chats")(
-            players.map { case (pov, chat) =>
-              div(cls := "game")(
-                a(
-                  href := routes.Round.player(pov.fullId),
-                  cls := List(
-                    "title"        -> true,
-                    "friend_title" -> pov.game.fromFriend
+          )
+        ,
+        priv.option(
+          frag(
+            h2("Recent private chats"),
+            div(cls := "player_chats")(
+              players.map { case (pov, chat) =>
+                div(cls := "game")(
+                  a(
+                    href := routes.Round.player(pov.fullId),
+                    cls  := List(
+                      "title"        -> true,
+                      "friend_title" -> pov.game.fromFriend
+                    ),
+                    title := pov.game.fromFriend.option("Friend game")
+                  )(
+                    usernameOrAnon(pov.opponent.userId),
+                    " – ",
+                    momentFromNowOnce(pov.game.updatedAt)
                   ),
-                  title := pov.game.fromFriend.option("Friend game")
-                )(
-                  usernameOrAnon(pov.opponent.userId),
-                  " – ",
-                  momentFromNowOnce(pov.game.updatedAt)
-                ),
-                div(cls := "chat")(
-                  chat.lines.map { line =>
-                    div(
-                      cls := List(
-                        "line"   -> true,
-                        "author" -> (line.author.toLowerCase == u.id)
-                      )
-                    )(
-                      userIdLink(line.userIdMaybe, withOnline = false, withTitle = false),
-                      nbsp,
-                      highlightBad(line.text)
-                    )
-                  }
-                )
-              )
-            }
-          ),
-          div(cls := "threads")(
-            h2("Recent inbox messages"),
-            convos.map { convo =>
-              div(cls := "thread")(
-                p(cls := "title")(strong(lightUserLink(convo.contact))),
-                table(cls := "slist")(
-                  tbody(
-                    convo.msgs.reverse.map { msg =>
-                      val author = msg.user == u.id
-                      tr(cls := List("post" -> true, "author" -> author))(
-                        td(momentFromNowOnce(msg.date)),
-                        td(strong(if (author) u.username else convo.contact.name)),
-                        td(highlightBad(msg.text))
+                  div(cls := "chat")(
+                    chat.lines.map { line =>
+                      div(
+                        cls := List(
+                          "line"   -> true,
+                          "author" -> (line.author.toLowerCase == u.id)
+                        )
+                      )(
+                        userIdLink(line.userIdMaybe, withOnline = false, withTitle = false),
+                        nbsp,
+                        highlightBad(line.text)
                       )
                     }
                   )
                 )
-              )
-            }
+              }
+            ),
+            div(cls := "threads")(
+              h2("Recent inbox messages"),
+              convos.map { convo =>
+                div(cls := "thread")(
+                  p(cls := "title")(strong(lightUserLink(convo.contact))),
+                  table(cls := "slist")(
+                    tbody(
+                      convo.msgs.reverse.map { msg =>
+                        val author = msg.user == u.id
+                        tr(cls := List("post" -> true, "author" -> author))(
+                          td(momentFromNowOnce(msg.date)),
+                          td(strong(if (author) u.username else convo.contact.name)),
+                          td(highlightBad(msg.text))
+                        )
+                      }
+                    )
+                  )
+                )
+              }
+            )
           )
         )
       )

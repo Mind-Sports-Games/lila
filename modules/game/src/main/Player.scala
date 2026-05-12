@@ -1,8 +1,7 @@
 package lila.game
 
-import cats.implicits._
-import strategygames.{ Player => PlayerIndex, P1 }
-import scala.util.chaining._
+import cats.implicits.*
+import strategygames.{ P1, Player as PlayerIndex }
 
 import lila.common.LightUser
 import lila.user.User
@@ -37,7 +36,7 @@ case class Player(
 
   def isHuman = !isAi && !isPSBot
 
-  def isPSBot = userId ?? LightUser.psBotsIDs.contains
+  def isPSBot = userId so LightUser.psBotsIDs.contains
 
   def hasUser = userId.isDefined
 
@@ -52,7 +51,7 @@ case class Player(
 
   def goBerserk = copy(berserk = true)
 
-  def finish(winner: Boolean) = copy(isWinner = winner option true)
+  def finish(winner: Boolean) = copy(isWinner = winner.option(true))
 
   def offerSelectSquares = copy(isOfferingSelectSquares = true)
 
@@ -84,7 +83,7 @@ case class Player(
 
   def ratingAfter = rating map (_ + ~ratingDiff)
 
-  def stableRating = rating ifFalse provisional
+  def stableRating = rating.ifFalse(provisional)
 
   def stableRatingAfter = stableRating map (_ + ~ratingDiff)
 }
@@ -185,7 +184,7 @@ object Player {
     val name                    = "na"
   }
 
-  import reactivemongo.api.bson._
+  import reactivemongo.api.bson.*
   import lila.db.BSON
 
   type ID      = String
@@ -194,15 +193,15 @@ object Player {
   type Builder = PlayerIndex => ID => UserId => Win => Player
 
   private def safeRange(range: Range)(v: Int): Option[Int] =
-    range.contains(v) option v
+    range.contains(v).option(v)
 
-  private val ratingRange     = safeRange(0 to 4000) _
-  private val ratingDiffRange = safeRange(-1000 to 1000) _
+  private val ratingRange     = safeRange(0 to 4000)
+  private val ratingDiffRange = safeRange(-1000 to 1000)
 
   implicit val playerBSONHandler: BSON[Builder] = new BSON[Builder] {
 
-    import BSONFields._
-    import Blurs._
+    import BSONFields.*
+    import Blurs.*
 
     def reads(r: BSON.Reader) =
       playerIndex =>
@@ -212,19 +211,19 @@ object Player {
               Player(
                 id = id,
                 playerIndex = playerIndex,
-                aiLevel = r intO aiLevel,
+                aiLevel = r.intO(aiLevel),
                 isWinner = win,
-                isOfferingDraw = r boolD isOfferingDraw,
-                isOfferingSelectSquares = r boolD isOfferingSelectSquares,
-                proposeTakebackAt = r intD proposeTakebackAt,
+                isOfferingDraw = r.boolD(isOfferingDraw),
+                isOfferingSelectSquares = r.boolD(isOfferingSelectSquares),
+                proposeTakebackAt = r.intD(proposeTakebackAt),
                 userId = userId,
-                rating = r intO rating flatMap ratingRange,
-                ratingDiff = r intO ratingDiff flatMap ratingDiffRange,
-                provisional = r boolD provisional,
-                isInputRating = r boolD isInputRating,
+                rating = r.intO(rating) flatMap ratingRange,
+                ratingDiff = r.intO(ratingDiff) flatMap ratingDiffRange,
+                provisional = r.boolD(provisional),
+                isInputRating = r.boolD(isInputRating),
                 blurs = r.getD[Blurs](blursBits, blursZero.zero),
-                berserk = r boolD berserk,
-                name = r strO name
+                berserk = r.boolD(berserk),
+                name = r.strO(name)
               )
 
     def writes(w: BSON.Writer, o: Builder) =
@@ -238,7 +237,7 @@ object Player {
           ratingDiff              -> p.ratingDiff,
           provisional             -> w.boolO(p.provisional),
           isInputRating           -> w.boolO(p.isInputRating),
-          blursBits               -> p.blurs.nonEmpty.??(BlursBSONHandler writeOpt p.blurs),
+          blursBits               -> p.blurs.nonEmpty.so(BlursBSONHandler writeOpt p.blurs),
           name                    -> p.name
         )
       }

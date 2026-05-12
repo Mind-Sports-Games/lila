@@ -21,7 +21,7 @@ case class Study(
     updatedAt: DateTime
 ) {
 
-  import Study._
+  import Study.*
 
   def id = _id
 
@@ -29,7 +29,7 @@ case class Study(
 
   def isOwner(id: User.ID) = ownerId == id
 
-  def isMember(id: User.ID) = members contains id
+  def isMember(id: User.ID) = members.contains(id)
 
   def canChat(id: User.ID) = Settings.UserSelection.allows(settings.chat, this, id.some)
 
@@ -115,7 +115,7 @@ object Study {
   object Rank {
     def compute(likes: Likes, createdAt: DateTime) =
       Rank {
-        createdAt plusHours likesToHours(likes)
+        createdAt.plusHours(likesToHours(likes))
       }
     private def likesToHours(likes: Likes): Int =
       if (likes.value < 1) 0
@@ -140,8 +140,8 @@ object Study {
       sticky: String,
       description: String
   ) {
-    import Settings._
-    def vis = Visibility.byKey.getOrElse(visibility, Visibility.Public)
+    import Settings.*
+    def vis      = Visibility.byKey.getOrElse(visibility, Visibility.Public)
     def settings =
       for {
         comp <- UserSelection.byKey get computer
@@ -167,7 +167,7 @@ object Study {
 
   val idSize = 8
 
-  def makeId = Id(lila.common.ThreadLocalRandom nextString idSize)
+  def makeId = Id(lila.common.ThreadLocalRandom.nextString(idSize))
 
   def make(
       user: User,

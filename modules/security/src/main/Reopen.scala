@@ -1,12 +1,11 @@
 package lila.security
 
 import play.api.i18n.Lang
-import scala.concurrent.duration._
-import scalatags.Text.all._
+import scalatags.Text.all.*
 
-import lila.common.config._
+import lila.common.config.*
 import lila.common.EmailAddress
-import lila.i18n.I18nKeys.{ emails => trans }
+import lila.i18n.I18nKeys.emails as trans
 import lila.user.{ User, UserRepo }
 
 final class Reopen(
@@ -16,7 +15,7 @@ final class Reopen(
     tokenerSecret: Secret
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import Mailer.html._
+  import Mailer.html.*
 
   def prepare(
       username: String,
@@ -27,7 +26,7 @@ final class Reopen(
       case Some(_) =>
         fuccess(Left("emailUsed" -> "This email address is already in use by an active account."))
       case _ =>
-        val userId = User normalize username
+        val userId = User.normalize(username)
         userRepo.byIdNotErased(userId) flatMap {
           case None =>
             fuccess(Left("noUser" -> "No account found with this username."))
@@ -51,13 +50,14 @@ final class Reopen(
     }
 
   def send(user: User, email: EmailAddress)(implicit lang: Lang): Funit =
-    tokener make user.id flatMap { token =>
+    tokener.make(user.id) flatMap { token =>
       lila.mon.email.send.reopen.increment()
       val url = s"$baseUrl/account/reopen/login/$token"
-      mailer send Mailer.Message(
-        to = email,
-        subject = s"Reopen your playstrategy.org account: ${user.username}",
-        text = s"""
+      mailer.send(
+        Mailer.Message(
+          to = email,
+          subject = s"Reopen your playstrategy.org account: ${user.username}",
+          text = s"""
 ${trans.passwordReset_clickOrIgnore.txt()}
 
 $url
@@ -66,18 +66,19 @@ ${trans.common_orPaste.txt()}
 
 ${Mailer.txt.serviceNote}
 """,
-        htmlBody = emailMessage(
-          p(trans.passwordReset_clickOrIgnore()),
-          potentialAction(metaName("Log in"), Mailer.html.url(url)),
-          serviceNote
-        ).some
+          htmlBody = emailMessage(
+            p(trans.passwordReset_clickOrIgnore()),
+            potentialAction(metaName("Log in"), Mailer.html.url(url)),
+            serviceNote
+          ).some
+        )
       )
     }
 
   def confirm(token: String): Fu[Option[User]] =
-    tokener read token flatMap { _ ?? userRepo.disabledById } flatMap {
-      _ ?? { user =>
-        userRepo reopen user.id inject user.some
+    tokener.read(token) flatMap { _ so userRepo.disabledById } flatMap {
+      _ so { user =>
+        userRepo.reopen(user.id) inject user.some
       }
     }
 

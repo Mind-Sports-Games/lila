@@ -1,21 +1,20 @@
 package views.html
 package tournament
 
-import controllers.routes
 import play.api.data.{ Field, Form }
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.hub.LeaderTeam
 import lila.tournament.{ Condition, Tournament, TournamentForm }
 import lila.i18n.VariantKeys
 
-import strategygames.{ GameFamily, GameGroup }
+import strategygames.GameGroup
 
 object form {
 
-  def create(form: Form[_], leaderTeams: List[LeaderTeam])(implicit ctx: Context) =
+  def create(form: Form[?], leaderTeams: List[LeaderTeam])(implicit ctx: Context) =
     views.html.base.layout(
       title = trans.newTournament.txt(),
       moreCss = cssTag("tournament.form"),
@@ -49,7 +48,7 @@ object form {
                 fields.startDate
               )
             ),
-            fields.isTeamBattle option form3.hidden(form("teamBattleByTeam")),
+            fields.isTeamBattle.option(form3.hidden(form("teamBattleByTeam"))),
             form3.actions(
               a(href := routes.Tournament.home)(trans.cancel()),
               form3.submit(trans.createANewTournament(), icon = "g".some)
@@ -60,7 +59,7 @@ object form {
       )
     }
 
-  def edit(tour: Tournament, form: Form[_], myTeams: List[LeaderTeam])(implicit ctx: Context) =
+  def edit(tour: Tournament, form: Form[?], myTeams: List[LeaderTeam])(implicit ctx: Context) =
     views.html.base.layout(
       title = tour.name(),
       moreCss = cssTag("tournament.form"),
@@ -71,7 +70,7 @@ object form {
         div(cls := "tour__form box box-pad")(
           h1("Edit ", tour.name()),
           postForm(cls := "form3", action := routes.Tournament.update(tour.id))(
-            form3.split(fields.name, tour.isCreated option fields.startDate),
+            form3.split(fields.name, tour.isCreated.option(fields.startDate)),
             form3.split(fields.rated, fields.variant),
             form3.split(fields.handicapped, fields.inputPlayerRatings),
             fields.medleyControls,
@@ -82,7 +81,8 @@ object form {
             fields.clockRow2,
             fields.clockRow3,
             form3.split(
-              if ((TournamentForm.minutes contains tour.minutes) || tour.isMedley) form3.split(fields.minutes)
+              if ((TournamentForm.minutes contains tour.minutes) || tour.isMedley)
+                form3.split(fields.minutes)
               else
                 form3.group(form("minutes"), trans.duration(), half = true)(
                   form3.input(_)(tpe := "number")
@@ -116,7 +116,7 @@ object form {
     )
 
   def condition(
-      form: Form[_],
+      form: Form[?],
       fields: TourFields,
       auto: Boolean,
       teams: List[LeaderTeam],
@@ -129,7 +129,7 @@ object form {
         fields.password,
         (auto && tour.isEmpty && teams.nonEmpty) option {
           val baseField = form("conditions.teamMember.teamId")
-          val field = ctx.req.queryString get "team" flatMap (_.headOption) match {
+          val field     = ctx.req.queryString get "team" flatMap (_.headOption) match {
             case None       => baseField
             case Some(team) => baseField.copy(value = team.some)
           }
@@ -165,7 +165,7 @@ object form {
         }
       ),
       form3.split(
-        (ctx.me.exists(_.hasTitle) || isGranted(_.ManageTournament)) ?? {
+        (ctx.me.exists(_.hasTitle) || isGranted(_.ManageTournament)) so {
           form3.checkbox(
             form("conditions.titled"),
             frag("Only titled players"),
@@ -226,7 +226,7 @@ object form {
   )
 }
 
-final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit ctx: Context) {
+final private class TourFields(form: Form[?], tour: Option[Tournament])(implicit ctx: Context) {
 
   def isTeamBattle = tour.exists(_.isTeamBattle) || form("teamBattleByTeam").value.nonEmpty
 
@@ -280,9 +280,9 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         ).some
       ),
       st.input(
-        tpe := "hidden",
+        tpe     := "hidden",
         st.name := form("handicapped").name,
-        value := "false"
+        value   := "false"
       ) // hack allow disabling handicapped
     )
   def inputPlayerRatings =

@@ -27,5 +27,4 @@ object Display {
     }
 
   def holdSig(pa: PlayerAssessment): Int = if (pa.flags.suspiciousHoldAlert) 5 else 1
-
 }

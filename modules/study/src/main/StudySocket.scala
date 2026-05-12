@@ -2,17 +2,16 @@ package lila.study
 
 import actorApi.Who
 import cats.data.Validated
-import strategygames.{ Centis, GameLogic }
+import strategygames.Centis
 import strategygames.format.pgn.{ Glyph, Glyphs, Tags }
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.chess.variant.{ Variant => ChessVariant }
-import play.api.libs.json._
-import scala.concurrent.duration._
+import strategygames.chess.variant.Variant as ChessVariant
+import play.api.libs.json.*
 
 import lila.common.Bus
-import lila.room.RoomSocket.{ Protocol => RP, _ }
-import lila.socket.RemoteSocket.{ Protocol => P, _ }
+import lila.room.RoomSocket.{ Protocol as RP, * }
+import lila.socket.RemoteSocket.{ Protocol as P, * }
 import lila.socket.Socket.{ makeMessage, Sri }
 import lila.socket.{ AnaAny, AnaDests, AnaDrop, AnaEndTurn, AnaLift, AnaMove, AnaPass, AnaRoll }
 import lila.tree.Node.{ defaultNodeJsonWriter, Comment, Gamebook, Shape, Shapes }
@@ -28,7 +27,7 @@ final private class StudySocket(
     mode: play.api.Mode
 ) {
 
-  import StudySocket._
+  import StudySocket.*
 
   implicit def roomIdToStudyId(roomId: RoomId): Study.Id  = Study.Id(roomId.value)
   implicit def studyIdToRoomId(studyId: Study.Id): RoomId = RoomId(studyId.value)
@@ -47,7 +46,7 @@ final private class StudySocket(
     eval match {
       case ServerEval.Progress(chapterId, tree, analysis, division) =>
         import lila.game.JsonView.divisionWriter
-        import JsonView._
+        import JsonView.*
         send(
           RP.Out.tellRoom(
             studyId,
@@ -65,9 +64,9 @@ final private class StudySocket(
     }
 
   private lazy val studyHandler: Handler = {
-    case RP.In.ChatSay(roomId, userId, msg) => api.talk(userId, roomId, msg)
+    case RP.In.ChatSay(roomId, userId, msg)                          => api.talk(userId, roomId, msg)
     case RP.In.TellRoomSri(studyId, P.In.TellSri(sri, user, tpe, o)) =>
-      import Protocol.In.Data._
+      import Protocol.In.Data.*
       def who = user map { Who(_, sri) }
       tpe match {
         case "setPath" =>
@@ -79,16 +78,16 @@ final private class StudySocket(
             who foreach api.like(studyId, v)
           }
         case "anaMove" =>
-          AnaMove parse o foreach { move =>
-            who foreach gameAction(studyId, move, MoveOpts parse o)
+          AnaMove.parse(o) foreach { move =>
+            who foreach gameAction(studyId, move, MoveOpts.parse(o))
           }
         case "anaDrop" =>
-          AnaDrop parse o foreach { drop =>
-            who foreach gameAction(studyId, drop, MoveOpts parse o)
+          AnaDrop.parse(o) foreach { drop =>
+            who foreach gameAction(studyId, drop, MoveOpts.parse(o))
           }
         case "anaPass" =>
-          AnaPass parse o foreach { pass =>
-            who foreach gameAction(studyId, pass, MoveOpts parse o)
+          AnaPass.parse(o) foreach { pass =>
+            who foreach gameAction(studyId, pass, MoveOpts.parse(o))
           }
         case "anaRoll" =>
           AnaRoll parse o foreach { roll =>
@@ -126,7 +125,7 @@ final private class StudySocket(
             who foreach api.setRole(studyId, d.userId, d.role)
           }
         case "kick" =>
-          o str "d" foreach { username =>
+          o.str("d") foreach { username =>
             who foreach api.kick(studyId, username)
           }
         case "leave" =>
@@ -137,8 +136,8 @@ final private class StudySocket(
           reading[AtPosition](o) { position =>
             {
               // TODO: this will only parse chess moves
-              val variantHandler = JsonView.VariantHandler()(Variant.Chess(ChessVariant.default))
-              import variantHandler._
+              val variantHandler = JsonView.VariantHandler()(using Variant.Chess(ChessVariant.default))
+              import variantHandler.*
               (o \ "d" \ "shapes").asOpt[List[Shape]] foreach { shapes =>
                 who foreach api.setShapes(studyId, position.ref, Shapes(shapes take 32))
               }
@@ -158,7 +157,7 @@ final private class StudySocket(
             who foreach api.editChapter(studyId, data)
           }
         case "descStudy" =>
-          o str "d" foreach { desc =>
+          o.str("d") foreach { desc =>
             who foreach api.descStudy(studyId, desc)
           }
         case "descChapter" =>
@@ -188,7 +187,7 @@ final private class StudySocket(
         case "setComment" =>
           reading[AtPosition](o) { position =>
             (o \ "d" \ "text").asOpt[String] foreach { text =>
-              who foreach api.setComment(studyId, position.ref, Comment sanitize text)
+              who foreach api.setComment(studyId, position.ref, Comment.sanitize(text))
             }
           }
         case "deleteComment" =>
@@ -210,7 +209,7 @@ final private class StudySocket(
             }
           }
         case "setTopics" =>
-          o strs "d" foreach { topics =>
+          o.strs("d") foreach { topics =>
             who foreach api.setTopics(studyId, topics)
           }
         case "explorerGame" =>
@@ -224,7 +223,7 @@ final private class StudySocket(
         case "invite" =>
           for {
             w        <- who
-            username <- o str "d"
+            username <- o.str("d")
           } InviteLimitPerUser(w.u, cost = 1) {
             api.invite(
               w.u,
@@ -236,7 +235,10 @@ final private class StudySocket(
           }(funit)
         case "relaySync" =>
           who foreach { w =>
-            Bus.publish(actorApi.RelayToggle(studyId, ~(o \ "d").asOpt[Boolean], w), "relayToggle")
+            Bus.publish(
+              actorApi.RelayToggle(studyId, ~(o \ "d").asOpt[Boolean], w),
+              "relayToggle"
+            )
           }
         case t => logger.warn(s"Unhandled study socket message: $t")
       }
@@ -248,7 +250,7 @@ final private class StudySocket(
     logger,
     _ => _ => none, // the "talk" event is handled by the study API
     localTimeout = Some { (roomId, modId, suspectId) =>
-      api.isContributor(roomId, modId) >>& !api.isMember(roomId, suspectId)
+      api.isContributor(roomId, modId) >>& api.isMember(roomId, suspectId).not
     },
     chatBusChan = _.Study
   )
@@ -260,22 +262,24 @@ final private class StudySocket(
           api.addNode(
             studyId,
             Position.Ref(Chapter.Id(chapterId), Path(m.path)),
-            Node.fromBranch(branch) withClock opts.clock,
+            Node.fromBranch(branch).withClock(opts.clock),
             opts
           )(who)
         }
       case _ =>
     }
 
-  private lazy val send: String => Unit = remoteSocketApi.makeSender("study-out").apply _
+  private lazy val send: String => Unit = remoteSocketApi.makeSender("study-out").apply
 
-  remoteSocketApi.subscribe("study-in", RP.In.reader)(
-    studyHandler orElse rHandler orElse remoteSocketApi.baseHandler
-  ) >>- send(P.Out.boot)
+  remoteSocketApi
+    .subscribe("study-in", RP.In.reader)(
+      studyHandler orElse rHandler orElse remoteSocketApi.baseHandler
+    )
+    .andDo(send(P.Out.boot))
 
   // send API
 
-  import JsonView._
+  import JsonView.*
   import jsonView.membersWrites
   import lila.tree.Node.{
     clockWrites,
@@ -387,7 +391,7 @@ final private class StudySocket(
     )
   private[study] def reloadChapters(chapters: List[Chapter.Metadata]) = version("chapters", chapters)
   def reloadAll                                                       = version("reload", JsNull)
-  def changeChapter(pos: Position.Ref, who: Who)                      = version("changeChapter", Json.obj("p" -> pos, "w" -> who))
+  def changeChapter(pos: Position.Ref, who: Who) = version("changeChapter", Json.obj("p" -> pos, "w" -> who))
   def updateChapter(chapterId: Chapter.Id, who: Who) =
     version("updateChapter", Json.obj("chapterId" -> chapterId, "w" -> who))
   def descChapter(chapterId: Chapter.Id, desc: Option[String], who: Who) =
@@ -400,7 +404,7 @@ final private class StudySocket(
       )
     )
   def descStudy(desc: Option[String], who: Who) = version("descStudy", Json.obj("desc" -> desc, "w" -> who))
-  def setTopics(topics: StudyTopics, who: Who) =
+  def setTopics(topics: StudyTopics, who: Who)  =
     version("setTopics", Json.obj("topics" -> topics, "w" -> who))
   def addChapter(pos: Position.Ref, sticky: Boolean, who: Who) =
     version(
@@ -428,7 +432,7 @@ final private class StudySocket(
         "w"         -> who
       )
     )
-  def reloadSri(sri: Sri) = notifySri(sri, "reload", JsNull)
+  def reloadSri(sri: Sri)                                 = notifySri(sri, "reload", JsNull)
   def reloadSriBecauseOf(sri: Sri, chapterId: Chapter.Id) =
     notifySri(sri, "reload", Json.obj("chapterId" -> chapterId))
   def validationError(error: String, sri: Sri) = notifySri(sri, "validationError", Json.obj("error" -> error))
@@ -439,7 +443,7 @@ final private class StudySocket(
     key = "study_invite.user"
   )
 
-  api registerSocket this
+  api.registerSocket(this)
 }
 
 object StudySocket {
@@ -450,10 +454,10 @@ object StudySocket {
 
       object Data {
         import lila.common.Json.stringIsoReader
-        import play.api.libs.functional.syntax._
+        import play.api.libs.functional.syntax.*
 
         def reading[A](o: JsValue)(f: A => Unit)(implicit reader: Reads[A]): Unit =
-          o obj "d" flatMap { d =>
+          o.obj("d") flatMap { d =>
             reader.reads(d).asOpt
           } foreach f
 
@@ -462,10 +466,10 @@ object StudySocket {
         }
         implicit val chapterIdReader: Reads[Chapter.Id]     = stringIsoReader(Chapter.idIso)
         implicit val chapterNameReader: Reads[Chapter.Name] = stringIsoReader(Chapter.nameIso)
-        implicit val atPositionReader: Reads[AtPosition] = (
+        implicit val atPositionReader: Reads[AtPosition]    = (
           (__ \ "path").read[String] and
             (__ \ "ch").read[Chapter.Id]
-        )(AtPosition.apply _)
+        )((path, ch) => AtPosition(path, ch))
         case class SetRole(userId: String, role: String)
         implicit val SetRoleReader: Reads[SetRole]                       = Json.reads[SetRole]
         implicit val ChapterDataReader: Reads[ChapterMaker.Data]         = Json.reads[ChapterMaker.Data]

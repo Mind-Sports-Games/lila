@@ -1,7 +1,7 @@
 package lila.app
 package templating
 
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 import lila.security.{ Granter, Permission }
 import lila.user.{ User, UserContext }
 
@@ -11,7 +11,7 @@ trait SecurityHelper {
     isGranted(permission(Permission))
 
   def isGranted(permission: Permission)(implicit ctx: UserContext): Boolean =
-    ctx.me ?? Granter(permission)
+    ctx.me so Granter(permission)
 
   def isGranted(permission: Permission.Selector, user: User): Boolean =
     isGranted(permission(Permission), user)
@@ -19,7 +19,7 @@ trait SecurityHelper {
   def isGranted(permission: Permission, user: User): Boolean =
     Granter(permission)(user)
 
-  def canGrant = Granter.canGrant _
+  def canGrant = Granter.canGrant
 
   def canViewRoles(user: User)(implicit ctx: UserContext): Boolean =
     isGranted(_.ChangePermission) || (isGranted(_.Admin) && user.roles.nonEmpty)

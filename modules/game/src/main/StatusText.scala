@@ -1,23 +1,23 @@
 package lila.game
 
 import strategygames.variant.Variant
-import strategygames.{ Player => PlayerIndex, Status }
+import strategygames.{ Player as PlayerIndex, Status }
 
 object StatusText {
 
-  import Status._
+  import Status.*
 
   def apply(status: Status, win: Option[PlayerIndex], variant: Variant): String =
     status match {
-      case Aborted                               => "Game was aborted."
-      case Mate                                  => s"${winner(win)} wins by checkmate."
-      case PerpetualCheck                        => s"${winner(win)} wins by opponent causing perpetual check."
-      case Resign                                => s"${loser(win)} resigns."
-      case ResignGammon                          => s"${loser(win)} resigns a gammon."
-      case ResignBackgammon                      => s"${loser(win)} resigns a backgammon."
-      case ResignMatch                           => s"${loser(win)} resigns the match."
-      case CubeDropped                           => s"${loser(win)} drops the cube."
-      case UnknownFinish                         => s"${winner(win)} wins."
+      case Aborted          => "Game was aborted."
+      case Mate             => s"${winner(win)} wins by checkmate."
+      case PerpetualCheck   => s"${winner(win)} wins by opponent causing perpetual check."
+      case Resign           => s"${loser(win)} resigns."
+      case ResignGammon     => s"${loser(win)} resigns a gammon."
+      case ResignBackgammon => s"${loser(win)} resigns a backgammon."
+      case ResignMatch      => s"${loser(win)} resigns the match."
+      case CubeDropped      => s"${loser(win)} drops the cube."
+      case UnknownFinish    => s"${winner(win)} wins."
       case Stalemate if !variant.stalemateIsDraw => s"${winner(win)} wins by stalemate."
       case Stalemate                             => "Draw by stalemate."
       case Timeout if win.isDefined              => s"${loser(win)} left the game."
@@ -33,7 +33,7 @@ object StatusText {
       case SingleWin                             => s"${winner(win)} wins."
       case GammonWin                             => s"${winner(win)} wins by gammon."
       case BackgammonWin                         => s"${winner(win)} wins by backgammon."
-      case VariantEnd =>
+      case VariantEnd                            =>
         variant match {
           case Variant.Chess(strategygames.chess.variant.KingOfTheHill) =>
             s"${winner(win)} brings the king in the center."
@@ -41,7 +41,7 @@ object StatusText {
             s"${winner(win)} gives the third check."
           case Variant.Chess(strategygames.chess.variant.FiveCheck) =>
             s"${winner(win)} gives the fifth check."
-          case Variant.Chess(strategygames.chess.variant.RacingKings) => s"${winner(win)} wins the race."
+          case Variant.Chess(strategygames.chess.variant.RacingKings)   => s"${winner(win)} wins the race."
           case Variant.Chess(strategygames.chess.variant.LinesOfAction) =>
             s"${winner(win)} connects all of their pieces."
           case Variant.Chess(strategygames.chess.variant.ScrambledEggs) =>
@@ -59,6 +59,6 @@ object StatusText {
 
   def apply(game: lila.game.Game): String = apply(game.status, game.winnerPlayerIndex, game.variant)
 
-  private def winner(win: Option[PlayerIndex]) = win.??(_.toString)
+  private def winner(win: Option[PlayerIndex]) = win.so(_.toString)
   private def loser(win: Option[PlayerIndex])  = winner(win.map(!_))
 }

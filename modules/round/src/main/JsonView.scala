@@ -2,29 +2,16 @@ package lila.round
 
 import actorApi.SocketStatus
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.dameo.format.{ Uci => DameoUci }
-import strategygames.dameo.{ Pos => DameoPos }
-import strategygames.{
-  ClockBase,
-  Player => PlayerIndex,
-  P1,
-  P2,
-  Pos,
-  Situation,
-  Move => StratMove,
-  Drop => StratDrop,
-  Lift => StratLift,
-  DiceRoll => StratDiceRoll,
-  CubeAction => StratCubeAction,
-  EndTurn => StratEndTurn
-}
+import strategygames.dameo.format.Uci as DameoUci
+import strategygames.dameo.Pos as DameoPos
+import strategygames.{ ClockBase, Player as PlayerIndex, Pos, Situation }
 import strategygames.variant.Variant
-import play.api.libs.json._
+import play.api.libs.json.*
 import scala.math
 
 import lila.common.ApiVersion
-import lila.game.JsonView._
-import lila.game.{ Event, Pov, Game, Player => GamePlayer, DeadStoneOfferState }
+import lila.game.JsonView.*
+import lila.game.{ DeadStoneOfferState, Event, Game, Player as GamePlayer, Pov }
 import lila.pref.Pref
 import lila.user.{ User, UserRepo }
 
@@ -40,25 +27,27 @@ final class JsonView(
     isOfferingRematch: Pov => Boolean
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import JsonView._
+  import JsonView.*
 
   private def checkCount(game: Game, playerIndex: PlayerIndex) =
-    (game.variant == strategygames.chess.variant.ThreeCheck || game.variant == strategygames.chess.variant.FiveCheck) option game.history
-      .checkCount(playerIndex)
+    (game.variant == strategygames.chess.variant.ThreeCheck || game.variant == strategygames.chess.variant.FiveCheck)
+      .option(
+        game.history
+          .checkCount(playerIndex)
+      )
 
   private def score(game: Game, playerIndex: PlayerIndex) =
     game.displayScore.map(_.apply(playerIndex))
 
   private def kingMoves(game: Game, playerIndex: PlayerIndex) =
-    (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
+    game.variant.frisianVariant.option(game.history.kingMoves(playerIndex))
 
   // TODO: in analysis mode, this will be evaluated against the last move, but we don't want to set onlyDropsVariant
   // in this case. Instead just have a return of pov.game.variant.onlyDropsVariant
-  private def onlyDropsVariantForCurrentAction(pov: Pov): Boolean = {
+  private def onlyDropsVariantForCurrentAction(pov: Pov): Boolean =
     pov.game.variant.onlyDropsVariant ||
-    (pov.game.situation.canOnlyDrop &&
-      !(List("crazyhouse", "minishogi", "shogi").contains(pov.game.variant.key)))
-  }
+      (pov.game.situation.canOnlyDrop &&
+        !List("crazyhouse", "minishogi", "shogi").contains(pov.game.variant.key))
 
   private def coordSystemForVariant(prefCoordSystem: Int, gameVariant: Variant): Int =
     gameVariant match {
@@ -72,9 +61,9 @@ final class JsonView(
 
   private def commonPlayerJson(g: Game, p: GamePlayer, user: Option[User], withFlags: WithFlags): JsObject =
     Json
-      //.obj("color" -> g.variant.playerNames(p.playerIndex), "playerIndex" -> p.playerIndex.name)
+      // .obj("color" -> g.variant.playerNames(p.playerIndex), "playerIndex" -> p.playerIndex.name)
       .obj(
-        //"color" -> p.playerIndex.classicName,
+        // "color" -> p.playerIndex.classicName,
         "playerName"  -> g.variant.playerNames(p.playerIndex),
         "playerIndex" -> p.playerIndex.name,
         "playerColor" -> g.variant.playerColors(p.playerIndex)
@@ -92,7 +81,7 @@ final class JsonView(
       .add("score" -> score(g, p.playerIndex))
       .add("kingMoves" -> kingMoves(g, p.playerIndex))
       .add("berserk" -> p.berserk)
-      .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
+      .add("blurs" -> (withFlags.blurs so blurs(g, p)))
 
   def playerJson(
       pov: Pov,
@@ -104,13 +93,13 @@ final class JsonView(
       nvui: Boolean
   ): Fu[JsObject] =
     getSocketStatus(pov.game) zip
-      (pov.opponent.userId ?? userRepo.byId) zip
+      (pov.opponent.userId so userRepo.byId) zip
       takebacker.isAllowedIn(pov.game) zip
       moretimer.isAllowedIn(pov.game) map { case (((socket, opponentUser), takebackable), moretimeable) =>
-        import pov._
+        import pov.*
         Json
           .obj(
-            "game" -> gameJsonView(pov.game, initialFen),
+            "game"   -> gameJsonView(pov.game, initialFen),
             "player" -> {
               commonPlayerJson(pov.game, player, playerUser, withFlags) ++ Json.obj(
                 "id"      -> playerId,
@@ -120,8 +109,8 @@ final class JsonView(
             "opponent" -> {
               commonPlayerJson(pov.game, opponent, opponentUser, withFlags) ++ Json
                 .obj(
-                  //"color" -> pov.game.variant.playerNames(opponent.playerIndex),
-                  //"color" -> opponent.playerIndex.classicName,
+                  // "color" -> pov.game.variant.playerNames(opponent.playerIndex),
+                  // "color" -> opponent.playerIndex.classicName,
                   "playerName"  -> pov.game.variant.playerNames(opponent.playerIndex),
                   "playerIndex" -> opponent.playerIndex.name,
                   "playerColor" -> pov.game.variant.playerColors(opponent.playerIndex),
@@ -135,20 +124,20 @@ final class JsonView(
               "round"  -> s"/$fullId"
             ),
             "captureLength" -> captureLength(pov),
-            "pref" -> Json
+            "pref"          -> Json
               .obj(
                 "animationDuration" -> animationMillis(pov, pref),
                 "coords"            -> pref.coords,
                 "coordSystem"       -> coordSystemForVariant(pref.coordSystem, pov.game.variant),
                 "resizeHandle"      -> pref.resizeHandle,
                 "replay"            -> pref.replay,
-                "autoQueen" -> (if (pov.game.variant == strategygames.chess.variant.Antichess)
+                "autoQueen"         -> (if (pov.game.variant == strategygames.chess.variant.Antichess)
                                   Pref.AutoQueen.NEVER
                                 else pref.autoQueen),
                 "clockTenths" -> pref.clockTenths,
                 "moveEvent"   -> pref.moveEvent,
                 "mancalaMove" -> (pref.mancalaMove == Pref.MancalaMove.SINGLE_CLICK),
-                "pieceSet" -> pref.pieceSet.map(p =>
+                "pieceSet"    -> pref.pieceSet.map(p =>
                   Json.obj("name" -> p.name, "gameFamily" -> p.gameFamilyName)
                 )
               )
@@ -169,7 +158,7 @@ final class JsonView(
               .add("enablePremove" -> pref.premove)
               .add("showCaptured" -> pref.captured)
               .add("submitMove" -> {
-                import Pref.SubmitMove._
+                import Pref.SubmitMove.*
                 (pref.submitMove match {
                   case _ if pov.game.hasAi || nvui                            => false
                   case ALWAYS                                                 => true
@@ -217,12 +206,12 @@ final class JsonView(
   private def commonWatcherJson(g: Game, p: GamePlayer, user: Option[User], withFlags: WithFlags): JsObject =
     Json
       .obj(
-        //"color" -> g.variant.playerNames(p.playerIndex),
-        //"color" -> p.playerIndex.classicName,
-        "playerName"   -> g.variant.playerNames(p.playerIndex),
-        "playerIndex"  -> p.playerIndex.name,
+        // "color" -> g.variant.playerNames(p.playerIndex),
+        // "color" -> p.playerIndex.classicName,
+        "playerName"  -> g.variant.playerNames(p.playerIndex),
+        "playerIndex" -> p.playerIndex.name,
         "playerColor" -> g.variant.playerColors(p.playerIndex),
-        "name"         -> p.name
+        "name"        -> p.name
       )
       .add("user" -> user.map { userJsonView.minimal(_, g.perfType) })
       .add("ai" -> p.aiLevel)
@@ -234,7 +223,7 @@ final class JsonView(
       .add("score" -> score(g, p.playerIndex))
       .add("kingMoves" -> kingMoves(g, p.playerIndex))
       .add("berserk" -> p.berserk)
-      .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
+      .add("blurs" -> (withFlags.blurs so blurs(g, p)))
 
   def watcherJson(
       pov: Pov,
@@ -247,17 +236,17 @@ final class JsonView(
   ) =
     getSocketStatus(pov.game) zip
       userRepo.pair(pov.player.userId, pov.opponent.userId) map { case (socket, (playerUser, opponentUser)) =>
-        import pov._
+        import pov.*
         Json
           .obj(
             "game" -> gameJsonView(game, initialFen)
-              .add("plyCentis" -> (withFlags.plytimes ?? game.plyTimes.map(_.map(_.centis))))
+              .add("plyCentis" -> (withFlags.plytimes so game.plyTimes.map(_.map(_.centis))))
               .add("division" -> withFlags.division.option(divider(game, initialFen)))
               .add("opening" -> game.opening)
               .add("importedBy" -> game.pgnImport.flatMap(_.user)),
             "clock"          -> game.clock.map(clockJson),
             "correspondence" -> game.correspondenceClock,
-            "player" -> {
+            "player"         -> {
               commonWatcherJson(game, player, playerUser, withFlags) ++ Json.obj(
                 "version"   -> socket.version.value,
                 "spectator" -> true,
@@ -268,9 +257,9 @@ final class JsonView(
               "onGame" -> (opponent.isAi || socket.onGame(opponent.playerIndex))
             ),
             "captureLength" -> captureLength(pov),
-            //"orientation" -> pov.game.variant.playerNames(pov.playerIndex),
+            // "orientation" -> pov.game.variant.playerNames(pov.playerIndex),
             "orientation" -> pov.playerIndex.name,
-            "url" -> Json.obj(
+            "url"         -> Json.obj(
               "socket" -> s"/watch/$gameId/${game.variant.playerNames(playerIndex)}/v$apiVersion",
               "round"  -> s"/$gameId/${game.variant.playerNames(playerIndex)}"
             ),
@@ -283,7 +272,7 @@ final class JsonView(
                 "replay"            -> pref.replay,
                 "clockTenths"       -> pref.clockTenths,
                 "mancalaMove"       -> (pref.mancalaMove == Pref.MancalaMove.SINGLE_CLICK),
-                "pieceSet" -> pref.pieceSet.map(p =>
+                "pieceSet"          -> pref.pieceSet.map(p =>
                   Json.obj("name" -> p.name, "gameFamily" -> p.gameFamilyName)
                 )
               )
@@ -295,9 +284,9 @@ final class JsonView(
               .add("actionReminder" -> false)
               .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
               .add("showCaptured" -> pref.captured),
-            "evalPut" -> JsBoolean(me.??(evalCache.shouldPut))
+            "evalPut" -> JsBoolean(me.so(evalCache.shouldPut))
           )
-          .add("evalPut" -> me.??(evalCache.shouldPut))
+          .add("evalPut" -> me.so(evalCache.shouldPut))
           .add("tv" -> tv.collect { case OnPlayStrategyTv(channel, flip) =>
             Json.obj("channel" -> channel, "flip" -> flip)
           })
@@ -318,22 +307,22 @@ final class JsonView(
       me: Option[User],
       division: Option[strategygames.Division] = none
   ) = {
-    import pov._
+    import pov.*
     val fen = Forsyth.>>(game.variant.gameLogic, game.stratGame)
     Json
       .obj(
         "game" -> Json
           .obj(
-            "id"         -> gameId,
-            "lib"        -> game.variant.gameLogic.id,
-            "variant"    -> game.variant,
-            "opening"    -> game.opening,
-            "initialFen" -> (initialFen | game.variant.initialFen),
-            "fen"        -> fen,
-            "plies"      -> game.plies,
-            "turns"      -> game.turnCount,
-            "player"     -> game.activePlayerIndex.name,
-            "status"     -> game.status,
+            "id"           -> gameId,
+            "lib"          -> game.variant.gameLogic.id,
+            "variant"      -> game.variant,
+            "opening"      -> game.opening,
+            "initialFen"   -> (initialFen | game.variant.initialFen),
+            "fen"          -> fen,
+            "plies"        -> game.plies,
+            "turns"        -> game.turnCount,
+            "player"       -> game.activePlayerIndex.name,
+            "status"       -> game.status,
             "gameFamily"   -> game.variant.gameFamily.key,
             "gameFamilyId" -> game.variant.gameFamily.id,
             "pointValue"   -> game.pointValue
@@ -354,14 +343,14 @@ final class JsonView(
           "ai"          -> opponent.aiLevel
         ),
         "orientation" -> orientation.name,
-        "pref" -> Json
+        "pref"        -> Json
           .obj(
             "animationDuration" -> animationMillis(pov, pref),
             "coords"            -> pref.coords,
             "coordSystem"       -> coordSystemForVariant(pref.coordSystem, game.variant),
             "moveEvent"         -> pref.moveEvent,
             "mancalaMove"       -> (pref.mancalaMove == Pref.MancalaMove.SINGLE_CLICK),
-            "pieceSet"          -> pref.pieceSet.map(p => Json.obj("name" -> p.name, "gameFamily" -> p.gameFamilyName))
+            "pieceSet" -> pref.pieceSet.map(p => Json.obj("name" -> p.name, "gameFamily" -> p.gameFamilyName))
           )
           .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
           .add("is3d" -> pref.is3d)
@@ -373,7 +362,7 @@ final class JsonView(
         "gameRecordFormat" -> pov.game.gameRecordFormat,
         "userAnalysis"     -> true
       )
-      .add("evalPut" -> me.??(evalCache.shouldPut))
+      .add("evalPut" -> me.so(evalCache.shouldPut))
       .add("possibleDropsByRole" -> possibleDropsByrole(pov))
       .add("onlyDropsVariant" -> onlyDropsVariantForCurrentAction(pov))
       .add("hasGameScore" -> pov.game.variant.hasGameScore)
@@ -393,93 +382,103 @@ final class JsonView(
 
   private def possibleMoves(pov: Pov, apiVersion: ApiVersion): Option[JsValue] =
     (pov.game.situation, pov.game.variant) match {
-      //TODO: The Draughts specific logic should be pushed into strategygames
-      //and should be ready to go now validMoves handles this ghosts logic internally
-      //see Situation.Draughts.destinations
+      // TODO: The Draughts specific logic should be pushed into strategygames
+      // and should be ready to go now validMoves handles this ghosts logic internally
+      // see Situation.Draughts.destinations
       case (Situation.Chess(_), Variant.Chess(_)) =>
-        (pov.game playableBy pov.player) option
-          Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion))
       case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
-        (pov.game playableBy pov.player) option {
+        (pov.game.playableBy(pov.player)) option {
           if (situation.ghosts > 0) {
             val move    = pov.game.actionStrs(pov.game.actionStrs.length - 1)(0)
             val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
             destPos match {
               case Some(dest) =>
                 Event.PossibleMoves.json(
-                  Map(Pos.Draughts(dest) -> situation.destinationsFrom(dest).map(Pos.Draughts)),
+                  Map(Pos.Draughts(dest) -> situation.destinationsFrom(dest).map(Pos.Draughts.apply)),
                   apiVersion
                 )
               case _ =>
                 Event.PossibleMoves.json(
                   situation.allDestinations.map { case (p, lp) =>
-                    (Pos.Draughts(p), lp.map(Pos.Draughts))
+                    (Pos.Draughts(p), lp.map(Pos.Draughts.apply))
                   },
                   apiVersion
                 )
             }
-          } else {
+          } else
             Event.PossibleMoves.json(
               situation.allDestinations.map { case (p, lp) =>
-                (Pos.Draughts(p), lp.map(Pos.Draughts))
+                (Pos.Draughts(p), lp.map(Pos.Draughts.apply))
               },
               apiVersion
             )
-          }
         }
       case (Situation.FairySF(_), Variant.FairySF(_)) =>
-        (pov.game playableBy pov.player) option
-          Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion))
       case (Situation.Samurai(_), Variant.Samurai(_)) =>
-        (pov.game playableBy pov.player) option
-          Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion))
       case (Situation.Togyzkumalak(_), Variant.Togyzkumalak(_)) =>
-        (pov.game playableBy pov.player) option
-          Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
-      case (Situation.Go(_), Variant.Go(_)) => None
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion))
+      case (Situation.Go(_), Variant.Go(_))                 => None
       case (Situation.Backgammon(_), Variant.Backgammon(_)) =>
-        (pov.game playableBy pov.player) option
-          Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion))
       case (Situation.Abalone(_), Variant.Abalone(_)) =>
-        (pov.game playableBy pov.player) option
-          Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion))
       case (Situation.Dameo(_), Variant.Dameo(_)) =>
-        (pov.game playableBy pov.player) option
-          Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion))
       case _ => sys.error("Mismatch of types for possibleMoves")
     }
 
   private def possibleDropsByrole(pov: Pov): Option[JsValue] =
     (pov.game.situation, pov.game.variant) match {
       case (Situation.Chess(_), Variant.Chess(_)) =>
-        (pov.game playableBy pov.player) option
-          Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty)))
       case (Situation.FairySF(_), Variant.FairySF(_)) =>
-        (pov.game playableBy pov.player) option
-          Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty)))
       case (Situation.Samurai(_), Variant.Samurai(_))           => None
       case (Situation.Togyzkumalak(_), Variant.Togyzkumalak(_)) => None
-      case (Situation.Go(_), Variant.Go(_)) =>
-        (pov.game playableBy pov.player) option
-          Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
+      case (Situation.Go(_), Variant.Go(_))                     =>
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty)))
       case (Situation.Backgammon(_), Variant.Backgammon(_)) =>
-        (pov.game playableBy pov.player) option
-          Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty)))
       case (Situation.Abalone(_), Variant.Abalone(_))   => None
       case (Situation.Dameo(_), Variant.Dameo(_))       => None
       case (Situation.Draughts(_), Variant.Draughts(_)) => None
-      case _                                            => sys.error("Mismatch of types for possibleDropsByrole")
+      case _ => sys.error("Mismatch of types for possibleDropsByrole")
     }
 
   private def possibleDrops(pov: Pov): Option[JsValue] =
-    (pov.game playableBy pov.player) ?? {
+    (pov.game.playableBy(pov.player)) so {
       pov.game.situation.drops map { drops =>
         JsString(drops.map(_.key).mkString)
       }
     }
 
   private def possibleLifts(pov: Pov): Option[JsValue] =
-    (pov.game playableBy pov.player) option { JsString(pov.game.situation.lifts.map(_.pos.key).mkString) }
+    (pov.game.playableBy(pov.player)) option { JsString(pov.game.situation.lifts.map(_.pos.key).mkString) }
 
   private def possibleCubeActions(pov: Pov): Option[JsValue] =
     (pov.game.situation, pov.game.variant) match {
@@ -489,20 +488,19 @@ final class JsonView(
       case _ => None
     }
 
-  private def selectMode(pov: Pov): Boolean = {
+  private def selectMode(pov: Pov): Boolean =
     pov.game.situation match {
       case Situation.Go(s) =>
         s.canSelectSquares && (
           (pov.game.turnOf(pov.player) && !pov.player.isOfferingSelectSquares)
             ||
               pov.opponent.isOfferingSelectSquares
-        ) && !pov.game.deadStoneOfferState.map(_.is(DeadStoneOfferState.RejectedOffer)).has(true)
+        ) && !pov.game.deadStoneOfferState.map(_.is(DeadStoneOfferState.RejectedOffer)).contains(true)
       case _ => false
     }
-  }
 
   // draughts and dameo
-  private def captureLength(pov: Pov): Int = {
+  private def captureLength(pov: Pov): Int =
     (pov.game.situation, pov.game.variant) match {
       case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
         if (situation.ghosts > 0) {
@@ -512,8 +510,7 @@ final class JsonView(
             case Some(dest) => ~situation.captureLengthFrom(dest)
             case _          => situation.allMovesCaptureLength
           }
-        } else
-          situation.allMovesCaptureLength
+        } else situation.allMovesCaptureLength
       case (Situation.Dameo(situation), Variant.Dameo(_)) => {
         if (situation.ghosts > 0) {
           val action = pov.game.actionStrs(pov.game.actionStrs.length - 1)
@@ -529,12 +526,10 @@ final class JsonView(
             case _ =>
               situation.allMovesCaptureLength
           }
-        } else
-          situation.allMovesCaptureLength
+        } else situation.allMovesCaptureLength
       }
       case _ => 0
     }
-  }
 
   private def animationMillis(pov: Pov, pref: Pref) =
     pref.animationMillis * {

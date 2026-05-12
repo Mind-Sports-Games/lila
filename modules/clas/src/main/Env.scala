@@ -1,8 +1,8 @@
 package lila.clas
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 
-import lila.common.config._
+import lila.common.config.*
 
 @Module
 final class Env(
@@ -42,7 +42,7 @@ final class Env(
 
   lila.common.Bus.subscribeFuns(
     "finishGame" -> { case lila.game.actorApi.FinishGame(game, _, _) =>
-      progressApi.onFinishGame(game).unit
+      progressApi.onFinishGame(game)
     },
     "clas" -> { case lila.hub.actorApi.clas.IsTeacherOf(teacher, student, promise) =>
       promise completeWith api.clas.isTeacherOf(teacher, student)

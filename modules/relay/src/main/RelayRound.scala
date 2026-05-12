@@ -3,7 +3,6 @@ package lila.relay
 import org.joda.time.DateTime
 
 import lila.study.{ Chapter, Study }
-import lila.user.User
 
 case class RelayRound(
     _id: RelayRound.Id,
@@ -25,7 +24,7 @@ case class RelayRound(
   def studyId = Study.Id(id.value)
 
   lazy val slug = {
-    val s = lila.common.String slugify name
+    val s = lila.common.String.slugify(name)
     if (s.isEmpty) "-" else s
   }
 
@@ -50,8 +49,8 @@ case class RelayRound(
 
   def shouldGiveUp =
     !hasStarted && (startsAt match {
-      case Some(at) => at.isBefore(DateTime.now minusHours 3)
-      case None     => createdAt.isBefore(DateTime.now minusDays 1)
+      case Some(at) => at.isBefore(DateTime.now.minusHours(3))
+      case None     => createdAt.isBefore(DateTime.now.minusDays(1))
     })
 
   def withSync(f: RelayRound.Sync => RelayRound.Sync) = copy(sync = f(sync))
@@ -65,7 +64,7 @@ object RelayRound {
 
   case class Id(value: String) extends AnyVal with StringValue
 
-  def makeId = Id(lila.common.ThreadLocalRandom nextString 8)
+  def makeId = Id(lila.common.ThreadLocalRandom.nextString(8))
 
   case class Sync(
       upstream: Option[Sync.Upstream], // if empty, needs a client to push PGN
@@ -81,7 +80,7 @@ object RelayRound {
       if (hasUpstream) copy(until = DateTime.now.plusHours(1).some)
       else pause
 
-    def ongoing = until ?? DateTime.now.isBefore
+    def ongoing = until so DateTime.now.isBefore
 
     def play =
       if (hasUpstream) renew.copy(nextAt = nextAt orElse DateTime.now.plusSeconds(3).some)
@@ -101,7 +100,7 @@ object RelayRound {
     def playing = nextAt.isDefined
     def paused  = !playing
 
-    def addLog(event: SyncLog.Event) = copy(log = log add event)
+    def addLog(event: SyncLog.Event) = copy(log = log.add(event))
     def clearLog                     = copy(log = SyncLog.empty)
 
     override def toString = upstream.toString
@@ -116,7 +115,7 @@ object RelayRound {
       def local = asUrl.fold(true)(_.isLocal)
     }
     case class UpstreamUrl(url: String) extends Upstream {
-      def isLocal = url.contains("://127.0.0.1") || url.contains("://localhost")
+      def isLocal   = url.contains("://127.0.0.1") || url.contains("://localhost")
       def withRound =
         url.split(" ", 2) match {
           case Array(u, round) => UpstreamUrl.WithRound(u, round.toIntOption)
@@ -133,7 +132,7 @@ object RelayRound {
   trait AndTour {
     val round: RelayRound
     val tour: RelayTour
-    def fullName = s"${tour.name} • ${round.name}"
+    def fullName     = s"${tour.name} • ${round.name}"
     def path: String =
       s"/broadcast/${tour.slug}/${if (round.slug == tour.slug) "-" else round.slug}/${round.id}"
     def path(chapterId: Chapter.Id): String = s"$path/$chapterId"

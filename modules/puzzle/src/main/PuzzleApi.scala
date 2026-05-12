@@ -1,13 +1,13 @@
 package lila.puzzle
 
-import cats.implicits._
+import cats.implicits.*
 import org.joda.time.DateTime
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import strategygames.variant.Variant
 import lila.common.paginator.Paginator
 import lila.common.config.MaxPerPage
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.db.paginator.Adapter
 import lila.user.User
 
@@ -17,8 +17,7 @@ final class PuzzleApi(
     countApi: PuzzleCountApi
 )(implicit ec: scala.concurrent.ExecutionContext, scheduler: akka.actor.Scheduler, mode: play.api.Mode) {
 
-  import Puzzle.{ BSONFields => F }
-  import BsonHandlers._
+  import BsonHandlers.*
 
   object puzzle {
 
@@ -35,7 +34,7 @@ final class PuzzleApi(
             collection = coll,
             selector = $doc("users" -> user.id),
             projection = none,
-            sort = $sort desc "glicko.r"
+            sort = $sort.desc("glicko.r")
           ),
           page,
           MaxPerPage(30)
@@ -49,7 +48,7 @@ final class PuzzleApi(
             collection = coll,
             selector = $doc("users" -> user.id, "v" -> variant.id, "l" -> variant.gameLogic.id),
             projection = none,
-            sort = $sort desc "glicko.r"
+            sort = $sort.desc("glicko.r")
           ),
           page,
           MaxPerPage(30)
@@ -90,9 +89,9 @@ final class PuzzleApi(
         round
           .find(user, id)
           .flatMap {
-            _ ?? { prevRound =>
+            _ so { prevRound =>
               trustApi.vote(user, prevRound, vote) flatMap {
-                _ ?? { weight =>
+                _ so { weight =>
                   val voteValue = (if (vote) 1 else -1) * weight
                   lila.mon.puzzle.vote(vote, prevRound.win).increment()
                   updatePuzzle(id, voteValue, prevRound.vote) zip
@@ -107,12 +106,12 @@ final class PuzzleApi(
 
     private def updatePuzzle(puzzleId: Puzzle.Id, newVote: Int, prevVote: Option[Int]): Funit =
       colls.puzzle { coll =>
-        import Puzzle.{ BSONFields => F }
+        import Puzzle.BSONFields as F
         coll.one[Bdoc](
           $id(puzzleId.value),
           $doc(F.voteUp -> true, F.voteDown -> true, F.day -> true, F.id -> false)
         ) flatMap {
-          _ ?? { doc =>
+          _ so { doc =>
             val prevUp   = ~doc.int(F.voteUp)
             val prevDown = ~doc.int(F.voteDown)
             val up       = prevUp + ~newVote.some.filter(0 <) - ~prevVote.filter(0 <)
@@ -127,7 +126,7 @@ final class PuzzleApi(
                 ) ++ {
                   (newVote <= -100 && doc
                     .getAsOpt[DateTime](F.day)
-                    .exists(_ isAfter DateTime.now.minusDays(1))) ??
+                    .exists(_.isAfter(DateTime.now.minusDays(1)))) so
                     $unset(F.day)
                 }
               )
@@ -150,9 +149,9 @@ final class PuzzleApi(
 
     def vote(user: User, id: Puzzle.Id, theme: PuzzleTheme.Key, vote: Option[Boolean]): Funit =
       round.find(user, id) flatMap {
-        _ ?? { round =>
-          round.themeVote(theme, vote) ?? { newThemes =>
-            import PuzzleRound.{ BSONFields => F }
+        _ so { round =>
+          round.themeVote(theme, vote) so { newThemes =>
+            import PuzzleRound.BSONFields as F
             val update =
               if (newThemes.isEmpty || !PuzzleRound.themesLookSane(newThemes))
                 fuccess($unset(F.themes, F.puzzle).some)
@@ -174,7 +173,7 @@ final class PuzzleApi(
                     }
                 }
             update flatMap {
-              _ ?? { up =>
+              _ so { up =>
                 lila.mon.puzzle.voteTheme(theme.value, vote, round.win).increment()
                 colls.round(_.update.one($id(round.id), up)) zip
                   colls.puzzle(_.updateField($id(round.id.puzzleId), Puzzle.BSONFields.dirty, true)) void
@@ -192,8 +191,8 @@ final class PuzzleApi(
     private def key(user: User, id: Puzzle.Id) = s"${user.id}:${id}"
 
     def setCasualIfNotYetPlayed(user: User, puzzle: Puzzle): Funit =
-      !round.exists(user, puzzle.id) map {
-        _ ?? store.put(key(user, puzzle.id))
+      round.exists(user, puzzle.id).not map {
+        _ so store.put(key(user, puzzle.id))
       }
 
     def apply(user: User, id: Puzzle.Id) = store.get(key(user, id))

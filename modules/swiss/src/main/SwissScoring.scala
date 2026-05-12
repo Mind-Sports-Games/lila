@@ -1,20 +1,21 @@
 package lila.swiss
 
-import reactivemongo.api.bson._
-import scala.concurrent.duration._
+import reactivemongo.api.bson.*
+import scala.concurrent.duration.*
 
-import lila.db.dsl._
+import lila.common.extensions.*
+import lila.db.dsl.*
 
-import strategygames.tiebreaks.{ Player => TiebreakPlayer, Result => TiebreakResult, Tiebreak, Tournament }
+import strategygames.tiebreaks.{ Player as TiebreakPlayer, Result as TiebreakResult, Tiebreak, Tournament }
 
 final private class SwissTiebreak(
     swiss: Swiss,
     playerMap: SwissPlayer.PlayerMap,
     pairingMap: SwissPairing.PairingMap
 ) extends Tournament {
-  val rounds   = swiss.tieBreakRounds
-  val nbRounds = rounds.length
-  def resultsForPlayer(hero: TiebreakPlayer): List[TiebreakResult] = {
+  val rounds                                                       = swiss.tieBreakRounds
+  val nbRounds                                                     = rounds.length
+  def resultsForPlayer(hero: TiebreakPlayer): List[TiebreakResult] =
     playerMap
       .get(hero.id)
       .fold[List[TiebreakResult]](List())(player => {
@@ -26,15 +27,13 @@ final private class SwissTiebreak(
             val r = Tiebreak.Round(round.value - 1)
             playerPairingMap get round match {
               case Some(pairing) => {
-                val foe = TiebreakPlayer(pairing opponentOf hero.id)
+                val foe = TiebreakPlayer(pairing.opponentOf(hero.id))
                 pairing.status match {
-                  case Left(_)     => None
-                  case Right(None) => Some(r.draw(hero, foe))
+                  case Left(_)                  => None
+                  case Right(None)              => Some(r.draw(hero, foe))
                   case Right(Some(playerIndex)) =>
-                    if (pairing(playerIndex) == hero.id)
-                      Some(r.win(hero, foe))
-                    else
-                      Some(r.lose(hero, foe))
+                    if (pairing(playerIndex) == hero.id) Some(r.win(hero, foe))
+                    else Some(r.lose(hero, foe))
                 }
               }
               case None if player.byes(round) => Some(r.bye(hero))
@@ -44,14 +43,13 @@ final private class SwissTiebreak(
           }
         }
       })
-  }
 }
 
 final private class SwissScoring(
     colls: SwissColls
 )(implicit scheduler: akka.actor.Scheduler, ec: scala.concurrent.ExecutionContext, mode: play.api.Mode) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   def apply(id: Swiss.Id): Fu[Option[SwissScoring.Result]] = sequencer(id).monSuccess(_.swiss.scoringGet)
 
@@ -65,7 +63,7 @@ final private class SwissScoring(
 
   private def recompute(id: Swiss.Id): Fu[Option[SwissScoring.Result]] =
     colls.swiss.byId[Swiss](id.value) flatMap {
-      _.?? { (swiss: Swiss) =>
+      _.so { (swiss: Swiss) =>
         for {
           (prevPlayers, pairings) <- fetchPlayers(swiss) zip fetchPairings(swiss)
           pairingMap = SwissPairing.toMap(pairings)
@@ -81,16 +79,16 @@ final private class SwissScoring(
           }
           playerMap = SwissPlayer.toMap(withPoints)
           tiebreaks = new Tiebreak(new SwissTiebreak(swiss, playerMap, pairingMap))
-          players = withPoints.map { p =>
+          players   = withPoints.map { p =>
             {
               val playerPairings = (~pairingMap.get(p.userId)).values
               val sbTieBreak     = 0.5 * tiebreaks.lilaSonnenbornBerger(TiebreakPlayer(p.userId))
               val bhTieBreak     = 0.5 * tiebreaks.fideBuchholz(TiebreakPlayer(p.userId))
               // TODO: should the perf rating be in stratgames too?
               val perfSum = playerPairings.foldLeft(0f) { case (perfSum, pairing) =>
-                val opponent = playerMap.get(pairing opponentOf p.userId)
+                val opponent = playerMap.get(pairing.opponentOf(p.userId))
                 val result   = pairing.resultFor(p.userId)
-                val newPerf = perfSum + opponent.??(_.actualRating) + result.?? { win =>
+                val newPerf  = perfSum + opponent.so(_.actualRating) + result.so { win =>
                   if (win) 500 else -500
                 }
                 newPerf
@@ -98,38 +96,40 @@ final private class SwissScoring(
               p.copy(
                 sbTieBreak = Swiss.SonnenbornBerger(sbTieBreak),
                 bhTieBreak = Some(Swiss.Buchholz(bhTieBreak)),
-                performance = playerPairings.nonEmpty option Swiss.Performance(perfSum / playerPairings.size)
+                performance = playerPairings.nonEmpty.option(Swiss.Performance(perfSum / playerPairings.size))
               ).recomputeScore
             }
           }
           _ <- SwissPlayer.fields { f =>
-            prevPlayers
-              .zip(players)
-              .withFilter { case (a, b) =>
-                a != b
-              }
-              .map { case (_, player) =>
-                colls.player.update
-                  .one(
-                    $id(player.id),
-                    $set(
-                      f.points      -> player.points,
-                      f.sbTieBreak  -> player.sbTieBreak,
-                      f.bhTieBreak  -> player.bhTieBreak,
-                      f.performance -> player.performance,
-                      f.score       -> player.score
-                    )
-                  )
-                  .void
-              }
-              .sequenceFu
+            Future
+              .sequence(
+                prevPlayers
+                  .zip(players)
+                  .withFilter { case (a, b) =>
+                    a != b
+                  }
+                  .map { case (_, player) =>
+                    colls.player.update
+                      .one(
+                        $id(player.id),
+                        $set(
+                          f.points      -> player.points,
+                          f.sbTieBreak  -> player.sbTieBreak,
+                          f.bhTieBreak  -> player.bhTieBreak,
+                          f.performance -> player.performance,
+                          f.score       -> player.score
+                        )
+                      )
+                      .void
+                  }
+              )
               .void
           }
         } yield SwissScoring
           .Result(
             swiss,
             players.zip(sheets).sortBy(-_._1.score.value),
-            SwissPlayer toMap players,
+            SwissPlayer.toMap(players),
             pairingMap
           )
           .some
@@ -140,13 +140,13 @@ final private class SwissScoring(
     SwissPlayer.fields { f =>
       colls.player
         .find($doc(f.swissId -> swiss.id))
-        .sort($sort asc f.score)
+        .sort($sort.asc(f.score))
         .cursor[SwissPlayer]()
         .list()
     }
 
   private def fetchPairings(swiss: Swiss) =
-    !swiss.isCreated ?? SwissPairing.fields { f =>
+    !swiss.isCreated so SwissPairing.fields { f =>
       colls.pairing.list[SwissPairing]($doc(f.swissId -> swiss.id))
     }
 }

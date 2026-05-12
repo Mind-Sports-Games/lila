@@ -1,17 +1,12 @@
 package views.html
 package round
 
-import strategygames.chess.variant.Crazyhouse
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import strategygames.GameLogic
-
-import controllers.routes
-import scala.util.chaining._
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.game.{ Game, Pov }
 
 object bits {
@@ -35,7 +30,7 @@ object bits {
           if (variant.hasDetachedPocket) "round.zh"
           else "round"
         },
-        ctx.blind option cssTag("round.nvui"),
+        ctx.blind.option(cssTag("round.nvui")),
         moreCss
       ),
       chessground = chessground,
@@ -53,27 +48,29 @@ object bits {
   def underchat(game: Game)(implicit ctx: Context) =
     frag(
       views.html.chat.spectatorsFrag,
-      isGranted(_.ViewBlurs) option div(cls := "round__mod")(
-        game.players.filter(p => game.playerBlurPercent(p.playerIndex) > 30) map { p =>
-          div(
-            playerLink(
-              p,
-              cssClass = s"is playerIndex-icon ${game.variant.playerColors(p.playerIndex)}".some,
-              withOnline = false,
-              mod = true
-            ),
-            s" ${p.blurs.nb}/${game.playerMoves(p.playerIndex)} blurs ",
-            strong(game.playerBlurPercent(p.playerIndex), "%")
-          )
-        }
-        // game.players flatMap { p => p.holdAlert.map(p ->) } map {
-        //   case (p, h) => div(
-        //     playerLink(p, cssClass = s"is playerIndex-icon ${game.variant.playerColors(p.playerIndex)}".some, mod = true, withOnline = false),
-        //     "hold alert",
-        //     br,
-        //     s"(ply: ${h.ply}, mean: ${h.mean} ms, SD: ${h.sd})"
-        //   )
-        // }
+      isGranted(_.ViewBlurs).option(
+        div(cls := "round__mod")(
+          game.players.filter(p => game.playerBlurPercent(p.playerIndex) > 30) map { p =>
+            div(
+              playerLink(
+                p,
+                cssClass = s"is playerIndex-icon ${game.variant.playerColors(p.playerIndex)}".some,
+                withOnline = false,
+                mod = true
+              ),
+              s" ${p.blurs.nb}/${game.playerMoves(p.playerIndex)} blurs ",
+              strong(game.playerBlurPercent(p.playerIndex), "%")
+            )
+          }
+          // game.players flatMap { p => p.holdAlert.map(p ->) } map {
+          //   case (p, h) => div(
+          //     playerLink(p, cssClass = s"is playerIndex-icon ${game.variant.playerColors(p.playerIndex)}".some, mod = true, withOnline = false),
+          //     "hold alert",
+          //     br,
+          //     s"(ply: ${h.ply}, mean: ${h.mean} ms, SD: ${h.sd})"
+          //   )
+          // }
+        )
       )
     )
 
@@ -152,6 +149,7 @@ object bits {
       swissPairingGames
     )
 
+  @annotation.nowarn("msg=unused")
   def roundAppPreload(pov: Pov, controls: Boolean)(implicit ctx: Context) =
     div(cls := s"round__app")(
       div(cls := "round__app__board main-board")(chessground(pov)),

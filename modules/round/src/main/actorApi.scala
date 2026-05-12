@@ -2,10 +2,10 @@ package lila.round
 package actorApi
 
 import scala.concurrent.Promise
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import strategygames.format.Uci
-import strategygames.{ Player => PlayerIndex, Move, MoveMetrics, Pos }
+import strategygames.{ Move, MoveMetrics, Player as PlayerIndex, Pos }
 
 import lila.common.IpAddress
 import lila.game.Game.PlayerId

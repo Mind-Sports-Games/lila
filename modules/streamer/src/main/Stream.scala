@@ -1,6 +1,6 @@
 package lila.streamer
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import org.joda.time.DateTime
 
 import lila.user.User
@@ -16,7 +16,7 @@ trait Stream {
   def twitch                       = serviceName == "twitch"
   def youTube                      = serviceName == "youTube"
 
-  lazy val cleanStatus = removeMultibyteSymbols(status).trim
+  lazy val cleanStatus  = removeMultibyteSymbols(status).trim
   lazy val lang: String = cleanStatus match {
     case Stream.LangRegex(code) => code.toLowerCase
     case _                      => "en"

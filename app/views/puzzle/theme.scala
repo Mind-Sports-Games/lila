@@ -1,14 +1,11 @@
 package views
 package html.puzzle
 
-import controllers.routes
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-import lila.puzzle.{ Puzzle, PuzzleTheme }
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
+import lila.puzzle.PuzzleTheme
 import strategygames.variant.Variant
-import lila.i18n.{ VariantKeys }
 
 object theme {
 
@@ -53,13 +50,14 @@ object theme {
                         )
                       }
                     },
-                    cat.key == "puzzle:origin" option
+                    (cat.key == "puzzle:origin").option(
                       a(cls := "puzzle-themes__link", href := routes.Puzzle.ofPlayer(variant.key))(
                         span(
                           h3("Player games"),
                           span("Lookup puzzles generated from your games, or from another player's games.")
                         )
                       )
+                    )
                   )
                 )
               }

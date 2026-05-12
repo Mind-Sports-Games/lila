@@ -1,7 +1,5 @@
 package lila.round
 
-import scala.concurrent.duration._
-
 import lila.user.User
 import lila.common.Bus
 
@@ -9,7 +7,7 @@ final class PlayingUsers {
 
   private val playing = new lila.memo.ExpireSetMemo(4 hours)
 
-  def apply(userId: User.ID): Boolean = playing get userId
+  def apply(userId: User.ID): Boolean = playing.get(userId)
 
   Bus.subscribeFun("startGame", "finishGame") {
 

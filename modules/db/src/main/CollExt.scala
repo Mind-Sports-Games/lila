@@ -1,13 +1,12 @@
 package lila.db
 
 import scala.collection.Factory
-import scala.annotation.nowarn
 
-import reactivemongo.api._
-import reactivemongo.api.bson._
-import reactivemongo.api.{ WriteConcern => CWC }
+import reactivemongo.api.*
+import reactivemongo.api.bson.*
+import reactivemongo.api.WriteConcern as CWC
 
-trait CollExt { self: dsl with QueryBuilderExt =>
+trait CollExt { self: dsl & QueryBuilderExt =>
 
   implicit final class ExtendColl(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
@@ -126,7 +125,7 @@ trait CollExt { self: dsl with QueryBuilderExt =>
         }
 
     def primitive[V: BSONReader](selector: Bdoc, sort: Bdoc, nb: Int, field: String): Fu[List[V]] =
-      (nb > 0) ?? coll
+      (nb > 0) so coll
         .find(selector, $doc(field -> true).some)
         .sort(sort)
         .cursor[Bdoc]()
@@ -176,7 +175,7 @@ trait CollExt { self: dsl with QueryBuilderExt =>
       coll
         .update(ordered = false, writeConcern = WriteConcern.Unacknowledged)
         .one(selector, $set(field -> value))
-        .unit
+        .discard
 
     def incField(selector: Bdoc, field: String, value: Int = 1) =
       coll.update.one(selector, $inc(field -> value))
@@ -185,7 +184,7 @@ trait CollExt { self: dsl with QueryBuilderExt =>
       coll
         .update(ordered = false, writeConcern = WriteConcern.Unacknowledged)
         .one(selector, $inc(field -> value))
-        .unit
+        .discard
 
     def unsetField(selector: Bdoc, field: String, multi: Boolean = false) =
       coll.update.one(selector, $unset(field), multi = multi)
@@ -198,63 +197,13 @@ trait CollExt { self: dsl with QueryBuilderExt =>
 
     def fetchUpdate[D: BSONDocumentHandler](selector: Bdoc)(update: D => Bdoc): Funit =
       one[D](selector) flatMap {
-        _ ?? { doc =>
+        _ so { doc =>
           coll.update.one(selector, update(doc)).void
         }
       }
 
-    def aggregateList(
-        maxDocs: Int,
-        readPreference: ReadPreference = ReadPreference.primary,
-        allowDiskUse: Boolean = false
-    )(
-        f: coll.AggregationFramework => (coll.PipelineOperator, List[coll.PipelineOperator])
-    )(implicit cp: CursorProducer[Bdoc]): Fu[List[Bdoc]] =
-      coll
-        .aggregateWith[Bdoc](
-          allowDiskUse = allowDiskUse,
-          readPreference = readPreference
-        )(agg => {
-          val nonEmpty = f(agg)
-          nonEmpty._1 +: nonEmpty._2
-        })
-        .collect[List](maxDocs = maxDocs)
 
-    def aggregateOne(
-        readPreference: ReadPreference = ReadPreference.primary,
-        allowDiskUse: Boolean = false
-    )(
-        f: coll.AggregationFramework => (coll.PipelineOperator, List[coll.PipelineOperator])
-    )(implicit cp: CursorProducer[Bdoc]): Fu[Option[Bdoc]] =
-      coll
-        .aggregateWith[Bdoc](
-          allowDiskUse = allowDiskUse,
-          readPreference = readPreference
-        )(agg => {
-          val nonEmpty = f(agg)
-          nonEmpty._1 +: nonEmpty._2
-        })
-        .collect[List](maxDocs = 1)
-        .dmap(_.headOption) // .one[Bdoc] ?
-
-    def aggregateExists(
-        readPreference: ReadPreference = ReadPreference.primary,
-        allowDiskUse: Boolean = false
-    )(
-        f: coll.AggregationFramework => (coll.PipelineOperator, List[coll.PipelineOperator])
-    )(implicit cp: CursorProducer[Bdoc]): Fu[Boolean] =
-      coll
-        .aggregateWith[Bdoc](
-          allowDiskUse = allowDiskUse,
-          readPreference = readPreference
-        )(agg => {
-          val nonEmpty = f(agg)
-          nonEmpty._1 +: nonEmpty._2
-        })
-        .headOption
-        .dmap(_.isDefined)
-
-    def distinctEasy[T, M[_] <: Iterable[_]](
+    def distinctEasy[T, M[_] <: Iterable[?]](
         key: String,
         selector: coll.pack.Document,
         readPreference: ReadPreference = ReadPreference.primary
@@ -271,7 +220,7 @@ trait CollExt { self: dsl with QueryBuilderExt =>
         upsert: Boolean = false,
         sort: Option[coll.pack.Document] = None,
         fields: Option[coll.pack.Document] = None,
-        @nowarn writeConcern: CWC = CWC.Acknowledged
+        writeConcern: CWC = CWC.Acknowledged
     ): Fu[Option[D]] =
       coll.findAndUpdate(
         selector = selector,
@@ -293,7 +242,7 @@ trait CollExt { self: dsl with QueryBuilderExt =>
         selector: coll.pack.Document,
         sort: Option[coll.pack.Document] = None,
         fields: Option[coll.pack.Document] = None,
-        @nowarn writeConcern: CWC = CWC.Acknowledged
+        writeConcern: CWC = CWC.Acknowledged
     ): Fu[Option[D]] =
       coll.findAndRemove(
         selector = selector,

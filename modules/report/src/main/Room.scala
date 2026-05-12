@@ -12,17 +12,17 @@ sealed trait Room {
 
 object Room {
 
-  case object Cheat extends Room
-  case object Boost extends Room
-  case object Print extends Room
-  case object Comm  extends Room
-  case object Other extends Room
+  case object Cheat  extends Room
+  case object Boost  extends Room
+  case object Print  extends Room
+  case object Comm   extends Room
+  case object Other  extends Room
   case object Xfiles extends Room {
     override def name = "X-Files"
   }
 
   val all: List[Room] = List(Cheat, Boost, Print, Comm, Other, Xfiles)
-  val byKey = all map { v =>
+  val byKey           = all map { v =>
     (v.key, v)
   } toMap
 
@@ -54,7 +54,7 @@ object Room {
     }
 
   case class Scores(value: Map[Room, Int]) {
-    def get     = value.get _
+    def get     = value.get
     def highest = ~value.values.maxOption
   }
 

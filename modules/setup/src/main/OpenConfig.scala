@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, Speed }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.variant.{ FromPosition, Standard }

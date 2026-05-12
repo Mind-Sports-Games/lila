@@ -1,13 +1,11 @@
 package views.html.mod
 
 import controllers.GameMod
-import scala.util.chaining._
-import controllers.routes
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.evaluation.PlayerAssessment
 import lila.game.Pov
 import lila.user.User
@@ -81,8 +79,8 @@ object games {
               tr(
                 sortNoneTh(
                   input(
-                    tpe := "checkbox",
-                    name := s"game[]",
+                    tpe      := "checkbox",
+                    name     := s"game[]",
                     st.value := "all"
                   )
                 ),
@@ -101,10 +99,12 @@ object games {
               games.map { case (pov, assessment) =>
                 tr(
                   td(cls := pov.game.analysable.option("input"))(
-                    pov.game.analysable option input(
-                      tpe := "checkbox",
-                      name := s"game[]",
-                      st.value := pov.gameId
+                    pov.game.analysable.option(
+                      input(
+                        tpe      := "checkbox",
+                        name     := s"game[]",
+                        st.value := pov.gameId
+                      )
                     )
                   ),
                   td(dataSort := ~pov.opponent.rating)(
@@ -124,15 +124,15 @@ object games {
                     pov.game.tournamentId map { tourId =>
                       a(
                         dataIcon := "g",
-                        href := routes.Tournament.show(tourId).url,
-                        title := tournamentIdToName(tourId)
+                        href     := routes.Tournament.show(tourId).url,
+                        title    := tournamentIdToName(tourId)
                       )
                     },
                     pov.game.swissId map { swissId =>
                       a(
                         dataIcon := "g",
-                        href := routes.Swiss.show(swissId).url,
-                        title := s"Swiss #${swissId}"
+                        href     := routes.Swiss.show(swissId).url,
+                        title    := s"Swiss #${swissId}"
                       )
                     }
                   ),
@@ -157,7 +157,7 @@ object games {
                     frag(
                       td(dataSort := basics.plyTimes.avg)(
                         s"${basics.plyTimes / 10}",
-                        basics.mtStreak ?? frag(br, "streak")
+                        basics.mtStreak so frag(br, "streak")
                       ),
                       td(dataSort := basics.blurs)(
                         s"${basics.blurs}%",

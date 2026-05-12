@@ -1,12 +1,16 @@
 package lila.swiss
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import akka.util.ByteString
 import java.io.File
 import scala.concurrent.blocking
-import scala.sys.process._
+import scala.sys.process.*
 
-final private class PairingSystem(trf: SwissTrf, rankingApi: SwissRankingApi, executable: String)(implicit
+final private class PairingSystem(
+    trf: SwissTrf,
+    @annotation.nowarn("msg=unused") _rankingApi: SwissRankingApi,
+    executable: String
+)(implicit
     ec: scala.concurrent.ExecutionContext,
     mat: akka.stream.Materializer
 ) {
@@ -18,7 +22,7 @@ final private class PairingSystem(trf: SwissTrf, rankingApi: SwissRankingApi, ex
       }
     }
 
-  private def invoke(swiss: Swiss, input: Source[String, _]): Fu[List[String]] =
+  private def invoke(swiss: Swiss, input: Source[String, ?]): Fu[List[String]] =
     withTempFile(swiss, input) { file =>
       val flavour =
         if (swiss.nbPlayers < 250) "dutch"
@@ -27,14 +31,19 @@ final private class PairingSystem(trf: SwissTrf, rankingApi: SwissRankingApi, ex
       val command = s"$executable --$flavour $file -p"
       val stdout  = new collection.mutable.ListBuffer[String]
       val stderr  = new StringBuilder
-      val status = lila.common.Chronometer.syncMon(_.swiss.bbpairing) {
+      val status  = lila.common.Chronometer.syncMon(_.swiss.bbpairing) {
         blocking {
-          command ! ProcessLogger(stdout append _, stderr append _ unit)
+          command ! ProcessLogger(
+            stdout append _,
+            { (s: String) =>
+              val _ = stderr append s
+            }
+          )
         }
       }
       if (status != 0) {
         val error = stderr.toString
-        if (error contains "No valid pairing exists") Nil
+        if (error.contains("No valid pairing exists")) Nil
         else throw PairingSystem.BBPairingException(error, swiss)
       } else stdout.toList
     }
@@ -56,7 +65,7 @@ final private class PairingSystem(trf: SwissTrf, rankingApi: SwissRankingApi, ex
       }
       .flatten
 
-  def withTempFile[A](swiss: Swiss, contents: Source[String, _])(f: File => A): Fu[A] = {
+  def withTempFile[A](swiss: Swiss, contents: Source[String, ?])(f: File => A): Fu[A] = {
     // NOTE: The prefix and suffix must be at least 3 characters long,
     // otherwise this function throws an IllegalArgumentException.
     val file = File.createTempFile(s"lila-swiss-${swiss.id}-${swiss.round}-", s"-bbp")

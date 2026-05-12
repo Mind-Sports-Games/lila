@@ -1,6 +1,6 @@
 package lila.importer
 
-import strategygames.chess._
+import strategygames.chess.*
 
 private object Chess960 {
 

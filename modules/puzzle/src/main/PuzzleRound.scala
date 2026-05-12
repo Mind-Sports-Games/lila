@@ -25,7 +25,7 @@ case class PuzzleRound(
         vote match {
           case None                      => themes.filter(_.theme != theme).some
           case Some(v) if v == prev.vote => none
-          case Some(v) =>
+          case Some(v)                   =>
             themes.map {
               case t if t.theme == theme => t.copy(vote = v)
               case t                     => t
@@ -33,7 +33,7 @@ case class PuzzleRound(
         }
     }
 
-  def nonEmptyThemes = themes.nonEmpty option themes
+  def nonEmptyThemes = themes.nonEmpty.option(themes)
 
   def updateWithWin(win: Boolean) = copy(
     win = win,
@@ -71,13 +71,13 @@ object PuzzleRound {
     val theme   = "h"
   }
 
-  import lila.db.dsl._
+  import lila.db.dsl.*
   def puzzleLookup(colls: PuzzleColls, pipeline: List[Bdoc] = Nil) =
     $doc(
       "$lookup" -> $doc(
         "from" -> colls.puzzle.name.value,
         "as"   -> "puzzle",
-        "let" -> $doc(
+        "let"  -> $doc(
           "pid" -> $doc("$arrayElemAt" -> $arr($doc("$split" -> $arr("$_id", ":")), 1))
         ),
         "pipeline" -> {

@@ -1,14 +1,14 @@
 package lila.clas
 
-import lila.db.dsl._
-import reactivemongo.api.bson._
+import lila.db.dsl.*
+import reactivemongo.api.bson.*
 
 private[clas] object BsonHandlers {
 
   import Clas.Recorded
   implicit val recordedBSONHandler: BSONDocumentHandler[Recorded] = Macros.handler[Recorded]
 
-  implicit val clasIdBSONHandler: BSONHandler[Clas.Id]    = stringAnyValHandler[Clas.Id](_.value, Clas.Id.apply)
+  implicit val clasIdBSONHandler: BSONHandler[Clas.Id] = stringAnyValHandler[Clas.Id](_.value, Clas.Id.apply)
   implicit val clasBSONHandler: BSONDocumentHandler[Clas] = Macros.handler[Clas]
 
   implicit val studentIdBSONHandler: BSONHandler[Student.Id] =

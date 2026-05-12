@@ -1,12 +1,14 @@
 package views.html
 package coach
 
+/*
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.i18n.LangList
 
 import controllers.routes
+*/
 
 object widget {
   /*

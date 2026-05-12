@@ -1,10 +1,8 @@
 package views.html.account
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
-import controllers.routes
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object layout {
 
@@ -21,51 +19,55 @@ object layout {
     ) {
       def activeCls(c: String) = cls := active.activeO(c)
       main(cls := "account page-menu")(
-        ctx.me.exists(_.enabled) option st.nav(cls := "page-menu__menu subnav")(
-          lila.pref.PrefCateg.all.map { categ =>
-            a(activeCls(categ.slug), href := routes.Pref.form(categ.slug))(
-              bits.categName(categ)
-            )
-          },
-          a(activeCls("kid"), href := routes.Account.kid)(
-            trans.kidMode()
-          ),
-          div(cls := "sep"),
-          a(activeCls("editProfile"), href := routes.Account.profile)(
-            trans.editProfile()
-          ),
-          /*isGranted(_.Coach) option a(activeCls("coach"), href := routes.Coach.edit)(
+        ctx.me
+          .exists(_.enabled)
+          .option(
+            st.nav(cls := "page-menu__menu subnav")(
+              lila.pref.PrefCateg.all.map { categ =>
+                a(activeCls(categ.slug), href := routes.Pref.form(categ.slug))(
+                  bits.categName(categ)
+                )
+              },
+              a(activeCls("kid"), href := routes.Account.kid)(
+                trans.kidMode()
+              ),
+              div(cls := "sep"),
+              a(activeCls("editProfile"), href := routes.Account.profile)(
+                trans.editProfile()
+              ),
+              /*isGranted(_.Coach) option a(activeCls("coach"), href := routes.Coach.edit)(
             trans.coach.playstrategyCoach()
           ),*/
-          div(cls := "sep"),
-          a(activeCls("password"), href := routes.Account.passwd)(
-            trans.changePassword()
+              div(cls := "sep"),
+              a(activeCls("password"), href := routes.Account.passwd)(
+                trans.changePassword()
+              ),
+              a(activeCls("email"), href := routes.Account.email)(
+                trans.changeEmail()
+              ),
+              a(activeCls("username"), href := routes.Account.username)(
+                trans.changeUsername()
+              ),
+              a(activeCls("twofactor"), href := routes.Account.twoFactor)(
+                trans.tfa.twoFactorAuth()
+              ),
+              a(activeCls("security"), href := routes.Account.security)(
+                trans.security()
+              ),
+              div(cls := "sep"),
+              a(href := routes.Plan.index)(trans.patron.playstrategyPatron()),
+              div(cls := "sep"),
+              a(activeCls("oauth.token"), href := routes.OAuthToken.index)(
+                "API Access tokens"
+              ),
+              // ctx.noBot option a(activeCls("oauth.app"), href := routes.OAuthApp.index)("OAuth Apps"),
+              ctx.noBot.option(a(href := routes.DgtCtrl.index)("DGT board")),
+              div(cls := "sep"),
+              a(activeCls("close"), href := routes.Account.close)(
+                trans.settings.closeAccount()
+              )
+            )
           ),
-          a(activeCls("email"), href := routes.Account.email)(
-            trans.changeEmail()
-          ),
-          a(activeCls("username"), href := routes.Account.username)(
-            trans.changeUsername()
-          ),
-          a(activeCls("twofactor"), href := routes.Account.twoFactor)(
-            trans.tfa.twoFactorAuth()
-          ),
-          a(activeCls("security"), href := routes.Account.security)(
-            trans.security()
-          ),
-          div(cls := "sep"),
-          a(href := routes.Plan.index)(trans.patron.playstrategyPatron()),
-          div(cls := "sep"),
-          a(activeCls("oauth.token"), href := routes.OAuthToken.index)(
-            "API Access tokens"
-          ),
-          // ctx.noBot option a(activeCls("oauth.app"), href := routes.OAuthApp.index)("OAuth Apps"),
-          ctx.noBot option a(href := routes.DgtCtrl.index)("DGT board"),
-          div(cls := "sep"),
-          a(activeCls("close"), href := routes.Account.close)(
-            trans.settings.closeAccount()
-          )
-        ),
         div(cls := "page-menu__content")(body)
       )
     }

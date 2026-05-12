@@ -2,7 +2,7 @@ package lila.team
 
 import lila.user.LightUserApi
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 final class JsonView(lightUserApi: LightUserApi) {
 

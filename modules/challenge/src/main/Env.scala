@@ -1,10 +1,9 @@
 package lila.challenge
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import play.api.Configuration
-import scala.concurrent.duration._
 
-import lila.common.config._
+import lila.common.config.*
 import lila.socket.Socket.{ GetVersion, SocketVersion }
 
 @Module
@@ -36,7 +35,7 @@ final class Env(
   private val colls = wire[ChallengeColls]
 
   def version(challengeId: Challenge.ID): Fu[SocketVersion] =
-    socket.rooms.ask[SocketVersion](challengeId)(GetVersion)
+    socket.rooms.ask[SocketVersion](challengeId)(GetVersion.apply)
 
   private lazy val joiner = wire[ChallengeJoiner]
 
@@ -59,11 +58,11 @@ final class Env(
   val forms = new ChallengeForm
 
   system.scheduler.scheduleWithFixedDelay(10 seconds, 3343 millis) { () =>
-    api.sweep.unit
+    api.sweep.discard
   }
 
   system.scheduler.scheduleWithFixedDelay(20 seconds, 2897 millis) { () =>
-    bulk.tick.unit
+    bulk.tick.discard
   }
 }
 

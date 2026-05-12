@@ -1,6 +1,6 @@
 package lila.playban
 
-import strategygames.{ Player => PlayerIndex, Speed }
+import strategygames.{ Player as PlayerIndex, Speed }
 import scala.math.{ log10, sqrt }
 
 import lila.game.Game
@@ -12,7 +12,7 @@ case class RageSit(counter: Int) extends AnyVal {
 
   def goneWeight: Float =
     if (!isBad) 1f
-    else (1 - 0.7 * sqrt(log10(-(counter / 10) - 3))).toFloat atLeast 0.1f
+    else (1 - 0.7 * sqrt(log10(-(counter / 10) - 3))).toFloat.atLeast(0.1f)
 
   def counterView = counter / 10
 }

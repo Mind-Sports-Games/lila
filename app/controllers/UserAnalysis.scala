@@ -3,14 +3,13 @@ package controllers
 import strategygames.format.Forsyth.SituationPlus
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.Variant
-import strategygames.{ P2, Player => PlayerIndex, GameLogic, Mode, Situation, P1 }
+import strategygames.{ GameLogic, Mode, P1, P2, Player as PlayerIndex, Situation }
 import play.api.libs.json.Json
-import play.api.mvc._
-import scala.concurrent.duration._
-import views._
+import play.api.mvc.*
+import views.*
 
 import lila.api.Context
-import lila.app._
+import lila.app.*
 import lila.game.Pov
 import lila.round.Forecast.{ forecastJsonWriter, forecastStepJsonFormat }
 import lila.round.JsonView.WithFlags
@@ -25,7 +24,7 @@ final class UserAnalysis(
 
   def parseArg(arg: String) =
     arg.split("/", 2) match {
-      case Array(key) => load("", Variant.orDefault(key))
+      case Array(key)      => load("", Variant.orDefault(key))
       case Array(key, fen) =>
         Variant.byKey get key match {
           case Some(variant) => load(fen, variant)
@@ -58,12 +57,12 @@ final class UserAnalysis(
 
   private[controllers] def makePov(fen: Option[FEN], variant: Variant): Pov =
     makePov {
-      fen.filter(_.value.nonEmpty)
-      .map(s => FEN.clean(variant.gameLogic, s.value))
-      .flatMap {
-        f => Forsyth.<<<@(variant.gameLogic, variant, f)
-      } | Forsyth.<<<@(variant.gameLogic, variant, variant.initialFen)
-          .getOrElse(SituationPlus(Situation(variant.gameLogic, variant), 1))
+      fen
+        .filter(_.value.nonEmpty)
+        .map(s => FEN.clean(variant.gameLogic, s.value))
+        .flatMap { f =>
+          Forsyth.<<<@(variant.gameLogic, variant, f)
+        } | SituationPlus(Situation(variant.gameLogic, variant), 1)
     }
 
   private[controllers] def makePov(from: SituationPlus): Pov =
@@ -88,8 +87,8 @@ final class UserAnalysis(
 
   def game(id: String, playerIndex: String) =
     Open { implicit ctx =>
-      OptionFuResult(env.game.gameRepo game id) { g =>
-        env.round.proxyRepo upgradeIfPresent g flatMap { game =>
+      OptionFuResult(env.game.gameRepo.game(id)) { g =>
+        env.round.proxyRepo.upgradeIfPresent(g) flatMap { game =>
           val pov = Pov(game, PlayerIndex.fromName(playerIndex) | P1)
           negotiate(
             html =
@@ -97,8 +96,8 @@ final class UserAnalysis(
               else {
                 val owner = isMyPov(pov)
                 for {
-                  initialFen <- env.game.gameRepo initialFen game.id
-                  data <-
+                  initialFen <- env.game.gameRepo.initialFen(game.id)
+                  data       <-
                     env.api.roundApi
                       .userAnalysisJson(
                         pov,
@@ -129,10 +128,10 @@ final class UserAnalysis(
   private def mobileAnalysis(pov: Pov, apiVersion: lila.common.ApiVersion)(implicit
       ctx: Context
   ): Fu[Result] =
-    env.game.gameRepo initialFen pov.gameId flatMap { initialFen =>
+    env.game.gameRepo.initialFen(pov.gameId) flatMap { initialFen =>
       val owner = isMyPov(pov)
       gameC.preloadUsers(pov.game) zip
-        (env.analyse.analyser get pov.game) zip
+        (env.analyse.analyser.get(pov.game)) zip
         env.game.crosstableApi(pov.game) flatMap { case ((_, analysis), crosstable) =>
           import lila.game.JsonView.crosstableWrites
           env.api.roundApi.review(
@@ -180,7 +179,7 @@ final class UserAnalysis(
   def forecasts(fullId: String) =
     AuthBody(parse.json) { implicit ctx => _ =>
       import lila.round.Forecast
-      OptionFuResult(env.round.proxyRepo pov fullId) { pov =>
+      OptionFuResult(env.round.proxyRepo.pov(fullId)) { pov =>
         if (isTheft(pov)) fuccess(theftResponse)
         else
           ctx.body.body
@@ -201,7 +200,7 @@ final class UserAnalysis(
   def forecastsOnMyTurn(fullId: String, uci: String) =
     AuthBody(parse.json) { implicit ctx => _ =>
       import lila.round.Forecast
-      OptionFuResult(env.round.proxyRepo pov fullId) { pov =>
+      OptionFuResult(env.round.proxyRepo.pov(fullId)) { pov =>
         if (isTheft(pov)) fuccess(theftResponse)
         else
           ctx.body.body
@@ -209,9 +208,9 @@ final class UserAnalysis(
             .fold(
               err => BadRequest(err.toString).fuccess,
               forecasts => {
-                val wait = 50 + (Forecast maxPlies forecasts min 10) * 50
+                val wait = 50 + (Forecast.maxPlies(forecasts) min 10) * 50
                 env.round.forecastApi.playAndSave(pov, uci, forecasts) >>
-                  lila.common.Future.sleep(wait.millis) inject
+                  lila.common.LilaFuture.sleep(wait.millis) inject
                   Ok(Json.obj("reload" -> true))
               }
             )

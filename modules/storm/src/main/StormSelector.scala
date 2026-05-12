@@ -1,9 +1,9 @@
 package lila.storm
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
-import lila.db.dsl._
+import lila.common.extensions.*
+import lila.db.dsl.*
 import lila.memo.CacheApi
 import lila.puzzle.PuzzleColls
 
@@ -13,7 +13,7 @@ import lila.puzzle.PuzzleColls
  */
 final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: ExecutionContext) {
 
-  import StormBsonHandlers._
+  import StormBsonHandlers.*
 
   def apply: Fu[List[StormPuzzle]] = current.get {}
 
@@ -48,8 +48,8 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
       .buildAsyncFuture { _ =>
         colls
           .path {
-            _.aggregateList(poolSize) { framework =>
-              import framework._
+            _.aggregateList(maxDocs = poolSize) { framework =>
+              import framework.*
               val fenPlayerIndexRegex = $doc(
                 "$regexMatch" -> $doc(
                   "input" -> "$fen",
@@ -61,8 +61,8 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
                   rating.toString -> List(
                     Match(
                       $doc(
-                        "min" $lte f"${theme}_${tier}_${rating}%04d",
-                        "max" $gte f"${theme}_${tier}_${rating}%04d"
+                        "min".$lte(f"${theme}_${tier}_${rating}%04d"),
+                        "max".$gte(f"${theme}_${tier}_${rating}%04d")
                       )
                     ),
                     Sample(1),
@@ -73,9 +73,9 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
                     PipelineOperator(
                       $doc(
                         "$lookup" -> $doc(
-                          "from" -> colls.puzzle.name.value,
-                          "as"   -> "puzzle",
-                          "let"  -> $doc("id" -> "$ids"),
+                          "from"     -> colls.puzzle.name.value,
+                          "as"       -> "puzzle",
+                          "let"      -> $doc("id" -> "$ids"),
                           "pipeline" -> $arr(
                             $doc(
                               "$match" -> $doc(
@@ -110,9 +110,10 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
                 ReplaceRootField("all"),
                 Sort(Ascending("rating"))
               )
-            }.map {
-              _.flatMap(StormPuzzleBSONReader.readOpt)
             }
+              .map {
+                _.flatMap(StormPuzzleBSONReader.readOpt)
+              }
           }
           .mon(_.storm.selector.time)
           .addEffect { puzzles =>
@@ -124,12 +125,11 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
   private def monitor(puzzles: Vector[StormPuzzle], poolSize: Int): Unit = {
     val nb = puzzles.size
     lila.mon.storm.selector.count.record(nb)
-    if (nb < poolSize * 0.9)
-      logger.warn(s"Selector wanted $poolSize puzzles, only got $nb")
+    if (nb < poolSize * 0.9) logger.warn(s"Selector wanted $poolSize puzzles, only got $nb")
     if (nb > 1) {
       val rest = puzzles.toVector drop 1
       lila.common.Maths.mean(rest.map(_.rating)) foreach { r =>
-        lila.mon.storm.selector.rating.record(r.toInt).unit
+        val _ = lila.mon.storm.selector.rating.record(r.toInt)
       }
       (0 to poolSize by 10) foreach { i =>
         val slice = rest drop i take 10

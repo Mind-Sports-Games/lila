@@ -1,5 +1,6 @@
 package views.html.relay
 
+/*
 import controllers.routes
 import play.api.data.Form
 
@@ -8,6 +9,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.relay.RelayTourForm.Data
 import lila.relay.{ RelayRound, RelayTour }
+*/
 
 object tourForm {
   /*

@@ -1,5 +1,6 @@
 package views.html.relay
 
+/*
 import play.api.mvc.Call
 
 import lila.api.Context
@@ -9,6 +10,7 @@ import lila.common.paginator.Paginator
 
 import controllers.routes
 import lila.relay.{ RelayRound, RelayTour }
+*/
 
 object tour {
   /*

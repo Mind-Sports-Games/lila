@@ -2,7 +2,7 @@ package controllers
 
 import play.api.libs.json.Json
 
-import lila.app._
+import lila.app.*
 import lila.setup.SetupBulk
 
 final class BulkPairing(env: Env) extends LilaController(env) {
@@ -32,7 +32,7 @@ final class BulkPairing(env: Env) extends LilaController(env) {
 
   def create =
     ScopedBody(_.Challenge.Bulk) { implicit req => me =>
-      implicit val lang = reqLang
+      implicit val lang: play.api.i18n.Lang = reqLang
       import lila.setup.SetupBulk
       lila.setup.SetupBulk.form
         .bindFromRequest()
@@ -46,7 +46,7 @@ final class BulkPairing(env: Env) extends LilaController(env) {
                 ).fuccess
               case Left(SetupBulk.BadTokens(tokens)) =>
                 import lila.setup.SetupBulk.BadToken
-                import play.api.libs.json._
+                import play.api.libs.json.*
                 BadRequest(
                   Json.obj(
                     "tokens" -> JsObject {
@@ -61,7 +61,7 @@ final class BulkPairing(env: Env) extends LilaController(env) {
               case Right(bulk) =>
                 env.challenge.bulk.schedule(bulk) map {
                   case Left(error) => BadRequest(jsonError(error))
-                  case Right(bulk) => JsonOk(SetupBulk toJson bulk)
+                  case Right(bulk) => JsonOk(SetupBulk.toJson(bulk))
                 }
             }
         )

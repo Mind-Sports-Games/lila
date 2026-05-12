@@ -1,10 +1,8 @@
 package views.html.lobby
 
-import controllers.routes
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import strategygames.variant.Variant
 import strategygames.GameGroup
 import lila.i18n.VariantKeys
@@ -22,7 +20,7 @@ object bits {
   def underboards(
       tours: List[lila.tournament.Tournament],
       simuls: List[lila.simul.Simul],
-      leaderboard: List[lila.user.User.LightPerf],
+      @annotation.nowarn("msg=unused") leaderboard: List[lila.user.User.LightPerf],
       tournamentWinners: List[lila.tournament.Winner]
   )(implicit ctx: Context) =
     frag(
@@ -79,13 +77,15 @@ object bits {
             .enterable(truncateTournamentList(tours, maxUnderboardRows))
         )
       ),
-      simuls.nonEmpty option div(cls := "lobby__simuls lobby__box")(
-        a(cls := "lobby__box__top", href := routes.Simul.home)(
-          h2(cls := "title text", dataIcon := "f")(trans.simultaneousExhibitions()),
-          span(cls := "more")(trans.more(), " »")
-        ),
-        div(cls := "enterable_list lobby__box__content")(
-          views.html.simul.bits.allCreated(simuls)
+      simuls.nonEmpty.option(
+        div(cls := "lobby__simuls lobby__box")(
+          a(cls := "lobby__box__top", href := routes.Simul.home)(
+            h2(cls := "title text", dataIcon := "f")(trans.simultaneousExhibitions()),
+            span(cls := "more")(trans.more(), " »")
+          ),
+          div(cls := "enterable_list lobby__box__content")(
+            views.html.simul.bits.allCreated(simuls)
+          )
         )
       )
     )
@@ -100,26 +100,27 @@ object bits {
   }
 
   def lastPosts(posts: List[lila.blog.MiniPost])(implicit ctx: Context): Option[Frag] =
-    posts.nonEmpty option
+    posts.nonEmpty.option(
       div(cls := "lobby__blog blog-post-cards")(
         posts map { post =>
           a(cls := "blog-post-card blog-post-card--link", href := routes.Blog.show(post.id, post.slug))(
             div(cls := "blog-post-card__container")(
               img(
-                src := post.image,
-                cls := "blog-post-card__image",
-                widthA := 400,
-                heightA := 400 * 10 / 16,
+                src             := post.image,
+                cls             := "blog-post-card__image",
+                widthA          := 400,
+                heightA         := 400 * 10 / 16,
                 attr("loading") := "lazy"
               ),
               span(cls := "blog-post-card__content")(
                 h2(cls := "blog-post-card__title")(post.title),
-                semanticDate(post.date)(ctx.lang)(cls := "blog-post-card__over-image")
+                semanticDate(post.date)(using ctx.lang)(cls := "blog-post-card__over-image")
               )
             )
           )
         }
       )
+    )
 
   def playbanInfo(ban: lila.playban.TempBan)(implicit ctx: Context) =
     nopeInfo(
@@ -185,10 +186,10 @@ object bits {
     div(
       a(
         href := (if (e.isNow || !e.countdown) e.url else routes.Event.show(e.id).url),
-        cls := List(
+        cls  := List(
           s"tour-spotlight event-spotlight id_${e.id} ${ctx.currentSelectedColor}" -> true,
           "invert"                                                                 -> e.isNowOrSoon,
-          "highlighted"                                                            -> (e.isNow || !e.countdown)
+          "highlighted" -> (e.isNow || !e.countdown)
         )
       )(
         if (e.isNow || !e.countdown) span(cls := "ribbon")(span("live")),

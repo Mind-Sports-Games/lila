@@ -1,21 +1,24 @@
 package lila.base
 
 import akka.actor.Scheduler
-import ornicar.scalalib.Zero
+import alleycats.Zero
 import scala.collection.BuildFrom
-import scala.concurrent.duration._
-import scala.concurrent.{ ExecutionContext => EC, Future, Await }
+import scala.concurrent.duration.*
+import scala.concurrent.{ Await, ExecutionContext as EC, Future }
 import scala.util.Try
 
 import lila.common.Chronometer
-import LilaTypes._
+import lila.core.lilaism.Lilaism.{ fuFalse, fuTrue, fuccess, fufail, Fu }
+import lila.core.lilaism.{ LilaException, LilaTimeout }
 
 final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal {
 
-  @inline def dmap[B](f: A => B): Fu[B]       = fua.map(f)(EC.parasitic)
-  @inline def dforeach[B](f: A => Unit): Unit = fua.foreach(f)(EC.parasitic)
+  @inline def dmap[B](f: A => B): Fu[B]       = fua.map(f)(using EC.parasitic)
+  @inline def dforeach[B](f: A => Unit): Unit = fua.foreach(f)(using EC.parasitic)
 
-  def >>-(sideEffect: => Unit)(implicit ec: EC): Fu[A] =
+
+  // this was previous >>- in scala2 days
+  def andDo(sideEffect: => Unit)(implicit ec: EC): Fu[A] =
     fua andThen { case _ =>
       sideEffect
     }
@@ -37,13 +40,12 @@ final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal {
 
   def injectAnyway[B](b: => B)(implicit ec: EC): Fu[B] = fold(_ => b, _ => b)
 
-  def effectFold(fail: Exception => Unit, succ: A => Unit)(implicit ec: EC): Unit = {
+  def effectFold(fail: Exception => Unit, succ: A => Unit)(implicit ec: EC): Unit =
     fua onComplete {
       case scala.util.Failure(e: Exception) => fail(e)
       case scala.util.Failure(e)            => throw e // Throwables
       case scala.util.Success(e)            => succ(e)
     }
-  }
 
   def fold[B](fail: Exception => B, succ: A => B)(implicit ec: EC): Fu[B] =
     fua map succ recover { case e: Exception => fail(e) }
@@ -58,9 +60,7 @@ final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal {
   def logFailure(logger: => lila.log.Logger)(implicit ec: EC): Fu[A] = logFailure(logger, _.toString)
 
   def addFailureEffect(effect: Throwable => Unit)(implicit ec: EC) = {
-    fua.failed.foreach { e: Throwable =>
-      effect(e)
-    }
+    fua.failed.foreach(effect)
     fua
   }
 
@@ -122,9 +122,9 @@ final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal {
     }
 
   def awaitOrElse(duration: FiniteDuration, name: String, default: => A): A =
-    try {
+    try
       await(duration, name)
-    } catch {
+    catch {
       case _: Exception => default
     }
 
@@ -134,25 +134,23 @@ final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal {
   def withTimeout(
       duration: FiniteDuration,
       error: => Throwable
-  )(implicit ec: EC, scheduler: Scheduler): Fu[A] = {
+  )(implicit ec: EC, scheduler: Scheduler): Fu[A] =
     Future firstCompletedOf Seq(
       fua,
       akka.pattern.after(duration, scheduler)(Future failed error)
     )
-  }
 
   def withTimeoutDefault(
       duration: FiniteDuration,
       default: => A
-  )(implicit ec: EC, scheduler: Scheduler): Fu[A] = {
+  )(implicit ec: EC, scheduler: Scheduler): Fu[A] =
     Future firstCompletedOf Seq(
       fua,
       akka.pattern.after(duration, scheduler)(Future(default))
     )
-  }
 
   def delay(duration: FiniteDuration)(implicit ec: EC, scheduler: Scheduler) =
-    lila.common.Future.delay(duration)(fua)
+    lila.common.LilaFuture.delay(duration)(fua)
 
   def chronometer    = Chronometer(fua)
   def chronometerTry = Chronometer.lapTry(fua)
@@ -165,17 +163,17 @@ final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal {
     }.result
   def monValue(path: A => lila.mon.TimerPath) = chronometer.monValue(path).result
 
-  def logTime(name: String)                               = chronometer pp name
+  def logTime(name: String)                               = chronometer.pp(name)
   def logTimeIfGt(name: String, duration: FiniteDuration) = chronometer.ppIfGt(name, duration)
 
-  def nevermind(implicit z: Zero[A], ec: EC): Fu[A] = nevermind(z.zero)
+  def recoverDefault(implicit z: Zero[A], ec: EC): Fu[A] = recoverDefault(z.zero)
 
-  def nevermind(default: => A)(implicit ec: EC): Fu[A] =
+  def recoverDefault(default: => A)(implicit ec: EC): Fu[A] =
     fua recover {
       case _: LilaException                         => default
       case _: java.util.concurrent.TimeoutException => default
-      case e: Exception =>
-        lila.log("common").warn("Future.nevermind", e)
+      case e: Exception                             =>
+        lila.log("common").warn("Future.recoverDefault", e)
         default
     }
 }
@@ -183,12 +181,12 @@ final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal {
 final class PimpedFutureBoolean(private val fua: Fu[Boolean]) extends AnyVal {
 
   def >>&(fub: => Fu[Boolean]): Fu[Boolean] =
-    fua.flatMap { if (_) fub else fuFalse }(EC.parasitic)
+    fua.flatMap(if (_) fub else fuFalse)(using EC.parasitic)
 
   def >>|(fub: => Fu[Boolean]): Fu[Boolean] =
-    fua.flatMap { if (_) fuTrue else fub }(EC.parasitic)
+    fua.flatMap(if (_) fuTrue else fub)(using EC.parasitic)
 
-  @inline def unary_! = fua.map { !_ }(EC.parasitic)
+  @inline def unary_! = fua.map(!_)(using EC.parasitic)
 }
 
 final class PimpedFutureOption[A](private val fua: Fu[Option[A]]) extends AnyVal {
@@ -213,14 +211,14 @@ final class PimpedFutureOption[A](private val fua: Fu[Option[A]]) extends AnyVal
   def getOrElse(other: => Fu[A])(implicit ec: EC): Fu[A] = fua flatMap { _.fold(other)(fuccess) }
 
   def map2[B](f: A => B)(implicit ec: EC): Fu[Option[B]] = fua.map(_ map f)
-  def dmap2[B](f: A => B): Fu[Option[B]]                 = fua.map(_ map f)(EC.parasitic)
+  def dmap2[B](f: A => B): Fu[Option[B]]                 = fua.map(_ map f)(using EC.parasitic)
 }
 
 // final class PimpedFutureValid[A](private val fua: Fu[Valid[A]]) extends AnyVal {
 
 //   def flatten: Fu[A] = fua.flatMap {
 //     _.fold[Fu[A]](fufail(_), fuccess(_))
-//   }(EC.parasitic)
+//   }(using EC.parasitic)
 // }
 
 final class PimpedIterableFuture[A, M[X] <: IterableOnce[X]](private val t: M[Fu[A]]) extends AnyVal {

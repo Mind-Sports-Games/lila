@@ -1,12 +1,12 @@
 package lila.video
 
 import org.joda.time.DateTime
-import play.api.libs.json._
-import play.api.libs.ws.JsonBodyReadables._
+import play.api.libs.json.*
+import play.api.libs.ws.JsonBodyReadables.*
 import play.api.libs.ws.StandaloneWSClient
 import scala.concurrent.Future
 
-import lila.common.config._
+import lila.common.config.*
 
 final private[video] class Youtube(
     ws: StandaloneWSClient,
@@ -16,14 +16,14 @@ final private[video] class Youtube(
     api: VideoApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import Youtube._
+  import Youtube.*
 
   implicit private val readSnippet: Reads[Snippet]               = Json.reads[Snippet]
   implicit private val readStatistics: Reads[Statistics]         = Json.reads[Statistics]
   implicit private val readContentDetails: Reads[ContentDetails] = Json.reads[ContentDetails]
   implicit private val readEntry: Reads[Entry]                   = Json.reads[Entry]
-  implicit private val readEntries: Reads[Seq[Entry]] =
-    (__ \ "items").read(Reads seq readEntry)
+  implicit private val readEntries: Reads[Seq[Entry]]            =
+    (__ \ "items").read(using Reads.seq(using readEntry))
 
   def updateAll: Funit =
     fetch flatMap { entries =>

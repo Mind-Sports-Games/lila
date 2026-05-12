@@ -3,15 +3,13 @@ package views.html.mod
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.IpAddress
 import lila.security.FingerHash
 import lila.mod.IpRender.RenderIp
 
-import controllers.routes
 import lila.user.User
-import lila.security.Granter
 import lila.user.Holder
 
 object search {
@@ -19,7 +17,7 @@ object search {
   private val email = tag("email")
   private val mark  = tag("marked")
 
-  def apply(mod: Holder, form: Form[_], users: List[User.WithEmails])(implicit ctx: Context) =
+  def apply(mod: Holder, form: Form[?], users: List[User.WithEmails])(implicit ctx: Context) =
     views.html.base.layout(
       title = "Search users",
       moreCss = cssTag("mod.misc")
@@ -33,7 +31,7 @@ object search {
               name := "q",
               autofocus,
               placeholder := "Search by IP, email, or username",
-              value := form("q").value
+              value       := form("q").value
             ),
             form3.select(form("as"), lila.mod.UserSearch.asChoices)
           ),
@@ -105,11 +103,13 @@ object search {
               )(if (blocked) "Banned" else "Ban this IP")
             )
           ),
-          isGranted(_.Admin) option div(cls := "box__pad")(
-            h2("User agents"),
-            ul(uas map { ua =>
-              li(ua)
-            })
+          isGranted(_.Admin).option(
+            div(cls := "box__pad")(
+              h2("User agents"),
+              ul(uas map { ua =>
+                li(ua)
+              })
+            )
           ),
           br,
           br,
@@ -137,40 +137,43 @@ object search {
       )
     }
 
+  @annotation.nowarn("msg=unused")
   private def userTable(mod: Holder, users: List[User.WithEmails])(implicit ctx: Context) =
-    users.nonEmpty option table(cls := "slist slist-pad")(
-      thead(
-        tr(
-          th("User"),
-          th("Games"),
-          th("Marks"),
-          th("Closed"),
-          th("Created"),
-          th("Active")
-        )
-      ),
-      tbody(
-        users.map { case lila.user.User.WithEmails(u, emails) =>
+    users.nonEmpty.option(
+      table(cls := "slist slist-pad")(
+        thead(
           tr(
-            if (isGranted(_.ViewAltUsernames))
-              td(
-                userLink(u, withBestRating = true, params = "?mod"),
-                (isGranted(_.Admin) && isGranted(_.SetEmail)) option
-                  email(emails.list.map(_.value).mkString(", "))
-              )
-            else td,
-            td(u.count.game.localize),
-            td(
-              u.marks.alt option mark("ALT"),
-              u.marks.engine option mark("ENGINE"),
-              u.marks.boost option mark("BOOSTER"),
-              u.marks.troll option mark("SHADOWBAN")
-            ),
-            td(u.disabled option mark("CLOSED")),
-            td(momentFromNow(u.createdAt)),
-            td(u.seenAt.map(momentFromNow(_)))
+            th("User"),
+            th("Games"),
+            th("Marks"),
+            th("Closed"),
+            th("Created"),
+            th("Active")
           )
-        }
+        ),
+        tbody(
+          users.map { case lila.user.User.WithEmails(u, emails) =>
+            tr(
+              if (isGranted(_.ViewAltUsernames))
+                td(
+                  userLink(u, withBestRating = true, params = "?mod"),
+                  (isGranted(_.Admin) && isGranted(_.SetEmail))
+                    .option(email(emails.list.map(_.value).mkString(", ")))
+                )
+              else td,
+              td(u.count.game.localize),
+              td(
+                u.marks.alt.option(mark("ALT")),
+                u.marks.engine.option(mark("ENGINE")),
+                u.marks.boost.option(mark("BOOSTER")),
+                u.marks.troll.option(mark("SHADOWBAN"))
+              ),
+              td(u.disabled.option(mark("CLOSED"))),
+              td(momentFromNow(u.createdAt)),
+              td(u.seenAt.map(momentFromNow(_)))
+            )
+          }
+        )
       )
     )
 }

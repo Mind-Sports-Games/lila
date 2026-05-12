@@ -1,8 +1,8 @@
 package lila.push
 
-import io.methvin.play.autoconfig._
-import play.api.libs.json._
-import play.api.libs.ws.JsonBodyWritables._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
+import play.api.libs.json.*
+import play.api.libs.ws.JsonBodyWritables.*
 import play.api.libs.ws.StandaloneWSClient
 import cats.data.NonEmptyList
 
@@ -17,10 +17,10 @@ final private class WebPush(
 
   def apply(userId: User.ID, data: => PushApi.Data): Funit =
     webSubscriptionApi.getSubscriptions(5)(userId) flatMap { subscriptions =>
-      subscriptions.toNel ?? send(data)
+      subscriptions.toNel so send(data)
     }
 
-  private def send(data: => PushApi.Data)(subscriptions: NonEmptyList[WebSubscription]): Funit = {
+  private def send(data: => PushApi.Data)(subscriptions: NonEmptyList[WebSubscription]): Funit =
     ws.url(config.url)
       .withHttpHeaders("ContentType" -> "application/json")
       .post(
@@ -28,7 +28,7 @@ final private class WebPush(
           "subs" -> JsArray(subscriptions.map { sub =>
             Json.obj(
               "endpoint" -> sub.endpoint,
-              "keys" -> Json.obj(
+              "keys"     -> Json.obj(
                 "p256dh" -> sub.p256dh,
                 "auth"   -> sub.auth
               )
@@ -48,7 +48,6 @@ final private class WebPush(
       case res if res.status == 200 => funit
       case res                      => fufail(s"[push] web: ${res.status} ${res.body}")
     }
-  }
 }
 
 private object WebPush {

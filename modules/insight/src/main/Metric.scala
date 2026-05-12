@@ -1,8 +1,8 @@
 package lila.insight
 
-import scalatags.Text.all._
+import scalatags.Text.all.*
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
 import strategygames.{ GameLogic, Role }
 
@@ -28,15 +28,15 @@ object Metric {
     case object Percent extends DataType
   }
 
-  import DataType._
-  import Position._
-  import InsightEntry.{ BSONFields => F }
+  import DataType.*
+  import Position.*
+  import InsightEntry.BSONFields as F
 
   case object MeanCpl
       extends Metric(
         "acpl",
         "Average centipawn loss",
-        F moves "c",
+        F.moves("c"),
         Move,
         Move,
         Average,
@@ -47,7 +47,7 @@ object Metric {
       extends Metric(
         "cplBucket",
         "Centipawn loss bucket",
-        F moves "c",
+        F.moves("c"),
         Move,
         Move,
         Percent,
@@ -58,7 +58,7 @@ object Metric {
       extends Metric(
         "movetime",
         "Move time",
-        F moves "t",
+        F.moves("t"),
         Move,
         Move,
         Seconds,
@@ -105,7 +105,7 @@ object Metric {
       extends Metric(
         "nbMoves",
         "Moves per game",
-        F moves "r",
+        F.moves("r"),
         Move,
         Game,
         Average,
@@ -116,7 +116,7 @@ object Metric {
       extends Metric(
         "piece",
         "Piece moved",
-        F moves "r",
+        F.moves("r"),
         Move,
         Move,
         Percent,
@@ -127,7 +127,7 @@ object Metric {
       extends Metric(
         "opportunism",
         "Opportunism",
-        F moves "o",
+        F.moves("o"),
         Move,
         Move,
         Percent,
@@ -140,7 +140,7 @@ object Metric {
       extends Metric(
         "luck",
         "Luck",
-        F moves "l",
+        F.moves("l"),
         Move,
         Move,
         Percent,
@@ -153,7 +153,7 @@ object Metric {
       extends Metric(
         "material",
         "Material imbalance",
-        F moves "i",
+        F.moves("i"),
         Move,
         Move,
         Average,
@@ -164,7 +164,7 @@ object Metric {
       extends Metric(
         "blurs",
         "Blurs",
-        F moves "b",
+        F.moves("b"),
         Move,
         Move,
         Percent,
@@ -175,7 +175,7 @@ object Metric {
       extends Metric(
         "timeVariance",
         "Time variance",
-        F moves "v",
+        F.moves("v"),
         Move,
         Move,
         Average,

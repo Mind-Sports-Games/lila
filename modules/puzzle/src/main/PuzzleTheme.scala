@@ -1,7 +1,7 @@
 package lila.puzzle
 
-import lila.i18n.I18nKeys.{ puzzleTheme => i }
-import lila.i18n.{ I18nKey, I18nKeys => trans }
+import lila.i18n.I18nKeys.puzzleTheme as i
+import lila.i18n.{ I18nKey, I18nKeys as trans }
 import lila.common.Iso
 import strategygames.variant.Variant
 
@@ -13,68 +13,68 @@ object PuzzleTheme {
 
   case class WithCount(theme: PuzzleTheme, count: Int)
 
-  val mix           = PuzzleTheme(Key("mix"), i.healthyMix, i.healthyMixDescription)
-  val advancedPawn  = PuzzleTheme(Key("advancedPawn"), i.advancedPawn, i.advancedPawnDescription)
-  val advantage     = PuzzleTheme(Key("advantage"), i.advantage, i.advantageDescription)
-  val anastasiaMate = PuzzleTheme(Key("anastasiaMate"), i.anastasiaMate, i.anastasiaMateDescription)
-  val arabianMate   = PuzzleTheme(Key("arabianMate"), i.arabianMate, i.arabianMateDescription)
-  val attackingF2F7 = PuzzleTheme(Key("attackingF2F7"), i.attackingF2F7, i.attackingF2F7Description)
-  val attraction    = PuzzleTheme(Key("attraction"), i.attraction, i.attractionDescription)
-  val backRankMate  = PuzzleTheme(Key("backRankMate"), i.backRankMate, i.backRankMateDescription)
-  val bishopEndgame = PuzzleTheme(Key("bishopEndgame"), i.bishopEndgame, i.bishopEndgameDescription)
-  val bodenMate     = PuzzleTheme(Key("bodenMate"), i.bodenMate, i.bodenMateDescription)
+  val mix               = PuzzleTheme(Key("mix"), i.healthyMix, i.healthyMixDescription)
+  val advancedPawn      = PuzzleTheme(Key("advancedPawn"), i.advancedPawn, i.advancedPawnDescription)
+  val advantage         = PuzzleTheme(Key("advantage"), i.advantage, i.advantageDescription)
+  val anastasiaMate     = PuzzleTheme(Key("anastasiaMate"), i.anastasiaMate, i.anastasiaMateDescription)
+  val arabianMate       = PuzzleTheme(Key("arabianMate"), i.arabianMate, i.arabianMateDescription)
+  val attackingF2F7     = PuzzleTheme(Key("attackingF2F7"), i.attackingF2F7, i.attackingF2F7Description)
+  val attraction        = PuzzleTheme(Key("attraction"), i.attraction, i.attractionDescription)
+  val backRankMate      = PuzzleTheme(Key("backRankMate"), i.backRankMate, i.backRankMateDescription)
+  val bishopEndgame     = PuzzleTheme(Key("bishopEndgame"), i.bishopEndgame, i.bishopEndgameDescription)
+  val bodenMate         = PuzzleTheme(Key("bodenMate"), i.bodenMate, i.bodenMateDescription)
   val capturingDefender =
     PuzzleTheme(Key("capturingDefender"), i.capturingDefender, i.capturingDefenderDescription)
-  val castling      = PuzzleTheme(Key("castling"), i.castling, i.castlingDescription)
-  val clearance     = PuzzleTheme(Key("clearance"), i.clearance, i.clearanceDescription)
-  val crushing      = PuzzleTheme(Key("crushing"), i.crushing, i.crushingDescription)
-  val defensiveMove = PuzzleTheme(Key("defensiveMove"), i.defensiveMove, i.defensiveMoveDescription)
-  val deflection    = PuzzleTheme(Key("deflection"), i.deflection, i.deflectionDescription)
+  val castling         = PuzzleTheme(Key("castling"), i.castling, i.castlingDescription)
+  val clearance        = PuzzleTheme(Key("clearance"), i.clearance, i.clearanceDescription)
+  val crushing         = PuzzleTheme(Key("crushing"), i.crushing, i.crushingDescription)
+  val defensiveMove    = PuzzleTheme(Key("defensiveMove"), i.defensiveMove, i.defensiveMoveDescription)
+  val deflection       = PuzzleTheme(Key("deflection"), i.deflection, i.deflectionDescription)
   val discoveredAttack =
     PuzzleTheme(Key("discoveredAttack"), i.discoveredAttack, i.discoveredAttackDescription)
   val doubleBishopMate =
     PuzzleTheme(Key("doubleBishopMate"), i.doubleBishopMate, i.doubleBishopMateDescription)
-  val doubleCheck = PuzzleTheme(Key("doubleCheck"), i.doubleCheck, i.doubleCheckDescription)
+  val doubleCheck  = PuzzleTheme(Key("doubleCheck"), i.doubleCheck, i.doubleCheckDescription)
   val dovetailMate =
     PuzzleTheme(Key("dovetailMate"), i.dovetailMate, i.dovetailMateDescription)
-  val equality       = PuzzleTheme(Key("equality"), i.equality, i.equalityDescription)
-  val endgame        = PuzzleTheme(Key("endgame"), i.endgame, i.endgameDescription)
-  val enPassant      = PuzzleTheme(Key("enPassant"), new I18nKey("En passant"), i.enPassantDescription)
-  val exposedKing    = PuzzleTheme(Key("exposedKing"), i.exposedKing, i.exposedKingDescription)
-  val fork           = PuzzleTheme(Key("fork"), i.fork, i.forkDescription)
-  val hangingPiece   = PuzzleTheme(Key("hangingPiece"), i.hangingPiece, i.hangingPieceDescription)
-  val hookMate       = PuzzleTheme(Key("hookMate"), i.hookMate, i.hookMateDescription)
-  val interference   = PuzzleTheme(Key("interference"), i.interference, i.interferenceDescription)
-  val intermezzo     = PuzzleTheme(Key("intermezzo"), i.intermezzo, i.intermezzoDescription)
-  val kingsideAttack = PuzzleTheme(Key("kingsideAttack"), i.kingsideAttack, i.kingsideAttackDescription)
-  val knightEndgame  = PuzzleTheme(Key("knightEndgame"), i.knightEndgame, i.knightEndgameDescription)
-  val kingOnHill     = PuzzleTheme(Key("kingOnHill"), i.kingOnHill, i.kingOnHillDescription)
-  val kingOnHillIn1  = PuzzleTheme(Key("kingOnHillIn1"), i.kingOnHillIn1, i.kingOnHillIn1Description)
-  val kingOnHillIn2  = PuzzleTheme(Key("kingOnHillIn2"), i.kingOnHillIn2, i.kingOnHillIn2Description)
-  val kingOnHillIn3  = PuzzleTheme(Key("kingOnHillIn3"), i.kingOnHillIn3, i.kingOnHillIn3Description)
-  val long           = PuzzleTheme(Key("long"), i.long, i.longDescription)
-  val master         = PuzzleTheme(Key("master"), i.master, i.masterDescription)
-  val masterVsMaster = PuzzleTheme(Key("masterVsMaster"), i.masterVsMaster, i.masterVsMasterDescription)
-  val mate           = PuzzleTheme(Key("mate"), i.mate, i.mateDescription)
-  val mateIn1        = PuzzleTheme(Key("mateIn1"), i.mateIn1, i.mateIn1Description)
-  val mateIn2        = PuzzleTheme(Key("mateIn2"), i.mateIn2, i.mateIn2Description)
-  val mateIn3        = PuzzleTheme(Key("mateIn3"), i.mateIn3, i.mateIn3Description)
-  val mateIn4        = PuzzleTheme(Key("mateIn4"), i.mateIn4, i.mateIn4Description)
-  val mateIn5        = PuzzleTheme(Key("mateIn5"), i.mateIn5, i.mateIn5Description)
-  val win            = PuzzleTheme(Key("win"), i.win, i.winDescription)
-  val winIn1         = PuzzleTheme(Key("winIn1"), i.winIn1, i.winIn1Description)
-  val winIn2         = PuzzleTheme(Key("winIn2"), i.winIn2, i.winIn2Description)
-  val winIn3         = PuzzleTheme(Key("winIn3"), i.winIn3, i.winIn3Description)
-  val smotheredMate  = PuzzleTheme(Key("smotheredMate"), i.smotheredMate, i.smotheredMateDescription)
-  val middlegame     = PuzzleTheme(Key("middlegame"), i.middlegame, i.middlegameDescription)
-  val oneMove        = PuzzleTheme(Key("oneMove"), i.oneMove, i.oneMoveDescription)
-  val opening        = PuzzleTheme(Key("opening"), i.opening, i.openingDescription)
-  val pawnEndgame    = PuzzleTheme(Key("pawnEndgame"), i.pawnEndgame, i.pawnEndgameDescription)
-  val pawns          = PuzzleTheme(Key("pawns"), i.pawns, i.pawnsDescription)
-  val pieces         = PuzzleTheme(Key("pieces"), i.pieces, i.piecesDescription)
-  val pin            = PuzzleTheme(Key("pin"), i.pin, i.pinDescription)
-  val promotion      = PuzzleTheme(Key("promotion"), i.promotion, i.promotionDescription)
-  val queenEndgame   = PuzzleTheme(Key("queenEndgame"), i.queenEndgame, i.queenEndgameDescription)
+  val equality         = PuzzleTheme(Key("equality"), i.equality, i.equalityDescription)
+  val endgame          = PuzzleTheme(Key("endgame"), i.endgame, i.endgameDescription)
+  val enPassant        = PuzzleTheme(Key("enPassant"), new I18nKey("En passant"), i.enPassantDescription)
+  val exposedKing      = PuzzleTheme(Key("exposedKing"), i.exposedKing, i.exposedKingDescription)
+  val fork             = PuzzleTheme(Key("fork"), i.fork, i.forkDescription)
+  val hangingPiece     = PuzzleTheme(Key("hangingPiece"), i.hangingPiece, i.hangingPieceDescription)
+  val hookMate         = PuzzleTheme(Key("hookMate"), i.hookMate, i.hookMateDescription)
+  val interference     = PuzzleTheme(Key("interference"), i.interference, i.interferenceDescription)
+  val intermezzo       = PuzzleTheme(Key("intermezzo"), i.intermezzo, i.intermezzoDescription)
+  val kingsideAttack   = PuzzleTheme(Key("kingsideAttack"), i.kingsideAttack, i.kingsideAttackDescription)
+  val knightEndgame    = PuzzleTheme(Key("knightEndgame"), i.knightEndgame, i.knightEndgameDescription)
+  val kingOnHill       = PuzzleTheme(Key("kingOnHill"), i.kingOnHill, i.kingOnHillDescription)
+  val kingOnHillIn1    = PuzzleTheme(Key("kingOnHillIn1"), i.kingOnHillIn1, i.kingOnHillIn1Description)
+  val kingOnHillIn2    = PuzzleTheme(Key("kingOnHillIn2"), i.kingOnHillIn2, i.kingOnHillIn2Description)
+  val kingOnHillIn3    = PuzzleTheme(Key("kingOnHillIn3"), i.kingOnHillIn3, i.kingOnHillIn3Description)
+  val long             = PuzzleTheme(Key("long"), i.long, i.longDescription)
+  val master           = PuzzleTheme(Key("master"), i.master, i.masterDescription)
+  val masterVsMaster   = PuzzleTheme(Key("masterVsMaster"), i.masterVsMaster, i.masterVsMasterDescription)
+  val mate             = PuzzleTheme(Key("mate"), i.mate, i.mateDescription)
+  val mateIn1          = PuzzleTheme(Key("mateIn1"), i.mateIn1, i.mateIn1Description)
+  val mateIn2          = PuzzleTheme(Key("mateIn2"), i.mateIn2, i.mateIn2Description)
+  val mateIn3          = PuzzleTheme(Key("mateIn3"), i.mateIn3, i.mateIn3Description)
+  val mateIn4          = PuzzleTheme(Key("mateIn4"), i.mateIn4, i.mateIn4Description)
+  val mateIn5          = PuzzleTheme(Key("mateIn5"), i.mateIn5, i.mateIn5Description)
+  val win              = PuzzleTheme(Key("win"), i.win, i.winDescription)
+  val winIn1           = PuzzleTheme(Key("winIn1"), i.winIn1, i.winIn1Description)
+  val winIn2           = PuzzleTheme(Key("winIn2"), i.winIn2, i.winIn2Description)
+  val winIn3           = PuzzleTheme(Key("winIn3"), i.winIn3, i.winIn3Description)
+  val smotheredMate    = PuzzleTheme(Key("smotheredMate"), i.smotheredMate, i.smotheredMateDescription)
+  val middlegame       = PuzzleTheme(Key("middlegame"), i.middlegame, i.middlegameDescription)
+  val oneMove          = PuzzleTheme(Key("oneMove"), i.oneMove, i.oneMoveDescription)
+  val opening          = PuzzleTheme(Key("opening"), i.opening, i.openingDescription)
+  val pawnEndgame      = PuzzleTheme(Key("pawnEndgame"), i.pawnEndgame, i.pawnEndgameDescription)
+  val pawns            = PuzzleTheme(Key("pawns"), i.pawns, i.pawnsDescription)
+  val pieces           = PuzzleTheme(Key("pieces"), i.pieces, i.piecesDescription)
+  val pin              = PuzzleTheme(Key("pin"), i.pin, i.pinDescription)
+  val promotion        = PuzzleTheme(Key("promotion"), i.promotion, i.promotionDescription)
+  val queenEndgame     = PuzzleTheme(Key("queenEndgame"), i.queenEndgame, i.queenEndgameDescription)
   val queenRookEndgame =
     PuzzleTheme(Key("queenRookEndgame"), i.queenRookEndgame, i.queenRookEndgameDescription)
   val queensideAttack = PuzzleTheme(Key("queensideAttack"), i.queensideAttack, i.queensideAttackDescription)
@@ -105,7 +105,7 @@ object PuzzleTheme {
     trans.puzzle.origin -> List(
       master,
       masterVsMaster
-      //superGM
+      // superGM
     )
   )
   val categorizedMate = List[(I18nKey, List[PuzzleTheme])](
@@ -119,7 +119,7 @@ object PuzzleTheme {
     )
   )
   val categorizedMateIn2 = List[(I18nKey, List[PuzzleTheme])](trans.puzzle.mates -> List(mateIn2))
-  val categorizedWin = List[(I18nKey, List[PuzzleTheme])](
+  val categorizedWin     = List[(I18nKey, List[PuzzleTheme])](
     trans.puzzle.wins -> List(
       win,
       winIn1,
@@ -127,7 +127,7 @@ object PuzzleTheme {
       winIn3
     )
   )
-  val categorizedWinIn2 = List[(I18nKey, List[PuzzleTheme])](trans.puzzle.wins -> List(winIn2))
+  val categorizedWinIn2     = List[(I18nKey, List[PuzzleTheme])](trans.puzzle.wins -> List(winIn2))
   val categorizedKingOnHill = List[(I18nKey, List[PuzzleTheme])](
     trans.puzzle.wins -> List(
       winIn2,
@@ -191,7 +191,7 @@ object PuzzleTheme {
       equality,
       advantage,
       crushing
-      //mate
+      // mate
     )
   )
 
@@ -202,7 +202,7 @@ object PuzzleTheme {
     )
   )
 
-  //todo refactor common themes between variants
+  // todo refactor common themes between variants
   val categorizedStandard =
     categorizedMix ::: categorizedChessPhases ::: categorizedChessMotifs ::: categorizedAdvanced ::: List[
       (I18nKey, List[PuzzleTheme])
@@ -335,7 +335,7 @@ object PuzzleTheme {
     pieces
   ).map(_.key)
 
-  //TODO recreate these when more themes are available (also set per variant)
+  // TODO recreate these when more themes are available (also set per variant)
   val studyChapterIds: Map[PuzzleTheme.Key, String] = List(
     advancedPawn      -> "sw8VyTe1",
     attackingF2F7     -> "r1ZAcrjZ",

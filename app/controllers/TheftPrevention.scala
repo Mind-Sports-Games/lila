@@ -1,9 +1,9 @@
 package controllers
 
 import lila.api.Context
-import lila.app._
-import lila.game.{ Game => GameModel, Pov, AnonCookie }
-import play.api.mvc._
+import lila.app.{ *, given }
+import lila.game.{ AnonCookie, Game as GameModel, Pov }
+import play.api.mvc.*
 
 private[controllers] trait TheftPrevention { self: LilaController =>
 
@@ -16,16 +16,16 @@ private[controllers] trait TheftPrevention { self: LilaController =>
       (pov.player.userId, ctx.userId) match {
         case (Some(_), None)                    => true
         case (Some(playerUserId), Some(userId)) => playerUserId != userId
-        case (None, _) =>
+        case (None, _)                          =>
           !lila.api.Mobile.Api.requested(ctx.req) &&
-            !ctx.req.cookies.get(AnonCookie.name).exists(_.value == pov.playerId)
+          !ctx.req.cookies.get(AnonCookie.name).exists(_.value == pov.playerId)
       }
     }
 
   protected def isMyPov(pov: Pov)(implicit ctx: Context) = !isTheft(pov)
 
   protected def playablePovForReq(game: GameModel)(implicit ctx: Context) =
-    (!game.isPgnImport && game.playable) ?? {
+    (!game.isPgnImport && game.playable) so {
       ctx.userId
         .flatMap(game.playerByUserId)
         .orElse {
@@ -43,5 +43,5 @@ private[controllers] trait TheftPrevention { self: LilaController =>
     jsonError(
       "This game requires authentication"
     )
-  ) as JSON
+  ).as(JSON)
 }

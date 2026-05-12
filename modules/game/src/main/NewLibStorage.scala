@@ -33,7 +33,6 @@ private object NewLibStorage {
           .toVector
           .map(_.toVector)
       }
-
   }
 
   private def monitor[A](mon: lila.mon.TimerPath)(f: => A): A =

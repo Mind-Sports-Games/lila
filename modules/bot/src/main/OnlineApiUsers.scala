@@ -1,7 +1,5 @@
 package lila.bot
 
-import scala.concurrent.duration._
-
 import lila.common.Bus
 import lila.hub.actorApi.socket.ApiUserIsOnline
 import lila.memo.ExpireCallbackMemo
@@ -21,9 +19,10 @@ final class OnlineApiUsers(
     // We must delay the event publication, because caffeine
     // delays the removal listener, therefore when a bot reconnects,
     // the offline event is sent after the online event.
-    if (!isOnline(userId) || !cache.get(userId)) scheduler.scheduleOnce(1 second) {
-      publish(userId, isOnline = true)
-    }
+    if (!isOnline(userId) || !cache.get(userId))
+      scheduler.scheduleOnce(1 second) {
+        publish(userId, isOnline = true)
+      }
     cache.put(userId)
   }
 

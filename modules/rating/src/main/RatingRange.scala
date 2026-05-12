@@ -8,7 +8,7 @@ case class RatingRange(min: Int, max: Int) {
     (min <= RatingRange.min || rating >= min) &&
       (max >= RatingRange.max || rating <= max)
 
-  def notBroad: Option[RatingRange] = (this != RatingRange.broad) option this
+  def notBroad: Option[RatingRange] = (this != RatingRange.broad).option(this)
 
   def withinLimits(rating: Int, delta: Int, multipleOf: Int) =
     copy(
@@ -46,5 +46,5 @@ object RatingRange {
 
   def valid(from: String) = apply(from).isDefined
 
-  private def acceptable(rating: Int) = broad contains rating
+  private def acceptable(rating: Int) = broad.contains(rating)
 }

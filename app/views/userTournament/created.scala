@@ -2,12 +2,10 @@ package views.html
 package userTournament
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.user.User
-
-import controllers.routes
 
 object created {
 
@@ -20,8 +18,7 @@ object created {
       path = path,
       moreJs = infiniteScrollTag
     ) {
-      if (pager.nbResults == 0)
-        div(cls := "box-pad")(u.username, " hasn't created any tournament yet!")
+      if (pager.nbResults == 0) div(cls := "box-pad")(u.username, " hasn't created any tournament yet!")
       else
         div(cls := "tournament-list")(
           table(cls := "slist")(
@@ -40,7 +37,7 @@ object created {
                   views.html.tournament.finishedList.header(t),
                   td(momentFromNow(t.startsAt)),
                   td(cls := "winner")(
-                    t.winnerId.isDefined option userIdLink(t.winnerId, withOnline = false)
+                    t.winnerId.isDefined.option(userIdLink(t.winnerId, withOnline = false))
                   ),
                   td(cls := "text", dataIcon := "r")(t.nbPlayers.localize)
                 )

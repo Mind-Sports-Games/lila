@@ -16,9 +16,9 @@
 
 package lila.db
 
-import ornicar.scalalib.Zero
+import alleycats.Zero
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
 trait dsl {
 
@@ -26,15 +26,15 @@ trait dsl {
   type Bdoc = BSONDocument
   type Barr = BSONArray
 
-  //**********************************************************************************************//
+  // **********************************************************************************************//
   // Helpers
   val $empty: Bdoc = document.asStrict
 
-  def $doc(elements: ElementProducer*): Bdoc = BSONDocument.strict(elements: _*)
+  def $doc(elements: ElementProducer*): Bdoc = BSONDocument.strict(elements*)
 
   def $doc(elements: Iterable[(String, BSONValue)]): Bdoc = BSONDocument.strict(elements)
 
-  def $arr(elements: Producer[BSONValue]*): Barr = BSONArray(elements: _*)
+  def $arr(elements: Producer[BSONValue]*): Barr = BSONArray(elements*)
 
   def $id[T: BSONWriter](id: T): Bdoc = $doc("_id" -> id)
 
@@ -46,11 +46,11 @@ trait dsl {
   def $int(i: Int)         = BSONInteger(i)
 
   // End of Helpers
-  //**********************************************************************************************//
+  // **********************************************************************************************//
 
-  implicit val LilaBSONDocumentZero: Zero[Bdoc] = Zero.instance($empty)
+  implicit val LilaBSONDocumentZero: Zero[Bdoc] = Zero($empty)
 
-  //**********************************************************************************************//
+  // **********************************************************************************************//
   // Top Level Logical Operators
   def $or(expressions: Bdoc*): Bdoc = {
     $doc("$or" -> expressions)
@@ -64,9 +64,9 @@ trait dsl {
     $doc("$nor" -> expressions)
   }
   // End of Top Level Logical Operators
-  //**********************************************************************************************//
+  // **********************************************************************************************//
 
-  //**********************************************************************************************//
+  // **********************************************************************************************//
   // Top Level Evaluation Operators
   def $text(term: String): Bdoc = {
     $doc("$text" -> $doc("$search" -> term))
@@ -80,12 +80,12 @@ trait dsl {
     $doc("$where" -> expr)
   }
   // End of Top Level Evaluation Operators
-  //**********************************************************************************************//
+  // **********************************************************************************************//
 
-  //**********************************************************************************************//
+  // **********************************************************************************************//
   // Top Level Field Update Operators
   def $inc(item: ElementProducer, items: ElementProducer*): Bdoc = {
-    $doc("$inc" -> $doc((Seq(item) ++ items): _*))
+    $doc("$inc" -> $doc((Seq(item) ++ items)*))
   }
   def $inc(doc: Bdoc): Bdoc =
     $doc("$inc" -> doc)
@@ -95,11 +95,11 @@ trait dsl {
   }
 
   def $setOnInsert(item: ElementProducer, items: ElementProducer*): Bdoc = {
-    $doc("$setOnInsert" -> $doc((Seq(item) ++ items): _*))
+    $doc("$setOnInsert" -> $doc((Seq(item) ++ items)*))
   }
 
   def $set(item: ElementProducer, items: ElementProducer*): Bdoc = {
-    $doc("$set" -> $doc((Seq(item) ++ items): _*))
+    $doc("$set" -> $doc((Seq(item) ++ items)*))
   }
 
   def $unset(field: String, fields: String*): Bdoc = {
@@ -107,7 +107,7 @@ trait dsl {
   }
 
   def $unset(fields: Seq[String]): Bdoc =
-    fields.nonEmpty ?? {
+    fields.nonEmpty so {
       $doc("$unset" -> $doc(fields.map(k => (k, BSONString("")))))
     }
 
@@ -162,21 +162,20 @@ trait dsl {
     def isValid: Boolean = Seq("date", "timestamp") contains value
 
     def produce: BSONValue = {
-      if (!isValid)
-        throw new IllegalArgumentException(value)
+      if (!isValid) throw new IllegalArgumentException(value)
 
       $doc("$type" -> value)
     }
   }
 
   // End of Top Level Field Update Operators
-  //**********************************************************************************************//
+  // **********************************************************************************************//
 
-  //**********************************************************************************************//
+  // **********************************************************************************************//
   // Top Level Array Update Operators
 
   def $addToSet(item: ElementProducer, items: ElementProducer*): Bdoc =
-    $doc("$addToSet" -> $doc((Seq(item) ++ items): _*))
+    $doc("$addToSet" -> $doc((Seq(item) ++ items)*))
 
   def $pop(item: (String, Int)): Bdoc = {
     if (item._2 != -1 && item._2 != 1)
@@ -203,10 +202,10 @@ trait dsl {
     $doc((if (add) "$addToSet" else "$pull") -> $doc(key -> value))
 
   // End ofTop Level Array Update Operators
-  //**********************************************************************************************//
+  // **********************************************************************************************//
 
-  /** Represents the initial state of the expression which has only the name of the field.
-    * It does not know the value of the expression.
+  /** Represents the initial state of the expression which has only the name of the field. It does not know
+    * the value of the expression.
     */
   trait ElementBuilder {
     def field: String
@@ -321,7 +320,7 @@ trait dsl {
     }
 
     def $elemMatch(query: ElementProducer*): SimpleExpression[Bdoc] = {
-      SimpleExpression(field, $doc("$elemMatch" -> $doc(query: _*)))
+      SimpleExpression(field, $doc("$elemMatch" -> $doc(query*)))
     }
 
     def $size(s: Int): SimpleExpression[Bdoc] = {
@@ -359,9 +358,9 @@ trait dsl {
     def pipeline(from: Coll, as: String, local: String, foreign: String, pipeline: List[Bdoc]): Bdoc =
       $doc(
         "$lookup" -> $doc(
-          "from" -> from.name,
-          "as"   -> as,
-          "let"  -> $doc("local" -> s"$$$local"),
+          "from"     -> from.name,
+          "as"       -> as,
+          "let"      -> $doc("local" -> s"$$$local"),
           "pipeline" -> {
             $doc(
               "$match" -> $doc(
@@ -393,4 +392,56 @@ trait dsl {
 //   }
 // }
 
-object dsl extends dsl with CollExt with QueryBuilderExt with CursorExt with Handlers
+object dsl extends dsl with CollExt with QueryBuilderExt with CursorExt with Handlers {
+
+  import reactivemongo.api.{ CursorProducer, ReadPreference }
+
+  // aggregateList/One/Exists must be Scala 3 extension methods (not in the implicit class ExtendColl)
+  // because `coll.PipelineOperator` in the callback type is only a stable path when `coll` is an
+  // extension receiver; in an implicit class, `coll` is a val field, which Scala 3 treats as a type
+  // projection (ExtendColl#coll) and cannot unify with `framework.PipelineOperator` at call sites.
+  extension (coll: Coll)(using scala.concurrent.ExecutionContext) {
+
+    def aggregateList(
+        maxDocs: Int,
+        readPreference: ReadPreference = ReadPreference.primary,
+        allowDiskUse: Boolean = false
+    )(
+        f: coll.AggregationFramework => (coll.PipelineOperator, List[coll.PipelineOperator])
+    )(implicit cp: CursorProducer[Bdoc]): Fu[List[Bdoc]] =
+      coll
+        .aggregateWith[Bdoc](allowDiskUse = allowDiskUse, readPreference = readPreference) { agg =>
+          val (head, tail) = f(agg)
+          head +: tail
+        }
+        .collect[List](maxDocs = maxDocs)
+
+    def aggregateOne(
+        readPreference: ReadPreference = ReadPreference.primary,
+        allowDiskUse: Boolean = false
+    )(
+        f: coll.AggregationFramework => (coll.PipelineOperator, List[coll.PipelineOperator])
+    )(implicit cp: CursorProducer[Bdoc]): Fu[Option[Bdoc]] =
+      coll
+        .aggregateWith[Bdoc](allowDiskUse = allowDiskUse, readPreference = readPreference) { agg =>
+          val (head, tail) = f(agg)
+          head +: tail
+        }
+        .collect[List](maxDocs = 1)
+        .dmap(_.headOption)
+
+    def aggregateExists(
+        readPreference: ReadPreference = ReadPreference.primary,
+        allowDiskUse: Boolean = false
+    )(
+        f: coll.AggregationFramework => (coll.PipelineOperator, List[coll.PipelineOperator])
+    )(implicit cp: CursorProducer[Bdoc]): Fu[Boolean] =
+      coll
+        .aggregateWith[Bdoc](allowDiskUse = allowDiskUse, readPreference = readPreference) { agg =>
+          val (head, tail) = f(agg)
+          head +: tail
+        }
+        .headOption
+        .dmap(_.isDefined)
+  }
+}

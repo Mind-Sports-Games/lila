@@ -2,16 +2,15 @@ package lila.importer
 
 import cats.data.Validated
 // TODO: For post mso tournament, get Parser refactored so we can parse draughts games.
-import strategygames.chess.format.pgn.{ Parser }
-import strategygames.format.pgn.{ ParsedPgn, Reader, Tag, TagType, Tags }
+import strategygames.chess.format.pgn.Parser
+import strategygames.format.pgn.{ ParsedPgn, Reader, Tags }
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.variant.{ Variant => StratVariant }
-import strategygames.{ Board, Player => PlayerIndex, GameLogic, Mode, Replay, Status }
-import play.api.data._
-import play.api.data.Forms._
-import scala.util.chaining._
+import strategygames.variant.Variant as StratVariant
+import strategygames.{ Board, GameLogic, Mode, Player as PlayerIndex, Replay, Status }
+import play.api.data.*
+import play.api.data.Forms.*
 
-import lila.game._
+import lila.game.*
 
 final class ImporterForm {
 
@@ -19,7 +18,7 @@ final class ImporterForm {
     mapping(
       "pgn"     -> nonEmptyText.verifying("invalidPgn", p => checkPgn(p).isValid),
       "analyse" -> optional(nonEmptyText)
-    )(ImportData.apply)(ImportData.unapply)
+    )(ImportData.apply)(unapply)
   )
 
   def checkPgn(pgn: String): Validated[String, Preprocessed] = ImporterForm.catchOverflow { () =>
@@ -29,10 +28,10 @@ final class ImporterForm {
 
 object ImporterForm {
 
-  def catchOverflow(f: () => Validated[String, Preprocessed]): Validated[String, Preprocessed] = try {
+  def catchOverflow(f: () => Validated[String, Preprocessed]): Validated[String, Preprocessed] = try
     f()
-  } catch {
-    case e: RuntimeException if e.getMessage contains "StackOverflowError" =>
+  catch {
+    case e: RuntimeException if e.getMessage.contains("StackOverflowError") =>
       Validated.Invalid("This PGN seems too long or too complex!")
   }
 }
@@ -47,14 +46,14 @@ case class Preprocessed(
 
 case class ImportData(pgn: String, analyse: Option[String]) {
 
-  private type TagPicker = Tag.type => TagType
+  // private type TagPicker = Tag.type => TagType
 
   private val maxPlies = 1000
 
   private def evenIncomplete(result: Reader.Result): Replay = result.evenIncomplete
 
   def preprocess(user: Option[String]): Validated[String, Preprocessed] = ImporterForm.catchOverflow { () =>
-    Parser.full(pgn) flatMap { parsed =>
+    Parser.full(pgn) andThen { parsed =>
       Reader.fullWithSans(
         GameLogic.Chess(),
         pgn,
@@ -69,11 +68,11 @@ case class ImportData(pgn: String, analyse: Option[String]) {
         }
         val initBoard    = parsed.tags.fen.map(fen => Forsyth.<<(GameLogic.Chess(), fen).map(_.board))
         val fromPosition = initBoard.nonEmpty && !parsed.tags.fen.exists(_.initial)
-        val variant = StratVariant.wrap({
+        val variant      = StratVariant.wrap({
           val chessVariant = parsed.tags.variant match {
             case Some(strategygames.variant.Variant.Chess(variant)) => Some(variant)
             case None                                               => None
-            case _                                                  => sys.error("Not implemented for draughts yet")
+            case _ => sys.error("Not implemented for draughts yet")
           }
           chessVariant | {
             if (fromPosition) strategygames.chess.variant.FromPosition
@@ -88,19 +87,19 @@ case class ImportData(pgn: String, analyse: Option[String]) {
             strategygames.chess.variant.FromPosition
           case v => v
         })
-        val game = state.copy(situation = state.situation withVariant variant)
+        val game       = state.copy(situation = state.situation.withVariant(variant))
         val initialFen = parsed.tags.fen
           .flatMap(fen => Forsyth.<<<@(GameLogic.Chess(), variant, fen))
           .map(situation => Forsyth.>>(GameLogic.Chess(), situation))
 
         val status = parsed.tags(_.Termination).map(_.toLowerCase) match {
-          case Some("normal") | None                   => Status.Resign
-          case Some("abandoned")                       => Status.Aborted
-          case Some("time forfeit")                    => Status.Outoftime
-          case Some("rule of gin")                     => Status.RuleOfGin
-          case Some("rules infraction")                => Status.Cheat
-          case Some(txt) if txt contains "won on time" => Status.Outoftime
-          case Some(_)                                 => Status.UnknownFinish
+          case Some("normal") | None                    => Status.Resign
+          case Some("abandoned")                        => Status.Aborted
+          case Some("time forfeit")                     => Status.Outoftime
+          case Some("rule of gin")                      => Status.RuleOfGin
+          case Some("rules infraction")                 => Status.Cheat
+          case Some(txt) if txt.contains("won on time") => Status.Outoftime
+          case Some(_)                                  => Status.UnknownFinish
         }
 
         val date = parsed.tags.anyDate
@@ -127,13 +126,12 @@ case class ImportData(pgn: String, analyse: Option[String]) {
           // apply the result from the board or the tags
           game.situation.status match {
             case Some(situationStatus) => dbGame.finish(situationStatus, game.situation.winner).game
-            case None =>
+            case None                  =>
               parsed.tags.resultPlayer
                 .map {
                   case Some(playerIndex)                       => TagResult(status, playerIndex.some)
                   case None if Status.flagged.contains(status) => TagResult(status, none)
                   case None                                    => TagResult(Status.Draw, none)
-                  case _                                       => sys.error("Not implemented for draughts yet")
                 }
                 .filter(_.status > Status.Started)
                 .fold(dbGame) { res =>

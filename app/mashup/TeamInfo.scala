@@ -48,14 +48,14 @@ final class TeamInfoApi(
     requestRepo: RequestRepo
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import TeamInfo._
+  import TeamInfo.*
 
   def apply(team: Team, me: Option[User]): Fu[TeamInfo] =
     for {
-      requests      <- (team.enabled && me.exists(m => team.leaders(m.id))) ?? api.requestsWithUsers(team)
-      mine          <- me.??(m => api.belongsTo(team.id, m.id))
-      requestedByMe <- !mine ?? me.??(m => requestRepo.exists(team.id, m.id))
-      subscribed    <- me.ifTrue(mine) ?? { api.isSubscribed(team, _) }
+      requests      <- (team.enabled && me.exists(m => team.leaders(m.id))) so api.requestsWithUsers(team)
+      mine          <- me.so(m => api.belongsTo(team.id, m.id))
+      requestedByMe <- !mine so me.so(m => requestRepo.exists(team.id, m.id))
+      subscribed    <- me.ifTrue(mine) so { api.isSubscribed(team, _) }
       forumPosts    <- forumRecent.team(team.id)
       tours         <- tournaments(team, 5, 5)
       simuls        <- simulApi.byTeamLeaders(team.id, team.leaders.toSeq)
@@ -76,10 +76,10 @@ final class TeamInfoApi(
         PastAndNext(
           past = {
             tours.past.map(anyTour) ::: swisses.past.map(anyTour)
-          }.sortBy(-_.startsAt.getSeconds),
+          }.sortBy(-_.startsAt.getMillis),
           next = {
             tours.next.map(anyTour) ::: swisses.next.map(anyTour)
-          }.sortBy(_.startsAt.getSeconds)
+          }.sortBy(_.startsAt.getMillis)
         )
     }
 }

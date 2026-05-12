@@ -1,7 +1,7 @@
 package lila.pref
 
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
+import play.api.libs.json.*
+import play.api.libs.functional.syntax.*
 
 object JsonView {
 
@@ -61,14 +61,14 @@ object JsonView {
   implicit val pieceSetJsonReads: Reads[PieceSet] = (
     (JsPath \ "name").read[String] and
       (JsPath \ "gameFamily").read[Int]
-  )(PieceSet.apply _)
+  )(PieceSet.apply)
 
   implicit val pieceSetFormat: Format[PieceSet] =
     Format(pieceSetJsonReads, pieceSetJsonWrites)
 
-  implicit val pieceSetsRead: Reads[List[PieceSet]] = Reads.list(pieceSetFormat)
+  implicit val pieceSetsRead: Reads[List[PieceSet]] = Reads.list(using pieceSetFormat)
 
-  implicit val pieceSetsWrite: Writes[List[PieceSet]] = Writes.list(pieceSetFormat)
+  implicit val pieceSetsWrite: Writes[List[PieceSet]] = Writes.list(using pieceSetFormat)
 
   implicit val themeJsonWrites: Writes[Theme] = (
     (JsPath \ "name").write[String] and
@@ -78,12 +78,12 @@ object JsonView {
   implicit val themeJsonReads: Reads[Theme] = (
     (JsPath \ "name").read[String] and
       (JsPath \ "gameFamily").read[Int]
-  )(Theme.apply _)
+  )(Theme.apply)
 
   implicit val themeFormat: Format[Theme] =
     Format(themeJsonReads, themeJsonWrites)
 
-  implicit val themesRead: Reads[List[Theme]] = Reads.list(themeFormat)
+  implicit val themesRead: Reads[List[Theme]] = Reads.list(using themeFormat)
 
-  implicit val themesWrite: Writes[List[Theme]] = Writes.list(themeFormat)
+  implicit val themesWrite: Writes[List[Theme]] = Writes.list(using themeFormat)
 }

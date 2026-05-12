@@ -4,7 +4,7 @@ import strategygames.Centis
 
 import lila.common.Bus
 import lila.game.{ Event, Game, Pov, Progress }
-import lila.i18n.{ I18nKeys => trans, defaultLang }
+import lila.i18n.{ defaultLang, I18nKeys as trans }
 import lila.pref.{ Pref, PrefApi }
 import play.api.i18n.Lang
 
@@ -17,38 +17,44 @@ final private[round] class Drawer(
 
   implicit private val chatLang: Lang = defaultLang
 
-  def autoThreefold(game: Game): Fu[Option[Pov]] = game.playable ??
-    Pov(game)
-      .map { pov =>
-        import Pref.PrefZero
-        if (game.playerHasOfferedDrawRecently(pov.playerIndex)) fuccess(pov.some)
-        else
-          pov.player.userId ?? prefApi.getPref map { pref =>
-            pref.autoThreefold == Pref.AutoThreefold.ALWAYS || {
-              pref.autoThreefold == Pref.AutoThreefold.TIME &&
-              game.clock ?? { _.remainingTime(pov.playerIndex) < Centis.ofSeconds(30) }
-            } || pov.player.userId.exists(isBotSync)
-          } map (_ option pov)
-      }
-      .sequenceFu
+  def autoThreefold(game: Game): Fu[Option[Pov]] = if (game.playable)
+    Future
+      .sequence(
+        Pov(game)
+          .map { pov =>
+            import Pref.PrefZero
+            if (game.playerHasOfferedDrawRecently(pov.playerIndex)) fuccess(pov.some)
+            else
+              pov.player.userId so prefApi.getPref map { pref =>
+                pref.autoThreefold == Pref.AutoThreefold.ALWAYS || {
+                  pref.autoThreefold == Pref.AutoThreefold.TIME &&
+                  game.clock.exists(_.remainingTime(pov.playerIndex) < Centis.ofSeconds(30))
+                } || pov.player.userId.exists(isBotSync)
+              } map { if (_) pov.some else none }
+          }
+      )
       .dmap(_.flatten.headOption)
+  else fuccess(none)
 
-  def yes(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable ?? {
+  def yes(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable so {
     pov match {
       case pov if pov.game.situation.threefoldRepetition =>
         finisher.other(pov.game, _.Draw, None)
       case pov if pov.opponent.isOfferingDraw =>
         finisher.other(pov.game, _.Draw, None, Some(trans.drawOfferAccepted.txt()))
-      case Pov(g, playerIndex) if g playerCanOfferDraw playerIndex =>
-        proxy.save {
-          messenger.system(g, trans.playerIndexOffersDraw(pov.game.playerTrans(playerIndex)).v)
-          Progress(g) map { _ offerDraw playerIndex }
-        } >>- publishDrawOffer(pov) inject List(Event.DrawOffer(by = playerIndex.some))
+      case Pov(g, playerIndex) if g.playerCanOfferDraw(playerIndex) =>
+        proxy
+          .save {
+            messenger.system(g, trans.playerIndexOffersDraw(pov.game.playerTrans(playerIndex)).v)
+            Progress(g) map { _.offerDraw(playerIndex) }
+          }
+          .andDo(publishDrawOffer(pov)) inject List(Event.DrawOffer(by = playerIndex.some))
       case _ => fuccess(List(Event.ReloadOwner))
     }
   }
 
-  def no(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable ?? {
+  def no(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = if (!pov.game.playable) fuccess(Nil)
+  else {
     pov match {
       case Pov(g, playerIndex) if pov.player.isOfferingDraw =>
         proxy.save {
@@ -69,10 +75,12 @@ final private[round] class Drawer(
   }
 
   def claim(pov: Pov)(implicit proxy: GameProxy): Fu[Events] =
-    (pov.game.playable && pov.game.situation.threefoldRepetition) ?? finisher.other(
-      pov.game,
-      _.Draw,
-      None
+    (pov.game.playable && pov.game.situation.threefoldRepetition).so(
+      finisher.other(
+        pov.game,
+        _.Draw,
+        None
+      )
     )
 
   def force(game: Game)(implicit proxy: GameProxy): Fu[Events] = finisher.other(game, _.Draw, None, None)
@@ -93,6 +101,6 @@ final private[round] class Drawer(
             )
           )
         }
-        .unit
+        .discard
   }
 }

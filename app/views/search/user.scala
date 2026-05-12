@@ -3,53 +3,50 @@ package views.html.search
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.user.User
-
-import controllers.routes
 
 object user {
 
-  import trans.search._
+  import trans.search.*
 
-  def apply(u: User, form: Form[_])(implicit ctx: Context) = {
-    val commons = bits of form
-    import commons._
+  def apply(u: User, form: Form[?])(implicit ctx: Context) = {
+    val commons = bits.of(form)
     st.form(
       noFollow,
-      cls := "search__form",
+      cls    := "search__form",
       action := routes.User.games(u.username, "search"),
       method := "GET"
-    )(dataReqs)(
+    )(commons.dataReqs)(
       table(
-        date,
-        rating,
-        turns,
-        duration,
-        clockTime,
-        clockIncrement,
-        source,
-        perf,
-        mode
+        commons.date,
+        commons.rating,
+        commons.turns,
+        commons.duration,
+        commons.clockTime,
+        commons.clockIncrement,
+        commons.source,
+        commons.perf,
+        commons.mode
       ),
       table(
-        hasAi,
-        aiLevel,
+        commons.hasAi,
+        commons.aiLevel,
         tr(cls := "opponentName")(
           th(label(`for` := form3.id(form("players")("b")))(opponentName())),
           td(cls := "usernames")(
-            st.input(tpe := "hidden", value := u.id, name := "players.a"),
+            st.input(tpe                          := "hidden", value := u.id, name := "players.a"),
             form3.input(form("players")("b"))(tpe := "text")
           )
         ),
-        winner(hide = false),
-        loser(hide = false),
-        playerIndexs(hide = false),
-        status,
-        winnerPlayerIndex,
-        sort,
-        analysed,
+        commons.winner(hide = false),
+        commons.loser(hide = false),
+        commons.playerIndexs(hide = false),
+        commons.status,
+        commons.winnerPlayerIndex,
+        commons.sort,
+        commons.analysed,
         tr(cls := "action")(
           th,
           td(button(cls := "button")(search()))

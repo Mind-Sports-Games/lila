@@ -3,11 +3,11 @@ package templating
 
 import play.api.i18n.Lang
 
-import ui.ScalatagsTemplate._
+import ui.ScalatagsTemplate.*
 
 trait StringHelper { self: NumberHelper =>
 
-  val slugify = lila.common.String.slugify _
+  val slugify = lila.common.String.slugify
 
   def shorten(text: String, length: Int, sep: String = "…") = lila.common.String.shorten(text, length, sep)
 
@@ -42,12 +42,12 @@ trait StringHelper { self: NumberHelper =>
   def encodeFen(fen: String) = lila.common.String.base64.encode(fen).reverse
 
   def addQueryParameter(url: String, key: String, value: Any) =
-    if (url contains "?") s"$url&$key=$value" else s"$url?$key=$value"
+    if (url.contains("?")) s"$url&$key=$value" else s"$url?$key=$value"
 
   def fragList(frags: List[Frag], separator: String = ", "): Frag =
     frags match {
-      case Nil        => emptyFrag
-      case one :: Nil => one
+      case Nil           => emptyFrag
+      case one :: Nil    => one
       case first :: rest =>
         RawFrag(
           frag(first :: rest.map { frag(separator, _) }).render

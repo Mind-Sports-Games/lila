@@ -1,9 +1,9 @@
 package lila.security
 
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final class PrintBan(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 

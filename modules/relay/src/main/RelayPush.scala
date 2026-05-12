@@ -1,7 +1,7 @@
 package lila.relay
 
-import akka.actor._
-import scala.concurrent.duration._
+import akka.actor.*
+import scala.concurrent.duration.*
 
 import lila.study.MultiPgn
 import lila.hub.EarlyMultiThrottler
@@ -14,8 +14,7 @@ final class RelayPush(sync: RelaySync, api: RelayApi)(implicit
   private val throttler = system.actorOf(Props(new EarlyMultiThrottler(logger = logger)))
 
   def apply(rt: RelayRound.WithTour, pgn: String): Fu[Option[String]] =
-    if (rt.round.sync.hasUpstream)
-      fuccess("The relay has an upstream URL, and cannot be pushed to.".some)
+    if (rt.round.sync.hasUpstream) fuccess("The relay has an upstream URL, and cannot be pushed to.".some)
     else
       fuccess {
         throttler ! EarlyMultiThrottler.Work(
@@ -40,7 +39,7 @@ final class RelayPush(sync: RelaySync, api: RelayApi)(implicit
           .flatMap { event =>
             api
               .update(rt.round)(
-                _.withSync(_ addLog event).copy(finished = games.forall(_.end.isDefined))
+                _.withSync(_.addLog(event)).copy(finished = games.forall(_.end.isDefined))
               )
               .void
           }

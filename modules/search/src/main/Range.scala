@@ -9,7 +9,7 @@ final class Range[A] private (val a: Option[A], val b: Option[A]) {
 
 object Range {
 
-  import play.api.libs.json._
+  import play.api.libs.json.*
 
   implicit def rangeJsonWriter[A: Writes]: Writes[Range[A]] =
     Writes[Range[A]] { r =>

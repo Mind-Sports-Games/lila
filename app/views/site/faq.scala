@@ -1,21 +1,20 @@
 package views
 package html.site
 
-import controllers.routes
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object faq {
 
-  import trans.faq._
+  import trans.faq.*
 
   val fideHandbookUrl = "https://handbook.fide.com/chapter/E012018"
 
   private def question(id: String, title: String, answer: Frag*) =
     div(
       st.id := id,
-      cls := "question"
+      cls   := "question"
     )(
       h3(a(href := s"#$id")(title)),
       div(cls := "answer")(answer)

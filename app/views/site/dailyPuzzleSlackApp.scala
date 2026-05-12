@@ -1,9 +1,8 @@
 package views.html.site
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-import controllers.routes
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object dailyPuzzleSlackApp {
 
@@ -24,10 +23,10 @@ object dailyPuzzleSlackApp {
             href := "https://slack.com/oauth/v2/authorize?client_id=17688987239.964622027363&scope=commands,incoming-webhook"
           )(
             img(
-              alt := "Add to Slack",
+              alt    := "Add to Slack",
               height := 40,
-              width := 139,
-              src := staticAssetUrl("images/add-to-slack.png")
+              width  := 139,
+              src    := staticAssetUrl("images/add-to-slack.png")
             )
           ),
           h2("Summary"),

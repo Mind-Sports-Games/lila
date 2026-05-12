@@ -2,13 +2,12 @@ package lila.puzzle
 
 import org.joda.time.DateTime
 import reactivemongo.api.bson.BSONNull
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
 import strategygames.variant.Variant
 import strategygames.GameLogic
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.memo.CacheApi
 import lila.user.User
 
@@ -19,7 +18,7 @@ case class PuzzleDashboard(
     byVariantAndTheme: Map[(Variant, PuzzleTheme.Key), PuzzleDashboard.Results]
 ) {
 
-  import PuzzleDashboard._
+  import PuzzleDashboard.*
 
   def strongAndWeakThemesByVariant
       : Map[Variant, (List[(PuzzleTheme.Key, Results)], List[(PuzzleTheme.Key, Results)])] =
@@ -81,7 +80,7 @@ object PuzzleDashboard {
     def firstWinPercent = if (nb == 0) 0 else firstWins * 100 / nb
 
     lazy val performance =
-      if (nb == 0) puzzleRatingAvg else (puzzleRatingAvg - 500 + math.round(1000 * (firstWins.toFloat / nb)))
+      if (nb == 0) puzzleRatingAvg else puzzleRatingAvg - 500 + math.round(1000 * (firstWins.toFloat / nb))
 
     def clear   = nb >= 6 && firstWins >= 2 && failed >= 2
     def unclear = !clear
@@ -119,7 +118,7 @@ final class PuzzleDashboardApi(
     cacheApi: CacheApi
 )(implicit ec: ExecutionContext) {
 
-  import PuzzleDashboard._
+  import PuzzleDashboard.*
 
   def apply(u: User, days: Days): Fu[Option[PuzzleDashboard]] = cache.get(u.id -> days)
 
@@ -130,18 +129,18 @@ final class PuzzleDashboardApi(
       }
     }
 
-  //TODO maybe remove bytheme query and data as no longer required?
+  // TODO maybe remove bytheme query and data as no longer required?
   private def compute(userId: User.ID, days: Days): Fu[Option[PuzzleDashboard]] =
     colls.round {
       _.aggregateOne() { framework =>
-        import framework._
+        import framework.*
         val resultsGroup = List(
           "nb"     -> SumAll,
           "wins"   -> Sum(countField("w")),
           "fixes"  -> Sum(countField("f")),
           "rating" -> AvgField("puzzle.rating")
         )
-        Match($doc("u" -> userId, "d" $gt DateTime.now.minusDays(days))) -> List(
+        Match($doc("u" -> userId, "d".$gt(DateTime.now.minusDays(days)))) -> List(
           Sort(Descending("d")),
           Limit(10_000),
           PipelineOperator(
@@ -155,11 +154,11 @@ final class PuzzleDashboardApi(
           Unwind("puzzle"),
           Facet(
             List(
-              "global" -> List(Group(BSONNull)(resultsGroup: _*)),
+              "global"  -> List(Group(BSONNull)(resultsGroup*)),
               "byTheme" -> List(
                 Unwind("puzzle.themes"),
                 Match(relevantThemesSelect),
-                GroupField("puzzle.themes")(resultsGroup: _*)
+                GroupField("puzzle.themes")(resultsGroup*)
               ),
               "byVariant" -> List(
                 Group(
@@ -167,18 +166,18 @@ final class PuzzleDashboardApi(
                     "variant" -> "$puzzle.v",
                     "lib"     -> "$puzzle.l"
                   )
-                )(resultsGroup: _*)
+                )(resultsGroup*)
               ),
               "byVariantAndTheme" -> List(
                 Unwind("puzzle.themes"),
-                //Match(relevantThemesSelect), //With few puzzles per variant, we keep all themes
+                // Match(relevantThemesSelect), //With few puzzles per variant, we keep all themes
                 Group(
                   $doc(
                     "variant" -> "$puzzle.v",
                     "lib"     -> "$puzzle.l",
                     "theme"   -> "$puzzle.themes"
                   )
-                )(resultsGroup: _*)
+                )(resultsGroup*)
               )
             )
           )
@@ -191,32 +190,35 @@ final class PuzzleDashboardApi(
             globalDoc  <- globalDocs.headOption
             global     <- readResults(globalDoc)
             themeDocs  <- result.getAsOpt[List[Bdoc]]("byTheme")
-            byTheme = for {
-              doc      <- themeDocs
-              themeStr <- doc.string("_id")
-              theme    <- PuzzleTheme find themeStr
-              results  <- readResults(doc)
-            } yield theme.key -> results
+            byTheme =
+              for {
+                doc      <- themeDocs
+                themeStr <- doc.string("_id")
+                theme    <- PuzzleTheme.find(themeStr)
+                results  <- readResults(doc)
+              } yield theme.key -> results
             variantDocs <- result.getAsOpt[List[Bdoc]]("byVariant")
-            byVariant = for {
-              doc       <- variantDocs
-              idDoc     <- doc.getAsOpt[Bdoc]("_id")
-              variantId <- idDoc.int("variant")
-              lib       <- idDoc.int("lib")
-              variant = Variant.orDefault(GameLogic(lib), variantId)
-              results <- readResults(doc)
-            } yield variant -> results
+            byVariant =
+              for {
+                doc       <- variantDocs
+                idDoc     <- doc.getAsOpt[Bdoc]("_id")
+                variantId <- idDoc.int("variant")
+                lib       <- idDoc.int("lib")
+                variant = Variant.orDefault(GameLogic(lib), variantId)
+                results <- readResults(doc)
+              } yield variant -> results
             variantAndThemeDocs <- result.getAsOpt[List[Bdoc]]("byVariantAndTheme")
-            byVariantAndTheme = for {
-              doc       <- variantAndThemeDocs
-              idDoc     <- doc.getAsOpt[Bdoc]("_id")
-              variantId <- idDoc.int("variant")
-              lib       <- idDoc.int("lib")
-              themeStr  <- idDoc.string("theme")
-              variant = Variant.orDefault(GameLogic(lib), variantId)
-              theme   <- PuzzleTheme find themeStr
-              results <- readResults(doc)
-            } yield (variant, theme.key) -> results
+            byVariantAndTheme =
+              for {
+                doc       <- variantAndThemeDocs
+                idDoc     <- doc.getAsOpt[Bdoc]("_id")
+                variantId <- idDoc.int("variant")
+                lib       <- idDoc.int("lib")
+                themeStr  <- idDoc.string("theme")
+                variant = Variant.orDefault(GameLogic(lib), variantId)
+                theme   <- PuzzleTheme.find(themeStr)
+                results <- readResults(doc)
+              } yield (variant, theme.key) -> results
           } yield PuzzleDashboard(
             global = global,
             byTheme = byTheme.toMap,
@@ -237,6 +239,6 @@ final class PuzzleDashboardApi(
   } yield Results(nb, wins, fixes, rating.toInt)
 
   val relevantThemesSelect = $doc(
-    "puzzle.themes" $nin irrelevantThemes.map(_.value)
+    "puzzle.themes".$nin(irrelevantThemes.map(_.value))
   )
 }

@@ -1,12 +1,13 @@
 package lila.security
 
 import com.github.blemale.scaffeine.AsyncLoadingCache
-import play.api.libs.json._
-import play.api.libs.ws.JsonBodyReadables._
+import play.api.libs.json.*
+import play.api.libs.ws.JsonBodyReadables.*
 import play.api.libs.ws.StandaloneWSClient
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import lila.common.IpAddress
+import lila.common.extensions.*
 
 trait Ip2Proxy {
 
@@ -54,18 +55,18 @@ final class Ip2ProxyServer(
 
   private def batch(ips: Seq[IpAddress]): Fu[Seq[Boolean]] =
     ips.take(50) match { // 50 * ipv6 length < max url length
-      case Nil      => fuccess(Seq.empty[Boolean])
-      case List(ip) => apply(ip).dmap(Seq(_))
-      case ips =>
-        ips.flatMap(cache.getIfPresent).sequenceFu flatMap { cached =>
+      case Nil     => fuccess(Seq.empty[Boolean])
+      case Seq(ip) => apply(ip).dmap(Seq(_))
+      case ips     =>
+        Future.sequence(ips.flatMap(cache.getIfPresent)) flatMap { cached =>
           if (cached.sizeIs == ips.size) fuccess(cached)
           else
             ws.url(s"$checkUrl/batch")
               .addQueryStringParameters("ips" -> ips.mkString(","))
               .get()
-              .withTimeout(3 seconds)
+              .withTimeout(3 seconds, "Ip2ProxyServer batch timeout")
               .map {
-                _.body[JsValue].asOpt[Seq[JsObject]] ?? {
+                _.body[JsValue].asOpt[Seq[JsObject]] so {
                   _.map(readIsProxy)
                 }
               }
@@ -85,11 +86,11 @@ final class Ip2ProxyServer(
   private val cache: AsyncLoadingCache[IpAddress, Boolean] = cacheApi.scaffeine
     .expireAfterWrite(1 days)
     .buildAsyncFuture { ip =>
-      checkUrl.nonEmpty ?? ws
+      checkUrl.nonEmpty so ws
         .url(checkUrl)
         .addQueryStringParameters("ip" -> ip.value)
         .get()
-        .withTimeout(2 seconds)
+        .withTimeout(2 seconds, "Ip2ProxyServer cache timeout")
         .dmap(_.body[JsValue])
         .dmap(readIsProxy)
         .monSuccess(_.security.proxy.request)

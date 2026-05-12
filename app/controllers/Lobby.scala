@@ -1,10 +1,10 @@
 package controllers
 
-import play.api.libs.json._
-import play.api.mvc._
+import play.api.libs.json.*
+import play.api.mvc.*
 
-import lila.app._
-import views._
+import lila.app.*
+import views.*
 
 final class Lobby(
     env: Env
@@ -39,7 +39,7 @@ final class Lobby(
 
   def handleStatus(req: RequestHeader, status: Results.Status): Fu[Result] =
     reqToCtx(req) flatMap { ctx =>
-      keyPages.home(status)(ctx)
+      keyPages.home(status)(using ctx)
     }
 
   def seeks =

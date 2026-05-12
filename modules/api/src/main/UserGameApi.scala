@@ -1,10 +1,9 @@
 package lila.api
 
 import play.api.i18n.Lang
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import strategygames.format.Forsyth
-import strategygames.GameLogic
 
 import lila.common.Json.jodaWrites
 import lila.common.LightUser
@@ -18,7 +17,7 @@ final class UserGameApi(
     getTournamentName: lila.tournament.GetTourName
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import lila.game.JsonView._
+  import lila.game.JsonView.*
   import LightUser.lightUserWrites
 
   def jsPaginator(pag: Paginator[Game])(implicit ctx: Context): Fu[JsObject] =
@@ -27,7 +26,7 @@ final class UserGameApi(
       _             <- lightUser.preloadMany(pag.currentPageResults.flatMap(_.userIds))
     } yield {
       implicit val gameWriter = Writes[Game] { g =>
-        write(g, bookmarkedIds(g.id), ctx.me)(ctx.lang)
+        write(g, bookmarkedIds(g.id), ctx.me)(using ctx.lang)
       }
       Json.obj(
         "paginator" -> lila.common.paginator.PaginatorJson(pag)
@@ -47,7 +46,7 @@ final class UserGameApi(
         "turns"     -> g.turnCount,
         "status"    -> g.status,
         "source"    -> g.source.map(_.name),
-        "players" -> JsObject(g.players map { p =>
+        "players"   -> JsObject(g.players map { p =>
           p.playerIndex.name -> Json
             .obj(
               "user"   -> p.userId.flatMap(lightUser.sync),

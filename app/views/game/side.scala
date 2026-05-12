@@ -7,11 +7,9 @@ import strategygames.GameFamily
 import strategygames.variant.Variant
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.i18n.VariantKeys
-
-import controllers.routes
 
 object side {
 
@@ -28,9 +26,11 @@ object side {
       bookmarked: Boolean,
       swissPairingGames: Option[lila.swiss.SwissPairingGames]
   )(implicit ctx: Context): Option[Frag] =
-    ctx.noBlind option frag(
-      meta(pov, initialFen, tour, simul, userTv, bookmarked, swissPairingGames),
-      pov.game.userIds.filter(isStreaming) map views.html.streamer.bits.contextual
+    ctx.noBlind.option(
+      frag(
+        meta(pov, initialFen, tour, simul, userTv, bookmarked, swissPairingGames),
+        pov.game.userIds.filter(isStreaming) map views.html.streamer.bits.contextual
+      )
     )
 
   def meta(
@@ -43,7 +43,7 @@ object side {
       swissPairingGames: Option[lila.swiss.SwissPairingGames]
   )(implicit ctx: Context): Option[Frag] =
     ctx.noBlind option {
-      import pov._
+      import pov.*
       div(cls := "game__meta")(
         st.section(
           div(cls := "game__meta__infos", dataIcon := bits.gameIcon(game))(
@@ -64,23 +64,22 @@ object side {
                           initialFen = initialFen,
                           game.metadata.multiPointState.map(_.target)
                         )
-                      else
-                        VariantKeys.variantName(game.variant).toUpperCase
+                      else VariantKeys.variantName(game.variant).toUpperCase
                     )
                   else
                     frag(
                       a(
-                        cls := "remove_color",
-                        title := "Clock info",
-                        href := s"${routes.Page.lonePage("clocks")}",
+                        cls    := "remove_color",
+                        title  := "Clock info",
+                        href   := s"${routes.Page.lonePage("clocks")}",
                         target := "_blank"
-                      )(widgets showClock game),
+                      )(widgets.showClock(game)),
                       separator,
                       if (game.fromHandicappedTournament) {
                         a(
-                          cls := "remove_color",
-                          title := "Handicap info",
-                          href := s"${routes.Page.lonePage("handicaps")}",
+                          cls    := "remove_color",
+                          title  := "Handicap info",
+                          href   := s"${routes.Page.lonePage("handicaps")}",
                           target := "_blank"
                         )(trans.handicapped.txt())
                       } else if (game.rated) trans.rated.txt()
@@ -108,12 +107,16 @@ object side {
                   )
                 }
               ),
-              game.pgnImport.exists(_.date.isDefined) option small(
-                "Imported ",
-                game.pgnImport.flatMap(_.user).map { user =>
-                  trans.by(userIdLink(user.some, None, withOnline = false))
-                }
-              )
+              game.pgnImport
+                .exists(_.date.isDefined)
+                .option(
+                  small(
+                    "Imported ",
+                    game.pgnImport.flatMap(_.user).map { user =>
+                      trans.by(userIdLink(user.some, None, withOnline = false))
+                    }
+                  )
+                )
             )
           ),
           div(cls := "game__meta__players")(
@@ -215,7 +218,7 @@ object side {
                   else if (spg.isPlayX) s" (play ${spg.nbGamesPerRound} games)"
                   else "",
                   s" : ${spg.game.p1Player.userId.getOrElse("?")} (${spg.strResultOf(P1)}) vs ${spg.game.p2Player.userId
-                    .getOrElse("?")} (${spg.strResultOf(P2)}) : ",
+                      .getOrElse("?")} (${spg.strResultOf(P2)}) : ",
                   spg.multiMatchGames
                     .foldLeft(List(spg.game))(_ ++ _)
                     .zipWithIndex
@@ -223,7 +226,7 @@ object side {
                       case (mmGame, index) => {
                         val current = if (mmGame.id == game.id) " current" else ""
                         a(
-                          cls := s"text glpt${current} mm_game_link",
+                          cls  := s"text glpt${current} mm_game_link",
                           href := routes.Round.watcher(mmGame.id, (!pov.playerIndex).name)
                         )(
                           trans.gameNumberX(index + 1)

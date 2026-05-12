@@ -3,21 +3,20 @@ package lila.clas
 import play.api.Mode
 import reactivemongo.api.bson.BSONNull
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.memo.CacheApi
 import lila.user.User
 import reactivemongo.core.errors.DatabaseException
 
 final class ClasMatesCache(colls: ClasColls, cacheApi: CacheApi, studentCache: ClasStudentCache)(implicit
     ec: ExecutionContext,
-    mode: Mode
+    _mode: Mode
 ) {
 
   def get(studentId: User.ID): Fu[Set[User.ID]] =
-    studentCache.isStudent(studentId) ?? cache.get(studentId)
+    studentCache.isStudent(studentId) so cache.get(studentId)
 
   private val cache = cacheApi[User.ID, Set[User.ID]](256, "clas.mates") {
     _.expireAfterWrite(5 minutes)
@@ -27,7 +26,7 @@ final class ClasMatesCache(colls: ClasColls, cacheApi: CacheApi, studentCache: C
   private def fetchMatesAndTeachers(studentId: User.ID): Fu[Set[User.ID]] =
     colls.student
       .aggregateOne(ReadPreference.secondaryPreferred) { framework =>
-        import framework._
+        import framework.*
         Match($doc("userId" -> studentId)) -> List(
           Group(BSONNull)("classes" -> PushField("clasId")),
           Facet(
@@ -36,9 +35,9 @@ final class ClasMatesCache(colls: ClasColls, cacheApi: CacheApi, studentCache: C
                 PipelineOperator(
                   $doc(
                     "$lookup" -> $doc(
-                      "from" -> colls.student.name,
-                      "as"   -> "mates",
-                      "let"  -> $doc("ids" -> "$classes"),
+                      "from"     -> colls.student.name,
+                      "as"       -> "mates",
+                      "let"      -> $doc("ids" -> "$classes"),
                       "pipeline" -> $arr(
                         $doc(
                           "$match" -> $doc(
@@ -66,9 +65,9 @@ final class ClasMatesCache(colls: ClasColls, cacheApi: CacheApi, studentCache: C
                 PipelineOperator(
                   $doc(
                     "$lookup" -> $doc(
-                      "from" -> colls.clas.name,
-                      "as"   -> "teachers",
-                      "let"  -> $doc("ids" -> "$classes"),
+                      "from"     -> colls.clas.name,
+                      "as"       -> "teachers",
+                      "let"      -> $doc("ids" -> "$classes"),
                       "pipeline" -> $arr(
                         $doc(
                           "$match" -> $doc(

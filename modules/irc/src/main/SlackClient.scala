@@ -1,9 +1,9 @@
 package lila.irc
 
-import play.api.libs.json._
-import play.api.libs.ws.JsonBodyWritables._
+import play.api.libs.json.*
+import play.api.libs.ws.JsonBodyWritables.*
 import play.api.libs.ws.StandaloneWSClient
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import lila.common.config.Secret
 import lila.memo.RateLimit
@@ -39,6 +39,6 @@ final private class SlackClient(ws: StandaloneWSClient, url: Secret)(implicit
             case res if res.status == 200 => funit
             case res                      => fufail(s"[slack] $url $msg ${res.status} ${res.body}")
           }
-          .nevermind
+          .recoverDefault
     }(funit)
 }

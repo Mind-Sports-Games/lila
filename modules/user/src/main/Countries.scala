@@ -1,6 +1,6 @@
 package lila.user
 
-import scala._
+import scala.*
 
 final class Country(
     val code: String,

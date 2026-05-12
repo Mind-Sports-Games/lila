@@ -1,8 +1,8 @@
 package lila.notify
 
 import lila.common.LightUser
-import play.api.libs.json._
-import lila.i18n.{ I18nKeys => trans }
+import play.api.libs.json.*
+import lila.i18n.I18nKeys as trans
 
 import lila.common.Json.jodaWrites
 import play.api.i18n.Lang
@@ -12,7 +12,7 @@ final class JSONHandlers(getLightUser: LightUser.GetterSync) {
 
   implicit val notificationWrites: Writes[Notification] = new Writes[Notification] {
 
-    private def writeBody(notificationContent: NotificationContent) = {
+    private def writeBody(notificationContent: NotificationContent) =
       notificationContent match {
         case MentionedInThread(mentionedBy, topic, _, category, postId) =>
           Json.obj(
@@ -37,7 +37,7 @@ final class JSONHandlers(getLightUser: LightUser.GetterSync) {
             "id"   -> id.value,
             "name" -> name.value
           )
-        case ReportedBanned | CoachReview => Json.obj()
+        case ReportedBanned | CoachReview         => Json.obj()
         case TitledTournamentInvitation(id, text) =>
           Json.obj(
             "id"   -> id,
@@ -49,8 +49,8 @@ final class JSONHandlers(getLightUser: LightUser.GetterSync) {
             "opponent" -> opponentId.map(_.value).flatMap(getLightUser),
             "win"      -> win.map(_.value)
           )
-        case _: PlanStart  => Json.obj()
-        case _: PlanExpire => Json.obj()
+        case _: PlanStart               => Json.obj()
+        case _: PlanExpire              => Json.obj()
         case RatingRefund(perf, points) =>
           Json.obj(
             "perf"   -> perf,
@@ -73,7 +73,6 @@ final class JSONHandlers(getLightUser: LightUser.GetterSync) {
             "icon"  -> icon
           )
       }
-    }
 
     def writes(notification: Notification) =
       Json.obj(
@@ -84,7 +83,7 @@ final class JSONHandlers(getLightUser: LightUser.GetterSync) {
       )
   }
 
-  import lila.common.paginator.PaginatorJson._
+  import lila.common.paginator.PaginatorJson.*
   implicit val unreadWrites: Writes[Notification.UnreadCount] = Writes[Notification.UnreadCount] { v =>
     JsNumber(v.value)
   }

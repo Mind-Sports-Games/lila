@@ -31,7 +31,7 @@ object SyncLog {
   ) {
     def isOk      = error.isEmpty
     def isKo      = error.nonEmpty
-    def isTimeout = error has SyncResult.Timeout.getMessage
+    def isTimeout = error contains SyncResult.Timeout.getMessage
   }
 
   def event(moves: Int, e: Option[Exception]) =

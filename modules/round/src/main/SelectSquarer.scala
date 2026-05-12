@@ -1,13 +1,13 @@
 package lila.round
 
-import strategygames.{ Centis, Pos }
+import strategygames.Pos
 import strategygames.variant.Variant
 import strategygames.format.Uci
 
 import lila.common.Bus
-import lila.game.{ Event, Game, Pov, Progress, Player => GamePlayer }
-import lila.i18n.{ I18nKeys => trans, defaultLang }
-import lila.pref.{ Pref, PrefApi }
+import lila.game.{ Event, Game, Player as GamePlayer, Pov, Progress }
+import lila.i18n.{ defaultLang, I18nKeys as trans }
+import lila.pref.PrefApi
 import actorApi.round.HumanPlay
 import lila.hub.actorApi.round.BotPlay
 import lila.hub.actorApi.map.Tell
@@ -15,14 +15,14 @@ import play.api.i18n.Lang
 
 final private[round] class SelectSquarer(
     messenger: Messenger,
-    finisher: Finisher,
-    prefApi: PrefApi,
-    isBotSync: lila.common.LightUser.IsBotSync
+    @annotation.nowarn("msg=unused") _finisher: Finisher,
+    @annotation.nowarn("msg=unused") _prefApi: PrefApi,
+    @annotation.nowarn("msg=unused") _isBotSync: lila.common.LightUser.IsBotSync
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   implicit private val chatLang: Lang = defaultLang
 
-  def accept(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable ?? {
+  def accept(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = if (pov.game.playable) {
     val squares: List[Pos] = pov.game.selectedSquares.getOrElse(List[Pos]().empty)
     pov match {
       case Pov(g, playerIndex) if pov.opponent.isOfferingSelectSquares =>
@@ -39,35 +39,39 @@ final private[round] class SelectSquarer(
         )
       case _ => fuccess(List(Event.ReloadOwner))
     }
-  }
+  } else fuccess(Nil)
 
-  def decline(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable ?? {
+  def decline(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = if (pov.game.playable) {
     val squares: List[Pos] = pov.game.selectedSquares.getOrElse(List[Pos]().empty)
     pov match {
       case Pov(g, playerIndex) if pov.opponent.isOfferingSelectSquares =>
-        proxy.save {
-          messenger.system(g, trans.selectSquareOfferDeclined.txt())
-          Progress(g) map { _.declineSelectSquares(playerIndex) }
-        } >>- publishSquareOfferEvent(pov) inject List(
+        proxy
+          .save {
+            messenger.system(g, trans.selectSquareOfferDeclined.txt())
+            Progress(g) map { _.declineSelectSquares(playerIndex) }
+          }
+          .andDo(publishSquareOfferEvent(pov)) inject List(
           Event.SelectSquaresOffer(playerIndex, squares, Some(false))
         )
       case _ => fuccess(List(Event.ReloadOwner))
     }
-  }
+  } else fuccess(Nil)
 
   def selectSquares(squares: List[Pos])(pov: Pov)(implicit proxy: GameProxy): Fu[Events] =
-    pov.game.playable ?? {
+    if (pov.game.playable)
       pov match {
-        case Pov(g, playerIndex) if g playerCanOfferSelectSquares playerIndex =>
-          proxy.save {
-            messenger.system(g, trans.playerIndexOffersSelectSquares(pov.game.playerTrans(playerIndex)).v)
-            Progress(g) map { _.offerSelectSquares(playerIndex, squares) }
-          } >>- publishSquareOfferEvent(pov) inject List(
+        case Pov(g, playerIndex) if g.playerCanOfferSelectSquares(playerIndex) =>
+          proxy
+            .save {
+              messenger.system(g, trans.playerIndexOffersSelectSquares(pov.game.playerTrans(playerIndex)).v)
+              Progress(g) map { _.offerSelectSquares(playerIndex, squares) }
+            }
+            .andDo(publishSquareOfferEvent(pov)) inject List(
             Event.SelectSquaresOffer(playerIndex, squares)
           )
         case _ => fuccess(List(Event.ReloadOwner))
       }
-    }
+    else fuccess(Nil)
 
   private def clientError[A](msg: String): Fu[A] = fufail(lila.round.ClientError(msg))
 
@@ -82,11 +86,8 @@ final private[round] class SelectSquarer(
   ): Funit = {
     val uciStr = "ss:" + squares.mkString(",")
     Uci(variant, uciStr).fold(clientError[Unit](s"Invalid UCI: $uciStr")) { uci =>
-      if (player.isAi || player.isPSBot) {
-        fuccess(tellRound(gameId, BotPlay(player.id, uci, None)))
-      } else {
-        fuccess(tellRound(gameId, HumanPlay(Game.PlayerId(player.id), uci, false)))
-      }
+      if (player.isAi || player.isPSBot) fuccess(tellRound(gameId, BotPlay(player.id, uci, None)))
+      else fuccess(tellRound(gameId, HumanPlay(Game.PlayerId(player.id), uci, false)))
     }
   }
 
@@ -105,7 +106,6 @@ final private[round] class SelectSquarer(
             Bus.publish(lila.game.actorApi.BoardOfferSquares(p), s"boardSelectSquaresOffer:${pov.gameId}")
           )
         }
-        .unit
+        .discard
   }
-
 }

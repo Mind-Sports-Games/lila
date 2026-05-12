@@ -3,9 +3,9 @@ package lila.study
 import strategygames.format.FEN
 import strategygames.format.Forsyth
 import strategygames.variant.Variant
-import strategygames.{ Player => PlayerIndex, P1, GameLogic }
-import play.api.data._
-import play.api.data.Forms._
+import strategygames.{ GameLogic, P1, Player as PlayerIndex }
+import play.api.data.*
+import play.api.data.Forms.*
 
 import lila.common.Form.cleanNonEmptyText
 
@@ -21,7 +21,7 @@ object StudyForm {
         "pgn"         -> optional(nonEmptyText),
         "variant"     -> optional(nonEmptyText),
         "as"          -> optional(nonEmptyText)
-      )(Data.apply)(Data.unapply)
+      )(Data.apply)(unapply)
         .verifying(s"Fen does not match variant given", _.validFen)
     )
 
@@ -42,8 +42,8 @@ object StudyForm {
 
       def validFen: Boolean = actualFen
         .fold(true) { f =>
-          (Forsyth
-            .<<<@(variant.gameLogic, variant, f))
+          Forsyth
+            .<<<@(variant.gameLogic, variant, f)
             .exists(_.situation.playable(false))
         }
 
@@ -82,7 +82,7 @@ object StudyForm {
         "initial"     -> boolean,
         "sticky"      -> boolean,
         "pgn"         -> nonEmptyText
-      )(Data.apply)(Data.unapply)
+      )(Data.apply)(unapply)
     )
 
     case class Data(
@@ -100,7 +100,7 @@ object StudyForm {
         pgns.zipWithIndex map { case (onePgn, index) =>
           ChapterMaker.Data(
             // only the first chapter can be named
-            name = Chapter.Name((index == 0) ?? name),
+            name = Chapter.Name((index == 0) so name),
             variant = variantStr,
             pgn = onePgn.some,
             orientation =
@@ -117,5 +117,5 @@ object StudyForm {
   def topicsForm = Form(single("topics" -> text))
 
   def topicsForm(topics: StudyTopics) =
-    Form(single("topics" -> text)) fill topics.value.map(_.value).mkString(", ")
+    Form(single("topics" -> text)).fill(topics.value.map(_.value).mkString(", "))
 }

@@ -3,10 +3,10 @@ package lila.tournament
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.{ GameLogic, Mode }
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
 import lila.db.BSON
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.rating.PerfType
 import lila.user.User.playstrategyId
 import strategygames.ClockConfig
@@ -16,19 +16,19 @@ object BSONHandlers {
   implicit val stratVariantHandler: BSONHandler[Variant] = stratVariantByKeyHandler
 
   implicit private[tournament] val statusBSONHandler: BSONHandler[Status] = tryHandler[Status](
-    { case BSONInteger(v) => Status(v) toTry s"No such status: $v" },
+    { case BSONInteger(v) => Status(v).toTry(s"No such status: $v") },
     x => BSONInteger(x.id)
   )
 
   implicit private[tournament] val scheduleFreqHandler: BSONHandler[Schedule.Freq] =
     tryHandler[Schedule.Freq](
-      { case BSONString(v) => Schedule.Freq(v) toTry s"No such freq: $v" },
+      { case BSONString(v) => Schedule.Freq(v).toTry(s"No such freq: $v") },
       x => BSONString(x.name)
     )
 
   implicit private[tournament] val scheduleSpeedHandler: BSONHandler[Schedule.Speed] =
     tryHandler[Schedule.Speed](
-      { case BSONString(v) => Schedule.Speed(v) toTry s"No such speed: $v" },
+      { case BSONString(v) => Schedule.Speed(v).toTry(s"No such speed: $v") },
       x => BSONString(x.key)
     )
 
@@ -60,20 +60,20 @@ object BSONHandlers {
       val position: Option[FEN] =
         r.getO[FEN]("fen").filterNot(_.initial) orElse
           r.strO("eco").flatMap(Thematic.byEco).map(f => FEN.wrap(f.fen)) // for BC
-      val startsAt   = r date "startsAt"
+      val startsAt   = r.date("startsAt")
       val conditions = r.getO[Condition.All]("conditions") getOrElse Condition.All.empty
       val mVariants  = r.getO[List[Variant]]("mVariants")
       val mIntervals = r.getO[List[Int]]("mIntervals")
-      val medleyVariantsAndIntervals: Option[List[(Variant, Int)]] = mVariants.map(_.zipWithIndex.map {
-        case (v, i) =>
+      val medleyVariantsAndIntervals: Option[List[(Variant, Int)]] =
+        mVariants.map(_.zipWithIndex.map { case (v, i) =>
           (v, mIntervals.fold(0)(_.lift(i).getOrElse(0)))
-      })
+        })
       Tournament(
-        id = r str "_id",
-        name = r str "name",
+        id = r.str("_id"),
+        name = r.str("name"),
         status = r.get[Status]("status"),
         clock = r.get[strategygames.ClockConfig]("clock"),
-        minutes = r int "minutes",
+        minutes = r.int("minutes"),
         variant = variant,
         medleyVariantsAndIntervals = medleyVariantsAndIntervals,
         medleyMinutes = r.intO("mMinutes"),
@@ -84,28 +84,28 @@ object BSONHandlers {
         password = r.strO("password"),
         conditions = r.getO[Condition.All]("conditions") getOrElse Condition.All.empty,
         teamBattle = r.getO[TeamBattle]("teamBattle"),
-        noBerserk = r boolD "noBerserk",
-        noStreak = r boolD "noStreak",
-        statusScoring = r boolO "statusScoring" getOrElse false,
+        noBerserk = r.boolD("noBerserk"),
+        noStreak = r.boolD("noStreak"),
+        statusScoring = r.boolO("statusScoring") getOrElse false,
         schedule = for {
           doc   <- r.getO[Bdoc]("schedule")
           freq  <- doc.getAsOpt[Schedule.Freq]("freq")
           speed <- doc.getAsOpt[Schedule.Speed]("speed")
         } yield Schedule(freq, speed, variant, position, startsAt, None, None, conditions),
-        nbPlayers = r int "nbPlayers",
-        createdAt = r date "createdAt",
-        createdBy = r strO "createdBy" getOrElse playstrategyId,
+        nbPlayers = r.int("nbPlayers"),
+        createdAt = r.date("createdAt"),
+        createdBy = r.strO("createdBy") getOrElse playstrategyId,
         startsAt = startsAt,
-        winnerId = r strO "winner",
-        featuredId = r strO "featured",
+        winnerId = r.strO("winner"),
+        featuredId = r.strO("featured"),
         spotlight = r.getO[Spotlight]("spotlight"),
-        trophy1st = r strO "trophy1st",
-        trophy2nd = r strO "trophy2nd",
-        trophy3rd = r strO "trophy3rd",
-        trophyExpiryDays = r intO "trophyExpiryDays",
-        botsAllowed = r boolD "botsAllowed",
-        description = r strO "description",
-        hasChat = r boolO "chat" getOrElse true
+        trophy1st = r.strO("trophy1st"),
+        trophy2nd = r.strO("trophy2nd"),
+        trophy3rd = r.strO("trophy3rd"),
+        trophyExpiryDays = r.intO("trophyExpiryDays"),
+        botsAllowed = r.boolD("botsAllowed"),
+        description = r.strO("description"),
+        hasChat = r.boolO("chat") getOrElse true
       )
     }
     def writes(w: BSON.Writer, o: Tournament) =
@@ -152,19 +152,19 @@ object BSONHandlers {
   implicit val playerBSONHandler: BSON[Player] = new BSON[Player] {
     def reads(r: BSON.Reader) =
       Player(
-        _id = r str "_id",
-        tourId = r str "tid",
-        userId = r str "uid",
-        rating = r int "r",
-        provisional = r boolD "pr",
-        inputRating = r intO "ir",
-        isBot = r boolD "b",
-        withdraw = r boolD "w",
-        disqualified = r boolD "dq",
-        score = r intD "s",
-        fire = r boolD "f",
-        performance = r intD "e",
-        team = r strO "t"
+        _id = r.str("_id"),
+        tourId = r.str("tid"),
+        userId = r.str("uid"),
+        rating = r.int("r"),
+        provisional = r.boolD("pr"),
+        inputRating = r.intO("ir"),
+        isBot = r.boolD("b"),
+        withdraw = r.boolD("w"),
+        disqualified = r.boolD("dq"),
+        score = r.intD("s"),
+        fire = r.boolD("f"),
+        performance = r.intD("e"),
+        team = r.strO("t")
       )
     def writes(w: BSON.Writer, o: Player) =
       $doc(
@@ -187,21 +187,21 @@ object BSONHandlers {
 
   implicit val pairingHandler: BSON[Pairing] = new BSON[Pairing] {
     def reads(r: BSON.Reader) = {
-      val users = r strsD "u"
-      val user1 = users.headOption err "tournament pairing first user"
-      val user2 = users lift 1 err "tournament pairing second user"
+      val users = r.strsD("u")
+      val user1 = users.headOption.err("tournament pairing first user")
+      val user2 = users.lift(1).err("tournament pairing second user")
       Pairing(
-        id = r str "_id",
-        tourId = r str "tid",
-        status = strategygames.Status(r int "s") err "tournament pairing status",
+        id = r.str("_id"),
+        tourId = r.str("tid"),
+        status = strategygames.Status(r.int("s")).err("tournament pairing status"),
         user1 = user1,
         user2 = user2,
-        winner = r boolO "w" map {
+        winner = r.boolO("w") map {
           case true => user1
           case _    => user2
         },
-        turns = r intO "t",
-        invertStartPlayer = r boolD "sp",
+        turns = r.intO("t"),
+        invertStartPlayer = r.boolD("sp"),
         berserk1 = r.intO("b1").fold(r.boolD("b1"))(1 ==), // it used to be int = 0/1
         berserk2 = r.intO("b2").fold(r.boolD("b2"))(1 ==)
       )
@@ -223,19 +223,19 @@ object BSONHandlers {
   implicit val leaderboardEntryHandler: BSON[LeaderboardApi.Entry] = new BSON[LeaderboardApi.Entry] {
     def reads(r: BSON.Reader) =
       LeaderboardApi.Entry(
-        id = r str "_id",
-        userId = r str "u",
-        tourId = r str "t",
-        nbGames = r int "g",
-        score = r int "s",
-        rank = r int "r",
+        id = r.str("_id"),
+        userId = r.str("u"),
+        tourId = r.str("t"),
+        nbGames = r.int("g"),
+        score = r.int("s"),
+        rank = r.int("r"),
         rankRatio = r.get[LeaderboardApi.Ratio]("w"),
-        metaPoints = r intO "mp",
-        shieldKey = r strO "k",
-        freq = r intO "f" flatMap Schedule.Freq.byId,
-        speed = r intO "p" flatMap Schedule.Speed.byId,
-        perf = PerfType.byId get r.int("v") err "Invalid leaderboard perf",
-        date = r date "d"
+        metaPoints = r.intO("mp"),
+        shieldKey = r.strO("k"),
+        freq = r.intO("f") flatMap Schedule.Freq.byId,
+        speed = r.intO("p") flatMap Schedule.Speed.byId,
+        perf = PerfType.byId.get(r.int("v")).err("Invalid leaderboard perf"),
+        date = r.date("d")
       )
 
     def writes(w: BSON.Writer, o: LeaderboardApi.Entry) =
@@ -264,10 +264,10 @@ object BSONHandlers {
     new BSON[ShieldTableApi.ShieldTableEntry] {
       def reads(r: BSON.Reader) =
         ShieldTableApi.ShieldTableEntry(
-          id = r str "_id",
-          userId = r str "u",
-          category = ShieldTableApi.Category.getFromId(r int "c"),
-          points = r int "p"
+          id = r.str("_id"),
+          userId = r.str("u"),
+          category = ShieldTableApi.Category.getFromId(r.int("c")),
+          points = r.int("p")
         )
 
       def writes(w: BSON.Writer, o: ShieldTableApi.ShieldTableEntry) =
@@ -278,5 +278,4 @@ object BSONHandlers {
           "p"   -> o.points
         )
     }
-
 }

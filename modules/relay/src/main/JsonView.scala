@@ -1,14 +1,13 @@
 package lila.relay
 
-import play.api.libs.json._
-import scala.concurrent.duration._
+import play.api.libs.json.*
 
 import lila.common.config.BaseUrl
 import lila.common.Json.jodaWrites
 
 final class JsonView(baseUrl: BaseUrl, markup: RelayMarkup) {
 
-  import JsonView._
+  import JsonView.*
 
   def apply(trs: RelayTour.WithRounds, withUrls: Boolean = false) =
     Json
@@ -40,7 +39,7 @@ final class JsonView(baseUrl: BaseUrl, markup: RelayMarkup) {
   ) =
     JsData(
       relay = apply(trs)
-        .add("sync" -> (canContribute ?? trs.rounds.find(_.id == currentRoundId).map(_.sync))),
+        .add("sync" -> (canContribute so trs.rounds.find(_.id == currentRoundId).map(_.sync))),
       study = studyData.study,
       analysis = studyData.analysis
     )
@@ -77,7 +76,7 @@ object JsonView {
       "ongoing" -> s.ongoing,
       "log"     -> s.log.events
     ) ++
-      s.upstream.?? {
+      s.upstream.so {
         case RelayRound.Sync.UpstreamUrl(url) => Json.obj("url" -> url)
         case RelayRound.Sync.UpstreamIds(ids) => Json.obj("ids" -> ids)
       }

@@ -2,9 +2,10 @@ package lila.puzzle
 
 import scala.concurrent.ExecutionContext
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.{ Perfs, User }
 import lila.common.Iso
+import lila.common.extensions.*
 import strategygames.variant.Variant
 import strategygames.GameLogic
 
@@ -33,8 +34,8 @@ final private class PuzzlePathApi(
     colls: PuzzleColls
 )(implicit ec: ExecutionContext) {
 
-  import BsonHandlers._
-  import PuzzlePath._
+  import BsonHandlers.*
+  import PuzzlePath.*
 
   def nextFor(
       user: User,
@@ -51,7 +52,7 @@ final private class PuzzlePathApi(
     colls
       .path {
         _.aggregateOne() { framework =>
-          import framework._
+          import framework.*
           val rating =
             Perfs
               .puzzleLens(variant)
@@ -66,15 +67,16 @@ final private class PuzzlePathApi(
               actualTier,
               (rating - ratingFlex) to (rating + ratingFlex)
             ) ++
-              ((compromise != 5 && previousPaths.nonEmpty) ?? $doc("_id" $nin previousPaths))
+              ((compromise != 5 && previousPaths.nonEmpty) so $doc("_id".$nin(previousPaths)))
           ) -> List(
             Sample(1),
             Project($id(true))
           )
-        }.dmap(_.flatMap(_.getAsOpt[Id]("_id")))
+        }
+          .dmap(_.flatMap(_.getAsOpt[Id]("_id")))
       }
       .flatMap {
-        case Some(path) => fuccess(path.some)
+        case Some(path)                        => fuccess(path.some)
         case _ if actualTier == PuzzleTier.Top =>
           nextFor(user, variant, theme, PuzzleTier.Good, difficulty, previousPaths)
         case _ if actualTier == PuzzleTier.Good && compromise == 2 =>
@@ -90,7 +92,7 @@ final private class PuzzlePathApi(
   def select(variant: Variant, theme: PuzzleTheme.Key, tier: PuzzleTier, rating: Range) = $doc(
     "l" -> variant.gameLogic.id,
     "v" -> variant.id,
-    "min" $lte f"${variant.gameLogic.id}${sep}${variant.id}${sep}${theme}${sep}${tier}${sep}${rating.max}%04d",
-    "max" $gte f"${variant.gameLogic.id}${sep}${variant.id}${sep}${theme}${sep}${tier}${sep}${rating.min}%04d"
+    "min".$lte(f"${variant.gameLogic.id}${sep}${variant.id}${sep}${theme}${sep}${tier}${sep}${rating.max}%04d"),
+    "max".$gte(f"${variant.gameLogic.id}${sep}${variant.id}${sep}${theme}${sep}${tier}${sep}${rating.min}%04d")
   )
 }

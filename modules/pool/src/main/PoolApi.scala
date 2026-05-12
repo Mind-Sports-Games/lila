@@ -1,6 +1,6 @@
 package lila.pool
 
-import akka.actor._
+import akka.actor.*
 
 import lila.game.Game
 import lila.rating.{ PerfType, RatingRange }
@@ -16,8 +16,8 @@ final class PoolApi(
     system: ActorSystem
 ) {
 
-  import PoolApi._
-  import PoolActor._
+  import PoolApi.*
+  import PoolActor.*
 
   private val actors: Map[PoolConfig.Id, ActorRef] = configs.map { config =>
     config.id -> system.actorOf(

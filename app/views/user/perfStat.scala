@@ -3,17 +3,15 @@ package views.html.user
 import play.api.i18n.Lang
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.rating.{ Perf, PerfType }
 import lila.perfStat.PerfStat
 import lila.user.User
 
-import controllers.routes
-
 object perfStat {
 
-  import trans.perfStat._
+  import trans.perfStat.*
 
   def apply(
       u: User,
@@ -32,7 +30,7 @@ object perfStat {
           frag(
             jsTag("chart/ratingHistory.js"),
             embedJsUnsafeLoadThen(
-              s"playstrategy.ratingHistoryChart($rc,'${perfType.trans(lila.i18n.defaultLang)}');"
+              s"playstrategy.ratingHistoryChart($rc,'${perfType.trans(using lila.i18n.defaultLang)}');"
             )
           )
         }
@@ -48,15 +46,17 @@ object perfStat {
               span(perfStats(perfType.trans))
             ),
             div(cls := "box__top__actions")(
-              u.perfs(perfType).nb > 0 option a(
-                cls := "button button-empty text",
-                dataIcon := perfType.iconChar,
-                href := s"${routes.User.games(u.username, "search")}?perf=${perfType.id}"
-              )(viewTheGames()),
+              (u.perfs(perfType).nb > 0).option(
+                a(
+                  cls      := "button button-empty text",
+                  dataIcon := perfType.iconChar,
+                  href     := s"${routes.User.games(u.username, "search")}?perf=${perfType.id}"
+                )(viewTheGames())
+              ),
               bits.perfTrophies(u, rankMap.view.filterKeys(perfType.==).toMap)
             )
           ),
-          ratingChart.isDefined option div(cls := "rating-history")(spinner),
+          ratingChart.isDefined.option(div(cls := "rating-history")(spinner)),
           div(cls := "box__pad perf-stat__content")(
             glicko(u, perfType, u.perfs(perfType), percentile),
             counter(stat.count),
@@ -83,17 +83,19 @@ object perfStat {
             else decimal(perf.glicko.rating).toString
           )
         ),
-        perf.glicko.provisional option frag(
-          " ",
-          span(
-            title := notEnoughRatedGames.txt(),
-            cls := "details"
-          )("(", provisional(), ")")
+        perf.glicko.provisional.option(
+          frag(
+            " ",
+            span(
+              title := notEnoughRatedGames.txt(),
+              cls   := "details"
+            )("(", provisional(), ")")
+          )
         ),
         ". ",
         percentile.filter(_ != 0.0 && !perf.glicko.provisional).map { percentile =>
           span(cls := "details")(
-            if (ctx is u) {
+            if (ctx.is(u)) {
               trans.youAreBetterThanPercentOfPerfTypePlayers(
                 a(href := routes.Stat.ratingDistribution(perfType.key))(strong(percentile, "%")),
                 a(href := routes.Stat.ratingDistribution(perfType.key))(perfType.trans)
@@ -126,7 +128,7 @@ object perfStat {
     )
 
   private def pct(num: Int, denom: Int): String = {
-    (denom != 0) ?? s"${Math.round(num * 100.0 / denom)}%"
+    (denom != 0) so s"${Math.round(num * 100.0 / denom)}%"
   }
 
   private def counter(count: lila.perfStat.Count)(implicit lang: Lang): Frag =
@@ -154,9 +156,11 @@ object perfStat {
               td(count.berserk),
               td(pct(count.berserk, count.tour))
             ),
-            count.seconds > 0 option tr(cls := "full")(
-              th(timeSpentPlaying()),
-              td(colspan := "2")(showPeriod(count.period))
+            (count.seconds > 0).option(
+              tr(cls := "full")(
+                th(timeSpentPlaying()),
+                td(colspan := "2")(showPeriod(count.period))
+              )
             )
           )
         )
@@ -186,7 +190,9 @@ object perfStat {
             ),
             tr(cls := "full")(
               th(disconnections()),
-              td(if (count.disconnects > count.all * 100 / 15) tag("red") else emptyFrag)(count.disconnects),
+              td(if (count.disconnects > count.all * 100 / 15) tag("red") else emptyFrag)(
+                count.disconnects
+              ),
               td(pct(count.disconnects, count.all))
             )
           )

@@ -1,7 +1,7 @@
 package lila.pref
 
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
 import lila.common.Form.{ numberIn, stringIn }
 
@@ -27,41 +27,41 @@ object PrefForm {
         "actionReminder"      -> booleanNumber,
         "coords"              -> checkedNumber(Pref.Coords.choices),
         "replay"              -> checkedNumber(Pref.Replay.choices),
-        //"gameResult"    -> checkedNumber(Pref.DraughtsGameResult.choices),
-        "coordSystem"   -> checkedNumber(Pref.DraughtsCoordSystem.choices),
-        "pieceNotation" -> optional(booleanNumber),
+        // "gameResult"    -> checkedNumber(Pref.DraughtsGameResult.choices),
+        "coordSystem"     -> checkedNumber(Pref.DraughtsCoordSystem.choices),
+        "pieceNotation"   -> optional(booleanNumber),
         "zen"             -> optional(booleanNumber),
         "resizeHandle"    -> optional(checkedNumber(Pref.ResizeHandle.choices)),
         "blindfold"       -> checkedNumber(Pref.Blindfold.choices),
         "boardIdentifier" -> optional(booleanNumber)
-      )(DisplayData.apply)(DisplayData.unapply),
+      )(DisplayData.apply)(unapply),
       "behavior" -> mapping(
-        "moveEvent"        -> optional(numberIn(Set(0, 1, 2))),
-        "mancalaMove"      -> optional(booleanNumber),
-        "premove"          -> booleanNumber,
-        "takeback"         -> checkedNumber(Pref.Takeback.choices),
-        "autoQueen"        -> checkedNumber(Pref.AutoQueen.choices),
-        "autoThreefold"    -> checkedNumber(Pref.AutoThreefold.choices),
-        "submitMove"       -> checkedNumber(Pref.SubmitMove.choices),
-        "confirmResign"       -> checkedNumber(Pref.ConfirmResign.choices),
-        "confirmPass"         -> checkedNumber(Pref.ConfirmPass.choices),
-        "confirmCubeActions"  -> optional(booleanNumber),
-        "playForcedAction"    -> checkedNumber(Pref.PlayForcedAction.choices),
-        "keyboardMove"     -> optional(booleanNumber),
-        "rookCastle"       -> optional(booleanNumber)
-      )(BehaviorData.apply)(BehaviorData.unapply),
+        "moveEvent"          -> optional(numberIn(Set(0, 1, 2))),
+        "mancalaMove"        -> optional(booleanNumber),
+        "premove"            -> booleanNumber,
+        "takeback"           -> checkedNumber(Pref.Takeback.choices),
+        "autoQueen"          -> checkedNumber(Pref.AutoQueen.choices),
+        "autoThreefold"      -> checkedNumber(Pref.AutoThreefold.choices),
+        "submitMove"         -> checkedNumber(Pref.SubmitMove.choices),
+        "confirmResign"      -> checkedNumber(Pref.ConfirmResign.choices),
+        "confirmPass"        -> checkedNumber(Pref.ConfirmPass.choices),
+        "confirmCubeActions" -> optional(booleanNumber),
+        "playForcedAction"   -> checkedNumber(Pref.PlayForcedAction.choices),
+        "keyboardMove"       -> optional(booleanNumber),
+        "rookCastle"         -> optional(booleanNumber)
+      )(BehaviorData.apply)(unapply),
       "clock" -> mapping(
         "tenths"   -> checkedNumber(Pref.ClockTenths.choices),
         "bar"      -> booleanNumber,
         "sound"    -> booleanNumber,
         "moretime" -> checkedNumber(Pref.Moretime.choices)
-      )(ClockData.apply)(ClockData.unapply),
+      )(ClockData.apply)(unapply),
       "follow"       -> booleanNumber,
       "challenge"    -> checkedNumber(Pref.Challenge.choices),
       "message"      -> checkedNumber(Pref.Message.choices),
       "studyInvite"  -> optional(checkedNumber(Pref.StudyInvite.choices)),
       "insightShare" -> numberIn(Set(0, 1, 2))
-    )(PrefData.apply)(PrefData.unapply)
+    )(PrefData.apply)(unapply)
   )
 
   case class DisplayData(
@@ -73,7 +73,7 @@ object PrefForm {
       actionReminder: Int,
       coords: Int,
       replay: Int,
-      //gameResult: Int,
+      // gameResult: Int,
       coordSystem: Int,
       pieceNotation: Option[Int],
       zen: Option[Int],
@@ -132,7 +132,7 @@ object PrefForm {
         actionReminder = display.actionReminder == 1,
         coords = display.coords,
         replay = display.replay,
-        //gameResult = display.gameResult,
+        // gameResult = display.gameResult,
         coordSystem = display.coordSystem,
         blindfold = display.blindfold,
         challenge = challenge,
@@ -169,7 +169,7 @@ object PrefForm {
           animation = pref.animation,
           coords = pref.coords,
           replay = pref.replay,
-          //gameResult = pref.gameResult,
+          // gameResult = pref.gameResult,
           coordSystem = pref.coordSystem,
           captured = if (pref.captured) 1 else 0,
           blindfold = pref.blindfold,
@@ -207,35 +207,35 @@ object PrefForm {
       )
   }
 
-  def prefOf(p: Pref): Form[PrefData] = pref fill PrefData(p)
+  def prefOf(p: Pref): Form[PrefData] = pref.fill(PrefData(p))
 
   val theme = Form(
     single(
-      "theme" -> text.verifying(Theme contains _)
+      "theme" -> text.verifying(Theme.contains(_))
     )
   )
 
   val pieceSet = Form(
     single(
-      "set" -> text.verifying(PieceSet contains _)
+      "set" -> text.verifying(PieceSet.contains(_))
     )
   )
 
   val theme3d = Form(
     single(
-      "theme" -> text.verifying(Theme3d contains _)
+      "theme" -> text.verifying(Theme3d.contains(_))
     )
   )
 
   val pieceSet3d = Form(
     single(
-      "set" -> text.verifying(PieceSet3d contains _)
+      "set" -> text.verifying(PieceSet3d.contains(_))
     )
   )
 
   val soundSet = Form(
     single(
-      "set" -> text.verifying(SoundSet contains _)
+      "set" -> text.verifying(SoundSet.contains(_))
     )
   )
 

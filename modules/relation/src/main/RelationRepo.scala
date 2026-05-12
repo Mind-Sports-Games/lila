@@ -1,17 +1,17 @@
 package lila.relation
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import reactivemongo.api.ReadPreference
 import org.joda.time.DateTime
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final private class RelationRepo(coll: Coll, userRepo: lila.user.UserRepo)(implicit
     ec: scala.concurrent.ExecutionContext
 ) {
 
-  import RelationRepo._
+  import RelationRepo.*
 
   def following(userId: ID) = relating(userId, Follow)
 
@@ -20,14 +20,14 @@ final private class RelationRepo(coll: Coll, userRepo: lila.user.UserRepo)(impli
 
   def freshFollowersFromSecondary(userId: ID): Fu[List[User.ID]] =
     coll
-      .aggregateOne(readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
-        import framework._
+      .aggregateOne(readPreference = ReadPreference.secondaryPreferred) { framework =>
+        import framework.*
         Match($doc("u2" -> userId, "r" -> Follow)) -> List(
           PipelineOperator(
             $doc(
               "$lookup" -> $doc(
-                "from" -> userRepo.coll.name,
-                "let"  -> $doc("uid" -> "$u1"),
+                "from"     -> userRepo.coll.name,
+                "let"      -> $doc("uid" -> "$u1"),
                 "pipeline" -> $arr(
                   $doc(
                     "$match" -> $doc(
@@ -45,7 +45,7 @@ final private class RelationRepo(coll: Coll, userRepo: lila.user.UserRepo)(impli
               )
             )
           ),
-          Match("follower" $ne $arr()),
+          Match("follower".$ne($arr())),
           Group(BSONNull)(
             "ids" -> PushField("u1")
           )
@@ -54,12 +54,12 @@ final private class RelationRepo(coll: Coll, userRepo: lila.user.UserRepo)(impli
       .map(~_.flatMap(_.getAsOpt[List[User.ID]]("ids")))
 
   def followingLike(userId: ID, term: String): Fu[List[ID]] =
-    User.validateId(term) ?? { valid =>
+    User.validateId(term) so { valid =>
       coll.secondaryPreferred.distinctEasy[ID, List](
         "u2",
         $doc(
           "u1" -> userId,
-          "u2" $startsWith valid,
+          "u2".$startsWith(valid),
           "r" -> Follow
         )
       )

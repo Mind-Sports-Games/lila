@@ -1,36 +1,36 @@
 package lila.insight
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
 import strategygames.chess.opening.{ Ecopening, EcopeningDB }
-import strategygames.{ Player => PlayerIndex, GameFamily, GameLogic, Role }
+import strategygames.{ GameFamily, GameLogic, Player as PlayerIndex, Role }
 import lila.db.BSON
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.rating.BSONHandlers.perfTypeIdHandler
 import lila.rating.PerfType
 
 private object BSONHandlers {
 
   implicit val EcopeningBSONHandler: BSONHandler[Ecopening] = tryHandler[Ecopening](
-    { case BSONString(v) => EcopeningDB.allByEco get v toTry s"Invalid ECO $v" },
+    { case BSONString(v) => EcopeningDB.allByEco.get(v).toTry(s"Invalid ECO $v") },
     e => BSONString(e.eco)
   )
   implicit val RelativeStrengthBSONHandler: BSONHandler[RelativeStrength] = tryHandler[RelativeStrength](
-    { case BSONInteger(v) => RelativeStrength.byId get v toTry s"Invalid relative strength $v" },
+    { case BSONInteger(v) => RelativeStrength.byId.get(v).toTry(s"Invalid relative strength $v") },
     e => BSONInteger(e.id)
   )
   implicit val ResultBSONHandler: BSONHandler[Result] = tryHandler[Result](
-    { case BSONInteger(v) => Result.byId get v toTry s"Invalid result $v" },
+    { case BSONInteger(v) => Result.byId.get(v).toTry(s"Invalid result $v") },
     e => BSONInteger(e.id)
   )
 
   implicit val PhaseBSONHandler: BSONHandler[Phase] = tryHandler[Phase](
-    { case BSONInteger(v) => Phase.byId get v toTry s"Invalid phase $v" },
+    { case BSONInteger(v) => Phase.byId.get(v).toTry(s"Invalid phase $v") },
     e => BSONInteger(e.id)
   )
 
-  //When we originally wrote this we made LOA have the same index as Chess
-  //But we have since split all other Roles by GameFamily (not GameLogic)
+  // When we originally wrote this we made LOA have the same index as Chess
+  // But we have since split all other Roles by GameFamily (not GameLogic)
   private def roleIndex(r: Role): Int =
     if (r.gameLogic == GameLogic.Chess()) r.gameLogic.id else r.gameFamily.id
 
@@ -38,32 +38,35 @@ private object BSONHandlers {
     { case BSONString(r) =>
       r.split(":") match {
         case Array(lib, r) =>
-          //require gf for fairy as roles are different, all other gamelogic currently dont need this
+          // require gf for fairy as roles are different, all other gamelogic currently dont need this
           if (lib.toInt == 2)
-            Role.allByForsyth(
-              GameLogic.FairySF(),
-              GameFamily(lib.toInt)
-            ) get r.head toTry s"Invalid role $r"
-          else Role.allByForsyth(GameLogic(lib.toInt)) get r.head toTry s"Invalid role $r"
+            Role
+              .allByForsyth(
+                GameLogic.FairySF(),
+                GameFamily(lib.toInt)
+              )
+              .get(r.head)
+              .toTry(s"Invalid role $r")
+          else Role.allByForsyth(GameLogic(lib.toInt)).get(r.head).toTry(s"Invalid role $r")
         case _ => sys.error("role not correctly encoded")
       }
     },
     e => BSONString(s"${roleIndex(e)}:${e.forsyth.toString}")
   )
   implicit val TerminationBSONHandler: BSONHandler[Termination] = tryHandler[Termination](
-    { case BSONInteger(v) => Termination.byId get v toTry s"Invalid termination $v" },
+    { case BSONInteger(v) => Termination.byId.get(v).toTry(s"Invalid termination $v") },
     e => BSONInteger(e.id)
   )
   implicit val MovetimeRangeBSONHandler: BSONHandler[MovetimeRange] = tryHandler[MovetimeRange](
-    { case BSONInteger(v) => MovetimeRange.byId get v toTry s"Invalid movetime range $v" },
+    { case BSONInteger(v) => MovetimeRange.byId.get(v).toTry(s"Invalid movetime range $v") },
     e => BSONInteger(e.id)
   )
   implicit val CastlingBSONHandler: BSONHandler[Castling] = tryHandler[Castling](
-    { case BSONInteger(v) => Castling.byId get v toTry s"Invalid Castling $v" },
+    { case BSONInteger(v) => Castling.byId.get(v).toTry(s"Invalid Castling $v") },
     e => BSONInteger(e.id)
   )
   implicit val MaterialRangeBSONHandler: BSONHandler[MaterialRange] = tryHandler[MaterialRange](
-    { case BSONInteger(v) => MaterialRange.byId get v toTry s"Invalid material range $v" },
+    { case BSONInteger(v) => MaterialRange.byId.get(v).toTry(s"Invalid material range $v") },
     e => BSONInteger(e.id)
   )
   implicit val QueenTradeBSONHandler: BSONHandler[QueenTrade] =
@@ -82,13 +85,13 @@ private object BSONHandlers {
   )
 
   implicit val CplRangeBSONHandler: BSONHandler[CplRange] = tryHandler[CplRange](
-    { case BSONInteger(v) => CplRange.byId get v toTry s"Invalid CPL range $v" },
+    { case BSONInteger(v) => CplRange.byId.get(v).toTry(s"Invalid CPL range $v") },
     e => BSONInteger(e.cpl)
   )
 
   implicit val DateRangeBSONHandler: BSONDocumentHandler[DateRange] = Macros.handler[lila.insight.DateRange]
 
-  implicit val PeriodBSONHandler: BSONHandler[Period] = intIsoHandler(
+  implicit val PeriodBSONHandler: BSONHandler[Period] = intIsoHandler(using
     lila.common.Iso.int[Period](Period.apply, _.days)
   )
 
@@ -126,7 +129,7 @@ private object BSONHandlers {
 
   implicit def EntryBSONHandler: BSON[InsightEntry] =
     new BSON[InsightEntry] {
-      import InsightEntry.BSONFields._
+      import InsightEntry.BSONFields.*
       def reads(r: BSON.Reader) =
         InsightEntry(
           id = r.str(id),

@@ -1,11 +1,11 @@
 package lila.tournament
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import reactivemongo.akkastream.cursorProducer
-import reactivemongo.api._
-import reactivemongo.api.bson._
+import reactivemongo.api.*
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final private class LeaderboardIndexer(
     tournamentRepo: TournamentRepo,
@@ -17,14 +17,14 @@ final private class LeaderboardIndexer(
     mat: akka.stream.Materializer
 ) {
 
-  import LeaderboardApi._
-  import BSONHandlers._
+  import LeaderboardApi.*
+  import BSONHandlers.*
 
   def generateAll: Funit =
     leaderboardRepo.coll.delete.one($empty) >>
       tournamentRepo.coll
         .find(tournamentRepo.finishedSelect)
-        .sort($sort desc "startsAt")
+        .sort($sort.desc("startsAt"))
         .cursor[Tournament](ReadPreference.secondaryPreferred)
         .documentSource()
         .via(lila.common.LilaStream.logRate[Tournament]("leaderboard index tour")(logger))
@@ -42,7 +42,7 @@ final private class LeaderboardIndexer(
       generateTourEntries(tour) flatMap saveEntries
 
   private def saveEntries(entries: Seq[Entry]): Funit =
-    entries.nonEmpty ?? leaderboardRepo.coll.insert
+    entries.nonEmpty so leaderboardRepo.coll.insert
       .many(
         entries.flatMap(BSONHandlers.leaderboardEntryHandler.writeOpt)
       )

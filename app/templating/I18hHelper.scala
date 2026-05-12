@@ -4,7 +4,7 @@ package templating
 import play.api.libs.json.JsObject
 import play.api.i18n.Lang
 
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 import lila.i18n.{ I18nKey, JsDump, LangList, MessageKey, TimeagoLocales, Translator }
 import lila.user.UserContext
 
@@ -25,7 +25,7 @@ trait I18nHelper extends HasEnv with UserContext.ToLang {
       ~TimeagoLocales.js.get("en")
   }
 
-  def langName = LangList.nameByStr _
+  def langName = LangList.nameByStr
 
   def shortLangName(str: String) = langName(str).takeWhile(','.!=)
 }

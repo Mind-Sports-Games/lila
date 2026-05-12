@@ -2,7 +2,7 @@ package lila.puzzle
 
 import cats.data.NonEmptyList
 import strategygames.format.{ FEN, Forsyth, Uci }
-import strategygames.{ Player => PlayerIndex, GameLogic }
+import strategygames.{ GameLogic, Player as PlayerIndex }
 import strategygames.variant.Variant
 
 import lila.rating.{ Glicko, PerfType }
@@ -26,13 +26,13 @@ case class Puzzle(
   def gameLogic: GameLogic = GameLogic(lib)
   def variant: Variant     = Variant.orDefault(gameLogic, variantId)
 
-  //When updating, also edit modules/game, modules/challenge, and ui/@types/playstrategy/index.d.ts:declare type PlayerName
+  // When updating, also edit modules/game, modules/challenge, and ui/@types/playstrategy/index.d.ts:declare type PlayerName
   def playerTrans(implicit lang: Lang): String =
     variant.playerNames(playerIndex) match {
       case "White" => I18nKeys.white.txt()
       case "Black" => I18nKeys.black.txt()
-      //Xiangqi add back in when adding red as a colour for Xiangqi
-      //case "Red"   => I18nKeys.red.txt()
+      // Xiangqi add back in when adding red as a colour for Xiangqi
+      // case "Red"   => I18nKeys.red.txt()
       case "Sente"   => I18nKeys.sente.txt()
       case "Gote"    => I18nKeys.gote.txt()
       case s: String => s
@@ -40,17 +40,17 @@ case class Puzzle(
 
   // ply after "initial move" when we start solving
   def initialPly: Int =
-    fen.fullMove ?? { fm =>
+    fen.fullMove so { fm =>
       fm * 2 - playerIndex.fold(1, 2)
     }
 
-  //TODO suport all actions when adding more variants
+  // TODO suport all actions when adding more variants
   lazy val fenAfterInitialMove: FEN = {
     for {
       sit1 <- Forsyth.<<<@(variant.gameLogic, variant, fen)
       sit2 <- sit1.situation.move(line.head).toOption.map(_.situationAfter)
     } yield Forsyth.>>(variant.gameLogic, sit2)
-  } err s"Can't apply puzzle $id first move"
+  }.err(s"Can't apply puzzle $id first move")
 
   def playerIndex = fen.player.fold[PlayerIndex](PlayerIndex.P1)(!_)
 }
@@ -61,15 +61,15 @@ object Puzzle {
 
   case class Id(value: String) extends AnyVal with StringValue
 
-  def toId(id: String) = id.size == idSize option Id(id)
+  def toId(id: String) = (id.size == idSize).option(Id(id))
 
   val puzzleVariants: List[Variant] = List(
-    Variant.orDefault(GameLogic.Chess(), 1), //Standard
-    Variant.orDefault(GameLogic.Chess(), 4), //King of the Hill
-    Variant.orDefault(GameLogic.Chess(), 7), //Atomic
-    Variant.orDefault(GameLogic.Chess(), 8), //Horde
-    Variant.orDefault(GameLogic.Chess(), 9), //Racing Kings
-    Variant.orDefault(GameLogic.Chess(), 11) //Lines of Action
+    Variant.orDefault(GameLogic.Chess(), 1), // Standard
+    Variant.orDefault(GameLogic.Chess(), 4), // King of the Hill
+    Variant.orDefault(GameLogic.Chess(), 7), // Atomic
+    Variant.orDefault(GameLogic.Chess(), 8), // Horde
+    Variant.orDefault(GameLogic.Chess(), 9), // Racing Kings
+    Variant.orDefault(GameLogic.Chess(), 11) // Lines of Action
   )
 
   val defaultVariant: Variant = puzzleVariants.head
@@ -90,14 +90,14 @@ object Puzzle {
         l + charToInt(char) * pow
       }
 
-    def apply(l: Long): Option[Id] = (l > 130_000) ?? {
+    def apply(l: Long): Option[Id] = (l > 130_000) so {
       val str = powers.reverse
         .foldLeft(("", l)) { case ((id, rest), pow) =>
           val frac = rest / pow
           (s"${intToChar(frac.toInt)}$id", rest - frac * pow)
         }
         ._1
-      (str.size == idSize) option Id(str)
+      (str.size == idSize).option(Id(str))
     }
 
     private def charToInt(c: Char) = {

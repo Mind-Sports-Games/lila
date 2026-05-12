@@ -43,7 +43,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17.0.5
+          java-version: 21
           cache: sbt
       - name: Setup sbt
         uses: sbt/setup-sbt@v1

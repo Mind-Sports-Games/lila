@@ -1,18 +1,18 @@
 package lila.forumSearch
 
-import akka.actor._
-import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import akka.actor.*
+import com.softwaremill.macwire.*
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.common.config._
-import lila.search._
+import lila.common.config.*
+import lila.search.*
 import Query.jsonWriter
 
 @Module
 private class ForumSearchConfig(
     @ConfigName("index") val indexName: String,
-    @ConfigName("paginator.max_per_page") val maxPerPage: MaxPerPage,
+    @ConfigName("paginator.max_per_page") val maxPerPage: lila.common.config.MaxPerPage,
     @ConfigName("actor.name") val actorName: String
 )
 
@@ -27,7 +27,7 @@ final class Env(
     mat: akka.stream.Materializer
 ) {
 
-  private val config = appConfig.get[ForumSearchConfig]("forumSearch")(AutoConfig.loader)
+  private val config = appConfig.get[ForumSearchConfig]("forumSearch")(using AutoConfig.loader)
 
   private lazy val client = makeClient(Index(config.indexName))
 
@@ -47,11 +47,11 @@ final class Env(
 
   system.actorOf(
     Props(new Actor {
-      import lila.forum.actorApi._
+      import lila.forum.actorApi.*
       def receive = {
-        case InsertPost(post) => api.store(post).unit
-        case RemovePost(id)   => client.deleteById(Id(id)).unit
-        case RemovePosts(ids) => client.deleteByIds(ids map Id).unit
+        case InsertPost(post) => api.store(post).discard
+        case RemovePost(id)   => client.deleteById(Id(id)).discard
+        case RemovePosts(ids) => client.deleteByIds(ids map Id.apply).discard
       }
     }),
     name = config.actorName

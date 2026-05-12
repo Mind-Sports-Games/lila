@@ -2,15 +2,11 @@ package views.html
 package puzzle
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import strategygames.variant.Variant
 
-import controllers.routes
-
 object faq {
-
-  import trans.puzzle._
 
   def apply(variant: Variant)(implicit ctx: Context) =
     views.html.base.layout(

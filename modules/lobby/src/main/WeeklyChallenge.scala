@@ -12,5 +12,4 @@ case class WeeklyChallenge(
 
   val currentIconChar  = currentIcon.getOrElse('5')
   val previousIconChar = previousIcon.getOrElse('5')
-
 }

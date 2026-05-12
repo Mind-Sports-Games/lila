@@ -2,14 +2,14 @@ package lila.oauth
 
 import reactivemongo.api.bson.BSONObjectID
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final class PersonalTokenApi(colls: OauthColls)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import PersonalToken._
+  import PersonalToken.*
   import OAuthScope.scopeHandler
-  import AccessToken.{ BSONFields => F, _ }
+  import AccessToken.{ BSONFields as F, * }
 
   def list(u: User): Fu[List[AccessToken]] =
     colls.token {
@@ -19,7 +19,7 @@ final class PersonalTokenApi(colls: OauthColls)(implicit ec: scala.concurrent.Ex
           F.clientId -> clientId
         )
       )
-        .sort($sort desc F.createdAt)
+        .sort($sort.desc(F.createdAt))
         .cursor[AccessToken]()
         .list(100)
     }
@@ -30,23 +30,23 @@ final class PersonalTokenApi(colls: OauthColls)(implicit ec: scala.concurrent.Ex
         $doc(
           F.userId   -> u.id,
           F.clientId -> clientId,
-          F.scopes $all scopes.toSeq
+          F.scopes.$all(scopes.toSeq)
         )
       )
     }
 
-  def create(token: AccessToken) = colls.token(_.insert.one(token).void) >>- {
+  def create(token: AccessToken) = colls.token(_.insert.one(token).void).andDo {
     if (token.scopes contains OAuthScope.Web.Login)
       logger.warn(s"web:login token created by ${token.userId} ${~token.description}")
   }
 
   def deleteByPublicId(publicId: String, user: User): Fu[Option[AccessToken]] =
-    BSONObjectID.parse(publicId).toOption ?? { objectId =>
+    BSONObjectID.parse(publicId).toOption so { objectId =>
       colls.token { coll =>
         coll
           .one[AccessToken]($doc(F.publicId -> objectId, F.clientId -> clientId, F.userId -> user.id))
           .flatMap {
-            _ ?? { token =>
+            _ so { token =>
               coll.delete.one($doc(F.publicId -> token.publicId)) inject token.some
             }
           }

@@ -1,7 +1,7 @@
 package lila.bot
 
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
 object BotForm {
 
@@ -9,7 +9,7 @@ object BotForm {
     mapping(
       "text" -> nonEmptyText(maxLength = lila.chat.Line.textMaxSize),
       "room" -> text.verifying(Set("player", "spectator") contains _)
-    )(ChatData.apply)(ChatData.unapply)
+    )(ChatData.apply)(unapply)
   )
 
   case class ChatData(

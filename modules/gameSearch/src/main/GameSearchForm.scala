@@ -2,10 +2,10 @@ package lila.gameSearch
 
 import strategygames.Mode
 import org.joda.time.DateTime
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
-import lila.common.Form._
+import lila.common.Form.*
 import lila.search.Range
 
 final private[gameSearch] class GameSearchForm {
@@ -19,7 +19,7 @@ final private[gameSearch] class GameSearchForm {
         "loser"  -> optional(nonEmptyText),
         "p1"     -> optional(nonEmptyText),
         "p2"     -> optional(nonEmptyText)
-      )(SearchPlayer.apply)(SearchPlayer.unapply),
+      )(SearchPlayer.apply)(unapply),
       "winnerPlayerIndex" -> optional(numberIn(Query.winnerPlayerIndexs)),
       "perf"              -> optional(numberIn(lila.rating.PerfType.nonPuzzle.map(_.id))),
       "source"            -> optional(numberIn(Query.sources)),
@@ -33,24 +33,24 @@ final private[gameSearch] class GameSearchForm {
       "aiLevelMax"        -> optional(numberIn(Query.aiLevels)),
       "durationMin"       -> optional(numberIn(Query.durations)),
       "durationMax"       -> optional(numberIn(Query.durations)),
-      "clock" -> mapping(
+      "clock"             -> mapping(
         "initMin" -> optional(numberIn(Query.clockInits)),
         "initMax" -> optional(numberIn(Query.clockInits)),
         "incMin"  -> optional(numberIn(Query.clockIncs)),
         "incMax"  -> optional(numberIn(Query.clockIncs))
-      )(SearchClock.apply)(SearchClock.unapply),
+      )(SearchClock.apply)(unapply),
       "dateMin"  -> GameSearchForm.dateField,
       "dateMax"  -> GameSearchForm.dateField,
       "status"   -> optional(numberIn(Query.statuses)),
       "analysed" -> optional(number),
-      "sort" -> optional(
+      "sort"     -> optional(
         mapping(
           "field" -> stringIn(Sorting.fields),
           "order" -> stringIn(Sorting.orders)
-        )(SearchSort.apply)(SearchSort.unapply)
+        )(SearchSort.apply)(unapply)
       )
-    )(SearchData.apply)(SearchData.unapply)
-  ) fill SearchData()
+    )(SearchData.apply)(unapply)
+  ).fill(SearchData())
 }
 
 private[gameSearch] object GameSearchForm {

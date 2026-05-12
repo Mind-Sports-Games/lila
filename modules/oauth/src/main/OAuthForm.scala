@@ -2,15 +2,15 @@ package lila.oauth
 
 import io.lemonlabs.uri.AbsoluteUrl
 import org.joda.time.DateTime
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 import reactivemongo.api.bson.BSONObjectID
 
 import lila.common.Form.absoluteUrl
 
 object OAuthForm {
 
-  private val scopesField = list(nonEmptyText.verifying(OAuthScope.byKey.contains _))
+  private val scopesField = list(nonEmptyText.verifying(OAuthScope.byKey.contains))
 
   object token {
 
@@ -18,7 +18,7 @@ object OAuthForm {
       mapping(
         "description" -> text(minLength = 3, maxLength = 140),
         "scopes"      -> scopesField
-      )(Data.apply)(Data.unapply)
+      )(Data.apply)(unapply)
     )
 
     def create = form
@@ -48,12 +48,12 @@ object OAuthForm {
         "description" -> optional(nonEmptyText(maxLength = 400)),
         "homepageUri" -> absoluteUrl,
         "redirectUri" -> absoluteUrl
-      )(Data.apply)(Data.unapply)
+      )(Data.apply)(unapply)
     )
 
     def create = form
 
-    def edit(app: OAuthApp) = form fill Data.make(app)
+    def edit(app: OAuthApp) = form.fill(Data.make(app))
 
     case class Data(
         name: String,

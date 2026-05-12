@@ -3,7 +3,7 @@ package lila.game
 import org.joda.time.DateTime
 import scala.concurrent.ExecutionContext
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final class CrosstableApi(
@@ -12,16 +12,16 @@ final class CrosstableApi(
 )(implicit ec: ExecutionContext) {
 
   import Crosstable.{ Matchup, Result }
-  import Crosstable.{ BSONFields => F }
+  import Crosstable.BSONFields as F
 
   def apply(game: Game): Fu[Option[Crosstable]] =
-    game.twoUserIds ?? { case (u1, u2) =>
-      apply(u1, u2) dmap some
+    game.twoUserIds so { case (u1, u2) =>
+      apply(u1, u2).dmap(some)
     }
 
   def withMatchup(game: Game): Fu[Option[Crosstable.WithMatchup]] =
-    game.twoUserIds ?? { case (u1, u2) =>
-      withMatchup(u1, u2) dmap some
+    game.twoUserIds so { case (u1, u2) =>
+      withMatchup(u1, u2).dmap(some)
     }
 
   def apply(u1: User.ID, u2: User.ID): Fu[Crosstable] =
@@ -52,16 +52,16 @@ final class CrosstableApi(
   def add(game: Game): Funit =
     game.userIds.distinct.sorted match {
       case List(u1, u2) =>
-        val result     = Result(game.id, game.winnerUserId)
-        val bsonResult = Crosstable.crosstableBSONHandler.writeResult(result, u1)
+        val result                         = Result(game.id, game.winnerUserId)
+        val bsonResult                     = Crosstable.crosstableBSONHandler.writeResult(result, u1)
         def incScore(userId: User.ID): Int =
           game.winnerUserId match {
             case Some(u) if u == userId => 10
             case None                   => 5
             case _                      => 0
           }
-        val inc1 = incScore(u1)
-        val inc2 = incScore(u2)
+        val inc1             = incScore(u1)
+        val inc2             = incScore(u2)
         val updateCrosstable = coll.update.one(
           select(u1, u2),
           $inc(

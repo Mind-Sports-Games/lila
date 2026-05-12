@@ -49,3 +49,4 @@ RUNNING_PID
 
 # VSCode auto-generated files
 .vscode/
+/.claude

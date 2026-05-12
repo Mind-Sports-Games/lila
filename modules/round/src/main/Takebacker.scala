@@ -1,10 +1,10 @@
 package lila.round
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 import lila.common.Bus
 import lila.game.{ Event, Game, GameRepo, Pov, Progress, Rewind, UciMemo }
 import lila.pref.{ Pref, PrefApi }
-import lila.i18n.{ defaultLang, I18nKeys => trans }
+import lila.i18n.{ defaultLang, I18nKeys as trans }
 import RoundDuct.TakebackSituation
 import play.api.i18n.Lang
 
@@ -31,19 +31,19 @@ final private class Takebacker(
             else
               // go back one ply. if playerindex has not switched, continue going back
               takebackRetainPlayer(game)
-          } dmap (_ -> situation.reset)
-        case Pov(game, _) if pov.game.playableByAi => takebackSwitchPlayer(game) dmap (_ -> situation)
-        case Pov(game, _) if pov.opponent.isAi     => takebackRetainPlayer(game) dmap (_ -> situation)
-        case Pov(game, _) if pov.opponent.isPSBot  => takebackRetainPlayer(game) dmap (_ -> situation)
-        case Pov(game, playerIndex) if (game playerCanProposeTakeback playerIndex) && situation.offerable =>
+          }.dmap(_ -> situation.reset)
+        case Pov(game, _) if pov.game.playableByAi => takebackSwitchPlayer(game).dmap(_ -> situation)
+        case Pov(game, _) if pov.opponent.isAi     => takebackRetainPlayer(game).dmap(_ -> situation)
+        case Pov(game, _) if pov.opponent.isPSBot  => takebackRetainPlayer(game).dmap(_ -> situation)
+        case Pov(game, playerIndex) if (game.playerCanProposeTakeback(playerIndex)) && situation.offerable =>
           {
             messenger.system(game, trans.takebackPropositionSent.txt())
             val progress = Progress(game) map { g =>
-              g.updatePlayer(playerIndex, _ proposeTakeback g.plies)
+              g.updatePlayer(playerIndex, _.proposeTakeback(g.plies))
             }
-            proxy.save(progress) >>- publishTakebackOffer(pov) inject
+            proxy.save(progress).andDo(publishTakebackOffer(pov)) inject
               List(Event.TakebackOffers(playerIndex.p1, playerIndex.p2))
-          } dmap (_ -> situation)
+          }.dmap(_ -> situation)
         case _ => fufail(ClientError("[takebacker] invalid yes " + pov))
       }
     }
@@ -78,9 +78,9 @@ final private class Takebacker(
   private def isAllowedByPrefs(game: Game): Fu[Boolean] =
     if (game.hasAi) fuTrue
     else
-      game.userIds.map {
+      Future.sequence(game.userIds.map {
         prefApi.getPref(_, (p: Pref) => p.takeback)
-      }.sequenceFu dmap {
+      }) dmap {
         _.forall { p =>
           p == Pref.Takeback.ALWAYS || (p == Pref.Takeback.CASUAL && game.casual)
         }
@@ -119,7 +119,7 @@ final private class Takebacker(
   private def rewindPly(game: Game)(implicit proxy: GameProxy): Fu[Events] =
     for {
       fen      <- gameRepo.initialFen(game)
-      progress <- Rewind(game, fen, true).toFuture
+      progress <- Rewind(game, fen, true).toEither.toFuture
       _        <- uciMemo.set(progress.game, fen)
       events   <- saveAndNotify(progress)
     } yield events
@@ -127,8 +127,8 @@ final private class Takebacker(
   private def rewindTurnAndPly(game: Game)(implicit proxy: GameProxy): Fu[Events] =
     for {
       fen   <- gameRepo.initialFen(game)
-      prog1 <- Rewind(game, fen, false).toFuture
-      prog2 <- Rewind(prog1.game, fen, true).toFuture dmap { progress =>
+      prog1 <- Rewind(game, fen, false).toEither.toFuture
+      prog2 <- Rewind(prog1.game, fen, true).toEither.toFuture dmap { progress =>
         prog1.withGame(progress.game)
       }
       _      <- uciMemo.set(prog2.game, fen)

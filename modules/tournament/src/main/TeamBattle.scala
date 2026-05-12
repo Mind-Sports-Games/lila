@@ -1,6 +1,6 @@
 package lila.tournament
 
-import play.api.data._
+import play.api.data.*
 
 import lila.hub.LightTeam.TeamID
 import lila.user.User
@@ -31,14 +31,14 @@ object TeamBattle {
       val score: Int
   ) extends Ordered[RankedTeam] {
     private def magicScore = leaders.foldLeft(0)(_ + _.magicScore)
-    def this(rank: Int, teamId: TeamID, leaders: List[TeamLeader]) =
+    def this(rank: Int, teamId: TeamID, leaders: List[TeamLeader]) = {
       this(rank, teamId, leaders, leaders.foldLeft(0)(_ + _.score))
-    def updateRank(newRank: Int) = new RankedTeam(newRank, teamId, leaders, score)
-    override def compare(that: RankedTeam) = {
+    }
+    def updateRank(newRank: Int)           = new RankedTeam(newRank, teamId, leaders, score)
+    override def compare(that: RankedTeam) =
       if (this.score > that.score) -1
       else if (this.score < that.score) 1
       else that.magicScore - this.magicScore
-    }
   }
 
   case class TeamLeader(userId: User.ID, magicScore: Int) {
@@ -55,12 +55,12 @@ object TeamBattle {
   )
 
   object DataForm {
-    import play.api.data.Forms._
+    import play.api.data.Forms.*
 
     val fields = mapping(
       "teams"     -> nonEmptyText,
       "nbLeaders" -> number(min = 1, max = 20)
-    )(Setup.apply)(Setup.unapply)
+    )(Setup.apply)(lila.core.lilaism.Lilaism.unapply)
       .verifying("We need at least 2 teams", s => s.potentialTeamIds.sizeIs > 1)
       .verifying(
         s"In this version of team battles, no more than $maxTeams teams can be allowed.",
@@ -68,8 +68,7 @@ object TeamBattle {
       )
 
     def edit(teams: List[String], nbLeaders: Int) =
-      Form(fields) fill
-        Setup(s"${teams mkString "\n"}\n", nbLeaders)
+      Form(fields).fill(Setup(s"${teams mkString "\n"}\n", nbLeaders))
 
     def empty = Form(fields)
 
@@ -79,10 +78,10 @@ object TeamBattle {
     ) {
       // guess if newline or comma separated
       def potentialTeamIds: Set[TeamID] = {
-        val lines = teams.linesIterator.toList
+        val lines    = teams.linesIterator.toList
         val dirtyIds =
           if (lines.sizeIs > 1) lines.map(_.takeWhile(' ' !=))
-          else lines.headOption.??(_.split(',').toList)
+          else lines.headOption.so(_.split(',').toList)
         dirtyIds.map(_.trim).filter(_.nonEmpty).toSet
       }
     }

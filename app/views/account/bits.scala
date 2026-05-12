@@ -2,11 +2,10 @@ package views.html
 package account
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.pref.PrefCateg
 import lila.user.User
-import controllers.routes
 
 object bits {
 

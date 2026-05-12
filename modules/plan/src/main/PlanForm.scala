@@ -1,8 +1,8 @@
 package lila.plan
 
-import cats.implicits._
-import play.api.data._
-import play.api.data.Forms._
+import cats.implicits.*
+import play.api.data.*
+import play.api.data.Forms.*
 
 object PlanForm {
 
@@ -21,7 +21,7 @@ object PlanForm {
       "first_name"        -> optional(text),
       "last_name"         -> optional(text),
       "residence_country" -> optional(text)
-    )(Ipn.apply)(Ipn.unapply)
+    )(Ipn.apply)(unapply)
   )
 
   case class Ipn(
@@ -43,6 +43,6 @@ object PlanForm {
 
     def feeCents = (fee * 100).toInt
 
-    def country = countryCode.map(Country)
+    def country = countryCode.map(Country.apply)
   }
 }

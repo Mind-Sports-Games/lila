@@ -1,6 +1,6 @@
 package lila.common
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import io.lemonlabs.uri.{ IpV4, IpV6 }
 
 case class ApiVersion(value: Int) extends AnyVal with IntValue with Ordered[ApiVersion] {
@@ -13,9 +13,9 @@ case class ApiVersion(value: Int) extends AnyVal with IntValue with Ordered[ApiV
 case class AssetVersion(value: String) extends AnyVal with StringValue
 
 object AssetVersion {
-  var current = random
-  def change() = { current = random }
-  private def random = AssetVersion(ornicar.scalalib.Random secureString 6)
+  var current        = random
+  def change()       = current = random
+  private def random = AssetVersion(Random.secureString(6))
 }
 
 case class IsMobile(value: Boolean) extends AnyVal with BooleanValue
@@ -67,13 +67,13 @@ case class EmailAddress(value: String) extends AnyVal with StringValue {
 
   def domain: Option[Domain] =
     value split '@' match {
-      case Array(_, domain) => Domain from domain.toLowerCase
+      case Array(_, domain) => Domain.from(domain.toLowerCase)
       case _                => none
     }
 
   def similarTo(other: EmailAddress) = normalize == other.normalize
 
-  def isNoReply  = EmailAddress isNoReply value
+  def isNoReply  = EmailAddress.isNoReply(value)
   def isSendable = !isNoReply
 
   // safer logs
@@ -94,7 +94,7 @@ object EmailAddress {
       regex.matches(str) && !str.contains("..") && !str.contains(".@") && !str.startsWith(".")
 
   def from(str: String): Option[EmailAddress] =
-    isValid(str) option EmailAddress(str)
+    isValid(str).option(EmailAddress(str))
 
   private def isNoReply(str: String) = str.startsWith("noreply.") && str.endsWith("@playstrategy.org")
 }
@@ -104,8 +104,8 @@ case class Domain private (value: String) extends AnyVal with StringValue {
   // tail.domain.com, tail.domain.co.uk, tail.domain.edu.au, etc.
   def withoutSubdomain: Option[Domain] =
     value.split('.').toList.reverse match {
-      case tld :: sld :: tail :: _ if sld.lengthIs <= 3 => Domain from s"$tail.$sld.$tld"
-      case tld :: sld :: _                              => Domain from s"$sld.$tld"
+      case tld :: sld :: tail :: _ if sld.lengthIs <= 3 => Domain.from(s"$tail.$sld.$tld")
+      case tld :: sld :: _                              => Domain.from(s"$sld.$tld")
       case _                                            => none
     }
   def lower = Domain.Lower(value.toLowerCase)
@@ -116,7 +116,7 @@ object Domain {
   private val regex =
     """^(((?!-))(xn--|_{1,1})?[a-z0-9-]{0,61}[a-z0-9]{1,1}\.)*(xn--)?([a-z0-9][a-z0-9\-]{0,60}|[a-z0-9-]{1,30}\.[a-z]{2,})$""".r
   def isValid(str: String)              = regex.matches(str)
-  def from(str: String): Option[Domain] = isValid(str) option Domain(str)
+  def from(str: String): Option[Domain] = isValid(str).option(Domain(str))
   def unsafe(str: String): Domain       = Domain(str)
 
   case class Lower(value: String) extends AnyVal with StringValue {

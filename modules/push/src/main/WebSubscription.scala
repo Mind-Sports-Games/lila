@@ -9,13 +9,13 @@ final case class WebSubscription(
 object WebSubscription {
 
   object readers {
-    import play.api.libs.json._
-    import play.api.libs.functional.syntax._
+    import play.api.libs.json.*
+    import play.api.libs.functional.syntax.*
 
     implicit val WebSubscriptionReads: Reads[WebSubscription] = (
       (__ \ "endpoint").read[String] and
         (__ \ "keys" \ "auth").read[String] and
         (__ \ "keys" \ "p256dh").read[String]
-    )(WebSubscription.apply _)
+    )(WebSubscription.apply)
   }
 }

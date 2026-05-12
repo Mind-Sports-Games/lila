@@ -1,14 +1,13 @@
 package lila.challenge
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import play.api.i18n.Lang
 
-import lila.i18n.{ I18nKeys => trans }
+import lila.i18n.I18nKeys as trans
 import lila.socket.Socket.SocketVersion
 import lila.socket.UserLagCache
 
-import strategygames.variant.Variant
-import strategygames.{ GameFamily, GameLogic, P1, P2 }
+import strategygames.{ GameFamily, P1, P2 }
 
 final class JsonView(
     baseUrl: lila.common.config.BaseUrl,
@@ -16,8 +15,8 @@ final class JsonView(
     isOnline: lila.socket.IsOnline
 ) {
 
-  import lila.game.JsonView._
-  import Challenge._
+  import lila.game.JsonView.*
+  import Challenge.*
 
   implicit private val RegisteredWrites: OWrites[Challenger.Registered] = OWrites[Challenger.Registered] {
     r =>
@@ -30,16 +29,16 @@ final class JsonView(
           "rating" -> r.rating.int
         )
         .add("provisional" -> r.rating.provisional)
-        .add("patron" -> light.??(_.isPatron))
+        .add("patron" -> light.so(_.isPatron))
         .add("online" -> isOnline(r.id))
         .add("lag" -> UserLagCache.getLagRating(r.id))
   }
 
   def apply(a: AllChallenges)(implicit lang: Lang): JsObject =
     Json.obj(
-      "in"   -> a.in.map(apply(Direction.In.some)),
-      "out"  -> a.out.map(apply(Direction.Out.some)),
-      "i18n" -> lila.i18n.JsDump.keysToObject(i18nKeys, lang),
+      "in"      -> a.in.map(apply(Direction.In.some)),
+      "out"     -> a.out.map(apply(Direction.Out.some)),
+      "i18n"    -> lila.i18n.JsDump.keysToObject(i18nKeys, lang),
       "reasons" -> JsObject(Challenge.DeclineReason.allExceptBot.map { r =>
         r.key -> JsString(r.trans.txt())
       })
@@ -53,12 +52,11 @@ final class JsonView(
       "socketVersion" -> socketVersion
     )
 
-  private def setupInfoJson(c: Challenge): String = {
+  private def setupInfoJson(c: Challenge): String =
     (c.initialFen, c.variant.gameFamily) match {
       case (Some(f), GameFamily.Go()) => c.variant.toGo.setupInfo(f.toGo).getOrElse("")
       case _                          => ""
     }
-  }
 
   def apply(direction: Option[Direction])(c: Challenge)(implicit lang: Lang): JsObject =
     Json
@@ -73,7 +71,7 @@ final class JsonView(
         "variant"          -> c.variant,
         "rated"            -> c.mode.rated,
         "speed"            -> c.speed.key,
-        "timeControl" -> (c.timeControl match {
+        "timeControl"      -> (c.timeControl match {
           case TimeControl.Clock(clock) =>
             Json.obj(
               "type"  -> "clock",
@@ -98,7 +96,7 @@ final class JsonView(
         "p1Color"          -> c.variant.playerColors(P1),
         "p2Color"          -> c.variant.playerColors(P2),
         "setupInfo"        -> setupInfoJson(c),
-        "perf" -> Json.obj(
+        "perf"             -> Json.obj(
           "icon" -> iconChar(c).toString,
           "name" -> c.perfType.trans
         )

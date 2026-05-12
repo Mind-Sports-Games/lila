@@ -7,7 +7,7 @@ object Thematic {
 
   def byFen(fen: FEN): Option[StartingPosition] = fenIndex get fen.value
 
-  def byEco = ecoIndexForBc.get _
+  def byEco = ecoIndexForBc.get
 
   private lazy val fenIndex: Map[String, StartingPosition] = StartingPosition.all.view.map { p =>
     p.fen.value -> p

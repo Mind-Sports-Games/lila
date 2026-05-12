@@ -1,6 +1,6 @@
 package lila.user
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import org.joda.time.DateTime
 
 case class Note(
@@ -26,7 +26,7 @@ final class NoteApi(
     ws: play.api.libs.ws.StandaloneWSClient
 ) {
 
-  import reactivemongo.api.bson._
+  import reactivemongo.api.bson.*
   import lila.db.BSON.BSONJodaDateTimeHandler
   implicit private val noteBSONHandler: BSONDocumentHandler[Note] = Macros.handler[Note]
 
@@ -42,28 +42,28 @@ final class NoteApi(
           else $doc("from" -> me.id)
         }
       )
-      .sort($sort desc "date")
+      .sort($sort.desc("date"))
       .cursor[Note]()
       .list(20)
 
   def forMod(id: User.ID): Fu[List[Note]] =
     coll
       .find($doc("to" -> id, "mod" -> true))
-      .sort($sort desc "date")
+      .sort($sort.desc("date"))
       .cursor[Note]()
       .list(50)
 
   def forMod(ids: List[User.ID]): Fu[List[Note]] =
     coll
-      .find($doc("to" $in ids, "mod" -> true))
-      .sort($sort desc "date")
+      .find($doc("to".$in(ids), "mod" -> true))
+      .sort($sort.desc("date"))
       .cursor[Note]()
       .list(100)
 
   def write(to: User, text: String, from: User, modOnly: Boolean, dox: Boolean) = {
 
     val note = Note(
-      _id = lila.common.ThreadLocalRandom nextString 8,
+      _id = lila.common.ThreadLocalRandom.nextString(8),
       from = from.id,
       to = to.id,
       text = text,
@@ -72,25 +72,28 @@ final class NoteApi(
       date = DateTime.now
     )
 
-    coll.insert.one(note) >>-
-      lila.common.Bus.publish(
-        lila.hub.actorApi.user.Note(
-          from = from.username,
-          to = to.username,
-          text = note.text,
-          mod = modOnly
-        ),
-        "userNote"
+    coll.insert
+      .one(note)
+      .andDo(
+        lila.common.Bus.publish(
+          lila.hub.actorApi.user.Note(
+            from = from.username,
+            to = to.username,
+            text = note.text,
+            mod = modOnly
+          ),
+          "userNote"
+        )
       )
   } >> {
-    modOnly ?? Title.fromUrl(text) flatMap {
-      _ ?? { userRepo.addTitle(to.id, _) }
+    modOnly so Title.fromUrl(text) flatMap {
+      _ so { userRepo.addTitle(to.id, _) }
     }
   }
 
   def playstrategyWrite(to: User, text: String) =
     userRepo.playstrategy flatMap {
-      _ ?? {
+      _ so {
         write(to, text, _, modOnly = true, dox = false)
       }
     }

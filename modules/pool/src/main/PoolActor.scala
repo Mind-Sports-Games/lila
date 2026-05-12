@@ -1,9 +1,8 @@
 package lila.pool
 
-import scala.concurrent.duration._
 import lila.common.ThreadLocalRandom
 
-import akka.actor._
+import akka.actor.*
 import akka.pattern.pipe
 
 import lila.socket.Socket.Sris
@@ -17,11 +16,11 @@ final private class PoolActor(
     botGameStarter: BotGameStarter
 ) extends Actor {
 
-  import PoolActor._
+  import PoolActor.*
 
   var members = Vector.empty[PoolMember]
 
-  var nextWave: Cancellable = _
+  var nextWave: Cancellable = scala.compiletime.uninitialized
 
   implicit def ec: ExecutionContextExecutor = context.dispatcher
 
@@ -43,7 +42,7 @@ final private class PoolActor(
           if (members.sizeIs >= config.wave.players.value) self ! FullWave
         case Some(member) if member.ratingRange != joiner.ratingRange =>
           members = members.map {
-            case m if m == member => m withRange joiner.ratingRange
+            case m if m == member => m.withRange(joiner.ratingRange)
             case m                => m
           }
         case _ => // no change
@@ -86,11 +85,7 @@ final private class PoolActor(
       members = members.diff(pairedMembers).map(_.incMisses)
 
       if (pairings.nonEmpty) gameStarter(config, pairings)
-      else if (
-        candidates
-          .filter(!_.lame)
-          .size == 1
-      )
+      else if (candidates.filter(!_.lame).size == 1)
         candidates
           .filter(c => !c.lame && c.misses >= 1)
           .headOption

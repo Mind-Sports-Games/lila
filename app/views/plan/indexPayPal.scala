@@ -1,14 +1,12 @@
 package views.html.plan
 
-import controllers.routes
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object indexPayPal {
 
-  import trans.patron._
+  import trans.patron.*
 
   private val dataForm = attr("data-form")
 

@@ -1,10 +1,10 @@
 package controllers
 
 import play.api.mvc.Result
-import views._
+import views.*
 
 import lila.api.Context
-import lila.app._
+import lila.app.{ *, given }
 import lila.report.Suspect
 import play.api.data.Form
 
@@ -17,15 +17,15 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
 
   def home =
     Auth { implicit ctx => me =>
-      renderAppealOrTree(me) map { Ok(_) }
+      renderAppealOrTree(me) map { content => Ok(content) }
     }
 
   def landing =
-    Auth { implicit ctx => me =>
+    Auth { implicit ctx => _ =>
       if (ctx.isAppealUser || isGranted(_.Appeals)) {
         pageHit
-        OptionOk(prismicC getPage "appeal-landing") { case (doc, resolver) =>
-          views.html.site.page.lone(doc, resolver)
+        OptionOk(prismicC.getPage("appeal-landing")) { case (doc, resolver) =>
+          views.html.site.page.lone(doc, resolver): scalatags.Text.Frag
         }
       } else notFound
     }
@@ -33,7 +33,7 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
   private def renderAppealOrTree(
       me: lila.user.User,
       err: Option[Form[String]] = None
-  )(implicit ctx: Context) = env.appeal.api mine me flatMap {
+  )(implicit ctx: Context) = env.appeal.api.mine(me) flatMap {
     case None =>
       env.playban.api.currentBan(me.id).dmap(_.isDefined) map {
         html.appeal.tree(me, _)
@@ -47,7 +47,7 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
       form
         .bindFromRequest()
         .fold(
-          err => renderAppealOrTree(me, err.some) map { BadRequest(_) },
+          err => renderAppealOrTree(me, err.some) map { content => BadRequest(content) },
           text => env.appeal.api.post(text, me) inject Redirect(routes.Appeal.home).flashSuccess
         )
     }
@@ -94,7 +94,11 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
       }
     }
 
-  private def getModData(me: lila.user.Holder, appeal: lila.appeal.Appeal, suspect: Suspect)(implicit
+  private def getModData(
+      me: lila.user.Holder,
+      @annotation.nowarn("msg=unused") appeal: lila.appeal.Appeal,
+      suspect: Suspect
+  )(implicit
       ctx: Context
   ) =
     for {
@@ -114,23 +118,24 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
 
   def mute(username: String) =
     Secure(_.Appeals) { implicit ctx => me =>
-      asMod(username) { (appeal, suspect) =>
+      asMod(username) { (appeal, _) =>
         env.appeal.api.toggleMute(appeal) >>
-          env.report.api.inquiries.toggle(lila.report.Mod(me.user), appeal.id) inject
-          Redirect(routes.Appeal.queue)
+          env.report.api.inquiries.toggle(lila.report.Mod(me.user), appeal.id) map { _ =>
+            Redirect(routes.Appeal.queue)
+          }
       }
     }
 
   def notifySlack(username: String) =
     Secure(_.NotifySlack) { implicit ctx => me =>
-      asMod(username) { (appeal, suspect) =>
+      asMod(username) { (_, suspect) =>
         env.irc.slack.userAppeal(user = suspect.user, mod = me) inject NoContent
       }
     }
 
   def snooze(username: String, dur: String) =
     Secure(_.Appeals) { implicit ctx => me =>
-      asMod(username) { (appeal, suspect) =>
+      asMod(username) { (appeal, _) =>
         env.appeal.api.snooze(me.user, appeal.id, dur)
         env.report.api.inquiries.toggle(lila.report.Mod(me.user), appeal.id) inject
           Redirect(routes.Appeal.queue)
@@ -142,12 +147,10 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
   private def asMod(
       username: String
   )(f: (lila.appeal.Appeal, Suspect) => Fu[Result])(implicit ctx: Context): Fu[Result] =
-    env.user.repo named username flatMap {
-      _ ?? { user =>
-        env.appeal.api get user flatMap {
-          _ ?? { appeal =>
-            f(appeal, Suspect(user)) dmap some
-          }
+    env.user.repo.named(username) flatMap {
+      _.so { user =>
+        env.appeal.api.get(user) flatMap {
+          _.so { appeal => f(appeal, Suspect(user)).dmap(some) }
         }
       }
     } flatMap {

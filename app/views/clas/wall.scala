@@ -2,10 +2,9 @@ package views.html.clas
 
 import play.api.data.Form
 
-import controllers.routes
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.clas.{ Clas, Student }
 
 object wall {
@@ -20,13 +19,11 @@ object wall {
           trans.clas.notifyAllStudents()
         )
       ),
-      if (c.wall.isEmpty)
-        div(cls := "box__pad clas-wall clas-wall--empty")(trans.clas.nothingHere())
-      else
-        div(cls := "box__pad clas-wall")(html)
+      if (c.wall.isEmpty) div(cls := "box__pad clas-wall clas-wall--empty")(trans.clas.nothingHere())
+      else div(cls := "box__pad clas-wall")(html)
     )
 
-  def edit(c: Clas, students: List[Student.WithUser], form: Form[_])(implicit ctx: Context) =
+  def edit(c: Clas, students: List[Student.WithUser], form: Form[?])(implicit ctx: Context) =
     teacherDashboard.layout(c, students, "wall")(
       div(cls := "box-pad clas-wall__edit")(
         p(

@@ -1,13 +1,13 @@
 package controllers
 
-import akka.stream.scaladsl._
-import play.api.data._
-import play.api.data.Forms._
-import play.api.mvc._
-import views._
+import akka.stream.scaladsl.*
+import play.api.data.*
+import play.api.data.Forms.*
+import play.api.mvc.*
+import views.*
 
 import lila.api.Context
-import lila.app._
+import lila.app.{ *, given }
 import lila.user.Holder
 
 final class Clas(
@@ -18,8 +18,8 @@ final class Clas(
   def index =
     Open { implicit ctx =>
       ctx.me match {
-        case _ if getBool("home") => renderHome
-        case None                 => renderHome
+        case _ if getBool("home")                                => renderHome
+        case None                                                => renderHome
         case Some(me) if isGranted(_.Teacher) && !me.lameOrTroll =>
           env.clas.api.clas.of(me) map { classes =>
             Ok(views.html.clas.clas.teacherIndex(classes))
@@ -52,7 +52,7 @@ final class Clas(
     SecureBody(_.Teacher) { implicit ctx => me =>
       SafeTeacher {
         env.clas.forms.clas.create
-          .bindFromRequest()(ctx.body, formBinding)
+          .bindFromRequest()(using ctx.body, formBinding)
           .fold(
             err => BadRequest(html.clas.clas.create(err)).fuccess,
             data =>
@@ -84,7 +84,7 @@ final class Clas(
         orDefault = _ =>
           if (isGranted(_.UserModView))
             env.clas.api.clas.byId(lila.clas.Clas.Id(id)) flatMap {
-              _ ?? { clas =>
+              _ so { clas =>
                 env.clas.api.student.allWithUsers(clas) flatMap { students =>
                   env.user.repo.withEmailsU(students.map(_.user)) map { users =>
                     Ok(html.mod.search.clas(Holder(me), clas, users))
@@ -99,15 +99,16 @@ final class Clas(
   private def WithClassAny(id: String, me: lila.user.User)(
       forTeacher: => Fu[Result],
       forStudent: (lila.clas.Clas, List[lila.clas.Student.WithUser]) => Fu[Result],
-      orDefault: Context => Fu[Result] = notFound(_)
+      orDefault: Context => Fu[Result] = notFound(using _)
   )(implicit ctx: Context): Fu[Result] =
-    isGranted(_.Teacher).??(env.clas.api.clas.isTeacherOf(me, lila.clas.Clas.Id(id))) flatMap {
+    (if (isGranted(_.Teacher)) env.clas.api.clas.isTeacherOf(me, lila.clas.Clas.Id(id))
+     else fuFalse) flatMap {
       case true => forTeacher
-      case _ =>
+      case _    =>
         env.clas.api.clas.byId(lila.clas.Clas.Id(id)) flatMap {
-          _ ?? { clas =>
+          _ so { clas =>
             env.clas.api.student.activeWithUsers(clas) flatMap { students =>
-              if (students.exists(_.student is me)) forStudent(clas, students)
+              if (students.exists(_.student.is(me))) forStudent(clas, students)
               else orDefault(ctx)
             }
           }
@@ -131,7 +132,7 @@ final class Clas(
     Secure(_.Teacher) { implicit ctx => me =>
       WithClass(me, id) { clas =>
         env.clas.api.student.activeWithUsers(clas) map { students =>
-          Ok(html.clas.wall.edit(clas, students, env.clas.forms.clas.wall fill clas.wall))
+          Ok(html.clas.wall.edit(clas, students, env.clas.forms.clas.wall.fill(clas.wall)))
         }
       }
     }
@@ -140,7 +141,7 @@ final class Clas(
     SecureBody(_.Teacher) { implicit ctx => me =>
       WithClass(me, id) { clas =>
         env.clas.forms.clas.wall
-          .bindFromRequest()(ctx.body, formBinding)
+          .bindFromRequest()(using ctx.body, formBinding)
           .fold(
             err =>
               env.clas.api.student.activeWithUsers(clas) map { students =>
@@ -168,7 +169,7 @@ final class Clas(
     SecureBody(_.Teacher) { implicit ctx => me =>
       WithClass(me, id) { clas =>
         env.clas.forms.clas.notifyText
-          .bindFromRequest()(ctx.body, formBinding)
+          .bindFromRequest()(using ctx.body, formBinding)
           .fold(
             err =>
               env.clas.api.student.activeWithUsers(clas) map { students =>
@@ -178,11 +179,11 @@ final class Clas(
               env.clas.api.student.activeWithUsers(clas) flatMap { students =>
                 Reasonable(clas, students, "notify") {
                   val url  = routes.Clas.show(clas.id.value).url
-                  val full = if (text contains url) text else s"$text\n\n${env.net.baseUrl}$url"
+                  val full = if (text.contains(url)) text else s"$text\n\n${env.net.baseUrl}$url"
                   env.msg.api
                     .multiPost(me, Source(students.map(_.user.id)), full)
                     .addEffect { nb =>
-                      lila.mon.msg.clasBulk(clas.id.value).record(nb).unit
+                      val _ = lila.mon.msg.clasBulk(clas.id.value).record(nb)
                     }
                     .inject {
                       Redirect(routes.Clas.show(clas.id.value)).flashSuccess
@@ -206,7 +207,7 @@ final class Clas(
 
   def progress(id: String, key: String, days: Int) =
     Secure(_.Teacher) { implicit ctx => me =>
-      lila.rating.PerfType(key) ?? { perfType =>
+      lila.rating.PerfType(key) so { perfType =>
         WithClass(me, id) { clas =>
           env.clas.api.student.activeWithUsers(clas) flatMap { students =>
             Reasonable(clas, students, "progress") {
@@ -249,7 +250,7 @@ final class Clas(
       WithClass(me, id) { clas =>
         env.clas.forms.clas
           .edit(clas)
-          .bindFromRequest()(ctx.body, formBinding)
+          .bindFromRequest()(using ctx.body, formBinding)
           .fold(
             err =>
               env.clas.api.student.activeWithUsers(clas) map { students =>
@@ -273,13 +274,14 @@ final class Clas(
 
   def studentForm(id: String) =
     Secure(_.Teacher) { implicit ctx => me =>
-      if (getBool("gen")) env.clas.nameGenerator() map {
-        Ok(_)
-      }
+      if (getBool("gen"))
+        env.clas.nameGenerator() map {
+          Ok(_)
+        }
       else
         WithClassAndStudents(me, id) { (clas, students) =>
           for {
-            created <- ctx.req.flash.get("created").map(_ split ' ').?? {
+            created <- ctx.req.flash.get("created").map(_ split ' ').so {
               case Array(userId, password) =>
                 env.clas.api.student
                   .get(clas, userId)
@@ -308,7 +310,7 @@ final class Clas(
           SafeTeacher {
             WithClassAndStudents(me, id) { (clas, students) =>
               env.clas.forms.student.create
-                .bindFromRequest()(ctx.body, formBinding)
+                .bindFromRequest()(using ctx.body, formBinding)
                 .fold(
                   err =>
                     env.clas.api.student.count(clas.id) map { nbStudents =>
@@ -338,7 +340,7 @@ final class Clas(
   // def studentManyForm(id: String) =
   //   Secure(_.Teacher) { implicit ctx => me =>
   //     WithClassAndStudents(me, id) { (clas, students) =>
-  //       ctx.req.flash.get("created").?? {
+  //       ctx.req.flash.get("created").so {
   //         _.split('/').toList
   //           .flatMap {
   //             _.split(' ') match {
@@ -372,7 +374,7 @@ final class Clas(
   //             env.clas.api.student.count(clas.id) flatMap { nbStudents =>
   //               env.clas.forms.student
   //                 .manyCreate(lila.clas.Clas.maxStudents - nbStudents)
-  //                 .bindFromRequest()(ctx.body, formBinding)
+  //                 .bindFromRequest()(using ctx.body, formBinding)
   //                 .fold(
   //                   err => BadRequest(html.clas.student.manyForm(clas, students, err, nbStudents)).fuccess,
   //                   data =>
@@ -400,7 +402,7 @@ final class Clas(
       WithClassAndStudents(me, id) { (clas, students) =>
         env.clas.forms.student
           .invite(clas)
-          .bindFromRequest()(ctx.body, formBinding)
+          .bindFromRequest()(using ctx.body, formBinding)
           .fold(
             err =>
               env.clas.api.student.count(clas.id) map { nbStudents =>
@@ -415,9 +417,9 @@ final class Clas(
                 )
               },
             data =>
-              env.user.repo enabledNamed data.username flatMap {
-                _ ?? { user =>
-                  import lila.clas.ClasInvite.{ Feedback => F }
+              env.user.repo.enabledNamed(data.username) flatMap {
+                _ so { user =>
+                  import lila.clas.ClasInvite.Feedback as F
                   env.clas.api.invite.create(clas, user, data.realName, me) map { feedback =>
                     Redirect(routes.Clas.studentForm(clas.id.value)).flashing {
                       feedback match {
@@ -450,7 +452,7 @@ final class Clas(
     Secure(_.Teacher) { implicit ctx => me =>
       WithClassAndStudents(me, id) { (clas, students) =>
         WithStudent(clas, username) { s =>
-          Ok(views.html.clas.student.edit(clas, students, s, env.clas.forms.student edit s.student)).fuccess
+          Ok(views.html.clas.student.edit(clas, students, s, env.clas.forms.student.edit(s.student))).fuccess
         }
       }
     }
@@ -461,7 +463,7 @@ final class Clas(
         WithStudent(clas, username) { s =>
           env.clas.forms.student
             .edit(s.student)
-            .bindFromRequest()(ctx.body, formBinding)
+            .bindFromRequest()(using ctx.body, formBinding)
             .fold(
               err => BadRequest(html.clas.student.edit(clas, students, s, err)).fuccess,
               data =>
@@ -502,8 +504,7 @@ final class Clas(
         WithStudent(clas, username) { s =>
           if (s.student.managed)
             Ok(views.html.clas.student.release(clas, students, s, env.clas.forms.student.release)).fuccess
-          else
-            Redirect(routes.Clas.studentShow(clas.id.value, s.user.username)).fuccess
+          else Redirect(routes.Clas.studentShow(clas.id.value, s.user.username)).fuccess
         }
       }
     }
@@ -513,13 +514,14 @@ final class Clas(
       WithClassAndStudents(me, id) { (clas, students) =>
         WithStudent(clas, username) { s =>
           if (s.student.managed)
-            env.security.forms.preloadEmailDns(ctx.body, formBinding) >> env.clas.forms.student.release
-              .bindFromRequest()(ctx.body, formBinding)
+            env.security.forms.preloadEmailDns(using ctx.body, formBinding) >> env.clas.forms.student.release
+              .bindFromRequest()(using ctx.body, formBinding)
               .fold(
                 err => BadRequest(html.clas.student.release(clas, students, s, err)).fuccess,
                 data => {
                   val email = env.security.emailAddressValidator
-                    .validate(lila.common.EmailAddress(data)) err s"Invalid email $data"
+                    .validate(lila.common.EmailAddress(data))
+                    .err(s"Invalid email $data")
                   val newUserEmail = lila.security.EmailConfirm.UserEmail(s.user.username, email.acceptable)
                   authC.EmailConfirmRateLimit(newUserEmail, ctx.req) {
                     env.security.emailChange.send(s.user, newUserEmail.email) inject
@@ -529,8 +531,7 @@ final class Clas(
                   }(rateLimitedFu)
                 }
               )
-          else
-            Redirect(routes.Clas.studentShow(clas.id.value, s.user.username)).fuccess
+          else Redirect(routes.Clas.studentShow(clas.id.value, s.user.username)).fuccess
         }
       }
     }
@@ -540,7 +541,7 @@ final class Clas(
       couldBeTeacher flatMap {
         case true =>
           val perm = lila.security.Permission.Teacher.dbKey
-          (!me.roles.has(perm) ?? env.user.repo.setRoles(me.id, perm :: me.roles).void) inject
+          (!me.roles.has(perm) so env.user.repo.setRoles(me.id, perm :: me.roles).void) inject
             Redirect(routes.Clas.index)
         case _ => notFound
       }
@@ -550,7 +551,7 @@ final class Clas(
     ctx.me match {
       case None             => fuTrue
       case _ if ctx.hasClas => fuTrue
-      case Some(me)         => !env.mod.logApi.wasUnteachered(me.id)
+      case Some(me)         => (!env.mod.logApi.wasUnteachered(me.id))
     }
 
   def invitation(id: String) =
@@ -563,17 +564,18 @@ final class Clas(
   def invitationAccept(id: String) =
     AuthBody { implicit ctx => me =>
       implicit val req = ctx.body
-      Form(single("v" -> boolean))
+      Form(single("v" -> play.api.data.Forms.boolean))
         .bindFromRequest()
         .fold(
           _ => Redirect(routes.Clas.invitation(id)).fuccess,
           v => {
             val inviteId = lila.clas.ClasInvite.Id(id)
-            if (v) env.clas.api.invite.accept(inviteId, me) map {
-              _ ?? { student =>
-                Redirect(routes.Clas.show(student.clasId.value))
+            if (v)
+              env.clas.api.invite.accept(inviteId, me) map {
+                _ so { student =>
+                  Redirect(routes.Clas.show(student.clasId.value))
+                }
               }
-            }
             else
               env.clas.api.invite.decline(inviteId) inject
                 Redirect(routes.Clas.invitation(id))
@@ -584,7 +586,7 @@ final class Clas(
   def invitationRevoke(id: String) =
     Secure(_.Teacher) { _ => me =>
       env.clas.api.invite.get(lila.clas.ClasInvite.Id(id)) flatMap {
-        _ ?? { invite =>
+        _ so { invite =>
           WithClass(me, invite.clasId.value) { clas =>
             env.clas.api.invite.delete(invite._id) inject Redirect(routes.Clas.students(clas.id.value))
           }
@@ -601,7 +603,7 @@ final class Clas(
   private def WithClass(me: Holder, clasId: String)(
       f: lila.clas.Clas => Fu[Result]
   ): Fu[Result] =
-    env.clas.api.clas.getAndView(lila.clas.Clas.Id(clasId), me.user) flatMap { _ ?? f }
+    env.clas.api.clas.getAndView(lila.clas.Clas.Id(clasId), me.user) flatMap { _ so f }
 
   private def WithClassAndStudents(me: Holder, clasId: String)(
       f: (lila.clas.Clas, List[lila.clas.Student]) => Fu[Result]
@@ -613,9 +615,9 @@ final class Clas(
   private def WithStudent(clas: lila.clas.Clas, username: String)(
       f: lila.clas.Student.WithUser => Fu[Result]
   ): Fu[Result] =
-    env.user.repo named username flatMap {
-      _ ?? { user =>
-        env.clas.api.student.get(clas, user) flatMap { _ ?? f }
+    env.user.repo.named(username) flatMap {
+      _ so { user =>
+        env.clas.api.student.get(clas, user) flatMap { _ so f }
       }
     }
 

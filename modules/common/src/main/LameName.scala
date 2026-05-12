@@ -8,21 +8,21 @@ object LameName {
     usernameRegex.find(name.replaceIf('_', "")) || containsTitleRegex.matches(name) || containsUsRegex
       .matches(name)
 
-  def tournament(name: String): Boolean = tournamentRegex find name
+  def tournament(name: String): Boolean = tournamentRegex.find(name)
 
   def team(name: String): Boolean =
     teamRegex.find(name.replaceIf('_', "")) || containsUsAnywhereRegex.matches(name)
 
-  private val titlePattern = "W*(?:[NCFI1L]|I?G)"
+  private val titlePattern       = "W*(?:[NCFI1L]|I?G)"
   private val containsTitleRegex = (
     "^"
-      + "(?i:" + titlePattern + "M[^a-z].*)|"                  // title at start, separated by non-letter
-      + "(?:(?i:" + titlePattern + ")m[^a-z].*)|"              // title at start with lowercase m, not followed by lowercase letter
-      + "(?:" + titlePattern + "M.*)|"                         // uppercase title at start
-      + "(?i:.*[^a-z]" + titlePattern + "M)|"                  // title at end, separated by non-letter
-      + "(?i:.*[^a-z]" + titlePattern + "M[^a-z].*)|"          // title in middle, surrounded by non-letters
+      + "(?i:" + titlePattern + "M[^a-z].*)|" // title at start, separated by non-letter
+      + "(?:(?i:" + titlePattern + ")m[^a-z].*)|" // title at start with lowercase m, not followed by lowercase letter
+      + "(?:" + titlePattern + "M.*)|"                // uppercase title at start
+      + "(?i:.*[^a-z]" + titlePattern + "M)|"         // title at end, separated by non-letter
+      + "(?i:.*[^a-z]" + titlePattern + "M[^a-z].*)|" // title in middle, surrounded by non-letters
       + "(?:.*[^A-Z]" + titlePattern + "M(?:[A-Z]?[^A-Z].*)?)" // uppercase title not preceeded by uppercase letter,
-      + "$"                                                    //   either at end or followed by at most one uppercase letter and then something else
+      + "$" //   either at end or followed by at most one uppercase letter and then something else
   ).r
 
   private val baseWords = List(
@@ -125,9 +125,9 @@ object LameName {
     )
 
     val subs: Map[Char, String] = {
-      (('a' to 'z' map { c =>
+      ('a' to 'z' map { c =>
         c -> s"[$c${c.toUpper}${~extras.get(c)}]"
-      }) ++ Seq('0' -> "[0O]", '1' -> "[1Il]", '8' -> "[8B]"))
+      }) ++ Seq('0' -> "[0O]", '1' -> "[1Il]", '8' -> "[8B]")
     }.toMap
 
     list

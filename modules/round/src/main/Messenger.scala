@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 
 import lila.chat.{ Chat, ChatApi, ChatTimeout }
 import lila.game.Game
@@ -17,36 +17,42 @@ final class Messenger(api: ChatApi) {
 
   def system(persistent: Boolean)(game: Game, message: String): Unit = {
     val apiCall =
-      if (persistent) api.userChat.system _
-      else api.userChat.volatile _
+      if (persistent) api.userChat.system
+      else api.userChat.volatile
     apiCall(watcherId(Chat.Id(game.id)), message, _.Round)
-    if (game.nonAi) apiCall(Chat.Id(game.id), message, _.Round)
-  }.unit
+    val _ = if (game.nonAi) apiCall(Chat.Id(game.id), message, _.Round)
+  }
 
   def systemForOwners(chatId: Chat.Id, message: String): Unit =
-    api.userChat.system(chatId, message, _.Round).unit
+    api.userChat.system(chatId, message, _.Round).discard
 
   def watcher(gameId: Game.Id, userId: User.ID, text: String) =
-    api.userChat.write(watcherId(gameId), userId, text, PublicSource.Watcher(gameId.value).some, _.Round)
+    api.userChat.write(
+      watcherIdOfGame(gameId),
+      userId,
+      text,
+      PublicSource.Watcher(gameId.value).some,
+      _.Round
+    )
 
   private val whisperCommands = List("/whisper ", "/w ", "/W ")
 
   def owner(gameId: Game.Id, userId: User.ID, text: String): Funit =
     whisperCommands.collectFirst {
-      case command if text startsWith command =>
+      case command if text.startsWith(command) =>
         val source = PublicSource.Watcher(gameId.value)
-        api.userChat.write(watcherId(gameId), userId, text drop command.length, source.some, _.Round)
+        api.userChat.write(watcherIdOfGame(gameId), userId, text drop command.length, source.some, _.Round)
     } getOrElse {
-      !text.startsWith("/") ?? // mistyped command?
+      !text.startsWith("/") so // mistyped command?
         api.userChat.write(Chat.Id(gameId.value), userId, text, publicSource = none, _.Round)
     }
 
   def owner(game: Game, anonPlayerIndex: PlayerIndex, text: String): Funit =
-    (game.fromFriend || presets.contains(text)) ??
+    (game.fromFriend || presets.contains(text)) so
       api.playerChat.write(Chat.Id(game.id), anonPlayerIndex, text, _.Round)
 
   def timeout(chatId: Chat.Id, modId: User.ID, suspect: User.ID, reason: String, text: String): Funit =
-    ChatTimeout.Reason(reason) ?? { r =>
+    ChatTimeout.Reason(reason) so { r =>
       api.userChat.timeout(chatId, modId, suspect, r, ChatTimeout.Scope.Global, text, _.Round)
     }
 
@@ -62,6 +68,6 @@ final class Messenger(api: ChatApi) {
     "Bye!"
   )
 
-  private def watcherId(chatId: Chat.Id) = Chat.Id(s"$chatId/w")
-  private def watcherId(gameId: Game.Id) = Chat.Id(s"$gameId/w")
+  private def watcherId(chatId: Chat.Id)       = Chat.Id(s"$chatId/w")
+  private def watcherIdOfGame(gameId: Game.Id) = Chat.Id(s"$gameId/w")
 }

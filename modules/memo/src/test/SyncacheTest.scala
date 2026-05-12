@@ -5,7 +5,7 @@ import akka.testkit.{ ImplicitSender, TestKit }
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContextExecutor
 
@@ -26,7 +26,7 @@ class MySpec()
 
     "be thread safe" in {
       var computeCount: Int = 0
-      val cache = new Syncache[Int, String](
+      val cache             = new Syncache[Int, String](
         name = "test",
         initialCapacity = 64,
         compute = s =>

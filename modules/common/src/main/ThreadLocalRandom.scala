@@ -14,7 +14,7 @@ object ThreadLocalRandom {
   def nextInt(n: Int): Int                = current.nextInt(n)
   def nextLong(): Long                    = current.nextLong()
   def nextGaussian(): Double              = current.nextGaussian()
-  def nextChar(): Char = {
+  def nextChar(): Char                    = {
     val i = nextInt(62)
     if (i < 26) i + 65
     else if (i < 52) i + 71
@@ -24,11 +24,11 @@ object ThreadLocalRandom {
     new scala.util.Random(current).shuffle(xs)
   def nextString(len: Int): String = {
     val sb = new StringBuilder(len)
-    for (_ <- 0 until len) sb += nextChar()
+    for _ <- 0 until len do sb += nextChar()
     sb.result()
   }
   def oneOf[A](vec: Vector[A]): Option[A] =
-    vec.nonEmpty ?? {
+    vec.nonEmpty so {
       vec lift nextInt(vec.size)
     }
 }

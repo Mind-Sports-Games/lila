@@ -13,7 +13,7 @@ import scala.concurrent.{ ExecutionContext, Future, Promise }
  */
 abstract class Trouper(implicit ec: ExecutionContext) extends lila.common.Tellable {
 
-  import Trouper._
+  import Trouper.*
 
   // implement async behaviour here
   protected val process: Receive
@@ -22,13 +22,11 @@ abstract class Trouper(implicit ec: ExecutionContext) extends lila.common.Tellab
 
   def getIsAlive = isAlive
 
-  def stop(): Unit = {
+  def stop(): Unit =
     isAlive = false
-  }
 
   def !(msg: Any): Unit =
-    if (isAlive && stateRef.getAndUpdate(state => Some(state.fold(Queue.empty[Any])(_ enqueue msg))).isEmpty)
-      run(msg)
+    if (isAlive && stateRef.getAndUpdate(state => Some(state.fold(Queue.empty[Any])(_ enqueue msg))).isEmpty) run(msg)
 
   def ask[A](makeMsg: Promise[A] => Any): Fu[A] = {
     val promise = Promise[A]()
@@ -43,15 +41,14 @@ abstract class Trouper(implicit ec: ExecutionContext) extends lila.common.Tellab
    * Busy: Some(Queue.empty)
    * Busy with backlog: Some(Queue.nonEmpty)
    */
-  private[this] val stateRef: AtomicReference[State] = new AtomicReference(None)
+  private val stateRef: AtomicReference[State] = new AtomicReference(None)
 
-  private[this] def run(msg: Any): Unit =
+  private def run(msg: Any): Unit =
     Future {
       process.applyOrElse(msg, fallback)
     } onComplete postRun
 
-  private[this] val postRun = (_: Any) =>
-    stateRef.getAndUpdate(postRunUpdate) flatMap (_.headOption) foreach run
+  private val postRun = (_: Any) => stateRef.getAndUpdate(postRunUpdate) flatMap (_.headOption) foreach run
 
   private val fallback: Receive = { case msg =>
     lila.log("trouper").warn(s"unhandled msg: $msg")

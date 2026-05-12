@@ -1,14 +1,13 @@
 package lila.team
 
-import play.api.data._
-import play.api.data.Forms._
-import scala.concurrent.duration._
+import play.api.data.*
+import play.api.data.Forms.*
 
 import lila.common.Form.{ cleanNonEmptyText, cleanText, numberIn }
 import lila.common.LameName
-import lila.db.dsl._
+import lila.common.extensions.*
+import lila.db.dsl.*
 import lila.security.SecurityHelper
-import org.apache.http.protocol.ExecutionContext
 
 final private[team] class TeamForm(
     teamRepo: TeamRepo,
@@ -19,12 +18,12 @@ final private[team] class TeamForm(
     with SecurityHelper {
 
   private object Fields {
-    val name     = "name"     -> cleanText(minLength = 3, maxLength = 60)
-    val location = "location" -> optional(cleanText(minLength = 3, maxLength = 80))
-    val password = "password" -> optional(cleanText(maxLength = 60))
+    val name                      = "name"     -> cleanText(minLength = 3, maxLength = 60)
+    val location                  = "location" -> optional(cleanText(minLength = 3, maxLength = 80))
+    val password                  = "password" -> optional(cleanText(maxLength = 60))
     def passwordCheck(team: Team) = "password" -> optional(text).verifying(
       "team:incorrectTeamPassword",
-      pw => team.password.fold(true)(_ == pw.??(_.trim))
+      pw => team.password.fold(true)(_ == pw.so(_.trim))
     )
     def requestMessage(team: Team) =
       "message" -> optional(cleanText(minLength = 30, maxLength = 2000))
@@ -39,7 +38,7 @@ final private[team] class TeamForm(
     val hideForum   = "hideForum"   -> boolean
   }
 
-  def create()(implicit ctx: lila.user.UserContext) = {
+  def create()(implicit ctx: lila.user.UserContext) =
     Form(
       mapping(
         Fields.name,
@@ -52,12 +51,11 @@ final private[team] class TeamForm(
         Fields.move,
         Fields.hideMembers,
         Fields.hideForum
-      )(TeamSetup.apply)(TeamSetup.unapply)
+      )(TeamSetup.apply)(unapply)
         .verifying("team:teamAlreadyExists", d => !teamExists(d).await(2 seconds, "teamExists"))
         .verifying("team:teamLameName", d => !lameName(d))
-        .verifying(captchaFailMessage, validateCaptcha _)
+        .verifying(captchaFailMessage, validateCaptcha)
     )
-  }
 
   def edit(team: Team) =
     Form(
@@ -70,33 +68,37 @@ final private[team] class TeamForm(
         Fields.chat,
         Fields.hideMembers,
         Fields.hideForum
-      )(TeamEdit.apply)(TeamEdit.unapply)
-    ) fill TeamEdit(
-      location = team.location,
-      password = team.password,
-      description = team.description,
-      descPrivate = team.descPrivate,
-      request = !team.open,
-      chat = team.chat,
-      hideMembers = team.hideMembers.has(true),
-      hideForum = team.hideForum.has(true)
+      )(TeamEdit.apply)(unapply)
+    ).fill(
+      TeamEdit(
+        location = team.location,
+        password = team.password,
+        description = team.description,
+        descPrivate = team.descPrivate,
+        request = !team.open,
+        chat = team.chat,
+        hideMembers = team.hideMembers.has(true),
+        hideForum = team.hideForum.has(true)
+      )
     )
 
   def request(team: Team) = Form(
     mapping(
       Fields.requestMessage(team),
       Fields.passwordCheck(team)
-    )(RequestSetup.apply)(RequestSetup.unapply)
-  ) fill RequestSetup(
-    message = "Hello, I would like to join the team!".some,
-    password = None
+    )(RequestSetup.apply)(unapply)
+  ).fill(
+    RequestSetup(
+      message = "Hello, I would like to join the team!".some,
+      password = None
+    )
   )
 
   def apiRequest(team: Team) = Form(
     mapping(
       Fields.requestMessage(team),
       Fields.passwordCheck(team)
-    )(RequestSetup.apply)(RequestSetup.unapply)
+    )(RequestSetup.apply)(unapply)
   )
 
   val processRequest = Form(
@@ -119,16 +121,18 @@ final private[team] class TeamForm(
   )
 
   def leaders(t: Team) =
-    Form(single("leaders" -> nonEmptyText)) fill t.leaders
-      .flatMap(lightUserApi.sync)
-      .map(_.name)
-      .mkString(", ")
+    Form(single("leaders" -> nonEmptyText)).fill(
+      t.leaders
+        .flatMap(lightUserApi.sync)
+        .map(_.name)
+        .mkString(", ")
+    )
 
   private def teamExists(setup: TeamSetup) =
-    teamRepo.coll.exists($id(Team nameToId setup.trim.name))
+    teamRepo.coll.exists($id(Team.nameToId(setup.trim.name)))
 
   private def lameName(d: TeamSetup)(implicit ctx: lila.user.UserContext) =
-    if (isGranted(_.Admin)(ctx)) false else LameName.team(d.name)
+    if (isGranted(_.Admin)(using ctx)) false else LameName.team(d.name)
 }
 
 private[team] case class TeamSetup(

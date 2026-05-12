@@ -599,12 +599,12 @@ object GreatPlayer {
     ("Żytogórski", "Adolf_Zytogorski")
   )
 
-  private val size = all.size
+  private val size                  = all.size
   private val names: Vector[String] = all.view.map { case (k, _) =>
     k
   }.toVector
 
-  def randomName: String = names(lila.common.ThreadLocalRandom nextInt size)
+  def randomName: String = names(lila.common.ThreadLocalRandom.nextInt(size))
 
   def wikiUrl(name: String) =
     all get name map { s =>

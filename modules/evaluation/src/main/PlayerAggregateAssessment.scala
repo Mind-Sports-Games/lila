@@ -1,6 +1,6 @@
 package lila.evaluation
 
-import cats.implicits._
+import cats.implicits.*
 import scala.math.sqrt
 
 import lila.user.User
@@ -9,8 +9,8 @@ case class PlayerAggregateAssessment(
     user: User,
     playerAssessments: List[PlayerAssessment]
 ) {
-  import Statistics._
-  import AccountAction._
+  import Statistics.*
+  import AccountAction.*
   import GameAssessment.{ Cheating, LikelyCheating }
 
   def action: AccountAction = {
@@ -42,20 +42,18 @@ case class PlayerAggregateAssessment(
     )
 
     val actionable: Boolean = {
-      val difFlags = difs map (sigDif(10) _).tupled
+      val difFlags = difs map sigDif(10).tupled
       difFlags.forall(_.isEmpty) || difFlags.exists(~_) || assessmentsCount < 50
     }
 
-    if (actionable) {
+    if (actionable)
       if (markable && bannable) EngineAndBan
-      else if (markable) reportVariousReasons //Engine
+      else if (markable) reportVariousReasons // Engine
       else if (reportable) reportVariousReasons
       else Nothing
-    } else {
-      if (markable) reportVariousReasons
-      else if (reportable) reportVariousReasons
-      else Nothing
-    }
+    else if (markable) reportVariousReasons
+    else if (reportable) reportVariousReasons
+    else Nothing
   }
 
   def countAssessmentValue(assessment: GameAssessment) =

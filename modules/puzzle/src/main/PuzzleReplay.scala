@@ -2,13 +2,11 @@ package lila.puzzle
 
 import org.joda.time.DateTime
 import reactivemongo.api.bson.BSONNull
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
-import scala.util.chaining._
 
 import strategygames.variant.Variant
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.memo.CacheApi
 import lila.user.User
 
@@ -29,7 +27,7 @@ final class PuzzleReplayApi(
     cacheApi: CacheApi
 )(implicit ec: ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   private val maxPuzzles = 100
 
@@ -46,11 +44,12 @@ final class PuzzleReplayApi(
     maybeDays map { days =>
       replays.getFuture((user.id, variant), _ => createReplayFor(user, days, variant, theme)) flatMap {
         current =>
-          if (current.days == days && current.theme == theme && current.remaining.nonEmpty) fuccess(current)
+          if (current.days == days && current.theme == theme && current.remaining.nonEmpty)
+            fuccess(current)
           else createReplayFor(user, days, variant, theme) tap { replays.put((user.id, variant), _) }
       } flatMap { replay =>
-        replay.remaining.headOption ?? { id =>
-          colls.puzzle(_.byId[Puzzle](id.value)) map2 (_ -> replay)
+        replay.remaining.headOption so { id =>
+          colls.puzzle(_.byId[Puzzle](id.value)).map2(_ -> replay)
         }
       }
     } getOrElse fuccess(None)
@@ -61,7 +60,7 @@ final class PuzzleReplayApi(
       variant: Variant,
       theme: PuzzleTheme.Key
   ): Funit =
-    replays.getIfPresent((round.userId, variant)) ?? {
+    replays.getIfPresent((round.userId, variant)) so {
       _ map { replay =>
         if (replay.days == days && replay.theme == theme)
           replays.put((round.userId, variant), fuccess(replay.step))
@@ -77,12 +76,12 @@ final class PuzzleReplayApi(
     colls
       .round {
         _.aggregateOne() { framework =>
-          import framework._
+          import framework.*
           Match(
             $doc(
               "u" -> user.id,
-              "d" $gt DateTime.now.minusDays(days),
-              "w" $ne true
+              "d".$gt(DateTime.now.minusDays(days)),
+              "w".$ne(true)
             )
           ) -> List(
             Sort(Ascending("d")),
@@ -91,7 +90,7 @@ final class PuzzleReplayApi(
                 "$lookup" -> $doc(
                   "from" -> colls.puzzle.name.value,
                   "as"   -> "puzzle",
-                  "let" -> $doc(
+                  "let"  -> $doc(
                     "pid" -> $doc("$arrayElemAt" -> $arr($doc("$split" -> $arr("$_id", ":")), 1))
                   ),
                   "pipeline" -> $arr(
@@ -136,24 +135,4 @@ final class PuzzleReplayApi(
       PuzzleReplay(days, theme, ids.size, ids)
     }
 
-  private val puzzleLookup =
-    $doc(
-      "$lookup" -> $doc(
-        "from" -> colls.puzzle.name.value,
-        "as"   -> "puzzle",
-        "let" -> $doc(
-          "pid" -> $doc("$arrayElemAt" -> $arr($doc("$split" -> $arr("$_id", ":")), 1))
-        ),
-        "pipeline" -> $arr(
-          $doc(
-            "$match" -> $doc(
-              "$expr" -> $doc(
-                $doc("$eq" -> $arr("$_id", "$$pid"))
-              )
-            )
-          ),
-          $doc("$project" -> $doc("_id" -> true))
-        )
-      )
-    )
 }
