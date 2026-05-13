@@ -124,7 +124,7 @@ object show {
               h2(trans.dailyPuzzle()),
               div(" ")
             ),
-            views.html.puzzle.embed.dailyLink(p)(ctx.lang)
+            views.html.puzzle.embed.dailyLink(p)(using ctx.lang)
           )
         },
         featuredGame map { g =>
