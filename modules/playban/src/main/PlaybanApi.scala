@@ -232,9 +232,9 @@ final class PlaybanApi(
         upsert = true
       )
       .orFail(s"can't find newly created record for user $userId") flatMap { record =>
-      (outcome != Outcome.Good) so {
+      (if (outcome != Outcome.Good)
         userRepo.createdAtById(userId).flatMap { _ so { legiferate(record, _) } }
-      } >>
+      else funit) >>
         registerRageSit(record, rsUpdate)
     }
   }.void.logFailure(lila.log("playban"))

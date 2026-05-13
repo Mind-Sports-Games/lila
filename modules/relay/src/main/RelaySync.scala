@@ -83,14 +83,14 @@ final private class RelaySync(
       case (found, _) => found
     } match {
       case (path, newNode) =>
-        !Path.isMainline(chapter.root, path) so {
+        (if (!Path.isMainline(chapter.root, path)) {
           logger.info(s"Change mainline ${showSC(study, chapter)} $path")
           studyApi.promote(
             studyId = study.id,
             position = Position(chapter, path).ref,
             toMainline = true
           )(who) >> chapterRepo.setRelayPath(chapter.id, path)
-        } >> newNode.so { node =>
+        } else funit) >> newNode.so { node =>
           lila.common.LilaFuture.fold(node.mainline.toList)(Position(chapter, path).ref) {
             case (position, n) =>
               studyApi.addNode(
