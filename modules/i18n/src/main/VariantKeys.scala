@@ -18,14 +18,14 @@ object VariantKeys {
 
   def gameFamilyName(gameFamily: GameFamily)(implicit lang: Lang = defaultLang) =
     new I18nKey(s"variantName:${gameFamily.key match {
-      case "loa" => "linesOfAction"
-      case key   => key
-    }}").txt()
+        case "loa" => "linesOfAction"
+        case key   => key
+      }}").txt()
 
   def gameGroupName(gameGroup: GameGroup)(implicit lang: Lang = defaultLang) =
     new I18nKey(s"variantName:${gameGroup.key match {
-      case "loa" => "linesOfAction"
-      case key   => key
-    }}").txt()
+        case "loa" => "linesOfAction"
+        case key   => key
+      }}").txt()
 
 }

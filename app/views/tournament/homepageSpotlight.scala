@@ -1,18 +1,16 @@
 package views.html.tournament
 
-import controllers.routes
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object homepageSpotlight {
 
   def apply(tour: lila.tournament.Tournament)(implicit ctx: Context) = {
-    val schedClass = tour.schedule ?? { sched =>
-      val invert      = (sched.freq.isWeeklyOrBetter && tour.isNowOrSoon) ?? " invert"
-      val highlighted = (tour.isStarted && !tour.isFinished) ?? " highlighted"
-      val distant     = tour.isDistant ?? " distant little"
+    val schedClass = tour.schedule so { sched =>
+      val invert      = (sched.freq.isWeeklyOrBetter && tour.isNowOrSoon) so " invert"
+      val highlighted = (tour.isStarted && !tour.isFinished) so " highlighted"
+      val distant     = tour.isDistant so " distant little"
       s"${sched.freq} ${sched.speed} ${sched.variant.key}$invert$highlighted$distant ${ctx.currentSelectedColor}"
     }
     val tourClass = s"tour-spotlight id_${tour.id} $schedClass"

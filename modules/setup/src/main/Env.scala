@@ -1,9 +1,9 @@
 package lila.setup
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import play.api.Configuration
 
-import lila.common.config._
+import lila.common.config.*
 import lila.oauth.OAuthServer
 
 @Module

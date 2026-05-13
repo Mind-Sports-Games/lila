@@ -1,12 +1,12 @@
 package lila.bookmark
 
-import akka.actor._
-import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import akka.actor.*
+import com.softwaremill.macwire.*
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.common.config._
-import lila.hub.actorApi.bookmark._
+import lila.common.config.*
+import lila.hub.actorApi.bookmark.*
 
 @Module
 final private class BookmarkConfig(
@@ -24,7 +24,7 @@ final class Env(
     system: ActorSystem
 ) {
 
-  private val config = appConfig.get[BookmarkConfig]("bookmark")(AutoConfig.loader)
+  private val config = appConfig.get[BookmarkConfig]("bookmark")(using AutoConfig.loader)
 
   private lazy val bookmarkColl = db(config.bookmarkCollName)
 
@@ -35,8 +35,8 @@ final class Env(
   system.actorOf(
     Props(new Actor {
       def receive = {
-        case Toggle(gameId, userId) => api.toggle(gameId, userId).unit
-        case Remove(gameId)         => api.removeByGameId(gameId).unit
+        case Toggle(gameId, userId) => api.toggle(gameId, userId).discard
+        case Remove(gameId)         => api.removeByGameId(gameId).discard
       }
     }),
     name = config.actorName

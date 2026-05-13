@@ -1,6 +1,6 @@
 package lila.lobby
 
-import strategygames.{ Game => StratGame, P1, P2, Situation }
+import strategygames.{ Game as StratGame, Situation }
 
 import actorApi.{ JoinHook, JoinSeek }
 import lila.game.{ Game, PerfPicker, Player }
@@ -25,15 +25,15 @@ final private class Biter(
 
   private def join(hook: Hook, sri: Sri, lobbyUserOption: Option[LobbyUser]): Fu[JoinHook] =
     for {
-      userOption         <- lobbyUserOption.map(_.id) ?? userRepo.byId
-      ownerOption        <- hook.userId ?? userRepo.byId
+      userOption         <- lobbyUserOption.map(_.id) so userRepo.byId
+      ownerOption        <- hook.userId so userRepo.byId
       creatorPlayerIndex <- assignCreatorPlayerIndex(ownerOption, userOption, hook.realPlayerIndex)
-      game <- makeGame(
+      game               <- makeGame(
         hook,
         p1User = creatorPlayerIndex.fold(ownerOption, userOption),
         p2User = creatorPlayerIndex.fold(userOption, ownerOption)
       ).withUniqueId
-      _ <- gameRepo insertDenormalized game
+      _ <- gameRepo.insertDenormalized(game)
     } yield {
       lila.mon.lobby.hook.join.increment()
       JoinHook(sri, hook, game, creatorPlayerIndex)
@@ -41,15 +41,15 @@ final private class Biter(
 
   private def join(seek: Seek, lobbyUser: LobbyUser): Fu[JoinSeek] =
     for {
-      user               <- userRepo byId lobbyUser.id orFail s"No such user: ${lobbyUser.id}"
-      owner              <- userRepo byId seek.user.id orFail s"No such user: ${seek.user.id}"
+      user               <- userRepo.byId(lobbyUser.id).orFail(s"No such user: ${lobbyUser.id}")
+      owner              <- userRepo.byId(seek.user.id).orFail(s"No such user: ${seek.user.id}")
       creatorPlayerIndex <- assignCreatorPlayerIndex(owner.some, user.some, seek.realPlayerIndex)
-      game <- makeGame(
+      game               <- makeGame(
         seek,
         p1User = creatorPlayerIndex.fold(owner.some, user.some),
         p2User = creatorPlayerIndex.fold(user.some, owner.some)
       ).withUniqueId
-      _ <- gameRepo insertDenormalized game
+      _ <- gameRepo.insertDenormalized(game)
     } yield JoinSeek(user.id, seek, game, creatorPlayerIndex)
 
   private def assignCreatorPlayerIndex(
@@ -74,7 +74,7 @@ final private class Biter(
           lib = hook.realVariant.gameLogic,
           situation = stratSit,
           clock = clock.some,
-          //we have to do this to handle Backgammon variable start player
+          // we have to do this to handle Backgammon variable start player
           plies = stratSit.player.fold(0, 1),
           turnCount = stratSit.player.fold(0, 1),
           startedAtPly = stratSit.player.fold(0, 1),
@@ -98,7 +98,7 @@ final private class Biter(
           lib = seek.realVariant.gameLogic,
           situation = stratSit,
           clock = none,
-          //we have to do this to handle Backgammon variable start player
+          // we have to do this to handle Backgammon variable start player
           plies = stratSit.player.fold(0, 1),
           turnCount = stratSit.player.fold(0, 1),
           startedAtPly = stratSit.player.fold(0, 1),
@@ -118,10 +118,10 @@ final private class Biter(
     hook.isAuth == user.isDefined && user.fold(true) { u =>
       u.lame == hook.lame &&
       !hook.userId.contains(u.id) &&
-      !hook.userId.??(u.blocking.contains) &&
-      !hook.user.??(_.blocking).contains(u.id) &&
+      !hook.userId.so(u.blocking.contains) &&
+      !hook.user.so(_.blocking).contains(u.id) &&
       hook.realRatingRange.fold(true) { range =>
-        (hook.perfType map u.ratingAt) ?? range.contains
+        (hook.perfType map u.ratingAt) so range.contains
       }
     }
 
@@ -131,7 +131,7 @@ final private class Biter(
       !(user.blocking contains seek.user.id) &&
       !(seek.user.blocking contains user.id) &&
       seek.realRatingRange.fold(true) { range =>
-        (seek.perfType map user.ratingAt) ?? range.contains
+        (seek.perfType map user.ratingAt) so range.contains
       }
 
   def showHookTo(hook: Hook, member: LobbySocket.Member): Boolean =

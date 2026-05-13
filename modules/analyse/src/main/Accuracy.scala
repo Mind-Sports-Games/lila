@@ -1,9 +1,9 @@
 package lila.analyse
 
 import lila.game.Pov
-import lila.tree.Eval._
+import lila.tree.Eval.*
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 
 object Accuracy {
 
@@ -52,7 +52,7 @@ object Accuracy {
   def mean(pov: PovLike, analysis: Analysis): Option[Int] = {
     val diffs = diffsList(pov, analysis)
     val nb    = diffs.size
-    (nb != 0) option (diffs.sum / nb)
+    (nb != 0).option(diffs.sum / nb)
   }
   def mean(pov: Pov, analysis: Analysis): Option[Int] = mean(povToPovLike(pov), analysis)
 }

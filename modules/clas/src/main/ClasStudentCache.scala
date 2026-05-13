@@ -2,18 +2,18 @@ package lila.clas
 
 import akka.actor.Scheduler
 import akka.stream.Materializer
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import bloomfilter.mutable.BloomFilter
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
-import lila.db.dsl._
+import lila.common.extensions.*
+import lila.db.dsl.*
 import lila.memo.CacheApi
 import lila.user.User
 
-final class ClasStudentCache(colls: ClasColls, cacheApi: CacheApi)(implicit
+final class ClasStudentCache(colls: ClasColls, @annotation.nowarn("msg=unused") _cacheApi: CacheApi)(implicit
     ec: ExecutionContext,
     scheduler: Scheduler,
     mat: Materializer
@@ -30,7 +30,7 @@ final class ClasStudentCache(colls: ClasColls, cacheApi: CacheApi)(implicit
     colls.student.countAll foreach { count =>
       val nextBloom = BloomFilter[User.ID](count + 1, falsePositiveRate)
       colls.student
-        .find($doc("archived" $exists false), $doc("userId" -> true).some)
+        .find($doc("archived".$exists(false)), $doc("userId" -> true).some)
         .cursor[Bdoc](ReadPreference.secondaryPreferred)
         .documentSource()
         .toMat(Sink.fold[Int, Bdoc](0) { case (total, doc) =>
@@ -44,8 +44,8 @@ final class ClasStudentCache(colls: ClasColls, cacheApi: CacheApi)(implicit
           bloomFilter = nextBloom
         }
         .monSuccess(_.clas.student.bloomFilter.fu)
-        .unit
+        .discard
     }
 
-  scheduler.scheduleWithFixedDelay(23 seconds, 1 hour) { rebuildBloomFilter _ }.unit
+  val _ = scheduler.scheduleWithFixedDelay(23 seconds, 1 hour) { () => rebuildBloomFilter() }
 }

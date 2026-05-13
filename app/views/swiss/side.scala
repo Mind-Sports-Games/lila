@@ -1,17 +1,14 @@
 package views
 package html.swiss
 
-import controllers.routes
-
 import strategygames.variant.Variant
 import strategygames.format.FEN
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.markdownLinksOrRichText
 import lila.swiss.{ Swiss, SwissCondition }
-import lila.common.Form
 import lila.i18n.VariantKeys
 
 object side {
@@ -32,8 +29,8 @@ object side {
           div(
             p(
               a(
-                title := "Clock info",
-                href := s"${routes.Page.lonePage("clocks")}",
+                title  := "Clock info",
+                href   := s"${routes.Page.lonePage("clocks")}",
                 target := "_blank"
               )(s.clock.show),
               separator,
@@ -49,8 +46,8 @@ object side {
                 )
               } else s.perfType.trans,
               separator,
-              if (s.settings.usingDrawTables) trans.swiss.usingDrawTables(),
-              if (s.settings.usingDrawTables) separator,
+              if (s.settings.usingDrawTables) trans.swiss.usingDrawTables() else emptyFrag,
+              if (s.settings.usingDrawTables) separator else "",
               if (s.settings.handicapped)
                 a(href := routes.Page.lonePage("handicaps"), target := "_blank")(
                   trans.handicappedTournament()
@@ -79,27 +76,31 @@ object side {
                 if (s.settings.isBestOfX || s.settings.isPlayX) ")"
                 else ""
               ),
-              (isGranted(_.ManageTournament) || (ctx.userId.has(s.createdBy) && !s.isFinished)) option frag(
-                " ",
-                a(href := routes.Swiss.edit(s.id.value), title := "Edit tournament")(iconTag("%"))
+              (isGranted(_.ManageTournament) || (ctx.userId.has(s.createdBy) && !s.isFinished)).option(
+                frag(
+                  " ",
+                  a(href := routes.Swiss.edit(s.id.value), title := "Edit tournament")(iconTag("%"))
+                )
               )
             ),
             bits.showInterval(s),
             p(bits.showHalfwayBreak(s))
           )
         ),
-        s.isMedley option views.html.swiss.bits.medleyGames(
-          s.medleyGameGroupsString.getOrElse(""),
-          s.settings.medleyVariants.getOrElse(List[Variant]()),
-          s.isCreated,
-          s.isFinished,
-          s.settings.nbRounds
+        s.isMedley.option(
+          views.html.swiss.bits.medleyGames(
+            s.medleyGameGroupsString.getOrElse(""),
+            s.settings.medleyVariants.getOrElse(List[Variant]()),
+            s.isCreated,
+            s.isFinished,
+            s.settings.nbRounds
+          )
         ),
-        s.settings.mcmahon option div("The bar is at ", strong(s.settings.mcmahonCutoff)),
+        s.settings.mcmahon.option(div("The bar is at ", strong(s.settings.mcmahonCutoff))),
         s.settings.description map { d =>
           st.section(cls := "description")(markdownLinksOrRichText(d))
         },
-        s.looksLikePrize option views.html.tournament.bits.userPrizeDisclaimer(s.createdBy),
+        s.looksLikePrize.option(views.html.tournament.bits.userPrizeDisclaimer(s.createdBy)),
         s.settings.position.flatMap(lila.tournament.Thematic.byFen) map { pos =>
           div(
             a(targetBlank, href := pos.url)(strong(pos.eco), " ", pos.name),
@@ -112,7 +113,7 @@ object side {
             views.html.base.bits.fenAnalysisLink(fen)
           )
         },
-        !s.isFinished option s.trophy1st.map { trophy1st =>
+        (!s.isFinished).option(s.trophy1st.map { trophy1st =>
           table(cls := "trophyPreview")(
             tr(
               td(
@@ -135,7 +136,7 @@ object side {
               s.trophy3rd.map { _ => td("3rd Place") }
             )
           )
-        },
+        }),
         teamLink(s.teamId),
         if (verdicts.relevant)
           st.section(
@@ -148,7 +149,7 @@ object side {
             )
           )(
             div(
-              verdicts.list.sizeIs < 2 option p(trans.conditionOfEntry()),
+              (verdicts.list.sizeIs < 2).option(p(trans.conditionOfEntry())),
               verdicts.list map { v =>
                 p(
                   cls := List(
@@ -164,9 +165,11 @@ object side {
         else br,
         absClientDateTime(s.startsAt)
       ),
-      streamers.nonEmpty option div(cls := "context-streamers")(
-        streamers map views.html.streamer.bits.contextual
+      streamers.nonEmpty.option(
+        div(cls := "context-streamers")(
+          streamers map views.html.streamer.bits.contextual
+        )
       ),
-      chat option views.html.chat.frag
+      chat.option(views.html.chat.frag)
     )
 }

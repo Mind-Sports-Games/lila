@@ -1,8 +1,8 @@
 package lila.common
 
 import scala.concurrent.duration.FiniteDuration
-import io.methvin.play.autoconfig._
-import scala.jdk.CollectionConverters._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
+import scala.jdk.CollectionConverters.*
 import play.api.ConfigLoader
 
 object config {
@@ -21,7 +21,7 @@ object config {
 
   case class Max(value: Int) extends AnyVal with IntValue with Ordered[Int] {
     def compare(other: Int) = Integer.compare(value, other)
-    def atMost(max: Int)    = Max(value atMost max)
+    def atMost(max: Int)    = Max(value.atMost(max))
   }
   case class MaxPerPage(value: Int) extends AnyVal with IntValue
 
@@ -68,8 +68,8 @@ object config {
       c.getConfigList(k).asScala.toList map { l.load(_) }
     }
 
-  def strLoader[A](f: String => A): ConfigLoader[A]              = ConfigLoader(_.getString) map f
-  def intLoader[A](f: Int => A): ConfigLoader[A]                 = ConfigLoader(_.getInt) map f
-  def boolLoader[A](f: Boolean => A): ConfigLoader[A]            = ConfigLoader(_.getBoolean) map f
-  def durationLoader[A](f: FiniteDuration => A): ConfigLoader[A] = ConfigLoader(_.duration) map f
+  def strLoader[A](f: String => A): ConfigLoader[A]              = ConfigLoader(_.getString).map(f)
+  def intLoader[A](f: Int => A): ConfigLoader[A]                 = ConfigLoader(_.getInt).map(f)
+  def boolLoader[A](f: Boolean => A): ConfigLoader[A]            = ConfigLoader(_.getBoolean).map(f)
+  def durationLoader[A](f: FiniteDuration => A): ConfigLoader[A] = ConfigLoader(_.duration).map(f)
 }

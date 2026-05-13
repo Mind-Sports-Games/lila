@@ -1,8 +1,7 @@
 package lila.tv
 
-import akka.pattern.{ ask => actorAsk }
+import akka.pattern.ask as actorAsk
 import play.api.libs.json.Json
-import scala.concurrent.duration._
 import scala.concurrent.Promise
 
 import lila.common.{ Bus, LightUser }
@@ -18,7 +17,7 @@ final private[tv] class TvTrouper(
 )(implicit ec: scala.concurrent.ExecutionContext)
     extends Trouper {
 
-  import TvTrouper._
+  import TvTrouper.*
 
   Bus.subscribe(this, "startGame")
 
@@ -48,15 +47,15 @@ final private[tv] class TvTrouper(
       if (g.hasClock || g.hasCorrespondenceClock || g.isUnlimited) {
         val candidate = Tv.toCandidate(lightUserSync)(g)
         channelTroupers collect {
-          case (chan, trouper) if chan filter candidate => trouper
-        } foreach (_ addCandidate g)
+          case (chan, trouper) if chan.filter(candidate) => trouper
+        } foreach (_.addCandidate(g))
       }
 
     case s @ TvTrouper.Select => channelTroupers.foreach(_._2 ! s)
 
     case Selected(channel, game) =>
       import lila.socket.Socket.makeMessage
-      import cats.implicits._
+      import cats.implicits.*
       val player = game.players.sortBy { p =>
         ~p.rating + ~p.userId.flatMap(lightUserSync).flatMap(_.title).flatMap(Tv.titleScores.get)
       }.lastOption | game.player(game.naturalOrientation)
@@ -69,7 +68,7 @@ final private[tv] class TvTrouper(
         "channel"     -> channel.key,
         "id"          -> game.id,
         "playerIndex" -> game.naturalOrientation.name,
-        "player" -> user.map { u =>
+        "player"      -> user.map { u =>
           Json.obj(
             "name"   -> u.name,
             "title"  -> u.title,
@@ -79,9 +78,9 @@ final private[tv] class TvTrouper(
       )
       Bus.publish(lila.hub.actorApi.tv.TvSelect(game.id, game.speed, data), "tvSelect")
       if (channel == Tv.Channel.AllGames) {
-        implicit def timeout = makeTimeout(100 millis)
+        given akka.util.Timeout = akka.util.Timeout(100.millis)
         actorAsk(renderer.actor, actorApi.RenderFeaturedJs(game)) foreach { case html: String =>
-          val pov = Pov naturalOrientation game
+          val pov   = Pov.naturalOrientation(game)
           val event = lila.round.ChangeFeatured(
             pov,
             makeMessage(

@@ -30,7 +30,11 @@ object PoolMember {
 
   case class BlockedUsers(ids: Set[User.ID]) extends AnyVal
 
-  def apply(joiner: PoolApi.Joiner, config: PoolConfig, rageSit: RageSit): PoolMember =
+  def apply(
+      joiner: PoolApi.Joiner,
+      @annotation.nowarn("msg=unused") _config: PoolConfig,
+      rageSit: RageSit
+  ): PoolMember =
     PoolMember(
       userId = joiner.userId,
       sri = joiner.sri,

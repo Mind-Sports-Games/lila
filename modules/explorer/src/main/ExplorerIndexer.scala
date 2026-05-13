@@ -1,17 +1,17 @@
 package lila.explorer
 
-import akka.stream.scaladsl._
-import strategygames.{ Player => PlayerIndex, P2, P1 }
+import akka.stream.scaladsl.*
+import strategygames.{ P1, P2, Player as PlayerIndex }
 import strategygames.GameLogic
 import strategygames.format.pgn.Tag
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import play.api.libs.ws.DefaultBodyWritables._
+import play.api.libs.ws.DefaultBodyWritables.*
 import lila.common.ThreadLocalRandom.nextFloat
 import scala.util.{ Failure, Success, Try }
 
 import lila.common.LilaStream
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.{ Game, GameRepo, PgnDump, Player, Query }
 import lila.user.{ User, UserRepo }
 import lila.i18n.VariantKeys
@@ -29,12 +29,12 @@ final private class ExplorerIndexer(
 
   private val separator           = "\n\n\n"
   private val datePattern         = "yyyy-MM-dd"
-  private val dateFormatter       = DateTimeFormat forPattern datePattern
-  private val pgnDateFormat       = DateTimeFormat forPattern "yyyy.MM.dd"
+  private val dateFormatter       = DateTimeFormat.forPattern(datePattern)
+  private val pgnDateFormat       = DateTimeFormat.forPattern("yyyy.MM.dd")
   private val internalEndPointUrl = s"$internalEndpoint/import/playstrategy"
 
   private def parseDate(str: String): Option[DateTime] =
-    Try(dateFormatter parseDateTime str).toOption
+    Try(dateFormatter.parseDateTime(str)).toOption
 
   def apply(sinceStr: String): Funit =
     getBotUserIds() flatMap { botUserIds =>
@@ -77,8 +77,8 @@ final private class ExplorerIndexer(
     }
 
   private object flowBuffer {
-    private val max = 30
-    private val buf = scala.collection.mutable.ArrayBuffer.empty[String]
+    private val max              = 30
+    private val buf              = scala.collection.mutable.ArrayBuffer.empty[String]
     def apply(pgn: String): Unit = {
       buf += pgn
       val startAt = nowMillis
@@ -105,10 +105,10 @@ final private class ExplorerIndexer(
       game.turnCount >= 10 &&
       game.variant != strategygames.chess.variant.FromPosition
 
-  private def stableRating(player: Player) = player.rating ifFalse player.provisional
+  private def stableRating(player: Player) = player.rating.ifFalse(player.provisional)
 
   // probability of the game being indexed, between 0 and 1
-  private def probability(game: Game, rating: Int) = {
+  private def probability(game: Game, rating: Int) =
     game.perfType match {
       case Some(pt) =>
         pt.key match {
@@ -129,7 +129,6 @@ final private class ExplorerIndexer(
         }
       case _ => 1 / 2f
     }
-  }
 
   private def makeFastPgn(game: Game, botUserIds: Set[User.ID]): Fu[Option[String]] =
     ~(for {
@@ -144,13 +143,13 @@ final private class ExplorerIndexer(
       if probability(game, averageRating) > nextFloat()
       if !game.userIds.exists(botUserIds.contains)
       if valid(game)
-    } yield gameRepo initialFen game flatMap { initialFen =>
+    } yield gameRepo.initialFen(game) flatMap { initialFen =>
       userRepo.usernamesByIds(game.userIds) map { usernames =>
         def username(playerIndex: PlayerIndex) =
           game.player(playerIndex).userId flatMap { id =>
             usernames.find(_.toLowerCase == id)
           } orElse game.player(playerIndex).userId getOrElse "?"
-        val fenTags = initialFen.?? { fen =>
+        val fenTags = initialFen.so { fen =>
           List(Tag(_.FEN, fen))
         }
         val otherTags = List(
@@ -174,7 +173,7 @@ final private class ExplorerIndexer(
           Tag(_.Date, pgnDateFormat.print(game.createdAt))
         )
         val allTags = fenTags ::: otherTags
-        //this uses maxPlies as maxTurns
+        // this uses maxPlies as maxTurns
         val allActionStrs = game.actionStrs.map(_.mkString(",")).take(maxPlies).mkString(" ")
         s"${allTags.mkString("\n")}\n\n${allActionStrs}".some
       }

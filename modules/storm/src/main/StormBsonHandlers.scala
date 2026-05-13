@@ -1,16 +1,16 @@
 package lila.storm
 
 import strategygames.chess.format.{ FEN, Uci }
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.puzzle.Puzzle
 import scala.util.Success
 import lila.common.Day
 
 object StormBsonHandlers {
 
-  import lila.puzzle.BsonHandlers.{ PuzzleIdBSONHandler }
+  import lila.puzzle.BsonHandlers.PuzzleIdBSONHandler
 
   implicit val StormPuzzleBSONReader: BSONDocumentReader[StormPuzzle] = new BSONDocumentReader[StormPuzzle] {
     def readDocument(r: BSONDocument) = for {

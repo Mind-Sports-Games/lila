@@ -2,7 +2,7 @@ package lila.learn
 
 case class StageProgress(scores: Vector[StageProgress.Score]) extends AnyVal {
 
-  import StageProgress._
+  import StageProgress.*
 
   def withScore(level: Int, s: Score) =
     copy(

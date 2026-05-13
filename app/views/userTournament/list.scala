@@ -3,13 +3,11 @@ package userTournament
 
 import play.api.i18n.Lang
 
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.user.User
 import lila.i18n.VariantKeys
-
-import controllers.routes
 
 object list {
 
@@ -20,8 +18,7 @@ object list {
       count: String,
       shieldLeaderboard: Boolean = false
   )(implicit lang: Lang) =
-    if (pager.nbResults == 0)
-      div(cls := "box-pad")(u.username, " hasn't played in any tournament yet!")
+    if (pager.nbResults == 0) div(cls := "box-pad")(u.username, " hasn't played in any tournament yet!")
     else
       div(cls := "tournament-list")(
         table(cls := "slist")(

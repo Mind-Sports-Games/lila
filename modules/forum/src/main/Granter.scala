@@ -1,6 +1,6 @@
 package lila.forum
 
-import lila.security.{ Permission, Granter => Master }
+import lila.security.{ Granter as Master, Permission }
 import lila.user.{ User, UserContext }
 
 trait Granter {
@@ -9,7 +9,7 @@ trait Granter {
   protected def userOwnsTeam(teamId: String, userId: String): Fu[Boolean]
 
   def isGrantedWrite(categSlug: String)(implicit ctx: UserContext): Fu[Boolean] =
-    ctx.me.filter(canForum) ?? { me =>
+    ctx.me.filter(canForum) so { me =>
       Categ.slugToTeamId(categSlug).fold(fuTrue) { teamId =>
         userBelongsToTeam(teamId, me.id)
       }
@@ -21,10 +21,10 @@ trait Granter {
     }
 
   def isGrantedMod(categSlug: String)(implicit ctx: UserContext): Fu[Boolean] =
-    if (ctx.me ?? Master(Permission.ModerateForum)) fuTrue
+    if (ctx.me so Master(Permission.ModerateForum)) fuTrue
     else
-      Categ.slugToTeamId(categSlug) ?? { teamId =>
-        ctx.userId ?? {
+      Categ.slugToTeamId(categSlug) so { teamId =>
+        ctx.userId so {
           userOwnsTeam(teamId, _)
         }
       }

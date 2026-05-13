@@ -5,10 +5,9 @@ import strategygames.format.pgn.{ Glyph, Glyphs }
 import strategygames.format.{ FEN, Uci, UciCharPair }
 import strategygames.opening.FullOpening
 import strategygames.variant.Variant
-import strategygames.{ GameLogic, Player => PlayerIndex, Pocket, PocketData, Pos, Role }
-import play.api.libs.json._
+import strategygames.{ GameLogic, Player as PlayerIndex, Pocket, PocketData, Pos, Role }
+import play.api.libs.json.*
 
-import lila.common.Json._
 import lila.base.PimpedJsObject
 
 sealed trait Node {
@@ -80,9 +79,9 @@ case class Root(
   def comp           = false
   def forceVariation = false
 
-  def addChild(branch: Branch)     = copy(children = children :+ branch)
-  def prependChild(branch: Branch) = copy(children = branch :: children)
-  def dropFirstChild               = copy(children = if (children.isEmpty) children else children.tail)
+  def addChild(branch: Branch): Root     = copy(children = children :+ branch)
+  def prependChild(branch: Branch): Root = copy(children = branch :: children)
+  def dropFirstChild                     = copy(children = if (children.isEmpty) children else children.tail)
 }
 
 case class Branch(
@@ -116,9 +115,9 @@ case class Branch(
   def idOption   = Some(id)
   def moveOption = Some(move)
 
-  def addChild(branch: Branch)     = copy(children = children :+ branch)
-  def prependChild(branch: Branch) = copy(children = branch :: children)
-  def dropFirstChild               = copy(children = if (children.isEmpty) children else children.tail)
+  def addChild(branch: Branch): Branch     = copy(children = children :+ branch)
+  def prependChild(branch: Branch): Branch = copy(children = branch :: children)
+  def dropFirstChild                       = copy(children = if (children.isEmpty) children else children.tail)
 
   def setComp = copy(comp = true)
 }
@@ -133,13 +132,12 @@ private object DropsByRole {
       var first = true
       drops foreach { case (orig, dests) =>
         if (first) first = false
-        else sb append " "
-        sb append orig.forsyth
-        dests foreach { sb append _.key }
+        else sb.append(" ")
+        sb.append(orig.forsyth)
+        dests.foreach(d => sb.append(d.key))
       }
       JsString(sb.toString)
     }
-
 }
 
 object Node {
@@ -152,7 +150,7 @@ object Node {
     case class Arrow(brush: Brush, orig: Pos, dest: Pos) extends Shape
   }
   case class Shapes(value: List[Shape]) extends AnyVal {
-    def list = value
+    def list               = value
     def ++(shapes: Shapes) =
       Shapes {
         (value ::: shapes.value).distinct
@@ -171,7 +169,7 @@ object Node {
   object Comment {
     case class Id(value: String) extends AnyVal
     object Id {
-      def make = Id(lila.common.ThreadLocalRandom nextString 4)
+      def make = Id(lila.common.ThreadLocalRandom.nextString(4))
     }
     private val metaReg = """\[%[^\]]+\]""".r
     case class Text(value: String) extends AnyVal {
@@ -200,12 +198,13 @@ object Node {
   case class Comments(value: List[Comment]) extends AnyVal {
     def list                           = value
     def findBy(author: Comment.Author) = list.find(_.by == author)
-    def set(comment: Comment) =
+    def set(comment: Comment)          =
       Comments {
-        if (list.exists(_.by == comment.by)) list.map {
-          case c if c.by == comment.by => c.copy(text = comment.text)
-          case c                       => c
-        }
+        if (list.exists(_.by == comment.by))
+          list.map {
+            case c if c.by == comment.by => c.copy(text = comment.text)
+            case c                       => c
+          }
         else list :+ comment
       }
     def delete(commentId: Comment.Id) =
@@ -225,7 +224,7 @@ object Node {
 
   case class Gamebook(deviation: Option[String], hint: Option[String]) {
     private def trimOrNone(txt: Option[String]) = txt.map(_.trim).filter(_.nonEmpty)
-    def cleanUp =
+    def cleanUp                                 =
       copy(
         deviation = trimOrNone(deviation),
         hint = trimOrNone(hint)
@@ -262,14 +261,14 @@ object Node {
   }
   implicit private val shapeCircleWrites: OWrites[Shape.Circle] = Json.writes[Shape.Circle]
   implicit private val shapeArrowWrites: OWrites[Shape.Arrow]   = Json.writes[Shape.Arrow]
-  implicit val shapeWrites: Writes[Shape] = Writes[Shape] {
+  implicit val shapeWrites: Writes[Shape]                       = Writes[Shape] {
     case s: Shape.Circle => shapeCircleWrites writes s
     case s: Shape.Arrow  => shapeArrowWrites writes s
   }
   implicit val shapesWrites: Writes[Node.Shapes] = Writes[Node.Shapes] { s =>
     JsArray(s.list.map(shapeWrites.writes))
   }
-  implicit val glyphWriter: Writes[Glyph] = Json.writes[Glyph]
+  implicit val glyphWriter: Writes[Glyph]   = Json.writes[Glyph]
   implicit val glyphsWriter: Writes[Glyphs] = Writes[Glyphs] { gs =>
     Json.toJson(gs.toList)
   }
@@ -310,7 +309,7 @@ object Node {
 
   def makeNodeJsonWriter(alwaysChildren: Boolean): Writes[Node] =
     Writes { node =>
-      import node._
+      import node.*
       try {
         val comments = node.comments.list.flatMap(_.removeMeta)
         Json
@@ -354,9 +353,10 @@ object Node {
           .add("comp", comp)
           .add(
             "children",
-            if (alwaysChildren || children.nonEmpty) Some {
-              nodeListJsonWriter(true) writes children
-            }
+            if (alwaysChildren || children.nonEmpty)
+              Some {
+                nodeListJsonWriter(true) writes children
+              }
             else None
           )
           .add("forceVariation", forceVariation)
@@ -372,9 +372,9 @@ object Node {
     var first = true
     dests foreach { case (orig, dests) =>
       if (first) first = false
-      else sb append " "
-      sb append orig.piotr
-      dests foreach { sb append _.piotr }
+      else sb.append(" ")
+      sb.append(orig.piotr)
+      dests.foreach(d => sb.append(d.piotr))
     }
     sb.toString
   }

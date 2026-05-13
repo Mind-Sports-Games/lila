@@ -1,10 +1,10 @@
 package lila.puzzle
 
-import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import com.softwaremill.macwire.*
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.common.config._
+import lila.common.config.*
 import lila.db.AsyncColl
 
 @Module
@@ -32,7 +32,7 @@ final class Env(
     mode: play.api.Mode
 ) {
 
-  private val config = appConfig.get[PuzzleConfig]("puzzle")(AutoConfig.loader)
+  private val config = appConfig.get[PuzzleConfig]("puzzle")(using AutoConfig.loader)
 
   private lazy val db = mongo.asyncDb("puzzle", config.mongoUri)
 
@@ -79,7 +79,7 @@ final class Env(
   def cli =
     new lila.common.Cli {
       def process = { case "puzzle" :: "delete" :: id :: Nil =>
-        api.puzzle delete Puzzle.Id(id) inject "Done"
+        api.puzzle.delete(Puzzle.Id(id)) inject "Done"
       }
     }
 }

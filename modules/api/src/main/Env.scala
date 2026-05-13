@@ -1,12 +1,12 @@
 package lila.api
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 import play.api.libs.ws.StandaloneWSClient
 import play.api.{ Configuration, Mode }
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-import lila.common.config._
+import lila.common.config.*
 import lila.common.Bus
 import lila.user.User
 import lila.chat.GetLinkCheck
@@ -58,9 +58,12 @@ final class Env(
     system: ActorSystem
 ) {
 
-  val config = ApiConfig loadFrom appConfig
+  val config = ApiConfig.loadFrom(appConfig)
   import config.apiToken
   import net.{ baseUrl, domain }
+  implicit private val netDomain: NetDomain = domain
+  implicit private val netBaseUrl: BaseUrl  = baseUrl
+  implicit private val apiSecret: Secret    = apiToken
 
   lazy val pgnDump: PgnDump = wire[PgnDump]
 

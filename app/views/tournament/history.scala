@@ -1,10 +1,8 @@
 package views.html.tournament
 
-import controllers.routes
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.tournament.Schedule.Freq
 import lila.tournament.Tournament
@@ -46,16 +44,16 @@ object history {
     Freq.Introductory,
     Freq.MSOGP,
     Freq.MSO21,
-    //Freq.MSOWarmUp,
+    // Freq.MSOWarmUp,
     Freq.Unique,
-    //Freq.Marathon,
+    // Freq.Marathon,
     Freq.Shield,
     Freq.Yearly,
     Freq.MedleyMarathon,
-    //Freq.Monthly,
-    //Freq.Weekend,
+    // Freq.Monthly,
+    // Freq.Weekend,
     Freq.Weekly
-    //Freq.Daily,
-    //Freq.Hourly
+    // Freq.Daily,
+    // Freq.Hourly
   )
 }

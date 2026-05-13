@@ -1,6 +1,6 @@
 package lila.simul
 
-import strategygames.{ Player => PlayerIndex, Speed }
+import strategygames.{ Player as PlayerIndex, Speed }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -42,48 +42,50 @@ case class Simul(
 
   def isRunning = status == SimulStatus.Started
 
-  def hasApplicant(userId: String) = applicants.exists(_ is userId)
+  def hasApplicant(userId: String) = applicants.exists(_.is(userId))
 
-  def hasPairing(userId: String) = pairings.exists(_ is userId)
+  def hasPairing(userId: String) = pairings.exists(_.is(userId))
 
   def hasUser(userId: String) = hasApplicant(userId) || hasPairing(userId)
 
   def addApplicant(applicant: SimulApplicant) =
     Created {
-      if (!hasApplicant(applicant.player.user) && variants.has(applicant.player.variant))
+      if (!hasApplicant(applicant.player.user) && variants.contains(applicant.player.variant))
         copy(applicants = applicants :+ applicant)
       else this
     }
 
   def removeApplicant(userId: String) =
     Created {
-      copy(applicants = applicants.filterNot(_ is userId))
+      copy(applicants = applicants.filterNot(_.is(userId)))
     }
 
   def accept(userId: String, v: Boolean) =
     Created {
       copy(applicants = applicants map {
-        case a if a is userId => a.copy(accepted = v)
-        case a                => a
+        case a if a.is(userId) => a.copy(accepted = v)
+        case a                 => a
       })
     }
 
   def removePairing(userId: String) =
-    copy(pairings = pairings.filterNot(_ is userId)).finishIfDone
+    copy(pairings = pairings.filterNot(_.is(userId))).finishIfDone
 
   def nbAccepted = applicants.count(_.accepted)
 
   def startable = isCreated && nbAccepted > 1
 
   def start =
-    startable option copy(
-      status = SimulStatus.Started,
-      startedAt = DateTime.now.some,
-      applicants = Nil,
-      pairings = applicants collect {
-        case a if a.accepted => SimulPairing(a.player)
-      },
-      hostSeenAt = none
+    startable.option(
+      copy(
+        status = SimulStatus.Started,
+        startedAt = DateTime.now.some,
+        applicants = Nil,
+        pairings = applicants collect {
+          case a if a.accepted => SimulPairing(a.player)
+        },
+        hostSeenAt = none
+      )
     )
 
   def updatePairing(gameId: String, f: SimulPairing => SimulPairing) =
@@ -95,7 +97,7 @@ case class Simul(
     ).finishIfDone
 
   def ejectCheater(userId: String): Option[Simul] =
-    hasUser(userId) option removeApplicant(userId).removePairing(userId)
+    hasUser(userId).option(removeApplicant(userId).removePairing(userId))
 
   private def finishIfDone =
     if (isStarted && pairings.forall(_.finished))
@@ -121,7 +123,7 @@ case class Simul(
 
   def variantRich = variants.sizeIs > 3
 
-  def isHost(userOption: Option[User]): Boolean = userOption ?? isHost
+  def isHost(userOption: Option[User]): Boolean = userOption so isHost
   def isHost(user: User): Boolean               = user.id == hostId
 
   def playingPairings = pairings filterNot (_.finished)
@@ -133,9 +135,9 @@ case class Simul(
 
   private def Created(s: => Simul): Simul = if (isCreated) s else this
 
-  def wins    = pairings.count(p => p.finished && p.wins.has(false))
+  def wins    = pairings.count(p => p.finished && p.wins.contains(false))
   def draws   = pairings.count(p => p.finished && p.wins.isEmpty)
-  def losses  = pairings.count(p => p.finished && p.wins.has(true))
+  def losses  = pairings.count(p => p.finished && p.wins.contains(true))
   def ongoing = pairings.count(_.ongoing)
 }
 
@@ -158,7 +160,7 @@ object Simul {
       featurable: Option[Boolean]
   ): Simul =
     Simul(
-      _id = lila.common.ThreadLocalRandom nextString 8,
+      _id = lila.common.ThreadLocalRandom.nextString(8),
       name = name,
       status = SimulStatus.Created,
       clock = clock,

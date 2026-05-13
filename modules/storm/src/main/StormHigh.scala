@@ -1,19 +1,18 @@
 package lila.storm
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.memo.CacheApi
 import lila.user.User
 
 case class StormHigh(day: Int, week: Int, month: Int, allTime: Int) {
 
   def update(score: Int) = copy(
-    day = day atLeast score,
-    week = week atLeast score,
-    month = month atLeast score,
-    allTime = allTime atLeast score
+    day = day.atLeast(score),
+    week = week.atLeast(score),
+    month = month.atLeast(score),
+    allTime = allTime.atLeast(score)
   )
 }
 
@@ -33,16 +32,16 @@ object StormHigh {
 
 final class StormHighApi(coll: Coll, cacheApi: CacheApi)(implicit ctx: ExecutionContext) {
 
-  import StormBsonHandlers._
+  import StormBsonHandlers.*
   import StormHigh.NewHigh
 
   def get(userId: User.ID): Fu[StormHigh] = cache get userId
 
   def update(userId: User.ID, prev: StormHigh, score: Int): Option[NewHigh] = {
-    val high = prev update score
-    (high != prev) ?? {
+    val high = prev.update(score)
+    (high != prev) so {
       cache.put(userId, fuccess(high))
-      import NewHigh._
+      import NewHigh.*
       if (high.allTime > prev.allTime) AllTime(prev.allTime).some
       else if (high.month > prev.month) Month(prev.month).some
       else if (high.week > prev.week) Week(prev.week).some
@@ -57,10 +56,10 @@ final class StormHighApi(coll: Coll, cacheApi: CacheApi)(implicit ctx: Execution
   private def compute(userId: User.ID): Fu[StormHigh] =
     coll
       .aggregateOne() { framework =>
-        import framework._
-        def matchSince(sinceId: User.ID => StormDay.Id) = Match($doc("_id" $gte sinceId(userId)))
+        import framework.*
+        def matchSince(sinceId: User.ID => StormDay.Id) = Match($doc("_id".$gte(sinceId(userId))))
         val scoreSort                                   = Sort(Descending("score"))
-        Match($doc("_id" $lte StormDay.Id.today(userId) $gt StormDay.Id.allTime(userId))) -> List(
+        Match($doc("_id".$lte(StormDay.Id.today(userId)).$gt(StormDay.Id.allTime(userId)))) -> List(
           Project($doc("score" -> true)),
           Sort(Descending("_id")),
           Facet(

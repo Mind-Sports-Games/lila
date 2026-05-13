@@ -1,7 +1,7 @@
 package lila.oauth
 
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
 import lila.user.User
 
@@ -26,7 +26,7 @@ object AccessToken {
     def isPersonal = value.lengthIs == idSize
   }
 
-  def makeId = Id(ornicar.scalalib.Random secureString idSize)
+  def makeId = Id(Random.secureString(idSize))
 
   case class ForAuth(userId: User.ID, scopes: List[OAuthScope])
 
@@ -44,7 +44,7 @@ object AccessToken {
   }
 
   import lila.db.BSON
-  import lila.db.dsl._
+  import lila.db.dsl.*
   import BSON.BSONJodaDateTimeHandler
   import OAuthScope.scopeHandler
 
@@ -66,16 +66,16 @@ object AccessToken {
 
   implicit val AccessTokenBSONHandler: BSON[AccessToken] = new BSON[AccessToken] {
 
-    import BSONFields._
+    import BSONFields.*
 
     def reads(r: BSON.Reader): AccessToken =
       AccessToken(
         id = r.get[Id](id),
         publicId = r.get[BSONObjectID](publicId),
-        clientId = r str clientId,
-        userId = r str userId,
+        clientId = r.str(clientId),
+        userId = r.str(userId),
         createdAt = r.getO[DateTime](createdAt),
-        description = r strO description,
+        description = r.strO(description),
         usedAt = r.getO[DateTime](usedAt),
         scopes = r.get[List[OAuthScope]](scopes)
       )

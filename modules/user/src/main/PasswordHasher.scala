@@ -4,14 +4,13 @@ import java.security.SecureRandom
 import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.{ IvParameterSpec, SecretKeySpec }
-import com.roundeights.hasher.Implicits._
+import com.roundeights.hasher.Implicits.*
 
 import lila.common.config.Secret
 
 /** Encryption for bcrypt hashes.
   *
-  * CTS reveals input length, which is fine for
-  * this application.
+  * CTS reveals input length, which is fine for this application.
   */
 final private class Aes(secret: Secret) {
   private val sKey = {
@@ -43,7 +42,7 @@ private object Aes {
 }
 
 case class HashedPassword(bytes: Array[Byte]) extends AnyVal {
-  def parse = bytes.lengthIs == 39 option bytes.splitAt(16)
+  def parse = (bytes.lengthIs == 39).option(bytes.splitAt(16))
 }
 
 final private class PasswordHasher(
@@ -54,8 +53,8 @@ final private class PasswordHasher(
   import org.mindrot.BCrypt
   import User.ClearPassword
 
-  private val prng = new SecureRandom()
-  private val aes  = new Aes(secret)
+  private val prng                                       = new SecureRandom()
+  private val aes                                        = new Aes(secret)
   private def bHash(salt: Array[Byte], p: ClearPassword) =
     hashTimer(BCrypt.hashpwRaw(p.value.sha512, 'a', logRounds, salt))
 
@@ -66,7 +65,7 @@ final private class PasswordHasher(
   }
 
   def check(bytes: HashedPassword, p: ClearPassword): Boolean =
-    bytes.parse ?? { case (salt, encHash) =>
+    bytes.parse so { case (salt, encHash) =>
       val hash = aes.decrypt(Aes.iv(salt), encHash)
       BCrypt.bytesEqualSecure(hash, bHash(salt, p))
     }
@@ -74,7 +73,7 @@ final private class PasswordHasher(
 
 object PasswordHasher {
 
-  import scala.concurrent.duration._
+  import scala.concurrent.duration.*
   import play.api.mvc.RequestHeader
   import lila.memo.RateLimit
   import lila.common.{ HTTPRequest, IpAddress }
@@ -102,8 +101,8 @@ object PasswordHasher {
   )(username: String, req: RequestHeader)(run: RateLimit.Charge => Fu[A])(default: => Fu[A]): Fu[A] =
     if (enforce.value) {
       val cost = 1
-      val ip   = HTTPRequest ipAddress req
-      rateLimitPerUser(User normalize username, cost = cost) {
+      val ip   = HTTPRequest.ipAddress(req)
+      rateLimitPerUser(User.normalize(username), cost = cost) {
         rateLimitPerIP.chargeable(ip, cost = cost) { charge =>
           rateLimitGlobal("-", cost = cost, msg = ip.value) {
             run(charge)

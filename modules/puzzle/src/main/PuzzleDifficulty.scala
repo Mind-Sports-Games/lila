@@ -1,6 +1,6 @@
 package lila.puzzle
 
-import lila.i18n.{ I18nKey, I18nKeys => trans }
+import lila.i18n.{ I18nKey, I18nKeys as trans }
 
 sealed abstract class PuzzleDifficulty(val ratingDelta: Int, val name: I18nKey) {
 

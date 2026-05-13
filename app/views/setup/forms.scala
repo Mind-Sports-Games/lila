@@ -1,24 +1,21 @@
 package views.html.setup
 
-import controllers.routes
 import play.api.data.Form
 import play.api.mvc.Call
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.user.User
-import lila.common.LightUser
 
-import strategygames.GameFamily
 import strategygames.variant.Variant
 
 object forms {
 
-  import bits._
+  import bits.*
 
   def game(
-      form: Form[_],
+      form: Form[?],
       user: Option[User],
       error: Option[String],
       validFen: Option[lila.setup.ValidFen],
@@ -27,7 +24,7 @@ object forms {
   )(implicit ctx: Context) =
     layout(
       "game",
-      (if (user.isDefined) trans.challenge.challengeToPlay else trans.createAGame)(),
+      (if (user.isDefined) trans.challenge.challengeToPlay else trans.createAGame) (),
       routes.Setup.game("sri-placeholder", user map (_.id)),
       inputVariant.map(v => s"${v.gameFamily.id}_${v.id}").getOrElse(""),
       inputTimeMode.getOrElse(""),
@@ -55,20 +52,15 @@ object forms {
       )
     }
 
-  private def translatedVariantChoicesForUser(user: Option[User])(implicit cts: Context) = {
-    user match {
-      case Some(u) if LightUser.stockfishBotsIDs.contains(u.id) => translatedAiVariantChoices
-      case Some(u) if u.id == "ps-greedy-four-move"             => translatedGreedyFourMoveChoices
-      case _                                                    => translatedVariantChoicesWithVariantsAndFen
-    }
-  }
-
-  private def blindSideChoice(form: Form[_])(implicit ctx: Context) =
-    ctx.blind option frag(
-      renderLabel(form("playerIndex"), trans.side()),
-      renderSelect(form("playerIndex").copy(value = "random".some), translatedSideChoices)
+  private def blindSideChoice(form: Form[?])(implicit ctx: Context) =
+    ctx.blind.option(
+      frag(
+        renderLabel(form("playerIndex"), trans.side()),
+        renderSelect(form("playerIndex").copy(value = "random".some), translatedSideChoices)
+      )
     )
 
+  @annotation.nowarn("msg=unused")
   private def layout(
       typ: String,
       titleF: Frag,
@@ -78,7 +70,7 @@ object forms {
       error: Option[Frag] = None,
       targetUser: Option[User] = None
   )(fields: Frag)(implicit ctx: Context) =
-    div(cls := error.isDefined option "error")(
+    div(cls := error.isDefined.option("error"))(
       h2(titleF),
       error
         .map { e =>
@@ -93,11 +85,11 @@ object forms {
             action := route,
             novalidate,
             dataRandomPlayerIndexVariants,
-            dataVariant := inputVariant,
-            dataTimeMode := inputTimeMode,
-            dataLobbyBan := ctx.isBot,
-            dataType := typ,
-            dataAnon := ctx.isAnon.option("1"),
+            dataVariant     := inputVariant,
+            dataTimeMode    := inputTimeMode,
+            dataLobbyBan    := ctx.isBot,
+            dataType        := typ,
+            dataAnon        := ctx.isAnon.option("1"),
             dataTargetIsBot := targetUser.exists(_.isBot).option("1")
           )(
             fields,

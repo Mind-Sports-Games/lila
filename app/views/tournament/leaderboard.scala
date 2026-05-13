@@ -3,12 +3,10 @@ package views.html.tournament
 import play.api.i18n.Lang
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.rating.PerfType
 import lila.i18n.VariantKeys
-
-import controllers.routes
 
 import strategygames.variant.Variant
 
@@ -31,24 +29,24 @@ object leaderboard {
         fws.yearly.map { w =>
           freqWinner(w, "Yearly")
         },
-        //fws.monthly.map { w =>
+        // fws.monthly.map { w =>
         //  freqWinner(w, "Monthly")
-        //},
+        // },
         fws.shield.map { w =>
           freqWinner(w, "Shield")
         },
         fws.weekly.map { w =>
           freqWinner(w, "Weekly")
         },
-        //fws.daily.map { w =>
+        // fws.daily.map { w =>
         //  freqWinner(w, "Daily")
-        //},
-        //fws.mso21.map { w =>
+        // },
+        // fws.mso21.map { w =>
         //  freqWinner(w, "MSO 2021")
-        //},
-        //fws.msoGP.map { w =>
+        // },
+        // fws.msoGP.map { w =>
         //  freqWinner(w, "MSO Grand Prix")
-        //},
+        // },
         fws.introductory.map { w =>
           freqWinner(w, "Introductory")
         }

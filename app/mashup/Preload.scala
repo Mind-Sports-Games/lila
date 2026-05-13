@@ -2,6 +2,7 @@ package lila.app
 package mashup
 
 import lila.api.Context
+import lila.common.extensions.*
 import lila.event.Event
 import lila.forum.MiniForumPost
 import lila.game.{ Game, Pov }
@@ -14,7 +15,7 @@ import lila.tournament.{ Tournament, Winner }
 import lila.tv.Tv
 import lila.user.LightUserApi
 import lila.user.User
-import play.api.libs.json._
+import play.api.libs.json.*
 
 final class Preload(
     tv: Tv,
@@ -35,7 +36,7 @@ final class Preload(
     onlineApiUsers: lila.bot.OnlineApiUsers
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import Preload._
+  import Preload.*
 
   def apply(
       posts: Fu[List[MiniForumPost]],
@@ -47,62 +48,62 @@ final class Preload(
       chatOption: Fu[Option[lila.chat.UserChat.Mine]],
       chatVersion: Fu[Option[lila.socket.Socket.SocketVersion]]
   )(implicit ctx: Context): Fu[Homepage] =
-    lobbyApi(ctx).mon(_.lobby segment "lobbyApi") zip
-      posts.mon(_.lobby segment "posts") zip
-      tours.mon(_.lobby segment "tours") zip
-      events.mon(_.lobby segment "events") zip
-      simuls.mon(_.lobby segment "simuls") zip
-      tv.getBestGame.mon(_.lobby segment "tvBestGame") zip
-      (ctx.userId ?? timelineApi.userEntries).mon(_.lobby segment "timeline") zip
-      userCached.topWeek.mon(_.lobby segment "userTopWeek") zip
-      tourWinners.all.dmap(_.top10).mon(_.lobby segment "tourWinners") zip
-      (ctx.noBot ?? dailyPuzzle()).mon(_.lobby segment "puzzle") zip
-      (ctx.noKid ?? liveStreamApi.all
-        .dmap(_.homepage(streamerSpots, ctx.req, ctx.me.flatMap(_.lang)) withTitles lightUserApi)
-        .mon(_.lobby segment "streams")) zip
-      (ctx.userId ?? playbanApi.currentBan).mon(_.lobby segment "playban") zip
-      (ctx.blind ?? ctx.me ?? roundProxy.urgentGames) zip
-      nbBots.mon(_.lobby segment "nbBots") zip
+    lobbyApi(using ctx).mon(_.lobby.segment("lobbyApi")) zip
+      posts.mon(_.lobby.segment("posts")) zip
+      tours.mon(_.lobby.segment("tours")) zip
+      events.mon(_.lobby.segment("events")) zip
+      simuls.mon(_.lobby.segment("simuls")) zip
+      tv.getBestGame.mon(_.lobby.segment("tvBestGame")) zip
+      (ctx.userId so timelineApi.userEntries).mon(_.lobby.segment("timeline")) zip
+      userCached.topWeek.mon(_.lobby.segment("userTopWeek")) zip
+      tourWinners.all.dmap(_.top10).mon(_.lobby.segment("tourWinners")) zip
+      (ctx.noBot so dailyPuzzle()).mon(_.lobby.segment("puzzle")) zip
+      (ctx.noKid so liveStreamApi.all
+        .dmap(_.homepage(streamerSpots, ctx.req, ctx.me.flatMap(_.lang)).withTitles(lightUserApi))
+        .mon(_.lobby.segment("streams"))) zip
+      (ctx.userId so playbanApi.currentBan).mon(_.lobby.segment("playban")) zip
+      (ctx.blind so ctx.me so roundProxy.urgentGames) zip
+      nbBots.mon(_.lobby.segment("nbBots")) zip
       chatOption zip chatVersion flatMap {
         // format: off
         case ((((((((((((((((data, povs), posts), tours), events), simuls), feat), entries), lead), tWinners), puzzle), streams), playban), blindGames), nbBots), chatOption), chatVersion) =>
         // format: on
-        (ctx.me ?? currentGameMyTurn(povs, lightUserApi.sync))
-          .mon(_.lobby segment "currentGame") zip
-          lightUserApi
-            .preloadMany {
-              tWinners.map(_.userId) ::: posts.flatMap(_.userId) ::: entries.flatMap(_.userIds).toList
+          (ctx.me so currentGameMyTurn(povs, lightUserApi.sync))
+            .mon(_.lobby.segment("currentGame")) zip
+            lightUserApi
+              .preloadMany {
+                tWinners.map(_.userId) ::: posts.flatMap(_.userId) ::: entries.flatMap(_.userIds).toList
+              }
+              .mon(_.lobby.segment("lightUsers")) map { case (currentGame, _) =>
+              Homepage(
+                data,
+                entries,
+                posts,
+                tours,
+                events,
+                simuls,
+                feat,
+                lead,
+                tWinners,
+                puzzle,
+                streams.excludeUsers(events.flatMap(_.hostedBy)),
+                lastPostCache.apply,
+                playban,
+                currentGame,
+                simulIsFeaturable,
+                blindGames,
+                lobbySocket.counters,
+                nbBots,
+                chatOption,
+                chatVersion,
+                weeklyChallenge
+              )
             }
-            .mon(_.lobby segment "lightUsers") map { case (currentGame, _) =>
-            Homepage(
-              data,
-              entries,
-              posts,
-              tours,
-              events,
-              simuls,
-              feat,
-              lead,
-              tWinners,
-              puzzle,
-              streams.excludeUsers(events.flatMap(_.hostedBy)),
-              lastPostCache.apply,
-              playban,
-              currentGame,
-              simulIsFeaturable,
-              blindGames,
-              lobbySocket.counters,
-              nbBots,
-              chatOption,
-              chatVersion,
-              weeklyChallenge
-            )
-          }
       }
 
   def currentGameMyTurn(user: User): Fu[Option[CurrentGame]] =
-    gameRepo.playingRealtimeNoAi(user).flatMap {
-      _.map { roundProxy.pov(_, user) }.sequenceFu.dmap(_.flatten)
+    gameRepo.playingRealtimeNoAi(user).flatMap { games =>
+      Future.sequence(games.map { roundProxy.pov(_, user) }).dmap(_.flatten)
     } flatMap {
       currentGameMyTurn(_, lightUserApi.sync)(user)
     }
@@ -115,8 +116,8 @@ final class Preload(
   ): Fu[Option[CurrentGame]] =
     ~povs.collectFirst {
       case p1 if p1.game.nonAi && p1.game.hasClock && p1.isMyTurn =>
-        roundProxy.pov(p1.gameId, user) dmap (_ | p1) map { pov =>
-          val opponent = lila.game.Namer.playerTextBlocking(pov.opponent)(lightUser)
+        roundProxy.pov(p1.gameId, user).dmap(_ | p1) map { pov =>
+          val opponent = lila.game.Namer.playerTextBlocking(pov.opponent)(using lightUser)
           CurrentGame(pov = pov, opponent = opponent).some
         }
     }

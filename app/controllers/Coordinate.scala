@@ -1,13 +1,13 @@
 package controllers
 
-import lila.app._
+import lila.app.{ *, given }
 
 final class Coordinate(env: Env) extends LilaController(env) {
 
   def home =
     Open { implicit ctx =>
-      ctx.userId ?? { userId =>
-        env.coordinate.api getScore userId map (_.some)
+      ctx.userId so { userId =>
+        env.coordinate.api.getScore(userId) map (_.some)
       } map { score =>
         views.html.coordinate.home(score)
       }
@@ -22,7 +22,7 @@ final class Coordinate(env: Env) extends LilaController(env) {
           _ => fuccess(BadRequest),
           data => env.coordinate.api.addScore(me.id, data.isP1, data.score)
         ) >> {
-        env.coordinate.api getScore me.id map { s =>
+        env.coordinate.api.getScore(me.id) map { s =>
           Ok(views.html.coordinate.scoreCharts(s))
         }
       }

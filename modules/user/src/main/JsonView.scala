@@ -1,6 +1,6 @@
 package lila.user
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import User.{ LightPerf, PlayTime }
 
 import lila.common.Json.jodaWrites
@@ -8,7 +8,7 @@ import lila.rating.{ Perf, PerfType }
 
 final class JsonView(isOnline: lila.socket.IsOnline) {
 
-  import JsonView._
+  import JsonView.*
   implicit private val profileWrites: OWrites[Profile]   = Json.writes[Profile]
   implicit private val playTimeWrites: OWrites[PlayTime] = Json.writes[PlayTime]
 
@@ -64,7 +64,7 @@ object JsonView {
       .obj(
         "id"       -> l.user.id,
         "username" -> l.user.name,
-        "perfs" -> Json.obj(
+        "perfs"    -> Json.obj(
           l.perfKey -> Json.obj("rating" -> l.rating, "progress" -> l.progress)
         )
       )
@@ -108,21 +108,27 @@ object JsonView {
         key -> perfWrites.writes(perf)
     }).add(
       "storm",
-      u.perfs.storm.nonEmpty option Json.obj(
-        "runs"  -> u.perfs.storm.runs,
-        "score" -> u.perfs.storm.score
+      u.perfs.storm.nonEmpty.option(
+        Json.obj(
+          "runs"  -> u.perfs.storm.runs,
+          "score" -> u.perfs.storm.score
+        )
       )
     ).add(
       "racer",
-      u.perfs.racer.nonEmpty option Json.obj(
-        "runs"  -> u.perfs.racer.runs,
-        "score" -> u.perfs.racer.score
+      u.perfs.racer.nonEmpty.option(
+        Json.obj(
+          "runs"  -> u.perfs.racer.runs,
+          "score" -> u.perfs.racer.score
+        )
       )
     ).add(
       "streak",
-      u.perfs.streak.nonEmpty option Json.obj(
-        "runs"  -> u.perfs.streak.runs,
-        "score" -> u.perfs.streak.score
+      u.perfs.streak.nonEmpty.option(
+        Json.obj(
+          "runs"  -> u.perfs.streak.runs,
+          "score" -> u.perfs.streak.score
+        )
       )
     )
 

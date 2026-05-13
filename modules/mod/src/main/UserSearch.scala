@@ -1,7 +1,7 @@
 package lila.mod
 
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
 import lila.common.{ EmailAddress, IpAddress }
 import lila.user.{ User, UserRepo }
@@ -20,9 +20,9 @@ final class UserSearch(
     }) flatMap userRepo.withEmailsU
 
   private def searchIp(ip: IpAddress) =
-    securityApi recentUserIdsByIp ip map (_.reverse) flatMap userRepo.usersFromSecondary
+    securityApi.recentUserIdsByIp(ip) map (_.reverse) flatMap userRepo.usersFromSecondary
 
-  private def searchUsername(username: String) = userRepo named username map (_.toList)
+  private def searchUsername(username: String) = userRepo.named(username) map (_.toList)
 
   private def searchEmail(email: EmailAddress): Fu[List[User]] = {
     val normalized = email.normalize
@@ -47,6 +47,6 @@ object UserSearch {
     mapping(
       "q"  -> nonEmptyText,
       "as" -> optional(nonEmptyText.verifying(asValues contains _))
-    )(Query.apply)(Query.unapply)
+    )(Query.apply)(unapply)
   )
 }

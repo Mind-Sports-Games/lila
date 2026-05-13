@@ -1,10 +1,11 @@
 package lila.search
 
 import lila.common.config.MaxPerPage
-import lila.common.paginator._
+import lila.common.paginator.*
 
 import play.api.libs.json.Writes
 
+@annotation.nowarn("msg=unused")
 final class PaginatorBuilder[A, Q: Writes](
     searchApi: SearchReadApi[A, Q],
     maxPerPage: MaxPerPage
@@ -19,7 +20,7 @@ final class PaginatorBuilder[A, Q: Writes](
 
   final private class ESAdapter(query: Q) extends AdapterLike[A] {
 
-    def nbResults = searchApi count query
+    def nbResults = searchApi.count(query)
 
     def slice(offset: Int, length: Int) =
       searchApi.search(query, From(offset), Size(length))

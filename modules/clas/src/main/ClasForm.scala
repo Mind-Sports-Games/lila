@@ -1,10 +1,10 @@
 package lila.clas
 
-import play.api.data._
-import play.api.data.Forms._
-import scala.concurrent.duration._
+import play.api.data.*
+import play.api.data.Forms.*
 
 import lila.common.Form.{ cleanNonEmptyText, cleanText }
+import lila.common.extensions.*
 import lila.user.User
 
 final class ClasForm(
@@ -13,14 +13,14 @@ final class ClasForm(
     nameGenerator: NameGenerator
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import ClasForm._
+  import ClasForm.*
 
   object clas {
 
     val form = Form(
       mapping(
-        "name" -> cleanText(minLength = 3, maxLength = 100),
-        "desc" -> cleanText(minLength = 0, maxLength = 2000),
+        "name"     -> cleanText(minLength = 3, maxLength = 100),
+        "desc"     -> cleanText(minLength = 0, maxLength = 2000),
         "teachers" -> nonEmptyText.verifying(
           "Invalid teacher list",
           str => {
@@ -30,16 +30,18 @@ final class ClasForm(
             }
           }
         )
-      )(ClasData.apply)(ClasData.unapply)
+      )(ClasData.apply)(unapply)
     )
 
     def create = form
 
     def edit(c: Clas) =
-      form fill ClasData(
-        name = c.name,
-        desc = c.desc,
-        teachers = c.teachers.toList mkString "\n"
+      form.fill(
+        ClasData(
+          name = c.name,
+          desc = c.desc,
+          teachers = c.teachers.toList mkString "\n"
+        )
       )
 
     def wall = Form(single("wall" -> text))
@@ -54,16 +56,17 @@ final class ClasForm(
         mapping(
           "create-username" -> securityForms.signup.username,
           "create-realName" -> cleanNonEmptyText(maxLength = 100)
-        )(NewStudent.apply)(NewStudent.unapply)
+        )(NewStudent.apply)(unapply)
       )
 
     def generate: Fu[Form[NewStudent]] =
       nameGenerator() map { username =>
-        create fill
+        create.fill(
           NewStudent(
             username = ~username,
             realName = ""
           )
+        )
       }
 
     def invite(c: Clas) =
@@ -73,7 +76,7 @@ final class ClasForm(
             .verifying("Unknown username", { blockingFetchUser(_).isDefined })
             .verifying("This is a teacher", u => !c.teachers.toList.contains(u.toLowerCase)),
           "realName" -> cleanNonEmptyText
-        )(NewStudent.apply)(NewStudent.unapply)
+        )(NewStudent.apply)(unapply)
       )
 
     def edit(s: Student) =
@@ -81,8 +84,8 @@ final class ClasForm(
         mapping(
           "realName" -> cleanNonEmptyText,
           "notes"    -> text(maxLength = 20000)
-        )(StudentData.apply)(StudentData.unapply)
-      ) fill StudentData(s.realName, s.notes)
+        )(StudentData.apply)(unapply)
+      ).fill(StudentData(s.realName, s.notes))
 
     def release =
       Form(
@@ -95,7 +98,7 @@ final class ClasForm(
       Form(
         mapping(
           "realNames" -> cleanNonEmptyText
-        )(ManyNewStudent.apply)(ManyNewStudent.unapply).verifying(
+        )(ManyNewStudent.apply)(_.realNamesText.some).verifying(
           s"There can't be more than ${lila.clas.Clas.maxStudents} per class. Split the students into more classes.",
           _.realNames.lengthIs <= max
         )
@@ -103,7 +106,7 @@ final class ClasForm(
   }
 
   private def blockingFetchUser(username: String) =
-    lightUserAsync(User normalize username).await(1 second, "clasInviteUser")
+    lightUserAsync(User.normalize(username)).await(1 second, "clasInviteUser")
 }
 
 object ClasForm {

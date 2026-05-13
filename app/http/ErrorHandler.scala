@@ -2,9 +2,9 @@ package lila.app
 package http
 
 import play.api.http.DefaultHttpErrorHandler
-import play.api.mvc._
-import play.api.mvc.Results._
-import play.api.routing._
+import play.api.mvc.*
+import play.api.mvc.Results.*
+import play.api.routing.*
 import play.api.{ Configuration, Environment, UsefulException }
 import scala.concurrent.Future
 
@@ -21,18 +21,20 @@ final class ErrorHandler(
 
   override def onProdServerError(req: RequestHeader, exception: UsefulException) =
     Future {
-      val actionName = HTTPRequest actionName req
-      val client     = HTTPRequest clientName req
+      val actionName = HTTPRequest.actionName(req)
+      val client     = HTTPRequest.clientName(req)
       lila.mon.http.error(actionName, client, req.method, 500).increment()
       lila.log("http").error(s"ERROR 500 $actionName", exception)
       if (canShowErrorPage(req))
-        InternalServerError(views.html.site.bits.errorPage {
-          lila.api.Context.error(
-            req,
-            lila.i18n.defaultLang,
-            HTTPRequest.isSynchronousHttp(req) option lila.common.Nonce.random
+        InternalServerError(
+          views.html.site.bits.errorPage(using
+            lila.api.Context.error(
+              req,
+              lila.i18n.defaultLang,
+              HTTPRequest.isSynchronousHttp(req).option(lila.common.Nonce.random)
+            )
           )
-        })
+        )
       else InternalServerError("Sorry, something went wrong.")
     } recover { case scala.util.control.NonFatal(e) =>
       lila.log("http").error(s"""Error handler exception on "${exception.getMessage}\"""", e)

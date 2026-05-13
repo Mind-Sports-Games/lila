@@ -1,8 +1,8 @@
 package lila.coach
 
 import org.joda.time.DateTime
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 import play.api.i18n.Lang
 import play.api.libs.json.{ JsSuccess, Json }
 import play.api.libs.json.Reads
@@ -16,7 +16,7 @@ object CoachProfileForm {
         "listed"    -> boolean,
         "available" -> boolean,
         "languages" -> nonEmptyText,
-        "profile" -> mapping(
+        "profile"   -> mapping(
           "headline"           -> optional(text(minLength = 5, maxLength = 170)),
           "languages"          -> optional(text(minLength = 3, maxLength = 140)),
           "hourlyRate"         -> optional(text(minLength = 3, maxLength = 140)),
@@ -29,13 +29,15 @@ object CoachProfileForm {
           "youtubeVideos"      -> optional(nonEmptyText),
           "youtubeChannel"     -> optional(nonEmptyText),
           "publicStudies"      -> optional(nonEmptyText)
-        )(CoachProfile.apply)(CoachProfile.unapply)
-      )(Data.apply)(Data.unapply)
-    ) fill Data(
-      listed = coach.listed.value,
-      available = coach.available.value,
-      languages = "",
-      profile = coach.profile
+        )(CoachProfile.apply)(unapply)
+      )(Data.apply)(unapply)
+    ).fill(
+      Data(
+        listed = coach.listed.value,
+        available = coach.available.value,
+        languages = "",
+        profile = coach.profile
+      )
     )
 
   private case class TagifyLang(code: String)

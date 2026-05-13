@@ -1,10 +1,10 @@
 package lila.api
 
-import akka.actor._
-import akka.stream.scaladsl._
+import akka.actor.*
+import akka.stream.scaladsl.*
 import org.joda.time.DateTime
-import play.api.libs.json._
-import scala.concurrent.duration._
+import play.api.libs.json.*
+import scala.concurrent.duration.*
 
 import lila.challenge.Challenge
 import lila.common.Bus
@@ -22,7 +22,7 @@ final class EventStream(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
-    scheduler: akka.actor.Scheduler
+    @annotation.nowarn("msg=unused") _scheduler: akka.actor.Scheduler
 ) {
 
   private case object SetOnline
@@ -34,7 +34,7 @@ final class EventStream(
       me: User,
       gamesInProgress: List[Game],
       challenges: List[Challenge]
-  ): Source[Option[JsObject], _] = {
+  ): Source[Option[JsObject], ?] = {
 
     // kill previous one if any
     Bus.publish(PoisonPill, s"eventStreamFor:${me.id}")
@@ -84,12 +84,12 @@ final class EventStream(
         case SetOnline =>
           onlineApiUsers.setOnline(me.id)
 
-          if (lastSetSeenAt isBefore DateTime.now.minusMinutes(10)) {
-            userRepo setSeenAt me.id
+          if (lastSetSeenAt.isBefore(DateTime.now.minusMinutes(10))) {
+            userRepo.setSeenAt(me.id)
             lastSetSeenAt = DateTime.now
           }
 
-          context.system.scheduler
+          val _ = context.system.scheduler
             .scheduleOnce(6 second) {
               if (online) {
                 // gotta send a message to check if the client has disconnected
@@ -97,20 +97,19 @@ final class EventStream(
                 self ! SetOnline
               }
             }
-            .unit
 
-        case StartGame(game) => queue.offer(gameJson("gameStart", me)(game)).unit
+        case StartGame(game) => queue.offer(gameJson("gameStart", me)(game)).discard
 
-        case FinishGame(game, _, _) => queue.offer(gameJson("gameFinish", me)(game)).unit
+        case FinishGame(game, _, _) => queue.offer(gameJson("gameFinish", me)(game)).discard
 
         case lila.challenge.Event.Create(c) if isMyChallenge(c) =>
-          queue.offer(challengeJson("challenge")(c).some).unit
+          queue.offer(challengeJson("challenge")(c).some).discard
 
         case lila.challenge.Event.Decline(c) if isMyChallenge(c) =>
-          queue.offer(challengeJson("challengeDeclined")(c).some).unit
+          queue.offer(challengeJson("challengeDeclined")(c).some).discard
 
         case lila.challenge.Event.Cancel(c) if isMyChallenge(c) =>
-          queue.offer(challengeJson("challengeCanceled")(c).some).unit
+          queue.offer(challengeJson("challengeCanceled")(c).some).discard
 
         // pretend like the rematch is a challenge
         case lila.hub.actorApi.round.RematchOffer(gameId) =>
@@ -146,7 +145,7 @@ final class EventStream(
   private def challengeJson(tpe: String)(c: Challenge) =
     Json.obj(
       "type"      -> tpe,
-      "challenge" -> challengeJsonView(none)(c)(lila.i18n.defaultLang)
+      "challenge" -> challengeJsonView(none)(c)(using lila.i18n.defaultLang)
     )
 
   private def compatJson(bot: Boolean, board: Boolean) =

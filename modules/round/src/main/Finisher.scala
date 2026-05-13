@@ -1,13 +1,13 @@
 package lila.round
 
-import strategygames.{ Player => PlayerIndex, DecayingStats, Status }
+import strategygames.{ DecayingStats, Player as PlayerIndex, Status }
 
 import lila.common.{ Bus, Uptime }
 import lila.game.actorApi.{ AbortedBy, FinishGame }
 import lila.game.{ Game, GameRepo, Pov, RatingDiffs }
 import lila.playban.PlaybanApi
 import lila.user.{ User, UserRepo }
-import lila.i18n.{ I18nKeys => trans, defaultLang }
+import lila.i18n.{ defaultLang, I18nKeys as trans }
 import play.api.i18n.Lang
 
 final private class Finisher(
@@ -25,7 +25,7 @@ final private class Finisher(
   implicit private val chatLang: Lang = defaultLang
 
   def abort(pov: Pov)(implicit proxy: GameProxy): Fu[Events] =
-    apply(pov.game, _.Aborted, None) >>- {
+    apply(pov.game, _.Aborted, None).andDo {
       getSocketStatus(pov.game) foreach { ss =>
         playban.abort(pov, ss.playerIndexsOnGame)
       }
@@ -33,33 +33,26 @@ final private class Finisher(
     }
 
   def rageQuit(game: Game, winner: Option[PlayerIndex])(implicit proxy: GameProxy): Fu[Events] =
-    apply(game, _.Timeout, winner) >>-
-      winner.foreach { playerIndex =>
-        playban.rageQuit(game, !playerIndex)
-      }
+    apply(game, _.Timeout, winner).andDo(winner.foreach { playerIndex =>
+      playban.rageQuit(game, !playerIndex)
+    })
 
   def outOfTime(game: Game)(implicit proxy: GameProxy): Fu[Events] =
-    if (
-      !game.isCorrespondence && !Uptime.startedSinceSeconds(120) && game.updatedAt.isBefore(Uptime.startedAt)
-    ) {
+    if (!game.isCorrespondence && !Uptime.startedSinceSeconds(120) && game.updatedAt.isBefore(Uptime.startedAt)) {
       logger.info(s"Aborting game last played before JVM boot: ${game.id}")
       other(game, _.Aborted, none)
-    } else if (game.player(!game.player.playerIndex).isOfferingDraw) {
+    } else if (game.player(!game.player.playerIndex).isOfferingDraw)
       apply(game, _.Draw, None, Some(trans.drawOfferAccepted.txt()))
-    } else if (
-      game.variant.useRuleOfGinOnInsufficientMaterial && game.situation.opponentHasInsufficientMaterial
-    ) {
-      apply(game, game.situation.insufficientMaterialStatus, Some(game.player.playerIndex))
-    } else {
-      val winner = Some(!game.player.playerIndex) ifFalse game.situation.opponentHasInsufficientMaterial
-      apply(game, game.situation.outOfTimeStatus, winner) >>-
-        winner.foreach { w =>
-          playban.flag(game, !w)
-        }
+    else if (game.variant.useRuleOfGinOnInsufficientMaterial && game.situation.opponentHasInsufficientMaterial) apply(game, game.situation.insufficientMaterialStatus, Some(game.player.playerIndex))
+    else {
+      val winner = Some(!game.player.playerIndex).ifFalse(game.situation.opponentHasInsufficientMaterial)
+      apply(game, game.situation.outOfTimeStatus, winner).andDo(winner.foreach { w =>
+        playban.flag(game, !w)
+      })
     }
 
   def noStart(game: Game)(implicit proxy: GameProxy): Fu[Events] =
-    game.playerWhoDidNotMove ?? { culprit =>
+    game.playerWhoDidNotMove so { culprit =>
       lila.mon.round.expiration.count.increment()
       playban.noStart(Pov(game, culprit))
       if (game.isMandatory) apply(game, _.NoStart, Some(!culprit.playerIndex))
@@ -72,7 +65,7 @@ final private class Finisher(
       winner: Option[PlayerIndex],
       message: Option[String] = None
   )(implicit proxy: GameProxy): Fu[Events] =
-    apply(game, status, winner, message) >>- playban.other(game, status, winner).unit
+    apply(game, status, winner, message).andDo(playban.other(game, status, winner).discard)
 
   private def recordLagStats(game: Game): Unit =
     for {
@@ -89,7 +82,7 @@ final private class Finisher(
       quotaStr     = f"${lt.quotaGain.centis / 10}%02d"
       compEstOvers = lt.compEstOvers.centis
     } {
-      import lila.mon.round.move.{ lag => lRec }
+      import lila.mon.round.move.lag as lRec
       lRec.mean.record(Math.round(10 * mean))
       lRec.stdDev.record(Math.round(10 * sd))
       // wikipedia.org/wiki/Coefficient_of_variation#Estimation
@@ -141,7 +134,7 @@ final private class Finisher(
           val finish = FinishGame(g, p1O, p2O)
           updateCountAndPerfs(finish) map { ratingDiffs =>
             message foreach { messenger.system(g, _) }
-            gameRepo game g.id foreach { newGame =>
+            gameRepo.game(g.id) foreach { newGame =>
               newGame foreach proxy.setFinishedGame
               val newFinish = finish.copy(game = newGame | g)
               Bus.publish(newFinish, "finishGame")
@@ -155,22 +148,25 @@ final private class Finisher(
   }
 
   private def updateCountAndPerfs(finish: FinishGame): Fu[Option[RatingDiffs]] =
-    (!finish.isVsSelf && !finish.game.aborted) ?? {
-      import cats.implicits._
-      (finish.p1, finish.p2).mapN((_, _)) ?? { case (p1, p2) =>
-        crosstableApi.add(finish.game) zip perfsUpdater.save(finish.game, p1, p2) dmap (_._2)
-      } zip
-        (finish.p1 ?? incNbGames(finish.game)) zip
-        (finish.p2 ?? incNbGames(finish.game)) dmap (_._1._1)
+    (!finish.isVsSelf && !finish.game.aborted) so {
+      import cats.implicits.*
+      (finish.p1, finish.p2)
+        .mapN((_, _))
+        .so { case (p1, p2) =>
+          crosstableApi.add(finish.game).zip(perfsUpdater.save(finish.game, p1, p2)).dmap(_._2)
+        }
+        .zip(finish.p1 so incNbGames(finish.game))
+        .zip(finish.p2 so incNbGames(finish.game))
+        .dmap(_._1._1)
     }
 
   private def incNbGames(game: Game)(user: User): Funit =
-    game.finished ?? {
-      val totalTime = (game.hasClock && user.playTime.isDefined) ?? game.durationSeconds
-      val tvTime    = totalTime ifTrue recentTvGames.get(game.id)
-      val result =
-        if (game.winnerUserId has user.id) 1
-        else if (game.loserUserId has user.id) -1
+    game.finished so {
+      val totalTime = (game.hasClock && user.playTime.isDefined) so game.durationSeconds
+      val tvTime    = totalTime.ifTrue(recentTvGames.get(game.id))
+      val result    =
+        if (game.winnerUserId.contains(user.id)) 1
+        else if (game.loserUserId.contains(user.id)) -1
         else 0
       userRepo
         .incNbGames(user.id, game.rated, game.hasAi, result = result, totalTime = totalTime, tvTime = tvTime)

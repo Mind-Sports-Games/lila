@@ -1,20 +1,20 @@
 package lila.simul
 
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import strategygames.{ GameLogic, Player => PlayerIndex, P1, P2, Status }
+import strategygames.{ GameLogic, P1, Player as PlayerIndex, Status }
 import strategygames.variant.Variant
 import lila.db.BSON
 import lila.db.BSON.{ Reader, Writer }
 import lila.db.BSON.BSONJodaDateTimeHandler
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
   implicit private val SimulStatusBSONHandler: BSONHandler[SimulStatus] = tryHandler[SimulStatus](
-    { case BSONInteger(v) => SimulStatus(v) toTry s"No such simul status: $v" },
+    { case BSONInteger(v) => SimulStatus(v).toTry(s"No such simul status: $v") },
     x => BSONInteger(x.id)
   )
   implicit private val ChessStatusBSONHandler: BSONHandler[Status] = lila.game.BSONHandlers.StatusBSONHandler
@@ -28,18 +28,18 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
   }
 
   import strategygames.ClockConfig
-  implicit private val clockHandler: BSONHandler[ClockConfig]              = clockConfigHandler
-  implicit private val ClockBSONHandler: BSONDocumentHandler[SimulClock]   = Macros.handler[SimulClock]
-  implicit private val PlayerBSONHandler: BSONDocumentHandler[SimulPlayer] = Macros.handler[SimulPlayer]
+  implicit private val clockHandler: BSONHandler[ClockConfig]                    = clockConfigHandler
+  implicit private val ClockBSONHandler: BSONDocumentHandler[SimulClock]         = Macros.handler[SimulClock]
+  implicit private val PlayerBSONHandler: BSONDocumentHandler[SimulPlayer]       = Macros.handler[SimulPlayer]
   implicit private val ApplicantBSONHandler: BSONDocumentHandler[SimulApplicant] =
     Macros.handler[SimulApplicant]
   implicit private val SimulPairingBSONHandler: BSON[SimulPairing] = new BSON[SimulPairing] {
     def reads(r: BSON.Reader) =
       SimulPairing(
         player = r.get[SimulPlayer]("player"),
-        gameId = r str "gameId",
+        gameId = r.str("gameId"),
         status = r.get[Status]("status"),
-        wins = r boolO "wins",
+        wins = r.boolO("wins"),
         hostPlayerIndex = r.strO("hostPlayerIndex").flatMap(PlayerIndex.fromName) | P1
       )
     def writes(w: BSON.Writer, o: SimulPairing) =
@@ -57,7 +57,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
   private val createdSelect  = $doc("status" -> SimulStatus.Created.id)
   private val startedSelect  = $doc("status" -> SimulStatus.Started.id)
   private val finishedSelect = $doc("status" -> SimulStatus.Finished.id)
-  private val createdSort    = $sort desc "createdAt"
+  private val createdSort    = $sort.desc("createdAt")
 
   def find(id: Simul.ID): Fu[Option[Simul]] =
     coll.byId[Simul](id)
@@ -81,7 +81,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
     coll
       .find(
         createdSelect ++
-          $doc("hostId" $in hostIds, "team" $in List(BSONString(teamId)))
+          $doc("hostId".$in(hostIds), "team".$in(List(BSONString(teamId))))
       )
       .hint(coll hint $doc("hostId" -> 1))
       .cursor[Simul]()
@@ -91,7 +91,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
     coll.primitiveOne[User.ID]($id(id), "hostId")
 
   private val featurableSelect         = $doc("featurable" -> true)
-  private val manyPairings             = $doc("pairings.3" $exists true)
+  private val manyPairings             = $doc("pairings.3".$exists(true))
   private val featurableOrManyPairings = $doc("$or" -> List(featurableSelect, manyPairings))
 
   def allCreatedFeaturable: Fu[List[Simul]] =
@@ -99,8 +99,8 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
       .find(
         // hits partial index hostSeenAt_-1
         createdSelect ++ featurableSelect ++ $doc(
-          //"hostSeenAt" $gte DateTime.now.minusSeconds(12),
-          "createdAt" $gte DateTime.now.minusDays(30)
+          // "hostSeenAt" $gte DateTime.now.minusSeconds(12),
+          "createdAt".$gte(DateTime.now.minusDays(30))
         )
       )
       .sort(createdSort)
@@ -117,7 +117,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
     coll
       .find(
         createdSelect ++ $doc(
-          "createdAt" $gte DateTime.now.minusDays(30)
+          "createdAt".$gte(DateTime.now.minusDays(30))
         )
       )
       .sort(createdSort)
@@ -134,31 +134,33 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
   def allFinishedFeaturable(max: Int): Fu[List[Simul]] =
     coll
       .find(finishedSelect ++ featurableSelect)
-      .sort($sort desc "finishedAt")
+      .sort($sort.desc("finishedAt"))
       .cursor[Simul]()
       .list(max)
 
   def allFinishedFeaturableOrManyPairings(max: Int): Fu[List[Simul]] =
     coll
       .find(finishedSelect ++ featurableOrManyPairings)
-      .sort($sort desc "finishedAt")
+      .sort($sort.desc("finishedAt"))
       .cursor[Simul]()
       .list(max)
 
   def allNotFinished =
-    coll.list[Simul]($doc("status" $ne SimulStatus.Finished.id))
+    coll.list[Simul]($doc("status".$ne(SimulStatus.Finished.id)))
 
   def create(simul: Simul): Funit =
-    coll.insert one {
-      SimulBSONHandler.writeTry(simul).get
-    } void
+    coll.insert
+      .one(
+        SimulBSONHandler.writeTry(simul).get
+      )
+      .void
 
   def update(simul: Simul) =
     coll.update
       .one(
         $id(simul.id),
         $set(SimulBSONHandler writeTry simul get) ++
-          simul.estimatedStartAt.isEmpty ?? ($unset("estimatedStartAt"))
+          simul.estimatedStartAt.isEmpty.so($unset("estimatedStartAt"))
       )
       .void
 
@@ -192,7 +194,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
   def cleanup =
     coll.delete.one(
       createdSelect ++ $doc(
-        "createdAt" -> $doc("$lt" -> (DateTime.now minusMinutes 60))
+        "createdAt" -> $doc("$lt" -> (DateTime.now.minusMinutes(60)))
       )
     )
 }

@@ -1,9 +1,9 @@
 package lila.swiss
 
-import akka.stream.scaladsl._
-import reactivemongo.api.bson._
+import akka.stream.scaladsl.*
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 // https://www.fide.com/FIDE/handbook/C04Annex2_TRF16.pdf
@@ -15,23 +15,23 @@ final class SwissTrf(
 
   private type Bits = List[(Int, String)]
 
-  def apply(swiss: Swiss, sorted: Boolean): Source[String, _] = Source futureSource {
+  def apply(swiss: Swiss, sorted: Boolean): Source[String, ?] = Source futureSource {
     fetchPlayerIds(swiss) map { apply(swiss, _, sorted) }
   }
 
-  def apply(swiss: Swiss, playerIds: PlayerIds, sorted: Boolean): Source[String, _] =
+  def apply(swiss: Swiss, playerIds: PlayerIds, sorted: Boolean): Source[String, ?] =
     SwissPlayer.fields { f =>
       tournamentLines(swiss) concat
         forbiddenPairings(swiss, playerIds) concat sheetApi
-          .source(swiss, sort = sorted.??($doc(f.inputRating -> -1, f.rating -> -1)))
-          .map((playerLine(swiss, playerIds) _).tupled)
+          .source(swiss, sort = sorted.so($doc(f.inputRating -> -1, f.rating -> -1)))
+          .map(playerLine(swiss, playerIds).tupled)
           .map(formatLine) concat (if (swiss.settings.mcmahon || swiss.settings.isMatchScore)
                                      sheetApi
                                        .source(
                                          swiss,
-                                         sort = sorted.??($doc(f.inputRating -> -1, f.rating -> -1))
+                                         sort = sorted.so($doc(f.inputRating -> -1, f.rating -> -1))
                                        )
-                                       .map((acceleratedPairingLine(swiss, playerIds) _).tupled)
+                                       .map(acceleratedPairingLine(swiss, playerIds).tupled)
                                        .map(formatLine)
                                    else Source.empty[String])
     }
@@ -42,8 +42,8 @@ final class SwissTrf(
         s"012 ${swiss.name}",
         s"022 $baseUrl/swiss/${swiss.id}",
         s"032 PlayStrategy",
-        s"042 ${dateFormatter print swiss.startsAt}",
-        s"052 ${swiss.finishedAt ?? dateFormatter.print}",
+        s"042 ${dateFormatter.print(swiss.startsAt)}",
+        s"052 ${swiss.finishedAt so dateFormatter.print}",
         s"062 ${swiss.nbPlayers}",
         s"092 Individual: Swiss-System",
         s"102 $baseUrl/swiss",
@@ -55,7 +55,11 @@ final class SwissTrf(
   private def acceleratedPairingLine(
       swiss: Swiss,
       playerIds: PlayerIds
-  )(p: SwissPlayer, pairings: Map[SwissRound.Number, SwissPairing], sheet: SwissSheet): Bits =
+  )(
+      p: SwissPlayer,
+      @annotation.nowarn("msg=unused") _pairings: Map[SwissRound.Number, SwissPairing],
+      sheet: SwissSheet
+  ): Bits =
     List(
       3 -> "XXA",
       8 -> playerIds.getOrElse(p.userId, 0).toString
@@ -65,7 +69,7 @@ final class SwissTrf(
       ).map { case (l, s) => (l + (rn.value - 1) * 5, s) }
     }
 
-  private def additionalPoints(swiss: Swiss, player: SwissPlayer, sheet: SwissSheet, round: Int): Double = {
+  private def additionalPoints(swiss: Swiss, player: SwissPlayer, sheet: SwissSheet, round: Int): Double =
     if (swiss.settings.isMatchScore) {
       val outcomesSoFar = sheet.outcomes.slice(0, round - 1)
       Swiss
@@ -81,7 +85,6 @@ final class SwissTrf(
       val maxScore = 30.0 // so that all scores are positive
       maxScore + player.mcMahonStartingScore(swiss.settings.mcmahonCutoffGrade)
     } else 0
-  }
 
   private def playerLine(
       swiss: Swiss,
@@ -97,10 +100,10 @@ final class SwissTrf(
       swiss.allRounds.zip(sheet.outcomes).flatMap { case (rn, outcome) =>
         val pairing = pairings get rn
         List(
-          95 -> pairing.map(_ opponentOf p.userId).flatMap(playerIds.get).??(_.toString),
-          97 -> pairing.map(_ bbpPairingPlayerIndexOf p.userId).??(_.fold("w", "b")),
+          95 -> pairing.map(_.opponentOf(p.userId)).flatMap(playerIds.get).so(_.toString),
+          97 -> pairing.map(_.bbpPairingPlayerIndexOf(p.userId)).so(_.fold("w", "b")),
           99 -> {
-            import SwissSheet._
+            import SwissSheet.*
             outcome match {
               case res if outcome.length == 1 =>
                 res(0) match {
@@ -112,7 +115,7 @@ final class SwissTrf(
                   case Ongoing => "Z"
                 }
               case _ if outcome(0) == Bye => "U"
-              case l =>
+              case l                      =>
                 pointsForTrf(l) match {
                   case 2 => "1"
                   case 1 => "="
@@ -124,7 +127,7 @@ final class SwissTrf(
       }
     } ::: {
       p.absent && swiss.round.value < swiss.settings.nbRounds
-    }.?? {
+    }.so {
       List( // http://www.rrweb.org/javafo/aum/JaVaFo2_AUM.htm#_Unusual_info_extensions
         95 -> "0000",
         97 -> "",
@@ -137,15 +140,15 @@ final class SwissTrf(
       s"""$acc${" " * (pos - txt.length - acc.length)}$txt"""
     }
 
-  private val dateFormatter = org.joda.time.format.DateTimeFormat forStyle "M-"
+  private val dateFormatter = org.joda.time.format.DateTimeFormat.forStyle("M-")
 
   def fetchPlayerIds(swiss: Swiss): Fu[PlayerIds] =
     SwissPlayer
       .fields { p =>
-        import BsonHandlers._
+        import BsonHandlers.*
         colls.player
           .aggregateOne() { framework =>
-            import framework._
+            import framework.*
             Match($doc(p.swissId -> swiss.id)) -> List(
               Sort(Descending(p.inputRating), Descending(p.rating)),
               Group(BSONNull)("us" -> PushField(p.userId))
@@ -155,13 +158,15 @@ final class SwissTrf(
             ~_.flatMap(_.getAsOpt[List[User.ID]]("us"))
           }
           .map {
-            _.view.zipWithIndex.map { case (userId, index) =>
-              (userId, index + 1)
-            }.toMap
+            _.view.zipWithIndex
+              .map { case (userId, index) =>
+                (userId, index + 1)
+              }
+              .toMap
           }
       }
 
-  private def forbiddenPairings(swiss: Swiss, playerIds: PlayerIds): Source[String, _] =
+  private def forbiddenPairings(swiss: Swiss, playerIds: PlayerIds): Source[String, ?] =
     if (swiss.settings.forbiddenPairings.isEmpty) Source.empty[String]
     else
       Source.fromIterator { () =>

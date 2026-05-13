@@ -1,6 +1,6 @@
 package lila.study
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import strategygames.format.sgf.{ Dumper, Tag, Tags }
 import strategygames.format.FEN
 import strategygames.{ ActionStrs, GameFamily, GameLogic }
@@ -8,8 +8,6 @@ import strategygames.variant.Variant
 import org.joda.time.format.DateTimeFormat
 
 import lila.common.String.slugify
-import lila.tree.Node.{ Shape, Shapes }
-import lila.i18n.VariantKeys
 
 final class SgfDump(
     chapterRepo: ChapterRepo,
@@ -17,9 +15,9 @@ final class SgfDump(
     net: lila.common.config.NetConfig
 ) {
 
-  import SgfDump._
+  import SgfDump.*
 
-  def apply(study: Study): Source[String, _] =
+  def apply(study: Study): Source[String, ?] =
     chapterRepo
       .orderedByStudySource(study.id)
       .map(ofChapter(study))
@@ -29,24 +27,18 @@ final class SgfDump(
   def ofChapter(study: Study)(chapter: Chapter): String = {
     val actionStrs = toActionStrs(chapter.root.mainline)
     val tags       = makeTags(study, chapter)
-    val initialFen = !chapter.root.fen.initial option chapter.root.fen
+    val initialFen = (!chapter.root.fen.initial).option(chapter.root.fen)
     format(chapter.setup.variant, actionStrs, tags, initialFen)
   }
 
-  def format(variant: Variant, actionStrs: ActionStrs, tags: Tags, initialFen: Option[FEN]): String = {
+  def format(variant: Variant, actionStrs: ActionStrs, tags: Tags, initialFen: Option[FEN]): String =
     "(;" ++ tags.toString ++ "\n\n" ++ validSgf(variant, actionStrs, initialFen) ++ ")"
-  }
 
-  def validSgf(variant: Variant, actionStrs: ActionStrs, initialFen: Option[FEN]): String = {
-    if (
-      variant.gameLogic == GameLogic.FairySF() || variant.gameLogic == GameLogic
-        .Go() || variant.gameLogic == GameLogic.Backgammon()
-    ) {
+  def validSgf(variant: Variant, actionStrs: ActionStrs, initialFen: Option[FEN]): String =
+    if (variant.gameLogic == GameLogic.FairySF() || variant.gameLogic == GameLogic
+        .Go() || variant.gameLogic == GameLogic.Backgammon())
       Dumper(variant, actionStrs, initialFen)
-    } else {
-      "SGF NOT SUPPORTED"
-    }
-  }
+    else "SGF NOT SUPPORTED"
 
   private val fileR = """[\s,]""".r
 
@@ -71,7 +63,7 @@ final class SgfDump(
   private def chapterUrl(studyId: Study.Id, chapterId: Chapter.Id) =
     s"${net.baseUrl}/study/$studyId/$chapterId"
 
-  private val dateFormat = DateTimeFormat forPattern "yyyy.MM.dd"
+  private val dateFormat = DateTimeFormat.forPattern("yyyy.MM.dd")
 
   private def makeTags(study: Study, chapter: Chapter): Tags = {
     val isGo = chapter.setup.variant.gameFamily == GameFamily.Go()
@@ -82,13 +74,13 @@ final class SgfDump(
         Tag(_.EV, s"${study.name}: ${chapter.name}"),
         Tag(_.PC, chapterUrl(study.id, chapter.id)),
         Tag(_.DT, Tag.DT.format.print(chapter.createdAt))
-      ) ::: (!chapter.root.fen.initial && !isGo).??(
+      ) ::: (!chapter.root.fen.initial && !isGo).so(
         List(
           Tag(_.IP, chapter.root.fen.value)
         )
       ) ::: (
         chapter.setup.variant.gameFamily match {
-          case GameFamily.LinesOfAction() => //not currently used
+          case GameFamily.LinesOfAction() => // not currently used
             List(
               Tag(_.GM, 9),
               Tag(_.SU, if (chapter.setup.variant.key == "linesOfAction") "Standard" else "Scrambled-eggs")
@@ -107,7 +99,7 @@ final class SgfDump(
             )
           case GameFamily.Flipello() =>
             List(Tag(_.GM, 2), Tag(_.SZ, chapter.setup.variant.toFairySF.boardSize.height))
-          case GameFamily.Amazons() => List(Tag(_.GM, 18))
+          case GameFamily.Amazons()            => List(Tag(_.GM, 18))
           case GameFamily.BreakthroughTroyka() =>
             List(
               Tag(_.GM, 41),
@@ -128,7 +120,7 @@ final class SgfDump(
           case GameFamily.Backgammon() =>
             List(
               Tag(_.GM, 6),
-              //Tag(_.RU, "Crawford"), // multipoint info
+              // Tag(_.RU, "Crawford"), // multipoint info
               Tag(_.CV, 1),
               Tag(_.CO, "n"),
               Tag.matchInfo(1, 1, 0, 0), // multipoint info
@@ -146,17 +138,13 @@ final class SgfDump(
 
 object SgfDump {
 
-  def toActionStrs(line: Vector[Node]): ActionStrs = {
+  def toActionStrs(line: Vector[Node]): ActionStrs =
     line
       .drop(1)
       .foldLeft(Vector(line.take(1))) { case (turn, node) =>
-        if (turn.head.head.playedPlayerIndex != node.playedPlayerIndex) {
-          Vector(node) +: turn
-        } else {
-          (turn.head :+ node) +: turn.tail
-        }
+        if (turn.head.head.playedPlayerIndex != node.playedPlayerIndex) Vector(node) +: turn
+        else (turn.head :+ node) +: turn.tail
       }
       .reverse
       .map(t => t.map(_.move.uci.uci))
-  }
 }

@@ -1,11 +1,10 @@
 package views.html.puzzle
 
-import controllers.routes
 import play.api.libs.json.{ JsObject, Json }
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 
 object show {
@@ -23,15 +22,15 @@ object show {
       moreJs = frag(
         jsModule("puzzle"),
         embedJsUnsafeLoadThen(s"""PlayStrategyPuzzle(${safeJsonValue(
-          Json
-            .obj(
-              "data" -> data,
-              "pref" -> pref,
-              "i18n" -> bits.jsI18n(streak = isStreak)
-            )
-            .add("themes" -> ctx.isAuth.option(bits.jsonThemes(puzzle.variant)))
-            .add("difficulty" -> difficulty.map(_.key))
-        )})""")
+            Json
+              .obj(
+                "data" -> data,
+                "pref" -> pref,
+                "i18n" -> bits.jsI18n(streak = isStreak)
+              )
+              .add("themes" -> ctx.isAuth.option(bits.jsonThemes(puzzle.variant)))
+              .add("difficulty" -> difficulty.map(_.key))
+          )})""")
       ),
       csp = defaultCsp.withWebAssembly.some,
       chessground = false,
@@ -46,10 +45,10 @@ object show {
             if (isStreak) trans.puzzle.streakDescription.txt()
             else
               s"PlayStrategy tactic trainer: ${trans.puzzle
-                .findTheBestMoveForPlayerIndex(
-                  puzzle.playerIndex.fold(trans.white.txt(), trans.black.txt())
-                )
-                .v}. Played by ${puzzle.plays} players."
+                  .findTheBestMoveForPlayerIndex(
+                    puzzle.playerIndex.fold(trans.white.txt(), trans.black.txt())
+                  )
+                  .v}. Played by ${puzzle.plays} players."
         )
         .some,
       zoomable = true,

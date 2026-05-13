@@ -1,9 +1,8 @@
 package lila.swiss
-import strategygames.{ GameFamily }
-import strategygames.variant.Variant
+import strategygames.GameFamily
 
 private case class SwissSheet(outcomes: List[List[SwissSheet.Outcome]]) {
-  import SwissSheet._
+  import SwissSheet.*
 
   def points =
     Swiss.Points {
@@ -36,7 +35,7 @@ private object SwissSheet {
   def pointsFor(outcome: List[Outcome]): Int =
     outcome.foldLeft(0) { case (acc, out) => acc + pointsFor(out) }
 
-  //BBpairings can only handle the same points for a win, loss or draw therefore we have to lie to it
+  // BBpairings can only handle the same points for a win, loss or draw therefore we have to lie to it
   def pointsForTrf(outcome: List[Outcome]): Int =
     pointsFor(outcome) match {
       case score if score > outcome.length  => 2
@@ -63,27 +62,23 @@ private object SwissSheet {
         pairingMap get round match {
           case Some(pairing) =>
             pairing.status match {
-              case Left(_) => List(Ongoing)
+              case Left(_)     => List(Ongoing)
               case Right(None) =>
-                if (swiss.settings.isMatchScore)
-                  outcomeListFromMultiMatch(player, pairing)
+                if (swiss.settings.isMatchScore) outcomeListFromMultiMatch(player, pairing)
                 else List(Draw)
               case Right(Some(playerIndex)) =>
-                if (swiss.settings.isMatchScore) {
-                  outcomeListFromMultiMatch(player, pairing)
-                } else if (pairing(playerIndex) == player.userId) List(Win)
+                if (swiss.settings.isMatchScore) outcomeListFromMultiMatch(player, pairing)
+                else if (pairing(playerIndex) == player.userId) List(Win)
                 else List(Loss)
             }
           case None if player.byes(round) =>
-            if (swiss.settings.isMatchScore) {
-              if (swiss.settings.isBestOfX) {
+            if (swiss.settings.isMatchScore)
+              if (swiss.settings.isBestOfX)
                 List.fill(swiss.settings.nbGamesPerRound / 2 + 1)(
                   Bye
                 ) // odd nbGamesPerRound not allowed in form for this setup...
-              } else {
-                List.fill(swiss.settings.nbGamesPerRound)(Bye)
-              }
-            } else List(Bye)
+              else List.fill(swiss.settings.nbGamesPerRound)(Bye)
+            else List(Bye)
           case None => List(Absent)
         }
       }
@@ -91,7 +86,7 @@ private object SwissSheet {
 
   def outcomeListFromMultiMatch(player: SwissPlayer, pairing: SwissPairing): List[Outcome] =
     pairing.matchStatus match {
-      case Left(_) => List(Ongoing)
+      case Left(_)  => List(Ongoing)
       case Right(l) =>
         l.zipWithIndex
           .map { case (outcome, index) =>
@@ -99,10 +94,9 @@ private object SwissSheet {
               pairing.variant match {
                 case Some(v) if v.gameFamily == GameFamily.Backgammon() => {
                   if (pairing(c) == player.userId) Win else Loss
-                } //multimatch Backgammon games require players to keep colour/player for display same pieces
+                } // multimatch Backgammon games require players to keep colour/player for display same pieces
                 case _ => {
-                  if (
-                    (pairing(c) == player.userId && index % 2 == 0) || (pairing(
+                  if ((pairing(c) == player.userId && index % 2 == 0) || (pairing(
                       c
                     ) != player.userId && index % 2 == 1)
                   ) Win
@@ -112,7 +106,6 @@ private object SwissSheet {
             })
           }
     }
-
 }
 
 final private class SwissSheetApi(colls: SwissColls)(implicit
@@ -120,19 +113,19 @@ final private class SwissSheetApi(colls: SwissColls)(implicit
     mat: akka.stream.Materializer
 ) {
 
-  import akka.stream.scaladsl._
+  import akka.stream.scaladsl.*
   import org.joda.time.DateTime
   import reactivemongo.akkastream.cursorProducer
   import reactivemongo.api.ReadPreference
-  import lila.db.dsl._
-  import BsonHandlers._
+  import lila.db.dsl.*
+  import BsonHandlers.*
 
   def source(
       swiss: Swiss,
       sort: Bdoc
-  ): Source[(SwissPlayer, Map[SwissRound.Number, SwissPairing], SwissSheet), _] = {
+  ): Source[(SwissPlayer, Map[SwissRound.Number, SwissPairing], SwissSheet), ?] = {
     val readPreference =
-      if (swiss.finishedAt.exists(_ isBefore DateTime.now.minusSeconds(10)))
+      if (swiss.finishedAt.exists(_.isBefore(DateTime.now.minusSeconds(10))))
         ReadPreference.secondaryPreferred
       else ReadPreference.primary
     SwissPlayer

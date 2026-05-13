@@ -54,7 +54,7 @@ case class Pref(
     tags: Map[String, String] = Map.empty
 ) {
 
-  import Pref._
+  import Pref.*
 
   def id = _id
 
@@ -68,7 +68,7 @@ case class Pref(
   def realSoundSet = SoundSet(soundSet)
 
   def coordPlayerIndexName = PlayerOrder.choices.toMap.get(coordPlayerIndex).fold("random")(_.toLowerCase)
-  def coordsClass          = Coords classOf coords
+  def coordsClass          = Coords.classOf(coords)
 
   def hasDgt = tags contains Tag.dgt
 
@@ -78,7 +78,7 @@ case class Pref(
       case "bgImg" => copy(bgImg = value.some).some
       // case "theme" =>
       //    copy(theme = Theme.updateBoardTheme(theme, value)).some
-      case "color" => Pref.Color.fromString.get(value).map { c => copy(color = c) }
+      case "color"    => Pref.Color.fromString.get(value).map { c => copy(color = c) }
       case "pieceSet" =>
         copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value)).some
       case "theme3d" =>
@@ -89,7 +89,7 @@ case class Pref(
         PieceSet3d.allByName get value map { p =>
           copy(pieceSet3d = p.name)
         }
-      case "is3d" => copy(is3d = value == "true").some
+      case "is3d"     => copy(is3d = value == "true").some
       case "soundSet" =>
         SoundSet.allByKey get value map { s =>
           copy(soundSet = s.key)
@@ -98,9 +98,8 @@ case class Pref(
       case _     => none
     }
 
-  def setTheme(value: String, gameFamily: String): Option[Pref] = {
+  def setTheme(value: String, gameFamily: String): Option[Pref] =
     copy(theme = Theme.updateBoardTheme(theme, value, gameFamily)).some
-  }
 
   def animationMillis: Int =
     animation match {
@@ -252,10 +251,10 @@ object Pref {
     )
   }
 
-  object ConfirmResign        extends BooleanPref
-  object ConfirmPass          extends BooleanPref
-  object ConfirmCubeActions   extends BooleanPref
-  object PlayForcedAction     extends BooleanPref
+  object ConfirmResign      extends BooleanPref
+  object ConfirmPass        extends BooleanPref
+  object ConfirmCubeActions extends BooleanPref
+  object PlayForcedAction   extends BooleanPref
 
   object InsightShare {
     val NOBODY    = 0
@@ -543,6 +542,6 @@ object Pref {
     tags = Map.empty
   )
 
-  import ornicar.scalalib.Zero
-  implicit def PrefZero: Zero[Pref] = Zero.instance(default)
+  import alleycats.Zero
+  implicit def PrefZero: Zero[Pref] = Zero(default)
 }

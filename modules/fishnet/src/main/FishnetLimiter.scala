@@ -1,10 +1,10 @@
 package lila.fishnet
 
-import reactivemongo.api.bson._
-import scala.concurrent.duration._
+import reactivemongo.api.bson.*
+import scala.concurrent.duration.*
 
 import lila.common.IpAddress
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final private class FishnetLimiter(
     analysisColl: Coll,
@@ -16,7 +16,7 @@ final private class FishnetLimiter(
       case false => fuFalse
       case true  => perDayCheck(sender)
     } flatMap { accepted =>
-      (accepted ?? requesterApi.add(sender.userId, ownGame)) inject accepted
+      (accepted so requesterApi.add(sender.userId, ownGame)) inject accepted
     }
 
   private val RequestLimitPerIP = new lila.memo.RateLimit[IpAddress](
@@ -28,14 +28,15 @@ final private class FishnetLimiter(
   private def concurrentCheck(sender: Work.Sender) =
     sender match {
       case Work.Sender(_, _, mod, system) if mod || system => fuTrue
-      case Work.Sender(userId, ip, _, _) =>
-        !analysisColl.exists(
-          $or(
-            $doc("sender.ip"     -> ip),
-            $doc("sender.userId" -> userId)
+      case Work.Sender(userId, ip, _, _)                   =>
+        analysisColl
+          .exists(
+            $or(
+              $doc("sender.ip"     -> ip),
+              $doc("sender.userId" -> userId)
+            )
           )
-        )
-      case _ => fuFalse
+          .not
     }
 
   private val maxPerDay  = 35
@@ -44,15 +45,14 @@ final private class FishnetLimiter(
   private def perDayCheck(sender: Work.Sender) =
     sender match {
       case Work.Sender(_, _, mod, system) if mod || system => fuTrue
-      case Work.Sender(userId, ip, _, _) =>
+      case Work.Sender(userId, ip, _, _)                   =>
         def perUser =
           requesterApi.countTodayAndThisWeek(userId) map { case (daily, weekly) =>
             weekly < maxPerWeek &&
-              daily < (if (weekly < maxPerWeek * 2 / 3) maxPerDay else maxPerDay * 2 / 3)
+            daily < (if (weekly < maxPerWeek * 2 / 3) maxPerDay else maxPerDay * 2 / 3)
           }
         ip.fold(perUser) { ipAddress =>
           RequestLimitPerIP(ipAddress, cost = 1)(perUser)(fuccess(false))
         }
-      case _ => fuFalse
     }
 }

@@ -1,14 +1,12 @@
 package views.html.streamer
 
-import controllers.routes
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object header {
 
-  import trans.streamer._
+  import trans.streamer.*
 
   def apply(s: lila.streamer.Streamer.WithUserAndStream)(implicit ctx: Context) =
     div(cls := "streamer-header")(
@@ -19,7 +17,9 @@ object header {
           s.streamer.name
         ),
         s.streamer.headline.map(_.value).map { d =>
-          p(cls := s"headline ${if (d.length < 60) "small" else if (d.length < 120) "medium" else "large"}")(
+          p(cls := s"headline ${
+              if (d.length < 60) "small" else if (d.length < 120) "medium" else "large"
+            }")(
             d
           )
         },

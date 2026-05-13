@@ -2,7 +2,7 @@ package lila.lobby
 
 import strategygames.{ GameLogic, Mode, Speed }
 import org.joda.time.DateTime
-import play.api.libs.json._
+import play.api.libs.json.*
 import play.api.i18n.Lang
 
 import lila.game.PerfPicker
@@ -25,27 +25,27 @@ case class Seek(
 
   def id = _id
 
-  val realPlayerIndex = PlayerIndex orDefault playerIndex
+  val realPlayerIndex = PlayerIndex.orDefault(playerIndex)
 
   val realVariant = strategygames.variant.Variant.orDefault(gameLogic, variant)
 
-  val realMode = Mode orDefault mode
+  val realMode = Mode.orDefault(mode)
 
   def compatibleWith(h: Seek) =
     user.id != h.user.id &&
       compatibilityProperties == h.compatibilityProperties &&
-      (realPlayerIndex compatibleWith h.realPlayerIndex) &&
+      (realPlayerIndex.compatibleWith(h.realPlayerIndex)) &&
       ratingRangeCompatibleWith(h) && h.ratingRangeCompatibleWith(this)
 
   private def ratingRangeCompatibleWith(s: Seek) =
     realRatingRange.fold(true) { range =>
-      s.rating ?? range.contains
+      s.rating so range.contains
     }
 
   private def compatibilityProperties =
     (gameLogic, variant, mode, daysPerTurn)
 
-  lazy val realRatingRange: Option[RatingRange] = RatingRange noneIfDefault ratingRange
+  lazy val realRatingRange: Option[RatingRange] = RatingRange.noneIfDefault(ratingRange)
 
   def perf = perfType map user.perfAt
 
@@ -53,7 +53,7 @@ case class Seek(
 
   val message =
     s"[Play](<https://playstrategy.org>) ${daysPerTurn.fold("unlimited")(_ => "correspondence")} **${VariantKeys
-      .variantName(realVariant)}** with @${user.username}${daysPerTurn.fold("")(d => s" (${d}d)")}"
+        .variantName(realVariant)}** with @${user.username}${daysPerTurn.fold("")(d => s" (${d}d)")}"
 
   def render(implicit lang: Lang): JsObject =
     Json
@@ -61,15 +61,15 @@ case class Seek(
         "id"       -> _id,
         "username" -> user.username,
         "rating"   -> rating,
-        "variant" -> Json.obj(
+        "variant"  -> Json.obj(
           "key"   -> realVariant.key,
           "short" -> VariantKeys.variantShortName(realVariant),
           "name"  -> VariantKeys.variantName(realVariant)
         ),
         "mode"        -> realMode.id,
         "days"        -> daysPerTurn,
-        "playerIndex" -> strategygames.Player.fromName(playerIndex).??(_.name),
-        "perf" -> Json.obj(
+        "playerIndex" -> strategygames.Player.fromName(playerIndex).fold("")(_.name),
+        "perf"        -> Json.obj(
           "icon" -> perfType.map(_.iconChar.toString),
           "name" -> perfType.map(_.trans)
         )
@@ -93,7 +93,7 @@ object Seek {
       blocking: Set[String]
   ): Seek =
     new Seek(
-      _id = lila.common.ThreadLocalRandom nextString idSize,
+      _id = lila.common.ThreadLocalRandom.nextString(idSize),
       gameLogic = variant.gameLogic,
       variant = variant.id,
       daysPerTurn = daysPerTurn,
@@ -106,7 +106,7 @@ object Seek {
 
   def renew(seek: Seek) =
     new Seek(
-      _id = lila.common.ThreadLocalRandom nextString idSize,
+      _id = lila.common.ThreadLocalRandom.nextString(idSize),
       gameLogic = seek.gameLogic,
       variant = seek.variant,
       daysPerTurn = seek.daysPerTurn,
@@ -117,7 +117,7 @@ object Seek {
       createdAt = DateTime.now
     )
 
-  import reactivemongo.api.bson._
+  import reactivemongo.api.bson.*
   import lila.db.BSON.BSONJodaDateTimeHandler
   implicit val lobbyPerfBSONHandler: BSONHandler[LobbyPerf] =
     BSONIntegerHandler.as[LobbyPerf](

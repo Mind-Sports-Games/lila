@@ -1,6 +1,5 @@
 package lila.fishnet
 
-import scala.concurrent.duration._
 import strategygames.format.Uci
 
 final private class Monitor(
@@ -40,7 +39,7 @@ final private class Monitor(
       monBy
         .totalMeganode(userId)
         .increment(sumOf(result.evaluations) { eval =>
-          eval.nodes ifFalse eval.mateFound
+          eval.nodes.ifFalse(eval.mateFound)
         } / 1000000)
 
     val metaMovesSample = sample(result.evaluations.drop(6).filterNot(_.mateFound), 100)
@@ -50,7 +49,7 @@ final private class Monitor(
           (sum + v, nb + 1)
         }
       }
-      (nb > 0) option (sum / nb)
+      (nb > 0).option(sum / nb)
     }
     avgOf(_.time) foreach { monBy.movetime(userId).record(_) }
     if (result.stockfish.isNnue) {
@@ -68,11 +67,11 @@ final private class Monitor(
   }
 
   private def sample[A](elems: List[A], n: Int) =
-    if (elems.sizeIs <= n) elems else lila.common.ThreadLocalRandom shuffle elems take n
+    if (elems.sizeIs <= n) elems else lila.common.ThreadLocalRandom.shuffle(elems) take n
 
   private def monitorClients(): Funit =
     repo.allRecentClients map { clients =>
-      import lila.mon.fishnet.client._
+      import lila.mon.fishnet.client.*
 
       status(true).update(clients.count(_.enabled))
       status(false).update(clients.count(_.disabled))

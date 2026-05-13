@@ -2,7 +2,6 @@ package lila.socket
 
 import strategygames.Centis
 import com.github.blemale.scaffeine.Cache
-import scala.concurrent.duration._
 
 object UserLagCache {
 
@@ -15,7 +14,7 @@ object UserLagCache {
       cache.put(
         userId,
         cache.getIfPresent(userId).fold(lag) {
-          _ avg lag
+          _.avg(lag)
         }
       )
 

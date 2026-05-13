@@ -1,9 +1,9 @@
 package lila.insight
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import play.api.Configuration
 
-import lila.common.config._
+import lila.common.config.*
 
 @Module
 final class Env(
@@ -42,6 +42,6 @@ final class Env(
   lazy val api = wire[InsightApi]
 
   lila.common.Bus.subscribeFun("analysisReady") { case lila.analyse.actorApi.AnalysisReady(game, _) =>
-    api.updateGame(game).unit
+    api.updateGame(game).discard
   }
 }

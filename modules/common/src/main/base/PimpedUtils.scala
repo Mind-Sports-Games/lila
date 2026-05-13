@@ -4,14 +4,14 @@ import cats.data.Validated
 import com.typesafe.config.Config
 import java.util.concurrent.TimeUnit
 import org.joda.time.{ DateTime, Duration }
-import ornicar.scalalib.Zero
-import scala.concurrent.duration._
+import alleycats.Zero
+import scala.concurrent.duration.*
 import scala.concurrent.Future
 import scala.util.Try
 
 import strategygames.Centis
 
-import LilaTypes._
+import lila.core.lilaism.Lilaism.{ fuccess, fufail, Fu }
 
 final class PimpedOption[A](private val self: Option[A]) extends AnyVal {
 
@@ -22,7 +22,7 @@ final class PimpedOption[A](private val self: Option[A]) extends AnyVal {
   def toTryWith(err: => Exception): Try[A] =
     self.fold[Try[A]](scala.util.Failure(err))(scala.util.Success.apply)
 
-  def toTry(err: => String): Try[A] = toTryWith(lila.base.LilaException(err))
+  def toTry(err: => String): Try[A] = toTryWith(lila.core.lilaism.LilaException(err))
 
   def err(message: => String): A = self.getOrElse(sys.error(message))
 
@@ -54,8 +54,8 @@ final class PimpedDateTime(private val date: DateTime) extends AnyVal {
   def getSeconds: Long         = date.getMillis / 1000
   def getCentis: Long          = date.getMillis / 10
   def toNow                    = new Duration(date, DateTime.now)
-  def atMost(other: DateTime)  = if (other isBefore date) other else date
-  def atLeast(other: DateTime) = if (other isAfter date) other else date
+  def atMost(other: DateTime)  = if (other.isBefore(date)) other else date
+  def atLeast(other: DateTime) = if (other.isAfter(date)) other else date
 }
 
 final class PimpedTry[A](private val v: Try[A]) extends AnyVal {

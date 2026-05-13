@@ -1,8 +1,8 @@
 package lila.streamer
 
 import org.joda.time.DateTime
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 import play.api.data.validation.Constraints
 
 import lila.common.Form.{ constraint, formatter }
@@ -17,7 +17,7 @@ object StreamerForm {
       "name"        -> nameField,
       "headline"    -> optional(headlineField),
       "description" -> optional(descriptionField),
-      "twitch" -> optional(
+      "twitch"      -> optional(
         text
           .verifying(
             Constraints.minLength(2),
@@ -28,7 +28,7 @@ object StreamerForm {
       "youTube" -> optional(
         text.verifying("Invalid YouTube channel", s => Streamer.YouTube.parseChannelId(s).isDefined)
       ),
-      "listed" -> boolean,
+      "listed"   -> boolean,
       "approval" -> optional(
         mapping(
           "granted"   -> boolean,
@@ -37,9 +37,9 @@ object StreamerForm {
           "ignored"   -> boolean,
           "chat"      -> boolean,
           "quick"     -> optional(nonEmptyText)
-        )(ApprovalData.apply)(ApprovalData.unapply)
+        )(ApprovalData.apply)(unapply)
       )
-    )(UserData.apply)(UserData.unapply)
+    )(UserData.apply)(unapply)
       .verifying(
         "Must specify a Twitch and/or YouTube channel.",
         u => u.twitch.isDefined || u.youTube.isDefined
@@ -47,20 +47,22 @@ object StreamerForm {
   )
 
   def userForm(streamer: Streamer) =
-    emptyUserForm fill UserData(
-      name = streamer.name,
-      headline = streamer.headline,
-      description = streamer.description,
-      twitch = streamer.twitch.map(_.userId),
-      youTube = streamer.youTube.map(_.channelId),
-      listed = streamer.listed.value,
-      approval = ApprovalData(
-        granted = streamer.approval.granted,
-        tier = streamer.approval.tier.some,
-        requested = streamer.approval.requested,
-        ignored = streamer.approval.ignored,
-        chat = streamer.approval.chatEnabled
-      ).some
+    emptyUserForm.fill(
+      UserData(
+        name = streamer.name,
+        headline = streamer.headline,
+        description = streamer.description,
+        twitch = streamer.twitch.map(_.userId),
+        youTube = streamer.youTube.map(_.channelId),
+        listed = streamer.listed.value,
+        approval = ApprovalData(
+          granted = streamer.approval.granted,
+          tier = streamer.approval.tier.some,
+          requested = streamer.approval.requested,
+          ignored = streamer.approval.ignored,
+          chat = streamer.approval.chatEnabled
+        ).some
+      )
     )
 
   case class UserData(
@@ -100,8 +102,8 @@ object StreamerForm {
           case _ =>
             streamer.approval.copy(
               granted = streamer.approval.granted &&
-                newStreamer.twitch.fold(true)(streamer.twitch.has) &&
-                newStreamer.youTube.fold(true)(streamer.youTube.has)
+                newStreamer.twitch.fold(true)(t => streamer.twitch.contains(t)) &&
+                newStreamer.youTube.fold(true)(y => streamer.youTube.contains(y))
             )
         }
       )
@@ -128,9 +130,9 @@ object StreamerForm {
   private def headlineField = of[Headline].verifying(constraint.maxLength[Headline](_.value)(300))
   implicit private val descriptionFormat: Formatter[Description] =
     formatter.stringFormatter[Description](_.value, Description.apply)
-  private def descriptionField                     = of[Description].verifying(constraint.maxLength[Description](_.value)(50000))
+  private def descriptionField = of[Description].verifying(constraint.maxLength[Description](_.value)(50000))
   implicit private val nameFormat: Formatter[Name] = formatter.stringFormatter[Name](_.value, Name.apply)
-  private def nameField =
+  private def nameField                            =
     of[Name].verifying(
       constraint.minLength[Name](_.value)(3),
       constraint.maxLength[Name](_.value)(30)

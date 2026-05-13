@@ -1,10 +1,8 @@
 package views.html
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
-import controllers.routes
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object irwin {
 
@@ -40,7 +38,7 @@ object irwin {
             div(cls := "box__top__actions")(
               a(
                 href := "https://monitor.playstrategy.ovh/d/a5qOnu9Wz/mod-yield",
-                cls := "button button-empty"
+                cls  := "button button-empty"
               )("Monitoring")
             )
           ),
@@ -99,9 +97,9 @@ object irwin {
                   a(href := routes.Round.watcher(pov.gameId, pov.playerIndex.name))(
                     gameReport.moves.map { move =>
                       span(
-                        cls := percentClass(move.activation),
+                        cls      := percentClass(move.activation),
                         st.title := move.toString,
-                        style := s"height:${move.activation}%"
+                        style    := s"height:${move.activation}%"
                       )
                     }
                   )
@@ -116,7 +114,7 @@ object irwin {
                       link = false
                     ),
                     br,
-                    pov.game.isTournament ?? frag(iconTag("g"), " "),
+                    pov.game.isTournament so frag(iconTag("g"), " "),
                     pov.game.perfType.map { pt =>
                       iconTag(pt.iconChar)
                     },

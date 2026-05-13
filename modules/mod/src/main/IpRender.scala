@@ -1,8 +1,7 @@
 package lila.mod
 
 import com.github.blemale.scaffeine.LoadingCache
-import scala.concurrent.duration._
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 import lila.common.CuteNameGenerator
 import lila.common.IpAddress
@@ -20,7 +19,7 @@ object IpRender {
 
 final class IpRender {
 
-  import IpRender._
+  import IpRender.*
 
   def apply(mod: Holder): RenderIp = if (Granter.is(_.Admin)(mod)) visible else encrypted
 

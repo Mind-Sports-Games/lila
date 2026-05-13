@@ -1,11 +1,10 @@
 package lila.lobby
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import play.api.Configuration
-import scala.concurrent.duration._
 import lila.socket.Socket.{ GetVersion, SocketVersion }
 
-import lila.common.config._
+import lila.common.config.*
 
 @Module
 final class Env(
@@ -67,10 +66,9 @@ final class Env(
 
   val socket = wire[LobbySocket]
 
-  def version(id: String = "lobbyhome") = socket.rooms.ask[SocketVersion](id)(GetVersion)
+  def version(id: String = "lobbyhome") = socket.rooms.ask[SocketVersion](id)(GetVersion.apply)
 
   lila.common.Bus.subscribeFun("abortGame") { case lila.game.actorApi.AbortedBy(pov) =>
-    abortListener(pov).unit
+    abortListener(pov).discard
   }
-
 }

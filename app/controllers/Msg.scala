@@ -1,8 +1,8 @@
 package controllers
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
-import lila.app._
+import lila.app.*
 import lila.common.LightUser.lightUserWrites
 
 final class Msg(
@@ -50,7 +50,7 @@ final class Msg(
     }
 
   def search(q: String) =
-    Auth { ctx => me =>
+    Auth { _ => me =>
       q.trim.some.filter(lila.user.User.couldBeUsername) match {
         case None    => env.msg.json.searchResult(me)(env.msg.search.empty) map { Ok(_) }
         case Some(q) => env.msg.search(me, q) flatMap env.msg.json.searchResult(me) map { Ok(_) }
@@ -58,9 +58,9 @@ final class Msg(
     }
 
   def unreadCount =
-    Auth { ctx => me =>
+    Auth { _ => me =>
       JsonOk {
-        env.msg.compat unreadCount me
+        env.msg.compat.unreadCount(me)
       }
     }
 
@@ -72,9 +72,9 @@ final class Msg(
 
   def compatCreate =
     AuthBody { implicit ctx => me =>
-      ctx.noKid ?? {
+      ctx.noKid so {
         env.msg.compat
-          .create(me)(ctx.body, formBinding)
+          .create(me)(using ctx.body, formBinding)
           .fold(
             jsonFormError,
             _ map { id =>
@@ -85,13 +85,13 @@ final class Msg(
     }
 
   def apiPost(username: String) = {
-    val userId = lila.user.User normalize username
+    val userId = lila.user.User.normalize(username)
     AuthOrScopedBody(_.Msg.Write)(
       // compat: reply
       auth = implicit ctx =>
         me =>
           env.msg.compat
-            .reply(me, userId)(ctx.body, formBinding)
+            .reply(me, userId)(using ctx.body, formBinding)
             .fold(
               jsonFormError,
               _ inject Ok(Json.obj("ok" -> true, "id" -> userId))
@@ -99,9 +99,9 @@ final class Msg(
       // new API: create/reply
       scoped = implicit req =>
         me =>
-          (!me.kid && userId != me.id) ?? {
-            import play.api.data._
-            import play.api.data.Forms._
+          (!me.kid && userId != me.id) so {
+            import play.api.data.*
+            import play.api.data.Forms.*
             Form(single("text" -> nonEmptyText))
               .bindFromRequest()
               .fold(
@@ -110,7 +110,7 @@ final class Msg(
                   env.msg.api.post(me.id, userId, text) map {
                     case lila.msg.MsgApi.PostResult.Success => jsonOkResult
                     case lila.msg.MsgApi.PostResult.Limited => apiC.tooManyRequests
-                    case _                                  => BadRequest(jsonError("The message was rejected"))
+                    case _ => BadRequest(jsonError("The message was rejected"))
                   }
               )
           }

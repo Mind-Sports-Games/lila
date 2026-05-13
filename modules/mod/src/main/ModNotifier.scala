@@ -9,17 +9,20 @@ final private class ModNotifier(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def reporters(mod: Mod, sus: Suspect): Funit =
-    reportApi.recentReportersOf(sus) flatMap {
-      _.filter(r => mod.user.id != r.value)
-        .map { reporterId =>
-          notifyApi.addNotification(
-            Notification.make(
-              notifies = Notification.Notifies(reporterId.value),
-              content = lila.notify.ReportedBanned
-            )
-          )
-        }
-        .sequenceFu
+    reportApi.recentReportersOf(sus) flatMap { reporters =>
+      Future
+        .sequence(
+          reporters
+            .filter(r => mod.user.id != r.value)
+            .map { reporterId =>
+              notifyApi.addNotification(
+                Notification.make(
+                  notifies = Notification.Notifies(reporterId.value),
+                  content = lila.notify.ReportedBanned
+                )
+              )
+            }
+        )
         .void
     }
 

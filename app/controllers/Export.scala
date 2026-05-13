@@ -1,12 +1,11 @@
 package controllers
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import akka.util.ByteString
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 import play.api.mvc.Result
-import scala.concurrent.duration._
 
-import lila.app._
+import lila.app.*
 import lila.common.HTTPRequest
 import lila.game.Pov
 import lila.puzzle.Puzzle.Id
@@ -28,7 +27,7 @@ final class Export(env: Env) extends LilaController(env) {
     Open { implicit ctx =>
       OnlyHumansAndFacebookOrTwitter {
         ExportGifRateLimitGlobal("-", msg = HTTPRequest.ipAddress(ctx.req).value) {
-          OptionFuResult(env.game.gameRepo gameWithInitialFen id) { case (game, initialFen) =>
+          OptionFuResult(env.game.gameRepo.gameWithInitialFen(id)) { case (game, initialFen) =>
             val pov = Pov(game, PlayerIndex.fromName(playerIndex) | PlayerIndex.p1)
             env.game.gifExport.fromPov(pov, initialFen) map
               stream("image/gif") map
@@ -46,7 +45,7 @@ final class Export(env: Env) extends LilaController(env) {
   def gameThumbnail(id: String) =
     Open { implicit ctx =>
       ExportImageRateLimitGlobal("-", msg = HTTPRequest.ipAddress(ctx.req).value) {
-        OptionFuResult(env.game.gameRepo game id) { game =>
+        OptionFuResult(env.game.gameRepo.game(id)) { game =>
           env.game.gifExport.gameThumbnail(game) map
             stream("image/gif") map
             gameImageCacheSeconds(game)
@@ -57,7 +56,7 @@ final class Export(env: Env) extends LilaController(env) {
   def puzzleThumbnail(id: String) =
     Open { implicit ctx =>
       ExportImageRateLimitGlobal("-", msg = HTTPRequest.ipAddress(ctx.req).value) {
-        OptionFuResult(env.puzzle.api.puzzle find Id(id)) { puzzle =>
+        OptionFuResult(env.puzzle.api.puzzle.find(Id(id))) { puzzle =>
           env.game.gifExport.thumbnail(
             fen = puzzle.fenAfterInitialMove,
             lastMove = puzzle.line.head.uci.some,
@@ -76,6 +75,6 @@ final class Export(env: Env) extends LilaController(env) {
     res.withHeaders(CACHE_CONTROL -> s"max-age=$cacheSeconds")
   }
 
-  private def stream(contentType: String)(stream: Source[ByteString, _]) =
-    Ok.chunked(stream).withHeaders(noProxyBufferHeader) as contentType
+  private def stream(contentType: String)(stream: Source[ByteString, ?]) =
+    Ok.chunked(stream).withHeaders(noProxyBufferHeader).as(contentType)
 }

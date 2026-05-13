@@ -1,12 +1,11 @@
 package views.html
 package tournament
 
-import controllers.routes
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.tournament.crud.CrudForm
 import lila.tournament.{ Tournament, TournamentForm }
@@ -32,7 +31,7 @@ object crud {
       )
     }
 
-  def create(form: Form[_])(implicit ctx: Context) =
+  def create(form: Form[?])(implicit ctx: Context) =
     layout(
       title = "New tournament",
       css = "mod.form"
@@ -43,7 +42,7 @@ object crud {
       )
     }
 
-  def edit(tour: Tournament, form: Form[_])(implicit ctx: Context) =
+  def edit(tour: Tournament, form: Form[?])(implicit ctx: Context) =
     layout(
       title = tour.name(),
       css = "mod.form"
@@ -56,7 +55,7 @@ object crud {
             span("Created by ", usernameOrId(tour.createdBy), " on ", showDate(tour.createdAt))
           ),
           st.form(
-            cls := "box__top__actions",
+            cls    := "box__top__actions",
             action := routes.TournamentCrud.cloneT(tour.id),
             method := "get"
           )(
@@ -68,7 +67,7 @@ object crud {
       )
     }
 
-  private def inForm(form: Form[_], tour: Option[Tournament])(implicit ctx: Context) = {
+  private def inForm(form: Form[?], tour: Option[Tournament])(implicit ctx: Context) = {
     def disabledAfterStart = tour.exists(!_.isCreated)
 
     frag(

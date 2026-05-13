@@ -1,7 +1,6 @@
 package lila.forum
 
 import org.joda.time.DateTime
-import scala.concurrent.duration._
 
 import lila.user.User
 
@@ -35,14 +34,14 @@ case class Post(
 
   def showUserIdOrAuthor = if (erased) "<erased>" else userId | showAuthor
 
-  def isTeam = categId startsWith teamSlug("")
+  def isTeam = categId.startsWith(teamSlug(""))
 
   def updatedOrCreatedAt = updatedAt | createdAt
 
   def canStillBeEdited =
     updatedOrCreatedAt.plus(permitEditsFor.toMillis).isAfterNow
 
-  def canBeEditedBy(editingId: User.ID): Boolean = userId has editingId
+  def canBeEditedBy(editingId: User.ID): Boolean = userId.has(editingId)
 
   def shouldShowEditForm(editingId: User.ID) =
     canBeEditedBy(editingId) &&
@@ -88,7 +87,7 @@ object Post {
     val Thinking     = "thinking"
     val Heart        = "heart"
     val PlayStrategy = "PlayStrategy"
-    //val Horsey       = "horsey"
+    // val Horsey       = "horsey"
 
     val list: List[String]    = List(PlusOne, MinusOne, Laugh, Thinking, Heart, PlayStrategy)
     val set                   = list.toSet
@@ -111,10 +110,10 @@ object Post {
       troll: Boolean,
       hidden: Boolean,
       modIcon: Option[Boolean]
-  ): Post = {
+  ): Post =
 
     Post(
-      _id = lila.common.ThreadLocalRandom nextString idSize,
+      _id = lila.common.ThreadLocalRandom.nextString(idSize),
       topicId = topicId,
       author = author,
       userId = userId.some,
@@ -127,5 +126,4 @@ object Post {
       categId = categId,
       modIcon = modIcon
     )
-  }
 }

@@ -182,7 +182,7 @@ object PerfType {
   def standardBySpeed(speed: Speed): PerfType =
     allSpeed.filter(_.category == Left(Left(speed))) match {
       case List(pt) => pt
-      //unnecessary default to keep compiler happy
+      // unnecessary default to keep compiler happy
       case _ => orDefaultSpeed("")
     }
 
@@ -214,9 +214,7 @@ object PerfType {
 
   val translated: Set[PerfType] =
     all
-      .filter(p =>
-        (List("rapid", "classical", "correspondence").contains(p.key) || p.key.startsWith("puzzle"))
-      )
+      .filter(p => List("rapid", "classical", "correspondence").contains(p.key) || p.key.startsWith("puzzle"))
       .toSet
 
   def desc(pt: PerfType)(implicit lang: Lang): String =

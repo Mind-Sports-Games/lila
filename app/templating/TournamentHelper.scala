@@ -4,14 +4,13 @@ package templating
 import play.api.i18n.Lang
 import play.api.libs.json.Json
 
-import controllers.routes
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 import lila.rating.PerfType
 import strategygames.Speed
 import lila.tournament.{ Schedule, Tournament }
 import lila.user.User
 
-trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
+trait TournamentHelper { self: I18nHelper & DateHelper & UserHelper =>
 
   def netBaseUrl: String
 
@@ -31,23 +30,23 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
   def tournamentLink(tour: Tournament)(implicit lang: Lang): Frag =
     a(
       dataIcon := "g",
-      cls := (if (tour.isScheduled) "text is-gold" else "text"),
-      href := routes.Tournament.show(tour.id).url
+      cls      := (if (tour.isScheduled) "text is-gold" else "text"),
+      href     := routes.Tournament.show(tour.id).url
     )(tour.name())
 
   def tournamentLink(tourId: String)(implicit lang: Lang): Frag =
     a(
       dataIcon := "g",
-      cls := "text",
-      href := routes.Tournament.show(tourId).url
+      cls      := "text",
+      href     := routes.Tournament.show(tourId).url
     )(tournamentIdToName(tourId))
 
   def tournamentIdToName(id: String)(implicit lang: Lang) =
-    env.tournament.getTourName get id getOrElse "Tournament"
+    env.tournament.getTourName.get(id) getOrElse "Tournament"
 
   object scheduledTournamentNameShortHtml {
     private def icon(c: Char) = s"""<span data-icon="$c"></span>"""
-    private val replacements = List(
+    private val replacements  = List(
       "PlayStrategy " -> "",
       "Marathon"      -> icon('\\'),
       "HyperBullet"   -> s"H${icon(Speed.Bullet.perfIcon)}",
@@ -58,7 +57,7 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
     ) ++ PerfType.leaderboardable
       .filterNot(PerfType.translated.contains)
       .map { pt =>
-        pt.trans(lila.i18n.defaultLang) -> icon(pt.iconChar)
+        pt.trans(using lila.i18n.defaultLang) -> icon(pt.iconChar)
       }
       .sortBy(-_._1.length) ++
       List(
@@ -73,7 +72,7 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
         else if (name.contains("End of Year"))
           (name.split(" ").drop(1).dropRight(2) ++ name.split(" ").takeRight(1)).toList.mkString(" ")
         else
-          //old replacements
+          // old replacements
           replacements.foldLeft(name) { case (n, (from, to)) =>
             n.replace(from, to)
           }
@@ -83,6 +82,6 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
   def tournamentIconChar(tour: Tournament): String =
     tour.schedule.map(_.freq) match {
       case Some(Schedule.Freq.Marathon | Schedule.Freq.ExperimentalMarathon) => "\\"
-      case _                                                                 => tour.spotlight.flatMap(_.iconFont) | tour.iconChar.toString
+      case _ => tour.spotlight.flatMap(_.iconFont) | tour.iconChar.toString
     }
 }

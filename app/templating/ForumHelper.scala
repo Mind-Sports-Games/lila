@@ -4,10 +4,10 @@ package templating
 import play.api.i18n.Lang
 
 import lila.api.Context
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 import lila.forum.Post
 
-trait ForumHelper { self: UserHelper with StringHelper with HasEnv =>
+trait ForumHelper { self: UserHelper & StringHelper & HasEnv =>
 
   private object Granter extends lila.forum.Granter {
 
@@ -19,7 +19,7 @@ trait ForumHelper { self: UserHelper with StringHelper with HasEnv =>
   }
 
   def isGrantedWrite(categSlug: String)(implicit ctx: Context) =
-    Granter isGrantedWrite categSlug
+    Granter.isGrantedWrite(categSlug)
 
   def authorLink(
       post: Post,

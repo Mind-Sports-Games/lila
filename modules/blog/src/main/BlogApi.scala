@@ -1,11 +1,11 @@
 package lila.blog
 
-import io.prismic._
+import io.prismic.*
 import play.api.mvc.RequestHeader
 import play.api.libs.ws.StandaloneWSClient
 
 import lila.common.config.MaxPerPage
-import lila.common.paginator._
+import lila.common.paginator.*
 
 final class BlogApi(
     config: BlogConfig
@@ -45,7 +45,7 @@ final class BlogApi(
 
   def one(prismic: BlogApi.Context, id: String): Fu[Option[Document]] = one(prismic.api, prismic.ref.some, id)
 
-  def byYear(prismic: BlogApi.Context, year: Int): Fu[List[MiniPost]] = {
+  def byYear(prismic: BlogApi.Context, year: Int): Fu[List[MiniPost]] =
     prismic.api
       .forms("everything")
       .ref(prismic.ref)
@@ -54,11 +54,10 @@ final class BlogApi(
       .pageSize(100) // prismic max
       .submit()
       .fold(_ => Nil, _.results flatMap MiniPost.fromDocument(collection, "wide"))
-  }
 
   def context(
       req: RequestHeader
-  )(implicit linkResolver: (Api, Option[String]) => DocumentLinkResolver): Fu[BlogApi.Context] = {
+  )(implicit linkResolver: (Api, Option[String]) => DocumentLinkResolver): Fu[BlogApi.Context] =
     prismicApi map { api =>
       val ref = resolveRef(api) {
         req.cookies
@@ -68,20 +67,18 @@ final class BlogApi(
       }
       BlogApi.Context(api, ref | api.master.ref, linkResolver(api, ref))
     }
-  }
 
   def masterContext(implicit
       linkResolver: (Api, Option[String]) => DocumentLinkResolver
-  ): Fu[BlogApi.Context] = {
+  ): Fu[BlogApi.Context] =
     prismicApi map { api =>
       BlogApi.Context(api, api.master.ref, linkResolver(api, none))
     }
-  }
 
   def all(page: Int = 1)(implicit prismic: BlogApi.Context): Fu[List[Document]] =
     recent(prismic.api, page, MaxPerPage(50), none) flatMap { res =>
-      val docs = res.??(_.currentPageResults).toList
-      (docs.nonEmpty ?? all(page + 1)) map (docs ::: _)
+      val docs = res.so(_.currentPageResults).toList
+      (docs.nonEmpty so all(page + 1)) map (docs ::: _)
     }
 
   private def resolveRef(api: Api)(ref: Option[String]) =

@@ -1,17 +1,17 @@
 package lila.insight
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.db.AsyncColl
 import lila.rating.BSONHandlers.perfTypeIdHandler
 import lila.rating.PerfType
 
 final private class Storage(val coll: AsyncColl)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import Storage._
-  import BSONHandlers._
-  import InsightEntry.{ BSONFields => F }
+  import Storage.*
+  import BSONHandlers.*
+  import InsightEntry.BSONFields as F
 
   def fetchFirst(userId: String): Fu[Option[InsightEntry]] =
     coll(_.find(selectUserId(userId)).sort(sortChronological).one[InsightEntry])
@@ -49,7 +49,7 @@ final private class Storage(val coll: AsyncColl)(implicit ec: scala.concurrent.E
       _.aggregateList(
         maxDocs = 50
       ) { framework =>
-        import framework._
+        import framework.*
         Match(BSONDocument(F.userId -> userId)) -> List(
           GroupField(F.perf)("nb" -> SumAll)
         )
@@ -66,7 +66,7 @@ final private class Storage(val coll: AsyncColl)(implicit ec: scala.concurrent.E
 
 private object Storage {
 
-  import InsightEntry.{ BSONFields => F }
+  import InsightEntry.BSONFields as F
 
   def selectId(id: String)     = BSONDocument(F.id -> id)
   def selectUserId(id: String) = BSONDocument(F.userId -> id)

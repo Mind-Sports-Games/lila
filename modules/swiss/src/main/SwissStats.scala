@@ -1,10 +1,10 @@
 package lila.swiss
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import reactivemongo.api.bson.Macros
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import reactivemongo.api.bson.BSONDocumentHandler
 
 case class SwissStats(
@@ -26,10 +26,10 @@ final class SwissStatsApi(
     mat: akka.stream.Materializer
 ) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   def apply(swiss: Swiss): Fu[Option[SwissStats]] =
-    swiss.isFinished ?? cache.get(swiss.id).dmap(some).dmap(_.filter(_.games > 0))
+    swiss.isFinished so cache.get(swiss.id).dmap(some).dmap(_.filter(_.games > 0))
 
   implicit private val statsBSONHandler: BSONDocumentHandler[SwissStats] = Macros.handler[SwissStats]
 
@@ -61,8 +61,8 @@ final class SwissStatsApi(
               case (games, p1Wins, p2Wins, draws) =>
                 sheet.outcomes.foldLeft((0, 0)) { case ((byes, absences), outcome) =>
                   (
-                    byes + (outcome.head == SwissSheet.Bye).??(1),
-                    absences + (outcome.head == SwissSheet.Absent).??(1)
+                    byes + (outcome.head == SwissSheet.Bye).so(1),
+                    absences + (outcome.head == SwissSheet.Absent).so(1)
                   )
                 } match {
                   case (byes, absences) =>

@@ -1,9 +1,9 @@
 package lila.msg
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.user.User
-import lila.common.Json._
+import lila.common.Json.*
 import lila.common.LightUser
 import lila.relation.Relations
 
@@ -46,9 +46,9 @@ final class MsgJson(
     }
 
   private def withContacts(me: User, threads: List[MsgThread]): Fu[List[MsgThread.WithContact]] =
-    lightUserApi.asyncMany(threads.map(_ other me)) map { users =>
+    lightUserApi.asyncMany(threads.map(_.other(me))) map { users =>
       threads.zip(users).map { case (thread, userOption) =>
-        MsgThread.WithContact(thread, userOption | LightUser.fallback(thread other me))
+        MsgThread.WithContact(thread, userOption | LightUser.fallback(thread.other(me)))
       }
     }
 

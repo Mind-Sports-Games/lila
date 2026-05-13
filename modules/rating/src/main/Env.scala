@@ -1,11 +1,11 @@
 package lila.rating
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 
 @Module
 final class Env(settingStore: lila.memo.SettingStore.Builder) {
 
-  import RatingFactor.implicits._
+  import RatingFactor.implicits.*
 
   lazy val ratingFactorsSetting = settingStore[RatingFactors](
     "ratingFactor",
@@ -13,5 +13,5 @@ final class Env(settingStore: lila.memo.SettingStore.Builder) {
     text = "Rating gain factor per perf type".some
   )
 
-  val getFactors = ratingFactorsSetting.get _
+  val getFactors = () => ratingFactorsSetting.get()
 }

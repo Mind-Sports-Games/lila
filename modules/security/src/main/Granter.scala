@@ -17,7 +17,7 @@ object Granter {
     apply(f)(holder.user)
 
   def apply(permission: Permission, roles: Seq[String]): Boolean =
-    Permission(roles).exists(_ is permission)
+    Permission(roles).exists(_.is(permission))
 
   def byRoles(f: Permission.Selector)(roles: Seq[String]): Boolean =
     apply(f(Permission), roles)
@@ -33,5 +33,4 @@ object Granter {
         )(permission)
       }
     }
-
 }

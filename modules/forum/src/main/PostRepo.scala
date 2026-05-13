@@ -4,8 +4,8 @@ import org.joda.time.DateTime
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.ReadPreference
 
-import Filter._
-import lila.db.dsl._
+import Filter.*
+import lila.db.dsl.*
 import lila.user.User
 
 final class PostRepo(val coll: Coll, filter: Filter = Safe)(implicit
@@ -21,7 +21,7 @@ final class PostRepo(val coll: Coll, filter: Filter = Safe)(implicit
 
   import BSONHandlers.PostBSONHandler
 
-  private val noTroll = $doc("troll" -> false)
+  private val noTroll     = $doc("troll" -> false)
   private val trollFilter = filter match {
     case Safe       => noTroll
     case SafeAnd(u) => $or(noTroll, $doc("userId" -> u))
@@ -80,19 +80,19 @@ final class PostRepo(val coll: Coll, filter: Filter = Safe)(implicit
   def selectTopic(topicId: String) = $doc("topicId" -> topicId) ++ trollFilter
 
   def selectCateg(categId: String)         = $doc("categId" -> categId) ++ trollFilter
-  def selectCategs(categIds: List[String]) = $doc("categId" $in categIds) ++ trollFilter
+  def selectCategs(categIds: List[String]) = $doc("categId".$in(categIds)) ++ trollFilter
 
   val selectNotHidden = $doc("hidden" -> false)
-  val selectNotErased = $doc("erasedAt" $exists false)
+  val selectNotErased = $doc("erasedAt".$exists(false))
 
   def selectLangs(langs: List[String]) =
     if (langs.isEmpty) $empty
-    else $doc("lang" $in langs)
+    else $doc("lang".$in(langs))
 
   def findDuplicate(post: Post): Fu[Option[Post]] =
     coll.one[Post](
       $doc(
-        "createdAt" $gt DateTime.now.minusHours(1),
+        "createdAt".$gt(DateTime.now.minusHours(1)),
         "userId" -> ~post.userId,
         "text"   -> post.text
       )
@@ -108,6 +108,6 @@ final class PostRepo(val coll: Coll, filter: Filter = Safe)(implicit
 
   def nonGhostCursor =
     coll
-      .find($doc("userId" $ne User.ghostId))
+      .find($doc("userId".$ne(User.ghostId)))
       .cursor[Post](ReadPreference.secondaryPreferred)
 }

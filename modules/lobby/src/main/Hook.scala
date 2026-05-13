@@ -4,7 +4,7 @@ import strategygames.{ ClockConfig, GameLogic, Mode, Speed }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import play.api.i18n.Lang
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.game.PerfPicker
 import lila.rating.RatingRange
@@ -28,11 +28,11 @@ case class Hook(
     boardApi: Boolean
 ) {
 
-  val realPlayerIndex = PlayerIndex orDefault playerIndex
+  val realPlayerIndex = PlayerIndex.orDefault(playerIndex)
 
   val realVariant = Variant.orDefault(lib, variant)
 
-  val realMode = Mode orDefault mode
+  val realMode = Mode.orDefault(mode)
 
   val isAuth = user.nonEmpty
 
@@ -42,30 +42,30 @@ case class Hook(
       lib == h.lib &&
       variant == h.variant &&
       clock == h.clock &&
-      (realPlayerIndex compatibleWith h.realPlayerIndex) &&
+      (realPlayerIndex.compatibleWith(h.realPlayerIndex)) &&
       ratingRangeCompatibleWith(h) && h.ratingRangeCompatibleWith(this) &&
       (userId.isEmpty || userId != h.userId)
 
   private def ratingRangeCompatibleWith(h: Hook) =
     realRatingRange.fold(true) { range =>
-      h.rating ?? range.contains
+      h.rating so range.contains
     }
 
-  lazy val realRatingRange: Option[RatingRange] = isAuth ?? {
-    RatingRange noneIfDefault ratingRange
+  lazy val realRatingRange: Option[RatingRange] = isAuth so {
+    RatingRange.noneIfDefault(ratingRange)
   }
 
   def userId   = user.map(_.id)
   def username = user.fold(User.anonymous)(_.username)
-  def lame     = user ?? (_.lame)
+  def lame     = user so (_.lame)
 
   lazy val perfType = PerfPicker.perfType(speed, realVariant, none)
 
-  lazy val perf: Option[LobbyPerf] = for { u <- user; pt <- perfType } yield u perfAt pt
+  lazy val perf: Option[LobbyPerf] = for { u <- user; pt <- perfType } yield u.perfAt(pt)
   def rating: Option[Int]          = perf.map(_.rating)
 
   val message = s"[Play](<https://playstrategy.org>) live **${VariantKeys
-    .variantName(realVariant)}** with ${user.fold(User.anonymous)(u => "@" + u.username)} (${clock.show})"
+      .variantName(realVariant)}** with ${user.fold(User.anonymous)(u => "@" + u.username)} (${clock.show})"
 
   def render(implicit lang: Lang): JsObject =
     Json
@@ -100,12 +100,12 @@ case class Hook(
     lila.pool.HookThieve.PoolHook(
       hookId = id,
       member = lila.pool.PoolMember(
-        userId = user.??(_.id),
+        userId = user.so(_.id),
         sri = sri,
         rating = rating | lila.rating.Glicko.default.intRating,
         ratingRange = realRatingRange,
-        lame = user.??(_.lame),
-        blocking = lila.pool.PoolMember.BlockedUsers(user.??(_.blocking)),
+        lame = user.so(_.lame),
+        blocking = lila.pool.PoolMember.BlockedUsers(user.so(_.blocking)),
         rageSitCounter = 0
       )
     )
@@ -130,7 +130,7 @@ object Hook {
       boardApi: Boolean = false
   ): Hook =
     new Hook(
-      id = lila.common.ThreadLocalRandom nextString idSize,
+      id = lila.common.ThreadLocalRandom.nextString(idSize),
       sri = sri,
       lib = variant.gameLogic,
       variant = variant.id,

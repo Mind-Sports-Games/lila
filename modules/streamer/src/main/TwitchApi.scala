@@ -1,17 +1,18 @@
 package lila.streamer
 
-import play.api.libs.json._
-import play.api.libs.ws.DefaultBodyWritables._
-import play.api.libs.ws.JsonBodyReadables._
+import play.api.libs.json.*
+import play.api.libs.ws.DefaultBodyWritables.*
+import play.api.libs.ws.JsonBodyReadables.*
 import play.api.libs.ws.StandaloneWSClient
 import scala.concurrent.ExecutionContext
 
 import lila.common.config.Secret
+import lila.common.extensions.*
 
 final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(implicit ec: ExecutionContext) {
 
   import Stream.Twitch
-  import Twitch.Reads._
+  import Twitch.Reads.*
 
   private var tmpToken = Secret("init")
 
@@ -20,15 +21,15 @@ final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(impl
       page: Int,
       pagination: Option[Twitch.Pagination]
   ): Fu[List[Twitch.TwitchStream]] =
-    (config.clientId.nonEmpty && config.secret.value.nonEmpty && page < 10) ?? {
+    (config.clientId.nonEmpty && config.secret.value.nonEmpty && page < 10) so {
       val query = List(
         "game_id" -> "490413", // 743 - chess //  490413 - Board games
-        "first"   -> "100" // max results per page
+        "first"   -> "100"     // max results per page
       ) ::: List(
         pagination.flatMap(_.cursor).map { "after" -> _ }
       ).flatten
       ws.url("https://api.twitch.tv/helix/streams")
-        .withQueryStringParameters(query: _*)
+        .withQueryStringParameters(query*)
         .withHttpHeaders(
           "Client-ID"     -> config.clientId,
           "Authorization" -> s"Bearer ${tmpToken.value}"
@@ -36,7 +37,7 @@ final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(impl
         .get()
         .flatMap {
           case res if res.status == 200 =>
-            res.body[JsValue].validate[Twitch.Result](twitchResultReads) match {
+            res.body[JsValue].validate[Twitch.Result](using twitchResultReads) match {
               case JsSuccess(result, _) => fuccess(result)
               case JsError(err)         => fufail(s"twitch $err ${lila.log.http(res.status, res.body)}")
             }
@@ -67,7 +68,7 @@ final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(impl
       .post(Map.empty[String, String])
       .flatMap {
         case res if res.status == 200 =>
-          res.body[JsValue].asOpt[JsObject].flatMap(_ str "access_token") match {
+          res.body[JsValue].asOpt[JsObject].flatMap(_.str("access_token")) match {
             case Some(token) =>
               tmpToken = Secret(token)
               funit

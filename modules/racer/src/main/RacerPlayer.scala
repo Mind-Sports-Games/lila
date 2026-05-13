@@ -15,7 +15,7 @@ case class RacerPlayer(id: RacerPlayer.Id, createdAt: DateTime, score: Int) {
 
   lazy val name: String = id match {
     case Id.User(n)  => n
-    case Id.Anon(id) => CuteNameGenerator fromSeed id.hashCode
+    case Id.Anon(id) => CuteNameGenerator.fromSeed(id.hashCode)
   }
 }
 
@@ -25,7 +25,7 @@ object RacerPlayer {
     case class User(name: String)      extends Id
     case class Anon(sessionId: String) extends Id
     def apply(str: String) =
-      if (str startsWith "@") Anon(str drop 1)
+      if (str.startsWith("@")) Anon(str drop 1)
       else User(str)
   }
 

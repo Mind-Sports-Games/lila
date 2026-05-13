@@ -1,18 +1,17 @@
 package views.html.team
 
-import controllers.routes
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.richText
 
 object request {
 
-  import trans.team._
+  import trans.team.*
 
-  def requestForm(t: lila.team.Team, form: Form[_])(implicit ctx: Context) = {
+  def requestForm(t: lila.team.Team, form: Form[?])(implicit ctx: Context) = {
 
     val title = s"${joinTeam.txt()} ${t.name}"
 
@@ -26,11 +25,11 @@ object request {
           h1(title),
           p(style := "margin:2em 0")(richText(t.description)),
           postForm(cls := "form3", action := routes.Team.requestCreate(t.id))(
-            !t.open ?? frag(
+            !t.open so frag(
               form3.group(form("message"), trans.message())(form3.textarea(_)()),
               p(willBeReviewed())
             ),
-            t.password.nonEmpty ?? form3.passwordModified(form("password"), teamPassword())(
+            t.password.nonEmpty so form3.passwordModified(form("password"), teamPassword())(
               autocomplete := "new-password"
             ),
             form3.globalError(form),
@@ -71,8 +70,8 @@ object request {
             td(cls := "process")(
               postForm(cls := "process-request", action := routes.Team.requestProcess(request.id))(
                 input(
-                  tpe := "hidden",
-                  name := "url",
+                  tpe   := "hidden",
+                  name  := "url",
                   value := t.fold(routes.Team.requests)(te => routes.Team.show(te.id))
                 ),
                 button(name := "process", cls := "button button-empty button-red", value := "decline")(

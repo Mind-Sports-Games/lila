@@ -1,10 +1,8 @@
 package views.html.oAuth.token
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
-import controllers.routes
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object index {
 
@@ -75,7 +73,7 @@ object index {
               td(cls := "action")(
                 postForm(action := routes.OAuthToken.delete(t.publicId.stringify))(
                   submitButton(
-                    cls := "button button-red button-empty confirm",
+                    cls      := "button button-red button-empty confirm",
                     st.title := "Delete this access token"
                   )("Delete")
                 )

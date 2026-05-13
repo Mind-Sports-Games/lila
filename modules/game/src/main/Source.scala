@@ -20,7 +20,7 @@ object Source {
   case object Pool       extends Source(id = 12)
   case object Swiss      extends Source(id = 13)
 
-  val all = List(Lobby, Friend, Ai, Api, Tournament, Position, Import, Simul, Relay, Pool, Swiss)
+  val all  = List(Lobby, Friend, Ai, Api, Tournament, Position, Import, Simul, Relay, Pool, Swiss)
   val byId = all map { v =>
     (v.id, v)
   } toMap

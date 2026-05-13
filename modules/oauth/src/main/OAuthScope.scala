@@ -102,10 +102,10 @@ object OAuthScope {
 
   def select(selectors: Iterable[OAuthScope.type => OAuthScope]) = selectors.map(_(OAuthScope)).toList
 
-  import reactivemongo.api.bson._
-  import lila.db.dsl._
+  import reactivemongo.api.bson.*
+  import lila.db.dsl.*
   implicit private[oauth] val scopeHandler: BSONHandler[OAuthScope] = tryHandler[OAuthScope](
-    { case b: BSONString => OAuthScope.byKey.get(b.value) toTry s"No such scope: ${b.value}" },
+    { case b: BSONString => OAuthScope.byKey.get(b.value).toTry(s"No such scope: ${b.value}") },
     s => BSONString(s.key)
   )
 }

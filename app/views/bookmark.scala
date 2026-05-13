@@ -1,10 +1,8 @@
 package views.html
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
-import controllers.routes
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object bookmark {
 
@@ -15,7 +13,7 @@ object bookmark {
           "bookmark"   -> true,
           "bookmarked" -> bookmarked
         ),
-        href := routes.Game.bookmark(g.id),
+        href  := routes.Game.bookmark(g.id),
         title := trans.bookmarkThisGame.txt()
       )(
         iconTag("t")(cls := "on is3"),

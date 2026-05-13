@@ -3,15 +3,14 @@ package templating
 
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
-import org.joda.time.format._
+import org.joda.time.format.*
 import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.{ DateTime, DateTimeZone, DurationFieldType, Period, PeriodType }
 import play.api.i18n.Lang
-import scala.collection.mutable
 
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 
-trait DateHelper { self: I18nHelper with StringHelper =>
+trait DateHelper { self: I18nHelper & StringHelper =>
 
   private val dateTimeStyle = "MS"
   private val dateStyle     = "M-"
@@ -19,16 +18,18 @@ trait DateHelper { self: I18nHelper with StringHelper =>
   private val dateTimeFormatters = new ConcurrentHashMap[String, DateTimeFormatter]
   private val dateFormatters     = new ConcurrentHashMap[String, DateTimeFormatter]
   private val periodFormatters   = new ConcurrentHashMap[String, PeriodFormatter]
-  private val periodType = PeriodType forFields Array(
-    DurationFieldType.days,
-    DurationFieldType.hours,
-    DurationFieldType.minutes
+  private val periodType         = PeriodType.forFields(
+    Array(
+      DurationFieldType.days,
+      DurationFieldType.hours,
+      DurationFieldType.minutes
+    )
   )
 
   private val isoFormatter = ISODateTimeFormat.dateTime
 
-  private val englishDateFormatter     = DateTimeFormat forStyle dateStyle
-  private val englishDateTimeFormatter = DateTimeFormat forStyle dateTimeStyle
+  private val englishDateFormatter     = DateTimeFormat.forStyle(dateStyle)
+  private val englishDateTimeFormatter = DateTimeFormat.forStyle(dateTimeStyle)
 
   private def dateTimeFormatter(implicit lang: Lang): DateTimeFormatter =
     dateTimeFormatters.computeIfAbsent(
@@ -45,41 +46,41 @@ trait DateHelper { self: I18nHelper with StringHelper =>
   private def periodFormatter(implicit lang: Lang): PeriodFormatter =
     periodFormatters.computeIfAbsent(
       lang.code, {
-        Locale setDefault Locale.ENGLISH
+        Locale.setDefault(Locale.ENGLISH)
         _ => PeriodFormat.wordBased(lang.toLocale)
       }
     )
 
   def showDateTimeZone(date: DateTime, zone: DateTimeZone)(implicit lang: Lang): String =
-    dateTimeFormatter print date.toDateTime(zone)
+    dateTimeFormatter.print(date.toDateTime(zone))
 
   def showDateTimeUTC(date: DateTime)(implicit lang: Lang): String =
     showDateTimeZone(date, DateTimeZone.UTC)
 
   def showDate(date: DateTime)(implicit lang: Lang): String =
-    dateFormatter print date
+    dateFormatter.print(date)
 
   def showEnglishDate(date: DateTime): String =
-    englishDateFormatter print date
+    englishDateFormatter.print(date)
   def showEnglishDateTime(date: DateTime): String =
-    englishDateTimeFormatter print date
+    englishDateTimeFormatter.print(date)
 
   def semanticDate(date: DateTime)(implicit lang: Lang): Tag =
     timeTag(datetimeAttr := isoDate(date))(showDate(date))
 
   def showPeriod(period: Period)(implicit lang: Lang): String =
-    periodFormatter print period.normalizedStandard(periodType)
+    periodFormatter.print(period.normalizedStandard(periodType))
 
   def showMinutes(minutes: Int)(implicit lang: Lang): String =
     showPeriod(new Period(minutes * 60 * 1000L))
 
-  def isoDate(date: DateTime): String = isoFormatter print date
+  def isoDate(date: DateTime): String = isoFormatter.print(date)
 
   private val oneDayMillis = 1000 * 60 * 60 * 24
 
   def momentFromNow(date: DateTime, alwaysRelative: Boolean = false, once: Boolean = false): Tag = {
     if (!alwaysRelative && (date.getMillis - nowMillis) > oneDayMillis) absClientDateTime(date)
-    else timeTag(cls := s"timeago${once ?? " once"}", datetimeAttr := isoDate(date))(nbsp)
+    else timeTag(cls := s"timeago${once so " once"}", datetimeAttr := isoDate(date))(nbsp)
   }
 
   def momentFromNowWithPreload(date: DateTime, alwaysRelative: Boolean = false, once: Boolean = false): Frag =
@@ -91,14 +92,14 @@ trait DateHelper { self: I18nHelper with StringHelper =>
   def momentFromNowOnce(date: DateTime) = momentFromNow(date, once = true)
 
   def secondsFromNow(seconds: Int, alwaysRelative: Boolean = false) =
-    momentFromNow(DateTime.now plusSeconds seconds, alwaysRelative)
+    momentFromNow(DateTime.now.plusSeconds(seconds), alwaysRelative)
 
   def momentFromNowServer(date: DateTime): Frag =
     timeTag(title := showEnglishDateTime(date))(momentFromNowServerText(date))
 
   def momentFromNowServerText(date: DateTime): Frag = {
     val (dateSec, nowSec) = (date.getMillis / 1000, nowSeconds)
-    val seconds           = (nowSec - dateSec).toInt atLeast 0
+    val seconds           = (nowSec - dateSec).toInt.atLeast(0)
     val minutes           = seconds / 60
     val hours             = minutes / 60
     val days              = hours / 24
@@ -114,8 +115,10 @@ trait DateHelper { self: I18nHelper with StringHelper =>
     else s"${pluralize("year", years)} ago"
   }
 
-  private val atomDateFormatter        = ISODateTimeFormat.dateTime
-  def atomDate(date: DateTime): String = atomDateFormatter print date
+  private val atomDateFormatter                                         = ISODateTimeFormat.dateTime
+  def atomDate(date: DateTime): String                                  = atomDateFormatter.print(date)
   def atomDate(field: String)(doc: io.prismic.Document): Option[String] =
-    doc getDate field map (_.value.toDateTimeAtStartOfDay) map atomDate
+    doc getDate field map (d =>
+      new DateTime(d.value.atStartOfDay(java.time.ZoneOffset.UTC).toInstant.toEpochMilli)
+    ) map atomDate
 }

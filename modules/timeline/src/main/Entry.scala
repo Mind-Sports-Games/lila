@@ -1,13 +1,13 @@
 package lila.timeline
 
 import org.joda.time.DateTime
-import play.api.libs.json._
-import reactivemongo.api.bson._
+import play.api.libs.json.*
+import reactivemongo.api.bson.*
 import scala.util.{ Failure, Success, Try }
 
 import lila.common.Json.jodaWrites
-import lila.db.dsl._
-import lila.hub.actorApi.timeline._
+import lila.db.dsl.*
+import lila.hub.actorApi.timeline.*
 
 case class Entry(
     _id: BSONObjectID,
@@ -17,8 +17,8 @@ case class Entry(
     date: DateTime
 ) {
 
-  import Entry._
-  import atomBsonHandlers._
+  import Entry.*
+  import atomBsonHandlers.*
 
   def similarTo(other: Entry) = typ == other.typ && data == other.data
 
@@ -46,14 +46,14 @@ case class Entry(
   }) match {
     case Success(atom)       => Some(atom)
     case Failure(Deprecated) => none
-    case Failure(err) =>
+    case Failure(err)        =>
       lila.log("timeline").warn(err.getMessage)
       none
   }
 
-  def userIds = decode.??(_.userIds)
+  def userIds = decode.so(_.userIds)
 
-  def okForKid = decode ?? (_.okForKid)
+  def okForKid = decode so (_.okForKid)
 }
 
 object Entry {
@@ -63,7 +63,7 @@ object Entry {
   private def toBson[A](data: A)(implicit writer: BSONDocumentWriter[A]) = writer.writeTry(data).get
 
   private[timeline] def make(data: Atom): Entry = {
-    import atomBsonHandlers._
+    import atomBsonHandlers.*
     data match {
       case d: Follow      => "follow"       -> toBson(d)
       case d: TeamJoin    => "team-join"    -> toBson(d)
@@ -73,12 +73,12 @@ object Entry {
       case d: GameEnd     => "game-end"     -> toBson(d)
       case d: SimulCreate => "simul-create" -> toBson(d)
       case d: SimulJoin   => "simul-join"   -> toBson(d)
-      case d: StudyCreate => "study-create" -> toBson(d)(studyCreateHandler)
-      case d: StudyLike   => "study-like"   -> toBson(d)(studyLikeHandler)
-      case d: PlanStart   => "plan-start"   -> toBson(d)(planStartHandler)
-      case d: PlanRenew   => "plan-renew"   -> toBson(d)(planRenewHandler)
-      case d: BlogPost    => "blog-post"    -> toBson(d)(blogPostHandler)
-      case d: StreamStart => "stream-start" -> toBson(d)(streamStartHandler)
+      case d: StudyCreate => "study-create" -> toBson(d)(using studyCreateHandler)
+      case d: StudyLike   => "study-like"   -> toBson(d)(using studyLikeHandler)
+      case d: PlanStart   => "plan-start"   -> toBson(d)(using planStartHandler)
+      case d: PlanRenew   => "plan-renew"   -> toBson(d)(using planRenewHandler)
+      case d: BlogPost    => "blog-post"    -> toBson(d)(using blogPostHandler)
+      case d: StreamStart => "stream-start" -> toBson(d)(using streamStartHandler)
     }
   } match {
     case (typ, bson) =>
@@ -117,7 +117,7 @@ object Entry {
     implicit val planRenewWrite: OWrites[PlanRenew]     = Json.writes[PlanRenew]
     implicit val blogPostWrite: OWrites[BlogPost]       = Json.writes[BlogPost]
     implicit val streamStartWrite: OWrites[StreamStart] = Json.writes[StreamStart]
-    implicit val atomWrite: Writes[Atom] = Writes[Atom] {
+    implicit val atomWrite: Writes[Atom]                = Writes[Atom] {
       case d: Follow      => followWrite writes d
       case d: TeamJoin    => teamJoinWrite writes d
       case d: TeamCreate  => teamCreateWrite writes d
@@ -138,7 +138,7 @@ object Entry {
   implicit val EntryBSONHandler: BSONDocumentHandler[Entry] = Macros.handler[Entry]
 
   implicit val entryWrites: OWrites[Entry] = OWrites[Entry] { e =>
-    import atomJsonWrite._
+    import atomJsonWrite.*
     Json.obj(
       "type" -> e.typ,
       "data" -> e.decode,

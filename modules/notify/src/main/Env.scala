@@ -1,12 +1,12 @@
 package lila.notify
 
-import akka.actor._
-import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import akka.actor.*
+import com.softwaremill.macwire.*
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
 import lila.common.Bus
-import lila.common.config._
+import lila.common.config.*
 
 private class NotifyConfig(
     @ConfigName("collection.notify") val notifyColl: CollName,
@@ -26,7 +26,7 @@ final class Env(
     system: ActorSystem
 ) {
 
-  private val config = appConfig.get[NotifyConfig]("notify")(AutoConfig.loader)
+  private val config = appConfig.get[NotifyConfig]("notify")(using AutoConfig.loader)
 
   lazy val jsonHandlers = wire[JSONHandlers]
 
@@ -42,17 +42,19 @@ final class Env(
       Props(new Actor {
         def receive = {
           case lila.hub.actorApi.notify.Notified(userId) =>
-            api.markAllRead(Notification.Notifies(userId)).unit
+            api.markAllRead(Notification.Notifies(userId)).discard
           case lila.hub.actorApi.notify.NotifiedBatch(userIds) =>
-            api.markAllRead(userIds.map(Notification.Notifies.apply)).unit
+            api.markAllRead(userIds.map(Notification.Notifies.apply)).discard
           case lila.game.actorApi.CorresAlarmEvent(pov) =>
-            pov.player.userId ?? { userId =>
-              lila.game.Namer.playerText(pov.opponent)(getLightUser) foreach { opponent =>
-                api addNotification Notification.make(
-                  Notification.Notifies(userId),
-                  CorresAlarm(
-                    gameId = pov.gameId,
-                    opponent = opponent
+            pov.player.userId so { userId =>
+              lila.game.Namer.playerText(pov.opponent)(using getLightUser) foreach { opponent =>
+                api.addNotification(
+                  Notification.make(
+                    Notification.Notifies(userId),
+                    CorresAlarm(
+                      gameId = pov.gameId,
+                      opponent = opponent
+                    )
                   )
                 )
               }

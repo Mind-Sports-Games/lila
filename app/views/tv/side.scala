@@ -3,11 +3,9 @@ package views.html.tv
 import strategygames.variant.Variant
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.i18n.VariantKeys
-
-import controllers.routes
 
 object side {
 
@@ -20,11 +18,11 @@ object side {
       lila.tv.Tv.Channel.all.map { c =>
         a(
           href := s"$baseUrl/${c.key}",
-          cls := List(
+          cls  := List(
             "tv-channel" -> true,
             c.key        -> true,
             "active"     -> (c == channel),
-            "hidden" -> !((c.gameFamily == channel.gameFamily || c.familyChannel) && (champions
+            "hidden"     -> !((c.gameFamily == channel.gameFamily || c.familyChannel) && (champions
               .get(c)
               .nonEmpty || c.name == "All Games"))
           )
@@ -50,13 +48,13 @@ object side {
   private val separator = " • "
 
   def meta(pov: lila.game.Pov)(implicit ctx: Context): Frag = {
-    import pov._
+    import pov.*
     div(cls := "game__meta")(
       st.section(
         div(cls := "game__meta__infos", dataIcon := views.html.game.bits.gameIcon(game))(
           div(cls := "header")(
             div(cls := "setup")(
-              views.html.game.widgets showClock game,
+              views.html.game.widgets.showClock(game),
               separator,
               (if (game.rated) trans.rated else trans.casual).txt(),
               separator,

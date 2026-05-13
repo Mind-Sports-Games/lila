@@ -2,20 +2,18 @@ package views.html
 package account
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
-import controllers.routes
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object twoFactor {
 
-  import trans.tfa._
+  import trans.tfa.*
 
   private val qrCode = raw(
     """<div style="width: 276px; height: 276px; padding: 10px; background: p1; margin: 2em auto;"><div id="qrcode" style="width: 256px; height: 256px;"></div></div>"""
   )
 
-  def setup(u: lila.user.User, form: play.api.data.Form[_])(implicit ctx: Context) =
+  def setup(u: lila.user.User, form: play.api.data.Form[?])(implicit ctx: Context) =
     account.layout(
       title = s"${u.username} - ${twoFactorAuth.txt()}",
       active = "twofactor",
@@ -41,7 +39,7 @@ object twoFactor {
           qrCode,
           div(cls := "form-group")(
             ifYouCannotScanEnterX(
-              span(style := "background:p2;playerIndex:p2;")(~form("secret").value)
+              span(style := "background:p2;playerIndex:p2;")(~form("secret").value: String)
             )
           ),
           div(cls := "form-group explanation")(enterPassword()),
@@ -60,7 +58,7 @@ object twoFactor {
       )
     }
 
-  def disable(u: lila.user.User, form: play.api.data.Form[_])(implicit ctx: Context) =
+  def disable(u: lila.user.User, form: play.api.data.Form[?])(implicit ctx: Context) =
     account.layout(
       title = s"${u.username} - ${twoFactorAuth.txt()}",
       active = "twofactor"

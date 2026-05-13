@@ -1,8 +1,8 @@
 package lila.analyse
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 
-import lila.common.config._
+import lila.common.config.*
 
 @Module
 final class Env(

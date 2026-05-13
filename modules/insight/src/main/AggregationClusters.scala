@@ -1,13 +1,13 @@
 package lila.insight
 
-import reactivemongo.api.bson._
-import lila.db.dsl._
+import reactivemongo.api.bson.*
+import lila.db.dsl.*
 
 object AggregationClusters {
 
   def apply[X](question: Question[X], aggDocs: List[Bdoc]): List[Cluster[X]] =
     postSort(question) {
-      if (Metric isStacked question.metric) stacked(question, aggDocs)
+      if (Metric.isStacked(question.metric)) stacked(question, aggDocs)
       else single(question, aggDocs)
     }
 
@@ -29,13 +29,13 @@ object AggregationClusters {
   private def stacked[X](question: Question[X], aggDocs: List[Bdoc]): List[Cluster[X]] =
     for {
       doc <- aggDocs
-      metricValues = Metric valuesOf question.metric
+      metricValues = Metric.valuesOf(question.metric)
       x     <- getId[X](doc)(question.dimension.bson)
       stack <- doc.getAsOpt[List[StackEntry]]("stack")
       points = metricValues.map { case Metric.MetricValue(id, name) =>
-        name -> Point(stack.find(_.metric == id).??(_.v.toDouble.get))
+        name -> Point(stack.find(_.metric == id).so(_.v.toDouble.get))
       }
-      total = stack.map(_.v.toInt.get).sum
+      total    = stack.map(_.v.toInt.get).sum
       percents =
         if (total == 0) points
         else

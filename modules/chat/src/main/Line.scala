@@ -1,6 +1,6 @@
 package lila.chat
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 
 import lila.user.{ Title, User }
 
@@ -10,7 +10,7 @@ sealed trait Line {
   def deleted: Boolean
   def isSystem    = author == systemUserId
   def isHuman     = !isSystem
-  def humanAuthor = isHuman option author
+  def humanAuthor = isHuman.option(author)
   def troll: Boolean
   def userIdMaybe: Option[User.ID]
 }
@@ -25,7 +25,7 @@ case class UserLine(
 
   def author = username
 
-  def userId = User normalize username
+  def userId = User.normalize(username)
 
   def userIdMaybe = userId.some
 
@@ -50,7 +50,7 @@ object Line {
   val textMaxSize = 140
   val titleSep    = '~'
 
-  import reactivemongo.api.bson._
+  import reactivemongo.api.bson.*
 
   private val invalidLine = UserLine("", None, "[invalid character]", troll = false, deleted = true)
 
@@ -64,7 +64,7 @@ object Line {
     lineToStr
   )
 
-  private val UserLineRegex = """(?s)([\w-~]{2,}+)([ !?])(.++)""".r
+  private val UserLineRegex                                = """(?s)([\w-~]{2,}+)([ !?])(.++)""".r
   private def strToUserLine(str: String): Option[UserLine] =
     str match {
       case UserLineRegex(username, sep, text) =>
@@ -72,7 +72,7 @@ object Line {
         val deleted = sep == "?"
         username split titleSep match {
           case Array(title, name) =>
-            UserLine(name, Title get title, text, troll = troll, deleted = deleted).some
+            UserLine(name, Title.get(title), text, troll = troll, deleted = deleted).some
           case _ => UserLine(username, None, text, troll = troll, deleted = deleted).some
         }
       case _ => none
@@ -82,7 +82,7 @@ object Line {
       if (x.troll) "!"
       else if (x.deleted) "?"
       else " "
-    val tit = x.title.??(_.value + titleSep)
+    val tit = x.title.so(_.value + titleSep)
     s"$tit${x.username}$sep${x.text}"
   }
 

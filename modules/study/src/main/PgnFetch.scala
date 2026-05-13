@@ -14,13 +14,12 @@ final private class PgnFetch(ws: StandaloneWSClient) {
 
   def fromUrl(url: String): Fu[Option[Pgn]] =
     url match {
-      case ChessbaseRegex(id) => id.toIntOption ?? downloadChessbase
+      case ChessbaseRegex(id) => id.toIntOption so downloadChessbase
       case _                  => fuccess(none)
     }
 
-  private def downloadChessbase(id: Int): Fu[Option[Pgn]] = {
+  private def downloadChessbase(id: Int): Fu[Option[Pgn]] =
     ws.url(s"""http://www.chessgames.com/pgn/any.pgn?gid=$id""").get().dmap { res =>
-      res.header("Content-Type").contains(pgnContentType) option res.body
+      res.header("Content-Type").contains(pgnContentType).option(res.body)
     }
-  }
 }

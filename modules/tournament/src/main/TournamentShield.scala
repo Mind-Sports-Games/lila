@@ -2,15 +2,14 @@ package lila.tournament
 
 import org.joda.time.{ DateTime, Months, Weeks }
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 import scala.util.Random
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
-import lila.memo.CacheApi._
+import lila.memo.CacheApi.*
 import lila.i18n.VariantKeys
 
-import Schedule.Speed._
+import Schedule.Speed.*
 
 import strategygames.variant.Variant
 import strategygames.{ GameFamily, GameGroup }
@@ -20,8 +19,8 @@ final class TournamentShieldApi(
     cacheApi: lila.memo.CacheApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import TournamentShield._
-  import BSONHandlers._
+  import TournamentShield.*
+  import BSONHandlers.*
 
   def active(u: User): Fu[List[Award]] =
     cache.getUnit dmap {
@@ -34,7 +33,7 @@ final class TournamentShieldApi(
     }
 
   def byCategKey(k: String): Fu[Option[(Category, List[Award])]] =
-    Category.byKey(k) ?? { categ =>
+    Category.byKey(k) so { categ =>
       cache.getUnit dmap {
         _.value get categ map {
           categ -> _
@@ -45,16 +44,16 @@ final class TournamentShieldApi(
   def byMedleyKey(k: String): Option[MedleyShield] = MedleyShield.byKey(k)
 
   def currentOwner(tour: Tournament): Fu[Option[OwnerId]] =
-    tour.isShield ?? {
-      Category.of(tour) ?? { cat =>
+    tour.isShield so {
+      Category.of(tour) so { cat =>
         history(none).map(_.current(cat).map(_.owner))
       }
     }
 
-  private[tournament] def clear(): Unit = cache.invalidateUnit().unit
+  private[tournament] def clear(): Unit = cache.invalidateUnit()
 
   private[tournament] def clearAfterMarking(userId: User.ID): Funit = cache.getUnit map { hist =>
-    import cats.implicits._
+    import cats.implicits.*
     if (hist.value.exists(_._2.exists(_.owner.value === userId))) clear()
   }
 
@@ -68,24 +67,27 @@ final class TournamentShieldApi(
               "status"        -> statusBSONHandler.writeTry(Status.Finished).get
             )
           )
-          .sort($sort asc "startsAt")
+          .sort($sort.asc("startsAt"))
           .cursor[Tournament](ReadPreference.secondaryPreferred)
-          .list() map { tours =>
-          for {
-            tour   <- tours
-            categ  <- Category of tour
-            winner <- tour.winnerId
-          } yield Award(
-            categ = categ,
-            owner = OwnerId(winner),
-            date = tour.finishesAt,
-            tourId = tour.id
-          )
-        } map {
-          _.foldLeft(Map.empty[Category, List[Award]]) { case (hist, entry) =>
-            hist + (entry.categ -> hist.get(entry.categ).fold(List(entry))(entry :: _))
+          .list()
+          .map { tours =>
+            for {
+              tour   <- tours
+              categ  <- Category.of(tour)
+              winner <- tour.winnerId
+            } yield Award(
+              categ = categ,
+              owner = OwnerId(winner),
+              date = tour.finishesAt,
+              tourId = tour.id
+            )
           }
-        } dmap History.apply
+          .map {
+            _.foldLeft(Map.empty[Category, List[Award]]) { case (hist, entry) =>
+              hist + (entry.categ -> hist.get(entry.categ).fold(List(entry))(entry :: _))
+            }
+          }
+          .dmap(History.apply)
       }
   }
 }
@@ -141,12 +143,12 @@ object TournamentShield {
     def medleyName       = s"${name} Medley Shield"
     def url              = s"https://playstrategy.org/tournament/medley-shield/${key}"
     def medleyMinutes    = arenaMinutes / medleyRounds
-    def balancedFormat =
+    def balancedFormat   =
       if (weekOfMonth.nonEmpty) ""
       else
         " Each variant is active for a short period of the tournament. The length each variant gets is variable but balanced so that quicker/slower variants have shorter/longer interval times."
-    def intervalStr     = if (weekOfMonth.isEmpty) "week" else "month"
-    def arenaFormatFull = s"${arenaFormat} ${balancedFormat}"
+    def intervalStr          = if (weekOfMonth.isEmpty) "week" else "month"
+    def arenaFormatFull      = s"${arenaFormat} ${balancedFormat}"
     def arenaDescriptionFull =
       s"${arenaDescription}\r\n\r\nWin the tournament, win the shield... until next ${intervalStr}!\r\n\r\nMore info here: ${url}"
     def useStatusScoring = variants.map(_.gameFamily).toSet.size == 1 && variants
@@ -292,8 +294,8 @@ object TournamentShield {
           loaRounds,
           "",
           s"An Arena which is divided into ${loaRounds} equal length periods of ${loaVariants.init
-            .map(VariantKeys.variantName)
-            .mkString(", ")} and ${VariantKeys.variantName(loaVariants.last)} again.",
+              .map(VariantKeys.variantName)
+              .mkString(", ")} and ${VariantKeys.variantName(loaVariants.last)} again.",
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.LinesOfAction())} Medley Arena!"
         )
 
@@ -324,8 +326,8 @@ object TournamentShield {
           shogiRounds,
           "",
           s"An Arena which is divided into ${shogiRounds} equal length periods of ${shogiVariants.init
-            .map(VariantKeys.variantName)
-            .mkString(", ")} and ${VariantKeys.variantName(shogiVariants.last)} again.",
+              .map(VariantKeys.variantName)
+              .mkString(", ")} and ${VariantKeys.variantName(shogiVariants.last)} again.",
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Shogi())} Medley Arena!"
         )
 
@@ -356,8 +358,8 @@ object TournamentShield {
           xiangqiRounds,
           "",
           s"An Arena which is divided into ${xiangqiRounds} equal length periods of ${xiangqiVariants.init
-            .map(VariantKeys.variantName)
-            .mkString(", ")} and ${VariantKeys.variantName(xiangqiVariants.last)} again.",
+              .map(VariantKeys.variantName)
+              .mkString(", ")} and ${VariantKeys.variantName(xiangqiVariants.last)} again.",
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Xiangqi())} Medley Arena!"
         )
 
@@ -400,7 +402,7 @@ object TournamentShield {
         mancalaVariantMinutes,
         mancalaRounds
       )
-    //all the order perms which allows for randomisation of Oware/Bestemshe order but keeps Togy at start and end
+    // all the order perms which allows for randomisation of Oware/Bestemshe order but keeps Togy at start and end
     private val mancalaVariantPermuations = List(
       List(0, 1, 2, 3),
       List(0, 2, 1, 3)
@@ -431,8 +433,8 @@ object TournamentShield {
           mancalaRounds,
           "",
           s"An Arena which is divided into ${mancalaRounds} equal length periods of ${mancalaVariants.init
-            .map(VariantKeys.variantName)
-            .mkString(", ")} and ${VariantKeys.variantName(mancalaVariants.last)} again.",
+              .map(VariantKeys.variantName)
+              .mkString(", ")} and ${VariantKeys.variantName(mancalaVariants.last)} again.",
           s"Welcome to the ${VariantKeys.gameGroupName(GameGroup.Mancala())} Medley Arena!"
         )
 
@@ -468,8 +470,8 @@ object TournamentShield {
           togyzkumalakRounds,
           "",
           s"An Arena which is divided into ${togyzkumalakRounds} equal length periods of ${togyzkumalakVariants.init
-            .map(VariantKeys.variantName)
-            .mkString(", ")} and ${VariantKeys.variantName(togyzkumalakVariants.last)} again.",
+              .map(VariantKeys.variantName)
+              .mkString(", ")} and ${VariantKeys.variantName(togyzkumalakVariants.last)} again.",
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Togyzkumalak())} Medley Arena!",
           6
         )
@@ -538,8 +540,8 @@ object TournamentShield {
           breakthroughRounds,
           "",
           s"An Arena which is divided into ${breakthroughRounds} equal length periods of ${breakthroughVariants.init
-            .map(VariantKeys.variantName)
-            .mkString(", ")} and ${VariantKeys.variantName(breakthroughVariants.last)} again.",
+              .map(VariantKeys.variantName)
+              .mkString(", ")} and ${VariantKeys.variantName(breakthroughVariants.last)} again.",
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.BreakthroughTroyka())} Medley Arena!",
           5
         )
@@ -576,13 +578,13 @@ object TournamentShield {
           abaloneRounds,
           "",
           s"An Arena which is divided into ${abaloneRounds} equal length periods of ${abaloneVariants.init
-            .map(VariantKeys.variantName)
-            .mkString(", ")} and ${VariantKeys.variantName(abaloneVariants.last)} again.",
+              .map(VariantKeys.variantName)
+              .mkString(", ")} and ${VariantKeys.variantName(abaloneVariants.last)} again.",
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Abalone())} Medley Arena!",
           5
         )
 
-    //all the order permuations which doesnt put two chess or two backgammon next to each other
+    // all the order permuations which doesnt put two chess or two backgammon next to each other
     private val chessgammonVariantPermuations = List(
       List(0, 1, 2, 3),
       List(2, 1, 0, 3),
@@ -627,26 +629,26 @@ object TournamentShield {
           chessgammonRounds,
           "",
           s"An Arena which is divided into ${chessgammonRounds} equal length periods of ${chessgammonVariants
-            .map(VariantKeys.variantName)
-            .mkString(", ")}.",
+              .map(VariantKeys.variantName)
+              .mkString(", ")}.",
           s"Welcome to the Chessgammon Medley Arena!",
           2
         )
 
     val all = List(
-      PlayStrategyMedley,  //Weekly - Sun evenings
-      ChessVariantsMedley, //Weekly - Sat evenings
-      DraughtsMedley,      //Weekly - Sat lunchtime
-      LinesOfActionMedley, //Monthly - 2nd Sat afternoon
-      ShogiMedley,         //Monthly - 3rd Sun lunchtime
-      XiangqiMedley,       //Monthly - 2nd Sun lunchtime
-      OthelloMedley,       //Monthly - 4th Sun lunchtime
-      MancalaMedley,       //Monthly - 1st Sun lunchtime
-      TogyzkumalakMedley,  //Monthly - 3rd Sat lunchtime
-      BackgammonMedley,    //Monthly - 1st Sat afternoon
-      BreakthroughMedley,  //Monthly - 4rd Sat afternoon
-      AbaloneMedley,       //Monthly - 3rd Sun afternoon
-      ChessgammonMedley    //Monthly - 1st Sun afternoon
+      PlayStrategyMedley,  // Weekly - Sun evenings
+      ChessVariantsMedley, // Weekly - Sat evenings
+      DraughtsMedley,      // Weekly - Sat lunchtime
+      LinesOfActionMedley, // Monthly - 2nd Sat afternoon
+      ShogiMedley,         // Monthly - 3rd Sun lunchtime
+      XiangqiMedley,       // Monthly - 2nd Sun lunchtime
+      OthelloMedley,       // Monthly - 4th Sun lunchtime
+      MancalaMedley,       // Monthly - 1st Sun lunchtime
+      TogyzkumalakMedley,  // Monthly - 3rd Sat lunchtime
+      BackgammonMedley,    // Monthly - 1st Sat afternoon
+      BreakthroughMedley,  // Monthly - 4rd Sat afternoon
+      AbaloneMedley,       // Monthly - 3rd Sun afternoon
+      ChessgammonMedley    // Monthly - 1st Sun afternoon
     )
 
     val allWeekly  = all.filter(_.weekOfMonth.isEmpty)
@@ -656,8 +658,8 @@ object TournamentShield {
 
     def byKey(k: String): Option[MedleyShield] = all.find(_.key == k)
 
-    private val medleyStartDate              = new DateTime(2022, 6, 11, 0, 0)
-    private val arenaMedleyStartDate         = new DateTime(2022, 8, 7, 22, 0)
+    private val medleyStartDate = new DateTime(2022, 6, 11, 0, 0)
+    // private val arenaMedleyStartDate         = new DateTime(2022, 8, 7, 22, 0)
     private val monthlyMedleyShieldStartDate = new DateTime(2024, 4, 1, 0, 0)
 
     def weeksSinceStart(startsAt: DateTime) =
@@ -683,7 +685,7 @@ object TournamentShield {
     def key                       = variant.key
     def name                      = VariantKeys.variantName(variant)
     def iconChar                  = variant.perfIcon
-    def matches(tour: Tournament) = Some(variant).has(tour.variant)
+    def matches(tour: Tournament) = Some(variant).contains(tour.variant)
 
     private def hoursList(month: Int) =
       if (month % 2 == 0) TournamentShield.defaultShieldHours
@@ -1084,12 +1086,12 @@ object TournamentShield {
       GrandAbalone
     )
 
-    def of(t: Tournament): Option[Category] = all.find(_ matches t)
+    def of(t: Tournament): Option[Category] = all.find(_.matches(t))
 
     def byKey(k: String): Option[Category] = all.find(_.key == k)
   }
 
-  val defaultShieldHours   = List(18, 12) //UTC
+  val defaultShieldHours   = List(18, 12) // UTC
   val alternateShieldHours = defaultShieldHours.reverse
 
   def spotlight(name: String, icon: Char) =

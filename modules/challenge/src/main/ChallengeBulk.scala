@@ -1,10 +1,10 @@
 package lila.challenge
 
 import akka.actor.ActorSystem
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import org.joda.time.DateTime
 import reactivemongo.api.bson.Macros
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import strategygames.{ GameLogic, Situation, Speed }
 import strategygames.Player.{ P1, P2 }
@@ -12,7 +12,7 @@ import strategygames.Player.{ P1, P2 }
 import lila.common.Bus
 import lila.common.LilaStream
 import lila.common.Template
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.{ Game, Player }
 import lila.hub.actorApi.map.TellMany
 import lila.hub.DuctSequencers
@@ -33,16 +33,17 @@ final class ChallengeBulkApi(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     mat: akka.stream.Materializer,
-    system: ActorSystem,
+    @annotation.nowarn("msg=unused") _system: ActorSystem,
     scheduler: akka.actor.Scheduler,
     mode: play.api.Mode
 ) {
 
-  implicit private val gameHandler: BSONDocumentHandler[ScheduledGame]   = Macros.handler[ScheduledGame]
+  implicit private val gameHandler: BSONDocumentHandler[ScheduledGame] = Macros.handler[ScheduledGame]
+  @annotation.nowarn("msg=unused")
   implicit private val variantHandler: BSONHandler[Variant]              = variantByKeyHandler
   implicit private val stratVariantHandler: BSONHandler[variant.Variant] = stratVariantByKeyHandler
   implicit private val clockHandler: BSONHandler[ClockConfig]            = clockConfigHandler
-  implicit private val messageHandler: BSONHandler[Template] =
+  implicit private val messageHandler: BSONHandler[Template]             =
     stringAnyValHandler[Template](_.value, Template.apply)
   implicit private val bulkHandler: BSONDocumentHandler[ScheduledBulk] = Macros.handler[ScheduledBulk]
 
@@ -59,15 +60,14 @@ final class ChallengeBulkApi(
 
   def startClocks(id: String, me: User): Fu[Boolean] =
     coll
-      .updateField($doc("_id" -> id, "by" -> me.id, "pairedAt" $exists true), "startClocksAt", DateTime.now)
+      .updateField($doc("_id" -> id, "by" -> me.id, "pairedAt".$exists(true)), "startClocksAt", DateTime.now)
       .map(_.n == 1)
 
   def schedule(bulk: ScheduledBulk): Fu[Either[String, ScheduledBulk]] = workQueue(bulk.by) {
-    coll.list[ScheduledBulk]($doc("by" -> bulk.by, "pairedAt" $exists false)) flatMap { bulks =>
-      val nbGames = bulks.map(_.games.size).sum
+    coll.list[ScheduledBulk]($doc("by" -> bulk.by, "pairedAt".$exists(false))) flatMap { bulks =>
       if (bulks.sizeIs >= 10) fuccess(Left("Already too many bulks queued"))
       else if (bulks.map(_.games.size).sum >= 1000) fuccess(Left("Already too many games queued"))
-      else if (bulks.exists(_ collidesWith bulk))
+      else if (bulks.exists(_.collidesWith(bulk)))
         fuccess(Left("A bulk containing the same players is scheduled at the same time"))
       else coll.insert.one(bulk) inject Right(bulk)
     }
@@ -77,8 +77,8 @@ final class ChallengeBulkApi(
     checkForPairing >> checkForClocks
 
   private def checkForPairing: Funit =
-    coll.one[ScheduledBulk]($doc("pairAt" $lte DateTime.now, "pairedAt" $exists false)) flatMap {
-      _ ?? { bulk =>
+    coll.one[ScheduledBulk]($doc("pairAt".$lte(DateTime.now), "pairedAt".$exists(false))) flatMap {
+      _ so { bulk =>
         workQueue(bulk.by) {
           makePairings(bulk).void
         }
@@ -86,8 +86,8 @@ final class ChallengeBulkApi(
     }
 
   private def checkForClocks: Funit =
-    coll.one[ScheduledBulk]($doc("startClocksAt" $lte DateTime.now, "pairedAt" $exists true)) flatMap {
-      _ ?? { bulk =>
+    coll.one[ScheduledBulk]($doc("startClocksAt".$lte(DateTime.now), "pairedAt".$exists(true))) flatMap {
+      _ so { bulk =>
         workQueue(bulk.by) {
           startClocksNow(bulk)
         }
@@ -127,7 +127,7 @@ final class ChallengeBulkApi(
         (game, p1, p2)
       }
       .mapAsyncUnordered(8) { case (game, p1, p2) =>
-        gameRepo.insertDenormalized(game) >>- onStart(game.id) inject {
+        gameRepo.insertDenormalized(game).andDo(onStart(game.id)) inject {
           (game, p1, p2)
         }
       }
@@ -137,10 +137,9 @@ final class ChallengeBulkApi(
       .toMat(LilaStream.sinkCount)(Keep.right)
       .run()
       .addEffect { nb =>
-        lila.mon.api.challenge.bulk.createNb(bulk.by).increment(nb).unit
+        val _ = lila.mon.api.challenge.bulk.createNb(bulk.by).increment(nb)
       } >> {
-      if (bulk.startClocksAt.isDefined)
-        coll.updateField($id(bulk._id), "pairedAt", DateTime.now)
+      if (bulk.startClocksAt.isDefined) coll.updateField($id(bulk._id), "pairedAt", DateTime.now)
       else coll.delete.one($id(bulk._id))
     }.void
   }

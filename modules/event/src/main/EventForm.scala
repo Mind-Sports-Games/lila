@@ -1,12 +1,12 @@
 package lila.event
 
 import org.joda.time.DateTime
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 import play.api.i18n.Lang
 
 import lila.common.Form.stringIn
-import lila.common.Form.UTCDate._
+import lila.common.Form.UTCDate.*
 import lila.i18n.LangList
 import lila.user.User
 
@@ -15,7 +15,7 @@ object EventForm {
   object icon {
     val default   = ""
     val broadcast = "broadcast.icon"
-    val choices = List(
+    val choices   = List(
       default                  -> "Microphone",
       "playstrategy.event.png" -> "PlayStrategy",
       "trophy.event.png"       -> "Trophy",
@@ -37,26 +37,28 @@ object EventForm {
       "enabled"       -> boolean,
       "startsAt"      -> utcDate,
       "finishesAt"    -> utcDate,
-      "hostedBy" -> optional {
+      "hostedBy"      -> optional {
         lila.user.UserForm.historicalUsernameField
           .transform[User.ID](_.toLowerCase, identity)
       },
       "icon"      -> stringIn(icon.choices),
       "countdown" -> boolean
-    )(Data.apply)(Data.unapply)
-  ) fill Data(
-    title = "",
-    headline = "",
-    beforeMessage = none,
-    duringMessage = none,
-    description = none,
-    homepageHours = 0,
-    url = "",
-    lang = lila.i18n.enLang.code,
-    enabled = true,
-    startsAt = DateTime.now,
-    finishesAt = DateTime.now,
-    countdown = true
+    )(Data.apply)(unapply)
+  ).fill(
+    Data(
+      title = "",
+      headline = "",
+      beforeMessage = none,
+      duringMessage = none,
+      description = none,
+      homepageHours = 0,
+      url = "",
+      lang = lila.i18n.enLang.code,
+      enabled = true,
+      startsAt = DateTime.now,
+      finishesAt = DateTime.now,
+      countdown = true
+    )
   )
 
   case class Data(

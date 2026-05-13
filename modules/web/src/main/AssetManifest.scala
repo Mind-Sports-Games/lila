@@ -2,11 +2,11 @@ package lila.web
 
 import play.api.Environment
 import play.api.libs.ws.StandaloneWSClient
-import play.api.libs.ws.JsonBodyReadables._
-import play.api.libs.json.{ JsObject, JsString, JsValue, Json }
+import play.api.libs.ws.JsonBodyReadables.*
+import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.Mode
 
-import java.nio.file.{ Files, Path, Paths }
+import java.nio.file.Files
 import java.time.Instant
 
 import lila.common.AssetVersion
@@ -32,7 +32,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
   def js(key: String): Option[SplitAsset]    = maps.js.get(key)
   def css(key: String): Option[String]       = maps.css.get(key)
   def hashed(path: String): Option[String]   = maps.hashed.get(path)
-  def deps(keys: List[String]): List[String] = keys.flatMap { key => js(key).??(_.imports) }.distinct
+  def deps(keys: List[String]): List[String] = keys.flatMap { key => js(key).so(_.imports) }.distinct
   def lastUpdate: Instant                    = lastModified
 
   def update(): Unit =
@@ -56,7 +56,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
       }
     }
 
-  private val keyRe = """^(?!common\.)(\S+)\.([A-Z0-9]{8})\.(?:js|css)""".r
+  private val keyRe                           = """^(?!common\.)(\S+)\.([A-Z0-9]{8})\.(?:js|css)""".r
   private def keyOf(fullName: String): String =
     fullName match {
       case keyRe(k, _) => k
@@ -112,9 +112,9 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
       .value
       .map {
         case (k, asset) => {
-          val hash   = (asset \ "hash").as[String]
-          val name   = k.substring(k.lastIndexOf('/') + 1)
-          val extPos = name.indexOf('.')
+          val hash       = (asset \ "hash").as[String]
+          val name       = k.substring(k.lastIndexOf('/') + 1)
+          val extPos     = name.indexOf('.')
           val hashedName =
             if (extPos < 0) s"${name}.$hash"
             else s"${name.slice(0, extPos)}.$hash${name.substring(extPos)}"

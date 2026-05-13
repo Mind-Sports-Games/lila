@@ -1,7 +1,7 @@
 package controllers
 
-import lila.app._
-import views._
+import lila.app.*
+import views.*
 
 final class Event(env: Env) extends LilaController(env) {
 
@@ -9,7 +9,7 @@ final class Event(env: Env) extends LilaController(env) {
 
   def show(id: String) =
     Open { implicit ctx =>
-      OptionOk(api oneEnabled id) { event =>
+      OptionOk(api.oneEnabled(id)) { event =>
         html.event.show(event)
       }
     }
@@ -23,14 +23,14 @@ final class Event(env: Env) extends LilaController(env) {
 
   def edit(id: String) =
     Secure(_.ManageEvent) { implicit ctx => _ =>
-      OptionOk(api one id) { event =>
-        html.event.edit(event, api editForm event)
+      OptionOk(api.one(id)) { event =>
+        html.event.edit(event, api.editForm(event))
       }
     }
 
   def update(id: String) =
     SecureBody(_.ManageEvent) { implicit ctx => me =>
-      OptionFuResult(api one id) { event =>
+      OptionFuResult(api.one(id)) { event =>
         implicit val req = ctx.body
         api
           .editForm(event)
@@ -63,9 +63,9 @@ final class Event(env: Env) extends LilaController(env) {
 
   def cloneE(id: String) =
     Secure(_.ManageEvent) { implicit ctx => _ =>
-      OptionFuResult(api one id) { old =>
-        val event = api clone old
-        Ok(html.event.create(api editForm event)).fuccess
+      OptionFuResult(api.one(id)) { old =>
+        val event = api.clone(old)
+        Ok(html.event.create(api.editForm(event))).fuccess
       }
     }
 }

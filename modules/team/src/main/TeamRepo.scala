@@ -2,16 +2,16 @@ package lila.team
 
 import org.joda.time.{ DateTime, Period }
 import reactivemongo.akkastream.cursorProducer
-import reactivemongo.api._
-import reactivemongo.api.bson._
+import reactivemongo.api.*
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.hub.LeaderTeam
 import lila.user.User
 
 final class TeamRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BSONHandlers._
+  import BSONHandlers.*
 
   private val lightProjection = $doc("name" -> true).some
 
@@ -71,7 +71,7 @@ final class TeamRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   private[team] def countCreatedSince(userId: String, duration: Period): Fu[Int] =
     coll.countSel(
       $doc(
-        "createdAt" $gt DateTime.now.minus(duration),
+        "createdAt".$gt(DateTime.now.minus(duration)),
         "createdBy" -> userId
       )
     )
@@ -93,14 +93,14 @@ final class TeamRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def addRequest(teamId: Team.ID, request: Request): Funit =
     coll.update
       .one(
-        $id(teamId) ++ $doc("requests.user" $ne request.user),
+        $id(teamId) ++ $doc("requests.user".$ne(request.user)),
         $push("requests" -> request.user)
       )
       .void
 
   def allWithChat: Fu[List[Team]] =
     coll
-      .find(enabledSelect ++ $doc("chat" $ne Team.ChatFor.NONE))
+      .find(enabledSelect ++ $doc("chat".$ne(Team.ChatFor.NONE)))
       .sort(sortPopular)
       .cursor[Team](ReadPreference.secondaryPreferred)
       .list()
@@ -112,8 +112,8 @@ final class TeamRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def countRequestsOfLeader(userId: User.ID, requestColl: Coll): Fu[Int] =
     coll
-      .aggregateOne(readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
-        import framework._
+      .aggregateOne(readPreference = ReadPreference.secondaryPreferred) { framework =>
+        import framework.*
         Match($doc("leaders" -> userId)) -> List(
           PipelineOperator(
             $doc(
@@ -134,5 +134,5 @@ final class TeamRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   private[team] val enabledSelect = $doc("enabled" -> true)
 
-  private[team] val sortPopular = $sort desc "nbMembers"
+  private[team] val sortPopular = $sort.desc("nbMembers")
 }

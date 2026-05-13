@@ -2,8 +2,8 @@ package views.html.study
 
 import play.api.i18n.Lang
 
-import lila.app.templating.Environment._
-import lila.i18n.{ I18nKeys => trans }
+import lila.app.templating.Environment.*
+import lila.i18n.I18nKeys as trans
 
 object jsI18n {
 
@@ -12,7 +12,7 @@ object jsI18n {
       i18nJsObject(i18nKeys)
 
   val i18nKeys: List[lila.i18n.MessageKey] = {
-    import trans.study._
+    import trans.study.*
     List(
       trans.name,
       trans.white,

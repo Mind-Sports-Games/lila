@@ -2,8 +2,8 @@ package lila.bookmark
 
 import reactivemongo.api.ReadPreference
 
-import lila.common.paginator._
-import lila.db.dsl._
+import lila.common.paginator.*
+import lila.db.dsl.*
 import lila.game.Game
 import lila.game.GameRepo
 import lila.user.User
@@ -22,12 +22,12 @@ final class PaginatorBuilder(
 
   final class UserAdapter(user: User) extends AdapterLike[Game] {
 
-    def nbResults: Fu[Int] = coll countSel selector
+    def nbResults: Fu[Int] = coll.countSel(selector)
 
     def slice(offset: Int, length: Int): Fu[Seq[Game]] =
       coll
         .aggregateList(length, readPreference = ReadPreference.secondaryPreferred) { framework =>
-          import framework._
+          import framework.*
           Match(selector) -> List(
             Sort(Descending("d")),
             Skip(offset),

@@ -1,16 +1,16 @@
 package lila.oauth
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.ExecutionContext) {
 
   import OAuthApp.{ AppBSONHandler, AppIdHandler }
-  import OAuthApp.{ BSONFields => F }
+  import OAuthApp.BSONFields as F
 
   def mine(u: User): Fu[List[OAuthApp]] =
     colls.app {
-      _.find($doc(F.author -> u.id)).sort($sort desc F.createdAt).cursor[OAuthApp]().list(30)
+      _.find($doc(F.author -> u.id)).sort($sort.desc(F.createdAt)).cursor[OAuthApp]().list(30)
     }
 
   def create(app: OAuthApp) = colls.app(_.insert.one(app).void)
@@ -29,8 +29,8 @@ final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.Executi
     colls.app { appColl =>
       import OAuthApp.AppBSONHandler
       colls.token {
-        _.aggregateList(maxDocs = 100) { implicit framework =>
-          import framework._
+        _.aggregateList(maxDocs = 100) { framework =>
+          import framework.*
           Match($doc("user_id" -> user.id)) -> List(
             Sort(Descending("used_at")),
             PipelineOperator(
@@ -44,13 +44,14 @@ final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.Executi
               )
             )
           )
-        }.map { docs =>
-          for {
-            doc   <- docs
-            token <- AccessToken.AccessTokenBSONHandler.readOpt(doc)
-            app   <- doc.getAsOpt[List[OAuthApp]]("app").??(_.headOption)
-          } yield AccessToken.WithApp(token, app)
         }
+          .map { docs =>
+            for {
+              doc   <- docs
+              token <- AccessToken.AccessTokenBSONHandler.readOpt(doc)
+              app   <- doc.getAsOpt[List[OAuthApp]]("app").so(_.headOption)
+            } yield AccessToken.WithApp(token, app)
+          }
       }
     }
 

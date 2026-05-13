@@ -2,12 +2,12 @@ package lila.socket
 
 import scala.collection.MapView
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.opening.FullOpeningDB
-import strategygames.{ Board, Game, GameLogic, Move, Pos, Situation }
+import strategygames.{ Game, GameLogic, Pos, Situation }
 import lila.tree.Node.{ destString, openingWriter }
 
 //We think this code is deprecated and never used!
@@ -26,36 +26,36 @@ case class AnaDests(
 
   private lazy val sit = Game(variant.gameLogic, variant.some, fen.some).situation
 
-  //draughts
+  // draughts
   private val orig: Option[strategygames.draughts.Pos] =
     (sit, variant) match {
       case (Situation.Draughts(sit), Variant.Draughts(variant)) =>
-        (lastUci.exists(_.length >= 4) && sit.ghosts > 0) ?? lastUci.flatMap { uci =>
+        (lastUci.exists(_.length >= 4) && sit.ghosts > 0) so lastUci.flatMap { uci =>
           variant.boardSize.pos.posAt(uci.substring(uci.length - 2))
         }
       case _ => None
     }
 
-  //draughts
+  // draughts
   private lazy val validMoves =
     AnaDests.validMoves(sit, orig, ~fullCapture)
 
-  //draughts
+  // draughts
   lazy val captureLength: Int = sit match {
     case Situation.Draughts(sit) =>
       orig.fold(sit.allMovesCaptureLength)(~sit.captureLengthFrom(_))
     case _ => 0
   }
 
-  //draughts
+  // draughts
   private val truncatedMoves: Option[MapView[strategygames.draughts.Pos, List[String]]] =
-    (!isInitial && ~fullCapture && captureLength > 1) option AnaDests.truncateMoves(validMoves)
+    (!isInitial && ~fullCapture && captureLength > 1).option(AnaDests.truncateMoves(validMoves))
 
   val dests: String = variant match {
     case Variant.Draughts(variant) =>
       if (isInitial) AnaDests.initialDraughtsDests
       else
-        sit.playable(false) ?? {
+        sit.playable(false) so {
           val truncatedDests = truncatedMoves.map {
             _ mapValues { _ flatMap (uci => variant.boardSize.pos.posAt(uci.takeRight(2))) }
           }
@@ -63,20 +63,20 @@ case class AnaDests(
             truncatedDests
               .getOrElse(validMoves.view.mapValues { _ map (_.dest) })
               .to(Map)
-              .map { case (p, lp) => (Pos.Draughts(p), lp.map(Pos.Draughts)) }
+              .map { case (p, lp) => (Pos.Draughts(p), lp.map(Pos.Draughts.apply)) }
           val destStr = destString(destsToConvert)
           if (captureLength > 0) s"#$captureLength $destStr"
           else destStr
         }
     case _ =>
       if (isInitial) AnaDests.initialChessDests
-      else sit.playable(false) ?? destString(sit.destinations)
+      else sit.playable(false) so destString(sit.destinations)
   }
 
-  //draughts
+  // draughts
   val destsUci: Option[List[String]] = truncatedMoves.map(_.values.toList.flatten)
 
-  lazy val opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? {
+  lazy val opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) so {
     FullOpeningDB.findByFen(variant.gameLogic, fen)
   }
 
@@ -96,14 +96,14 @@ object AnaDests {
   private val initialChessDests    = "iqy muC gvx ltB bqs pxF jrz nvD ksA owE"
   private val initialDraughtsDests = "HCD GBC ID FAB EzA"
 
-  //draughts
+  // draughts
   private type BoardWithUci = (Option[strategygames.draughts.Board], String)
 
-  //draughts
+  // draughts
   private def uniqueUci(otherUcis: List[BoardWithUci], uci: BoardWithUci) = {
     var i      = 2
     var unique = uci._2.slice(0, i)
-    while (i + 2 <= uci._2.length && otherUcis.exists(_._2.startsWith(unique))) {
+    while i + 2 <= uci._2.length && otherUcis.exists(_._2.startsWith(unique)) do {
       i += 2
       unique = uci._2.slice(0, i)
     }
@@ -112,7 +112,7 @@ object AnaDests {
     else (none, unique)
   }
 
-  //draughts
+  // draughts
   def validMoves(
       sit: Situation,
       from: Option[strategygames.draughts.Pos],
@@ -125,11 +125,11 @@ object AnaDests {
     case _ => Map.empty[strategygames.draughts.Pos, List[strategygames.draughts.Move]]
   }
 
-  //draughts
+  // draughts
   def truncateMoves(
       validMoves: Map[strategygames.draughts.Pos, List[strategygames.draughts.Move]]
   ): MapView[strategygames.draughts.Pos, List[String]] = {
-    var truncated = false
+    var truncated      = false
     val truncatedMoves = validMoves map { case (pos, moves) =>
       if (moves.size <= 1) pos -> moves.map(m => (m.after.some, m.toUci.uci))
       else
@@ -137,7 +137,7 @@ object AnaDests {
           val sameDestUcis = moves
             .filter(m => m != move && m.dest == move.dest && (m.orig == m.dest || m.after != move.after))
             .map(m => (m.after.some, m.toUci.uci))
-          val uci = (move.after.some, move.toUci.uci)
+          val uci    = (move.after.some, move.toUci.uci)
           val newUci =
             if (sameDestUcis.isEmpty && move.orig != move.dest) uci else uniqueUci(sameDestUcis, uci)
           if (!acc.contains(newUci)) {
@@ -152,17 +152,17 @@ object AnaDests {
     (if (truncated) truncateUcis(truncatedMoves) else truncatedMoves).view.mapValues { _ map { _._2 } }
   }
 
-  //draughts
+  // draughts
   @scala.annotation.tailrec
   private def truncateUcis(
       validUcis: Map[strategygames.draughts.Pos, List[BoardWithUci]]
   ): Map[strategygames.draughts.Pos, List[BoardWithUci]] = {
-    var truncated = false
+    var truncated     = false
     val truncatedUcis = validUcis map { case (pos, uciList) =>
       if (uciList.size <= 1) pos -> uciList
       else
         pos -> uciList.foldLeft(List[BoardWithUci]()) { (acc, uci) =>
-          val dest = uci._2.takeRight(2)
+          val dest         = uci._2.takeRight(2)
           val sameDestUcis = uciList.filter(u =>
             u != uci && u._2.takeRight(2) == dest && (u._2.startsWith(
               dest
@@ -184,16 +184,16 @@ object AnaDests {
 
   def parse(o: JsObject) =
     for {
-      d   <- o obj "d"
-      lib <- d int "lib"
+      d   <- o.obj("d")
+      lib <- d.int("lib")
       variant = Variant.orDefault(GameLogic(lib), ~d.str("variant"))
-      fen  <- d str "fen"
-      path <- d str "path"
+      fen  <- d.str("fen")
+      path <- d.str("path")
     } yield AnaDests(
       variant = variant,
       fen = FEN(GameLogic(lib), fen),
       path = path,
-      chapterId = d str "ch",
-      fullCapture = d boolean "fullCapture"
+      chapterId = d.str("ch"),
+      fullCapture = d.boolean("fullCapture")
     )
 }

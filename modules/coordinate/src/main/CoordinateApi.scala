@@ -1,12 +1,12 @@
 package lila.coordinate
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import reactivemongo.api.ReadPreference
 
 import lila.user.User
-import lila.db.dsl._
+import lila.db.dsl.*
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 
 final class CoordinateApi(scoreColl: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
@@ -22,11 +22,11 @@ final class CoordinateApi(scoreColl: Coll)(implicit ec: scala.concurrent.Executi
         $push(
           $doc(
             "p1" -> BSONDocument(
-              "$each"  -> (p1 ?? List(BSONInteger(hits))),
+              "$each"  -> (p1 so List(BSONInteger(hits))),
               "$slice" -> -20
             ),
             "p2" -> BSONDocument(
-              "$each"  -> (!p1 ?? List(BSONInteger(hits))),
+              "$each"  -> (!p1 so List(BSONInteger(hits))),
               "$slice" -> -20
             )
           )
@@ -41,8 +41,8 @@ final class CoordinateApi(scoreColl: Coll)(implicit ec: scala.concurrent.Executi
         maxDocs = Int.MaxValue,
         readPreference = ReadPreference.secondaryPreferred
       ) { framework =>
-        import framework._
-        Match($doc("_id" $in userIds)) -> List(
+        import framework.*
+        Match($doc("_id".$in(userIds))) -> List(
           Project(
             $doc(
               "p1" -> $doc("$max" -> "$p1"),

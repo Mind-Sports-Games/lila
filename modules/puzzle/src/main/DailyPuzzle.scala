@@ -2,11 +2,10 @@ package lila.puzzle
 
 import akka.pattern.ask
 import org.joda.time.DateTime
-import Puzzle.{ BSONFields => F }
-import scala.concurrent.duration._
+import Puzzle.BSONFields as F
 
-import lila.db.dsl._
-import lila.memo.CacheApi._
+import lila.db.dsl.*
+import lila.memo.CacheApi.*
 
 final private[puzzle] class DailyPuzzle(
     colls: PuzzleColls,
@@ -15,7 +14,7 @@ final private[puzzle] class DailyPuzzle(
     cacheApi: lila.memo.CacheApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   private val cache =
     cacheApi.unit[Option[DailyPuzzle.WithHtml]] {
@@ -37,22 +36,23 @@ final private[puzzle] class DailyPuzzle(
   private def findLastForVariantKey(key: String): Fu[Option[DailyPuzzle.WithHtml]] =
     strategygames.variant.Variant.all.find(_.key == key).fold(fuccess(none[DailyPuzzle.WithHtml])) { variant =>
       colls.puzzle {
-        _.find($doc(F.day $exists true, F.lib -> variant.gameLogic.id, F.variant -> variant.id))
+        _.find($doc(F.day.$exists(true), F.lib -> variant.gameLogic.id, F.variant -> variant.id))
           .sort($doc(F.day -> -1))
           .one[Puzzle]
-      } flatMap { _ ?? makeDaily }
+      } flatMap { _ so makeDaily }
     }
 
   private def find: Fu[Option[DailyPuzzle.WithHtml]] =
-    (findCurrent orElse findNew) recover { case e: Exception =>
+    (findCurrent.orElse(findNew)) recover { case e: Exception =>
       logger.error("find daily", e)
       none
-    } flatMap { _ ?? makeDaily }
+    } flatMap { _ so makeDaily }
 
   private def makeDaily(puzzle: Puzzle): Fu[Option[DailyPuzzle.WithHtml]] = {
-    import makeTimeout.short
-    renderer.actor ? DailyPuzzle.Render(puzzle, puzzle.fenAfterInitialMove, puzzle.line.head.uci) map {
-      case html: String => DailyPuzzle.WithHtml(puzzle, html).some
+    given akka.util.Timeout = akka.util.Timeout(1.second)
+    (renderer.actor ? DailyPuzzle.Render(puzzle, puzzle.fenAfterInitialMove, puzzle.line.head.uci))
+      .mapTo[String] map { html =>
+      DailyPuzzle.WithHtml(puzzle, html).some
     }
   } recover { case e: Exception =>
     logger.warn("make daily", e)
@@ -61,7 +61,7 @@ final private[puzzle] class DailyPuzzle(
 
   private def findCurrent =
     colls.puzzle {
-      _.find($doc(F.day $gt DateTime.now.minusDays(1)))
+      _.find($doc(F.day.$gt(DateTime.now.minusDays(1))))
         .one[Puzzle]
     }
 
@@ -69,7 +69,7 @@ final private[puzzle] class DailyPuzzle(
     colls
       .path {
         _.aggregateOne() { framework =>
-          import framework._
+          import framework.*
           Match(
             pathApi.select(Puzzle.randomVariant, PuzzleTheme.short.key, PuzzleTier.Top, 100 to 1900)
           ) -> List(
@@ -79,9 +79,9 @@ final private[puzzle] class DailyPuzzle(
             PipelineOperator(
               $doc(
                 "$lookup" -> $doc(
-                  "from" -> colls.puzzle.name.value,
-                  "as"   -> "puzzle",
-                  "let"  -> $doc("id" -> "$ids"),
+                  "from"     -> colls.puzzle.name.value,
+                  "as"       -> "puzzle",
+                  "let"      -> $doc("id" -> "$ids"),
                   "pipeline" -> $arr(
                     $doc(
                       "$match" -> $doc(
@@ -92,7 +92,7 @@ final private[puzzle] class DailyPuzzle(
                     ),
                     $doc(
                       "$match" -> $doc(
-                        Puzzle.BSONFields.day $exists false
+                        Puzzle.BSONFields.day.$exists(false)
                       )
                     )
                   )
@@ -108,7 +108,7 @@ final private[puzzle] class DailyPuzzle(
         }
       }
       .flatMap { docOpt =>
-        docOpt.flatMap(PuzzleBSONReader.readOpt) ?? { puzzle =>
+        docOpt.flatMap(PuzzleBSONReader.readOpt) so { puzzle =>
           colls.puzzle {
             _.update.one($id(puzzle.id), $set(F.day -> DateTime.now))
           } inject puzzle.some

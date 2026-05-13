@@ -1,9 +1,9 @@
 package controllers
 
-import lila.api._
-
-import play.api.http._
+import play.api.http.*
 import play.api.mvc.Codec
+import scalalib.extensions.*
+import scalalib.zeros.given
 
 trait ResponseWriter {
 

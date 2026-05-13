@@ -1,7 +1,6 @@
 package lila.i18n
 
 import play.api.i18n.Lang
-import scala.annotation.nowarn
 
 sealed private trait I18nQuantity
 
@@ -25,7 +24,7 @@ private object I18nQuantity {
   type Selector = Count => I18nQuantity
 
   def apply(lang: Lang, c: Count): I18nQuantity =
-    langMap.getOrElse(lang.language, selectors.default _)(c)
+    langMap.getOrElse(lang.language, selectors.default)(c)
 
   private object selectors {
 
@@ -125,10 +124,10 @@ private object I18nQuantity {
       if (c == 0 || c == 1) One
       else Other
 
-    @nowarn("cat=unused") def none(c: Count) = Other
+    def none(_c: Count) = Other
   }
 
-  import selectors._
+  import selectors.*
 
   private val langMap: Map[Language, Selector] = LangList.all.map { case (lang, _) =>
     lang.language -> (lang.language match {

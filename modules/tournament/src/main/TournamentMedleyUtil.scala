@@ -13,7 +13,7 @@ object TournamentMedleyUtil {
   ): List[(Variant, Int)] = {
     val mBalanced                                 = gameClockSeconds.nonEmpty
     val medleyVariantsInTournament: List[Variant] = orderedMedleyList.take(mNumIntervals)
-    val medleySpeedChoice = orderedMedleyList match {
+    val medleySpeedChoice                         = orderedMedleyList match {
       case x if isMedleyChessShieldStyle(x)    => medleyChessShieldSpeeds
       case x if isMedleyDraughtsShieldStyle(x) => medleyDraughtShieldSpeeds
       case _                                   => medleyVariantSpeeds
@@ -29,9 +29,7 @@ object TournamentMedleyUtil {
         // take time from first variant and give to last
         times.take(1).map(v => v - firstLastBonus) ::: times.drop(1).take(times.size - 2) :::
           times.drop(times.size - 1).map(v => v + extra + firstLastBonus)
-      } else {
-        defaultIntervalTimes(minutes, mNumIntervals)
-      }
+      } else defaultIntervalTimes(minutes, mNumIntervals)
 
     orderedMedleyList.zipWithIndex
       .map { case (v, i) => (v, medleyIntervalSeconds.lift(i).getOrElse(0)) }
@@ -138,5 +136,4 @@ object TournamentMedleyUtil {
       "english"       -> medium
     )
   }
-
 }

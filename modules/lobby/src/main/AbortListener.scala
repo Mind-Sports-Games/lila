@@ -9,25 +9,26 @@ final private class AbortListener(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def apply(pov: Pov): Funit =
-    (pov.game.isCorrespondence ?? recreateSeek(pov)) >>-
-      cancelPlayerIndexIncrement(pov) >>-
-      lobbyTrouper.registerAbortedGame(pov.game)
+    (pov.game.isCorrespondence so recreateSeek(pov))
+      .andDo(cancelPlayerIndexIncrement(pov))
+      .andDo(lobbyTrouper.registerAbortedGame(pov.game))
 
   private def cancelPlayerIndexIncrement(pov: Pov): Unit =
-    if (pov.game.source.exists(s => s == Source.Lobby || s == Source.Pool)) pov.game.userIds match {
-      case List(u1, u2) =>
-        userRepo.incPlayerIndex(u1, -1)
-        userRepo.incPlayerIndex(u2, 1)
-      case _ =>
-    }
+    if (pov.game.source.exists(s => s == Source.Lobby || s == Source.Pool))
+      pov.game.userIds match {
+        case List(u1, u2) =>
+          userRepo.incPlayerIndex(u1, -1)
+          userRepo.incPlayerIndex(u2, 1)
+        case _ =>
+      }
 
   private def recreateSeek(pov: Pov): Funit =
-    pov.player.userId ?? { aborterId =>
+    pov.player.userId so { aborterId =>
       seekApi.findArchived(pov.gameId) flatMap {
-        _ ?? { seek =>
-          (seek.user.id != aborterId) ?? {
+        _ so { seek =>
+          (seek.user.id != aborterId) so {
             worthRecreating(seek) flatMap {
-              _ ?? seekApi.insert(Seek renew seek)
+              _ so seekApi.insert(Seek.renew(seek))
             }
           }
         }
@@ -35,7 +36,7 @@ final private class AbortListener(
     }
 
   private def worthRecreating(seek: Seek): Fu[Boolean] =
-    userRepo byId seek.user.id map {
+    userRepo.byId(seek.user.id) map {
       _ exists { u =>
         u.enabled && !u.lame
       }

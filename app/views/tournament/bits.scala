@@ -1,13 +1,11 @@
 package views.html.tournament
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-import lila.i18n.{ I18nKeys => trans, VariantKeys }
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
+import lila.i18n.{ I18nKeys as trans, VariantKeys }
 import lila.tournament.Tournament
 import strategygames.variant.Variant
-
-import controllers.routes
 
 object bits {
 
@@ -44,12 +42,13 @@ object bits {
     )
 
   def userPrizeDisclaimer(ownerId: lila.user.User.ID) =
-    !env.prizeTournamentMakers.get().value.contains(ownerId) option
+    (!env.prizeTournamentMakers.get().value.contains(ownerId)).option(
       div(cls := "tour__prize")(
         "This tournament is NOT organized by PlayStrategy.",
         br,
         "If it has prizes, PlayStrategy is NOT responsible for paying them."
       )
+    )
 
   def medleyGames(
       variants: List[Variant],

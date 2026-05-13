@@ -1,8 +1,8 @@
 package lila.insight
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final private class AggregationPipeline(store: Storage)(implicit ec: scala.concurrent.ExecutionContext) {
@@ -12,13 +12,13 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
       _.aggregateList(
         maxDocs = Int.MaxValue,
         allowDiskUse = true
-      ) { implicit framework =>
-        import framework._
+      ) { framework =>
+        import framework.*
         import question.{ dimension, filters, metric }
 
-        import lila.insight.{ Dimension => D, Metric => M }
-        import InsightEntry.{ BSONFields => F }
-        import Storage._
+        import lila.insight.{ Dimension as D, Metric as M }
+        import InsightEntry.BSONFields as F
+        import Storage.*
 
         val sampleGames    = Sample(10_000)
         val sampleMoves    = Sample(200_000).some
@@ -82,7 +82,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
                 )
               )
             }
-        def dimensionGroupId(dim: Dimension[_]): BSONValue =
+        def dimensionGroupId(dim: Dimension[?]): BSONValue =
           dim match {
             case Dimension.MovetimeRange => movetimeIdDispatcher
             case Dimension.CplRange      => cplIdDispatcher
@@ -95,7 +95,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
           object Group                                                            extends Grouping
           case class BucketAuto(buckets: Int, granularity: Option[String] = None) extends Grouping
         }
-        def dimensionGrouping(dim: Dimension[_]): Grouping =
+        def dimensionGrouping(dim: Dimension[?]): Grouping =
           dim match {
             case D.Date => Grouping.BucketAuto(buckets = 12)
             case _      => Grouping.Group
@@ -105,7 +105,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
         val includeSomeGameIds = AddFields(gameIdsSlice)
         val toPercent          = $doc("v" -> $doc("$multiply" -> $arr(100, $doc("$avg" -> "$v"))))
 
-        def group(d: Dimension[_], f: GroupFunction): List[Option[PipelineOperator]] =
+        def group(d: Dimension[?], f: GroupFunction): List[Option[PipelineOperator]] =
           List(dimensionGrouping(d) match {
             case Grouping.Group =>
               Group(dimensionGroupId(d))(
@@ -121,7 +121,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
               )
           }) map { Option(_) }
 
-        def groupMulti(d: Dimension[_], metricDbKey: String): List[Option[PipelineOperator]] =
+        def groupMulti(d: Dimension[?], metricDbKey: String): List[Option[PipelineOperator]] =
           (dimensionGrouping(d) match {
             case Grouping.Group =>
               List[PipelineOperator](
@@ -161,8 +161,8 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
           combineDocs(extraMatcher :: question.filters.collect {
             case f if f.dimension.isInMove => f.matcher
           } ::: (dimension match {
-            case D.TimeVariance => List($doc(F.moves("v") $exists true))
-            case D.CplRange     => List($doc(F.moves("c") $exists true))
+            case D.TimeVariance => List($doc(F.moves("v").$exists(true)))
+            case D.CplRange     => List($doc(F.moves("c").$exists(true)))
             case _              => List.empty[Bdoc]
           })).some.filterNot(_.isEmpty) map Match.apply
 
@@ -176,10 +176,10 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
         val pipeline = Match(
           selectUserId(user.id) ++
             gameMatcher ++
-            (dimension == Dimension.Opening).??($doc(F.eco $exists true)) ++
-            Metric.requiresAnalysis(metric).??($doc(F.analysed -> true)) ++
-            (Metric.requiresStableRating(metric) || Dimension.requiresStableRating(dimension)).?? {
-              $doc(F.provisional $ne true)
+            (dimension == Dimension.Opening).so($doc(F.eco.$exists(true))) ++
+            Metric.requiresAnalysis(metric).so($doc(F.analysed -> true)) ++
+            (Metric.requiresStableRating(metric) || Dimension.requiresStableRating(dimension)).so {
+              $doc(F.provisional.$ne(true))
             }
         ) -> /* sortDate :: */ {
           sampleGames :: ((metric match {
@@ -214,7 +214,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
               List(
                 projectForMove,
                 unwindMoves,
-                matchMoves($doc(F.moves("o") $exists true)),
+                matchMoves($doc(F.moves("o").$exists(true))),
                 sampleMoves
               ) :::
                 group(dimension, GroupFunction("$push", $doc("$cond" -> $arr("$" + F.moves("o"), 1, 0)))) :::
@@ -223,7 +223,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
               List(
                 projectForMove,
                 unwindMoves,
-                matchMoves($doc(F.moves("l") $exists true)),
+                matchMoves($doc(F.moves("l").$exists(true))),
                 sampleMoves
               ) :::
                 group(dimension, GroupFunction("$push", $doc("$cond" -> $arr("$" + F.moves("l"), 1, 0)))) :::
@@ -293,7 +293,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
               List(
                 projectForMove,
                 unwindMoves,
-                matchMoves($doc(F.moves("v") $exists true)),
+                matchMoves($doc(F.moves("v").$exists(true))),
                 sampleMoves
               ) :::
                 group(

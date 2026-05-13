@@ -1,9 +1,8 @@
 package views.html.site
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-import controllers.routes
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object bits {
 
@@ -15,7 +14,7 @@ object bits {
       main(
         iframe(
           src := "https://docs.google.com/forms/d/e/1FAIpQLSeGgDHgWGP0uobQknF92eCMXqebyNBTyzJoJqbeGjRezlbWOw/viewform?embedded=true",
-          style := "width:100%;height:1400px",
+          style          := "width:100%;height:1400px",
           st.frameborder := 0
         )(spinner)
       )

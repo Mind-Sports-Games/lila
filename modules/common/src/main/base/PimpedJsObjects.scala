@@ -1,6 +1,6 @@
 package lila.base
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 final class PimpedJsObject(private val js: JsObject) extends AnyVal {
 
@@ -90,7 +90,7 @@ final class PimpedJsValue(private val js: JsValue) extends AnyVal {
     }
 
   def get[A: Reads](key: String): Option[A] =
-    js.asOpt[JsObject] flatMap { obj =>
+    js.asOpt[JsObject] flatMap { _ =>
       (js \ key).asOpt[A]
     }
 

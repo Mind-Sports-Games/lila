@@ -2,11 +2,11 @@ package lila.study
 
 import strategygames.variant.Variant
 
-import BSONHandlers._
+import BSONHandlers.*
 import Node.Children
 
 import lila.common.Chronometer
-import lila.db.dsl._
+import lila.db.dsl.*
 
 private object StudyFlatTree {
 
@@ -44,7 +44,7 @@ private object StudyFlatTree {
     // assumes that node has a greater depth than roots (sort beforehand)
     private def update(roots: Map[Path, Children], flat: FlatNode)(implicit
         variant: Variant
-    ): Map[Path, Children] = {
+    ): Map[Path, Children] =
       flat
         .toNodeWithChildren(roots.get(flat.path))
         .fold(roots) { node =>
@@ -55,7 +55,6 @@ private object StudyFlatTree {
               case Some(siblings) => siblings.addNode(node).some
             }
         }
-    }
   }
 
   object writer {
@@ -66,11 +65,11 @@ private object StudyFlatTree {
       }
 
     private def traverse(node: Node, parentPath: Path): Vector[(String, Bdoc)] =
-      (parentPath.depth < Node.maxPlies) ?? {
+      (parentPath.depth < Node.maxPlies) so {
         val path = parentPath + node.id
         node.children.nodes.flatMap {
           traverse(_, path)
-        } appended (Path.encodeDbKey(path) -> VariantHandlers()(node.variant).writeNode(node))
+        } appended (Path.encodeDbKey(path) -> VariantHandlers()(using node.variant).writeNode(node))
       }
   }
 }

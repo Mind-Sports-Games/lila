@@ -1,7 +1,7 @@
 package controllers
 
-import io.prismic.{ Api => PrismicApi, _ }
-import lila.app._
+import io.prismic.{ Api as PrismicApi, * }
+import lila.app.*
 
 final class Prismic(
     env: Env
@@ -12,20 +12,8 @@ final class Prismic(
   private def prismicApi = env.blog.api.prismicApi
 
   implicit def makeLinkResolver(prismicApi: PrismicApi, ref: Option[String] = None): DocumentLinkResolver =
-    DocumentLinkResolver(prismicApi) {
-      case (link, _) => routes.Blog.show(link.id, link.slug, ref).url
-      case _         => routes.Lobby.home.url
-    }
-
-  private def getDocument(id: String): Fu[Option[Document]] =
-    prismicApi flatMap { api =>
-      api
-        .forms("everything")
-        .query(s"""[[:d = at(document.id, "$id")]]""")
-        .ref(api.master.ref)
-        .submit() dmap {
-        _.results.headOption
-      }
+    DocumentLinkResolver(prismicApi) { case (link, _) =>
+      routes.Blog.show(link.id, link.slug, ref).url
     }
 
   private def getPageDocument(api: PrismicApi, uid: String): Fu[Option[Document]] =

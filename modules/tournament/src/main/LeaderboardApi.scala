@@ -1,13 +1,13 @@
 package lila.tournament
 
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import reactivemongo.api.ReadPreference
 
 import lila.common.Maths
 import lila.common.config.MaxPerPage
 import lila.common.paginator.Paginator
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.db.paginator.Adapter
 import lila.rating.PerfType
 import lila.user.User
@@ -17,12 +17,12 @@ final class LeaderboardApi(
     tournamentRepo: TournamentRepo
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import LeaderboardApi._
-  import BSONHandlers._
+  import LeaderboardApi.*
+  import BSONHandlers.*
 
   private val maxPerPage = MaxPerPage(15)
 
-  private def userSelector(userId: User.ID) = $doc("u" -> userId)
+  private def userSelector(userId: User.ID)                            = $doc("u" -> userId)
   private def tourUserSelector(userId: User.ID, tourId: Tournament.ID) =
     $doc(
       "u" -> userId,
@@ -30,10 +30,10 @@ final class LeaderboardApi(
     )
 
   def recentByUser(user: User, page: Int) =
-    paginator(user, page, userSelector(user.id), $sort desc "d")
+    paginator(user, page, userSelector(user.id), $sort.desc("d"))
 
   def bestByUser(user: User, page: Int) =
-    paginator(user, page, userSelector(user.id), $sort asc "w")
+    paginator(user, page, userSelector(user.id), $sort.asc("w"))
 
   def shieldLeaderboardByUser(user: User, page: Int, lastXMonths: Int = 2) =
     paginator(
@@ -41,11 +41,11 @@ final class LeaderboardApi(
       page,
       $doc(
         "u" -> user.id,
-        "d" $gt DateTime.now().plusMonths(lastXMonths * -1) $lt DateTime.now(),
-        "mp" $exists true,
-        "k" $exists true
+        "d".$gt(DateTime.now().plusMonths(lastXMonths * -1)).$lt(DateTime.now()),
+        "mp".$exists(true),
+        "k".$exists(true)
       ),
-      $sort desc "d"
+      $sort.desc("d")
     )
 
   def timeRange(userId: User.ID, range: (DateTime, DateTime)): Fu[List[Entry]] =
@@ -53,20 +53,17 @@ final class LeaderboardApi(
       .find(
         $doc(
           "u" -> userId,
-          "d" $gt range._1 $lt range._2
+          "d".$gt(range._1).$lt(range._2)
         )
       )
-      .sort($sort desc "d")
+      .sort($sort.desc("d"))
       .cursor[Entry]()
       .list()
 
-  def chart(user: User): Fu[ChartData] = {
+  def chart(user: User): Fu[ChartData] =
     repo.coll
-      .aggregateList(
-        maxDocs = Int.MaxValue,
-        ReadPreference.secondaryPreferred
-      ) { framework =>
-        import framework._
+      .aggregateList(maxDocs = Int.MaxValue, ReadPreference.secondaryPreferred) { framework =>
+        import framework.*
         Match($doc("u" -> user.id)) -> List(
           GroupField("v")("nb" -> SumAll, "points" -> PushField("s"), "ratios" -> PushField("w"))
         )
@@ -89,7 +86,6 @@ final class LeaderboardApi(
             .sortLike(PerfType.leaderboardable, _._1)
         }
       }
-  }
 
   private def ejectEntries(entryIds: List[String], disqualify: Boolean) =
     if (disqualify) repo.coll.update.one($inIds(entryIds), $set("dq" -> true)).void
@@ -99,17 +95,22 @@ final class LeaderboardApi(
     repo.coll.list[Entry](
       $doc(
         "u" -> userId,
-        "d" $gt since
+        "d".$gt(since)
       )
     ) flatMap { entries =>
-      (entries.nonEmpty ?? ejectEntries(entries.map(_.id), disqualify)) inject entries.map(_.tourId)
+      (entries.nonEmpty so ejectEntries(entries.map(_.id), disqualify)) inject entries.map(_.tourId)
     }
 
   def ejectEntry(userId: User.ID, tourId: Tournament.ID, disqualify: Boolean) =
     if (disqualify) repo.coll.update.one(tourUserSelector(userId, tourId), $set("dq" -> true)).void
     else repo.coll.delete.one(tourUserSelector(userId, tourId)).void
 
-  private def paginator(user: User, page: Int, selector: Bdoc, sort: Bdoc): Fu[Paginator[TourEntry]] =
+  private def paginator(
+      @annotation.nowarn("msg=unused") _user: User,
+      page: Int,
+      selector: Bdoc,
+      sort: Bdoc
+  ): Fu[Paginator[TourEntry]] =
     Paginator(
       adapter = new Adapter[Entry](
         collection = repo.coll,
@@ -117,13 +118,13 @@ final class LeaderboardApi(
         projection = none,
         sort = sort,
         readPreference = ReadPreference.secondaryPreferred
-      ) mapFutureList withTournaments,
+      ).mapFutureList(withTournaments),
       currentPage = page,
       maxPerPage = maxPerPage
     )
 
   private def withTournaments(entries: Seq[Entry]): Fu[Seq[TourEntry]] =
-    tournamentRepo byIds entries.map(_.tourId) map { tours =>
+    tournamentRepo.byIds(entries.map(_.tourId)) map { tours =>
       entries.flatMap { entry =>
         tours.find(_.id == entry.tourId).map { TourEntry(_, entry) }
       }
@@ -131,8 +132,8 @@ final class LeaderboardApi(
 
   private def findByCategory(lastXMonths: Int, category: ShieldTableApi.Category) =
     $doc(
-      "d" $gt DateTime.now().plusMonths(lastXMonths * -1) $lt DateTime.now(),
-      "mp" $exists true,
+      "d".$gt(DateTime.now().plusMonths(lastXMonths * -1)).$lt(DateTime.now()),
+      "mp".$exists(true),
       "k" -> $doc(
         "$regex" -> BSONRegex(s"^${category.id - 1}_|${category.medleyShieldCode}", "")
       )
@@ -140,9 +141,9 @@ final class LeaderboardApi(
 
   private def findAll(lastXMonths: Int) =
     $doc(
-      "d" $gt DateTime.now().plusMonths(lastXMonths * -1) $lt DateTime.now(),
-      "mp" $exists true,
-      "k" $exists true
+      "d".$gt(DateTime.now().plusMonths(lastXMonths * -1)).$lt(DateTime.now()),
+      "mp".$exists(true),
+      "k".$exists(true)
     )
 
   def shieldLeaderboardMetaPoints(lastXMonths: Int, category: ShieldTableApi.Category) =
@@ -171,7 +172,6 @@ final class LeaderboardApi(
           .toMap
           .map { case (u, v) => (u, v.map { case (_, p) => p }.sum) }
       }
-
 }
 
 object LeaderboardApi {
@@ -181,7 +181,7 @@ object LeaderboardApi {
   case class TourEntry(tour: Tournament, entry: Entry)
 
   case class Ratio(value: Double) extends AnyVal {
-    def percent = (value * 100).toInt atLeast 1
+    def percent = (value * 100).toInt.atLeast(1)
   }
 
   case class Entry(
@@ -201,7 +201,7 @@ object LeaderboardApi {
   )
 
   case class ChartData(perfResults: List[(PerfType, ChartData.PerfResult)]) {
-    import ChartData._
+    import ChartData.*
     lazy val allPerfResults: PerfResult = perfResults.map(_._2) match {
       case head :: tail =>
         tail.foldLeft(head) { case (acc, res) =>

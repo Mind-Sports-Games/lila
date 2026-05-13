@@ -2,12 +2,10 @@ package views.html
 package userTournament
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.user.User
-
-import controllers.routes
 
 object bits {
 
@@ -56,12 +54,15 @@ object bits {
           a(cls := path.active("created"), href := routes.UserTournament.path(u.username, "created"))(
             "Created"
           ),
-          ctx.is(u) option
-            a(cls := path.active("upcoming"), href := routes.UserTournament.path(u.username, "upcoming"))(
-              "Upcoming"
+          ctx
+            .is(u)
+            .option(
+              a(cls := path.active("upcoming"), href := routes.UserTournament.path(u.username, "upcoming"))(
+                "Upcoming"
+              )
             ),
           a(
-            cls := path.active("shieldleaderboard"),
+            cls  := path.active("shieldleaderboard"),
             href := routes.UserTournament.path(u.username, "shieldleaderboard")
           )(
             "Shield Leaderboard"

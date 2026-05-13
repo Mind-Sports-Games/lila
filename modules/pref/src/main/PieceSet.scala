@@ -1,8 +1,5 @@
 package lila.pref
-import strategygames.{ GameFamily }
-
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
+import strategygames.GameFamily
 
 sealed class PieceSet private[pref] (val name: String, val gameFamily: Int) {
 
@@ -30,7 +27,6 @@ sealed trait PieceSetObject {
   def unapply(full: PieceSet): Some[(String, Int)] = Some((full.name, full.gameFamily))
 
   def contains(name: String) = allByName contains name
-
 }
 
 object PieceSet extends PieceSetObject {
@@ -48,20 +44,16 @@ object PieceSet extends PieceSetObject {
     }
   }
 
-  def addMissingDefaultsIfAny(currentPieceSets: List[PieceSet]): List[PieceSet] = {
+  def addMissingDefaultsIfAny(currentPieceSets: List[PieceSet]): List[PieceSet] =
     defaults.map { x =>
-      if (currentPieceSets.filter(ps => ps.gameFamily == x.gameFamily).size == 1) {
+      if (currentPieceSets.filter(ps => ps.gameFamily == x.gameFamily).size == 1)
         currentPieceSets.filter(ps => ps.gameFamily == x.gameFamily)(0)
-      } else {
-        x
-      }
+      else x
     }
-  }
   val all: List[PieceSet] =
     GameFamily.all.map(gf => gf.pieceSetThemes.map(t => new PieceSet(t, gf.id))).flatten
 
   def allOfFamily(gf: GameFamily): List[PieceSet] = gf.pieceSetThemes.map(t => new PieceSet(t, gf.id))
-
 }
 
 object PieceSet3d extends PieceSetObject {

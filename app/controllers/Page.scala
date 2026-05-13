@@ -1,9 +1,8 @@
 package controllers
 
 import strategygames.variant.Variant
-import strategygames.GameLogic
 
-import lila.app._
+import lila.app.*
 import lila.i18n.VariantKeys
 
 final class Page(
@@ -18,7 +17,7 @@ final class Page(
   def page(uid: String, active: Option[String]) =
     Open { implicit ctx =>
       pageHit
-      OptionOk(prismicC getPage uid) { case (doc, resolver) =>
+      OptionOk(prismicC.getPage(uid)) { case (doc, resolver) =>
         active match {
           case None      => views.html.site.page.lone(doc, resolver)
           case Some(uid) => views.html.site.page.withMenu(uid, doc, resolver)
@@ -32,20 +31,20 @@ final class Page(
   def source =
     Open { implicit ctx =>
       pageHit
-      OptionOk(prismicC getPage "source") { case (doc, resolver) =>
+      OptionOk(prismicC.getPage("source")) { case (doc, resolver) =>
         views.html.site.page.source(doc, resolver)
       }
     }
 
   def variantHome =
     Open { implicit ctx =>
-      import play.api.libs.json._
+      import play.api.libs.json.*
       negotiate(
-        html = OptionOk(prismicC getPage "variant") { case (doc, resolver) =>
+        html = OptionOk(prismicC.getPage("variant")) { case (doc, resolver) =>
           views.html.site.variant.home(doc, resolver)
         },
         api = _ =>
-          Ok(JsArray((Variant.all).map { v =>
+          Ok(JsArray(Variant.all.map { v =>
             Json.obj(
               "id"   -> v.id,
               "key"  -> v.key,
@@ -58,10 +57,10 @@ final class Page(
   def variant(key: String) =
     Open { implicit ctx =>
       (for {
-        variant <- (Variant.all).map { v =>
+        variant <- Variant.all.map { v =>
           (v.key, v)
         }.toMap get key
-      } yield OptionOk(prismicC getPage prismicUid(key)) { case (doc, resolver) =>
+      } yield OptionOk(prismicC.getPage(prismicUid(key))) { case (doc, resolver) =>
         views.html.site.variant.show(doc, resolver, variant)
       }) | notFound
     }

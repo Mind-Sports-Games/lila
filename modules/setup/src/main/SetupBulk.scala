@@ -1,11 +1,11 @@
 package lila.setup
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import org.joda.time.DateTime
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 import play.api.libs.json.Json
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import strategygames.{ ClockConfig, GameLogic, Mode }
 import strategygames.variant.Variant
@@ -72,7 +72,7 @@ object SetupBulk {
           rated,
           pairTs.map { new DateTime(_) },
           clockTs.map { new DateTime(_) },
-          message map Template
+          message map Template.apply
         )
     }(_ => None)
   )
@@ -81,7 +81,7 @@ object SetupBulk {
     str
       .split(',')
       .view
-      .map(_ split ":")
+      .map(_.split(":"))
       .collect { case Array(w, b) =>
         w.trim -> b.trim
       }
@@ -107,7 +107,7 @@ object SetupBulk {
       message: Option[Template],
       pairedAt: Option[DateTime] = None
   ) {
-    def userSet = Set(games.flatMap(g => List(g.p1, g.p2)))
+    def userSet                            = Set(games.flatMap(g => List(g.p1, g.p2)))
     def collidesWith(other: ScheduledBulk) = {
       pairAt == other.pairAt || startClocksAt == startClocksAt
     } && userSet.exists(other.userSet.contains)
@@ -119,11 +119,11 @@ object SetupBulk {
   case object RateLimited                         extends ScheduleError
 
   def toJson(bulk: ScheduledBulk) = {
-    import bulk._
+    import bulk.*
     import lila.common.Json.jodaWrites
     Json
       .obj(
-        "id" -> _id,
+        "id"    -> _id,
         "games" -> games.map { g =>
           Json.obj(
             "id" -> g.id,
@@ -132,7 +132,7 @@ object SetupBulk {
           )
         },
         "variant" -> variant.key,
-        "clock" -> Json.obj(
+        "clock"   -> Json.obj(
           "limit" -> clock.limitSeconds,
           // TODO: the name of this field is no longer correct for all clocks (Bronstein/ Simple Delay) should we change it?
           "increment" -> clock.graceSeconds
@@ -145,7 +145,6 @@ object SetupBulk {
       )
       .add("message" -> message.map(_.value))
   }
-
 }
 
 final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(implicit
@@ -153,7 +152,7 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
     mat: akka.stream.Materializer
 ) {
 
-  import SetupBulk._
+  import SetupBulk.*
 
   type Result = Either[ScheduleError, ScheduledBulk]
 
@@ -180,7 +179,7 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
         case (Right(users), Right(scoped)) => Right(scoped.user.id :: users)
       }
       .flatMap {
-        case Left(errors) => fuccess(Left(BadTokens(errors.reverse)))
+        case Left(errors)      => fuccess(Left(BadTokens(errors.reverse)))
         case Right(allPlayers) =>
           val dups = allPlayers
             .groupBy(identity)
@@ -198,7 +197,7 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
               .toList
             val nbGames = pairs.size
             rateLimit[Fu[Result]](me.id, cost = nbGames) {
-              lila.mon.api.challenge.bulk.scheduleNb(me.id).increment(nbGames).unit
+              val _ = lila.mon.api.challenge.bulk.scheduleNb(me.id).increment(nbGames)
               idGenerator
                 .games(nbGames)
                 .map {
@@ -211,7 +210,7 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
                 }
                 .dmap {
                   ScheduledBulk(
-                    _id = lila.common.ThreadLocalRandom nextString 8,
+                    _id = lila.common.ThreadLocalRandom.nextString(8),
                     by = me.id,
                     _,
                     data.variant,

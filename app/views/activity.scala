@@ -1,12 +1,10 @@
 package views.html
 
-import controllers.routes
-
-import lila.activity.activities._
-import lila.activity.model._
+import lila.activity.activities.*
+import lila.activity.model.*
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.user.User
 import lila.swiss.Swiss
 import lila.rating.PerfType
@@ -39,8 +37,8 @@ object activity {
             a.tours map renderTours,
             a.swisses map renderSwisses,
             a.teams map renderTeams,
-            a.stream option renderStream(u),
-            a.signup option renderSignup
+            a.stream.option(renderStream(u)),
+            a.signup.option(renderSignup)
           )
         )
       }
@@ -138,21 +136,23 @@ object activity {
     }
 
   private def renderPosts(posts: Map[lila.forum.Topic, List[lila.forum.Post]])(implicit ctx: Context) =
-    ctx.noKid option entryTag(
-      iconTag("d"),
-      div(
-        posts.toSeq.map { case (topic, posts) =>
-          val url = routes.ForumTopic.show(topic.categId, topic.slug)
-          frag(
-            trans.activity.postedNbMessages
-              .plural(posts.size, posts.size, a(href := url)(shorten(topic.name, 70))),
-            subTag(
-              posts.map { post =>
-                div(cls := "line")(a(href := routes.ForumPost.redirect(post.id))(shorten(post.text, 120)))
-              }
+    ctx.noKid.option(
+      entryTag(
+        iconTag("d"),
+        div(
+          posts.toSeq.map { case (topic, posts) =>
+            val url = routes.ForumTopic.show(topic.categId, topic.slug)
+            frag(
+              trans.activity.postedNbMessages
+                .plural(posts.size, posts.size, a(href := url)(shorten(topic.name, 70))),
+              subTag(
+                posts.map { post =>
+                  div(cls := "line")(a(href := routes.ForumPost.redirect(post.id))(shorten(post.text, 120)))
+                }
+              )
             )
-          )
-        }
+          }
+        )
       )
     )
 
@@ -260,11 +260,13 @@ object activity {
     )
 
   private def renderTeams(teams: Teams)(implicit ctx: Context) =
-    ctx.noKid option entryTag(
-      iconTag("f"),
-      div(
-        trans.activity.joinedNbTeams.pluralSame(teams.value.size),
-        subTag(fragList(teams.value.map(id => teamLink(id))))
+    ctx.noKid.option(
+      entryTag(
+        iconTag("f"),
+        div(
+          trans.activity.joinedNbTeams.pluralSame(teams.value.size),
+          subTag(fragList(teams.value.map(id => teamLink(id))))
+        )
       )
     )
 
@@ -322,9 +324,11 @@ object activity {
     )
 
   private def renderStream(u: User)(implicit ctx: Context) =
-    ctx.noKid option entryTag(
-      iconTag(""),
-      a(href := routes.Streamer.redirect(u.username))(trans.activity.hostedALiveStream())
+    ctx.noKid.option(
+      entryTag(
+        iconTag(""),
+        a(href := routes.Streamer.redirect(u.username))(trans.activity.hostedALiveStream())
+      )
     )
 
   private def renderSignup(implicit ctx: Context) =
@@ -341,10 +345,10 @@ object activity {
   private def scoreFrag(s: Score)(implicit ctx: Context) =
     raw {
       s"""<score>${scoreStr("win", s.win, trans.nbWins)}${scoreStr("draw", s.draw, trans.nbDraws)}${scoreStr(
-        "loss",
-        s.loss,
-        trans.nbLosses
-      )}</score>"""
+          "loss",
+          s.loss,
+          trans.nbLosses
+        )}</score>"""
     }
 
   private def ratingProgFrag(r: RatingProg) =

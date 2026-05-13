@@ -3,6 +3,7 @@ package lila.rating
 import play.api.data.Form
 import play.api.data.Forms.{ single, text }
 
+import lila.base.DoubleValue
 import lila.memo.SettingStore.{ Formable, StringReader }
 import reactivemongo.api.bson.BSONHandler
 
@@ -38,6 +39,6 @@ object RatingFactor {
     implicit val ratingFactorsStringReader: StringReader[RatingFactors] =
       StringReader.fromIso(ratingFactorsIso)
     implicit val ratingFactorsFormable: Formable[RatingFactors] =
-      new Formable[RatingFactors](rfs => Form(single("v" -> text)) fill write(rfs))
+      new Formable[RatingFactors](rfs => Form(single("v" -> text)).fill(write(rfs)))
   }
 }

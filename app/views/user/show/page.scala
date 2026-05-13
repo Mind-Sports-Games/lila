@@ -1,13 +1,12 @@
 package views.html.user.show
 
-import controllers.routes
 import play.api.data.Form
 
 import lila.api.Context
 import lila.app.mashup.UserInfo
 import lila.app.mashup.UserInfo.Angle
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.game.Game
 import lila.user.User
@@ -34,7 +33,7 @@ object page {
       moreJs = moreJs(info),
       moreCss = frag(
         cssTag("user.show"),
-        isGranted(_.UserModView) option cssTag("mod.user")
+        isGranted(_.UserModView).option(cssTag("mod.user"))
       ),
       robots = u.count.game >= 10
     ) {
@@ -52,18 +51,19 @@ object page {
       info: UserInfo,
       games: Paginator[Game],
       filters: lila.app.mashup.GameFilterMenu,
-      searchForm: Option[Form[_]],
+      searchForm: Option[Form[?]],
       social: lila.app.mashup.UserInfo.Social
   )(implicit ctx: Context) =
     views.html.base.layout(
-      title =
-        s"${u.username} : ${userGameFilterTitleNoTag(u, info.nbs, filters.current)}${if (games.currentPage == 1) ""
-        else " - page " + games.currentPage}",
+      title = s"${u.username} : ${userGameFilterTitleNoTag(u, info.nbs, filters.current)}${
+          if (games.currentPage == 1) ""
+          else " - page " + games.currentPage
+        }",
       moreJs = moreJs(info, filters.current.name == "search"),
       moreCss = frag(
         cssTag("user.show"),
-        filters.current.name == "search" option cssTag("user.show.search"),
-        isGranted(_.UserModView) option cssTag("mod.user")
+        (filters.current.name == "search").option(cssTag("user.show.search")),
+        isGranted(_.UserModView).option(cssTag("mod.user"))
       ),
       robots = u.count.game >= 10
     ) {
@@ -86,8 +86,8 @@ object page {
           embedJsUnsafeLoadThen(s"playstrategy.ratingHistoryChart($ratingChart)")
         )
       },
-      withSearch option jsModule("gameSearch"),
-      isGranted(_.UserModView) option jsModule("mod.user")
+      withSearch.option(jsModule("gameSearch")),
+      isGranted(_.UserModView).option(jsModule("mod.user"))
     )
 
   def disabled(u: User)(implicit ctx: Context) =

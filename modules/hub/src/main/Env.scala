@@ -1,14 +1,14 @@
 package lila.hub
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 import com.typesafe.config.Config
 import play.api.Configuration
 
 object actors {
   trait Actor {
     val actor: ActorSelection
-    val ! = actor ! _
+    val ! = (msg: Any) => actor ! msg
   }
   case class GameSearch(actor: ActorSelection)    extends Actor
   case class ForumSearch(actor: ActorSelection)   extends Actor
@@ -30,7 +30,7 @@ final class Env(
     system: ActorSystem
 ) {
 
-  import actors._
+  import actors.*
 
   private val config = appConfig.get[Config]("hub")
 

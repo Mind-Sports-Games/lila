@@ -133,90 +133,88 @@ case class History(
 
 object History {
 
-  import reactivemongo.api.bson._
+  import reactivemongo.api.bson.*
 
-  implicit private[history] val RatingsMapReader: BSONDocumentReader[RatingsMap] {
-    def readDocument(doc: reactivemongo.api.bson.BSONDocument): scala.util.Success[List[(Int, Int)]]
-  } = new BSONDocumentReader[RatingsMap] {
-    def readDocument(doc: BSONDocument) =
-      Success(
-        doc.elements
-          .flatMap {
-            case BSONElement(k, BSONInteger(v)) => k.toIntOption map (_ -> v)
-            case _                              => none[(Int, Int)]
-          }
-          .sortBy(_._1)
-          .toList
-      )
-  }
-
-  implicit private[history] val HistoryBSONReader: BSONDocumentReader[History] {
-    def readDocument(doc: reactivemongo.api.bson.BSONDocument): scala.util.Success[lila.history.History]
-  } = new BSONDocumentReader[History] {
-    def readDocument(doc: BSONDocument) =
-      Success {
-        def ratingsMap(key: String): RatingsMap = ~doc.getAsOpt[RatingsMap](key)
-        History(
-          standard = ratingsMap("standard"),
-          chess960 = ratingsMap("chess960"),
-          kingOfTheHill = ratingsMap("kingOfTheHill"),
-          threeCheck = ratingsMap("threeCheck"),
-          fiveCheck = ratingsMap("fiveCheck"),
-          antichess = ratingsMap("antichess"),
-          atomic = ratingsMap("atomic"),
-          horde = ratingsMap("horde"),
-          racingKings = ratingsMap("racingKings"),
-          crazyhouse = ratingsMap("crazyhouse"),
-          noCastling = ratingsMap("noCastling"),
-          monster = ratingsMap("monster"),
-          linesOfAction = ratingsMap("linesOfAction"),
-          scrambledEggs = ratingsMap("scrambledEggs"),
-          international = ratingsMap("international"),
-          frisian = ratingsMap("frisian"),
-          frysk = ratingsMap("frysk"),
-          antidraughts = ratingsMap("antidraughts"),
-          breakthrough = ratingsMap("breakthrough"),
-          russian = ratingsMap("russian"),
-          brazilian = ratingsMap("brazilian"),
-          pool = ratingsMap("pool"),
-          portuguese = ratingsMap("portuguese"),
-          english = ratingsMap("english"),
-          dameo = ratingsMap("dameo"),
-          shogi = ratingsMap("shogi"),
-          xiangqi = ratingsMap("xiangqi"),
-          minishogi = ratingsMap("minishogi"),
-          minixiangqi = ratingsMap("minixiangqi"),
-          flipello = ratingsMap("flipello"),
-          flipello10 = ratingsMap("flipello10"),
-          antiflipello = ratingsMap("antiflipello"),
-          octagonflipello = ratingsMap("octagonflipello"),
-          amazons = ratingsMap("amazons"),
-          breakthroughtroyka = ratingsMap("breakthroughtroyka"),
-          minibreakthroughtroyka = ratingsMap("minibreakthroughtroyka"),
-          oware = ratingsMap("oware"),
-          togyzkumalak = ratingsMap("togyzkumalak"),
-          bestemshe = ratingsMap("bestemshe"),
-          go9x9 = ratingsMap("go9x9"),
-          go13x13 = ratingsMap("go13x13"),
-          go19x19 = ratingsMap("go19x19"),
-          backgammon = ratingsMap("backgammon"),
-          hyper = ratingsMap("hyper"),
-          nackgammon = ratingsMap("nackgammon"),
-          abalone = ratingsMap("abalone"),
-          grandabalone = ratingsMap("grandabalone"),
-          ultraBullet = ratingsMap("ultraBullet"),
-          bullet = ratingsMap("bullet"),
-          blitz = ratingsMap("blitz"),
-          rapid = ratingsMap("rapid"),
-          classical = ratingsMap("classical"),
-          correspondence = ratingsMap("correspondence"),
-          puzzle_standard = ratingsMap("puzzle_standard"),
-          puzzle_kingOfTheHill = ratingsMap("puzzle_kingOfTheHill"),
-          puzzle_atomic = ratingsMap("puzzle_atomic"),
-          puzzle_horde = ratingsMap("puzzle_horde"),
-          puzzle_racingKings = ratingsMap("puzzle_racingKings"),
-          puzzle_linesOfAction = ratingsMap("puzzle_linesOfAction")
+  implicit private[history] val RatingsMapReader: BSONDocumentReader[RatingsMap] =
+    new BSONDocumentReader[RatingsMap] {
+      def readDocument(doc: BSONDocument) =
+        Success(
+          doc.elements
+            .flatMap {
+              case BSONElement(k, BSONInteger(v)) => k.toIntOption map (_ -> v)
+              case _                              => none[(Int, Int)]
+            }
+            .sortBy(_._1)
+            .toList
         )
-      }
-  }
+    }
+
+  implicit private[history] val HistoryBSONReader: BSONDocumentReader[History] =
+    new BSONDocumentReader[History] {
+      def readDocument(doc: BSONDocument) =
+        Success {
+          def ratingsMap(key: String): RatingsMap = ~doc.getAsOpt[RatingsMap](key)
+          History(
+            standard = ratingsMap("standard"),
+            chess960 = ratingsMap("chess960"),
+            kingOfTheHill = ratingsMap("kingOfTheHill"),
+            threeCheck = ratingsMap("threeCheck"),
+            fiveCheck = ratingsMap("fiveCheck"),
+            antichess = ratingsMap("antichess"),
+            atomic = ratingsMap("atomic"),
+            horde = ratingsMap("horde"),
+            racingKings = ratingsMap("racingKings"),
+            crazyhouse = ratingsMap("crazyhouse"),
+            noCastling = ratingsMap("noCastling"),
+            monster = ratingsMap("monster"),
+            linesOfAction = ratingsMap("linesOfAction"),
+            scrambledEggs = ratingsMap("scrambledEggs"),
+            international = ratingsMap("international"),
+            frisian = ratingsMap("frisian"),
+            frysk = ratingsMap("frysk"),
+            antidraughts = ratingsMap("antidraughts"),
+            breakthrough = ratingsMap("breakthrough"),
+            russian = ratingsMap("russian"),
+            brazilian = ratingsMap("brazilian"),
+            pool = ratingsMap("pool"),
+            portuguese = ratingsMap("portuguese"),
+            english = ratingsMap("english"),
+            dameo = ratingsMap("dameo"),
+            shogi = ratingsMap("shogi"),
+            xiangqi = ratingsMap("xiangqi"),
+            minishogi = ratingsMap("minishogi"),
+            minixiangqi = ratingsMap("minixiangqi"),
+            flipello = ratingsMap("flipello"),
+            flipello10 = ratingsMap("flipello10"),
+            antiflipello = ratingsMap("antiflipello"),
+            octagonflipello = ratingsMap("octagonflipello"),
+            amazons = ratingsMap("amazons"),
+            breakthroughtroyka = ratingsMap("breakthroughtroyka"),
+            minibreakthroughtroyka = ratingsMap("minibreakthroughtroyka"),
+            oware = ratingsMap("oware"),
+            togyzkumalak = ratingsMap("togyzkumalak"),
+            bestemshe = ratingsMap("bestemshe"),
+            go9x9 = ratingsMap("go9x9"),
+            go13x13 = ratingsMap("go13x13"),
+            go19x19 = ratingsMap("go19x19"),
+            backgammon = ratingsMap("backgammon"),
+            hyper = ratingsMap("hyper"),
+            nackgammon = ratingsMap("nackgammon"),
+            abalone = ratingsMap("abalone"),
+            grandabalone = ratingsMap("grandabalone"),
+            ultraBullet = ratingsMap("ultraBullet"),
+            bullet = ratingsMap("bullet"),
+            blitz = ratingsMap("blitz"),
+            rapid = ratingsMap("rapid"),
+            classical = ratingsMap("classical"),
+            correspondence = ratingsMap("correspondence"),
+            puzzle_standard = ratingsMap("puzzle_standard"),
+            puzzle_kingOfTheHill = ratingsMap("puzzle_kingOfTheHill"),
+            puzzle_atomic = ratingsMap("puzzle_atomic"),
+            puzzle_horde = ratingsMap("puzzle_horde"),
+            puzzle_racingKings = ratingsMap("puzzle_racingKings"),
+            puzzle_linesOfAction = ratingsMap("puzzle_linesOfAction")
+          )
+        }
+    }
 }

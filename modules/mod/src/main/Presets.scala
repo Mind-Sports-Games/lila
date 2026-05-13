@@ -1,7 +1,7 @@
 package lila.mod
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import scala.concurrent.ExecutionContext
 
 import lila.memo.SettingStore.{ Formable, StringReader }
@@ -9,9 +9,9 @@ import reactivemongo.api.bson.BSONHandler
 
 final class ModPresetsApi(
     settingStore: lila.memo.SettingStore.Builder
-)(implicit ec: ExecutionContext) {
+)(implicit @annotation.nowarn("msg=unused") _ec: ExecutionContext) {
 
-  import ModPresets.setting._
+  import ModPresets.setting.*
 
   def get(group: String) =
     group match {
@@ -72,7 +72,7 @@ object ModPresets {
 
     implicit val presetsBsonHandler: BSONHandler[ModPresets]   = lila.db.dsl.isoHandler(presetsIso)
     implicit val presetsStringReader: StringReader[ModPresets] = StringReader.fromIso(presetsIso)
-    implicit val presetsFormable: Formable[ModPresets] =
-      new Formable[ModPresets](presets => Form(single("v" -> text)) fill write(presets))
+    implicit val presetsFormable: Formable[ModPresets]         =
+      new Formable[ModPresets](presets => Form(single("v" -> text)).fill(write(presets)))
   }
 }

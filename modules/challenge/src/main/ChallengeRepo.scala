@@ -1,17 +1,16 @@
 package lila.challenge
 
 import org.joda.time.DateTime
-import scala.annotation.nowarn
 
 import lila.common.config.Max
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implicit
     ec: scala.concurrent.ExecutionContext
 ) {
 
-  import BSONHandlers._
-  import Challenge._
+  import BSONHandlers.*
+  import Challenge.*
 
   private val coll = colls.challenge
 
@@ -25,10 +24,10 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
   def exists(id: Challenge.ID) = coll.countSel($id(id)).dmap(0 <)
 
   def insert(c: Challenge): Funit =
-    coll.insert.one(c) >> c.challengerUser.?? { challenger =>
+    coll.insert.one(c) >> c.challengerUser.so { challenger =>
       createdByChallengerId(challenger.id).flatMap {
         case challenges if challenges.sizeIs <= maxPerUser.value => funit
-        case challenges                                          => challenges.drop(maxPerUser.value).map(_.id).map(remove).sequenceFu.void
+        case challenges => Future.sequence(challenges.drop(maxPerUser.value).map(_.id).map(remove)).void
       }
     }
 
@@ -52,7 +51,7 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
     coll.update
       .one(
         $id(c.id),
-        $set($doc("challenger" -> c.challenger) ++ playerIndex.?? { c =>
+        $set($doc("challenger" -> c.challenger) ++ playerIndex.so { c =>
           $doc("playerIndexChoice" -> Challenge.PlayerIndexChoice(c), "finalPlayerIndex" -> c)
         })
       )
@@ -63,7 +62,7 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
       x ::: y
     }
 
-  @nowarn("cat=unused") def like(c: Challenge) =
+  def like(c: Challenge) =
     ~(for {
       challengerId <- c.challengerUserId
       destUserId   <- c.destUserId
@@ -78,22 +77,21 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
   private[challenge] def countCreatedByDestId(userId: String): Fu[Int] =
     coll.countSel(selectCreated ++ $doc("destUser.id" -> userId))
 
-  private[challenge] def realTimeUnseenSince(date: DateTime, max: Int): Fu[List[Challenge]] = {
+  private[challenge] def realTimeUnseenSince(date: DateTime, max: Int): Fu[List[Challenge]] =
     coll
       .find(
         $doc(
-          "seenAt" $lt date,
+          "seenAt".$lt(date),
           "status" -> Status.Created.id,
-          "timeControl" $exists true
+          "timeControl".$exists(true)
         )
       )
       .hint(coll hint $doc("seenAt" -> 1)) // partial index
       .cursor[Challenge]()
       .list(max)
-  }
 
   private[challenge] def expired(max: Int): Fu[List[Challenge]] =
-    coll.list[Challenge]($doc("expiresAt" $lt DateTime.now), max)
+    coll.list[Challenge]($doc("expiresAt".$lt(DateTime.now)), max)
 
   def setSeenAgain(id: Challenge.ID) =
     coll.update
@@ -112,14 +110,14 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
   def setSeen(id: Challenge.ID) =
     coll.updateField($id(id), "seenAt", DateTime.now).void
 
-  def offline(challenge: Challenge) = setStatus(challenge, Status.Offline, Some(_ plusHours 3))
-  def cancel(challenge: Challenge)  = setStatus(challenge, Status.Canceled, Some(_ plusHours 3))
+  def offline(challenge: Challenge) = setStatus(challenge, Status.Offline, Some(_.plusHours(3)))
+  def cancel(challenge: Challenge)  = setStatus(challenge, Status.Canceled, Some(_.plusHours(3)))
   def decline(challenge: Challenge, reason: Challenge.DeclineReason) =
-    setStatus(challenge, Status.Declined, Some(_ plusHours 3)) >> {
-      (reason != Challenge.DeclineReason.default) ??
+    setStatus(challenge, Status.Declined, Some(_.plusHours(3))) >> {
+      (reason != Challenge.DeclineReason.default) so
         coll.updateField($id(challenge.id), "declineReason", reason).void
     }
-  def accept(challenge: Challenge) = setStatus(challenge, Status.Accepted, Some(_ plusHours 3))
+  def accept(challenge: Challenge) = setStatus(challenge, Status.Accepted, Some(_.plusHours(3)))
 
   def statusById(id: Challenge.ID) = coll.primitiveOne[Status]($id(id), "status")
 

@@ -1,9 +1,9 @@
 package lila.team
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 
-import lila.common.config._
+import lila.common.config.*
 import lila.mod.ModlogApi
 import lila.notify.NotifyApi
 import lila.socket.Socket.{ GetVersion, SocketVersion }
@@ -44,7 +44,7 @@ final class Env(
   private val teamSocket = wire[TeamSocket]
 
   def version(teamId: Team.ID) =
-    teamSocket.rooms.ask[SocketVersion](teamId)(GetVersion)
+    teamSocket.rooms.ask[SocketVersion](teamId)(GetVersion.apply)
 
   private lazy val notifier = wire[Notifier]
 
@@ -54,10 +54,10 @@ final class Env(
 
   lila.common.Bus.subscribeFuns(
     "deleteTeamChats" -> { case lila.hub.actorApi.security.DeletePublicChats(userId) =>
-      api.deleteUserChats(userId).unit
+      api.deleteUserChats(userId).discard
     },
     "shadowban" -> { case lila.hub.actorApi.mod.Shadowban(userId, true) =>
-      api.deleteRequestsByUserId(userId).unit
+      api.deleteRequestsByUserId(userId).discard
     },
     "teamIsLeader" -> { case lila.hub.actorApi.team.IsLeader(teamId, userId, promise) =>
       promise completeWith cached.isLeader(teamId, userId)

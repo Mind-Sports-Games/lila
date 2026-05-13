@@ -2,14 +2,12 @@ package views.html
 package account
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
-import controllers.routes
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object reopen {
 
-  def form(form: lila.security.HcaptchaForm[_], error: Option[String] = None)(implicit
+  def form(form: lila.security.HcaptchaForm[?], error: Option[String] = None)(implicit
       ctx: Context
   ) =
     views.html.base.layout(

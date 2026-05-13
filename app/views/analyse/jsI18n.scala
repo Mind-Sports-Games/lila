@@ -2,8 +2,8 @@ package views.html.analyse
 
 import play.api.i18n.Lang
 
-import lila.app.templating.Environment._
-import lila.i18n.{ I18nKeys => trans }
+import lila.app.templating.Environment.*
+import lila.i18n.I18nKeys as trans
 
 private object jsI18n {
 

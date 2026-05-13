@@ -3,20 +3,17 @@ package html.puzzle
 
 import strategygames.format.FEN
 
-import controllers.routes
 import play.api.i18n.Lang
 import play.api.libs.json.{ JsString, Json }
 import strategygames.variant.Variant
 import lila.puzzle.Puzzle
 
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.i18n.{ MessageKey, VariantKeys }
 import lila.puzzle.{ PuzzleDifficulty, PuzzleTheme }
 
 object bits {
-
-  private val dataLastmove = attr("data-lastmove")
 
   def daily(p: lila.puzzle.Puzzle, fen: FEN, lastMove: String) =
     views.html.board.bits.miniForVariant(fen, p.variant, p.playerIndex, lastMove)(span)
@@ -25,7 +22,7 @@ object bits {
     if (streak) i18nJsObject(streakI18nKeys)
     else
       i18nJsObject(trainingI18nKeys) + (PuzzleTheme.enPassant.key.value -> JsString(
-        PuzzleTheme.enPassant.name.txt()(lila.i18n.defaultLang)
+        PuzzleTheme.enPassant.name.txt()(using lila.i18n.defaultLang)
       ))
 
   def jsonThemes(variant: Variant) = PuzzleTheme
@@ -46,7 +43,7 @@ object bits {
       Puzzle.puzzleVariants.map { v =>
         button(cls := s"variant ${if (v.key == variant.key) "selected" else ""}")(
           a(
-            href := link(v),
+            href     := link(v),
             dataIcon := v.perfIcon
           )(VariantKeys.variantName(v))
         )
@@ -64,7 +61,7 @@ object bits {
       a(cls := active.active("dashboard"), href := routes.Puzzle.dashboard(variant.key, days, "dashboard"))(
         trans.puzzle.puzzleDashboard()
       ),
-      //TODO we can put this back once we have more themes for our puzzles
+      // TODO we can put this back once we have more themes for our puzzles
       // a(
       //   cls := active.active("improvementAreas"),
       //   href := routes.Puzzle.dashboard(variant.key, days, "improvementAreas")

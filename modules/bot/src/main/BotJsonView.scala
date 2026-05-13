@@ -1,14 +1,11 @@
 package lila.bot
 
-import scala.concurrent.duration._
 import play.api.i18n.Lang
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.common.Json.jodaWrites
-import lila.game.JsonView._
+import lila.game.JsonView.*
 import lila.game.{ DeadStoneOfferState, Game, GameRepo, Pov }
-
-import strategygames.GameLogic
 
 final class BotJsonView(
     lightUserApi: lila.user.LightUserApi,
@@ -27,14 +24,14 @@ final class BotJsonView(
     }
 
   def gameImmutable(wf: Game.WithInitialFen)(implicit lang: Lang): JsObject = {
-    import wf._
+    import wf.*
     Json
       .obj(
         "id"      -> game.id,
         "variant" -> game.variant,
         "clock"   -> game.clock.map(_.config),
         "speed"   -> game.speed.key,
-        "perf" -> game.perfType.map { p =>
+        "perf"    -> game.perfType.map { p =>
           Json.obj("name" -> p.trans)
         },
         "rated"      -> game.rated,
@@ -50,26 +47,28 @@ final class BotJsonView(
     // NOTE: this uses UciDump to generate the moves for the bot
     // while the round game json uses the round.StepBuilder object.
     // not sure why the difference.
-    import wf._
-    strategygames.format.UciDump(game.variant.gameLogic, game.actionStrs, fen, game.variant).toFuture map {
-      uciMoves =>
-        Json
-          .obj(
-            "type"            -> "gameState",
-            "moves"           -> uciMoves.map(_.mkString(",")).mkString(" "),
-            "activeplayer"    -> game.activePlayer.name,
-            "wtime"           -> millisOf(game.p1Pov),
-            "btime"           -> millisOf(game.p2Pov),
-            "winc"            -> incOf(game.p1Pov),
-            "binc"            -> incOf(game.p2Pov),
-            "wdraw"           -> game.p1Player.isOfferingDraw,
-            "bdraw"           -> game.p2Player.isOfferingDraw,
-            "status"          -> game.status.name,
-            "abortable"       -> game.abortable,
-            "selectedsquares" -> selectedSquaresJson(game)
-          )
-          .add("winner" -> game.winnerPlayerIndex)
-          .add("rematch" -> rematches.of(game.id))
+    import wf.*
+    strategygames.format
+      .UciDump(game.variant.gameLogic, game.actionStrs, fen, game.variant)
+      .toEither
+      .toFuture map { uciMoves =>
+      Json
+        .obj(
+          "type"            -> "gameState",
+          "moves"           -> uciMoves.map(_.mkString(",")).mkString(" "),
+          "activeplayer"    -> game.activePlayer.name,
+          "wtime"           -> millisOf(game.p1Pov),
+          "btime"           -> millisOf(game.p2Pov),
+          "winc"            -> incOf(game.p1Pov),
+          "binc"            -> incOf(game.p2Pov),
+          "wdraw"           -> game.p1Player.isOfferingDraw,
+          "bdraw"           -> game.p2Player.isOfferingDraw,
+          "status"          -> game.status.name,
+          "abortable"       -> game.abortable,
+          "selectedsquares" -> selectedSquaresJson(game)
+        )
+        .add("winner" -> game.winnerPlayerIndex)
+        .add("rematch" -> rematches.of(game.id))
     }
   }
 
@@ -102,7 +101,6 @@ final class BotJsonView(
           case DeadStoneOfferState.ChooseFirstOffer => Some("pending")
           case DeadStoneOfferState.AcceptedP1Offer  => Some("accepted")
           case DeadStoneOfferState.AcceptedP2Offer  => Some("accepted")
-          case _                                    => None
         }
       )
 

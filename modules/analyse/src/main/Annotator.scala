@@ -2,7 +2,7 @@ package lila.analyse
 
 import strategygames.format.pgn.{ FullTurn, Glyphs, Pgn, Tag, Turn }
 import strategygames.opening.FullOpening
-import strategygames.{ Player => PlayerIndex, Status }
+import strategygames.{ Player as PlayerIndex, Status }
 import strategygames.variant.Variant
 
 import lila.game.GameDrawOffers
@@ -15,7 +15,7 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
       annotateOpening(game.opening) {
         annotateTurns(
           annotateDrawOffers(p, game.drawOffers, game.variant),
-          analysis.??(_.advices)
+          analysis.so(_.advices)
         )
       }.copy(
         tags = p.tags + Tag(_.Annotator, netDomain)
@@ -30,7 +30,7 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
 
   private def annotateOpening(opening: Option[FullOpening.AtPly])(p: Pgn) =
     opening.fold(p) { o =>
-      //Ply can be passed here as Openings aren't supported for multiaction
+      // Ply can be passed here as Openings aren't supported for multiaction
       p.updateTurnCount(o.ply, _.copy(opening = o.opening.toString().some))
     }
 
@@ -51,7 +51,11 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
       )
     }
 
-  private def annotateDrawOffers(pgn: Pgn, drawOffers: GameDrawOffers, variant: Variant): Pgn =
+  private def annotateDrawOffers(
+      pgn: Pgn,
+      drawOffers: GameDrawOffers,
+      @annotation.nowarn("msg=unused") _variant: Variant
+  ): Pgn =
     if (drawOffers.isEmpty) pgn
     else
       drawOffers.normalizedTurns.foldLeft(pgn) { case (pgn, turnCount) =>
@@ -66,7 +70,7 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
 
   private def makeVariation(fullTurn: FullTurn, advice: Advice): List[FullTurn] =
     FullTurn.fromTurns(
-      //TODO Need to fix variation for multiaction
+      // TODO Need to fix variation for multiaction
       advice.info.variation.take(20).flatten.toList map { san =>
         Turn(san)
       },
