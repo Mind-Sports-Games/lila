@@ -448,10 +448,10 @@ final class Mod(
           def tryWith(setEmail: EmailAddress, q: String): Fu[Option[Result]] =
             env.mod.search(UserSearch.exact(q)) flatMap {
               case List(UserModel.WithEmails(user, _)) =>
-                (!user.everLoggedIn).so {
+                (if (!user.everLoggedIn) {
                   lila.mon.user.register.modConfirmEmail.increment()
                   modApi.setEmail(me.id, user.id, setEmail)
-                } >>
+                } else funit) >>
                   env.user.repo.email(user.id) map { email =>
                     Ok(html.mod.emailConfirm("", user.some, email)).some
                   }

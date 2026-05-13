@@ -620,11 +620,11 @@ final class StudyApi(
               else
                 chapterRepo.nextOrderByStudy(study.id) flatMap { order =>
                   chapterMaker(study, data, order, who.u) flatMap { chapter =>
-                    data.initial so {
+                    (if (data.initial)
                       chapterRepo.firstByStudy(study.id) flatMap {
                         _.filter(_.isEmptyInitial) so chapterRepo.delete
                       }
-                    } >> doAddChapter(study, chapter, sticky, who)
+                    else funit) >> doAddChapter(study, chapter, sticky, who)
                   } addFailureEffect {
                     case ChapterMaker.ValidationException(error) =>
                       sendTo(study.id)(_.validationError(error, who.sri))
@@ -755,11 +755,11 @@ final class StudyApi(
                 }
               // deleting the current chapter? Automatically move to another one
               else
-                (study.position.chapterId == chapterId).so {
+                (if (study.position.chapterId == chapterId)
                   chaps.find(_.id != chapterId) so { newChap =>
                     doSetChapter(study, newChap.id, who)
                   }
-                }
+                else funit)
             } >> chapterRepo.delete(chapter.id).andDo(reloadChapters(study))
           }.andDo(indexStudy(study))
         }
