@@ -73,12 +73,12 @@ final class ModApi(
   def setTroll(mod: Mod, prev: Suspect, value: Boolean): Fu[Suspect] = {
     val changed = value != prev.user.marks.troll
     val sus     = prev.set(_.withMarks(_.set(_.Troll, value)))
-    changed so {
+    (if (changed)
       userRepo.updateTroll(sus.user).void.andDo {
         logApi.troll(mod, sus)
         Bus.publish(lila.hub.actorApi.mod.Shadowban(sus.user.id, value), "shadowban")
       }
-    } >>
+    else funit) >>
       reportApi.process(mod, sus, Set(Room.Comm)).andDo {
         if (value) notifier.reporters(mod, sus).discard
       } inject sus
@@ -112,7 +112,7 @@ final class ModApi(
   def setKid(mod: String, username: String): Funit =
     withUser(username) { user =>
       userRepo.isKid(user.id) flatMap {
-        !_ so { userRepo.setKid(user, true) } >> logApi.setKidMode(mod, user.id)
+        isKid => (if (!isKid) userRepo.setKid(user, true) else funit) >> logApi.setKidMode(mod, user.id)
       }
     }
 
