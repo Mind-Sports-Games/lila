@@ -67,7 +67,7 @@ object bits {
   def releaseDateDisplay(data: List[MonthlyGameData], variant: Variant) =
     firstGamePlayedForVariant(data, variant)
       .map(_.toString(dateFormat))
-      .getOrElse("N/A")
+      .getOrElse(DateTime.now.toString(dateFormat))
 
   def studyLink(variant: Variant): Option[String] = {
     variant.key match {

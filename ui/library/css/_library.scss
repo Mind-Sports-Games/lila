@@ -92,6 +92,31 @@
     width: 100%;
     max-width: 350px;
     margin-bottom: 2em;
+
+    .title {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5em 1em;
+      align-items: center;
+
+      ::before {
+        font-size: 2.2em;
+      }
+
+      h2 {
+        font-size: 1.3em;
+        font-weight: bold;
+      }
+    }
+  }
+
+  @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
+    .selected-color-#{$c} & .library__tv .title.color-choice,
+    .selected-color-#{$c} & .library__puzzle .title.color-choice {
+      background: map-get($c-color-choice-map, $c);
+      color: $c-color-choice-font-default;
+      text-shadow: 0 1px 0 map-get($c-color-choice-map, $c);
+    }
   }
 
   .library__tv .mini-game {
@@ -108,6 +133,10 @@
 
   .library__puzzle {
     display: block;
+
+    > a {
+      display: block;
+    }
 
     .text {
       color: $c-font-dim;
@@ -381,6 +410,18 @@
       .library__tv {
         grid-area: tv;
         max-width: 100%;
+      }
+      .library__tv--centered {
+        grid-column: 1 / -1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .title,
+        .mini-game {
+          width: calc(50% - 0.5em);
+          margin-left: 0em;
+        }
       }
       .tournaments {
         grid-area: tours;

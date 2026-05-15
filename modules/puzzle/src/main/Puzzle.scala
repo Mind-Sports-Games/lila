@@ -74,7 +74,7 @@ object Puzzle {
 
   val defaultVariant: Variant = puzzleVariants.head
 
-  val randomVariant: Variant = puzzleVariants(scala.util.Random.nextInt(puzzleVariants.size))
+  def randomVariant: Variant = puzzleVariants(scala.util.Random.nextInt(puzzleVariants.size))
 
   /* The mobile app requires numerical IDs.
    * We convert string ids from and to Longs using base 62
