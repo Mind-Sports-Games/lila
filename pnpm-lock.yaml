@@ -15,8 +15,8 @@ importers:
         specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.35
         version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/2b25e53ffa115fde174ef53e3e51611e440634ba
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.29
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/2a43aecfa8995e0c3167b308c93c5043ed5e1c49
+        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.30
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/1d823d7d48b62a1330110222a37d357cab91ed88
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -1400,9 +1400,9 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/2a43aecfa8995e0c3167b308c93c5043ed5e1c49:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/2a43aecfa8995e0c3167b308c93c5043ed5e1c49}
-    version: 0.8.1-pstrat5.29
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/1d823d7d48b62a1330110222a37d357cab91ed88:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/1d823d7d48b62a1330110222a37d357cab91ed88}
+    version: 0.8.1-pstrat5.30
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   string-argv@0.3.2:
@@ -2332,7 +2332,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/2a43aecfa8995e0c3167b308c93c5043ed5e1c49:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/1d823d7d48b62a1330110222a37d357cab91ed88:
     dependencies:
       '@badrap/result': 0.2.13
 
