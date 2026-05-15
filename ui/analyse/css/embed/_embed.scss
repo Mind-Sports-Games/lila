@@ -43,6 +43,28 @@ cg-board {
   }
 }
 
+// For boards under 400px, the container queries in _chessground.scss reduce sizes further.
+.variant-nackgammon,
+.variant-hyper,
+.variant-backgammon {
+  cg-multi-point-score {
+    border: thin solid !important;
+  }
+
+  cg-multi-point-target,
+  cg-crawford-game {
+    border: thin solid;
+  }
+
+  cg-buttons {
+    font-size: 40%;
+
+    cg-button {
+      border-width: thin !important;
+    }
+  }
+}
+
 .analyse .game-score {
   &-name,
   &-player-name {

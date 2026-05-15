@@ -297,6 +297,11 @@ export const piotr: Piotr = {
   '¤': 'j7',
   '¥': 'i8',
   '¦': 'j8',
+  // backgammon K1/L1/K2/L2 (bar/home positions)
+  '\u00A9': 'k1',
+  '\u00AA': 'l1',
+  '\u00B2': 'k2',
+  '\u00B3': 'l2',
 };
 
 export function abalonePiotrToKey(k: string): Key | undefined {

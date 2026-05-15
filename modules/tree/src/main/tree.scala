@@ -23,6 +23,7 @@ sealed trait Node {
   def captureLength: Option[Int]
   def drops: Option[List[Pos]]
   def dropsByRole: Option[Map[Role, List[Pos]]]
+  def lifts: Option[List[Pos]]
   def eval: Option[Eval]
   def shapes: Node.Shapes
   def comments: Node.Comments
@@ -63,6 +64,7 @@ case class Root(
     captureLength: Option[Int] = None,
     drops: Option[List[Pos]] = None,
     dropsByRole: Option[Map[Role, List[Pos]]] = None,
+    lifts: Option[List[Pos]] = None,
     eval: Option[Eval] = None,
     shapes: Node.Shapes = Node.Shapes(Nil),
     comments: Node.Comments = Node.Comments(Nil),
@@ -99,6 +101,7 @@ case class Branch(
     captureLength: Option[Int] = None,
     drops: Option[List[Pos]] = None,
     dropsByRole: Option[Map[Role, List[Pos]]] = None,
+    lifts: Option[List[Pos]] = None,
     eval: Option[Eval] = None,
     shapes: Node.Shapes = Node.Shapes(Nil),
     comments: Node.Comments = Node.Comments(Nil),
@@ -346,6 +349,12 @@ object Node {
             "drops",
             drops.map { drops =>
               JsString(drops.map(_.key).mkString)
+            }
+          )
+          .add(
+            "lifts",
+            lifts.map { lifts =>
+              JsString(lifts.map(_.key).mkString)
             }
           )
           .add("clock", clock)

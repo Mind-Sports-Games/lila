@@ -1,6 +1,6 @@
 /// <reference types="../types/ab" />
 
-import * as ab from 'ab';
+import * as ab from 'ab/round';
 import * as round from './round';
 import * as game from 'game';
 import * as status from 'game/status';

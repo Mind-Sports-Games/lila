@@ -1,5 +1,5 @@
 import * as domData from './data';
-import { readDice, fenPlayerIndex, readDoublingCube, parseLastMove } from 'stratutils';
+import { fenPlayerIndex, parseLastMove, backgammon as bgUtils } from 'stratutils';
 
 export const init = (node: HTMLElement): void => {
   const [fen, orientation, ,] = node.getAttribute('data-state')!.split('|');
@@ -42,8 +42,8 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
           viewOnly: !node.getAttribute('data-playable'),
           resizable: false,
           fen,
-          dice: readDice(fen, variantFromElement($el) as VariantKey),
-          doublingCube: readDoublingCube(fen, variantFromElement($el) as VariantKey),
+          dice: bgUtils.readDice(fen, variantFromElement($el) as VariantKey),
+          doublingCube: bgUtils.readDoublingCube(fen, variantFromElement($el) as VariantKey),
           showUndoButton: false,
           lastMove: parseLastMove(lm),
           highlight: {

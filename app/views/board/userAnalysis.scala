@@ -3,6 +3,7 @@ package views.html.board
 import play.api.libs.json.{ JsObject, Json }
 
 import strategygames.variant.Variant
+import strategygames.GameFamily
 import strategygames.GameLogic
 
 import lila.api.Context
@@ -15,10 +16,7 @@ import lila.i18n.VariantKeys
 object userAnalysis {
 
   def noAnalysisVariants = List(
-    Variant.Chess(strategygames.chess.variant.FromPosition),
-    Variant.Backgammon(strategygames.backgammon.variant.Backgammon),
-    Variant.Backgammon(strategygames.backgammon.variant.Hyper),
-    Variant.Backgammon(strategygames.backgammon.variant.Nackgammon)
+    Variant.Chess(strategygames.chess.variant.FromPosition)
   )
 
   def analysisVariants =
@@ -29,7 +27,8 @@ object userAnalysis {
         Variant.all(GameLogic.Samurai()) ++
         Variant.all(GameLogic.Togyzkumalak()) ++
         Variant.all(GameLogic.Go()) ++
-        Variant.all(GameLogic.Abalone())
+        Variant.all(GameLogic.Abalone()) ++
+        Variant.all(GameLogic.Backgammon())
     )
       .filterNot(noAnalysisVariants.contains(_))
 
@@ -43,6 +42,9 @@ object userAnalysis {
             "analyse.zh"
           )
         ),
+        (pov.game.variant.gameFamily == GameFamily.Backgammon()).option(cssTag(
+          "analyse.backgammon"
+        )),
         withForecast.option(cssTag("analyse.forecast")),
         ctx.blind.option(cssTag("round.nvui"))
       ),

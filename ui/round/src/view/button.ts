@@ -476,7 +476,7 @@ export function backToTournament(ctrl: RoundController): VNode | undefined {
 
 export function backToSwiss(ctrl: RoundController): VNode | undefined {
   const d = ctrl.data;
-  const mps = stratUtils.finalMultiPointState(d.game, ctrl.ply, ctrl.lastPly());
+  const mps = stratUtils.backgammon.finalMultiPointState(d.game, ctrl.ply, ctrl.lastPly());
   const moreGamesInMultiMatch = d.game.multiMatch && d.game.multiMatch.index < ctrl.data.swiss?.nbGamesPerRound;
   const moreGamesInMultiPoint = mps && mps.p1 < mps.target && mps.p2 < mps.target;
   if (d.swiss?.running && (moreGamesInMultiMatch || moreGamesInMultiPoint)) {

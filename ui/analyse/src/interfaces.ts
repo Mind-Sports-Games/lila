@@ -114,6 +114,13 @@ export interface Game {
   perf: string;
   rated?: boolean;
   pointValue?: number;
+  multiPointState?: MultiPointState;
+}
+
+export interface MultiPointState {
+  target: number;
+  p1: number;
+  p2: number;
 }
 
 export interface Opening {

@@ -228,30 +228,37 @@ export function side(ctrl: StudyCtrl): VNode {
   return h('div.study__side', [tabs, content]);
 }
 
-export function contextMenu(ctrl: StudyCtrl, path: Tree.Path, node: Tree.Node): VNode[] {
+export function contextMenu(ctrlAna: AnalyseCtrl, path: Tree.Path, node: Tree.Node): VNode[] {
+  const ctrl = ctrlAna.study!;
+  const canComment = ctrlAna.controlConfig.isNodeCommentable?.(node) ?? true;
+  const canGlyph = ctrlAna.controlConfig.isNodeAnnotatable?.(node) ?? true;
   return ctrl.vm.mode.write
     ? [
-        h(
-          'a',
-          {
-            attrs: dataIcon('c'),
-            hook: bind('click', () => {
-              ctrl.vm.toolTab('comments');
-              ctrl.commentForm.start(ctrl.currentChapter()!.id, path, node);
-            }),
-          },
-          ctrl.trans.noarg('commentThisMove'),
-        ),
-        h(
-          'a.glyph-icon',
-          {
-            hook: bind('click', () => {
-              ctrl.vm.toolTab('glyphs');
-              ctrl.userJump(path);
-            }),
-          },
-          ctrl.trans.noarg('annotateWithGlyphs'),
-        ),
+        canComment
+          ? h(
+              'a',
+              {
+                attrs: dataIcon('c'),
+                hook: bind('click', () => {
+                  ctrl.vm.toolTab('comments');
+                  ctrl.commentForm.start(ctrl.currentChapter()!.id, path, node);
+                }),
+              },
+              ctrl.trans.noarg('commentThisMove'),
+            )
+          : null,
+        canGlyph
+          ? h(
+              'a.glyph-icon',
+              {
+                hook: bind('click', () => {
+                  ctrl.vm.toolTab('glyphs');
+                  ctrl.userJump(path);
+                }),
+              },
+              ctrl.trans.noarg('annotateWithGlyphs'),
+            )
+          : null,
       ]
     : [];
 }
@@ -265,44 +272,48 @@ export function overboard(ctrl: StudyCtrl) {
   return undefined;
 }
 
-export function underboard(ctrl: AnalyseCtrl): MaybeVNodes {
-  if (ctrl.embed) return [];
-  if (ctrl.studyPractice) return practiceView.underboard(ctrl.study!);
-  const study = ctrl.study!,
-    toolTab = study.vm.toolTab();
-  if (study.gamebookPlay())
-    return [gbPlayButtons(ctrl), descView(study, true), descView(study, false), metadata(study)];
+export function underboard(ctrlAna: AnalyseCtrl): MaybeVNodes {
+  if (ctrlAna.embed) return [];
+  if (ctrlAna.studyPractice) return practiceView.underboard(ctrlAna.study!);
+  const ctrl = ctrlAna.study!,
+    toolTab = ctrl.vm.toolTab();
+  if (ctrl.gamebookPlay()) return [gbPlayButtons(ctrlAna), descView(ctrl, true), descView(ctrl, false), metadata(ctrl)];
   let panel;
   switch (toolTab) {
     case 'tags':
-      panel = metadata(study);
+      panel = metadata(ctrl);
       break;
-    case 'comments':
-      panel = study.vm.mode.write
-        ? commentForm.view(ctrl)
-        : commentForm.viewDisabled(
-            ctrl,
-            study.members.canContribute()
-              ? 'Press REC to comment moves'
-              : 'Only the study members can comment on moves',
-          );
+    case 'comments': {
+      const canComment = ctrlAna.controlConfig.isNodeCommentable?.(ctrlAna.node) ?? true;
+      if (!ctrl.vm.mode.write)
+        panel = commentForm.viewDisabled(
+          ctrlAna,
+          ctrl.members.canContribute() ? 'Press REC to comment moves' : 'Only the study members can comment on moves',
+        );
+      else if (!canComment) panel = commentForm.viewDisabled(ctrlAna, 'Comments are only visible on dice roll moves');
+      else panel = commentForm.view(ctrlAna);
       break;
-    case 'glyphs':
-      panel = ctrl.path
-        ? study.vm.mode.write
-          ? glyphForm.view(study.glyphForm)
+    }
+    case 'glyphs': {
+      const canGlyph = ctrlAna.controlConfig.isNodeAnnotatable?.(ctrlAna.node) ?? true;
+      panel = ctrlAna.path
+        ? ctrl.vm.mode.write
+          ? canGlyph
+            ? glyphForm.view(ctrl.glyphForm)
+            : glyphForm.viewDisabled('Glyphs cannot be applied to automatic actions')
           : glyphForm.viewDisabled('Press REC to annotate moves')
         : glyphForm.viewDisabled('Select a move to annotate');
       break;
+    }
     case 'serverEval':
-      panel = serverEvalView(study.serverEval);
+      panel = serverEvalView(ctrl.serverEval);
       break;
     case 'share':
-      panel = studyShareView(study.share);
+      panel = studyShareView(ctrl.share);
       break;
     case 'multiBoard':
-      panel = multiBoardView(study.multiBoard, study);
+      panel = multiBoardView(ctrl.multiBoard, ctrl);
       break;
   }
-  return [notifView(study.notif), descView(study, true), descView(study, false), buttons(ctrl), panel];
+  return [notifView(ctrl.notif), descView(ctrl, true), descView(ctrl, false), buttons(ctrlAna), panel];
 }

@@ -25,6 +25,10 @@
   &__moves {
     flex: 2 1 0;
 
+    /* fixes nested-flexbox overflow-y in Firefox: without this the container
+       grows to fit content instead of capping at the board height and scrolling */
+    min-height: 0;
+
     // 0 size forces vertical scrollbar
     overflow-y: auto;
     overflow-x: hidden;

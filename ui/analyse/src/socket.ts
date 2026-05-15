@@ -2,7 +2,17 @@ import { initial as initialBoardFen } from 'chessground/fen';
 import { ops as treeOps } from 'tree';
 import AnalyseCtrl from './ctrl';
 import { CachedEval, EvalGetData, EvalPutData, ServerEvalData } from './interfaces';
-import { AnaDests, AnaDrop, AnaMove, AnaPass, ChapterData, EditChapterData } from './study/interfaces';
+import {
+  AnaDests,
+  AnaDrop,
+  AnaLift,
+  AnaMove,
+  AnaPass,
+  AnaRoll,
+  AnaEndTurn,
+  ChapterData,
+  EditChapterData,
+} from './study/interfaces';
 import { FormData as StudyFormData } from './study/studyForm';
 
 interface DestsCache {
@@ -50,7 +60,10 @@ export type StudySocketSendParams =
   | [t: 'setTag', d: { chapterId: string; name: string; value: string }]
   | [t: 'anaMove', d: AnaMove & MoveOpts]
   | [t: 'anaDrop', d: AnaDrop & MoveOpts]
+  | [t: 'anaLift', d: AnaLift & MoveOpts]
   | [t: 'anaPass', d: AnaPass & MoveOpts]
+  | [t: 'anaRoll', d: AnaRoll & MoveOpts]
+  | [t: 'anaEndTurn', d: AnaEndTurn & MoveOpts]
   | [t: 'anaDests', d: AnaDestsReq]
   | [t: 'like', d: { liked: boolean }]
   | [t: 'kick', username: string]
@@ -76,7 +89,10 @@ export interface Socket {
   receive(type: string, data: any): boolean;
   sendAnaMove(d: AnaMove): void;
   sendAnaDrop(d: AnaDrop): void;
+  sendAnaLift(d: AnaLift): void;
   sendAnaPass(d: AnaPass): void;
+  sendAnaRoll(d: AnaRoll): void;
+  sendAnaEndTurn(d: AnaEndTurn): void;
   sendAnaDests(d: AnaDestsReq): void;
   clearCache(): void;
 }
@@ -133,12 +149,13 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     stepFailure() {
       clearTimeout(anaMoveTimeout);
       ctrl.reset();
+      ctrl.controlConfig.onStepFailure?.();
     },
     dests(data: AnaDests) {
       clearTimeout(anaDestsTimeout);
       if (!data.ch || data.ch === currentChapterId()) {
         anaDestsCache[data.path] = data;
-        ctrl.addDests(data.dests, data.path);
+        ctrl.addDests(data.dests, data.path, data.lifts);
       } else console.log('socket handler node got wrong chapter id', data);
     },
     destsFailure(data: any) {
@@ -194,12 +211,36 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     anaMoveTimeout = setTimeout(() => sendAnaDrop(req), 3000);
   }
 
+  function sendAnaLift(req: AnaLift) {
+    clearTimeout(anaMoveTimeout);
+    withoutStandardVariant(req);
+    addStudyData(req, true);
+    send('anaLift', req);
+    anaMoveTimeout = setTimeout(() => sendAnaLift(req), 3000);
+  }
+
   function sendAnaPass(req: AnaPass) {
     clearTimeout(anaMoveTimeout);
     withoutStandardVariant(req);
     addStudyData(req, true);
     send('anaPass', req);
     anaMoveTimeout = setTimeout(() => sendAnaPass(req), 3000);
+  }
+
+  function sendAnaRoll(req: AnaRoll) {
+    clearTimeout(anaMoveTimeout);
+    withoutStandardVariant(req);
+    addStudyData(req, true);
+    send('anaRoll', req);
+    // No retry: dice are random, a retry would produce different values
+  }
+
+  function sendAnaEndTurn(req: AnaEndTurn) {
+    clearTimeout(anaMoveTimeout);
+    withoutStandardVariant(req);
+    addStudyData(req, true);
+    send('anaEndTurn', req);
+    // No retry: a duplicate endturn response would re-navigate and corrupt auto-roll state
   }
 
   return {
@@ -213,7 +254,10 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     },
     sendAnaMove,
     sendAnaDrop,
+    sendAnaLift,
     sendAnaPass,
+    sendAnaRoll,
+    sendAnaEndTurn,
     sendAnaDests,
     clearCache,
     send,

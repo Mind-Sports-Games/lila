@@ -1,6 +1,6 @@
 /// <reference types="../types/ab" />
 
-import * as ab from 'ab';
+import * as ab from 'ab/round';
 import * as round from './round';
 import * as game from 'game';
 import * as status from 'game/status';
@@ -207,15 +207,17 @@ export default class RoundController {
     this.sendLift(this.data.game.variant.key, dest);
   };
 
-  private onNewPiece = () => {
-    if (!['backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key)) sound.move();
+  private onNewPiece = (_piece: cg.Piece, _key: cg.Key, captured?: cg.Piece) => {
+    if (['backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key)) {
+      if (captured) sound.capture();
+      else sound.move();
+    } else sound.move();
   };
 
   private onUserNewPiece = (role: cg.Role, key: cg.Key, meta: cg.MoveMetadata) => {
     if (!this.replaying() && crazyValid(this.data, role, key)) {
       this.sendNewPiece(role, key, this.data.game.variant.key, !!meta.predrop);
       if (['backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key)) {
-        sound.move();
         cancelDropMode(this.chessground.state);
         this.redraw();
       }
@@ -384,7 +386,11 @@ export default class RoundController {
         this.data.game.multiPointState
       ) {
         this.chessground.set({
-          multiPointState: stratUtils.finalMultiPointState(this.data.game, this.ply, round.lastPly(this.data)),
+          multiPointState: stratUtils.backgammon.finalMultiPointState(
+            this.data.game,
+            this.ply,
+            round.lastPly(this.data),
+          ),
         });
         this.chessground.redrawAll();
       }
@@ -400,6 +406,13 @@ export default class RoundController {
     else this.redraw();
   };
 
+  userJumpToPly = (ply: Ply): void => {
+    this.cancelMove();
+    this.chessground.selectSquare(null);
+    if (ply !== this.ply && this.jump(ply)) speech.userJump(this, this.ply);
+    else this.redraw();
+  };
+
   isPlaying = () => game.isPlayerPlaying(this.data);
 
   jump = (ply: Ply): boolean => {
@@ -411,12 +424,12 @@ export default class RoundController {
     const s = this.stepAt(ply);
     this.turnCount = s.turnCount;
     const turnPlayerIndex = util.turnPlayerIndexFromLastTurn(this.turnCount);
-    const dice = stratUtils.readDice(
+    const dice = stratUtils.backgammon.readDice(
       s.fen,
       this.data.game.variant.key,
       this.replaying() ? false : this.data.canEndTurn,
     );
-    const doublingCube = stratUtils.readDoublingCube(s.fen, this.data.game.variant.key);
+    const doublingCube = stratUtils.backgammon.readDoublingCube(s.fen, this.data.game.variant.key);
     const config: CgConfig = {
       fen: s.fen,
       lastMove: stratUtils.lastMove(this.data.onlyDropsVariant, s.uci),
@@ -426,7 +439,7 @@ export default class RoundController {
       doublingCube: doublingCube,
       showUndoButton: false,
       cubeActions: [], //we dont know what these are so dont want to display them
-      multiPointState: stratUtils.finalMultiPointState(this.data.game, this.ply, round.lastPly(this.data)),
+      multiPointState: stratUtils.backgammon.finalMultiPointState(this.data.game, this.ply, round.lastPly(this.data)),
     };
     if (this.replaying()) {
       cancelDropMode(this.chessground.state);
@@ -665,8 +678,8 @@ export default class RoundController {
     //set the right data from all backgammon actions
     this.areDiceDescending = activePlayerIndex ? this.areDiceDescending : true;
     d.canOnlyRollDice = activePlayerIndex ? o.canOnlyRollDice : false;
-    d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key, o.canEndTurn, this.areDiceDescending);
-    d.doublingCube = stratUtils.readDoublingCube(o.fen, this.data.game.variant.key);
+    d.dice = stratUtils.backgammon.readDice(o.fen, this.data.game.variant.key, o.canEndTurn, this.areDiceDescending);
+    d.doublingCube = stratUtils.backgammon.readDoublingCube(o.fen, this.data.game.variant.key);
     d.activeDiceValue = this.activeDiceValue(d.dice);
     ((d.cubeActions = o.cubeActions), (d.forcedAction = o.forcedAction));
 
@@ -1428,7 +1441,7 @@ export default class RoundController {
 
   private doForcedActions = (): void => {
     const d = this.data;
-    if (this.isPlaying() && !this.replaying()) {
+    if (this.isPlaying() && !this.replaying() && d.player.playerIndex === d.game.player) {
       //flipello pass
       if (
         ['flipello', 'flipello10', 'antiflipello', 'octagonflipello'].includes(d.game.variant.key) &&

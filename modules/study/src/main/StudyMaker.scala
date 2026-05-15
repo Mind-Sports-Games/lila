@@ -13,8 +13,10 @@ final private class StudyMaker(
 
   def apply(data: StudyMaker.ImportGame, user: User): Fu[Study.WithChapter] =
     (data.form.gameId so gameRepo.gameWithInitialFen).flatMap {
-      case Some((game, initialFen)) => createFromPov(data, Pov(game, data.form.orientation), initialFen, user)
-      case None                     => createFromScratch(data, user)
+      case Some((game, initialFen)) if game.metadata.multiPointState.isEmpty =>
+        createFromPov(data, Pov(game, data.form.orientation), initialFen, user)
+      case Some(_) => createFromScratch(data, user)
+      case None    => createFromScratch(data, user)
     } map { sc =>
       // apply specified From if any
       sc.copy(study = sc.study.copy(from = data.from | sc.study.from))

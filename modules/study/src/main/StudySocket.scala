@@ -13,7 +13,7 @@ import lila.common.Bus
 import lila.room.RoomSocket.{ Protocol as RP, * }
 import lila.socket.RemoteSocket.{ Protocol as P, * }
 import lila.socket.Socket.{ makeMessage, Sri }
-import lila.socket.{ AnaAny, AnaDests, AnaDrop, AnaMove, AnaPass }
+import lila.socket.{ AnaAny, AnaDests, AnaDrop, AnaEndTurn, AnaLift, AnaMove, AnaPass, AnaRoll }
 import lila.tree.Node.{ defaultNodeJsonWriter, Comment, Gamebook, Shape, Shapes }
 import lila.user.User
 
@@ -88,6 +88,18 @@ final private class StudySocket(
         case "anaPass" =>
           AnaPass.parse(o) foreach { pass =>
             who foreach gameAction(studyId, pass, MoveOpts.parse(o))
+          }
+        case "anaRoll" =>
+          AnaRoll.parse(o) foreach { roll =>
+            who foreach gameAction(studyId, roll, MoveOpts.parse(o))
+          }
+        case "anaLift" =>
+          AnaLift.parse(o) foreach { lift =>
+            who foreach gameAction(studyId, lift, MoveOpts.parse(o))
+          }
+        case "anaEndTurn" =>
+          AnaEndTurn.parse(o) foreach { endTurn =>
+            who foreach gameAction(studyId, endTurn, MoveOpts.parse(o))
           }
         case "deleteNode" =>
           reading[AtPosition](o) { position =>

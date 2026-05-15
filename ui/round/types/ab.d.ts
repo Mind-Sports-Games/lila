@@ -1,4 +1,4 @@
-declare module 'ab' {
+declare module 'ab/round' {
   import { MoveMetadata } from 'chessground/types';
   function init(round: unknown): void;
   function move(round: unknown, meta: MoveMetadata): void;

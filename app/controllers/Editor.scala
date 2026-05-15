@@ -3,6 +3,9 @@ package controllers
 import strategygames.variant.Variant
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.Situation
+import strategygames.abalone.opening.EcopeningDB
+import strategygames.abalone.{ Replay => AbaloneReplay }
+import strategygames.abalone.format.{ Forsyth => AbaloneForsyth, Uci => AbaloneUci }
 import play.api.libs.json.*
 import views.*
 import strategygames.chess.format.Forsyth as ChessForsyth
@@ -12,14 +15,53 @@ import lila.common.Json.*
 
 final class Editor(env: Env) extends LilaController(env) {
 
-  private lazy val positionsJson = lila.common.String.html.safeJsonValue {
+  private lazy val chessPositionsData: JsArray =
     JsArray(strategygames.chess.StartingPosition.all map { p =>
-      Json.obj(
-        "eco"  -> p.eco,
-        "name" -> p.name,
-        "fen"  -> p.fen
-      )
+      Json.obj("eco" -> p.eco, "name" -> p.name, "fen" -> p.fen)
     })
+
+  private def abalonePositionsData(variantGrouping: String): JsArray = {
+    val startingPositions = strategygames.abalone.StartingPosition.forVariant(variantGrouping).map { p =>
+      Json.obj("eco" -> p.eco, "name" -> p.name, "fen" -> p.fen.value)
+    }
+    val abaloneVariant = variantGrouping match {
+      case "grandabalone" => strategygames.abalone.variant.GrandAbalone
+      case _              => strategygames.abalone.variant.Abalone
+    }
+    val openings = EcopeningDB.all
+      .filter(_.variantGrouping == variantGrouping)
+      .sortBy(_.eco)
+      .map { p =>
+        val ucis = p.moves.split("\\s+").toList.flatMap(AbaloneUci.Move(_))
+        val fen = AbaloneReplay(ucis, None, abaloneVariant)
+          .map(r => AbaloneForsyth.>>(r.state).value)
+          .getOrElse(s"${p.fen} 0 0 b 0 1")
+        Json.obj(
+          "eco"  -> p.eco,
+          "name" -> s"${p.family}: ${p.name}",
+          "fen"  -> fen
+        )
+      }
+    JsArray(startingPositions ++ openings)
+  }
+
+  private lazy val abalonePositionsDataCached: JsArray      = abalonePositionsData("abalone")
+  private lazy val grandAbalonePositionsDataCached: JsArray = abalonePositionsData("grandabalone")
+
+  private lazy val positionsByVariantJson = lila.common.String.html.safeJsonValue {
+    Json.obj(
+      "chess"        -> chessPositionsData,
+      "abalone"      -> abalonePositionsDataCached,
+      "grandabalone" -> grandAbalonePositionsDataCached
+    )
+  }
+
+  private def positionsJsonForVariant(variantKey: String) = lila.common.String.html.safeJsonValue {
+    variantKey match {
+      case "abalone"      => abalonePositionsDataCached
+      case "grandabalone" => grandAbalonePositionsDataCached
+      case _              => chessPositionsData
+    }
   }
 
   def index = load("")
@@ -40,7 +82,8 @@ final class Editor(env: Env) extends LilaController(env) {
             sit = situation,
             fen = Forsyth.>>(situation.board.variant.gameLogic, situation),
             variant = variant,
-            positionsJson,
+            positionsJsonForVariant(variant.key),
+            positionsByVariantJson,
             orientation
           )
         )
@@ -71,7 +114,9 @@ final class Editor(env: Env) extends LilaController(env) {
       .filter(_.nonEmpty)
       .map(s => FEN.clean(variant.gameLogic, s))
       .flatMap(f => Forsyth.<<<@(variant.gameLogic, variant, f))
-      .map(_.situation) | Situation(variant.gameLogic, variant)
+      .map(_.situation) | Forsyth
+        .<<<@(variant.gameLogic, variant, variant.initialFen)
+        .fold(Situation(variant.gameLogic, variant))(_.situation)
 
   // If the game is not playable and the FEN is not passed, redirect to the editor based on the state after the last move.
   def game(id: String) =

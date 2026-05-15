@@ -256,6 +256,7 @@ export interface AnaDests {
   path: string;
   ch?: string;
   opening?: Opening;
+  lifts?: string;
 }
 
 export interface AnaMove {
@@ -284,7 +285,33 @@ export interface AnaDrop {
   };
 }
 
+export interface AnaLift {
+  pos: string;
+  variant: VariantKey;
+  lib: number;
+  fen: Fen;
+  path: string;
+  ch?: string;
+}
+
 export interface AnaPass {
+  variant: VariantKey;
+  lib: number;
+  fen: Fen;
+  path: string;
+  ch?: string;
+}
+
+export interface AnaRoll {
+  variant: VariantKey;
+  lib: number;
+  fen: Fen;
+  path: string;
+  ch?: string;
+  dice?: number[];
+}
+
+export interface AnaEndTurn {
   variant: VariantKey;
   lib: number;
   fen: Fen;

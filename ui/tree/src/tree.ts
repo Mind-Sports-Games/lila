@@ -17,6 +17,7 @@ export interface TreeWrapper {
   addNode(node: Tree.Node, path: Tree.Path): Tree.Path | undefined;
   addNodes(nodes: Tree.Node[], path: Tree.Path): Tree.Path | undefined;
   addDests(dests: string, path: Tree.Path): MaybeNode;
+  addLifts(lifts: string, path: Tree.Path): MaybeNode;
   setShapes(shapes: Tree.Shape[], path: Tree.Path): MaybeNode;
   setCommentAt(comment: Tree.Comment, path: Tree.Path): MaybeNode;
   deleteCommentAt(id: string, path: Tree.Path): MaybeNode;
@@ -227,6 +228,11 @@ export function build(root: Tree.Node): TreeWrapper {
     addDests(dests: string, path: Tree.Path) {
       return updateAt(path, function (node: Tree.Node) {
         node.dests = dests;
+      });
+    },
+    addLifts(lifts: string, path: Tree.Path) {
+      return updateAt(path, function (node: Tree.Node) {
+        node.lifts = lifts;
       });
     },
     setShapes(shapes: Tree.Shape[], path: Tree.Path) {

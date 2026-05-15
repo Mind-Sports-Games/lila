@@ -114,6 +114,7 @@ case class AnaMove(
           },
           drops = if (movable) game.situation.drops else Some(Nil),
           dropsByRole = game.situation.dropsByRole,
+          lifts = if (movable) Some(game.situation.lifts.map(_.pos)) else Some(Nil),
           pocketData = game.situation.board.pocketData
         )
       }
@@ -125,7 +126,7 @@ object AnaMove {
   private def dataGameLogic(d: JsObject): GameLogic =
     GameLogic(d.int("lib") getOrElse 0)
 
-  def parse(o: JsObject) =
+  def parse(o: JsObject): Option[AnaMove] =
     for {
       d <- o.obj("d")
       gl = dataGameLogic(d)

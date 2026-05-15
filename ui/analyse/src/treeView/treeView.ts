@@ -70,11 +70,12 @@ export function render(ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
   return (ctrl.treeView.inline() || isCol1()) && !concealOf ? inline(ctrl) : column(ctrl, concealOf);
 }
 
-export function nodeClasses(ctx: Ctx, node: Tree.Node, path: Tree.Path): NodeClasses {
+export function nodeClasses(ctx: Ctx, node: Tree.Node, path: Tree.Path, fullTurnPath: Tree.Path = path): NodeClasses {
   const glyphIds = ctx.showGlyphs && node.glyphs ? node.glyphs.map(g => g.id) : [];
+  const rawActivePath = ctx.ctrl.controlConfig.getActivePath?.();
+  const activePath = rawActivePath === undefined ? ctx.ctrl.path : rawActivePath;
   return {
-    active:
-      path === ctx.ctrl.path || (treePath.init(ctx.ctrl.path) === path && node.playedPlayerIndex === node.playerIndex),
+    active: activePath !== null && activePath.startsWith(path) && activePath.length <= fullTurnPath.length,
     'context-menu': path === ctx.ctrl.contextMenuPath,
     current: path === ctx.currentPath,
     nongame:
@@ -143,7 +144,7 @@ export function mainHook(ctrl: AnalyseCtrl): Hooks {
         el.addEventListener(mousedownEvent, (e: MouseEvent) => {
           if (defined(e.button) && e.button !== 0) return; // only touch or left click
           const path = eventPath(e);
-          if (path) ctrl.userJump(path);
+          if (path) ctrl.userJumpFromTree(path);
           ctrl.redraw();
         });
       }

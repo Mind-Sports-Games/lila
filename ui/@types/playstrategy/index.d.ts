@@ -224,6 +224,7 @@ declare namespace Editor {
     };
     embed: boolean;
     positions?: OpeningPosition[];
+    positionsByVariant?: Record<string, OpeningPosition[]>;
     i18n: I18nDict;
     standardInitialPosition: boolean;
     playerIndex?: PlayerIndex;
@@ -624,6 +625,7 @@ declare namespace Tree {
     dests?: string;
     drops?: string | null;
     dropsByRole?: string | null;
+    lifts?: string | null;
     check?: Key;
     threat?: ClientEval;
     ceval?: ClientEval;
