@@ -30,3 +30,5 @@ ui/puz/**/*.d.ts
 .bloop/
 .bsp/
 .metals/
+
+graphify-out/
