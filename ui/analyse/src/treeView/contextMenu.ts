@@ -75,7 +75,7 @@ function view(opts: Opts, coords: Coords): VNode {
       onMainline ? null : action('E', trans('makeMainLine'), () => ctrl.promote(opts.path, true)),
       action('q', trans('deleteFromHere'), () => ctrl.deleteNode(opts.path)),
     ]
-      .concat(ctrl.study ? studyView.contextMenu(ctrl.study, opts.path, node) : [])
+      .concat(ctrl.study ? studyView.contextMenu(ctrl, opts.path, node) : [])
       .concat([onMainline ? action('F', trans('forceVariation'), () => ctrl.forceVariation(opts.path, true)) : null]),
   );
 }

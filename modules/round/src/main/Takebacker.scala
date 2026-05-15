@@ -105,13 +105,16 @@ final private class Takebacker(
   private def currentPlayerTakingBack(g: Game) =
     g.turnPlayerIndex == PlayerIndex.fromTurnCount(g.actionStrs.size + g.startPlayerIndex.hashCode - 1)
 
-  // Would be nice to test these methods with a multimove game that has > 2 plies in a turn
+  // variants with several ply per turn where we always cancel exactly 1 ply regardless of turn state
+  private def alwaysRewindSinglePly(game: Game): Boolean =
+    game.variant.key == "grandabalone"
+
   private def takebackSwitchPlayer(game: Game)(implicit proxy: GameProxy): Fu[Events] =
-    if (currentPlayerTakingBack(game)) rewindPly(game)
+    if (alwaysRewindSinglePly(game) || currentPlayerTakingBack(game)) rewindPly(game)
     else rewindTurnAndPly(game)
   private def takebackRetainPlayer(game: Game)(implicit proxy: GameProxy): Fu[Events] =
-    if (currentPlayerTakingBack(game)) rewindTurnAndPly(game)
-    else rewindPly(game)
+    if (alwaysRewindSinglePly(game) || !currentPlayerTakingBack(game)) rewindPly(game)
+    else rewindTurnAndPly(game)
 
   private def rewindPly(game: Game)(implicit proxy: GameProxy): Fu[Events] =
     for {

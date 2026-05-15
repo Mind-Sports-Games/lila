@@ -105,6 +105,8 @@ const allVariants: Array<[stratopsVariantKey, string]> = [
   [stratopsVariantKey.xiangqi, 'Xiangqi'],
   [stratopsVariantKey.minixiangqi, 'Mini Xiangqi'],
   [stratopsVariantKey.amazons, 'Amazons'],
+  [stratopsVariantKey.abalone, 'Abalone'],
+  [stratopsVariantKey.grandAbalone, 'Grand Abalone'],
 ];
 
 function controls(ctrl: EditorCtrl, state: EditorState): VNode {
@@ -133,7 +135,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
       ctrl.trans.noarg('clearBoard'),
     );
   return h('div.board-editor__tools', [
-    ...(ctrl.cfg.embed || !ctrl.cfg.positions
+    ...(ctrl.cfg.embed || (!ctrl.positions.length && ctrl.extraPositions.length <= 2)
       ? []
       : [
           h('div', [
@@ -165,8 +167,8 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   ),
                   ...ctrl.extraPositions.map(position2option),
                 ]),
-                isChessRules(ctrl.variantKey) && ctrl.standardInitialPosition
-                  ? optgroup(ctrl.trans.noarg('popularOpenings'), ctrl.cfg.positions.map(position2option))
+                ctrl.positions.length > 0
+                  ? optgroup(ctrl.trans.noarg('popularOpenings'), ctrl.positions.map(position2option))
                   : null,
               ],
             ),
@@ -375,13 +377,9 @@ function inputs(ctrl: EditorCtrl, fen: string): VNode | undefined {
   return h('div.copyables', [
     h('p', [
       h('strong', 'FEN'),
-      h('input.copyable', {
-        attrs: {
-          spellcheck: false,
-        },
-        props: {
-          value: fen,
-        },
+      h('input#board-editor-fen.copyable', {
+        attrs: { spellcheck: false },
+        props: { value: fen },
         on: {
           change(e) {
             const el = e.target as HTMLInputElement;
@@ -400,15 +398,21 @@ function inputs(ctrl: EditorCtrl, fen: string): VNode | undefined {
           },
         },
       }),
+      h('button.copy.button', {
+        attrs: { 'data-rel': 'board-editor-fen', 'data-icon': '"', title: 'Copy FEN' },
+      }),
     ]),
     h('p', [
       h('strong.name', 'URL'),
-      h('input.copyable.autoselect', {
+      h('input#board-editor-url.copyable.autoselect', {
         attrs: {
           readonly: true,
           spellcheck: false,
           value: ctrl.makeUrl(ctrl.cfg.baseUrl, fen),
         },
+      }),
+      h('button.copy.button', {
+        attrs: { 'data-rel': 'board-editor-url', 'data-icon': '"', title: 'Copy URL' },
       }),
     ]),
   ]);
@@ -463,6 +467,11 @@ function sparePieces(
   }
   if (ctrl.variantKey == 'amazons') {
     pieces = ['q-piece', 'p-piece'].map(function (role) {
+      return [playerIndex, role];
+    });
+  }
+  if (ctrl.variantKey === 'abalone' || ctrl.variantKey === 'grandabalone') {
+    pieces = ['s-piece'].map(function (role) {
       return [playerIndex, role];
     });
   }

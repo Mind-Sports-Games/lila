@@ -1,7 +1,7 @@
 import { Coords as CgCoords } from 'chessground/types';
 import * as domData from 'common/data';
 import { variantFromElement } from 'common/mini-board';
-import { readDice, readDoublingCube, displayScore, fenPlayerIndex, parseLastMove } from 'stratutils';
+import { displayScore, fenPlayerIndex, parseLastMove, backgammon as bgUtils } from 'stratutils';
 import clockWidget from './clock-widget';
 
 interface UpdateData {
@@ -57,8 +57,8 @@ export const init = (node: HTMLElement) => {
           turnPlayerIndex: fenPlayerIndex(variantFromElement($el) as VariantKey, fen),
           resizable: false,
           fen,
-          dice: readDice(fen, variantFromElement($el) as VariantKey),
-          doublingCube: readDoublingCube(fen, variantFromElement($el) as VariantKey),
+          dice: bgUtils.readDice(fen, variantFromElement($el) as VariantKey),
+          doublingCube: bgUtils.readDoublingCube(fen, variantFromElement($el) as VariantKey),
           showUndoButton: false,
           orientation,
           lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : parseLastMove(lm)),
@@ -151,8 +151,8 @@ export const update = (node: HTMLElement, data: UpdateData) => {
     cg.set({
       fen: data.fen,
       turnPlayerIndex: fenPlayerIndex(variantFromElement($el) as VariantKey, data.fen),
-      dice: readDice(data.fen, variantFromElement($el) as VariantKey),
-      doublingCube: readDoublingCube(data.fen, variantFromElement($el) as VariantKey),
+      dice: bgUtils.readDice(data.fen, variantFromElement($el) as VariantKey),
+      doublingCube: bgUtils.readDoublingCube(data.fen, variantFromElement($el) as VariantKey),
       lastMove,
       ...(multiPointState?.length === 6 && {
         multiPointState: {

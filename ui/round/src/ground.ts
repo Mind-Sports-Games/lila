@@ -28,8 +28,10 @@ export function makeConfig(ctrl: RoundController): Config {
     turnPlayerIndex = util.turnPlayerIndexFromLastTurn(step.turnCount),
     dice = data.dice
       ? data.dice
-      : stratUtils.readDice(step.fen, data.game.variant.key, data.canEndTurn, ctrl.areDiceDescending),
-    doublingCube = data.doublingCube ? data.doublingCube : stratUtils.readDoublingCube(step.fen, data.game.variant.key),
+      : stratUtils.backgammon.readDice(step.fen, data.game.variant.key, data.canEndTurn, ctrl.areDiceDescending),
+    doublingCube = data.doublingCube
+      ? data.doublingCube
+      : stratUtils.backgammon.readDoublingCube(step.fen, data.game.variant.key),
     cubeActions = data.cubeActions ? data.cubeActions.split(',').map(a => a as cg.CubeAction) : [];
   const config: Config = {
     fen: step.fen,
@@ -48,7 +50,7 @@ export function makeConfig(ctrl: RoundController): Config {
     showUndoButton: playing && turnPlayerIndex == data.player.playerIndex && dice.length > 0,
     autoRoll:
       ctrl.isPlaying() && data.game.winner === undefined && ctrl.isBackgammonMultiPoint() ? ctrl.autoRoll : undefined,
-    multiPointState: stratUtils.finalMultiPointState(data.game, ctrl.ply, ctrl.lastPly()),
+    multiPointState: stratUtils.backgammon.finalMultiPointState(data.game, ctrl.ply, ctrl.lastPly()),
     addPieceZIndex: ctrl.data.pref.is3d,
     selectOnly: data.selectMode,
     highlight: {

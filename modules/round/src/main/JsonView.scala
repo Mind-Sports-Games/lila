@@ -328,7 +328,8 @@ final class JsonView(
             "pointValue"   -> game.pointValue
           )
           .add("division", division)
-          .add("winner", game.winner.map(w => game.variant.playerNames(w.playerIndex))),
+          .add("winner", game.winner.map(_.playerIndex.name))
+          .add("winnerPlayer", game.winner.map(w => game.variant.playerNames(w.playerIndex))),
         "player" -> Json.obj(
           "id"          -> owner.option(pov.playerId),
           "playerName"  -> game.variant.playerNames(playerIndex),

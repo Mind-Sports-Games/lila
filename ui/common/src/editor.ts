@@ -23,6 +23,8 @@ export function canUseBoardEditor(variantKey: VariantKey): boolean {
     'xiangqi',
     'minixiangqi',
     'amazons',
+    'abalone',
+    'grandabalone',
   ].includes(variantKey);
 }
 

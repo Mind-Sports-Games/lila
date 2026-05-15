@@ -1,4 +1,5 @@
 import RoundController from './ctrl';
+import { firstPly as roundFirstPly, lastPly as roundLastPly } from './round';
 
 export const prev = (ctrl: RoundController) => ctrl.userJump(ctrl.ply - 1);
 
@@ -14,11 +15,11 @@ export const init = (ctrl: RoundController) =>
       ctrl.redraw();
     })
     .bind(['up', 'k'], () => {
-      ctrl.userJump(0);
+      ctrl.userJump(roundFirstPly(ctrl.data));
       ctrl.redraw();
     })
     .bind(['down', 'j'], () => {
-      ctrl.userJump(ctrl.data.steps.length - 1);
+      ctrl.userJump(roundLastPly(ctrl.data));
       ctrl.redraw();
     })
     .bind('f', ctrl.flipNow)

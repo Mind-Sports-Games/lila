@@ -102,6 +102,6 @@ export function renderFullMove(ctx: Ctx, node: Tree.ParentedNode, style: Notatio
 }
 
 export function renderIndexAndMove(ctx: Ctx, node: Tree.ParentedNode): VNode[] | undefined {
-  if (!node.san) return; // initial position
+  if (!node.san && !node.uci) return; // initial position
   return [renderIndex(node, ctx.withDots), ...renderMove(ctx, node)];
 }

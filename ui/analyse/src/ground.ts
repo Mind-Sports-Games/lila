@@ -60,12 +60,15 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     check: opts.check,
     lastMove: opts.lastMove,
     orientation: ctrl.getOrientation(),
-    myPlayerIndex: ctrl.data.player.playerIndex,
+    // in analyse mode, always treat current turn player as "my" player so dice/buttons are always interactive
+    myPlayerIndex: ['backgammon', 'hyper', 'nackgammon'].includes(variantKey)
+      ? opts.turnPlayerIndex
+      : ctrl.data.player.playerIndex,
     coordinates: !!ctrl.embed || !!renderPlayerBars(ctrl) ? cg.Coords.Hidden : pref.coords,
     boardScores: ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(variantKey),
-    dice: stratUtils.readDice(ctrl.node.fen, variantKey),
-    doublingCube: stratUtils.readDoublingCube(ctrl.node.fen, variantKey),
-    multiPointState: stratUtils.finalMultiPointState(d.game, ctrl.node.ply, ctrl.tree.lastPly()),
+    dice: stratUtils.backgammon.readDice(ctrl.node.fen, variantKey),
+    doublingCube: stratUtils.backgammon.readDoublingCube(ctrl.node.fen, variantKey),
+    multiPointState: stratUtils.backgammon.finalMultiPointState(d.game, ctrl.node.ply, ctrl.tree.lastPly()),
     addPieceZIndex: pref.is3d,
     viewOnly: !!ctrl.embed,
     movable: {
@@ -78,9 +81,17 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     events: {
       move: ctrl.userMove,
       dropNewPiece: ctrl.userNewPiece,
+      selectDice: hooks.onSelectDice,
+      buttonClick: hooks.onButtonClick,
       insert(elements: cg.Elements) {
         if (!ctrl.embed) resizeHandle(elements, Prefs.ShowResizeHandle.Always, ctrl.node.ply);
         if (!ctrl.embed && ctrl.data.pref.coords == cg.Coords.Inside) changeColorHandle();
+      },
+    },
+    liftable: {
+      liftDests: [],
+      events: {
+        after: hooks.onUserLift,
       },
     },
     premovable: {
@@ -173,6 +184,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     onlyDropsVariant: isOnlyDropsPly(ctrl.node, variantKey, d.onlyDropsVariant),
     singleClickMoveVariant:
       ctrl.data.game.gameFamily === 'togyzkumalak' ||
+      ['backgammon', 'hyper', 'nackgammon'].includes(variantKey) ||
       (variantClassFromKey(d.game.variant.key).getNotationStyle() === NotationStyle.man && d.pref.mancalaMove),
   };
   ctrl.study && ctrl.study.mutateCgConfig(config);
