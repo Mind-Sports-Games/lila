@@ -32,7 +32,7 @@ final private class DiscordClient(ws: StandaloneWSClient, urlMatchMaking: Secret
             Json.obj("content" -> msg.text).noNull
           )
           .flatMap {
-            case res if res.status == 200 => funit
+            case res if res.status == 200 || res.status == 204 => funit
             case res => fufail(s"[discord] ${urlForMsg(msg)} $msg ${res.status} ${res.body}")
           }
           .recoverDefault
