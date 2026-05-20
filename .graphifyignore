@@ -1,0 +1,35 @@
+# Build artifacts & caches
+target/
+dist/
+.bsp/
+.metals/
+node_modules/
+graphify-out/
+logs/
+
+# Generated/compiled assets
+public/compiled/
+public/assets/
+public/sound/
+public/images/
+public/piece/
+public/vendor/
+*.class
+*.tasty
+
+# Lock files & package metadata
+pnpm-lock.yaml
+
+# Binary/font/audio assets
+*.png
+*.jpg
+*.jpeg
+*.ico
+*.svg
+*.woff
+*.woff2
+*.ttf
+*.mp3
+*.ogg
+*.wav
+*.wasm
