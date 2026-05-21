@@ -175,4 +175,14 @@ final class PlayApi(
         Ok(views.html.user.bots(users))
       }
     }
+
+  def botOnlineApi = Open { implicit ctx =>
+    val nb = getInt("nb").fold(50)(_.atMost(100))
+    env.user.repo.botsByIds(
+      env.bot.onlineApiUsers.get.filterNot(_.startsWith("pst-")).take(nb)
+    ) map { users =>
+      Ok(users.map(env.user.jsonView(_).toString).mkString("\n"))
+        .as(ndJsonContentType)
+    }
+  }
 }
