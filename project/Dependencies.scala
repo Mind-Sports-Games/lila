@@ -38,10 +38,10 @@ object Dependencies {
   val prismic       = "io.prismic"           %% "scala-kit"                       % "1.2.19_lila-3.2"
   val scrimage      = "com.sksamuel.scrimage" % "scrimage-core"                   % "4.3.0"
   val scaffeine     = "com.github.blemale"   %% "scaffeine"                       % "5.2.1" % "compile"
-  val googleOAuth   = "com.google.auth"       % "google-auth-library-oauth2-http" % "0.25.5"
+  val googleOAuth   = "com.google.auth"       % "google-auth-library-oauth2-http" % "1.47.0"
   val scalaUri      = "io.lemonlabs"         %% "scala-uri"                       % "4.0.3"
   val scalatags     = "com.lihaoyi"          %% "scalatags"                       % "0.13.1"
-  val lettuce       = "io.lettuce"            % "lettuce-core"                    % "6.1.2.RELEASE"
+  val lettuce       = "io.lettuce"            % "lettuce-core"                    % "7.5.2.RELEASE"
   val nettyTransport = ("io.netty" % s"netty-transport-native-$notifier" % "4.1.58.Final").classifier(s"$os-$arch")
   val scalatest = "org.scalatest" %% "scalatest"                    % "3.2.18" % Test
   val uaparser  = "org.uaparser"  %% "uap-scala"                    % "0.21.0"
