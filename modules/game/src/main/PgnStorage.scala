@@ -35,7 +35,6 @@ private object PgnStorage {
   case object Huffman extends PgnStorage {
 
     import org.lichess.compression.game.{ Encoder, Piece as JavaPiece, Role as JavaRole }
-    import scala.jdk.CollectionConverters.*
 
     def encode(pgnMoves: PgnMoves) =
       ByteArray {
@@ -45,11 +44,11 @@ private object PgnStorage {
       }
     def decode(bytes: ByteArray, plies: Int): Decoded =
       monitor(_.game.pgn.decode("huffman")) {
-        val decoded      = Encoder.decode(bytes.value, plies)
-        val unmovedRooks = decoded.unmovedRooks.asScala.view.flatMap(chessPos).to(Set)
+        val decoded         = Encoder.decode(bytes.value, plies)
+        val unmovedRooks = unmovedRooksFromBitboard(decoded.board.castlingRights)
         Decoded(
           actionStrs = decoded.pgnMoves.toVector.map(Vector(_)),
-          pieces = decoded.pieces.asScala.view.flatMap { case (k, v) =>
+          pieces = decoded.board.pieceMap().view.flatMap { case (k, v) =>
             chessPos(k).map(_ -> chessPiece(v))
           }.toMap,
           positionHashes = decoded.positionHashes,
@@ -64,6 +63,17 @@ private object PgnStorage {
           halfMoveClock = decoded.halfMoveClock
         )
       }
+
+    private def unmovedRooksFromBitboard(bitboard: Long): Set[Pos] =
+      Iterator
+        .unfold(bitboard) { remaining =>
+          Option.when(remaining != 0L) {
+            val sq = java.lang.Long.numberOfTrailingZeros(remaining).toInt
+            (sq, remaining & (remaining - 1L))
+          }
+        }
+        .flatMap(chessPos(_))
+        .toSet
 
     private def chessPos(sq: Integer): Option[Pos] = Pos(sq)
     private def chessRole(role: JavaRole): Role    =
