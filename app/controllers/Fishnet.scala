@@ -16,8 +16,8 @@ final class Fishnet(env: Env) extends LilaController(env) {
   private val logger = lila.log("fishnet")
 
   def acquire(slow: Boolean = false) =
-    ClientAction[JsonApi.Request.Acquire] { _ => client =>
-      api.acquire(client, slow) addEffect { jobOpt =>
+    ClientAction[JsonApi.Request.Acquire] { data => client =>
+      api.acquire(client, slow, data.fishnet.variants) addEffect { jobOpt =>
         val _ = lila.mon.fishnet.http.request(jobOpt.isDefined).increment()
       } map Right.apply
     }
@@ -27,15 +27,19 @@ final class Fishnet(env: Env) extends LilaController(env) {
       import lila.fishnet.FishnetApi.*
       def onComplete =
         if (stop) fuccess(Left(NoContent))
-        else api.acquire(client, slow) map Right.apply
+        else api.acquire(client, slow, data.fishnet.variants) map Right.apply
       api
         .postAnalysis(Work.Id(workId), client, data)
         .flatMap {
           case PostAnalysisResult.Complete(analysis) =>
             env.round.proxyRepo.updateIfPresent(analysis.id)(_.setAnalysed)
             onComplete
-          case _: PostAnalysisResult.Partial    => fuccess(Left(NoContent))
-          case PostAnalysisResult.UnusedPartial => fuccess(Left(NoContent))
+          case PostAnalysisResult.CompleteBackgammon(id) =>
+            env.round.proxyRepo.updateIfPresent(id)(_.setAnalysed)
+            onComplete
+          case _: PostAnalysisResult.Partial         => fuccess(Left(NoContent))
+          case PostAnalysisResult.PartialBackgammon  => fuccess(Left(NoContent))
+          case PostAnalysisResult.UnusedPartial      => fuccess(Left(NoContent))
         }
         .recoverWith {
           case WorkNotFound    => onComplete
