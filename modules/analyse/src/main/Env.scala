@@ -13,6 +13,8 @@ final class Env(
 
   lazy val analysisRepo = new AnalysisRepo(db(CollName("analysis2")))
 
+  lazy val analysisBackgammonRepo = new BackgammonAnalysisRepo(db(CollName("analysis_backgammon")))
+
   lazy val requesterApi = new RequesterApi(db(CollName("analysis_requester")))
 
   lazy val analyser = wire[Analyser]
