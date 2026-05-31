@@ -42,6 +42,9 @@ private object BSONHandlers {
   implicit val MoveAcquiredHandler: BSONDocumentHandler[Acquired] = Macros.handler[Acquired]
   import Work.Clock
   implicit val ClockHandler: BSONDocumentHandler[Clock] = Macros.handler[Clock]
+  import Work.{ BgDecision, BgWork }
+  implicit val BgDecisionHandler: BSONDocumentHandler[BgDecision] = Macros.handler[BgDecision]
+  implicit val BgWorkHandler: BSONDocumentHandler[BgWork]         = Macros.handler[BgWork]
   import Work.Game
   implicit val GameHandler: BSONDocumentHandler[Game] = Macros.handler[Game]
   import Work.Sender

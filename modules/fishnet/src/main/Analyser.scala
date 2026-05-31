@@ -99,17 +99,40 @@ final class Analyser(
 
   private def makeWork(game: Game, sender: Work.Sender): Fu[Work.Analysis] =
     gameRepo.initialFen(game) zip uciMemo.get(game) map { case (initialFen, moves) =>
+      val cappedMoves = moves.take(maxPlies)
       makeWork(
         game = Work.Game(
           id = game.id,
           initialFen = initialFen,
           studyId = none,
           variant = game.variant,
-          moves = moves.take(maxPlies).map(_.mkString(",")).mkString(" ")
+          moves = cappedMoves.map(_.mkString(",")).mkString(" "),
+          backgammon = backgammonWork(game, initialFen, cappedMoves)
         ),
         startPly = game.stratGame.startedAtPly,
         sender = sender
       )
+    }
+
+  // For backgammon games, replay the action list and emit one decision per dice
+  // roll (the chequer-play position: board + dice + cube + score). The gnubg
+  // worker turns each FEN into an XGID and evaluates it. Cube decisions are not
+  // emitted yet. None for any non-backgammon variant.
+  private def backgammonWork(
+      game: Game,
+      initialFen: Option[strategygames.format.FEN],
+      actionStrs: strategygames.ActionStrs
+  ): Option[Work.BgWork] =
+    Option.when(game.variant.gameLogic == strategygames.GameLogic.Backgammon()) {
+      val bgVariant = game.variant.toBackgammon
+      val fen       = initialFen.fold(bgVariant.initialFen)(_.toBackgammon)
+      val games     = strategygames.backgammon.Replay.gameWithUciWhileValid(actionStrs, fen, bgVariant)._2
+      val decisions = games.collect {
+        case (gameAfter, withSan)
+            if withSan.uci.isInstanceOf[strategygames.backgammon.format.Uci.DiceRoll] =>
+          strategygames.backgammon.format.Forsyth.>>(gameAfter).value
+      }.zipWithIndex.map { case (decisionFen, idx) => Work.BgDecision(idx, "chequer", decisionFen) }
+      Work.BgWork(matchLength = game.multiPointState.fold(0)(_.target), decisions = decisions)
     }
 
   private def makeWork(game: Work.Game, startPly: Int, sender: Work.Sender): Work.Analysis =
