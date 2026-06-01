@@ -56,6 +56,40 @@ ThisBuild / dependencyOverrides += "org.scala-lang.modules" %% "scala-java8-comp
 // which enforces a strict databind version match at runtime).
 ThisBuild / dependencyOverrides += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.16.0"
 
+// org.lz4:lz4-java:1.8.1 is the highest version under the archived group ID; its POM relocates to
+// at.yawk.lz4:lz4-java. The second override forces the actual resolved jar to 1.10.1, which fixes
+// both CVE-2025-12183 (OOB read/DoS) and the follow-on buffer-disclosure CVE (Java decompressor
+// leaking previous buffer contents). JNI-based decompressors are unaffected, but the Java
+// implementations used via the Play framework and lichess modules are.
+ThisBuild / dependencyOverrides += "org.lz4"     % "lz4-java" % "1.8.1"
+ThisBuild / dependencyOverrides += "at.yawk.lz4" % "lz4-java" % "1.10.1"
+
+// Force netty epoll transport to 4.2.14.Final to fix CVE: stale channels + CPU busy-loop when a
+// TCP connection receives RST after half-close. Affects all 4.2.x up to 4.2.12.Final.
+ThisBuild / dependencyOverrides += "io.netty" % "netty-transport-native-epoll" % "4.2.14.Final"
+
+// Force netty-codec to 4.1.133.Final to fix CVE: Lz4FrameDecoder trusts untrusted decompressedLength
+// header field and pre-allocates up to 32 MB per block before decompressing — 21-byte payload
+// triggers full allocation, enabling memory exhaustion DoS.
+ThisBuild / dependencyOverrides += "io.netty" % "netty-codec" % "4.1.133.Final"
+
+// Force netty-codec-http to 4.1.133.Final to fix two CVEs:
+//   - Request-smuggling: misparses quoted strings in chunked transfer encoding extensions (< 4.1.132)
+//   - Decompression bomb: HttpContentDecompressor.maxAllocation limit silently ignored for Brotli/
+//     zstd/snappy, allowing unbounded memory allocation via Content-Encoding: br (< 4.1.133).
+//     DelegatingDecompressorFrameListener (HTTP/2) has the same gap.
+// Staying on 4.1.x intentionally — play-netty-server 2.8.18 was built against 4.1.x codec APIs.
+ThisBuild / dependencyOverrides += "io.netty" % "netty-codec-http" % "4.1.133.Final"
+
+// Force commons-lang3 to 3.18.0 to fix CVE: ClassUtils.getClass() uncontrolled recursion on long
+// inputs throws StackOverflowError (uncaught Error) — DoS if user-controlled input reaches it.
+ThisBuild / dependencyOverrides += commonsLang3
+
+// Force jakarta.mail to 1.6.8 to fix CVE: SMTP injection via unescaped \r\n in user-controlled
+// content (e.g. username in email subject/body), allowing header injection and BCC spam.
+ThisBuild / dependencyOverrides += jakartaMail
+
+
 // format: off
 libraryDependencies ++= akka.bundle ++ playWs.bundle ++ Seq(
   macwire.macros, macwire.util, play.json,

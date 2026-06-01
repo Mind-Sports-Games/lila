@@ -42,7 +42,7 @@ object Dependencies {
   val scalaUri      = "io.lemonlabs"         %% "scala-uri"                       % "4.0.3"
   val scalatags     = "com.lihaoyi"          %% "scalatags"                       % "0.13.1"
   val lettuce       = "io.lettuce"            % "lettuce-core"                    % "7.5.2.RELEASE"
-  val nettyTransport = ("io.netty" % s"netty-transport-native-$notifier" % "4.1.58.Final").classifier(s"$os-$arch")
+  val nettyTransport = ("io.netty" % s"netty-transport-native-$notifier" % "4.2.14.Final").classifier(s"$os-$arch")
   val scalatest = "org.scalatest" %% "scalatest"                    % "3.2.18" % Test
   val uaparser  = "org.uaparser"  %% "uap-scala"                    % "0.21.0"
   val apacheText  = "org.apache.commons"          % "commons-text"   % "1.12.0"
@@ -51,6 +51,9 @@ object Dependencies {
   val catsMtl     = "org.typelevel"              %% "cats-mtl"       % "1.6.0"
   val kittens     = "org.typelevel"              %% "kittens"        % "3.5.0"
   val bloomFilter = "com.github.alexandrnikitin" %% "bloom-filter"   % "0.13.1_lila-1"
+
+  val commonsLang3  = "org.apache.commons" % "commons-lang3"   % "3.18.0"
+  val jakartaMail   = "com.sun.mail"       % "jakarta.mail"    % "1.6.8"
 
   val munit      = "org.scalameta"  %% "munit"            % "1.2.1"  % Test
   val scalacheck = "org.scalacheck" %% "scalacheck"       % "1.19.0" % Test
