@@ -1,6 +1,6 @@
 import * as cg from 'chessground/types';
 import { h, Hooks, VNodeData } from 'snabbdom';
-import { opposite, calculatePieceGroup, backgammonPosDiff } from 'chessground/util';
+import { opposite, calculatePieceGroupsInArea, backgammonPosDiff } from 'chessground/util';
 import { Redraw, EncodedDests, Dests, MaterialDiff, Step, CheckCount } from './interfaces';
 import { ByoyomiClockData, ClockData } from './clock/clockCtrl';
 import * as stratutils from 'stratutils';
@@ -180,7 +180,9 @@ export function getBackgammonScoreFromPieces(pieces: cg.Pieces, pocketPieces: cg
 export function goStonesToSelect(deadstones: cg.Key[], pieces: cg.Pieces, bd: cg.BoardDimensions): cg.Key[] {
   const stonesToSelect: cg.Key[] = [];
   if (deadstones.length > 0) {
-    const pieceGroups: cg.Key[][] = deadstones.map(s => calculatePieceGroup(s, pieces, bd).sort());
+    const pieceGroups: cg.Key[][] = deadstones
+      .map(s => calculatePieceGroupsInArea(s, pieces, bd).sort())
+      .filter(g => g.length > 0);
     for (const group of pieceGroups) {
       if (!stonesToSelect.includes(group[0])) stonesToSelect.push(group[0]);
     }
