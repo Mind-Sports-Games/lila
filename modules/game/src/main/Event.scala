@@ -79,6 +79,7 @@ object Event {
         possibleLifts: Option[List[Pos]],
         possibleCubeActions: Option[List[CubeInteraction]],
         forcedAction: Option[String],
+        forcedTurnAction: Option[String],
         pocketData: Option[PocketData],
         captLen: Option[Int] = None
     )(extra: JsObject) =
@@ -115,6 +116,7 @@ object Event {
           JsString(squares.map(_.key).mkString)
         })
         .add("forcedAction" -> forcedAction)
+        .add("forcedTurnAction" -> forcedTurnAction)
   }
 
   case class Move(
@@ -143,6 +145,7 @@ object Event {
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String],
+      forcedTurnAction: Option[String],
       pocketData: Option[PocketData],
       captLen: Option[Int]
   ) extends Event {
@@ -168,6 +171,7 @@ object Event {
         possibleLifts,
         possibleCubeActions,
         forcedAction,
+        forcedTurnAction,
         pocketData,
         captLen
       ) {
@@ -254,6 +258,7 @@ object Event {
           case _                         => None
         },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
+        forcedTurnAction = situation.forcedTurnAction.map(_.toUci.uci),
         pocketData = pocketData,
         captLen = (situation, move.dest) match {
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
@@ -290,7 +295,8 @@ object Event {
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
-      forcedAction: Option[String]
+      forcedAction: Option[String],
+      forcedTurnAction: Option[String]
   ) extends Event {
     def typ  = "drop"
     def data =
@@ -314,6 +320,7 @@ object Event {
         possibleLifts,
         possibleCubeActions,
         forcedAction,
+        forcedTurnAction,
         pocketData
       ) {
         Json.obj(
@@ -366,6 +373,7 @@ object Event {
           case _                         => None
         },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
+        forcedTurnAction = situation.forcedTurnAction.map(_.toUci.uci),
         pocketData = pocketData
       )
   }
@@ -392,7 +400,8 @@ object Event {
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
-      forcedAction: Option[String]
+      forcedAction: Option[String],
+      forcedTurnAction: Option[String]
   ) extends Event {
     def typ  = "lift"
     def data =
@@ -416,6 +425,7 @@ object Event {
         possibleLifts,
         possibleCubeActions,
         forcedAction,
+        forcedTurnAction,
         pocketData
       ) {
         Json.obj(
@@ -469,6 +479,7 @@ object Event {
           case _                         => None
         },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
+        forcedTurnAction = situation.forcedTurnAction.map(_.toUci.uci),
         pocketData = pocketData
       )
   }
@@ -494,7 +505,8 @@ object Event {
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
-      forcedAction: Option[String]
+      forcedAction: Option[String],
+      forcedTurnAction: Option[String]
   ) extends Event {
     def typ  = "endturn"
     def data =
@@ -518,6 +530,7 @@ object Event {
         possibleLifts,
         possibleCubeActions,
         forcedAction,
+        forcedTurnAction,
         pocketData
       ) {
         Json.obj(
@@ -571,6 +584,7 @@ object Event {
           case _                         => None
         },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
+        forcedTurnAction = situation.forcedTurnAction.map(_.toUci.uci),
         pocketData = pocketData
       )
   }
@@ -599,7 +613,8 @@ object Event {
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
-      forcedAction: Option[String]
+      forcedAction: Option[String],
+      forcedTurnAction: Option[String]
   ) extends Event {
     def typ  = "pass"
     def data =
@@ -623,6 +638,7 @@ object Event {
         possibleLifts,
         possibleCubeActions,
         forcedAction,
+        forcedTurnAction,
         pocketData
       ) {
         Json.obj(
@@ -677,6 +693,7 @@ object Event {
           case _                         => None
         },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
+        forcedTurnAction = situation.forcedTurnAction.map(_.toUci.uci),
         pocketData = pocketData
       )
   }
@@ -703,7 +720,8 @@ object Event {
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
-      forcedAction: Option[String]
+      forcedAction: Option[String],
+      forcedTurnAction: Option[String]
   ) extends Event {
     def typ  = "selectSquares"
     def data =
@@ -727,6 +745,7 @@ object Event {
         possibleLifts,
         possibleCubeActions,
         forcedAction,
+        forcedTurnAction,
         pocketData
       ) {
         Json.obj(
@@ -774,6 +793,7 @@ object Event {
           case _                         => None
         },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
+        forcedTurnAction = situation.forcedTurnAction.map(_.toUci.uci),
         pocketData = pocketData
       )
   }
@@ -800,7 +820,8 @@ object Event {
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
-      forcedAction: Option[String]
+      forcedAction: Option[String],
+      forcedTurnAction: Option[String]
   ) extends Event {
     def typ  = "diceroll"
     def data =
@@ -824,6 +845,7 @@ object Event {
         possibleLifts,
         possibleCubeActions,
         forcedAction,
+        forcedTurnAction,
         pocketData
       ) {
         Json.obj(
@@ -877,6 +899,7 @@ object Event {
           case _                         => None
         },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
+        forcedTurnAction = situation.forcedTurnAction.map(_.toUci.uci),
         pocketData = pocketData
       )
   }
@@ -903,7 +926,8 @@ object Event {
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
-      forcedAction: Option[String]
+      forcedAction: Option[String],
+      forcedTurnAction: Option[String]
   ) extends Event {
     def typ  = "cubeaction"
     def data =
@@ -927,6 +951,7 @@ object Event {
         possibleLifts,
         possibleCubeActions,
         forcedAction,
+        forcedTurnAction,
         pocketData
       ) {
         Json.obj(
@@ -980,6 +1005,7 @@ object Event {
           case _                         => None
         },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
+        forcedTurnAction = situation.forcedTurnAction.map(_.toUci.uci),
         pocketData = pocketData
       )
   }
@@ -1005,7 +1031,8 @@ object Event {
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
-      forcedAction: Option[String]
+      forcedAction: Option[String],
+      forcedTurnAction: Option[String]
   ) extends Event {
     def typ  = "undo"
     def data =
@@ -1029,6 +1056,7 @@ object Event {
         possibleLifts,
         possibleCubeActions,
         forcedAction,
+        forcedTurnAction,
         pocketData
       ) {
         Json.obj(
@@ -1082,6 +1110,7 @@ object Event {
           case _                         => None
         },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
+        forcedTurnAction = situation.forcedTurnAction.map(_.toUci.uci),
         pocketData = pocketData
       )
   }

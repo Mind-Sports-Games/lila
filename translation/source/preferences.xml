@@ -50,6 +50,8 @@
   <string name="confirmPassAction">Confirm pass action</string>
   <string name="confirmCubeActions">Confirm cube actions (Double / Take / Drop)</string>
   <string name="playForcedAction">Play Forced Actions (e.g. backgammon no-play option)</string>
+  <string name="partialForcedActions">Partial Forced Actions</string>
+  <string name="fullForcedActions">Full Forced Actions</string>
   <string name="castleByMovingTheKingTwoSquaresOrOntoTheRook">Castling method</string>
   <string name="castleByMovingTwoSquares">Move king two squares</string>
   <string name="castleByMovingOntoTheRook">Move king onto rook</string>

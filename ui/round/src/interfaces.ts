@@ -94,6 +94,7 @@ export interface RoundData extends GameData {
   canUndo: boolean;
   canEndTurn: boolean;
   forcedAction?: string;
+  forcedTurnAction?: string;
   pauseSecs?: number;
   forecastCount?: number;
   crazyhouse?: CrazyData;
@@ -194,6 +195,7 @@ export interface ApiAction extends Step {
   canUndo: boolean;
   canEndTurn: boolean;
   forcedAction?: string;
+  forcedTurnAction?: string;
   dice?: string;
   cubeActions?: string;
   canSelectSquares?: boolean;
@@ -245,7 +247,7 @@ export interface Pref {
   confirmResign: boolean;
   confirmPass: boolean;
   confirmCubeActions: boolean;
-  playForcedAction: boolean;
+  playForcedAction: Prefs.PlayForcedActions;
   coords: cg.Coords;
   destination: boolean;
   playerTurnIndicator: boolean;

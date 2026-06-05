@@ -527,7 +527,8 @@ trait SetupHelper { self: I18nHelper =>
   def playForcedActionChoices(implicit lang: Lang) =
     List(
       (Pref.PlayForcedAction.NO, trans.no.txt()),
-      (Pref.PlayForcedAction.YES, trans.yes.txt())
+      (Pref.PlayForcedAction.PARTIAL, trans.preferences.partialForcedActions.txt()),
+      (Pref.PlayForcedAction.FULL, trans.preferences.fullForcedActions.txt())
     )
 
   def translatedRookCastleChoices(implicit lang: Lang) =
