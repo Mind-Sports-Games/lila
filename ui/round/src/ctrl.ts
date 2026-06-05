@@ -766,7 +766,7 @@ export default class RoundController {
           viewOnly:
             this.isPlaying() &&
             ((this.data.pref.playForcedAction === 1 && this.data.forcedAction !== undefined) ||
-            (this.data.pref.playForcedAction === 2 && this.data.forcedTurnAction !== undefined)) &&
+              (this.data.pref.playForcedAction === 2 && this.data.forcedTurnAction !== undefined)) &&
             this.data.player.playerIndex === this.data.game.player,
         });
       }
@@ -1400,7 +1400,7 @@ export default class RoundController {
       !this.replaying() &&
       d.player.playerIndex === d.game.player &&
       ((d.pref.playForcedAction === 1 && d.forcedAction !== undefined) ||
-      (d.pref.playForcedAction === 2 && d.forcedTurnAction !== undefined))
+        (d.pref.playForcedAction === 2 && d.forcedTurnAction !== undefined))
     ) {
       const forcedAction = d.pref.playForcedAction === 1 ? d.forcedAction : d.forcedTurnAction;
       if (forcedAction === 'endturn') {
