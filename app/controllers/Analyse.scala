@@ -35,6 +35,17 @@ final class Analyse(
       }
     }
 
+  // The stored whole-game backgammon analysis: gnubg's own per-player error rate,
+  // luck and ratings plus every candidate play it evaluated.
+  def backgammonRating(id: String) =
+    Open { implicit ctx =>
+      env.analyse.analyser.getBackgammon(id) map {
+        case None           => NotFound("no backgammon analysis stored")
+        case Some(analysis) =>
+          Ok(play.api.libs.json.Json.toJson(analysis)(using lila.analyse.BackgammonAnalysis.matchWrites))
+      }
+    }
+
   def replay(pov: Pov, userTv: Option[lila.user.User])(implicit ctx: Context) =
     if (HTTPRequest.isCrawler(ctx.req)) replayBot(pov)
     else

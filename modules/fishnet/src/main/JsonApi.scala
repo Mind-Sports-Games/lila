@@ -38,10 +38,9 @@ object JsonApi {
       def isNnue = flavor.contains("nnue")
     }
 
-    // Backgammon result payload, posted by the gnubg-backed mindcube worker. It
-    // maps 1:1 onto lila.analyse's backgammon model. Posted progressively: each
-    // post carries the decisions computed so far with complete=false, then a
-    // final complete=true.
+    // Whole-game backgammon analysis, posted once by the gnubg-backed mindcube
+    // worker. Maps 1:1 onto lila.analyse's backgammon model: gnubg's OWN per-player
+    // error rate, luck and ratings, plus every candidate play it evaluated.
     case class EngineMeta(name: String, eval: String)
 
     case class BgProbsPost(
@@ -70,19 +69,55 @@ object JsonApi {
         lila.analyse.BgCandidate(rank, evaluator, play, equity, equityDelta, probabilities.toModel, evalClass, played)
     }
 
-    case class BgResultPost(
-        index:         Int,
-        kind:          String,
-        equity:        Double,
-        probabilities: BgProbsPost,
-        candidates:    List[BgCandPost]
+    case class BgMovePost(
+        number:       Int,
+        player:       String,
+        kind:         String,
+        dice:         Option[String],
+        action:       String,
+        bestAction:   Option[String],
+        playedEquity: Option[Double],
+        bestEquity:   Option[Double],
+        rollLuck:     Option[Double],
+        candidates:   List[BgCandPost]
     ) {
-      def toInfo =
-        lila.analyse.BackgammonInfo(index, kind, equity, probabilities.toModel, candidates.map(_.toModel))
+      def toModel =
+        lila.analyse.BgMove(number, player, kind, dice, action, bestAction, playedEquity, bestEquity, rollLuck, candidates.map(_.toModel))
     }
 
-    case class BackgammonPost(complete: Boolean, results: List[BgResultPost]) {
-      def toInfos: List[lila.analyse.BackgammonInfo] = results.map(_.toInfo)
+    case class BgStatsPost(
+        player:           String,
+        chequerErrorRate: Option[Double],
+        cubeErrorRate:    Option[Double],
+        overallErrorRate: Option[Double],
+        snowieErrorRate:  Option[Double],
+        luckTotalEmg:     Option[Double],
+        luckRateEmg:      Option[Double],
+        chequerRating:    Option[String],
+        cubeRating:       Option[String],
+        overallRating:    Option[String],
+        luckRating:       Option[String]
+    ) {
+      def toModel =
+        lila.analyse.BgPlayerStats(player, chequerErrorRate, cubeErrorRate, overallErrorRate, snowieErrorRate, luckTotalEmg, luckRateEmg, chequerRating, cubeRating, overallRating, luckRating)
+    }
+
+    case class BgWinnerPost(player: String, points: Int, winType: String) {
+      def toModel = lila.analyse.BgWinner(player, points, winType)
+    }
+
+    case class BgGamePost(
+        number: Int,
+        winner: Option[BgWinnerPost],
+        stats:  List[BgStatsPost],
+        moves:  List[BgMovePost]
+    ) {
+      def toModel =
+        lila.analyse.BgGame(number, winner.map(_.toModel), stats.map(_.toModel), moves.map(_.toModel))
+    }
+
+    case class BackgammonPost(white: String, black: String, games: List[BgGamePost]) {
+      def toGames: List[lila.analyse.BgGame] = games.map(_.toModel)
     }
 
     case class Acquire(
@@ -285,7 +320,10 @@ object JsonApi {
     implicit val EngineMetaReads: Reads[Request.EngineMeta]         = Json.reads[Request.EngineMeta]
     implicit val BgProbsReads: Reads[Request.BgProbsPost]           = Json.reads[Request.BgProbsPost]
     implicit val BgCandReads: Reads[Request.BgCandPost]             = Json.reads[Request.BgCandPost]
-    implicit val BgResultReads: Reads[Request.BgResultPost]         = Json.reads[Request.BgResultPost]
+    implicit val BgMoveReads: Reads[Request.BgMovePost]             = Json.reads[Request.BgMovePost]
+    implicit val BgStatsReads: Reads[Request.BgStatsPost]           = Json.reads[Request.BgStatsPost]
+    implicit val BgWinnerReads: Reads[Request.BgWinnerPost]         = Json.reads[Request.BgWinnerPost]
+    implicit val BgGameReads: Reads[Request.BgGamePost]             = Json.reads[Request.BgGamePost]
     implicit val BackgammonPostReads: Reads[Request.BackgammonPost] = Json.reads[Request.BackgammonPost]
 
     // Lenient: chess clients send {fishnet, stockfish, analysis}; the backgammon
@@ -304,7 +342,6 @@ object JsonApi {
 
   object writers {
     implicit val VariantWrites: Writes[Variant]          = Writes[Variant] { v => JsString(v.fishnetKey) }
-    implicit val BgDecisionWrites: OWrites[W.BgDecision]  = Json.writes[W.BgDecision]
     implicit val BgWorkWrites: OWrites[W.BgWork]          = Json.writes[W.BgWork]
     implicit val GameWrites: Writes[UciGame]    = Writes[UciGame] { g =>
       Json.obj(
