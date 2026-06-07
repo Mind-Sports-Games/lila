@@ -29,6 +29,7 @@ final class Env(
     requesterApi: lila.analyse.RequesterApi,
     evalCacheApi: lila.evalCache.EvalCacheApi,
     gameRepo: lila.game.GameRepo,
+    sgfDump: lila.game.SgfDump,
     analysisRepo: lila.analyse.AnalysisRepo,
     db: lila.db.Db,
     cacheApi: lila.memo.CacheApi,
