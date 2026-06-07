@@ -46,7 +46,16 @@ final class Analyser(
   // study chapter) mark it analysed.
   def saveBackgammon(analysis: BackgammonAnalysis): Funit =
     backgammonRepo.save(analysis) map { _ =>
-      if (analysis.studyId.isEmpty) gameRepo.setAnalysed(analysis.id)
+      if (analysis.studyId.isEmpty) {
+        gameRepo.setAnalysed(analysis.id)
+        // TODO(bg-analysis): notify any open game/analysis page so it flips from
+        // "analysing" to the win% graph. Mirrors chess sendAnalysisProgress but
+        // minimal — RoundDuct turns this into a "bgAnalysisProgress" socket message.
+        Bus.publish(
+          TellIfExists(analysis.id, actorApi.BackgammonAnalysisProgress(analysis.id, complete = true)),
+          "roundSocket"
+        )
+      }
     }
 
   private def sendAnalysisProgress(analysis: Analysis, complete: Boolean): Funit =

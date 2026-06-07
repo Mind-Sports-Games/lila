@@ -160,6 +160,14 @@ playstrategy.advantageChart = function (data, trans, el) {
               format = format.replace('{series.name}', trans('advantage'));
               var eval = data.treeParts[this.x + 1].eval;
               if (!eval) return;
+              // NOTE(bg-analysis): backgammon feeds a win probability (0..1) as eval.win
+              // (alongside a synthetic cp that drives the curve). Show the LEADING side's
+              // win chance, signed: + = white to win, - = black to win (white 25% -> -75%).
+              else if (typeof eval.win !== 'undefined') {
+                var white = eval.win * 100;
+                var pct = white >= 50 ? white : white - 100;
+                return format.replace('{point.y}', (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%');
+              }
               else if (eval.mate) return format.replace('{point.y}', '#' + eval.mate);
               else if (typeof eval.cp !== 'undefined') {
                 var e = Math.max(Math.min(Math.round(eval.cp / 10) / 10, 99), -99);

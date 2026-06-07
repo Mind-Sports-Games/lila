@@ -7,6 +7,7 @@ import { defined } from 'common';
 import modal from 'common/modal';
 import { formToXhr } from 'common/xhr';
 import { AnalyseData } from './interfaces';
+import bgWinChart from './bgWinChart';
 
 interface PlyChart extends Highcharts.ChartObject {
   lastPly?: Ply | false;
@@ -29,6 +30,16 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
     };
   let lastFen: string;
 
+  // TODO(bg-analysis): minimal backgammon win% wiring. The colleague owns the real
+  // chart; this makes the basics work — request shows an "analysing" spinner,
+  // completion (socket "bgAnalysisProgress" -> pubsub) draws the graph, and a
+  // stored analysis is drawn on load.
+  const isBackgammon = data.game.variant.key === 'backgammon';
+  // bg-analysis: backgammon has many board actions per turn, so the chart's
+  // ply-based point selection doesn't fit; track the selected dot by the current
+  // node's mainline index instead.
+  let bgLastIdx = -2;
+
   if (!playstrategy.AnalyseNVUI) {
     playstrategy.pubsub.on('analysis.comp.toggle', (v: boolean) => {
       setTimeout(function () {
@@ -44,7 +55,23 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
       if ($chart.length) {
         const chart: PlyChart = ($chart[0] as any).highcharts;
         if (chart) {
-          if (mainlinePly != chart.lastPly) {
+          if (isBackgammon) {
+            // TODO(bg-analysis): "current action" dot. Backgammon has ~370 points (one
+            // per board action), dense enough that Highcharts auto-hides markers, so
+            // point.select() draws nothing. Instead force a marker onto just the current
+            // point (located by mainline index — chess's ply index doesn't fit
+            // multi-action turns) and clear the previously-marked one.
+            const idx = ctrl.onMainline ? ctrl.mainline.indexOf(ctrl.node) - 1 : -1;
+            if (idx !== bgLastIdx) {
+              const pts = chart.series[0].data;
+              if (bgLastIdx >= 0 && pts[bgLastIdx]) pts[bgLastIdx].update({ marker: { enabled: false } }, false);
+              const point = idx >= 0 ? pts[idx] : undefined;
+              if (defined(point))
+                point.update({ marker: { enabled: true, radius: 4, lineWidth: 1, lineColor: '#d85000', fillColor: '#d85000' } }, true);
+              else chart.redraw();
+              bgLastIdx = idx;
+            }
+          } else if (mainlinePly != chart.lastPly) {
             if (mainlinePly === false) unselect(chart);
             else {
               //TODO fix for multiaction when analysis is supported also change /public/javascripts/chart/acpl.js
@@ -52,8 +79,8 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
               if (defined(point)) point.select();
               else unselect(chart);
             }
+            chart.lastPly = mainlinePly;
           }
-          chart.lastPly = mainlinePly;
         }
       }
       if ($timeChart.length) {
@@ -82,6 +109,12 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
       else if (playstrategy.advantageChart.update) playstrategy.advantageChart.update(d);
       if (d.analysis && !d.analysis.partial) $('#acpl-chart-loader').remove();
     });
+    // TODO(bg-analysis): draw/redraw the win% graph when the worker finishes, and
+    // once on load if a stored analysis already exists (drawBgWinChart no-ops on 404).
+    if (isBackgammon) {
+      playstrategy.pubsub.on('analysis.bg.progress', drawBgWinChart);
+      drawBgWinChart();
+    }
   }
 
   function chartLoader() {
@@ -96,6 +129,18 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
     playstrategy.loadScriptCJS('javascripts/chart/acpl.js').then(function () {
       playstrategy.advantageChart!(data, ctrl.trans, $('#acpl-chart')[0] as HTMLElement);
     });
+  }
+
+  // TODO(bg-analysis): backgammon "analysing" spinner + win% draw. Colleague:
+  // replace the placeholder chart (./bgWinChart) and the copy below.
+  function showBgAnalysing() {
+    $panels
+      .filter('.computer-analysis')
+      .html(`<div id="acpl-chart"></div><div id="acpl-chart-loader"><span>gnubg analysis</span>${playstrategy.spinnerHtml}</div>`);
+  }
+  function drawBgWinChart() {
+    const panel = $panels.filter('.computer-analysis')[0];
+    if (panel) bgWinChart(ctrl, panel as HTMLElement);
   }
 
   const storage = playstrategy.storage.make('analysis.panel');
@@ -134,7 +179,9 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
         if (confirm(ctrl.trans('youNeedAnAccountToDoThat'))) location.href = '/signup';
         return false;
       }
-      formToXhr(this).then(startAdvantageChart, playstrategy.reload);
+      // TODO(bg-analysis): backgammon shows its own "analysing" spinner; the win%
+      // graph is drawn later when the worker finishes (socket "bgAnalysisProgress").
+      formToXhr(this).then(isBackgammon ? showBgAnalysing : startAdvantageChart, playstrategy.reload);
       return false;
     });
   }

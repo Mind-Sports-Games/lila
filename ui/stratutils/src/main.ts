@@ -173,7 +173,10 @@ const noFishnetVariants: VariantKey[] = [
   'go9x9',
   'go13x13',
   'go19x19',
-  'backgammon',
+  // NOTE(bg-analysis): standard backgammon IS analysable (gnubg worker via
+  // mindcube), so it is intentionally NOT in this list — that lets the analysis
+  // page wire the request-analysis XHR + "analysing" spinner. 'hyper'/'nackgammon'
+  // stay here (their variants have hasFishnet=false).
   'hyper',
   'nackgammon',
   'abalone',

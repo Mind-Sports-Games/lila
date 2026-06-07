@@ -170,6 +170,11 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     analysisProgress(data: ServerEvalData) {
       ctrl.mergeAnalysisData(data);
     },
+    // TODO(bg-analysis): backgammon analysis finished server-side (RoundDuct
+    // "bgAnalysisProgress"). Tell the controller to (re)draw the win% graph.
+    bgAnalysisProgress(_data: { complete: boolean }) {
+      ctrl.onBackgammonAnalysisProgress();
+    },
     evalHit(e: CachedEval) {
       ctrl.evalCache.onCloudEval(e);
     },
