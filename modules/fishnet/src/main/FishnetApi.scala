@@ -37,7 +37,11 @@ final class FishnetApi(
     else repo.getEnabledClient(req.fishnet.apikey)
   } map {
     case None         => Failure(new Exception("Can't authenticate: invalid key or disabled client"))
-    case Some(client) => clientVersion.accept(req.fishnet.version) map (_ => client)
+    case Some(client) =>
+      // variant-declaring workers (e.g. the backgammon/gnubg worker) version on their
+      // own track, so the stockfish client_min_version gate only applies to default clients
+      if (req.fishnet.variants.exists(_.nonEmpty)) Success(client)
+      else clientVersion.accept(req.fishnet.version) map (_ => client)
   } flatMap {
     case Success(client) => repo.updateClientInstance(client, req.instance(ip)) map Success.apply
     case failure         => fuccess(failure)
@@ -105,15 +109,21 @@ final class FishnetApi(
         case Some(work) if work.isAcquiredBy(client) =>
           lexicalData.backgammon match {
             case Some(bg) =>
-              // merge + persist the freshly-posted decisions; on completion mark
-              // analysed and free the work. Posted progressively (see worker).
-              sink.saveBackgammon(work.game.id, work.game.studyId, bg.toInfos, bg.complete) >> {
-                if (bg.complete)
-                  repo
-                    .deleteAnalysis(work)
-                    .inject(PostAnalysisResult.CompleteBackgammon(work.game.id): PostAnalysisResult)
-                else fuccess(PostAnalysisResult.PartialBackgammon: PostAnalysisResult)
-              }
+              // store gnubg's whole-game analysis (ER, luck, ratings + every
+              // candidate play), mark analysed, and free the work. Posted once.
+              val analysis = lila.analyse.BackgammonAnalysis(
+                _id = work.game.id,
+                studyId = work.game.studyId,
+                white = bg.white,
+                black = bg.black,
+                games = bg.toGames,
+                date = DateTime.now,
+                fk = none
+              )
+              sink.saveBackgammon(analysis) >>
+                repo
+                  .deleteAnalysis(work)
+                  .inject(PostAnalysisResult.CompleteBackgammon(work.game.id): PostAnalysisResult)
             case None =>
               val v    = work.game.variant
               val data = lexicalData.toUci(v)
@@ -156,16 +166,14 @@ final class FishnetApi(
         case PostAnalysisResult.Partial(res)           => s"partial analysis for ${res.id}"
         case PostAnalysisResult.UnusedPartial          => s"unused partial analysis"
         case PostAnalysisResult.CompleteBackgammon(id) => s"post backgammon analysis for $id"
-        case PostAnalysisResult.PartialBackgammon      => s"partial backgammon analysis"
       }
       .result
       .flatMap {
         case r @ PostAnalysisResult.Complete(res)         => sink.save(res) inject r
         case r @ PostAnalysisResult.Partial(res)          => sink.progress(res) inject r
         case r @ PostAnalysisResult.UnusedPartial         => fuccess(r)
-        // backgammon analysis is already merged + saved in the match above
+        // backgammon analysis is already saved in the match above
         case r @ PostAnalysisResult.CompleteBackgammon(_) => fuccess(r)
-        case r @ PostAnalysisResult.PartialBackgammon     => fuccess(r)
       }
   }
 
@@ -247,9 +255,8 @@ object FishnetApi {
     case class Complete(analysis: lila.analyse.Analysis) extends PostAnalysisResult
     case class Partial(analysis: lila.analyse.Analysis)  extends PostAnalysisResult
     case object UnusedPartial                            extends PostAnalysisResult
-    // Backgammon analysis is merged + saved as it is posted; these only carry
-    // enough to drive the HTTP response and "next work" acquisition.
+    // Backgammon analysis is saved when posted; this only carries enough to
+    // drive the HTTP response and "next work" acquisition.
     case class CompleteBackgammon(id: String) extends PostAnalysisResult
-    case object PartialBackgammon             extends PostAnalysisResult
   }
 }

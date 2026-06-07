@@ -1,7 +1,5 @@
 package lila.analyse
 
-import org.joda.time.DateTime
-
 import lila.db.dsl.*
 
 final class BackgammonAnalysisRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
@@ -15,16 +13,7 @@ final class BackgammonAnalysisRepo(val coll: Coll)(implicit ec: scala.concurrent
 
   def remove(id: String): Funit = coll.delete.one($id(id)).void
 
-  /** Read-merge-write, so the worker can post decisions progressively (each post
-    * adds/updates infos by index). Returns the merged analysis. */
-  def merge(
-      id: BackgammonAnalysis.ID,
-      studyId: Option[String],
-      more: List[BackgammonInfo],
-      date: DateTime
-  ): Fu[BackgammonAnalysis] =
-    byId(id).flatMap { existing =>
-      val merged = existing.getOrElse(BackgammonAnalysis.empty(id, studyId, date)).merge(more).copy(date = date)
-      coll.update.one($id(id), merged, upsert = true).inject(merged)
-    }
+  /** The worker posts the whole-game analysis at once, so we just upsert it. */
+  def save(analysis: BackgammonAnalysis): Funit =
+    coll.update.one($id(analysis.id), analysis, upsert = true).void
 }

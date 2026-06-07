@@ -1,7 +1,5 @@
 package lila.analyse
 
-import org.joda.time.DateTime
-
 import lila.common.Bus
 import lila.game.actorApi.InsertGame
 import lila.game.{ Game, GameRepo }
@@ -44,16 +42,11 @@ final class Analyser(
   def getBackgammon(id: BackgammonAnalysis.ID): Fu[Option[BackgammonAnalysis]] =
     backgammonRepo.byId(id)
 
-  // Merge freshly-posted backgammon decisions (progressive). On completion of a
-  // game (not a study chapter) mark the game analysed.
-  def saveBackgammon(
-      id: String,
-      studyId: Option[String],
-      infos: List[BackgammonInfo],
-      complete: Boolean
-  ): Funit =
-    backgammonRepo.merge(id, studyId, infos, DateTime.now) map { _ =>
-      if (complete && studyId.isEmpty) gameRepo.setAnalysed(id)
+  // Store the whole-game backgammon analysis the worker posted. On a game (not a
+  // study chapter) mark it analysed.
+  def saveBackgammon(analysis: BackgammonAnalysis): Funit =
+    backgammonRepo.save(analysis) map { _ =>
+      if (analysis.studyId.isEmpty) gameRepo.setAnalysed(analysis.id)
     }
 
   private def sendAnalysisProgress(analysis: Analysis, complete: Boolean): Funit =

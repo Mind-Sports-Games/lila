@@ -49,9 +49,8 @@ object Work {
       studyId: Option[String],
       variant: Variant,
       moves: String,
-      // For backgammon work: one descriptor per decision point gnubg must
-      // evaluate. The gnubg-backed mindcube worker consumes these; chess work
-      // leaves it None.
+      // For backgammon work: the game's SGF, which the gnubg-backed mindcube
+      // worker reads directly. Chess work leaves it None.
       backgammon: Option[BgWork] = None
   ) {
 
@@ -59,14 +58,9 @@ object Work {
       ~Uci.readList(variant.gameLogic, variant.gameFamily, moves)
   }
 
-  /** One backgammon decision to analyse. `fen` is the strategygames backgammon
-    * FEN at the decision point (board + dice + cube + score + turn). `kind` is
-    * `chequer | dance | cube-offer | cube-response`. */
-  case class BgDecision(index: Int, kind: String, fen: String)
-
-  /** The backgammon-specific part of a work item: the match length (0 = money
-    * game, needed for match-equity) and the decisions to analyse. */
-  case class BgWork(matchLength: Int, decisions: List[BgDecision])
+  /** The backgammon-specific part of a work item: the game's SGF, which gnubg
+    * reads directly to run a whole-game `analyse match`. */
+  case class BgWork(sgf: String)
 
   case class Sender(
       userId: lila.user.User.ID,
