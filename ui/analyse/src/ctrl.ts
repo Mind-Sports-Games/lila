@@ -951,6 +951,15 @@ export default class AnalyseCtrl {
     this.redraw();
   }
 
+  // TODO(bg-analysis): minimal hook — the backgammon worker finished (socket.ts
+  // "bgAnalysisProgress"). Emit a pubsub the underboard listens to (it fetches
+  // /<id>/backgammon-rating.json and draws the win% graph) and redraw. Colleague:
+  // fold this into the normal analysis lifecycle once the real chart lands.
+  onBackgammonAnalysisProgress(): void {
+    playstrategy.pubsub.emit('analysis.bg.progress');
+    this.redraw();
+  }
+
   playUci(uci: Uci): void {
     const move = parseUci(variantKeyToRules(this.data.game.variant.key))(uci)!;
     const to = makeSquare(variantKeyToRules(this.data.game.variant.key))(move.to);
