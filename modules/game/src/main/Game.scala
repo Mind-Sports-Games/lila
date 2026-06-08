@@ -891,7 +891,7 @@ case class Game(
         case "go13x13" => (baseSeconds * 3) / 2
         case _         => baseSeconds
       }
-    Centis ofSeconds multiplied
+    Centis.ofSeconds(multiplied)
   }
 
   def expirableOnPaused = playable && nonAi && clock.exists(_.isPaused)
