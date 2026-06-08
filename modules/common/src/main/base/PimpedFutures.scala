@@ -171,7 +171,8 @@ final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal {
   def recoverDefault(default: => A)(implicit ec: EC): Fu[A] =
     fua recover {
       case _: LilaException                         => default
-      case _: java.util.concurrent.TimeoutException => default
+      case _: java.util.concurrent.TimeoutException => default // legacy Akka actor ask
+      case _: scalalib.future.TimeoutException      => default // scalalib withTimeout
       case e: Exception                             =>
         lila.log("common").warn("Future.recoverDefault", e)
         default
