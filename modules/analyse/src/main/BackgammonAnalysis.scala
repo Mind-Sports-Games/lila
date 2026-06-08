@@ -47,6 +47,7 @@ case class BgMove(
     playedEquity: Option[Double],
     bestEquity:   Option[Double],
     rollLuck:     Option[Double],
+    cubeAdvice:   Option[String], // gnubg's "Proper cube action" text (cube decisions only)
     candidates:   List[BgCandidate]
 )
 
@@ -78,8 +79,8 @@ case class BgGame(
 case class BackgammonAnalysis(
     _id:     String, // game id, or study chapter id when studyId is set
     studyId: Option[String],
-    white:   String,
-    black:   String,
+    player1: String,
+    player2: String,
     games:   List[BgGame],
     date:    DateTime,
     fk:      Option[String]
@@ -108,7 +109,7 @@ object BackgammonAnalysis {
   implicit val winnerWrites: Writes[BgWinner]               = Json.writes[BgWinner]
   implicit val gameWrites: OWrites[BgGame]                  = Json.writes[BgGame]
   implicit val matchWrites: OWrites[BackgammonAnalysis] = OWrites { a =>
-    Json.obj("id" -> a._id, "white" -> a.white, "black" -> a.black, "games" -> a.games) ++
+    Json.obj("id" -> a._id, "player1" -> a.player1, "player2" -> a.player2, "games" -> a.games) ++
       a.studyId.fold(Json.obj())(s => Json.obj("studyId" -> s))
   }
 }

@@ -114,8 +114,8 @@ final class FishnetApi(
               val analysis = lila.analyse.BackgammonAnalysis(
                 _id = work.game.id,
                 studyId = work.game.studyId,
-                white = bg.white,
-                black = bg.black,
+                player1 = bg.player1,
+                player2 = bg.player2,
                 games = bg.toGames,
                 date = DateTime.now,
                 fk = none
