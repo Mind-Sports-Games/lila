@@ -79,10 +79,11 @@ object JsonApi {
         playedEquity: Option[Double],
         bestEquity:   Option[Double],
         rollLuck:     Option[Double],
+        cubeAdvice:   Option[String],
         candidates:   List[BgCandPost]
     ) {
       def toModel =
-        lila.analyse.BgMove(number, player, kind, dice, action, bestAction, playedEquity, bestEquity, rollLuck, candidates.map(_.toModel))
+        lila.analyse.BgMove(number, player, kind, dice, action, bestAction, playedEquity, bestEquity, rollLuck, cubeAdvice, candidates.map(_.toModel))
     }
 
     case class BgStatsPost(
@@ -116,7 +117,7 @@ object JsonApi {
         lila.analyse.BgGame(number, winner.map(_.toModel), stats.map(_.toModel), moves.map(_.toModel))
     }
 
-    case class BackgammonPost(white: String, black: String, games: List[BgGamePost]) {
+    case class BackgammonPost(player1: String, player2: String, games: List[BgGamePost]) {
       def toGames: List[lila.analyse.BgGame] = games.map(_.toModel)
     }
 
