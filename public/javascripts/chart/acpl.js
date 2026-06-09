@@ -167,8 +167,7 @@ playstrategy.advantageChart = function (data, trans, el) {
                 var white = eval.win * 100;
                 var pct = white >= 50 ? white : white - 100;
                 return format.replace('{point.y}', (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%');
-              }
-              else if (eval.mate) return format.replace('{point.y}', '#' + eval.mate);
+              } else if (eval.mate) return format.replace('{point.y}', '#' + eval.mate);
               else if (typeof eval.cp !== 'undefined') {
                 var e = Math.max(Math.min(Math.round(eval.cp / 10) / 10, 99), -99);
                 if (e > 0) e = '+' + e;
