@@ -23,7 +23,16 @@ import explorerCtrl from './explorer/explorerCtrl';
 import GamebookPlayCtrl from './study/gamebook/gamebookPlayCtrl';
 import makeStudy from './study/studyCtrl';
 import throttle from 'common/throttle';
-import { AnalyseOpts, AnalyseData, ServerEvalData, Key, JustCaptured, NvuiPlugin, Redraw } from './interfaces';
+import {
+  AnalyseOpts,
+  AnalyseData,
+  ServerEvalData,
+  Key,
+  JustCaptured,
+  NvuiPlugin,
+  Redraw,
+  BackgammonAnalysis,
+} from './interfaces';
 import { Autoplay, AutoplayDelay } from './autoplay';
 import { build as makeTree, path as treePath, ops as treeOps, TreeWrapper } from 'tree';
 import { compute as computeAutoShapes } from './autoShape';
@@ -96,6 +105,7 @@ export default class AnalyseCtrl {
   showGauge: StoredBooleanProp = storedProp('show-gauge', true);
   showComputer: StoredBooleanProp = storedProp('show-computer', true);
   showMoveAnnotation: StoredBooleanProp = storedProp('show-move-annotation', true);
+  showMoveList: StoredBooleanProp = storedProp('analyse.show-move-list', true);
   keyboardHelp: boolean = location.hash === '#keyboard';
   threatMode: Prop<boolean> = prop(false);
   treeView: TreeView;
@@ -116,6 +126,11 @@ export default class AnalyseCtrl {
 
   // per-variant navigation overrides
   controlConfig: ControlConfig = {};
+
+  // backgammon analysis stats (populated by bgWinChart after fetch)
+  bgAnalysis?: BackgammonAnalysis;
+  // glyph id of the currently locked advice-summary category (4=blunder, 3=perfect, 51=lucky, 52=unlucky); undefined = none
+  bgHighlightGlyphId?: number;
 
   // misc
   cgConfig: any; // latest chessground config (useful for revert)
@@ -480,8 +495,8 @@ export default class AnalyseCtrl {
     this.userJump(this.mainlinePathToPly(ply));
   };
 
-  jumpToIndex = (index: number): void => {
-    this.jumpToMain(index + 1 + this.tree.root.ply);
+  jumpToIndex = (ply: number): void => {
+    this.jumpToMain(ply);
   };
 
   jumpToGlyphSymbol(playerIndex: PlayerIndex, symbol: string): void {

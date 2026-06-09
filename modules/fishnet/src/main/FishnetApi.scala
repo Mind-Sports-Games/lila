@@ -63,7 +63,7 @@ final class FishnetApi(
       variants: Option[List[String]]
   ): Fu[Option[JsonApi.Work]] = {
     val allowedLogicIds = FishnetVariants.allowedLogicIds(variants)
-    logger.info(
+    logger.debug(
       s"acquire by ${client.fullId} variants=${variants.fold("<default>")(_.mkString(","))} " +
         s"allowedLogics=${allowedLogicIds.toList.sorted.mkString(",")} slow=$slow"
     )

@@ -145,7 +145,7 @@ object replay {
                 div(cls := "analyse__underboard__panels")(
                   game.analysable.option(
                     div(cls := "computer-analysis")(
-                      if (analysis.isDefined || analysisStarted) div(id := "acpl-chart")
+                      if (analysis.isDefined || analysisStarted) div(id := "acpl-chart-container")(canvas(id := "acpl-chart"))
                       else
                         postForm(
                           cls    := s"future-game-analysis${ctx.isAnon so " must-login"}",
@@ -158,7 +158,7 @@ object replay {
                     )
                   ),
                   div(cls := "move-times")(
-                    (game.plies > 1).option(div(id := "movetimes-chart"))
+                    (game.plies > 1).option(canvas(id := "movetimes-chart"))
                   ),
                   div(cls := "fen-pgn")(
                     div(

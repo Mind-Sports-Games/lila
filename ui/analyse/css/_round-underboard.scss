@@ -139,7 +139,7 @@ $col2-panel-height: 240px;
   }
 }
 
-#acpl-chart,
+#acpl-chart-container,
 #movetimes-chart {
   width: 100%;
   height: var(--panel-height);
@@ -154,7 +154,13 @@ $col2-panel-height: 240px;
   overflow: hidden;
 }
 
-#acpl-chart-loader {
+#acpl-chart-container canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#acpl-chart-container-loader {
   font-size: 0.9em;
   position: absolute;
   top: 91px;

@@ -1,8 +1,12 @@
 import AnalyseCtrl from '../ctrl';
 import { h, VNode } from 'snabbdom';
-import { Prop, prop, defined } from 'common';
+import { Prop, prop } from 'common';
 import { spinner, bind, onInsert } from '../util';
-import Highcharts from 'highcharts';
+
+interface AcplChart {
+  selectPly(ply: number): void;
+  updateData(data: any, mainline: Tree.Node[]): void;
+}
 
 export interface ServerEvalCtrl {
   requested: Prop<boolean>;
@@ -10,7 +14,7 @@ export interface ServerEvalCtrl {
   chapterId(): string;
   request(): void;
   onMergeAnalysisData(): void;
-  chartEl: Prop<HighchartsHTMLElement | null>;
+  chartEl: Prop<HTMLCanvasElement | null>;
   reset(): void;
   lastPly: Prop<number | false>;
 }
@@ -18,24 +22,13 @@ export interface ServerEvalCtrl {
 export function ctrl(root: AnalyseCtrl, chapterId: () => string): ServerEvalCtrl {
   const requested = prop(false),
     lastPly = prop<number | false>(false),
-    chartEl = prop<HighchartsHTMLElement | null>(null);
-
-  function unselect(chart: Highcharts.ChartObject) {
-    chart.getSelectedPoints().forEach(p => p.select(false));
-  }
+    chartEl = prop<HTMLCanvasElement | null>(null);
 
   playstrategy.pubsub.on('analysis.change', (_fen: string, _path: string, mainlinePly: number | false) => {
-    if (!playstrategy.advantageChart || lastPly() === mainlinePly) return;
-    const lp = lastPly(typeof mainlinePly === 'undefined' ? lastPly() : mainlinePly),
-      el = chartEl(),
-      chart = el && el.highcharts;
+    const lp = lastPly(typeof mainlinePly === 'undefined' ? lastPly() : mainlinePly);
+    const chart: AcplChart | undefined = (chartEl() as any)?.__acplChart;
     if (chart) {
-      if (lp === false) unselect(chart);
-      else {
-        const point = chart.series[0].data[lp - 1 - root.tree.root.ply];
-        if (defined(point)) point.select();
-        else unselect(chart);
-      }
+      chart.selectPly(lp === false ? root.tree.root.ply : (lp as number));
     } else lastPly(false);
   });
 
@@ -47,7 +40,8 @@ export function ctrl(root: AnalyseCtrl, chapterId: () => string): ServerEvalCtrl
     },
     chapterId,
     onMergeAnalysisData() {
-      if (playstrategy.advantageChart) playstrategy.advantageChart.update(root.data);
+      const chart: AcplChart | undefined = (chartEl() as any)?.__acplChart;
+      if (chart) chart.updateData(root.data, root.mainline);
     },
     request() {
       root.socket.send('requestAnalysis', chapterId());
@@ -68,13 +62,22 @@ export function view(ctrl: ServerEvalCtrl): VNode {
   return h(
     'div.study__server-eval.ready.' + analysis.id,
     {
-      hook: onInsert(el => {
+      hook: onInsert(container => {
         ctrl.lastPly(false);
+        const canvas = document.createElement('canvas');
+        canvas.id = 'acpl-chart';
+        container.appendChild(canvas);
         playstrategy.requestIdleCallback(
           () =>
-            playstrategy.loadScriptCJS('javascripts/chart/acpl.js').then(() => {
-              playstrategy.advantageChart!(ctrl.root.data, ctrl.root.trans, el);
-              ctrl.chartEl(el as HighchartsHTMLElement);
+            playstrategy.loadModule('chart.game').then(() => {
+              const chart = (window as any).PlayStrategyChartGame.acpl(
+                canvas,
+                ctrl.root.data,
+                ctrl.root.mainline,
+                ctrl.root.trans,
+              );
+              (canvas as any).__acplChart = chart;
+              ctrl.chartEl(canvas);
             }),
           800,
         );
@@ -110,7 +113,7 @@ function requestButton(ctrl: ServerEvalCtrl) {
               'a.button.text',
               {
                 attrs: {
-                  'data-icon': '',
+                  'data-icon': '',
                   disabled: root.mainline.length < 5,
                 },
                 hook: bind('click', ctrl.request, root.redraw),

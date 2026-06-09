@@ -73,11 +73,6 @@ interface PlayStrategy {
   timeagoLocale(a: number, b: number, c: number): any;
 
   // misc
-  advantageChart?: {
-    update(data: any): void;
-    (data: any, trans: Trans, el: HTMLElement): void;
-  };
-  movetimeChart: any;
   RoundNVUI?(redraw: () => void): {
     render(ctrl: any): any;
   };
@@ -587,6 +582,7 @@ declare namespace Tree {
   export interface ServerEval {
     cp?: number;
     mate?: number;
+    win?: number;
     best?: Uci;
     fen: Fen;
     knodes: number;
@@ -723,10 +719,6 @@ declare namespace PowerTip {
     openEvents?: string[];
     closeEvents?: string[];
   }
-}
-
-interface HighchartsHTMLElement extends HTMLElement {
-  highcharts: Highcharts.ChartObject;
 }
 
 declare namespace Prefs {

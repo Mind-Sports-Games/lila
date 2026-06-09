@@ -76,33 +76,21 @@ function playerTable(ctrl: AnalyseCtrl, playerIndex: PlayerIndex): VNode {
 }
 
 function doRender(ctrl: AnalyseCtrl): VNode {
-  return h(
-    'div.advice-summary',
-    {
-      hook: {
-        insert: vnode => {
-          $(vnode.elm as HTMLElement).on('click', 'div.symbol', function (this: Element) {
-            ctrl.jumpToGlyphSymbol($(this).data('playerIndex'), $(this).data('symbol'));
-          });
-        },
-      },
-    },
-    [
-      playerTable(ctrl, 'p1'),
-      ctrl.study
-        ? null
-        : h(
-            'a.button.text',
-            {
-              class: { active: !!ctrl.retro },
-              attrs: dataIcon('G'),
-              hook: bind('click', ctrl.toggleRetro, ctrl.redraw),
-            },
-            ctrl.trans.noarg('learnFromYourMistakes'),
-          ),
-      playerTable(ctrl, 'p2'),
-    ],
-  );
+  return h('div.advice-summary', {}, [
+    playerTable(ctrl, 'p1'),
+    ctrl.study
+      ? null
+      : h(
+          'a.button.text',
+          {
+            class: { active: !!ctrl.retro },
+            attrs: dataIcon('G'),
+            hook: bind('click', ctrl.toggleRetro, ctrl.redraw),
+          },
+          ctrl.trans.noarg('learnFromYourMistakes'),
+        ),
+    playerTable(ctrl, 'p2'),
+  ]);
 }
 
 export function render(ctrl: AnalyseCtrl): VNode | undefined {
