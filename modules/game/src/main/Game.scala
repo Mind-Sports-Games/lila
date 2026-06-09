@@ -877,16 +877,22 @@ case class Game(
       Centis.ofMillis(turnAt.getMillis - nowMillis + timeForFirstTurn.millis).nonNeg
     }
 
-  def timeWhenPaused: Centis =
-    Centis ofSeconds {
-      import Speed.*
-      speed match {
-        case UltraBullet => 15
-        case Bullet      => 20
-        case Blitz       => if (isTournament) 30 else 60
-        case _           => 60
-      }
+  def timeWhenPaused: Centis = {
+    import Speed.*
+    val baseSeconds = speed match {
+      case UltraBullet => 15
+      case Bullet      => 20
+      case Blitz       => if (isTournament) 30 else 60
+      case _           => 60
     }
+    val multiplied = if (isTournament) baseSeconds
+      else variant.key match {
+        case "go19x19" => baseSeconds * 2
+        case "go13x13" => (baseSeconds * 3) / 2
+        case _         => baseSeconds
+      }
+    Centis.ofSeconds(multiplied)
+  }
 
   def expirableOnPaused = playable && nonAi && clock.exists(_.isPaused)
 
