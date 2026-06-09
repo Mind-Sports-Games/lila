@@ -256,14 +256,14 @@ object Pref {
   object ConfirmCubeActions extends BooleanPref
 
   object PlayForcedAction {
-    val NO      = 0
-    val PARTIAL = 2
-    val FULL    = 1
+    val NO       = 0
+    val FULLTURN = 2
+    val ALL      = 1
 
     val choices = Seq(
-      NO      -> "No",
-      PARTIAL -> "Partial",
-      FULL    -> "Full"
+      NO       -> "No",
+      FULLTURN -> "FullTurn",
+      ALL      -> "All"
     )
   }
 
@@ -541,7 +541,7 @@ object Pref {
     confirmResign = ConfirmResign.YES,
     confirmPass = ConfirmPass.YES,
     confirmCubeActions = ConfirmCubeActions.YES,
-    playForcedAction = PlayForcedAction.FULL,
+    playForcedAction = PlayForcedAction.FULLTURN,
     insightShare = InsightShare.FRIENDS,
     keyboardMove = KeyboardMove.NO,
     zen = Zen.NO,

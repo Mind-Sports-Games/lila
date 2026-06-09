@@ -40,6 +40,6 @@ export const enum Replay {
 
 export const enum PlayForcedActions {
   No = 0,
-  Full = 1,
-  Partial = 2,
+  All = 1,
+  FullTurn = 2,
 }
