@@ -148,6 +148,24 @@ export interface AnalysisSide {
   blunder: number;
 }
 
+export interface BackgammonAnalysisSide {
+  errorRate: number; // overall error rate in mEMG/move (lower is better)
+  luck: number; // total luck in EMG (positive = lucky)
+  rating?: string;
+  luckRating?: string;
+  blunders: number;
+  mistakes: number;
+  perfectPlay: number;
+  luckyRolls: number;
+  unluckyRolls: number;
+  decisions: number; // number of real decisions (excludes forced moves and dances)
+}
+
+export interface BackgammonAnalysis {
+  p1: BackgammonAnalysisSide;
+  p2: BackgammonAnalysisSide;
+}
+
 export interface AnalyseOpts {
   element: HTMLElement;
   data: AnalyseData;

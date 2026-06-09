@@ -1,3 +1,55 @@
+.movelist-toggle {
+  @extend %button-none;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.35em 0.6em;
+  font-size: 0.85em;
+  color: $c-font-dim;
+  border-bottom: $border;
+  background: $c-bg-zebra;
+  cursor: pointer;
+
+  &::before {
+    content: 'Moves';
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &::after {
+    content: '▾';
+    transition: transform 0.15s;
+  }
+
+  &:not(.expanded)::after {
+    transform: rotate(-90deg);
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      color: $c-font;
+      background: mix($c-secondary, $c-bg-box, 20%);
+    }
+  }
+}
+
+.analyse.no-movelist {
+  // Collapse the tools row from minmax(20em, 30vh) to auto so it doesn't
+  // reserve unused vertical space on mobile when the move list is hidden.
+  grid-template-rows: auto auto auto;
+
+  @include breakpoint($mq-col2-uniboard) {
+    // Desktop layouts define their own grid-template-rows — restore default.
+    grid-template-rows: fit-content(0);
+  }
+
+  @include breakpoint($mq-col3-uniboard) {
+    grid-template-rows: var(--meta-height) fit-content(0) 2.5em auto;
+  }
+}
+
 .analyse {
   &__tools {
     @extend %box-neat-force, %flex-column;

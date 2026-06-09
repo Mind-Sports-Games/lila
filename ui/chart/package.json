@@ -1,0 +1,15 @@
+{
+  "name": "chart",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "chart.js": "^4.4.8",
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "common": "workspace:*"
+  },
+  "playstrategy": {
+    "bundles": [
+      "src/chart.game.ts"
+    ]
+  }
+}

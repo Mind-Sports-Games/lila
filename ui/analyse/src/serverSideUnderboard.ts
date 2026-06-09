@@ -1,16 +1,16 @@
-import type Highcharts from 'highcharts';
-
-import AnalyseCtrl from './ctrl';
+import type AnalyseCtrl from './ctrl';
 import { baseUrl } from './util';
 import { allowFishnetForVariant } from 'stratutils';
-import { defined } from 'common';
 import modal from 'common/modal';
 import { formToXhr } from 'common/xhr';
 import { AnalyseData } from './interfaces';
 import bgWinChart from './bgWinChart';
 
-interface PlyChart extends Highcharts.ChartObject {
-  lastPly?: Ply | false;
+interface AcplChart {
+  data: { datasets: any[] };
+  setActiveElements(elements: { datasetIndex: number; index: number }[]): void;
+  update(mode?: string): void;
+  updateData(data: AnalyseData, mainline: Tree.Node[]): void;
 }
 
 export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
@@ -21,23 +21,12 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
   const data = ctrl.data,
     $panels = $('.analyse__underboard__panels > div'),
     $menu = $('.analyse__underboard__menu'),
-    $timeChart = $('#movetimes-chart'),
-    inputFen = document.querySelector('.analyse__underboard__fen') as HTMLInputElement,
-    unselect = (chart: Highcharts.ChartObject) => {
-      chart.getSelectedPoints().forEach(function (point) {
-        point.select(false);
-      });
-    };
+    inputFen = document.querySelector('.analyse__underboard__fen') as HTMLInputElement;
   let lastFen: string;
+  let advChart: AcplChart | undefined;
+  let timeChartLoaded = false;
 
-  // TODO(bg-analysis): minimal backgammon win% wiring. The colleague owns the real
-  // chart; this makes the basics work — request shows an "analysing" spinner,
-  // completion (socket "bgAnalysisProgress" -> pubsub) draws the graph, and a
-  // stored analysis is drawn on load.
   const isBackgammon = data.game.variant.key === 'backgammon';
-  // bg-analysis: backgammon has many board actions per turn, so the chart's
-  // ply-based point selection doesn't fit; track the selected dot by the current
-  // node's mainline index instead.
   let bgLastIdx = -2;
 
   if (!playstrategy.AnalyseNVUI) {
@@ -46,98 +35,81 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
         (v ? $menu.find('[data-panel="computer-analysis"]') : $menu.find('span:eq(1)')).trigger('mousedown');
       }, 50);
     });
-    playstrategy.pubsub.on('analysis.change', (fen: Fen, _, mainlinePly: Ply | false) => {
-      const $chart = $('#acpl-chart');
+
+    playstrategy.pubsub.on('analysis.change', (fen: Fen) => {
       if (fen && fen !== lastFen) {
         inputFen.value = fen;
         lastFen = fen;
       }
-      if ($chart.length) {
-        const chart: PlyChart = ($chart[0] as any).highcharts;
-        if (chart) {
-          if (isBackgammon) {
-            // TODO(bg-analysis): "current action" dot. Backgammon has ~370 points (one
-            // per board action), dense enough that Highcharts auto-hides markers, so
-            // point.select() draws nothing. Instead force a marker onto just the current
-            // point (located by mainline index — chess's ply index doesn't fit
-            // multi-action turns) and clear the previously-marked one.
-            const idx = ctrl.onMainline ? ctrl.mainline.indexOf(ctrl.node) - 1 : -1;
-            if (idx !== bgLastIdx) {
-              const pts = chart.series[0].data;
-              if (bgLastIdx >= 0 && pts[bgLastIdx]) pts[bgLastIdx].update({ marker: { enabled: false } }, false);
-              const point = idx >= 0 ? pts[idx] : undefined;
-              if (defined(point))
-                point.update({ marker: { enabled: true, radius: 4, lineWidth: 1, lineColor: '#d85000', fillColor: '#d85000' } }, true);
-              else chart.redraw();
-              bgLastIdx = idx;
+      if (isBackgammon && advChart) {
+        // The backgammon chart has one point per roll and one per last-checker-move,
+        // not one per mainline node. Find the chart point by ply; fall back to the
+        // nearest preceding point for intermediate checker moves.
+        let idx = -1;
+        if (ctrl.onMainline) {
+          const ply = ctrl.node.ply;
+          const pts = advChart.data.datasets[0]?.data as { x: number }[] | undefined;
+          if (pts) {
+            idx = pts.findIndex(p => p.x === ply);
+            if (idx < 0) {
+              for (let i = pts.length - 1; i >= 0; i--) {
+                if (pts[i].x < ply) {
+                  idx = i;
+                  break;
+                }
+              }
             }
-          } else if (mainlinePly != chart.lastPly) {
-            if (mainlinePly === false) unselect(chart);
-            else {
-              //TODO fix for multiaction when analysis is supported also change /public/javascripts/chart/acpl.js
-              const point = chart.series[0].data[mainlinePly - 1 - data.game.startedAtTurn];
-              if (defined(point)) point.select();
-              else unselect(chart);
-            }
-            chart.lastPly = mainlinePly;
           }
         }
-      }
-      if ($timeChart.length) {
-        const chart: PlyChart = ($timeChart[0] as any).highcharts;
-        if (chart) {
-          if (mainlinePly != chart.lastPly) {
-            if (mainlinePly === false) unselect(chart);
-            else {
-              const pointIndex =
-                chart.series[0].data.map(p => p.x).indexOf(mainlinePly - 1) === -1
-                  ? chart.series[1].data.map(p => p.x).indexOf(mainlinePly - 1)
-                  : chart.series[0].data.map(p => p.x).indexOf(mainlinePly - 1);
-              const p1 = chart.series[0].data.map(p => p.x).indexOf(mainlinePly - 1) !== -1;
-              const serie = p1 ? 0 : 1;
-              const point = chart.series[serie].data[pointIndex];
-              if (defined(point)) point.select();
-              else unselect(chart);
-            }
-          }
-          chart.lastPly = mainlinePly;
+        if (idx !== bgLastIdx) {
+          advChart.setActiveElements(idx >= 0 ? [{ datasetIndex: 0, index: idx }] : []);
+          advChart.update('none');
+          bgLastIdx = idx;
         }
       }
     });
+
     playstrategy.pubsub.on('analysis.server.progress', (d: AnalyseData) => {
-      if (!playstrategy.advantageChart) startAdvantageChart();
-      else if (playstrategy.advantageChart.update) playstrategy.advantageChart.update(d);
-      if (d.analysis && !d.analysis.partial) $('#acpl-chart-loader').remove();
+      if (!advChart) startAdvantageChart();
+      else advChart.updateData(d, ctrl.mainline);
+      if (d.analysis && !d.analysis.partial) $('#acpl-chart-container-loader').remove();
     });
-    // TODO(bg-analysis): draw/redraw the win% graph when the worker finishes, and
-    // once on load if a stored analysis already exists (drawBgWinChart no-ops on 404).
+
     if (isBackgammon) {
       playstrategy.pubsub.on('analysis.bg.progress', drawBgWinChart);
-      drawBgWinChart();
     }
   }
 
   function chartLoader() {
-    return `<div id="acpl-chart-loader"><span>Stockfish 13+<br>server analysis</span>${playstrategy.spinnerHtml}</div>`;
+    return `<div id="acpl-chart-container-loader"><span>${
+      isBackgammon ? 'gnubg analysis' : 'Stockfish 13+<br>server analysis'
+    }</span>${playstrategy.spinnerHtml}</div>`;
   }
+
   function startAdvantageChart() {
-    if (playstrategy.advantageChart || playstrategy.AnalyseNVUI) return;
+    if (advChart || playstrategy.AnalyseNVUI) return;
     const loading = !data.treeParts[0].eval || !Object.keys(data.treeParts[0].eval).length;
     const $panel = $panels.filter('.computer-analysis');
-    if (!$('#acpl-chart').length) $panel.html('<div id="acpl-chart"></div>' + (loading ? chartLoader() : ''));
-    else if (loading && !$('#acpl-chart-loader').length) $panel.append(chartLoader());
-    playstrategy.loadScriptCJS('javascripts/chart/acpl.js').then(function () {
-      playstrategy.advantageChart!(data, ctrl.trans, $('#acpl-chart')[0] as HTMLElement);
+    if (!$('#acpl-chart-container').length) {
+      $panel.html(
+        '<div id="acpl-chart-container"><canvas id="acpl-chart"></canvas></div>' + (loading ? chartLoader() : ''),
+      );
+    } else if (loading && !$('#acpl-chart-container-loader').length) {
+      $panel.append(chartLoader());
+    }
+    const el = document.querySelector<HTMLCanvasElement>('#acpl-chart');
+    if (!el) return;
+    playstrategy.loadModule('chart.game').then(() => {
+      advChart = (window as any).PlayStrategyChartGame.acpl(el, data, ctrl.mainline, ctrl.trans);
     });
   }
 
-  // TODO(bg-analysis): backgammon "analysing" spinner + win% draw. Colleague:
-  // replace the placeholder chart (./bgWinChart) and the copy below.
   function showBgAnalysing() {
     $panels
       .filter('.computer-analysis')
-      .html(`<div id="acpl-chart"></div><div id="acpl-chart-loader"><span>gnubg analysis</span>${playstrategy.spinnerHtml}</div>`);
+      .html(`<div id="acpl-chart-container"><canvas id="acpl-chart"></canvas></div>${chartLoader()}`);
   }
+
   function drawBgWinChart() {
     const panel = $panels.filter('.computer-analysis')[0];
     if (panel) bgWinChart(ctrl, panel as HTMLElement);
@@ -151,16 +123,27 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
       .removeClass('active')
       .filter('.' + panel)
       .addClass('active');
-    if ((panel == 'move-times' || ctrl.opts.hunter) && !playstrategy.movetimeChart)
-      playstrategy.loadScript('javascripts/chart/movetime.js').then(() => playstrategy.movetimeChart(data, ctrl.trans));
-    if ((panel == 'computer-analysis' || ctrl.opts.hunter) && $('#acpl-chart').length)
-      setTimeout(startAdvantageChart, 200);
+    if ((panel == 'move-times' || ctrl.opts.hunter) && !timeChartLoaded) {
+      const el = document.querySelector<HTMLCanvasElement>('#movetimes-chart');
+      if (el) {
+        timeChartLoaded = true;
+        playstrategy.loadModule('chart.game').then(() => {
+          (window as any).PlayStrategyChartGame.movetime(el, data, ctrl.trans);
+        });
+      }
+    }
+    if (panel == 'computer-analysis' || ctrl.opts.hunter) {
+      if (isBackgammon) setTimeout(drawBgWinChart, 200);
+      else if ($('#acpl-chart-container').length) setTimeout(startAdvantageChart, 200);
+    }
   };
+
   $menu.on('mousedown', 'span', function (this: HTMLElement) {
     const panel = $(this).data('panel');
     storage.set(panel);
     setPanel(panel);
   });
+
   const stored = storage.get();
   const foundStored =
     stored &&
@@ -173,14 +156,13 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
     const $menuCt = $menu.children('[data-panel="ctable"]');
     ($menuCt.length ? $menuCt : $menu.children(':first-child')).trigger('mousedown');
   }
+
   if (!data.analysis && allowFishnetForVariant(data.game.variant.key)) {
     $panels.find('form.future-game-analysis').on('submit', function (this: HTMLFormElement) {
       if ($(this).hasClass('must-login')) {
         if (confirm(ctrl.trans('youNeedAnAccountToDoThat'))) location.href = '/signup';
         return false;
       }
-      // TODO(bg-analysis): backgammon shows its own "analysing" spinner; the win%
-      // graph is drawn later when the worker finishes (socket "bgAnalysisProgress").
       formToXhr(this).then(isBackgammon ? showBgAnalysing : startAdvantageChart, playstrategy.reload);
       return false;
     });
@@ -193,6 +175,7 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
     selection!.removeAllRanges();
     selection!.addRange(range);
   });
+
   $panels.on('click', '.embed-howto', function (this: HTMLElement) {
     const url = `${baseUrl()}/embed/${data.game.id}${location.hash}`;
     const iframe = '<iframe src="' + url + '?theme=auto&bg=auto"\nwidth=600 height=397 frameborder=0></iframe>';
@@ -206,7 +189,7 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
           '</pre><br />' +
           iframe +
           '<br /><br />' +
-          '<a class="text" data-icon="" href="/developers#embed-game">Read more about embedding games</a>',
+          '<a class="text" data-icon="" href="/developers#embed-game">Read more about embedding games</a>',
       ),
     );
   });

@@ -1,3 +1,126 @@
+// Always show both player sides side by side for direct value comparison.
+// _acpl.scss defaults to flex-column and gates the row layout behind $mq-col1;
+// override here so backgammon is always a row on every screen size.
+.analyse__acpl .advice-summary {
+  flex-direction: row;
+  align-items: flex-start;
+  margin-top: 0;
+
+  > hr {
+    display: none;
+  }
+
+  .advice-summary__player {
+    justify-content: flex-start;
+    margin-bottom: 0.4em;
+  }
+
+  .advice-summary__side > div {
+    gap: 0.3em;
+  }
+
+  .advice-summary__side {
+    flex: 1;
+    min-width: 0; // prevent flex blowout on narrow screens
+
+    &:first-child {
+      padding-right: 0.6em;
+      border-right: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    &:last-child {
+      padding-left: 0.6em;
+    }
+  }
+
+  .advice-summary__luck-hdr {
+    margin-top: 0.4em;
+  }
+}
+
+// Advice-summary symbol hover + locked state — colour-coded by annotation type.
+// Attribute selector gives higher specificity than the generic :hover in _acpl.scss.
+.advice-summary__side .symbol {
+  &[data-symbol='d']:hover,
+  &[data-symbol='d'].locked {
+    color: #4da3d5;
+  }
+
+  &[data-symbol='luck']:hover,
+  &[data-symbol='luck'].locked {
+    color: #a060bb;
+  }
+
+  &[data-symbol='??']:hover,
+  &[data-symbol='??'].locked {
+    color: #db3031;
+  }
+
+  &[data-symbol='?']:hover,
+  &[data-symbol='?'].locked {
+    color: #d96420;
+  }
+
+  &[data-symbol='!!']:hover,
+  &[data-symbol='!!'].locked {
+    color: #5ebe5e;
+  }
+
+  &[data-symbol='+']:hover,
+  &[data-symbol='+'].locked {
+    color: #8855cc;
+  }
+
+  &[data-symbol='-']:hover,
+  &[data-symbol='-'].locked {
+    color: #d45090;
+  }
+}
+
+// Move tree annotation colours for backgammon gnubg analysis.
+// Glyphs have empty symbols; colour only.
+.tview2 {
+  move glyph {
+    display: none;
+  }
+
+  // Reset annotation colors from _tree.scss — backgammon shows no color by default.
+  move.blunder,
+  move.brilliant,
+  move.mistake,
+  move.inaccuracy {
+    color: unset;
+  }
+
+  // Colors only appear when a category is selected in the advice-summary panel.
+  // Each h-* class is mutually exclusive (only one category selected at a time).
+  move.h-blunder,
+  move.h-mistake,
+  move.h-brilliant,
+  move.h-lucky,
+  move.h-unlucky {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 2px;
+    outline: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  move.h-blunder {
+    color: #db3031;
+  }
+  move.h-mistake {
+    color: #d96420;
+  }
+  move.h-brilliant {
+    color: #5ebe5e;
+  }
+  move.h-lucky {
+    color: #8855cc;
+  }
+  move.h-unlucky {
+    color: #d45090;
+  }
+}
+
 .analyse__board {
   .dice-picker {
     position: absolute;

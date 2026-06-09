@@ -39,6 +39,7 @@ import * as studyView from './study/studyView';
 import * as studyPracticeView from './study/practice/studyPracticeView';
 import { view as forkView } from './fork';
 import { render as acplView } from './acpl';
+import { render as bgAcplView, isBackgammonVariant } from './backgammonAnalysis';
 import AnalyseCtrl from './ctrl';
 import { ConcealOf, Position } from './interfaces';
 import relayManager from './study/relay/relayManagerView';
@@ -99,11 +100,19 @@ function makeConcealOf(ctrl: AnalyseCtrl): ConcealOf | undefined {
 }
 
 function renderAnalyse(ctrl: AnalyseCtrl, concealOf?: ConcealOf) {
+  const showList = ctrl.showMoveList();
   return h(
     'div.analyse__moves.areplay',
     [
       ctrl.embed && ctrl.study ? h('div.chapter-name', ctrl.study.currentChapter().name) : null,
-      renderTreeView(ctrl, concealOf),
+      h('button.movelist-toggle', {
+        class: { expanded: showList },
+        hook: bind('click', () => {
+          ctrl.showMoveList(!ctrl.showMoveList());
+          ctrl.redraw();
+        }),
+      }),
+      showList ? renderTreeView(ctrl, concealOf) : null,
     ].concat(renderResult(ctrl)),
   );
 }
@@ -654,6 +663,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
           'has-clocks': !!clocks,
           'has-relay-tour': !!tour,
           'analyse-hunter': ctrl.opts.hunter,
+          'no-movelist': !ctrl.showMoveList(),
         },
       },
       [
@@ -715,7 +725,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
               },
               study ? studyView.underboard(ctrl) : [inputs(ctrl)],
             ),
-        tour ? null : acplView(ctrl),
+        tour ? null : isBackgammonVariant(ctrl.data.game.variant.key) ? bgAcplView(ctrl) : acplView(ctrl),
         ctrl.embed
           ? null
           : ctrl.studyPractice
