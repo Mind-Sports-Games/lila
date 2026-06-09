@@ -692,6 +692,7 @@ export default class RoundController {
       d.selectMode = o.canSelectSquares ? activePlayerIndex : false;
       d.deadStoneOfferState = o.canSelectSquares ? 'ChooseFirstOffer' : undefined;
       if (d.clock) {
+        if (o.canSelectSquares) d.expirationAtStart = undefined;
         d.expirationOnPaused = o.canSelectSquares
           ? {
               idleMillis: 0,
