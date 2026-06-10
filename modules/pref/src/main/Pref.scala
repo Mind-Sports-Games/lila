@@ -258,12 +258,12 @@ object Pref {
   object PlayForcedAction {
     val NO       = 0
     val FULLTURN = 2
-    val ALL      = 1
+    val ALWAYS   = 1
 
     val choices = Seq(
       NO       -> "No",
-      FULLTURN -> "FullTurn",
-      ALL      -> "All"
+      FULLTURN -> "Full Forced Turn Only",
+      ALWAYS   -> "Always"
     )
   }
 

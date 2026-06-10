@@ -768,7 +768,7 @@ declare namespace Prefs {
 
   const enum PlayForcedActions {
     No = 0,
-    All = 1,
+    Always = 1,
     FullTurn = 2,
   }
 }
