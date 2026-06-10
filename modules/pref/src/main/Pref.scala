@@ -254,7 +254,19 @@ object Pref {
   object ConfirmResign      extends BooleanPref
   object ConfirmPass        extends BooleanPref
   object ConfirmCubeActions extends BooleanPref
-  object PlayForcedAction   extends BooleanPref
+
+  object PlayForcedAction {
+    val NO       = 0
+    val FULLTURN = 2
+    val ALWAYS   = 1
+
+    val choices = Seq(
+      NO       -> "No",
+      FULLTURN -> "Full Forced Turn Only",
+      ALWAYS   -> "Always"
+    )
+  }
+
 
   object InsightShare {
     val NOBODY    = 0
@@ -529,7 +541,7 @@ object Pref {
     confirmResign = ConfirmResign.YES,
     confirmPass = ConfirmPass.YES,
     confirmCubeActions = ConfirmCubeActions.YES,
-    playForcedAction = PlayForcedAction.YES,
+    playForcedAction = PlayForcedAction.FULLTURN,
     insightShare = InsightShare.FRIENDS,
     keyboardMove = KeyboardMove.NO,
     zen = Zen.NO,

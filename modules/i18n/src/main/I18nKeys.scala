@@ -1705,6 +1705,7 @@ val `confirmResignationAndDrawOffers` = new I18nKey("preferences:confirmResignat
 val `confirmPassAction` = new I18nKey("preferences:confirmPassAction")
 val `confirmCubeActions` = new I18nKey("preferences:confirmCubeActions")
 val `playForcedAction` = new I18nKey("preferences:playForcedAction")
+val `forcedTurns` = new I18nKey("preferences:forcedTurns")
 val `castleByMovingTheKingTwoSquaresOrOntoTheRook` = new I18nKey("preferences:castleByMovingTheKingTwoSquaresOrOntoTheRook")
 val `castleByMovingTwoSquares` = new I18nKey("preferences:castleByMovingTwoSquares")
 val `castleByMovingOntoTheRook` = new I18nKey("preferences:castleByMovingOntoTheRook")

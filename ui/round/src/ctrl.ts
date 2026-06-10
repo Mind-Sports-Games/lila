@@ -681,7 +681,9 @@ export default class RoundController {
     d.dice = stratUtils.backgammon.readDice(o.fen, this.data.game.variant.key, o.canEndTurn, this.areDiceDescending);
     d.doublingCube = stratUtils.backgammon.readDoublingCube(o.fen, this.data.game.variant.key);
     d.activeDiceValue = this.activeDiceValue(d.dice);
-    ((d.cubeActions = o.cubeActions), (d.forcedAction = o.forcedAction));
+    d.cubeActions = o.cubeActions;
+    d.forcedAction = o.forcedAction;
+    d.forcedTurnAction = o.forcedTurnAction;
 
     d.crazyhouse = o.crazyhouse;
     d.takebackable = d.canTakeBack ? o.takebackable : false;
@@ -764,8 +766,8 @@ export default class RoundController {
             this.data.dice.length > 0,
           viewOnly:
             this.isPlaying() &&
-            this.data.pref.playForcedAction &&
-            this.data.forcedAction !== undefined &&
+            ((this.data.pref.playForcedAction === 1 && this.data.forcedAction !== undefined) ||
+              (this.data.pref.playForcedAction === 2 && this.data.forcedTurnAction !== undefined)) &&
             this.data.player.playerIndex === this.data.game.player,
         });
       }
@@ -1398,15 +1400,16 @@ export default class RoundController {
       this.isPlaying() &&
       !this.replaying() &&
       d.player.playerIndex === d.game.player &&
-      d.pref.playForcedAction &&
-      d.forcedAction !== undefined
+      ((d.pref.playForcedAction === 1 && d.forcedAction !== undefined) ||
+        (d.pref.playForcedAction === 2 && d.forcedTurnAction !== undefined))
     ) {
-      if (d.forcedAction === 'endturn') {
+      const forcedAction = d.pref.playForcedAction === 1 ? d.forcedAction : d.forcedTurnAction;
+      if (forcedAction === 'endturn') {
         this.chessground.set({ viewOnly: true });
         setTimeout(() => {
           this.sendEndTurn(d.game.variant.key);
         }, this.forcedActionDelayMillis);
-      } else if (d.forcedAction.includes('@')) {
+      } else if (forcedAction.includes('@')) {
         const dropDests = stratUtils.readDropsByRole(d.possibleDropsByRole).get('s-piece');
         if (dropDests) {
           this.chessground.set({ viewOnly: true });
@@ -1421,14 +1424,14 @@ export default class RoundController {
             this.onUserNewPiece('s-piece', dropDests[0], { premove: false });
           }, this.forcedActionDelayMillis);
         }
-      } else if (d.forcedAction.includes('^')) {
+      } else if (forcedAction.includes('^')) {
         this.chessground.set({ viewOnly: true });
         setTimeout(() => {
-          this.chessground.liftNoAnim(d.forcedAction!.slice(1) as cg.Key);
-          this.onUserLift(d.forcedAction!.slice(1) as cg.Key);
+          this.chessground.liftNoAnim(forcedAction!.slice(1) as cg.Key);
+          this.onUserLift(forcedAction!.slice(1) as cg.Key);
         }, this.forcedActionDelayMillis);
       } else {
-        const uciMove = stratUtils.uci2move(d.forcedAction);
+        const uciMove = stratUtils.uci2move(forcedAction);
         if (uciMove !== undefined) {
           this.chessground.set({ viewOnly: true });
           setTimeout(() => {
@@ -1455,7 +1458,7 @@ export default class RoundController {
         if (d.canOnlyRollDice) setTimeout(() => this.forceRollDice(d.game.variant.key), this.forcedActionDelayMillis);
         else if (d.game.multiPointState && this.autoRoll && d.cubeActions && d.cubeActions.includes('offer')) {
           setTimeout(() => this.forceRollDice(d.game.variant.key), this.forcedActionDelayMillis);
-        } else if (d.pref.playForcedAction) this.playForcedAction();
+        } else if (d.pref.playForcedAction > 0) this.playForcedAction();
       }
     }
   };

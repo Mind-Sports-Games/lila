@@ -37,3 +37,9 @@ export const enum Replay {
   OnlySlowGames = 1,
   Always = 2,
 }
+
+export const enum PlayForcedActions {
+  No = 0,
+  Always = 1,
+  FullTurn = 2,
+}

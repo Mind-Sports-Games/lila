@@ -137,6 +137,7 @@ final class JsonView(
                 "clockTenths" -> pref.clockTenths,
                 "moveEvent"   -> pref.moveEvent,
                 "mancalaMove" -> (pref.mancalaMove == Pref.MancalaMove.SINGLE_CLICK),
+                "playForcedAction" -> pref.playForcedAction,
                 "pieceSet"    -> pref.pieceSet.map(p =>
                   Json.obj("name" -> p.name, "gameFamily" -> p.gameFamilyName)
                 )
@@ -147,7 +148,6 @@ final class JsonView(
               .add("confirmResign" -> (!nvui && pref.confirmResign == Pref.ConfirmResign.YES))
               .add("confirmPass" -> (!nvui && pref.confirmPass == Pref.ConfirmPass.YES))
               .add("confirmCubeActions" -> (!nvui && pref.confirmCubeActions == Pref.ConfirmCubeActions.YES))
-              .add("playForcedAction" -> (!nvui && pref.playForcedAction == Pref.PlayForcedAction.YES))
               .add("keyboardMove" -> (!nvui && pref.keyboardMove == Pref.KeyboardMove.YES))
               .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
               .add("blindfold" -> pref.isBlindfold)
@@ -188,6 +188,7 @@ final class JsonView(
           .add("canEndTurn" -> pov.game.situation.canEndTurn)
           .add("canUndo" -> pov.game.situation.canUndo)
           .add("forcedAction" -> pov.game.situation.forcedAction.map(_.toUci.uci))
+          .add("forcedTurnAction" -> pov.game.situation.forcedTurnAction.map(_.toUci.uci))
           .add("pauseSecs" -> pov.game.timeWhenPaused.millis.some)
           .add("expirationAtStart" -> pov.game.expirableAtStart.option {
             Json.obj(

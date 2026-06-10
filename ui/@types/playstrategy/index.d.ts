@@ -765,6 +765,12 @@ declare namespace Prefs {
     OnlySlowGames = 1,
     Always = 2,
   }
+
+  const enum PlayForcedActions {
+    No = 0,
+    Always = 1,
+    FullTurn = 2,
+  }
 }
 
 interface Dictionary<T> {
