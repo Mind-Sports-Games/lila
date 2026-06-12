@@ -81,6 +81,12 @@ ThisBuild / dependencyOverrides += "io.netty" % "netty-codec" % "4.1.133.Final"
 // Staying on 4.1.x intentionally — play-netty-server 2.8.18 was built against 4.1.x codec APIs.
 ThisBuild / dependencyOverrides += "io.netty" % "netty-codec-http" % "4.1.133.Final"
 
+// Force netty-handler to 4.2.15.Final to fix CVE: IpSubnetFilterRule.compareTo() masks with
+// networkAddress instead of subnetMask, allowing valid public IPv6 addresses to bypass subnet
+// access-control rules. The lichess upstream modules resolve handler to 4.2.13.Final (highest
+// transitive version wins), so we must patch on the 4.2.x line. We don't use IpSubnetFilterRule.
+ThisBuild / dependencyOverrides += "io.netty" % "netty-handler" % "4.2.15.Final"
+
 // Force commons-lang3 to 3.18.0 to fix CVE: ClassUtils.getClass() uncontrolled recursion on long
 // inputs throws StackOverflowError (uncaught Error) — DoS if user-controlled input reaches it.
 ThisBuild / dependencyOverrides += commonsLang3
