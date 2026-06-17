@@ -22,6 +22,17 @@ Thank you for your understanding."""
 If this behaviour continues to happen, your account will be restricted."""
   )
 
+  lazy val botFarmingAuto = MsgPreset(
+    name = "Warning: playing rated games against practice bots",
+    text =
+      """You have been winning several rated games against one of our practice bots.
+These bots are intentionally weak, and repeated rated wins against them will inflate your rating artificially.
+
+We recommend switching to unrated games against these bots, or trying a stronger bot if one is available.
+
+Thank you for your understanding."""
+  )
+
   lazy val sittingAuto = MsgPreset(
     name = "Warning: leaving games / stalling on time",
     text =

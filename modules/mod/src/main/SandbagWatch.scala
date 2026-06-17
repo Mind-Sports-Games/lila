@@ -20,6 +20,7 @@ final private class SandbagWatch(
   def apply(game: Game): Unit = for {
     loser <- game.loser.map(_.playerIndex)
     if game.rated && !game.fromApi
+    if !(game.isTournament && game.hasPSBot)
     userId <- game.userIds
   }
     (records getIfPresent userId, outcomeOf(game, loser, userId)) match {
@@ -37,14 +38,22 @@ final private class SandbagWatch(
       records.put(userId, record)
       val sandbagCount = record.countSandbagWithLatest
       val boostCount   = record.samePlayerBoostCount
-      if (sandbagCount == 3) sendMessage(userId, MsgPreset.sandbagAuto)
-      else if (sandbagCount == 4)
-        game.loserUserId so { loser =>
-          reportApi.autoSandbagReport(record.sandbagOpponents, loser)
-        }
-      else if (boostCount == 3) sendMessage(userId, MsgPreset.boostAuto)
-      else if (boostCount == 4) withWinnerAndLoser(game)(reportApi.autoBoostReport)
-      else funit
+      if (game.hasPSBot) {
+        // Bots lose by design: suppress sandbagging tracking entirely.
+        // For the human winner, send a bot-farming notice instead of the generic boosting warning.
+        if (boostCount == 3) sendMessage(userId, MsgPreset.botFarmingAuto)
+        else if (boostCount == 4) withWinnerAndLoser(game)(reportApi.autoBotFarmingReport)
+        else funit
+      } else {
+        if (sandbagCount == 3) sendMessage(userId, MsgPreset.sandbagAuto)
+        else if (sandbagCount == 4)
+          game.loserUserId so { loser =>
+            reportApi.autoSandbagReport(record.sandbagOpponents, loser)
+          }
+        else if (boostCount == 3) sendMessage(userId, MsgPreset.boostAuto)
+        else if (boostCount == 4) withWinnerAndLoser(game)(reportApi.autoBoostReport)
+        else funit
+      }
     }
 
   private def sendMessage(userId: User.ID, preset: MsgPreset): Funit =

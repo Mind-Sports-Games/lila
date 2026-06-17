@@ -243,7 +243,8 @@ final class ReportApi(
   def autoBoostReport(winnerId: User.ID, loserId: User.ID): Funit =
     securityApi.shareAnIpOrFp(winnerId, loserId) zip
       userRepo.pair(winnerId, loserId) zip getPlayStrategyReporter flatMap {
-        case ((isSame, Some((winner, loser))), reporter) if !winner.lame && !loser.lame =>
+        case ((isSame, Some((winner, loser))), reporter)
+            if !winner.lame && !loser.lame && !winner.isBot && !loser.isBot =>
           val loginsText =
             if (isSame) "Found matching IP/print"
             else "No IP/print match found"
@@ -260,13 +261,27 @@ final class ReportApi(
 
   def autoSandbagReport(winnerIds: List[User.ID], loserId: User.ID): Funit =
     userRepo.byId(loserId) zip getPlayStrategyReporter flatMap {
-      case (Some(loser), reporter) if !loser.lame =>
+      case (Some(loser), reporter) if !loser.lame && !loser.isBot =>
         create(
           Candidate(
             reporter = reporter,
             suspect = Suspect(loser),
             reason = Reason.Boost,
             text = s"Sandbagging: throws games to ${winnerIds.map("@" + _) mkString " "}"
+          )
+        )
+      case _ => funit
+    }
+
+  def autoBotFarmingReport(winnerId: User.ID, loserId: User.ID): Funit =
+    userRepo.pair(winnerId, loserId) zip getPlayStrategyReporter flatMap {
+      case (Some((winner, loser)), reporter) if !winner.lame =>
+        create(
+          Candidate(
+            reporter = reporter,
+            suspect = Suspect(winner),
+            reason = Reason.Boost,
+            text = s"Bot farming: farms rating points from PS bot @${loser.username}"
           )
         )
       case _ => funit
