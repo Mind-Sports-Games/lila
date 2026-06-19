@@ -64,9 +64,13 @@ ThisBuild / dependencyOverrides += "com.fasterxml.jackson.module" %% "jackson-mo
 ThisBuild / dependencyOverrides += "org.lz4"     % "lz4-java" % "1.8.1"
 ThisBuild / dependencyOverrides += "at.yawk.lz4" % "lz4-java" % "1.10.1"
 
-// Force netty epoll transport to 4.2.14.Final to fix CVE: stale channels + CPU busy-loop when a
-// TCP connection receives RST after half-close. Affects all 4.2.x up to 4.2.12.Final.
-ThisBuild / dependencyOverrides += "io.netty" % "netty-transport-native-epoll" % "4.2.14.Final"
+// Force netty epoll transport to 4.2.15.Final to fix two CVEs:
+//   - Stale channels + CPU busy-loop when a TCP connection receives RST after half-close (< 4.2.13)
+//   - netty_unix_socket_recvFd allocates a 24-byte control buffer; a peer sending SCM_RIGHTS with two
+//     fds fits exactly (no MSG_CTRUNC), so the kernel installs both fds but the cmsg_len check
+//     (expects 20 bytes) skips reading them — leaking two fds per recvmsg call until EAGAIN.
+//     Reachable only via DomainSocketReadMode.FILE_DESCRIPTORS (non-default). (< 4.2.15)
+ThisBuild / dependencyOverrides += "io.netty" % "netty-transport-native-epoll" % "4.2.15.Final"
 
 // Force netty-codec to 4.1.133.Final to fix CVE: Lz4FrameDecoder trusts untrusted decompressedLength
 // header field and pre-allocates up to 32 MB per block before decompressing — 21-byte payload
@@ -86,6 +90,12 @@ ThisBuild / dependencyOverrides += "io.netty" % "netty-codec-http" % "4.1.133.Fi
 // access-control rules. The lichess upstream modules resolve handler to 4.2.13.Final (highest
 // transitive version wins), so we must patch on the 4.2.x line. We don't use IpSubnetFilterRule.
 ThisBuild / dependencyOverrides += "io.netty" % "netty-handler" % "4.2.15.Final"
+
+// Force netty-resolver-dns to 4.2.15.Final to fix CVE: DnsResolveContext accepts NS records from
+// the AUTHORITY section for parent domains (e.g. co.uk) when resolving a subdomain (e.g. evil.co.uk),
+// violating bailiwick rules and allowing DNS cache poisoning. Lichess upstream modules all pull in
+// 4.2.13.Final transitively, so we override on the 4.2.x line.
+ThisBuild / dependencyOverrides += "io.netty" % "netty-resolver-dns" % "4.2.15.Final"
 
 // Force commons-lang3 to 3.18.0 to fix CVE: ClassUtils.getClass() uncontrolled recursion on long
 // inputs throws StackOverflowError (uncaught Error) — DoS if user-controlled input reaches it.
