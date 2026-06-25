@@ -349,8 +349,6 @@ object BSONHandlers {
 
         val gameVariant = DraughtsVariant(r.intD(F.variant)) | DraughtsStandard
 
-        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Draughts(), r.bytesD(F.oldPgn), playedPlies)
-
         val decodedBoard = draughts.Board(
           pieces = BinaryFormat.piece.readDraughts(r.bytes(F.binaryPieces), gameVariant),
           history = draughts.DraughtsHistory(
@@ -373,10 +371,16 @@ object BSONHandlers {
           variant = gameVariant
         )
 
-        // we can flatten as draughts does not have any multiaction games (yet)
-        val midCapture =
-          actionStrs.flatten.lastOption.fold(false)(_.indexOf('x') != -1) && decodedBoard.ghosts != 0
-        val currentPly = if (midCapture) plies - 1 else plies
+        // draughts.plies is not incremented for ghost (mid-capture) steps, so playedPlies
+        // undercounts the stored binary entries during a partial capture sequence.
+        // Each binary entry is exactly 2 bytes, so value.length / 2 gives the true entry count,
+        // which includes any trailing ghost steps that playedPlies would otherwise drop.
+        val oldPgnBytes = r.bytesD(F.oldPgn)
+        val actionStrs = NewLibStorage.OldBin.decode(
+          GameLogic.Draughts(),
+          oldPgnBytes,
+          oldPgnBytes.value.length / 2
+        )
 
         val decodedSituation = draughts.Situation(
           board = decodedBoard,
@@ -389,8 +393,8 @@ object BSONHandlers {
             actionStrs = actionStrs,
             clock = clock,
             // whilst Draughts isnt upgraded to multiaction
-            plies = currentPly,
-            turnCount = currentPly,
+            plies = plies,
+            turnCount = plies,
             startedAtPly = startedAtPly,
             startedAtTurn = startedAtTurn
           )
