@@ -315,3 +315,9 @@ package plan {
   case class PlanStart(userId: String)
   case class PlanExpire(userId: String)
 }
+
+package bot {
+  case object BotVsBotStart
+  case object BotVsBotStop
+  case class BotVsBotStatus(promise: scala.concurrent.Promise[String])
+}

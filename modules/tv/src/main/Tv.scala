@@ -739,7 +739,7 @@ object Tv {
         extends Channel(
           name = "Bot",
           icon = "n",
-          secondsSinceLastMove = freshBlitz,
+          secondsSinceLastMove = freshRapid,
           filters = Seq(hasBot),
           familyChannel = true,
           gameFamily = "other"

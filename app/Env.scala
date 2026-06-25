@@ -274,7 +274,7 @@ final class EnvBoot(
   lazy val relay: lila.relay.Env             = wire[lila.relay.Env]
   lazy val streamer: lila.streamer.Env       = wire[lila.streamer.Env]
   lazy val oAuth: lila.oauth.Env             = wire[lila.oauth.Env]
-  lazy val bot: lila.bot.Env                 = wire[lila.bot.Env]
+  lazy val bot: lila.bot.Env                 = wire[lila.bot.Env] 
   lazy val evalCache: lila.evalCache.Env     = wire[lila.evalCache.Env]
   lazy val rating: lila.rating.Env           = wire[lila.rating.Env]
   lazy val swiss: lila.swiss.Env             = wire[lila.swiss.Env]

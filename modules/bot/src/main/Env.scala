@@ -7,11 +7,14 @@ import lila.socket.IsOnline
 final class Env(
     chatApi: lila.chat.ChatApi,
     gameRepo: lila.game.GameRepo,
+    userRepo: lila.user.UserRepo,
     lightUserApi: lila.user.LightUserApi,
+    challengeApi: lila.challenge.ChallengeApi,
     rematches: lila.game.Rematches,
     isOfferingRematch: lila.round.IsOfferingRematch,
     spam: lila.security.Spam,
-    isOnline: IsOnline
+    isOnline: IsOnline,
+    appConfig: play.api.Configuration
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: akka.actor.ActorSystem,
@@ -27,5 +30,9 @@ final class Env(
 
   lazy val onlineApiUsers: OnlineApiUsers = wire[OnlineApiUsers]
 
+  lazy val coordinator: BotVsBotCoordinator = wire[BotVsBotCoordinator]
+
   val form = BotForm
+
+  coordinator.init()
 }
