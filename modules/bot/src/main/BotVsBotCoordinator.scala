@@ -124,8 +124,7 @@ final class BotVsBotCoordinator(
               case Some(game) =>
                 logger.info(s"Bot vs bot game started: ${spec.p1.name} vs ${spec.p2.name} (${spec.variant.name}) — game ${game.id}")
                 currentGame.set(game.id.some)
-                val maxGameDuration = (2 * spec.clock.limit + 80 * spec.clock.increment).seconds
-                val watchdogTimeout = maxGameDuration * 2
+                val watchdogTimeout = (4 * spec.clock.estimateTotalSeconds).seconds
                 val wd = scheduler.scheduleOnce(watchdogTimeout) {
                   logger.warn(s"Bot vs bot game ${game.id} watchdog timeout after $watchdogTimeout, moving to next matchup")
                   currentGame.set(none)
