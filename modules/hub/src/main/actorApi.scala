@@ -320,4 +320,6 @@ package bot {
   case object BotVsBotStart
   case object BotVsBotStop
   case class BotVsBotStatus(promise: scala.concurrent.Promise[String])
+  case class BotVsBotStartStream(name: String, promise: scala.concurrent.Promise[String])
+  case class BotVsBotStopStream(name: String, promise: scala.concurrent.Promise[String])
 }

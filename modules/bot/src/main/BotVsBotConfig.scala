@@ -1,6 +1,6 @@
 package lila.bot
 
-import strategygames.{ Clock, GameFamily }
+import strategygames.Clock
 import strategygames.variant.Variant
 import lila.common.LightUser
 
@@ -11,37 +11,39 @@ case class BotVsBotGame(
     clock: Clock.Config
 )
 
+case class BotVsBotStream(name: String, games: List[BotVsBotGame])
+
 object BotVsBotConfig {
 
   private val rapidClock = Clock.Config(3 * 60, 2) // 3+2
 
   private val stockfishVariants: List[Variant] =
-    GameFamily.all
-      .filter(_.hasFishnet)
-      .flatMap(_.variants.filter(!_.fromPositionVariant))
-      .toList
+    Variant.all.filter(v => v.hasFishnet && !v.fromPositionVariant).toList
 
-  private val allVariants: List[Variant] =
-    GameFamily.all
-      .flatMap(_.variants.filter(!_.fromPositionVariant))
-      .toList
+  private val nonStockfishVariants: List[Variant] =
+    Variant.all.filter(v => !v.hasFishnet && !v.fromPositionVariant).toList
 
-  private val matchups: List[(LightUser, LightUser, List[Variant])] = {
+  private def gamesForMatchup(p1: LightUser, p2: LightUser, variants: List[Variant]): List[BotVsBotGame] =
+    for {
+      variant <- variants
+      (a, b)  <- List((p1, p2), (p2, p1))
+    } yield BotVsBotGame(a, b, variant, rapidClock)
+
+  val streams: List[BotVsBotStream] = {
     import LightUser.*
     List(
-      (stockfishBots(0), poolBots(1), stockfishVariants), // Stockfish-Level1 vs PS-Greedy-Two-Move
-      (stockfishBots(1), poolBots(1), stockfishVariants), // Stockfish-Level2 vs PS-Greedy-Two-Move
-      (poolBots(1), poolBots(0), allVariants),             // PS-Greedy-Two-Move vs PS-Greedy-One-Move
-      (stockfishBots(7), stockfishBots(6), stockfishVariants), // Stockfish-Level8 vs Stockfish-Level7
+      BotVsBotStream(
+        "Stockfish-8 vs Stockfish-7",
+        gamesForMatchup(stockfishBots(7), stockfishBots(6), stockfishVariants)
+      ),
+      BotVsBotStream(
+        "Greedy-Two-Move vs Stockfish-3/One-Move",
+        gamesForMatchup(poolBots(1), stockfishBots(2), stockfishVariants) ++
+          gamesForMatchup(poolBots(1), poolBots(0), nonStockfishVariants)
+      ),
     )
   }
 
-  // Each (matchup, variant) produces two games: p1 vs p2 then p2 vs p1
-  val allGames: List[BotVsBotGame] = for {
-    (p1, p2, variants) <- matchups
-    variant            <- variants
-    (a, b)             <- List((p1, p2), (p2, p1))
-  } yield BotVsBotGame(a, b, variant, rapidClock)
-
-  val allBotIds: Set[String] = matchups.flatMap { case (p1, p2, _) => List(p1.id, p2.id) }.toSet
+  val allBotIds: Set[String] =
+    streams.flatMap(_.games.flatMap(g => List(g.p1.id, g.p2.id))).toSet
 }

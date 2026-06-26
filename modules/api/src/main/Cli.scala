@@ -45,6 +45,14 @@ final private[api] class Cli(
       val promise = scala.concurrent.Promise[String]()
       Bus.publish(lila.hub.actorApi.bot.BotVsBotStatus(promise), "botVsBot")
       promise.future
+    case "bot-vs-bot" :: "start" :: rest if rest.nonEmpty =>
+      val promise = scala.concurrent.Promise[String]()
+      Bus.publish(lila.hub.actorApi.bot.BotVsBotStartStream(rest.mkString(" "), promise), "botVsBot")
+      promise.future
+    case "bot-vs-bot" :: "stop" :: rest if rest.nonEmpty =>
+      val promise = scala.concurrent.Promise[String]()
+      Bus.publish(lila.hub.actorApi.bot.BotVsBotStopStream(rest.mkString(" "), promise), "botVsBot")
+      promise.future
     case "uptime" :: Nil => fuccess(s"${lila.common.Uptime.seconds} seconds")
     case "change" :: ("asset" | "assets") :: "version" :: Nil => {
       import lila.common.AssetVersion
