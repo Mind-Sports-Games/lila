@@ -61,12 +61,8 @@ final class BotVsBotCoordinator(
     def startNextGame(): Funit = {
       if (!running.get()) return funit
       val online = onlineApiUsers.get
-      logger.info(
-        s"[${stream.name}] seeking next game — online API users: ${online.mkString(", ").some.filter(_.nonEmpty) | "(none)"}"
-      )
       findNextAvailableGame(cycleIdx.get(), 0, online) match {
         case Some((idx, spec)) =>
-          logger.info(s"[${stream.name}] matched: ${spec.p1.name} vs ${spec.p2.name} (${spec.variant.name})")
           cycleIdx.set((idx + 1) % stream.games.length)
           createGame(spec)
         case None =>
@@ -114,11 +110,8 @@ final class BotVsBotCoordinator(
               scheduler.scheduleOnce(5.seconds)(startNextGame().discard)
               funit
             case true =>
-              challengeApi.oauthAccept(p2User, challenge) flatMap {
+              challengeApi.botVsBotAccept(p2User, challenge) flatMap {
                 case Some(game) =>
-                  logger.info(
-                    s"[${stream.name}] game started: ${spec.p1.name} vs ${spec.p2.name} (${spec.variant.name}) — game ${game.id}"
-                  )
                   currentGame.set(game.id.some)
                   val watchdogTimeout = (4 * spec.clock.estimateTotalSeconds).seconds
                   val wd = scheduler.scheduleOnce(watchdogTimeout) {
@@ -155,6 +148,9 @@ final class BotVsBotCoordinator(
   Bus.subscribeFun("botVsBot") {
     case lila.hub.actorApi.bot.BotVsBotStart => start().discard
     case lila.hub.actorApi.bot.BotVsBotStop  => stop()
+    case lila.hub.actorApi.bot.BotVsBotRestart =>
+      stop()
+      start().discard
     case lila.hub.actorApi.bot.BotVsBotStatus(promise) =>
       promise.success(runners.map(_.status()).mkString("\n"))
     case lila.hub.actorApi.bot.BotVsBotStartStream(name, promise) =>
@@ -165,6 +161,11 @@ final class BotVsBotCoordinator(
     case lila.hub.actorApi.bot.BotVsBotStopStream(name, promise) =>
       runners.find(_.stream.name == name) match {
         case Some(runner) => runner.stop(); promise.success(s"Stream '$name' stopped")
+        case None         => promise.success(s"Stream not found: '$name'. Available: ${runners.map(_.stream.name).mkString(", ")}")
+      }
+    case lila.hub.actorApi.bot.BotVsBotRestartStream(name, promise) =>
+      runners.find(_.stream.name == name) match {
+        case Some(runner) => runner.stop(); runner.start().discard; promise.success(s"Stream '$name' restart requested")
         case None         => promise.success(s"Stream not found: '$name'. Available: ${runners.map(_.stream.name).mkString(", ")}")
       }
   }
