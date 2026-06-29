@@ -15,8 +15,10 @@ final private class HookThieve()(implicit
   def candidates(clock: strategygames.ClockConfig, variant: strategygames.variant.Variant): Fu[PoolHooks] =
     Bus
       .ask[PoolHooks]("lobbyTrouper")(GetCandidates(clock, variant, _))
-      .logFailure(logger)
-      .recoverDefault(PoolHooks(Vector.empty))
+      .recover { case e =>
+        logger.warn(e.getMessage)
+        PoolHooks(Vector.empty)
+      }
 
   def stolen(poolHooks: Vector[PoolHook], monId: String) = {
     lila.mon.lobby.pool.thieve.stolen(monId).record(poolHooks.size)
