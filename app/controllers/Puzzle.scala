@@ -296,7 +296,11 @@ final class Puzzle(
           .bindFromRequest()
           .fold(
             jsonFormError,
-            vote => env.puzzle.api.vote.update(Puz.Id(id), me, vote) inject jsonOkResult
+            vote =>
+              env.puzzle.api.vote
+                .update(Puz.Id(id), me, vote)
+                .inject(jsonOkResult)
+                .recoverWith { case _: lila.hub.BoundedDuct.EnqueueException => rateLimitedFu }
           )
       }
     }
@@ -564,7 +568,10 @@ final class Puzzle(
               jsonFormError,
               intVote =>
                 Puz.numericalId(nid) so {
-                  env.puzzle.api.vote.update(_, me, intVote == 1) inject jsonOkResult
+                  env.puzzle.api.vote
+                    .update(_, me, intVote == 1)
+                    .inject(jsonOkResult)
+                    .recoverWith { case _: lila.hub.BoundedDuct.EnqueueException => rateLimitedFu }
                 }
             )
         }
