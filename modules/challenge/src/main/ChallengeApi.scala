@@ -150,6 +150,10 @@ final class ChallengeApi(
   def oauthAccept(dest: User, challenge: Challenge): Fu[Option[Game]] =
     joiner(challenge, dest.some, none).map2(_.game)
 
+  def botVsBotAccept(dest: User, challenge: Challenge): Fu[Option[Game]] =
+    repo.accept(challenge) >> joiner(challenge, dest.some, none).map2(_.game)
+      .recover(lila.db.recoverDuplicateKey(_ => none))
+
   private def isLimitedByMaxPlaying(c: Challenge) =
     if (c.hasClock) fuFalse
     else
