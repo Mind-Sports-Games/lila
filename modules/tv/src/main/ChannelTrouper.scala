@@ -51,13 +51,13 @@ final private[tv] class ChannelTrouper(
         .map(
           _.view
             .collect {
-              case Some(g) if channel.isOngoingGame(g) => g
+              case Some(g) if eligible(g) => g
             }
             .toList
         )
         .foreach { candidates =>
           oneId so proxyGame foreach {
-            case Some(current) if channel.isOngoingGame(current) =>
+            case Some(current) if eligible(current) =>
               fuccess(wayBetter(current, candidates)).orElse(rematch(current)) foreach elect
             case Some(current) => rematch(current).orElse(fuccess(bestOf(candidates))) foreach elect
             case _             => elect(bestOf(candidates))
@@ -78,7 +78,9 @@ final private[tv] class ChannelTrouper(
   private def elect(gameOption: Option[Game]): Unit = gameOption foreach { this ! SetGame(_) }
 
   private def wayBetter(game: Game, candidates: List[Game]) =
-    bestOf(candidates) filter { isWayBetter(game, _) }
+    bestOf(candidates) filter { better =>
+      tier(better) > tier(game) || (tier(better) == tier(game) && isWayBetter(game, better))
+    }
 
   private def isWayBetter(g1: Game, g2: Game) = score(g2.resetTurns) > (score(g1.resetTurns) * 1.17)
 
@@ -86,8 +88,19 @@ final private[tv] class ChannelTrouper(
 
   private def bestOf(candidates: List[Game]) = {
     import cats.implicits.*
-    candidates.maximumByOption(score)
+    candidates.maximumByOption(g => (tier(g), score(g)))
   }
+
+  // live human games beat live bot games beat correspondence games,
+  // regardless of rating; unlimited games never reach here (excluded at candidate intake)
+  private def tier(game: Game): Int =
+    if (game.hasClock) { if (Tv.hasBot(lightUserSync)(game)) 2 else 3 }
+    else 1
+
+  // live games must have moved recently or they're dropped in favour of a fresher candidate;
+  // correspondence games are naturally slow-moving, so only their ongoing status matters
+  private def eligible(game: Game): Boolean =
+    if (game.hasClock) channel.isFresh(game) else channel.isOngoingGame(game)
 
   private def score(game: Game): Int =
     heuristics.foldLeft(0) { case (score, fn) =>

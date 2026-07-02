@@ -44,7 +44,7 @@ final private[tv] class TvTrouper(
     case GetChampions(promise) => promise success Tv.Champions(channelChampions)
 
     case lila.game.actorApi.StartGame(g) =>
-      if (g.hasClock || g.hasCorrespondenceClock || g.isUnlimited) {
+      if (g.hasClock || g.hasCorrespondenceClock) {
         val candidate = Tv.toCandidate(lightUserSync)(g)
         channelTroupers collect {
           case (chan, trouper) if chan.filter(candidate) => trouper
