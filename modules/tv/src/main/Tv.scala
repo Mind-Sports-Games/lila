@@ -107,13 +107,12 @@ object Tv {
   }
 
   private[tv] case class Candidate(game: Game, hasBot: Boolean)
+  private[tv] def hasBot(lightUser: LightUser.GetterSync)(game: Game): Boolean =
+    game.userIds.exists { userId =>
+      lightUser(userId).exists(_.isBot)
+    }
   private[tv] def toCandidate(lightUser: LightUser.GetterSync)(game: Game) =
-    Tv.Candidate(
-      game = game,
-      hasBot = game.userIds.exists { userId =>
-        lightUser(userId).exists(_.isBot)
-      }
-    )
+    Tv.Candidate(game = game, hasBot = hasBot(lightUser)(game))
 
   sealed abstract class Channel(
       val name: String,
