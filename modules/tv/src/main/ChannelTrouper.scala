@@ -100,7 +100,7 @@ final private[tv] class ChannelTrouper(
   // live games must have moved recently or they're dropped in favour of a fresher candidate;
   // correspondence games are naturally slow-moving, so only their ongoing status matters
   private def eligible(game: Game): Boolean =
-    if (game.hasClock) channel.isFresh(game) else channel.isOngoingGame(game)
+    game.bothPlayersHaveMoved && (if (game.hasClock) channel.isFresh(game) else channel.isOngoingGame(game))
 
   private def score(game: Game): Int =
     heuristics.foldLeft(0) { case (score, fn) =>
