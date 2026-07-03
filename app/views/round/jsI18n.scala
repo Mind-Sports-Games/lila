@@ -123,7 +123,6 @@ object jsI18n {
     trans.confirmMove,
     trans.viewRematch,
     trans.viewNextGame,
-    trans.followBots,
     trans.playerIndexPlays,
     trans.giveNbSeconds,
     trans.preferences.giveMoreTime,

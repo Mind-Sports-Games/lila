@@ -417,10 +417,9 @@ export function followUp(ctrl: RoundController): VNode {
 }
 
 function nextGameLabel(ctrl: RoundController): string {
-  const d = ctrl.data;
-  if (d.swiss) return ctrl.noarg('viewNextGame');
-  if (!d.tournament && d.opponent.user && d.opponent.user.title === 'BOT') return ctrl.noarg('followBots');
-  return ctrl.noarg('viewRematch');
+  const d = ctrl.data,
+    botOpponent = !d.tournament && d.opponent.user && d.opponent.user.title === 'BOT';
+  return d.swiss || botOpponent ? ctrl.noarg('viewNextGame') : ctrl.noarg('viewRematch');
 }
 
 export function watcherFollowUp(ctrl: RoundController): VNode | null {
@@ -430,7 +429,7 @@ export function watcherFollowUp(ctrl: RoundController): VNode | null {
     content = [
       d.game.rematch
         ? h(
-            'a.fbt.text',
+            'a.fbt.text.glowing',
             {
               attrs: {
                 'data-icon': 'v',
