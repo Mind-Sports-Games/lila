@@ -286,6 +286,7 @@ package round {
   case class ResignMatch(playerId: String)
   case class Mlat(micros: Int)
   case object MultiMatchRematch
+  case class NextGameLinked(nextId: String)
 }
 
 package evaluation {

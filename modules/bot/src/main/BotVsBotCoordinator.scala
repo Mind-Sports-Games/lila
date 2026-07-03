@@ -8,6 +8,8 @@ import play.api.Configuration
 import lila.challenge.{ Challenge, ChallengeApi }
 import lila.common.Bus
 import lila.game.{ Game, actorApi }
+import lila.hub.actorApi.map.Tell
+import lila.hub.actorApi.round.NextGameLinked
 import lila.user.UserRepo
 
 final class BotVsBotCoordinator(
@@ -52,23 +54,23 @@ final class BotVsBotCoordinator(
       else s"[${stream.name}] Stopped (cycle $cyclePos)"
     }
 
-    def gameFinished(): Unit = {
+    def gameFinished(finishedGameId: Game.ID): Unit = {
       currentGame.set(none)
       watchdog.getAndSet(none).foreach(_.cancel())
-      scheduler.scheduleOnce(2.seconds)(startNextGame().discard)
+      scheduler.scheduleOnce(2.seconds)(startNextGame(finishedGameId.some).discard)
     }
 
-    def startNextGame(): Funit = {
+    def startNextGame(finishedGameId: Option[Game.ID] = none): Funit = {
       if (!running.get()) return funit
       val online = onlineApiUsers.get
       findNextAvailableGame(cycleIdx.get(), 0, online) match {
         case Some((idx, spec)) =>
           cycleIdx.set((idx + 1) % stream.games.length)
-          createGame(spec)
+          createGame(spec, finishedGameId)
         case None =>
           val missing = botIds.diff(online)
           logger.info(s"[${stream.name}] no bots available — missing ${missing.mkString(", ")}, retrying in 30s")
-          scheduler.scheduleOnce(30.seconds)(startNextGame().discard)
+          scheduler.scheduleOnce(30.seconds)(startNextGame(finishedGameId).discard)
           funit
       }
     }
@@ -82,13 +84,13 @@ final class BotVsBotCoordinator(
         else findNextAvailableGame(idx + 1, attempts + 1, online)
       }
 
-    private def createGame(spec: BotVsBotGame): Funit = {
+    private def createGame(spec: BotVsBotGame, finishedGameId: Option[Game.ID]): Funit = {
       import lila.challenge.Challenge.*
       val timeControl = TimeControl.Clock(spec.clock)
       userRepo.namePair(spec.p1.id, spec.p2.id) flatMap {
         _.fold {
           logger.warn(s"[${stream.name}] users not found: ${spec.p1.name} or ${spec.p2.name}, trying next matchup")
-          scheduler.scheduleOnce(5.seconds)(startNextGame().discard)
+          scheduler.scheduleOnce(5.seconds)(startNextGame(finishedGameId).discard)
           funit
         } { case (p1User, p2User) =>
           val challenge = Challenge.make(
@@ -107,12 +109,13 @@ final class BotVsBotCoordinator(
               logger.warn(
                 s"[${stream.name}] failed to create challenge: ${spec.p1.name} vs ${spec.p2.name} (${spec.variant.name}), trying next matchup"
               )
-              scheduler.scheduleOnce(5.seconds)(startNextGame().discard)
+              scheduler.scheduleOnce(5.seconds)(startNextGame(finishedGameId).discard)
               funit
             case true =>
               challengeApi.botVsBotAccept(p2User, challenge) flatMap {
                 case Some(game) =>
                   currentGame.set(game.id.some)
+                  finishedGameId.foreach(oldId => tellRound(oldId, NextGameLinked(game.id)))
                   val watchdogTimeout = (4 * spec.clock.estimateTotalSeconds).seconds
                   val wd = scheduler.scheduleOnce(watchdogTimeout) {
                     logger.warn(
@@ -127,7 +130,7 @@ final class BotVsBotCoordinator(
                   logger.warn(
                     s"[${stream.name}] failed to accept challenge: ${spec.p1.name} vs ${spec.p2.name} (${spec.variant.name}), trying next matchup"
                   )
-                  scheduler.scheduleOnce(5.seconds)(startNextGame().discard)
+                  scheduler.scheduleOnce(5.seconds)(startNextGame(finishedGameId).discard)
                   funit
               }
           }
@@ -136,12 +139,15 @@ final class BotVsBotCoordinator(
     }
   }
 
+  private def tellRound(gameId: Game.ID, msg: Any): Unit =
+    Bus.publish(Tell(gameId, msg), "roundSocket")
+
   private val runners: List[StreamRunner] = BotVsBotConfig.streams.map(new StreamRunner(_))
 
   Bus.subscribeFun("finishGame") {
     case actorApi.FinishGame(game, _, _) =>
       runners.find(_.ownsGame(game.id)).foreach { runner =>
-        if (runner.isRunning) runner.gameFinished()
+        if (runner.isRunning) runner.gameFinished(game.id)
       }
   }
 

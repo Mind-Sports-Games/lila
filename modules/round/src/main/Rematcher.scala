@@ -84,6 +84,14 @@ final private class Rematcher(
 
   def multiMatch(game: Game): Fu[Events] = rematchJoin(game)
 
+  // links a finished game to a next game created outside the normal rematch flow
+  // (e.g. swiss multimatch/multipoint pairings, bot vs bot streams) so that
+  // spectators get the same "follow to next game" treatment as real rematches
+  def linkNextGame(gameId: Game.ID, nextId: Game.ID): Events = {
+    rematches.cache.put(gameId, nextId)
+    List(Event.RematchTaken(nextId))
+  }
+
   private def rematchExists(pov: Pov)(nextId: Game.ID): Fu[Events] =
     gameRepo.game(nextId) flatMap {
       _.fold(rematchJoin(pov.game))(g => fuccess(redirectEvents(g)))

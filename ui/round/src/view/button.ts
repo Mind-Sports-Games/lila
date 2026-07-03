@@ -587,6 +587,13 @@ export function followUp(ctrl: RoundController): VNode {
   ]);
 }
 
+function nextGameLabel(ctrl: RoundController): string {
+  const d = ctrl.data;
+  if (d.swiss) return ctrl.noarg('viewNextGame');
+  if (!d.tournament && d.opponent.user && d.opponent.user.title === 'BOT') return ctrl.noarg('followBots');
+  return ctrl.noarg('viewRematch');
+}
+
 export function watcherFollowUp(ctrl: RoundController): VNode | null {
   const d = ctrl.data,
     content = [
@@ -598,7 +605,7 @@ export function watcherFollowUp(ctrl: RoundController): VNode | null {
                 href: `/${d.game.rematch}/${d.opponent.playerIndex}`,
               },
             },
-            ctrl.noarg('viewRematch'),
+            nextGameLabel(ctrl),
           )
         : null,
       d.tournament

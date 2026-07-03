@@ -19,6 +19,7 @@ import lila.hub.actorApi.round.{
   FishnetStart,
   IsOnGame,
   MultiMatchRematch,
+  NextGameLinked,
   RematchNo,
   RematchYes,
   Resign,
@@ -393,6 +394,12 @@ final private[round] class RoundDuct(
           events
         }
       }
+
+    // sent by callers outside the round module (e.g. swiss multimatch, bot vs bot
+    // streams) once a next game exists, so spectators of this finished game get
+    // the same "follow to next game" link as a real rematch
+    case NextGameLinked(nextId) =>
+      handle { game => fuccess(rematcher.linkNextGame(game.id, nextId)) }
 
     case TakebackYes(playerId) =>
       handle(playerId) { pov =>
