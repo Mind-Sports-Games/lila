@@ -14,6 +14,7 @@ import lila.common.{ Bus, GreatPlayer, LightUser }
 import lila.db.dsl.*
 import lila.game.{ Game, Handicaps, Pov }
 import lila.hub.LightTeam.TeamID
+import lila.hub.actorApi.round.NextGameLinked
 import lila.round.actorApi.round.QuietFlag
 import lila.user.{ User, UserRepo }
 import lila.i18n.VariantKeys
@@ -648,6 +649,7 @@ final class SwissApi(
                         gameRepo.insertDenormalized(nextGame) >> recomputeAndUpdateAll(
                           pairing.swissId
                         ).andDo(onStart(nextGame.id))
+                          .andDo(roundSocket.rounds.tell(spgame.lastGame.id, NextGameLinked(nextGame.id)))
                       }
                     }
                   )

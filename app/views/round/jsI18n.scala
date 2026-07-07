@@ -122,6 +122,7 @@ object jsI18n {
     trans.newOpponent,
     trans.confirmMove,
     trans.viewRematch,
+    trans.viewNextGame,
     trans.playerIndexPlays,
     trans.giveNbSeconds,
     trans.preferences.giveMoreTime,
