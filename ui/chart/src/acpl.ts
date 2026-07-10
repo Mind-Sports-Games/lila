@@ -99,7 +99,7 @@ function winToCp(win: number): number {
 function makeDataset(
   data: AnalyseData,
   mainline: Tree.Node[],
-): { acpl: ChartDataset<'line'>; moveLabels: string[]; hoverColors: string[] } {
+): { acpl: ChartDataset<'line'>; moveLabels: string[]; hoverColors: string[]; pointBorderColors: string[] } {
   const isOppositeColor = oppositeColorVariants.includes(data.game.variant.key);
   const p1Fill = isOppositeColor ? blackFill : whiteFill;
   const p2Fill = isOppositeColor ? whiteFill : blackFill;
@@ -116,6 +116,8 @@ function makeDataset(
   const pointStyles: PointStyle[] = [];
   const pointSizes: number[] = [];
   const pointColors: string[] = [];
+  const pointBorderColors: string[] = [];
+  const pointBorderWidths: number[] = [];
   const partial = !data.analysis || data.analysis.partial;
 
   mainline.slice(1).forEach(node => {
@@ -150,6 +152,8 @@ function makeDataset(
     pointStyles.push(isBlur || isDiceRoll ? 'rect' : 'circle');
     pointSizes.push(isBlur ? 5 : 0);
     pointColors.push(isBlur ? (isP1 ? '#ffffff' : '#333333') : orangeAccent);
+    pointBorderColors.push(isBlur ? (isP1 ? '#555555' : '#bbbbbb') : 'transparent');
+    pointBorderWidths.push(isBlur ? 1 : 0);
   });
 
   const hasBlurs = data.player.blurs || data.opponent.blurs;
@@ -168,6 +172,8 @@ function makeDataset(
       pointHitRadius: 100,
       borderColor: orangeAccent,
       pointBackgroundColor: pointColors,
+      pointBorderColor: pointBorderColors,
+      pointBorderWidth: pointBorderWidths,
       pointHoverBackgroundColor: hoverColors,
       pointStyle: pointStyles,
       hoverBackgroundColor: orangeAccent,
@@ -176,6 +182,7 @@ function makeDataset(
     },
     moveLabels,
     hoverColors,
+    pointBorderColors,
   };
 }
 
@@ -188,6 +195,7 @@ function christmasTree(
   chart: AcplChart,
   mainline: Tree.Node[],
   hoverColors: string[],
+  pointBorderColors: string[],
   state: { currentPly: number; clearCategoryLock: () => void },
 ) {
   let lockedSymbol: string | null = null;
@@ -208,7 +216,7 @@ function christmasTree(
   const applyHighlight = (symbol: string, pi: PlayerIndex) => {
     const acpl = chart.data.datasets[0] as ChartDataset<'line'>;
     acpl.pointHoverBackgroundColor = hoverColors;
-    (acpl as any).pointBorderColor = hoverColors;
+    (acpl as any).pointBorderColor = pointBorderColors;
     chart.setActiveElements(pointsFor(symbol, pi));
     chart.update('none');
   };
@@ -220,7 +228,7 @@ function christmasTree(
     chart.tooltip?.setActiveElements([], { x: 0, y: 0 });
     const acpl = chart.data.datasets[0] as ChartDataset<'line'>;
     acpl.pointHoverBackgroundColor = hoverColors;
-    (acpl as any).pointBorderColor = hoverColors;
+    (acpl as any).pointBorderColor = pointBorderColors;
     const pts = pointsFor(symbol, pi);
     const mainData = chart.data.datasets[0].data as { x: number; y: number }[];
     (chart as any)._lockedDots = pts
@@ -238,7 +246,7 @@ function christmasTree(
     chart.tooltip?.setActiveElements([], { x: 0, y: 0 });
     const acpl = chart.data.datasets[0] as ChartDataset<'line'>;
     acpl.pointHoverBackgroundColor = hoverColors;
-    (acpl as any).pointBorderColor = hoverColors;
+    (acpl as any).pointBorderColor = pointBorderColors;
     (chart as any)._lockedDots = [];
     chart.update('none');
   };
@@ -264,18 +272,23 @@ function christmasTree(
     playstrategy.pubsub.emit('analysis.chart.category.select', null);
   };
 
-  $('div.advice-summary').on('mouseenter', 'div.symbol', function (this: HTMLElement) {
+  // Use document-level delegation so handlers survive Snabbdom DOM reconstruction
+  // (div.advice-summary can be recreated when switching detail mode on mobile).
+  // Namespace .ctree lets us replace handlers cleanly on each christmasTree call.
+  $(document).off('.ctree');
+
+  $(document).on('mouseenter.ctree', 'div.advice-summary div.symbol', function (this: HTMLElement) {
     if (lockedSymbol) return;
     const symbol = this.getAttribute('data-symbol');
     const pi = this.getAttribute('data-playerindex') as PlayerIndex | null;
     if (symbol && pi) applyHighlight(symbol, pi);
   });
 
-  $('div.advice-summary').on('mouseleave', 'div.symbol', function () {
+  $(document).on('mouseleave.ctree', 'div.advice-summary div.symbol', function () {
     if (!lockedSymbol) clearHighlight();
   });
 
-  $('div.advice-summary').on('click', 'div.symbol', function (this: HTMLElement) {
+  $(document).on('click.ctree', 'div.advice-summary div.symbol', function (this: HTMLElement) {
     const symbol = this.getAttribute('data-symbol');
     const pi = this.getAttribute('data-playerindex') as PlayerIndex | null;
     if (!symbol || !pi) return;
@@ -369,7 +382,7 @@ export default function acpl(el: HTMLCanvasElement, data: AnalyseData, mainline:
     const updated = makeDataset(d, ml);
     chart.data.datasets[0] = updated.acpl;
     chart.data.labels = updated.moveLabels.map((_, i) => i);
-    if (!d.analysis?.partial) christmasTree(chart, ml, updated.hoverColors, state);
+    if (!d.analysis?.partial) christmasTree(chart, ml, updated.hoverColors, updated.pointBorderColors, state);
     chart.update('none');
   };
 
@@ -380,7 +393,7 @@ export default function acpl(el: HTMLCanvasElement, data: AnalyseData, mainline:
   // Trigger initial selection
   playstrategy.pubsub.emit('analysis.change.trigger');
 
-  if (!data.analysis?.partial) christmasTree(chart, mainline, dataset.hoverColors, state);
+  if (!data.analysis?.partial) christmasTree(chart, mainline, dataset.hoverColors, dataset.pointBorderColors, state);
 
   return chart;
 }

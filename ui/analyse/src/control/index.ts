@@ -53,6 +53,7 @@ export interface ControlConfig {
 
   // Board overlay (e.g. dice picker)
   renderBoardOverlay?(): VNode | null;
+  dismissBoardOverlay?(): void;
 
   // Redirect tree-click jump paths (e.g. skip to end-of-turn for backgammon roll nodes)
   redirectJumpPath?(path: string): string;

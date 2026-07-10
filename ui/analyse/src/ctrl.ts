@@ -32,6 +32,7 @@ import {
   NvuiPlugin,
   Redraw,
   BackgammonAnalysis,
+  BgCandidateUI,
 } from './interfaces';
 import { Autoplay, AutoplayDelay } from './autoplay';
 import { build as makeTree, path as treePath, ops as treeOps, TreeWrapper } from 'tree';
@@ -106,6 +107,7 @@ export default class AnalyseCtrl {
   showComputer: StoredBooleanProp = storedProp('show-computer', true);
   showMoveAnnotation: StoredBooleanProp = storedProp('show-move-annotation', true);
   showMoveList: StoredBooleanProp = storedProp('analyse.show-move-list', true);
+  analyseDetail: StoredBooleanProp = storedProp('analyse.detail-mode', false);
   keyboardHelp: boolean = location.hash === '#keyboard';
   threatMode: Prop<boolean> = prop(false);
   treeView: TreeView;
@@ -129,8 +131,19 @@ export default class AnalyseCtrl {
 
   // backgammon analysis stats (populated by bgWinChart after fetch)
   bgAnalysis?: BackgammonAnalysis;
+  // candidates per decision ply (keyed by last-checker ply), populated by bgWinChart after fetch
+  bgTurnCandidates?: Map<number, BgCandidateUI[]>;
+  // turn-start FEN per ply: position after dice rolled, before any checker moves
+  bgTurnStartFen?: Map<number, string>;
+  // mainline ply of the turn-start node for each decision ply (used to jump there on preview dismiss)
+  bgTurnStartPly?: Map<number, number>;
+  // original game node id per ply — used to detect when user is in a variation vs. the actual game
+  bgOriginalNodeIdByPly?: Map<number, string>;
   // glyph id of the currently locked advice-summary category (4=blunder, 3=perfect, 51=lucky, 52=unlucky); undefined = none
   bgHighlightGlyphId?: number;
+  // symbol string and player index of the locked advice-summary entry, for re-applying the locked class after Snabbdom re-render
+  bgHighlightSymbol?: string;
+  bgHighlightPlayerIndex?: PlayerIndex;
 
   // misc
   cgConfig: any; // latest chessground config (useful for revert)

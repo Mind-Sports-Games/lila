@@ -402,6 +402,10 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     return undefined;
   };
 
+  ctrl.controlConfig.dismissBoardOverlay = () => {
+    dicePickerActive = false;
+  };
+
   ctrl.controlConfig.renderBoardOverlay = () => {
     if (!dicePickerActive || ctrl.embed) return null;
     const playerIndex = ctrl.turnPlayerIndex() as CgPlayerIndex;

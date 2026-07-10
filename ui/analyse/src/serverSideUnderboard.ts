@@ -26,8 +26,9 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
   let advChart: AcplChart | undefined;
   let timeChartLoaded = false;
 
-  const isBackgammon = data.game.variant.key === 'backgammon';
+  const isBackgammon = ['backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key);
   let bgLastIdx = -2;
+  let bgChartInitiated = false;
 
   if (!playstrategy.AnalyseNVUI) {
     playstrategy.pubsub.on('analysis.comp.toggle', (v: boolean) => {
@@ -111,8 +112,14 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
   }
 
   function drawBgWinChart() {
+    if (bgChartInitiated) return;
+    bgChartInitiated = true;
     const panel = $panels.filter('.computer-analysis')[0];
-    if (panel) bgWinChart(ctrl, panel as HTMLElement);
+    if (!panel) return;
+    // Clear server-rendered HTML (e.g. "Request analysis" button) immediately so it
+    // never flashes while the fetch is pending. bgWinChart fills the panel on completion.
+    if (!panel.querySelector('#acpl-chart-container')) panel.innerHTML = '';
+    bgWinChart(ctrl, panel as HTMLElement);
   }
 
   const storage = playstrategy.storage.make('analysis.panel');
@@ -156,6 +163,10 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
     const $menuCt = $menu.children('[data-panel="ctable"]');
     ($menuCt.length ? $menuCt : $menu.children(':first-child')).trigger('mousedown');
   }
+
+  // For backgammon, always load analysis data at page load regardless of which
+  // underboard tab was last active — candidates, PR stats, and luck display need it.
+  if (isBackgammon) setTimeout(drawBgWinChart, 200);
 
   if (!data.analysis && allowFishnetForVariant(data.game.variant.key)) {
     $panels.find('form.future-game-analysis').on('submit', function (this: HTMLFormElement) {

@@ -1,8 +1,9 @@
 import AnalyseCtrl from '../ctrl';
+import { clearCandidatePreview } from '../backgammonAnalysis';
+import isCol1 from 'common/isCol1';
 import column from './columnView';
 import contextMenu from './contextMenu';
 import inline from './inlineView';
-import isCol1 from 'common/isCol1';
 import throttle from 'common/throttle';
 import { authorText as commentAuthorText } from '../study/studyComments';
 import { enrichText, innerHTML, bindMobileTapHold, clearSelection } from '../util';
@@ -67,7 +68,7 @@ export function ctrl(initialValue: TreeViewKey = 'column'): TreeView {
 
 // entry point, dispatching to selected view
 export function render(ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
-  return (ctrl.treeView.inline() || isCol1()) && !concealOf ? inline(ctrl) : column(ctrl, concealOf);
+  return ctrl.treeView.inline() && !concealOf ? inline(ctrl) : column(ctrl, concealOf);
 }
 
 export function nodeClasses(ctx: Ctx, node: Tree.Node, path: Tree.Path, fullTurnPath: Tree.Path = path): NodeClasses {
@@ -151,7 +152,14 @@ export function mainHook(ctrl: AnalyseCtrl): Hooks {
         el.addEventListener(mousedownEvent, (e: MouseEvent) => {
           if (defined(e.button) && e.button !== 0) return; // only touch or left click
           const path = eventPath(e);
-          if (path) ctrl.userJumpFromTree(path);
+          if (path) {
+            clearCandidatePreview(ctrl);
+            ctrl.userJumpFromTree(path);
+            // On mobile, suppress the auto-scroll that jump() schedules: scrolling
+            // after a tap shifts the DOM and causes the touch to land on the wrong move.
+            // External navigation (advice summary, keyboard) still scrolls normally.
+            if (isCol1()) ctrl.autoScrollRequested = false;
+          }
           ctrl.redraw();
         });
       }
@@ -181,7 +189,22 @@ function eventPath(e: MouseEvent): Tree.Path | null {
 export const autoScroll = throttle(200, (ctrl: AnalyseCtrl, el: HTMLElement) => {
   const cont = el.parentNode as HTMLElement;
   if (!cont) return;
-  const target = el.querySelector('.active') as HTMLElement;
+  let target = el.querySelector('.active') as HTMLElement | null;
+  if (!target && ctrl.path) {
+    // Fallback: find the deepest <move> whose p attribute is a prefix of ctrl.path.
+    // Needed when ctrl.path points past the rendered full-turn boundary (e.g. backgammon
+    // endturn node), so no element receives the active class.
+    let best: HTMLElement | null = null;
+    let bestLen = -1;
+    el.querySelectorAll('move[p]').forEach(m => {
+      const p = m.getAttribute('p') ?? '';
+      if (ctrl.path.startsWith(p) && p.length > bestLen) {
+        best = m as HTMLElement;
+        bestLen = p.length;
+      }
+    });
+    target = best;
+  }
   if (!target) {
     cont.scrollTop = ctrl.path ? 99999 : 0;
     return;
