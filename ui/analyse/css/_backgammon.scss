@@ -1,7 +1,9 @@
 // Always show both player sides side by side for direct value comparison.
 // _acpl.scss defaults to flex-column and gates the row layout behind $mq-col1;
 // override here so backgammon is always a row on every screen size.
-.analyse__acpl .advice-summary {
+// Also targets standalone .advice-summary in detail mode (not inside .analyse__acpl).
+.analyse__acpl .advice-summary,
+.analyse.analyse--detail > .advice-summary {
   flex-direction: row;
   align-items: flex-start;
   margin-top: 0;
@@ -35,6 +37,48 @@
 
   .advice-summary__luck-hdr {
     margin-top: 0.4em;
+  }
+}
+
+// In detail mode the advice-summary is a grid item directly below the board —
+// lay out each side's stats in a 2-column inner grid to halve the height.
+.analyse.analyse--detail > .advice-summary {
+  padding: 0.3em 0.5em;
+  font-size: 0.82em;
+
+  .advice-summary__side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 0.4em;
+    row-gap: 0.1em;
+
+    .advice-summary__player {
+      grid-column: 1 / -1;
+      margin-bottom: 0.1em;
+    }
+
+    // Luck section header spans both columns — acts as a visual divider between skill and dice
+    .advice-summary__luck-hdr {
+      grid-column: 1 / -1;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 0.2em;
+      margin-top: 0.1em;
+    }
+
+    > div {
+      gap: 0.1em;
+      min-width: 0;
+
+      // Truncate long labels (e.g. "Intermediate", "Perfect play") with ellipsis.
+      // Full text is in the title attribute (desktop hover / iOS long-press).
+      > span {
+        flex: 1 1 0;
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
   }
 }
 
@@ -97,27 +141,106 @@
   move.h-blunder,
   move.h-mistake,
   move.h-brilliant,
-  move.h-lucky,
-  move.h-unlucky {
+  move.h-blunder { color: #db3031; }
+  move.h-mistake { color: #d96420; }
+  move.h-brilliant { color: #5ebe5e; }
+  move.h-lucky { color: #8855cc; }
+  move.h-unlucky { color: #d45090; }
+
+  move.h-lucky.current,
+  move.h-unlucky.current,
+  move.h-blunder.current,
+  move.h-mistake.current,
+  move.h-brilliant.current {
     background: rgba(255, 255, 255, 0.12);
     border-radius: 2px;
     outline: 1px solid rgba(255, 255, 255, 0.2);
   }
+}
 
-  move.h-blunder {
-    color: #db3031;
+.bg-candidates {
+  margin-top: 1em;
+  font-size: 0.9em;
+
+  &__list {
+    max-height: 12em;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
-  move.h-mistake {
-    color: #d96420;
+
+  &__header {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.8em;
+    opacity: 0.6;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4em;
   }
-  move.h-brilliant {
-    color: #5ebe5e;
+
+  &__no-play {
+    font-style: italic;
+    opacity: 0.5;
+    padding: 0.3em 0.4em;
   }
-  move.h-lucky {
-    color: #8855cc;
+
+  &__row {
+    display: flex;
+    flex-direction: column;
+    padding: 0.3em 0.4em;
+    border-radius: 3px;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    &.played {
+      border-left-color: #4da3d5;
+      background: rgba(77, 163, 213, 0.08);
+    }
+
+    &.expanded {
+      background: rgba(255, 255, 255, 0.08);
+    }
   }
-  move.h-unlucky {
-    color: #d45090;
+
+  &__main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__move {
+    font-family: monospace;
+    font-size: 1em;
+  }
+
+  &__meta {
+    display: flex;
+    gap: 0.4em;
+    opacity: 0.75;
+
+    .rank {
+      opacity: 0.5;
+    }
+
+    .delta.bad {
+      color: #db3031;
+    }
+  }
+
+  &__probs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3em 0.6em;
+    margin-top: 0.3em;
+    font-size: 0.85em;
+    opacity: 0.8;
+
+    .sep {
+      opacity: 0.3;
+    }
   }
 }
 

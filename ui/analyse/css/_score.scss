@@ -979,3 +979,37 @@ $backgammon-pocket-height: 6em;
     margin-bottom: 5px;
   }
 }
+
+// Detail mode: show Analysis block above Moves on col1 (backgammon family only).
+// The class is only added by JS when isCol1(), so no @media guard needed here.
+.analyse.analyse--detail {
+  // Place split sections in their own grid areas
+  .advice-summary {
+    grid-area: advice-summary;
+  }
+
+  .bg-candidates {
+    grid-area: top-moves;
+  }
+
+  &.variant-backgammon,
+  &.variant-hyper,
+  &.variant-nackgammon {
+    // under (underboard with bgWinChart) acts as "les graphes", promoted above movelist
+    grid-template-areas: 'pocket-top' 'board' 'controls' 'advice-summary' 'top-moves' 'under' 'tools' 'side' 'acpl' 'chat' 'uchat';
+    // top-moves fixed at 13em so the rows below (under, tools) don't shift with candidate count
+    grid-template-rows: 18vw auto auto auto 13em auto minmax(20em, 30vh);
+  }
+
+  &.has-players.variant-backgammon,
+  &.has-players.variant-hyper,
+  &.has-players.variant-nackgammon {
+    grid-template-areas: 'pocket-top' 'board' 'controls' 'advice-summary' 'top-moves' 'under' 'tools' 'side' 'acpl' 'chat' 'uchat';
+    grid-template-rows: 23vw auto auto auto 13em auto minmax(20em, 30vh);
+  }
+
+  // movelist is now at row 7 (minmax above) — no extra min-height needed
+  .analyse__moves {
+    min-height: unset;
+  }
+}

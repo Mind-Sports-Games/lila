@@ -1,5 +1,7 @@
 import AnalyseCtrl from './ctrl';
+import { BgCandidateUI } from './interfaces';
 import { GameFamily as BackgammonFamily } from 'stratops/variants/backgammon/GameFamily';
+import { clearCandidatePreview } from './backgammonAnalysis';
 
 // NOTE(bg-analysis): reuse the advantage chart (ui/chart/src/acpl.ts via chart.game module)
 // for backgammon. It reads `data.treeParts[].eval.cp`, maps it through a sigmoid to a
@@ -21,12 +23,18 @@ import { GameFamily as BackgammonFamily } from 'stratops/variants/backgammon/Gam
 
 interface BgProbs {
   win: number;
+  winGammon: number;
+  winBackgammon: number;
   lose: number;
+  loseGammon: number;
+  loseBackgammon: number;
 }
 interface BgCandidate {
   rank: number;
+  play?: string;         // gnubg move notation e.g. "24/20 8/7*"
   played: boolean;
-  equityDelta?: number; // EMG gap vs rank-1 move (negative for rank 2+; absent on rank 1)
+  equity?: number;
+  equityDelta?: number;  // EMG gap vs rank-1 move (negative for rank 2+; absent on rank 1)
   probabilities: BgProbs;
 }
 interface BgMove {
@@ -216,7 +224,7 @@ function chartNodes(ctrl: AnalyseCtrl, turns: TurnVal[]): ChartNode[] {
       // checker move: only emit the LAST one of this turn.
       // A move is last when the next src node is endturn, a different player's node, or EOF.
       const next = src[i + 1];
-      const isLast = !next || next.uci === 'endturn' || next.playedPlayerIndex !== pi;
+      const isLast = !next || next.uci === 'endturn' || (next.playedPlayerIndex !== undefined && next.playedPlayerIndex !== pi);
       if (isLast) {
         const t = turns[turnIdx];
         const node: ChartNode = {
@@ -239,6 +247,124 @@ function chartNodes(ctrl: AnalyseCtrl, turns: TurnVal[]): ChartNode[] {
   }
 
   return out;
+}
+
+// Build candidate and turn-start-FEN maps keyed by decision ply.
+// candidateMap: ply → candidates for that turn's decision.
+// fenMap: ply → FEN after dice rolled, before any checker moves.
+function buildCandidateMap(
+  ctrl: AnalyseCtrl,
+  a: BgAnalysis,
+): { candidateMap: Map<number, BgCandidateUI[]>; fenMap: Map<number, string>; plyMap: Map<number, number> } {
+  const map = new Map<number, BgCandidateUI[]>();
+  const fenMap = new Map<number, string>();
+  const plyMap = new Map<number, number>(); // decision ply → turn-start node ply
+  const allMoves: BgMove[] = a.games.flatMap(g => g.moves);
+  const src = ctrl.data.treeParts;
+
+  const toCandidateUI = (move: BgMove, isP1: boolean): BgCandidateUI[] =>
+    move.candidates.map(c => ({
+      rank: c.rank,
+      play: c.play,
+      played: c.played,
+      isP1,
+      equity: c.equity,
+      equityDelta: c.equityDelta,
+      probabilities: c.probabilities,
+    } as BgCandidateUI));
+
+  // Pre-pass: collect the turn-start FEN and ply (first node of each turn, before any checker moves).
+  const turnStartByIdx = new Map<number, { fen: string; ply: number }>();
+  {
+    let preTurnIdx = -1;
+    let prePrevPi: string | undefined;
+    for (let i = 1; i < src.length; i++) {
+      const n = src[i];
+      if (n.uci === 'endturn') continue;
+      const pi = n.playedPlayerIndex;
+      if (pi !== undefined && pi !== prePrevPi) {
+        preTurnIdx++;
+        prePrevPi = pi;
+        if (n.fen) turnStartByIdx.set(preTurnIdx, { fen: n.fen, ply: n.ply });
+      }
+    }
+  }
+
+  // Pass 1: map every non-endturn ply to its own turn's candidates.
+  // Only advance turnIdx on nodes with a defined playedPlayerIndex to avoid
+  // false transitions on checker-move nodes that may have it undefined.
+  let turnIdx = -1;
+  let prevPi: string | undefined;
+  let turnPlies: number[] = [];
+  let currentIsP1 = true;
+
+  for (let i = 1; i < src.length; i++) {
+    const n = src[i];
+    if (n.uci === 'endturn') continue;
+    const pi = n.playedPlayerIndex;
+    const isRoll = pi !== undefined && pi !== prevPi;
+    if (isRoll) {
+      turnIdx++;
+      turnPlies = [];
+      prevPi = pi;
+      currentIsP1 = (pi === 'p1');
+    }
+    turnPlies.push(n.ply);
+
+    const next = src[i + 1];
+    const isLast = !next || next.uci === 'endturn' || (next.playedPlayerIndex !== undefined && next.playedPlayerIndex !== pi);
+    if (isLast) {
+      const move = allMoves[turnIdx];
+      if (move?.candidates?.length) {
+        const mapped = toCandidateUI(move, currentIsP1);
+        const turnStart = turnStartByIdx.get(turnIdx);
+        for (const ply of turnPlies) {
+          map.set(ply, mapped);
+          if (turnStart) { fenMap.set(ply, turnStart.fen); plyMap.set(ply, turnStart.ply); }
+        }
+        // ply 0 is the root node (dice-picker phase); it has no tree entry of its own,
+        // so explicitly expose the first turn's candidates there too.
+        if (turnIdx === 0) {
+          map.set(0, mapped);
+          if (turnStart) { fenMap.set(0, turnStart.fen); plyMap.set(0, turnStart.ply); }
+        }
+      } else if (move?.kind === 'Dance') {
+        // No-play (forced dance): store empty array so renderCandidates can show "No play".
+        for (const ply of turnPlies) map.set(ply, []);
+        if (turnIdx === 0) map.set(0, []);
+      }
+    }
+  }
+
+  // Pass 2: map each endturn ply to the NEXT turn's candidates (upcoming decision).
+  // Turns alternate strictly in backgammon, so nextIsP1 = !currentIsP1.
+  turnIdx = -1;
+  prevPi = undefined;
+  let currentIsP1P2 = true;
+  for (let i = 1; i < src.length; i++) {
+    const n = src[i];
+    if (n.uci === 'endturn') continue;
+    const pi2 = n.playedPlayerIndex;
+    const isRoll2 = pi2 !== undefined && pi2 !== prevPi;
+    if (isRoll2) {
+      turnIdx++;
+      prevPi = pi2;
+      currentIsP1P2 = (pi2 === 'p1');
+    }
+    const next = src[i + 1];
+    if (next?.uci === 'endturn') {
+      const nextMove = allMoves[turnIdx + 1];
+      if (nextMove?.candidates?.length) {
+        map.set(next.ply, toCandidateUI(nextMove, !currentIsP1P2));
+        const nextTurnStart = turnStartByIdx.get(turnIdx + 1);
+        if (nextTurnStart) { fenMap.set(next.ply, nextTurnStart.fen); plyMap.set(next.ply, nextTurnStart.ply); }
+      } else if (nextMove?.kind === 'Dance') {
+        map.set(next.ply, []);
+      }
+    }
+  }
+
+  return { candidateMap: map, fenMap, plyMap };
 }
 
 // Write glyphs directly onto ctrl.data.treeParts nodes so treeView.ts nodeClasses() colours them.
@@ -276,7 +402,29 @@ export default function bgWinChart(ctrl: AnalyseCtrl, panel: HTMLElement): void 
   const symbolToGlyphId: Record<string, number> = { '??': 4, '?': 2, '!!': 3, '+': 51, '-': 52, d: 99 };
   playstrategy.pubsub.on('analysis.chart.category.select', (symbol: string | null) => {
     ctrl.bgHighlightGlyphId = symbol ? symbolToGlyphId[symbol] : undefined;
+    ctrl.bgHighlightSymbol = symbol || undefined;
+    if (!symbol) ctrl.bgHighlightPlayerIndex = undefined;
+    clearCandidatePreview(ctrl);
     ctrl.redraw();
+  });
+  // When the user navigates via an advice-summary or chart click, clear any active
+  // candidate preview. This listener fires after ctrl.ts's analysis.chart.click handler
+  // (which calls ctrl.redraw()), but before the browser paints — chessground's debounced
+  // rAF fires with autoShapes=[] and lastCandidatePly=-1 forces the ply-change guard on
+  // the next Snabbdom render, even if navigation lands on the same ply as the preview.
+  playstrategy.pubsub.on('analysis.chart.click', () => clearCandidatePreview(ctrl));
+  // Force a redraw on orientation/resize changes so isCol1() recomputes and the
+  // detail-mode toggle button appears/disappears correctly on portrait↔landscape rotation.
+  window.addEventListener('resize', () => ctrl.redraw());
+
+  // Capture player index when a symbol is clicked so Snabbdom can re-apply the locked
+  // class after a mode switch recreates the DOM. Registered before acpl's jQuery handler
+  // so it fires first and ctrl is updated before the pubsub-triggered redraw.
+  document.addEventListener('click', (e: MouseEvent) => {
+    const el = (e.target as HTMLElement).closest?.('[data-symbol][data-playerindex]');
+    if (el?.closest?.('div.advice-summary')) {
+      ctrl.bgHighlightPlayerIndex = el.getAttribute('data-playerindex') as PlayerIndex | undefined ?? undefined;
+    }
   });
 
   fetch(`/${ctrl.data.game.id}/backgammon-rating.json`, { headers: { Accept: 'application/json' } })
@@ -287,6 +435,11 @@ export default function bgWinChart(ctrl: AnalyseCtrl, panel: HTMLElement): void 
     .then((a: BgAnalysis) => {
       const turns = turnValues(a);
       annotateTreeNodes(ctrl, turns);
+      const { candidateMap, fenMap, plyMap } = buildCandidateMap(ctrl, a);
+      ctrl.bgTurnCandidates = candidateMap;
+      ctrl.bgTurnStartFen = fenMap;
+      ctrl.bgTurnStartPly = plyMap;
+      ctrl.bgOriginalNodeIdByPly = new Map(ctrl.data.treeParts.map(n => [n.ply, n.id]));
 
       // per-player event counts derived from turn values
       const cnt = {

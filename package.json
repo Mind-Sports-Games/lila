@@ -33,7 +33,10 @@
     "onlyBuiltDependencies": [
       "chessground",
       "stratops"
-    ]
+    ],
+    "overrides": {
+      "chessground": "link:../chessground"
+    }
   },
   "devDependencies": {
     "@types/node": "^20.19.4",

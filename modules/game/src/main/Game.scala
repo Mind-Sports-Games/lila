@@ -1486,18 +1486,21 @@ case class DelayClockHistory(
     p1ActionTimes: Vector[Centis] = Vector.empty,
     p2ActionTimes: Vector[Centis] = Vector.empty,
     p1RemainingTime: Option[Centis] = None,
-    p2RemainingTime: Option[Centis] = None
+    p2RemainingTime: Option[Centis] = None,
+    delay: Centis = Centis(0),
+    initial: Centis = Centis(0)
 ) extends ClockHistory {
-  // In this case, our case class stores the time moves took as the primary
-  // attribue but, we need to produce the time remaining after each move.
-  // We do this by working backwards from the prevsRemainingTime and adding in the move times
-  // and then reversing it.
-  // TODO this doesn't work as remaingtime is always None, would need clock details to work out remaining time?
-  // Issues seen in analysis clock times (not correct for delay)
-  private def timeRemaining(moveTimes: Vector[Centis], remainingTime: Option[Centis]): Vector[Centis] =
-    moveTimes.reverse.scanLeft(remainingTime.getOrElse(Centis(0)))(_ + _).reverse
-  val p1: Vector[Centis] = timeRemaining(p1ActionTimes, p1RemainingTime)
-  val p2: Vector[Centis] = timeRemaining(p2ActionTimes, p2RemainingTime)
+  // Stores raw move times (wall-clock elapsed minus lag comp) per ply.
+  // Reconstruct remaining time at each ply forward from the initial clock time:
+  // Bronstein/SimpleDelay consume max(0, moveTime - delay) per move.
+  private def timeRemaining(moveTimes: Vector[Centis]): Vector[Centis] =
+    moveTimes
+      .scanLeft(initial) { (remaining, moveTime) =>
+        (remaining - (moveTime - delay).max(Centis(0))).max(Centis(0))
+      }
+      .tail
+  val p1: Vector[Centis] = timeRemaining(p1ActionTimes)
+  val p2: Vector[Centis] = timeRemaining(p2ActionTimes)
 
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
     playerIndex.fold(copy(p1ActionTimes = f(p1ActionTimes)), copy(p2ActionTimes = f(p2ActionTimes)))
