@@ -1392,6 +1392,7 @@ export default class RoundController {
   };
 
   private forcedActionDelayMillis = 500;
+  private forcedActionPending = false;
 
   playForcedAction = (): void => {
     const d = this.data;
@@ -1399,6 +1400,7 @@ export default class RoundController {
       ['backgammon', 'hyper', 'nackgammon'].includes(d.game.variant.key) &&
       this.isPlaying() &&
       !this.replaying() &&
+      !this.forcedActionPending &&
       d.player.playerIndex === d.game.player &&
       ((d.pref.playForcedAction === 1 && d.forcedAction !== undefined) ||
         (d.pref.playForcedAction === 2 && d.forcedTurnAction !== undefined))
@@ -1406,14 +1408,18 @@ export default class RoundController {
       const forcedAction = d.pref.playForcedAction === 1 ? d.forcedAction : d.forcedTurnAction;
       if (forcedAction === 'endturn') {
         this.chessground.set({ viewOnly: true });
+        this.forcedActionPending = true;
         setTimeout(() => {
+          this.forcedActionPending = false;
           this.sendEndTurn(d.game.variant.key);
         }, this.forcedActionDelayMillis);
       } else if (forcedAction.includes('@')) {
         const dropDests = stratUtils.readDropsByRole(d.possibleDropsByRole).get('s-piece');
         if (dropDests) {
           this.chessground.set({ viewOnly: true });
+          this.forcedActionPending = true;
           setTimeout(() => {
+            this.forcedActionPending = false;
             this.chessground.newPiece(
               {
                 role: 's-piece',
@@ -1426,7 +1432,9 @@ export default class RoundController {
         }
       } else if (forcedAction.includes('^')) {
         this.chessground.set({ viewOnly: true });
+        this.forcedActionPending = true;
         setTimeout(() => {
+          this.forcedActionPending = false;
           this.chessground.liftNoAnim(forcedAction!.slice(1) as cg.Key);
           this.onUserLift(forcedAction!.slice(1) as cg.Key);
         }, this.forcedActionDelayMillis);
@@ -1434,7 +1442,9 @@ export default class RoundController {
         const uciMove = stratUtils.uci2move(forcedAction);
         if (uciMove !== undefined) {
           this.chessground.set({ viewOnly: true });
+          this.forcedActionPending = true;
           setTimeout(() => {
+            this.forcedActionPending = false;
             this.chessground.moveNoAnim(uciMove[0], uciMove[1]);
             this.onUserMove(uciMove[0], uciMove[1], { premove: false });
           }, this.forcedActionDelayMillis);
