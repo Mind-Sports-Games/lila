@@ -25,7 +25,7 @@ final private[puzzle] class PuzzleFinisher(
     new lila.hub.DuctSequencers(
       maxSize = 64,
       expiration = 5 minutes,
-      timeout = 5 seconds,
+      timeout = 10 seconds,
       name = "puzzle.finish"
     )
 
@@ -47,101 +47,99 @@ final private[puzzle] class PuzzleFinisher(
       }.dmap(some)
     else
       sequencer(id.value) {
-        api.round.find(user, id) flatMap { prevRound =>
-          api.puzzle.find(id) flatMap {
-            _ so { puzzle =>
-              val now                  = DateTime.now
-              val userPuzzlePerf: Perf =
-                Perfs.puzzleLens(variant).map(_.get(user.perfs)).getOrElse(user.perfs.puzzle_standard)
-              val formerUserRating = userPuzzlePerf.intRating
+        (api.round.find(user, id) zip api.puzzle.find(id)) flatMap { case (prevRound, puzzleOption) =>
+          puzzleOption so { puzzle =>
+            val now                  = DateTime.now
+            val userPuzzlePerf: Perf =
+              Perfs.puzzleLens(variant).map(_.get(user.perfs)).getOrElse(user.perfs.puzzle_standard)
+            val formerUserRating = userPuzzlePerf.intRating
 
-              val (round, newPuzzleGlicko, userPerf) = prevRound match {
-                case Some(prev) =>
-                  (
-                    prev.updateWithWin(result.win),
-                    none,
-                    userPuzzlePerf
+            val (round, newPuzzleGlicko, userPerf) = prevRound match {
+              case Some(prev) =>
+                (
+                  prev.updateWithWin(result.win),
+                  none,
+                  userPuzzlePerf
+                )
+              case None =>
+                val userRating   = userPuzzlePerf.toRating
+                val puzzleRating = new Rating(
+                  puzzle.glicko.rating.atLeast(Glicko.minRating),
+                  puzzle.glicko.deviation,
+                  puzzle.glicko.volatility,
+                  puzzle.plays,
+                  null
+                )
+                updateRatings(userRating, puzzleRating, result.glicko)
+                val newPuzzleGlicko = !user.perfs.dubiousPuzzle so ponder
+                  .puzzle(
+                    theme,
+                    result,
+                    puzzle.glicko -> Glicko(
+                      rating = puzzleRating.getRating
+                        .atMost(puzzle.glicko.rating + Glicko.maxRatingDelta)
+                        .atLeast(puzzle.glicko.rating - Glicko.maxRatingDelta),
+                      deviation = puzzleRating.getRatingDeviation,
+                      volatility = puzzleRating.getVolatility
+                    ).cap,
+                    player = userPuzzlePerf.glicko
                   )
-                case None =>
-                  val userRating   = userPuzzlePerf.toRating
-                  val puzzleRating = new Rating(
-                    puzzle.glicko.rating.atLeast(Glicko.minRating),
-                    puzzle.glicko.deviation,
-                    puzzle.glicko.volatility,
-                    puzzle.plays,
-                    null
+                  .some
+                  .filter(puzzle.glicko !=)
+                  .filter(_.sanityCheck)
+                val round =
+                  PuzzleRound(
+                    id = PuzzleRound.Id(user.id, puzzle.id),
+                    win = result.win,
+                    fixedAt = none,
+                    date = DateTime.now
                   )
-                  updateRatings(userRating, puzzleRating, result.glicko)
-                  val newPuzzleGlicko = !user.perfs.dubiousPuzzle so ponder
-                    .puzzle(
-                      theme,
-                      result,
-                      puzzle.glicko -> Glicko(
-                        rating = puzzleRating.getRating
-                          .atMost(puzzle.glicko.rating + Glicko.maxRatingDelta)
-                          .atLeast(puzzle.glicko.rating - Glicko.maxRatingDelta),
-                        deviation = puzzleRating.getRatingDeviation,
-                        volatility = puzzleRating.getVolatility
-                      ).cap,
-                      player = userPuzzlePerf.glicko
+                val userPerf =
+                  userPuzzlePerf
+                    .addOrReset(_.puzzle.crazyGlicko, s"puzzle ${puzzle.id}")(userRating, now) pipe { p =>
+                    p.copy(glicko =
+                      ponder.player(theme, result, userPuzzlePerf.glicko -> p.glicko, puzzle.glicko)
                     )
-                    .some
-                    .filter(puzzle.glicko !=)
-                    .filter(_.sanityCheck)
-                  val round =
-                    PuzzleRound(
-                      id = PuzzleRound.Id(user.id, puzzle.id),
-                      win = result.win,
-                      fixedAt = none,
-                      date = DateTime.now
-                    )
-                  val userPerf =
-                    userPuzzlePerf
-                      .addOrReset(_.puzzle.crazyGlicko, s"puzzle ${puzzle.id}")(userRating, now) pipe { p =>
-                      p.copy(glicko =
-                        ponder.player(theme, result, userPuzzlePerf.glicko -> p.glicko, puzzle.glicko)
-                      )
-                    }
-                  (round, newPuzzleGlicko, userPerf)
-              }
-              api.round.upsert(round, theme) zip
-                colls.puzzle {
-                  _.update
-                    .one(
-                      $id(puzzle.id),
-                      $inc(Puzzle.BSONFields.plays -> $int(1)) ++ newPuzzleGlicko.so { glicko =>
-                        $set(Puzzle.BSONFields.glicko -> Glicko.glickoBSONHandler.write(glicko))
-                      }
-                    )
-                    .void
-                } zip
-                (userPerf != userPuzzlePerf)
-                  .so {
-                    userRepo.setPerf(
-                      user.id,
-                      PerfType
-                        .puzzlebyVariant(variant)
-                        .getOrElse(PerfType.orDefaultPuzzle("puzzle_standard")),
-                      userPerf.clearRecent
-                    ) zip
-                      historyApi.addPuzzle(user = user, completedAt = now, perf = userPerf) void
                   }
-                  .andDo {
-                    if (prevRound.isEmpty)
-                      Bus.publish(
-                        Puzzle.UserResult(
-                          puzzle.id,
-                          user.id,
-                          result,
-                          formerUserRating -> userPerf.intRating,
-                          PerfType
-                            .puzzlebyVariant(variant)
-                            .getOrElse(PerfType.orDefaultPuzzle("puzzle_standard"))
-                        ),
-                        "finishPuzzle"
-                      )
-                  } inject (round -> userPerf).some
+                (round, newPuzzleGlicko, userPerf)
             }
+            api.round.upsert(round, theme) zip
+              colls.puzzle {
+                _.update
+                  .one(
+                    $id(puzzle.id),
+                    $inc(Puzzle.BSONFields.plays -> $int(1)) ++ newPuzzleGlicko.so { glicko =>
+                      $set(Puzzle.BSONFields.glicko -> Glicko.glickoBSONHandler.write(glicko))
+                    }
+                  )
+                  .void
+              } zip
+              (userPerf != userPuzzlePerf)
+                .so {
+                  userRepo.setPerf(
+                    user.id,
+                    PerfType
+                      .puzzlebyVariant(variant)
+                      .getOrElse(PerfType.orDefaultPuzzle("puzzle_standard")),
+                    userPerf.clearRecent
+                  ) zip
+                    historyApi.addPuzzle(user = user, completedAt = now, perf = userPerf) void
+                }
+                .andDo {
+                  if (prevRound.isEmpty)
+                    Bus.publish(
+                      Puzzle.UserResult(
+                        puzzle.id,
+                        user.id,
+                        result,
+                        formerUserRating -> userPerf.intRating,
+                        PerfType
+                          .puzzlebyVariant(variant)
+                          .getOrElse(PerfType.orDefaultPuzzle("puzzle_standard"))
+                      ),
+                      "finishPuzzle"
+                    )
+                } inject (round -> userPerf).some
           }
         }
       }
