@@ -38,7 +38,7 @@ final private class Finisher(
     })
 
   def outOfTime(game: Game)(implicit proxy: GameProxy): Fu[Events] =
-    if (!game.isCorrespondence && !Uptime.startedSinceSeconds(120) && game.updatedAt.isBefore(Uptime.startedAt)) {
+    if (!game.isSwiss && !game.isCorrespondence && !Uptime.startedSinceSeconds(120) && game.updatedAt.isBefore(Uptime.startedAt)) {
       logger.info(s"Aborting game last played before JVM boot: ${game.id}")
       other(game, _.Aborted, none)
     } else if (game.player(!game.player.playerIndex).isOfferingDraw)
