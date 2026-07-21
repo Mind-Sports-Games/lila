@@ -579,7 +579,7 @@ final class SwissApi(
     getSwissPairingForGame(game).flatMap {
       _ so { pairing =>
         getGamesMap(pairing.multiMatchGameIds.foldLeft(List(pairing.id))(_ ++ _)) map { gamesById =>
-          toSwissPairingGames(pairing.swissId, pairing, gamesById).head.some
+          toSwissPairingGames(pairing.swissId, pairing, gamesById)
         }
       }
     }
