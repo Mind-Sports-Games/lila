@@ -43,6 +43,7 @@ final private[round] class Titivate(
     case ReceiveTimeout =>
       val msg = "Titivate timed out!"
       logBranch.error(msg)
+      lila.mon.round.titivate.timeout.increment()
       throw new RuntimeException(msg)
 
     case Run =>

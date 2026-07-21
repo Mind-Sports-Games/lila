@@ -159,10 +159,11 @@ object mon {
       val other   = counter("round.error").withTag("from", "other")
     }
     object titivate {
-      val time  = future("round.titivate.time")
-      val game  = histogram("round.titivate.game").withoutTags()  // how many games were processed
-      val total = histogram("round.titivate.total").withoutTags() // how many games should have been processed
-      val old   = histogram("round.titivate.old").withoutTags()   // how many old games remain
+      val time    = future("round.titivate.time")
+      val game    = histogram("round.titivate.game").withoutTags()  // how many games were processed
+      val total   = histogram("round.titivate.total").withoutTags() // how many games should have been processed
+      val old     = histogram("round.titivate.old").withoutTags()   // how many old games remain
+      val timeout = counter("round.titivate.timeout").withoutTags() // actor missed its heartbeat and restarted
       def broken(error: String) = counter("round.titivate.broken").withTag("error", error) // broken game
     }
     object alarm {
@@ -268,6 +269,7 @@ object mon {
     def moves(official: Boolean, slug: String)     = counter("relay.moves").withTags(relay(official, slug))
     def fetchTime(official: Boolean, slug: String) = timer("relay.fetch.time").withTags(relay(official, slug))
     def syncTime(official: Boolean, slug: String)  = timer("relay.sync.time").withTags(relay(official, slug))
+    val timeout = counter("relay.fetch.timeout").withoutTags() // RelayFetch actor missed its heartbeat and restarted
   }
   object bot {
     def moves(username: String)   = counter("bot.moves").withTag("name", username)
@@ -381,9 +383,11 @@ object mon {
     object startedOrganizer {
       val tick         = future("tournament.startedOrganizer.tick")
       val waitingUsers = future("tournament.startedOrganizer.waitingUsers")
+      val timeout      = counter("tournament.startedOrganizer.timeout").withoutTags() // actor missed its heartbeat and restarted
     }
     object createdOrganizer {
-      val tick = future("tournament.createdOrganizer.tick")
+      val tick    = future("tournament.createdOrganizer.tick")
+      val timeout = counter("tournament.createdOrganizer.timeout").withoutTags() // actor missed its heartbeat and restarted
     }
     def standingOverload = counter("tournament.standing.overload").withoutTags()
     def apiShowPartial(partial: Boolean, client: String)(success: Boolean) =
