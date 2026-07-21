@@ -53,6 +53,7 @@ final private class RelayFetch(
     case ReceiveTimeout =>
       val msg = "RelaySync timed out!"
       logger.error(msg)
+      lila.mon.relay.timeout.increment()
       throw new RuntimeException(msg)
 
     case Tick =>
