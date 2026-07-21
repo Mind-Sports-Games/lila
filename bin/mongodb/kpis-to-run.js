@@ -1,6 +1,33 @@
-//total game count by lib and variant (TAB - Games per variant)
+// PlayStrategy's own automated bot accounts, used for the bot-vs-bot streams
+// (mirror of modules/common/src/main/LightUser.scala psBotsIDs - keep in sync)
+const PS_BOT_IDS = [
+  'pst-greedy-tom',
+  'ps-greedy-one-move',
+  'ps-greedy-two-move',
+  'ps-greedy-four-move',
+  'stockfish-level1',
+  'stockfish-level2',
+  'stockfish-level3',
+  'stockfish-level4',
+  'stockfish-level5',
+  'stockfish-level6',
+  'stockfish-level7',
+  'stockfish-level8',
+  'ps-random-mover',
+];
+
+// matches games where at least one player is not one of our bots, i.e. excludes
+// games where both players are our automated bots (bot-vs-bot streams)
+const notAutoBotVsBot = { us: { $elemMatch: { $nin: PS_BOT_IDS } } };
+
+//total game count by lib and variant, excluding our bot-vs-bot streams (TAB - Games per variant)
 db.game5.aggregate([
-  { $match: { l: { $exists: true } } }, // old games dont have library (pre Aug 2021)
+  {
+    $match: {
+      l: { $exists: true }, // old games dont have library (pre Aug 2021)
+      ...notAutoBotVsBot,
+    },
+  },
   {
     $project: {
       l: 1,
@@ -19,8 +46,9 @@ db.game5.aggregate([
   { $sort: { count: -1 } },
 ]);
 
-//total game count per month (TAB - Games)
+//total game count per month, excluding our bot-vs-bot streams (TAB - Games)
 db.game5.aggregate([
+  { $match: notAutoBotVsBot },
   {
     $project: {
       date: {
@@ -38,6 +66,40 @@ db.game5.aggregate([
     },
   },
   { $sort: { '_id.date.year': -1, '_id.date.month': -1 } },
+]);
+
+//game count per month broken down by human_vs_human / human_vs_bot / bot_vs_bot (TAB - Games)
+//"bot" here means one of PS_BOT_IDS above; bot_vs_bot is our automated streams,
+//human_vs_bot includes both our bots played by real users (pool/lobby) and third-party bots
+db.game5.aggregate([
+  {
+    $project: {
+      date: {
+        month: { $month: '$ca' },
+        year: { $year: '$ca' },
+      },
+      p1IsPsBot: { $in: [{ $arrayElemAt: ['$us', 0] }, PS_BOT_IDS] },
+      p2IsPsBot: { $in: [{ $arrayElemAt: ['$us', 1] }, PS_BOT_IDS] },
+    },
+  },
+  {
+    $group: {
+      _id: {
+        date: '$date',
+        category: {
+          $switch: {
+            branches: [
+              { case: { $and: ['$p1IsPsBot', '$p2IsPsBot'] }, then: 'bot_vs_bot' },
+              { case: { $or: ['$p1IsPsBot', '$p2IsPsBot'] }, then: 'human_vs_bot' },
+            ],
+            default: 'human_vs_human',
+          },
+        },
+      },
+      count: { $sum: 1 },
+    },
+  },
+  { $sort: { '_id.date.year': -1, '_id.date.month': -1, '_id.category': 1 } },
 ]);
 
 //Users over time (TAB - users)
