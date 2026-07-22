@@ -27,7 +27,7 @@ const PS_BOT_IDS = [
 ];
 
 const botVsBotFriendGames = {
-  s: 2, // Source.Friend - the only source these games could have prior to this migration
+  so: 2, // Source.Friend - the only source these games could have prior to this migration
   us: { $size: 2 }, // guard against open/anonymous challenges with fewer than 2 known players
   'us.0': { $in: PS_BOT_IDS },
   'us.1': { $in: PS_BOT_IDS },
@@ -39,6 +39,6 @@ print('games to migrate: ' + db.game5.countDocuments(botVsBotFriendGames));
 // inspect a sample before committing, if you want:
 // db.game5.find(botVsBotFriendGames).limit(5).forEach(g => print(g._id + ' ' + g.us));
 
-db.game5.updateMany(botVsBotFriendGames, { $set: { s: 14 } });
+db.game5.updateMany(botVsBotFriendGames, { $set: { so: 14 } });
 
-print('games now on BotVsBotStream source: ' + db.game5.countDocuments({ s: 14 }));
+print('games now on BotVsBotStream source: ' + db.game5.countDocuments({ so: 14 }));
