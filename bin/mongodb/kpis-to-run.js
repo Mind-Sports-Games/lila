@@ -1,31 +1,9 @@
-// PlayStrategy's own automated bot accounts, used for the bot-vs-bot streams
-// (mirror of modules/common/src/main/LightUser.scala psBotsIDs - keep in sync)
-const PS_BOT_IDS = [
-  'pst-greedy-tom',
-  'ps-greedy-one-move',
-  'ps-greedy-two-move',
-  'ps-greedy-four-move',
-  'stockfish-level1',
-  'stockfish-level2',
-  'stockfish-level3',
-  'stockfish-level4',
-  'stockfish-level5',
-  'stockfish-level6',
-  'stockfish-level7',
-  'stockfish-level8',
-  'ps-random-mover',
-];
-
-// matches games where at least one player is not one of our bots, i.e. excludes
-// games where both players are our automated bots (bot-vs-bot streams)
-const notAutoBotVsBot = { us: { $elemMatch: { $nin: PS_BOT_IDS } } };
-
 //total game count by lib and variant, excluding our bot-vs-bot streams (TAB - Games per variant)
 db.game5.aggregate([
   {
     $match: {
       l: { $exists: true }, // old games dont have library (pre Aug 2021)
-      ...notAutoBotVsBot,
+      s: { $ne: 14 }, // exclude lila.game.Source.BotVsBotStream (modules/game/src/main/Source.scala)
     },
   },
   {
@@ -48,7 +26,7 @@ db.game5.aggregate([
 
 //total game count per month, excluding our bot-vs-bot streams (TAB - Games)
 db.game5.aggregate([
-  { $match: notAutoBotVsBot },
+  { $match: { s: { $ne: 14 } } }, // exclude lila.game.Source.BotVsBotStream (modules/game/src/main/Source.scala)
   {
     $project: {
       date: {
@@ -69,8 +47,22 @@ db.game5.aggregate([
 ]);
 
 //game count per month broken down by human_vs_human / human_vs_bot / bot_vs_bot (TAB - Games)
-//"bot" here means one of PS_BOT_IDS above; bot_vs_bot is our automated streams,
-//human_vs_bot includes both our bots played by real users (pool/lobby) and third-party bots
+//(mirrors modules/common/src/main/LightUser.scala psBotsIDs - keep in sync)
+const PS_BOT_IDS = [
+  'pst-greedy-tom',
+  'ps-greedy-one-move',
+  'ps-greedy-two-move',
+  'ps-greedy-four-move',
+  'stockfish-level1',
+  'stockfish-level2',
+  'stockfish-level3',
+  'stockfish-level4',
+  'stockfish-level5',
+  'stockfish-level6',
+  'stockfish-level7',
+  'stockfish-level8',
+  'ps-random-mover',
+];
 db.game5.aggregate([
   {
     $project: {
@@ -78,6 +70,7 @@ db.game5.aggregate([
         month: { $month: '$ca' },
         year: { $year: '$ca' },
       },
+      isAutoBotVsBot: { $eq: ['$s', 14] },
       p1IsPsBot: { $in: [{ $arrayElemAt: ['$us', 0] }, PS_BOT_IDS] },
       p2IsPsBot: { $in: [{ $arrayElemAt: ['$us', 1] }, PS_BOT_IDS] },
     },
@@ -89,7 +82,7 @@ db.game5.aggregate([
         category: {
           $switch: {
             branches: [
-              { case: { $and: ['$p1IsPsBot', '$p2IsPsBot'] }, then: 'bot_vs_bot' },
+              { case: '$isAutoBotVsBot', then: 'bot_vs_bot' },
               { case: { $or: ['$p1IsPsBot', '$p2IsPsBot'] }, then: 'human_vs_bot' },
             ],
             default: 'human_vs_human',

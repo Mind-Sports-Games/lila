@@ -102,7 +102,8 @@ final class BotVsBotCoordinator(
             playerIndex = "p1",
             challenger = toRegistered(spec.variant, timeControl)(p1User),
             destUser = p2User.some,
-            rematchOf = none
+            rematchOf = none,
+            isBotvsBotStream = true
           )
           challengeApi.create(challenge) flatMap {
             case false =>
