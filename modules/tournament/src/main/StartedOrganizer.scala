@@ -33,6 +33,7 @@ final private class StartedOrganizer(
     case ReceiveTimeout =>
       val msg = "tournament.StartedOrganizer timed out!"
       pairingLogger.error(msg)
+      lila.mon.tournament.startedOrganizer.timeout.increment()
       throw new RuntimeException(msg)
 
     case Tick =>
@@ -81,6 +82,10 @@ final private class StartedOrganizer(
       socket
         .getWaitingUsers(tour)
         .monSuccess(_.tournament.startedOrganizer.waitingUsers)
+        .recover { case _: scalalib.future.TimeoutException =>
+          logger.info(s"StartedOrganizer.getWaitingUsers timeout $tour")
+          WaitingUsers.empty(tour.clock)
+        }
         .flatMap { waiting =>
           api.makePairings(tour, waiting) inject waiting.size
         }

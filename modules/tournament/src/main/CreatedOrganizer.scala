@@ -32,6 +32,7 @@ final private class CreatedOrganizer(
     case ReceiveTimeout =>
       val msg = "tournament.CreatedOrganizer timed out!"
       pairingLogger.error(msg)
+      lila.mon.tournament.createdOrganizer.timeout.increment()
       throw new RuntimeException(msg)
 
     case Tick =>

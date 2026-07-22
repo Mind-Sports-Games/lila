@@ -84,7 +84,7 @@ object Info {
           ply,
           // TODO Wrong for non Chess
           Eval(strCp(cp), strMate(ma), Uci.Move.piotr(GameLogic.Chess(), GameFamily.Chess(), be)),
-          va.split(' ').toVector.map(Vector(_))
+          if (va.isEmpty) Vector.empty else va.split(' ').toVector.map(Vector(_))
         ).some
       case _ => none
     }

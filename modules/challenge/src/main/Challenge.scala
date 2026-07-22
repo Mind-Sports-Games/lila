@@ -33,7 +33,8 @@ case class Challenge(
     name: Option[String] = None,
     declineReason: Option[Challenge.DeclineReason] = None,
     multiMatch: Option[Boolean] = None,
-    backgammonPoints: Option[Int] = None
+    backgammonPoints: Option[Int] = None,
+    isBotvsBotStream: Boolean = false
 ) {
 
   import Challenge.*
@@ -270,7 +271,8 @@ object Challenge {
       name: Option[String] = None,
       multiMatch: Boolean = false,
       // this could be extended into 'gameSettings' if more game specific fields are required
-      backgammonPoints: Option[Int] = None
+      backgammonPoints: Option[Int] = None,
+      isBotvsBotStream: Boolean = false
   ): Challenge = {
     val (playerIndexChoice, finalPlayerIndex) = playerIndex match {
       case "p1" => PlayerIndexChoice.P1     -> P1
@@ -328,7 +330,8 @@ object Challenge {
       open = isOpen.option(true),
       name = name,
       multiMatch = multiMatch.option(true),
-      backgammonPoints = backgammonPoints
+      backgammonPoints = backgammonPoints,
+      isBotvsBotStream = isBotvsBotStream
     )
     if (multiMatch && !challenge.customStartingPosition) challenge = challenge.copy(multiMatch = none)
     if (challenge.mode.rated && !challenge.isMultiMatch && challenge.customStartingPosition)

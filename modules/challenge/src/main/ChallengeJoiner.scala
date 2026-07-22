@@ -73,7 +73,7 @@ private object ChallengeJoiner {
         p1Player = Player.make(P1, c.finalPlayerIndex.fold(origUser, destUser), perfPicker),
         p2Player = Player.make(P2, c.finalPlayerIndex.fold(destUser, origUser), perfPicker),
         mode = if (stratGame.board.variant.fromPositionVariant) Mode.Casual else c.mode,
-        source = Source.Friend,
+        source = if (c.isBotvsBotStream) Source.BotVsBotStream else Source.Friend,
         daysPerTurn = c.daysPerTurn,
         pgnImport = None,
         multiMatch = multiMatch,
