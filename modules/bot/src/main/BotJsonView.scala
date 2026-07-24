@@ -48,10 +48,10 @@ final class BotJsonView(
     // while the round game json uses the round.StepBuilder object.
     // not sure why the difference.
     import wf.*
-    strategygames.format
-      .UciDump(game.variant.gameLogic, game.actionStrs, fen, game.variant)
-      .toEither
-      .toFuture map { uciMoves =>
+    Future(
+      strategygames.format
+        .UciDump(game.variant.gameLogic, game.actionStrs, fen, game.variant)
+    ).flatMap(_.toEither.toFuture) map { uciMoves =>
       Json
         .obj(
           "type"            -> "gameState",
