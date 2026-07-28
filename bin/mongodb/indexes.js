@@ -49,6 +49,11 @@ db.msg_thread.createIndex({ users: 1, 'maskWith.date': -1 });
 db.notify.createIndex({ notifies: 1, read: 1, createdAt: -1 });
 db.notify.createIndex({ createdAt: 1 }, { expireAfterSeconds: 2592000 });
 
+db.ranking.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+db.ranking.createIndex({ perf: 1, rating: -1 }, { partialFilterExpression: { stable: true } });
+db.ranking.createIndex({ perf: 1, rating: -1, expiresAt: -1 }, { partialFilterExpression: { stable: true } });
+db.ranking.createIndex({ perf: 1, rating: -1 });
+
 db.simul.createIndex({ hostId: 1 }, { partialFilterExpression: { status: 10 } });
 db.simul.createIndex({ hostSeenAt: -1 }, { partialFilterExpression: { status: 10, featurable: true } });
 

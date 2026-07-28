@@ -37,7 +37,7 @@ final class RankingApi(
           "rating"    -> perf.intRating,
           "prog"      -> perf.progress,
           "stable"    -> perf.rankable(PerfType.variantOf(perfType)),
-          "expiresAt" -> DateTime.now.plusDays(31) // change back to 7 when more regular users
+          "expiresAt" -> DateTime.now.plusDays(90) // change back to 7 when more regular users
         ),
         upsert = true
       )
@@ -66,26 +66,43 @@ final class RankingApi(
   private[user] def topPerf(perfId: Perf.ID, nb: Int): Fu[List[User.LightPerf]] =
     PerfType.id2key(perfId) so { perfKey =>
       coll
-        // .find($doc("perf" -> perfId, "stable" -> true)) // change back to stable when more regular users
-        .find($doc("perf" -> perfId))
+        .find($doc("perf" -> perfId, "stable" -> true))
         .sort($doc("rating" -> -1))
         .cursor[Ranking](ReadPreference.secondaryPreferred)
         .list(nb)
-        .flatMap { rankings =>
-          Future
-            .sequence(rankings.map { r =>
-              lightUser(r.user).map {
-                _ map { light =>
-                  User.LightPerf(
-                    user = light,
-                    perfKey = perfKey,
-                    rating = r.rating,
-                    progress = ~r.prog
+        .flatMap { stableRankings =>
+          val missing = nb - stableRankings.size
+          val unstableRankings =
+            if (missing > 0)
+              coll
+                .find(
+                  $doc(
+                    "perf"    -> perfId,
+                    "stable"  -> false,
+                    "_id".$nin(stableRankings.map(_._id))
                   )
+                )
+                .sort($doc("rating" -> -1))
+                .cursor[Ranking](ReadPreference.secondaryPreferred)
+                .list(missing)
+            else fuccess(Nil)
+          unstableRankings.flatMap { unstable =>
+            val rankings = (stableRankings ++ unstable).sortBy(-_.rating).take(nb)
+            Future
+              .sequence(rankings.map { r =>
+                lightUser(r.user).map {
+                  _ map { light =>
+                    User.LightPerf(
+                      user = light,
+                      perfKey = perfKey,
+                      rating = r.rating,
+                      progress = ~r.prog
+                    )
+                  }
                 }
-              }
-            })
-            .dmap(_.flatten)
+              })
+              .dmap(_.flatten)
+          }
         }
     }
 
