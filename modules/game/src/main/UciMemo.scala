@@ -2,7 +2,7 @@ package lila.game
 
 import com.github.blemale.scaffeine.Cache
 
-import strategygames.format.{ FEN, UciDump }
+import strategygames.format.{ FEN, GameToUciStrings, UciDump }
 import strategygames.{ Action, ActionStrs, Player }
 
 final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionContext) {
@@ -45,9 +45,13 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
       @annotation.nowarn("msg=unused") _max: Int,
       fen: Option[FEN]
   ): Fu[ActionStrs] =
-    UciDump(game.variant.gameLogic, game.actionStrs take maxTurns, fen, game.variant)
-      .map(_.toVector.map(_.toVector))
+    GameToUciStrings(game.variant.gameLogic, game.actionStrs take maxTurns, fen, game.variant)
+      .map(actionStrsFromUciString)
       .fold(fufail(_), fuccess(_))
+
+  private def actionStrsFromUciString(uci: String): ActionStrs =
+    if (uci.isEmpty) Vector.empty
+    else uci.split(' ').toVector.map(_.split(',').toVector)
 
   // These API methods will query for the initial fen and then use it.
   def set(game: Game): Fu[Unit] =
