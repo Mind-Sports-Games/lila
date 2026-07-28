@@ -131,7 +131,8 @@ object list {
       ol(users map { l =>
         li(
           lightUserLink(l.user),
-          l.rating
+          l.rating,
+          (!l.stable).option("?")
         )
       })
     )

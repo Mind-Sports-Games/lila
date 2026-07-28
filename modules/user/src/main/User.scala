@@ -190,7 +190,7 @@ object User {
   case class GDPRErase(user: User)  extends AnyVal
   case class Erased(value: Boolean) extends AnyVal
 
-  case class LightPerf(user: LightUser, perfKey: String, rating: Int, progress: Int)
+  case class LightPerf(user: LightUser, perfKey: String, rating: Int, progress: Int, stable: Boolean = true)
   case class LightCount(user: LightUser, count: Int)
 
   case class Emails(current: Option[EmailAddress], previous: Option[NormalizedEmailAddress]) {

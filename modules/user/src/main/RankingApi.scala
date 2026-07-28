@@ -87,7 +87,7 @@ final class RankingApi(
                 .list(missing)
             else fuccess(Nil)
           unstableRankings.flatMap { unstable =>
-            val rankings = (stableRankings ++ unstable).sortBy(-_.rating).take(nb)
+            val rankings = (stableRankings ++ unstable).take(nb)
             Future
               .sequence(rankings.map { r =>
                 lightUser(r.user).map {
@@ -96,7 +96,8 @@ final class RankingApi(
                       user = light,
                       perfKey = perfKey,
                       rating = r.rating,
-                      progress = ~r.prog
+                      progress = ~r.prog,
+                      stable = r.stable
                     )
                   }
                 }
@@ -336,7 +337,7 @@ final class RankingApi(
 
 object RankingApi {
 
-  private case class Ranking(_id: String, rating: Int, prog: Option[Int]) {
+  private case class Ranking(_id: String, rating: Int, prog: Option[Int], stable: Boolean) {
     def user = _id.takeWhile(':' !=)
   }
 }
