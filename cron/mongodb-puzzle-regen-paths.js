@@ -101,11 +101,12 @@ variantKeys.forEach(variantkey => {
       output: { puzzle: { $push: { id: '$_id', vote: '$vote' } } },
     };
 
-    const nbPuzzles = puzzleColl.countDocuments(selector);
+    const hasPuzzles = puzzleColl.countDocuments(selector, { limit: 1 }) > 0;
 
-    if (!nbPuzzles) return [];
+    if (!hasPuzzles) return [];
 
-    const themeMaxPathLength = Math.max(10, Math.min(maxPathLength, Math.round(nbPuzzles / 150)));
+    const nbPuzzles = verbose ? puzzleColl.countDocuments(selector) : 0; //can be slow for large collections, so only do it in verbose mode
+    const themeMaxPathLength = verbose ? Math.max(10, Math.min(maxPathLength, Math.round(nbPuzzles / 150))) : 0;
 
     //Note dynamic bucket ranges existsed priviously for non mixed themes - we might want these back in future
     const bucketStages = [
