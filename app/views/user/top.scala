@@ -31,7 +31,7 @@ object top {
               tr(
                 td(i + 1),
                 td(lightUserLink(u.user)),
-                td(u.rating, (!u.stable).option("?")),
+                td(u.rating),
                 td(ratingProgress(u.progress))
               )
             }

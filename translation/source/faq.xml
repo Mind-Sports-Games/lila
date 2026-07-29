@@ -131,10 +131,11 @@ Another point to note is that, as time passes, the confidence interval will incr
   <string name="ratingLeaderboards">rating leaderboard</string>
   <string name="havePlayedMoreThanThirtyGamesInThatRating">have played at least 30 rated games in a given rating,</string>
   <string name="havePlayedARatedGameAtLeastOneWeekAgo">have played a rated game within the last week for this rating,</string>
-  <string name="havePlayedARatedGameAtLeastOneMonthAgo">have played a rated game within the last month for this rating,</string>
+  <string name="havePlayedARatedGameAtLeastOneYearAgo">have played a rated game within the last year for this rating,</string>
   <string name="ratingDeviationLowerThanXinChessYinVariants">have a rating deviation lower than %1$s, in standard chess, and lower than %2$s in variants,</string>
   <string name="beInTopTen">be in the top 10 in this rating.</string>
   <string name="secondRequirementToStopOldPlayersTrustingLeaderboards">The 2nd requirement is so that players who no longer use their accounts stop populating leaderboards.</string>
+  <string name="leaderboardIncludesStableAndProvisional">Leaderboards rank players purely by rating — whether that rating is stable or provisional makes no difference to where you appear. The only ratings excluded are those with a Glicko-2 deviation of 230 or higher, meaning there isn't yet enough reliable information to trust the number at all.</string>
   <string name="howDoesTheSheildLeaderboardWork">How does the shield leaderboard work?</string>
   <string name="shieldLeaderboardOverview">Every %1$s tournament that has been played in the last 2 months counts towards the Shield Leaderboard. This includes both Variant Shields and Medley Shields. The following points are awarded from each Shield:</string>
   <string name="firstPlaceShield">1st Place: 5 points</string>

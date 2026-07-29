@@ -6,7 +6,6 @@ import reactivemongo.api.bson.{ BSONDocument, Macros }
 
 import lila.db.BSON
 
-import strategygames.variant.Variant
 import reactivemongo.api.bson.BSONDocumentHandler
 
 case class Perf(
@@ -78,7 +77,7 @@ case class Perf(
   def isEmpty  = latest.isEmpty
   def nonEmpty = !isEmpty
 
-  def rankable(variant: Variant) = glicko.rankable(variant)
+  def rankable = glicko.rankable
   def clueless                   = glicko.clueless
   def provisional                = glicko.provisional
   def established                = glicko.established

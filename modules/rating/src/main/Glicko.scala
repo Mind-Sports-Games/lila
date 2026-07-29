@@ -4,8 +4,6 @@ import org.goochjs.glicko2.*
 import org.joda.time.DateTime
 import reactivemongo.api.bson.BSONDocument
 
-import strategygames.variant.Variant
-
 import lila.db.BSON
 
 case class Glicko(
@@ -21,11 +19,7 @@ case class Glicko(
   def intervalMax = (rating + deviation * 2).toInt
   def interval    = intervalMin -> intervalMax
 
-  def rankable(variant: Variant) =
-    deviation <= {
-      if (variant.key == "standard") Glicko.standardRankableDeviation
-      else Glicko.variantRankableDeviation
-    }
+  def rankable             = deviation <= Glicko.standardRankableDeviation
   def provisional          = deviation >= Glicko.provisionalDeviation
   def established          = !provisional
   def establishedIntRating = established.option(intRating)
@@ -69,7 +63,6 @@ case object Glicko {
   val minRating = 600
 
   val minDeviation              = 45
-  val variantRankableDeviation  = 65
   val standardRankableDeviation = 75
   val provisionalDeviation      = 110
   val cluelessDeviation         = 230
