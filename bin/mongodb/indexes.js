@@ -36,6 +36,7 @@ db.puzzle2_round.createIndex({ u: 1, d: -1 }, { partialFilterExpression: { u: { 
 db.puzzle2_puzzle.createIndex({ day: 1 }, { partialFilterExpression: { day: { $exists: true } } });
 db.puzzle2_puzzle.createIndex({ themes: 1, votes: -1 });
 db.puzzle2_puzzle.createIndex({ themes: 1 });
+db.puzzle2_puzzle.createIndex({ l: 1, v: 1, themes: 1 });
 db.puzzle2_puzzle.createIndex({ users: 1 });
 db.puzzle2_puzzle.createIndex({ opening: 1, votes: -1 }, { partialFilterExpression: { opening: { $exists: 1 } } });
 db.puzzle2_puzzle.createIndex({ tagMe: 1 }, { partialFilterExpression: { tagMe: true } });
