@@ -36,8 +36,9 @@ final class RankingApi(
           "perf"      -> perfType.id,
           "rating"    -> perf.intRating,
           "prog"      -> perf.progress,
-          "stable"    -> perf.rankable(PerfType.variantOf(perfType)),
-          "expiresAt" -> DateTime.now.plusDays(31) // change back to 7 when more regular users
+          "stable"    -> perf.rankable,
+          "clueless"  -> perf.clueless,
+          "expiresAt" -> DateTime.now.plusDays(365) // change back to 7 when more regular users
         ),
         upsert = true
       )
@@ -66,8 +67,7 @@ final class RankingApi(
   private[user] def topPerf(perfId: Perf.ID, nb: Int): Fu[List[User.LightPerf]] =
     PerfType.id2key(perfId) so { perfKey =>
       coll
-        // .find($doc("perf" -> perfId, "stable" -> true)) // change back to stable when more regular users
-        .find($doc("perf" -> perfId))
+        .find($doc("perf" -> perfId, "clueless".$ne(true)))
         .sort($doc("rating" -> -1))
         .cursor[Ranking](ReadPreference.secondaryPreferred)
         .list(nb)

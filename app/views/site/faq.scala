@@ -211,10 +211,13 @@ object faq {
             // ),
             // li(beInTopTen())
             li(beInTopTen()),
-            li(havePlayedARatedGameAtLeastOneMonthAgo())
+            li(havePlayedARatedGameAtLeastOneYearAgo())
           ),
           p(
             secondRequirementToStopOldPlayersTrustingLeaderboards()
+          ),
+          p(
+            leaderboardIncludesStableAndProvisional()
           )
         ),
         question(
