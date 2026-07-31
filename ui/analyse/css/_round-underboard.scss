@@ -139,6 +139,19 @@ $col2-panel-height: 240px;
   }
 }
 
+.move-times {
+  position: relative;
+}
+
+.game-duration {
+  position: absolute;
+  bottom: 4px;
+  right: 8px;
+  font-size: 0.8em;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 #acpl-chart-container,
 #movetimes-chart {
   width: 100%;
