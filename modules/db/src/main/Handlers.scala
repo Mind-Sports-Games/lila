@@ -7,7 +7,7 @@ import reactivemongo.api.bson.exceptions.TypeDoesNotMatchException
 import scala.util.{ Failure, Success, Try }
 
 import lila.common.Iso.*
-import lila.common.{ EmailAddress, IpAddress, Iso, NormalizedEmailAddress }
+import lila.common.{ EmailAddress, Freq, IpAddress, Iso, NormalizedEmailAddress }
 import strategygames.{ ByoyomiClock, Clock, GameLogic, Player as PlayerIndex }
 import strategygames.format.FEN as StratFEN
 import strategygames.variant.Variant as StratVariant
@@ -238,5 +238,11 @@ trait Handlers {
   implicit val absoluteUrlHandler: BSONHandler[AbsoluteUrl] = tryHandler[AbsoluteUrl](
     { case str: BSONString => AbsoluteUrl parseTry str.value },
     url => BSONString(url.toString)
+  )
+
+  // scheduled tournament frequency
+  implicit val freqHandler: BSONHandler[Freq] = tryHandler[Freq](
+    { case BSONString(v) => Freq(v).fold[Try[Freq]](Failure(new Exception(s"No such freq: $v")))(Success(_)) },
+    x => BSONString(x.name)
   )
 }

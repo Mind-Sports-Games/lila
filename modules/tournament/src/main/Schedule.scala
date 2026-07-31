@@ -189,72 +189,10 @@ object Schedule {
       )
   }
 
-  sealed abstract class Freq(val id: Int, val importance: Int) extends Ordered[Freq] {
-
-    val name    = toString.toLowerCase
-    val display = toString
-
-    def compare(other: Freq) = Integer.compare(importance, other.importance)
-
-    def isDaily          = this == Schedule.Freq.Daily
-    def isDailyOrBetter  = this >= Schedule.Freq.Daily
-    def isWeeklyOrBetter = this >= Schedule.Freq.Weekly
-  }
-  object Freq {
-    case object Hourly extends Freq(10, 10)
-    case object Daily  extends Freq(20, 20)
-    // case object Eastern  extends Freq(30, 15)
-    case object Weekly               extends Freq(40, 40)
-    case object Weekend              extends Freq(41, 41)
-    case object Monthly              extends Freq(50, 50)
-    case object Shield               extends Freq(51, 51)
-    case object MedleyShield         extends Freq(52, 52)
-    case object Marathon             extends Freq(60, 60)
-    case object ExperimentalMarathon extends Freq(61, 55) { // for DB BC
-      override val display = "Experimental Marathon"
-    }
-    case object MedleyMarathon extends Freq(65, 70) {
-      override val display = "Medley Marathon"
-    }
-    case object Yearly       extends Freq(70, 70)
-    case object Annual       extends Freq(75, 80)
-    case object Introductory extends Freq(80, 65)
-    case object Unique       extends Freq(90, 59)
-    case object MSOWarmUp    extends Freq(120, 41) {
-      override val display = "MSO Warm-Up"
-    }
-    case object MSO21 extends Freq(121, 61) {
-      override val display = "MSO 2021"
-    }
-    case object MSOGP extends Freq(122, 75) {
-      override val display = "MSO Grand Prix"
-    }
-
-    val all: List[Freq] = List(
-      Hourly,
-      Daily,
-      // Eastern,
-      Weekly,
-      Weekend,
-      Monthly,
-      Shield,
-      MedleyShield,
-      Marathon,
-      ExperimentalMarathon,
-      MedleyMarathon,
-      Yearly,
-      Annual,
-      Introductory,
-      Unique,
-      MSOWarmUp,
-      MSO21,
-      MSOGP
-    )
-    val shields: List[Freq] = List(Shield, MedleyShield)
-
-    def apply(name: String) = all.find(_.name == name)
-    def byId(id: Int)       = all.find(_.id == id)
-  }
+  // Freq now lives in lila.common so it can be shared with the swiss module.
+  // These aliases keep all existing `Schedule.Freq...` references working unchanged.
+  type Freq = lila.common.Freq
+  val Freq = lila.common.Freq
 
   sealed abstract class Speed(val id: Int) {
     val name = s"${toString} Chess"

@@ -9,6 +9,7 @@ import strategygames.variant.Variant
 import org.joda.time.DateTime
 import scala.concurrent.duration.*
 
+import lila.common.Freq
 import lila.hub.LightTeam.TeamID
 import lila.rating.PerfType
 import lila.user.User
@@ -34,7 +35,8 @@ case class Swiss(
     trophy1st: Option[String] = None,
     trophy2nd: Option[String] = None,
     trophy3rd: Option[String] = None,
-    trophyExpiryDays: Option[Int] = None
+    trophyExpiryDays: Option[Int] = None,
+    schedule: Option[Swiss.Schedule] = None
 ) {
   def id = _id
 
@@ -50,6 +52,8 @@ case class Swiss(
         DateTime.now
           .isAfter(startsAt.minusMinutes(mbs))
       )
+  def autoAnalysable = schedule.map(_.freq).exists(Freq.autoAnalyse.contains)
+
   def isHalfway = round.value == (settings.nbRounds + 1) / 2
   def isMedley  = settings.medleyVariants.nonEmpty
 
@@ -141,6 +145,8 @@ case class Swiss(
 object Swiss {
 
   val maxPlayers = 4000
+
+  case class Schedule(freq: Freq)
 
   case class Id(value: String) extends AnyVal with StringValue
   case class Round(value: Int) extends AnyVal with IntValue

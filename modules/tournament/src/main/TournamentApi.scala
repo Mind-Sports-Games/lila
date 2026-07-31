@@ -50,6 +50,7 @@ final class TournamentApi(
     verify: Condition.Verify,
     duelStore: DuelStore,
     pause: Pause,
+    autoAnalyse: lila.game.AutoAnalyseRequester,
     cacheApi: lila.memo.CacheApi,
     lightUserApi: lila.user.LightUserApi,
     proxyRepo: lila.round.GameProxyRepo
@@ -577,6 +578,7 @@ final class TournamentApi(
             socket.reload(tour.id)
             updateTournamentStanding(tour)
             withdrawNonMover(game)
+            if (tour.autoAnalysable) autoAnalyse(game)
           }
       }
     }

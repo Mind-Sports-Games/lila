@@ -36,6 +36,7 @@ final class SwissApi(
     roundSocket: lila.round.RoundSocket,
     gameRepo: lila.game.GameRepo,
     onStart: Game.ID => Unit,
+    autoAnalyse: lila.game.AutoAnalyseRequester,
     idGenerator: lila.game.IdGenerator
 )(implicit
     ec: scala.concurrent.ExecutionContext,
@@ -703,6 +704,7 @@ final class SwissApi(
             if (result.nModified == 0) fuccess(false) // dedup
             else
               {
+                if (swiss.autoAnalysable) autoAnalyse(game.game)
                 if (swiss.nbOngoing > 0) colls.swiss.update.one($id(swiss.id), $inc("nbOngoing" -> -1))
                 else
                   fuccess {

@@ -63,7 +63,7 @@ final class TournamentShieldApi(
         tournamentRepo.coll
           .find(
             $doc(
-              "schedule.freq" -> scheduleFreqHandler.writeTry(Schedule.Freq.Shield).get,
+              "schedule.freq" -> freqHandler.writeTry(Schedule.Freq.Shield).get,
               "status"        -> statusBSONHandler.writeTry(Status.Finished).get
             )
           )
