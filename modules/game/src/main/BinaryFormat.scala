@@ -68,16 +68,21 @@ object BinaryFormat {
     def readSide(start: Centis, ba: ByteArray, flagged: Boolean) =
       fischerClockHistory.readSide(start, ba, flagged)
 
-    def read(delay: Centis, start: Centis, bw: ByteArray, bb: ByteArray, flagged: Option[PlayerIndex]) =
+    def read(delay: Centis, start: Centis, bw: ByteArray, bb: ByteArray, flagged: Option[PlayerIndex], isSimpleDelay: Boolean = false) =
       Try {
         // `start` is the encoding reference (= config.limit); `initial` is the actual starting clock
-        // time used for forward reconstruction. They differ only for 0-limit delay clocks (e.g. 0 d+10).
-        val initial = if (start == Centis(0)) delay.max(Centis(300)) else start
+        // time used for forward reconstruction.
+        // For SimpleDelay, Timer.remaining = baseLimit + delay (willAdd = delay always), so initial = limit + delay.
+        // For Bronstein, Timer.remaining = baseLimit (willAdd = 0), so initial = limit.
+        val initial = if (start == Centis(0)) delay.atLeast(Centis(300))
+                      else if (isSimpleDelay) start + delay
+                      else start
         DelayClockHistory(
           p1ActionTimes = readSide(start, bw, flagged.contains(P1)),
           p2ActionTimes = readSide(start, bb, flagged.contains(P2)),
           delay = delay,
-          initial = initial
+          initial = initial,
+          isSimpleDelay = isSimpleDelay
         )
       }.fold(
         e => { logger.warn(s"Exception decoding history", e); none },

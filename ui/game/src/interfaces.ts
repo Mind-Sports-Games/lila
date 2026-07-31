@@ -184,6 +184,10 @@ export interface Clock {
   running: boolean;
   initial: number;
   increment: number;
+  delay?: number;
+  delayType?: string;
+  byoyomi?: number;
+  periods?: number;
 }
 export interface CorrespondenceClock {
   daysPerTurn: number;
