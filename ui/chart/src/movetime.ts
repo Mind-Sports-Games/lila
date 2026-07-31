@@ -96,11 +96,24 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   let lastBgKey: 'p1' | 'p2' | undefined;
   let bgTurnCentis = 0;
   let bgTurnNotations: string[] = [];
+  let bgRollSan = '-'; // san from roll node, used as fallback label when no checker moves (e.g. dance)
   // For backgammon: use a per-turn index as x so doubles (4 checkers) don't shift subsequent bars.
   let bgTurnX = firstPly;
   const bgPlyToTurnX = new Map<number, number>(); // any ply → its turn's x (for selectPly)
-  const bgTurnXToPly = new Map<number, number>(); // turn x → last-checker ply (for click navigation)
+  const bgTurnXToPly = new Map<number, number>(); // turn x → endturn/last-checker ply (for click navigation)
   const bgLabelByX = new Map<number, string>(); // turn x → tooltip label
+  // For delay clocks: track remaining time per-turn on the frontend so the tooltip and clock line
+  // are both correct (delay is applied once per full backgammon turn, not per individual action).
+  const bgDelayCentis = (data.clock?.delay ?? 0) * 100;
+  const bgInitialCentis = (data.clock?.initial ?? 0) * 100;
+  const bgIsDelayType = !!(data.clock?.delayType && bgInitialCentis > 0);
+  const bgCorrectRemaining: Record<'p1' | 'p2', number> = { p1: bgInitialCentis, p2: bgInitialCentis };
+  // For byoyomi clocks: ByoyomiClockHistory.plyTimes adds grace=increment to every non-endturn
+  // action pair (roll, checker moves) in main time. Track count to subtract the inflation.
+  const bgIncrementCentis = (data.clock?.increment ?? 0) * 100;
+  const bgByoyomiCentis = (data.clock?.byoyomi ?? 0) * 100;
+  const bgIsByoyomiIncrement = isBackgammon && bgByoyomiCentis > 0 && bgIncrementCentis > 0;
+  let bgTurnNonEndturnCount = 0;
 
   const flushBgBlur = () => {
     if (!bgBlurPending) return;
@@ -129,11 +142,37 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     const san = node ? (node.san === 'NOSAN' ? (node.uci ?? '-') : (node.san ?? '-')) : '-';
 
     if (isBackgammon) {
-      // Handle endturn before isNewTurn: endturn's playedPlayerIndex may differ from the checker
-      // player, which would incorrectly trigger a new turn and shift bgTurnX prematurely.
+      // Handle endturn before isNewTurn: endturn's playedPlayerIndex differs from the checker player,
+      // which would incorrectly trigger a new turn and shift bgTurnX prematurely.
+      // The bar is emitted HERE (not at last-checker) so that the time spent waiting before pressing
+      // end-turn is included in bgTurnCentis and shown in the chart.
       if (node?.uci === 'endturn') {
         bgTurnCentis += centis;
         bgPlyToTurnX.set(node.ply, bgTurnX);
+        const clock = node?.clock;
+        // Subtract the per-action grace inflation added by ByoyomiClockHistory.plyTimes in main time.
+        // In byoyomi phase (clock === bgByoyomiCentis), cGrace=0 so plyCentis are already correct.
+        const isInByoyomi = bgIsByoyomiIncrement && clock === bgByoyomiCentis;
+        const turnCentis =
+          bgIsByoyomiIncrement && !isInByoyomi
+            ? Math.max(0, bgTurnCentis - bgTurnNonEndturnCount * bgIncrementCentis)
+            : bgTurnCentis;
+        const y = Math.pow(Math.log(0.005 * Math.min(turnCentis, 12e4) + 3), 2) - logC;
+        const movePoint: MovePoint = { x: bgTurnX, y: isP1 ? y : -y };
+        bgTurnXToPly.set(bgTurnX, node.ply);
+        if (bgBlurPending) bgBlurPending.point = movePoint;
+        const moveSan = bgTurnNotations.length > 0 ? BackgammonFamily.combinedNotation(bgTurnNotations) : bgRollSan;
+        const seconds = (turnCentis / 100).toFixed(turnCentis >= 200 ? 1 : 2);
+        if (bgIsDelayType) {
+          const consumed = Math.max(0, turnCentis - bgDelayCentis);
+          bgCorrectRemaining[key] = Math.max(0, bgCorrectRemaining[key] - consumed);
+        }
+        const displayClock = bgIsDelayType ? bgCorrectRemaining[key] : clock;
+        let label = turn + dots + ' ' + moveSan + '\n' + trans.plural('nbSeconds', Number(seconds));
+        if (displayClock) label += '\n' + formatClock(displayClock);
+        bgLabelByX.set(bgTurnX, label);
+        moveSeries[key].push(movePoint);
+        if (displayClock) totalSeries[key].push({ x: bgTurnX, y: isP1 ? displayClock : -displayClock });
         return;
       }
 
@@ -143,10 +182,13 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
         lastBgKey = key;
         bgTurnX++;
         bgTurnCentis = 0;
+        bgTurnNonEndturnCount = 0;
         bgTurnNotations = [];
+        bgRollSan = san; // save the roll's notation for use in the endturn label (e.g. for dances with no checkers)
         bgBlurPending = blurs[isP1 ? 1 : 0].shift() === '1' ? { key, point: { x: bgTurnX, y: 0 } } : undefined;
       }
       bgTurnCentis += centis;
+      bgTurnNonEndturnCount++;
       bgPlyToTurnX.set(node ? node.ply : ply, bgTurnX);
 
       // Roll node (isNewTurn) contributes time but not move notation; checker moves accumulate notation
@@ -161,23 +203,34 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
         );
       }
 
-      // Emit only on the last checker move of the turn (next node is endTurn or player changes)
+      // For turns with an explicit endturn node, the bar is emitted in the endturn branch above.
+      // Here we only emit for turns that end WITHOUT an explicit endturn (e.g. bearing off the last
+      // piece auto-ends the turn, or the game ends mid-turn) — detected by a player change in nextNode.
       const nextNode = tree[i + 2];
-      const isLastChecker = !nextNode || nextNode.uci === 'endturn' || nextNode.playedPlayerIndex !== key;
+      const isLastChecker = !nextNode || nextNode.playedPlayerIndex !== key;
       if (!isLastChecker) return;
 
-      const y = Math.pow(Math.log(0.005 * Math.min(bgTurnCentis, 12e4) + 3), 2) - logC;
+      const clock = node?.clock;
+      const isInByoyomi = bgIsByoyomiIncrement && clock === bgByoyomiCentis;
+      const turnCentis =
+        bgIsByoyomiIncrement && !isInByoyomi
+          ? Math.max(0, bgTurnCentis - bgTurnNonEndturnCount * bgIncrementCentis)
+          : bgTurnCentis;
+      const y = Math.pow(Math.log(0.005 * Math.min(turnCentis, 12e4) + 3), 2) - logC;
       const movePoint: MovePoint = { x: bgTurnX, y: isP1 ? y : -y };
       bgTurnXToPly.set(bgTurnX, node ? node.ply : ply);
       if (bgBlurPending) bgBlurPending.point = movePoint;
 
       const moveSan = bgTurnNotations.length > 0 ? BackgammonFamily.combinedNotation(bgTurnNotations) : san;
-      const seconds = (bgTurnCentis / 100).toFixed(bgTurnCentis >= 200 ? 1 : 2);
-      bgLabelByX.set(bgTurnX, turn + dots + ' ' + moveSan + '\n' + trans.plural('nbSeconds', Number(seconds)));
+      const seconds = (turnCentis / 100).toFixed(turnCentis >= 200 ? 1 : 2);
+      if (bgIsDelayType)
+        bgCorrectRemaining[key] = Math.max(0, bgCorrectRemaining[key] - Math.max(0, turnCentis - bgDelayCentis));
+      const displayClock = bgIsDelayType ? bgCorrectRemaining[key] : clock;
+      let label = turn + dots + ' ' + moveSan + '\n' + trans.plural('nbSeconds', Number(seconds));
+      if (displayClock) label += '\n' + formatClock(displayClock);
+      bgLabelByX.set(bgTurnX, label);
       moveSeries[key].push(movePoint);
-
-      const clock = node?.clock;
-      if (clock) totalSeries[key].push({ x: bgTurnX, y: isP1 ? clock : -clock });
+      if (displayClock) totalSeries[key].push({ x: bgTurnX, y: isP1 ? displayClock : -displayClock });
       return;
     }
 
@@ -239,13 +292,14 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     type: 'line' as const,
     data: totalSeries[key].map(p => ({ x: p.x, y: p.y / maxTotal })),
     backgroundColor: key,
-    borderColor: blueLineColor,
-    borderWidth: 1.5,
+    borderColor: 'rgba(56,147,232,0.5)',
+    borderWidth: 1,
+    borderDash: [4, 4],
     pointHitRadius: 200,
     pointHoverBorderColor: blueLineColor,
     pointRadius: 0,
     pointHoverRadius: 5,
-    fill: { target: 'origin', above: 'rgba(153,153,153,.3)', below: 'rgba(0,0,0,0.3)' },
+    fill: false,
     order: 1,
     datalabels: { display: false },
   }));
