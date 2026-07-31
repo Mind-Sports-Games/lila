@@ -106,6 +106,7 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
   }
 
   function showBgAnalysing() {
+    bgChartInitiated = false;
     $panels
       .filter('.computer-analysis')
       .html(`<div id="acpl-chart-container"><canvas id="acpl-chart"></canvas></div>${chartLoader()}`);
@@ -116,9 +117,6 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
     bgChartInitiated = true;
     const panel = $panels.filter('.computer-analysis')[0];
     if (!panel) return;
-    // Clear server-rendered HTML (e.g. "Request analysis" button) immediately so it
-    // never flashes while the fetch is pending. bgWinChart fills the panel on completion.
-    if (!panel.querySelector('#acpl-chart-container')) panel.innerHTML = '';
     bgWinChart(ctrl, panel as HTMLElement);
   }
 

@@ -1,7 +1,7 @@
 import AnalyseCtrl from './ctrl';
 import { BgCandidateUI } from './interfaces';
 import { GameFamily as BackgammonFamily } from 'stratops/variants/backgammon/GameFamily';
-import { clearCandidatePreview } from './backgammonAnalysis';
+import { clearCandidatePreview, scheduleShowPlayed, reapplyFenOverride } from './backgammonAnalysis';
 
 // NOTE(bg-analysis): reuse the advantage chart (ui/chart/src/acpl.ts via chart.game module)
 // for backgammon. It reads `data.treeParts[].eval.cp`, maps it through a sigmoid to a
@@ -274,18 +274,30 @@ function buildCandidateMap(
     } as BgCandidateUI));
 
   // Pre-pass: collect the turn-start FEN and ply (first node of each turn, before any checker moves).
+  // The dice-roll node is the first node of each player's run but may have no fen of its own
+  // (rolling dice doesn't change the board position, only the dice state).  In that case,
+  // the endturn node that precedes it already carries the rolled dice for the coming turn,
+  // so we fall back to prevFen (the last non-undefined FEN seen before this node).
   const turnStartByIdx = new Map<number, { fen: string; ply: number }>();
   {
     let preTurnIdx = -1;
     let prePrevPi: string | undefined;
+    let prevFen: string = src[0]?.fen ?? '';
     for (let i = 1; i < src.length; i++) {
       const n = src[i];
+      const priorFen = prevFen;           // FEN of the previous non-undefined node, captured before this node
+      if (n.fen) prevFen = n.fen;        // update for subsequent nodes, including endturn
       if (n.uci === 'endturn') continue;
       const pi = n.playedPlayerIndex;
       if (pi !== undefined && pi !== prePrevPi) {
         preTurnIdx++;
         prePrevPi = pi;
-        if (n.fen) turnStartByIdx.set(preTurnIdx, { fen: n.fen, ply: n.ply });
+        // The dice-roll node is the first node of each player's run.  It may have no fen
+        // of its own (rolling dice doesn't move pieces).  In that case, the endturn node
+        // that immediately precedes it already carries the rolled dice in its FEN — that
+        // FEN is captured in priorFen and is the correct pre-move turn-start state.
+        const startFen = n.fen ?? priorFen;
+        if (startFen) turnStartByIdx.set(preTurnIdx, { fen: startFen, ply: n.ply });
       }
     }
   }
@@ -400,6 +412,10 @@ export default function bgWinChart(ctrl: AnalyseCtrl, panel: HTMLElement): void 
   // Sync category-lock state from the chart into the move tree for node highlighting.
   // Chart nodes have real symbols ('??', '!!') but tree nodes use glyph ids — map here.
   const symbolToGlyphId: Record<string, number> = { '??': 4, '?': 2, '!!': 3, '+': 51, '-': 52, d: 99 };
+  // Incremented whenever analysis.chart.click fires (whether from acpl's christmasTree jQuery
+  // handler or from our own fallback below). Used to detect whether christmasTree already
+  // handled a given advice-summary click so we don't emit the pubsub events twice.
+  let bgClickGeneration = 0;
   playstrategy.pubsub.on('analysis.chart.category.select', (symbol: string | null) => {
     ctrl.bgHighlightGlyphId = symbol ? symbolToGlyphId[symbol] : undefined;
     ctrl.bgHighlightSymbol = symbol || undefined;
@@ -407,12 +423,23 @@ export default function bgWinChart(ctrl: AnalyseCtrl, panel: HTMLElement): void 
     clearCandidatePreview(ctrl);
     ctrl.redraw();
   });
-  // When the user navigates via an advice-summary or chart click, clear any active
-  // candidate preview. This listener fires after ctrl.ts's analysis.chart.click handler
-  // (which calls ctrl.redraw()), but before the browser paints — chessground's debounced
-  // rAF fires with autoShapes=[] and lastCandidatePly=-1 forces the ply-change guard on
-  // the next Snabbdom render, even if navigation lands on the same ply as the preview.
-  playstrategy.pubsub.on('analysis.chart.click', () => clearCandidatePreview(ctrl));
+  // Fired after ctrl.ts's analysis.chart.click handler (registration order: ctrl first,
+  // bgWinChart second). ctrl.ts has already called jumpToMain(lastCheckerPly) + redraw()
+  // synchronously. Since redraw() is a synchronous Snabbdom patch, both renders are in
+  // the same JS task — the browser only paints once at the end, no flash.
+  // We do NOT navigate to turnStartPly here: ctrl.node.ply must stay at lastCheckerPly
+  // so that analysis.change fires with that ply and state.currentPly (in acpl.ts) is
+  // set past the glyph node, allowing the next symbol click to cycle to the next match.
+  // renderCandidates auto-show overrides the board FEN to the turn-start position.
+  playstrategy.pubsub.on('analysis.chart.click', () => {
+    bgClickGeneration++;
+    clearCandidatePreview(ctrl);
+    const sym = ctrl.bgHighlightSymbol;
+    if (sym === '??' || sym === '?' || sym === '!!') {
+      scheduleShowPlayed();
+      ctrl.redraw();
+    }
+  });
   // Force a redraw on orientation/resize changes so isCol1() recomputes and the
   // detail-mode toggle button appears/disappears correctly on portrait↔landscape rotation.
   window.addEventListener('resize', () => ctrl.redraw());
@@ -420,11 +447,51 @@ export default function bgWinChart(ctrl: AnalyseCtrl, panel: HTMLElement): void 
   // Capture player index when a symbol is clicked so Snabbdom can re-apply the locked
   // class after a mode switch recreates the DOM. Registered before acpl's jQuery handler
   // so it fires first and ctrl is updated before the pubsub-triggered redraw.
+  // Also provides a fallback navigation path when acpl's christmasTree jQuery handler was
+  // never registered (e.g. page loaded on move-times tab and the hidden canvas prevented
+  // Chart.js from initialising): we emit the pubsub events ourselves unless bgClickGeneration
+  // already changed during this click event (meaning christmasTree handled it).
   document.addEventListener('click', (e: MouseEvent) => {
     const el = (e.target as HTMLElement).closest?.('[data-symbol][data-playerindex]');
-    if (el?.closest?.('div.advice-summary')) {
-      ctrl.bgHighlightPlayerIndex = el.getAttribute('data-playerindex') as PlayerIndex | undefined ?? undefined;
-    }
+    if (!el?.closest?.('div.advice-summary')) return;
+    const symbol = el.getAttribute('data-symbol') ?? undefined;
+    const pi = (el.getAttribute('data-playerindex') ?? undefined) as PlayerIndex | undefined;
+    ctrl.bgHighlightPlayerIndex = pi;
+    if (!symbol || !pi) return;
+    // Snapshot bgClickGeneration before jQuery's handlers run. christmasTree's jQuery
+    // handler fires synchronously after this native listener (jQuery registers its own
+    // native document listener which follows ours in registration order). If christmasTree
+    // emits analysis.chart.click, bgClickGeneration increments synchronously. The
+    // setTimeout(0) runs after all synchronous click handlers, so we can check.
+    const genSnapshot = bgClickGeneration;
+    setTimeout(() => {
+      if (bgClickGeneration !== genSnapshot) return; // christmasTree already navigated
+      // Find annotated roll nodes (from annotateTreeNodes) with matching glyph ID.
+      // annotateTreeNodes annotates roll nodes (not decision nodes) with error/luck glyphs,
+      // but bgTurnCandidates maps roll-node plies to candidates too, so navigating to the
+      // roll ply shows the same candidate panel as navigating to the decision ply would.
+      const glyphIds =
+        symbol === 'luck'
+          ? [51, 52] // lucky (+) and unlucky (-)
+          : symbolToGlyphId[symbol] !== undefined
+            ? [symbolToGlyphId[symbol]]
+            : [];
+      if (!glyphIds.length) return; // 'd' (decisions): id 99 not on tree nodes — skip
+      const plies: number[] = [];
+      for (const n of ctrl.data.treeParts) {
+        if (n.glyphs?.some(g => glyphIds.includes(g.id)) && n.playedPlayerIndex === pi) {
+          plies.push(n.ply);
+        }
+      }
+      if (!plies.length) return;
+      plies.sort((a, b) => a - b);
+      const currentPly = ctrl.node.ply;
+      const ply = plies.find(p => p > currentPly) ?? plies[0];
+      if (ply !== undefined) {
+        playstrategy.pubsub.emit('analysis.chart.category.select', symbol);
+        playstrategy.pubsub.emit('analysis.chart.click', ply);
+      }
+    }, 0);
   });
 
   fetch(`/${ctrl.data.game.id}/backgammon-rating.json`, { headers: { Accept: 'application/json' } })
@@ -440,6 +507,26 @@ export default function bgWinChart(ctrl: AnalyseCtrl, panel: HTMLElement): void 
       ctrl.bgTurnStartFen = fenMap;
       ctrl.bgTurnStartPly = plyMap;
       ctrl.bgOriginalNodeIdByPly = new Map(ctrl.data.treeParts.map(n => [n.ply, n.id]));
+
+      // Chain onto the existing onAfterAddDests (set in backgammon.ts for no-moves detection).
+      // addDests() calls showGround() then this hook — we use it to re-apply the pre-move FEN
+      // and arrows when an async dests response resets the board after a symbol click.
+      const prevOnAfterAddDests = ctrl.controlConfig.onAfterAddDests;
+      ctrl.controlConfig.onAfterAddDests = () => {
+        prevOnAfterAddDests?.();
+        reapplyFenOverride(ctrl);
+      };
+
+      // Hook ctrl.setAutoShapes so ceval's continuous evaluation arrows can't overwrite the
+      // candidate preview.  ctrl.setAutoShapes() is called from showGround() (inside addDests)
+      // AND from onNewCeval (the ceval background worker) — both fire asynchronously AFTER
+      // reapplyFenOverride restores the candidate arrows, so without this hook they race and
+      // erase the candidate shapes.  When a preview is active we re-apply it instead of
+      // rendering eval arrows; once the preview is cleared the original behaviour is restored.
+      const origSetAutoShapes = ctrl.setAutoShapes.bind(ctrl);
+      ctrl.setAutoShapes = () => {
+        if (!reapplyFenOverride(ctrl)) origSetAutoShapes();
+      };
 
       // per-player event counts derived from turn values
       const cnt = {

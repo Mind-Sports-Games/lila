@@ -181,6 +181,102 @@ function parseGnubgPlay(play: string, isP1: boolean): CheckerMove[] {
 let expandedCandidateRank = -1;
 let lastCandidatePly = -1;
 let pendingArrows: CgDrawShape[] = [];
+let showPlayedOnNextRender = false;
+// Stores the FEN we're currently overriding the board with (pre-move position) so it can
+// be re-applied if showGround() resets it (e.g. async dests response via addDests).
+let activeFenOverride: { fen: string; dice: unknown[] } | null = null;
+let activeFenOverridePly = -1;
+
+export function scheduleShowPlayed(): void {
+  showPlayedOnNextRender = true;
+}
+
+// Re-apply the board FEN override and arrows.
+// Returns true if the override was active and applied (caller should skip its own setAutoShapes).
+// Called from onAfterAddDests (fires after showGround in addDests) and from the ctrl.setAutoShapes
+// hook in bgWinChart.ts, which intercepts ceval's continuous setAutoShapes calls so they can't
+// overwrite the candidate arrows.
+export function reapplyFenOverride(ctrl: AnalyseCtrl): boolean {
+  if (!activeFenOverride || ctrl.node.ply !== activeFenOverridePly || pendingArrows.length === 0) {
+    activeFenOverride = null;
+    return false;
+  }
+  ctrl.chessground.set({ fen: activeFenOverride.fen, dice: activeFenOverride.dice as never });
+  ctrl.chessground.setAutoShapes(pendingArrows);
+  // showGround() calls cg.redrawAll() synchronously (needsFullRedrawAfterGround=true for
+  // backgammon) BEFORE calling setAutoShapes, drawing shapes against POST-MOVE state.pieces.
+  // We counter this by calling redrawAll() immediately after restoring PRE-MOVE + shapes.
+  ctrl.chessground.redrawAll();
+  return true;
+}
+
+// Build chessground arrow/circle shapes for a candidate's play string.
+// ctrl.chessground.set({fen}) must be called before this so state.pieces is current.
+function buildArrowShapes(ctrl: AnalyseCtrl, c: BgCandidateUI): CgDrawShape[] {
+  if (!c.play) return [];
+  const myPlayerIndex = c.isP1 ? 'p1' : 'p2';
+  // Why "19/20 19/24" produces two visually distinct arrows but "19/20(3)" cannot:
+  //
+  // "19/20 19/24" — two tokens, same origin, DIFFERENT destinations.
+  //   originUsedCount tracks pieces already gone from 19: the 2nd token gets
+  //   stackOffset:-1 so its tail starts one step lower in the stack. The two arrows
+  //   diverge toward different squares, so they look distinct even with the same
+  //   horizontal origin column.
+  //
+  // "19/20(3)" — one token with count=3, SAME origin AND destination.
+  //   Three arrows orig→dest at stackOffset 0/-1/-2 would all converge to the
+  //   exact same tip pixel, producing three overlapping lines that look like one.
+  //   We draw 1 arrow + blue circles for the extra pieces instead.
+  const originUsedCount = new Map<CgKey, number>();
+  const destArrivedCount = new Map<CgKey, number>();
+  return parseGnubgPlay(c.play, c.isP1).flatMap((m): CgDrawShape[] => {
+    if (m.from !== null && m.to !== null) {
+      const fromKey = bgPointToKey(m.from);
+      const destKey = bgPointToKey(m.to);
+      const alreadyLeft = originUsedCount.get(fromKey) ?? 0;
+      originUsedCount.set(fromKey, alreadyLeft + m.count);
+      const arrivedSoFar = destArrivedCount.get(destKey) ?? 0;
+      destArrivedCount.set(destKey, arrivedSoFar + m.count);
+      // destStackOffset: +1 if destination has own pieces (tip lands on top of the stack,
+      // since pos2px returns the topmost existing piece's cy, not the landing position),
+      // +arrivedSoFar for additional arrows to the same destination this move.
+      const destPiece = ctrl.chessground.state.pieces.get(destKey);
+      const destIsOwn = destPiece?.playerIndex === myPlayerIndex;
+      const destOffset = (destIsOwn ? 1 : 0) + arrivedSoFar;
+      const shapes: CgDrawShape[] = [{
+        orig: fromKey, dest: destKey, brush: 'blue',
+        ...(alreadyLeft > 0 ? { stackOffset: -alreadyLeft } : {}),
+        ...(destOffset > 0 ? { destStackOffset: destOffset } : {}),
+      }];
+      for (let i = 1; i < m.count; i++)
+        shapes.push({ orig: fromKey, brush: 'blue', stackOffset: -(alreadyLeft + i) });
+      return shapes;
+    }
+    if (m.from === null && m.to !== null) {
+      // Bar entry: red circle(s) at landing point.
+      // +1 if destination has own pieces, same reasoning as arrow tips above.
+      const destKey = bgPointToKey(m.to);
+      const destPiece = ctrl.chessground.state.pieces.get(destKey);
+      const base = destPiece?.playerIndex === myPlayerIndex ? 1 : 0;
+      return Array.from({ length: m.count }, (_, i) => ({
+        orig: destKey, brush: 'red', ...(base + i > 0 ? { stackOffset: base + i } : {}),
+      }));
+    }
+    if (m.from !== null && m.to === null) {
+      // Bearing off: green circle(s) at origin, downward through the stack.
+      // Use originUsedCount so a bearing off from the same point as an arrow
+      // (e.g. "21/off 21/23") doesn't overlap with it.
+      const fromKey = bgPointToKey(m.from);
+      const alreadyLeft = originUsedCount.get(fromKey) ?? 0;
+      originUsedCount.set(fromKey, alreadyLeft + m.count);
+      return Array.from({ length: m.count }, (_, i) => ({
+        orig: fromKey, brush: 'green',
+        ...(alreadyLeft + i > 0 ? { stackOffset: -(alreadyLeft + i) } : {}),
+      }));
+    }
+    return [];
+  });
+}
 
 function renderCandidates(ctrl: AnalyseCtrl): VNode | undefined {
   const ply = ctrl.node.ply;
@@ -190,10 +286,16 @@ function renderCandidates(ctrl: AnalyseCtrl): VNode | undefined {
     // Start with nothing selected — played row is always visually expanded via c.played.
     expandedCandidateRank = -1;
     pendingArrows = [];
+    activeFenOverride = null;
     // Clear arrows immediately on ply change; without this, if the new ply has no
     // candidates the early return below fires before setAutoShapes([]) is ever called.
     ctrl.chessground?.setAutoShapes([]);
   }
+
+  // Consume the auto-show flag here, before any early returns, so it never leaks
+  // to a subsequent ply's render if this ply has no candidates or is a variation node.
+  const shouldAutoShow = showPlayedOnNextRender;
+  showPlayedOnNextRender = false;
 
   // Only show candidates when the current node is part of the original game — not in
   // user-added variations (even if a variation was promoted to mainline by the user).
@@ -207,6 +309,27 @@ function renderCandidates(ctrl: AnalyseCtrl): VNode | undefined {
       h('div.bg-candidates__header', 'Top moves'),
       h('div.bg-candidates__no-play', 'No play'),
     ]);
+  }
+
+  // Auto-show the played move's arrows when navigation was triggered by a symbol click
+  // (blunder/mistake/perfect play), so the board immediately shows what was played.
+  if (shouldAutoShow) {
+    const played = candidates.find(c => c.played);
+    if (played) {
+      const turnStartFen = ctrl.bgTurnStartFen?.get(ply);
+      const targetFen = turnStartFen ?? ctrl.node.fen;
+      const dice = stratUtils.backgammon.readDice(targetFen, ctrl.data.game.variant.key);
+      activeFenOverride = { fen: targetFen, dice };
+      activeFenOverridePly = ply;
+      ctrl.chessground.set({ fen: targetFen, dice });
+      pendingArrows = buildArrowShapes(ctrl, played);
+      ctrl.chessground.setAutoShapes(pendingArrows);
+      // Force an immediate synchronous draw so shapes are positioned against PRE-MOVE
+      // state.pieces before any subsequent redrawAll() (from needsFullRedrawAfterGround) can
+      // render them against POST-MOVE pieces.
+      ctrl.chessground.redrawAll();
+      ctrl.controlConfig.dismissBoardOverlay?.();
+    }
   }
 
   ctrl.chessground.setAutoShapes(pendingArrows);
@@ -226,6 +349,7 @@ function renderCandidates(ctrl: AnalyseCtrl): VNode | undefined {
         if (wasSelected) {
           // Deselecting: navigate to the turn-start node so the board shows the dice-rolled
           // position and all subsequent navigation works from the correct tree position.
+          activeFenOverride = null;
           pendingArrows = [];
           ctrl.chessground.setAutoShapes([]);
           const turnStartPly = ctrl.bgTurnStartPly?.get(ply);
@@ -248,77 +372,19 @@ function renderCandidates(ctrl: AnalyseCtrl): VNode | undefined {
           lastCandidatePly = turnStartPly;
           ctrl.jumpToMain(turnStartPly);
         }
-        // Set FEN so state.pieces reflects the turn-start position when we build shapes —
-        // bar-entry circles need to know if the destination already has own pieces (stackOffset=1).
+        // Set FEN so state.pieces reflects the turn-start position when we build shapes.
+        // Also store it in activeFenOverride so reapplyFenOverride() can re-apply it
+        // after addDests() resets the board (addDests fires async, after redrawAll's rAF,
+        // so without this the shapes render against the post-move pieces, off by 1).
         const turnStartFen = ctrl.bgTurnStartFen?.get(ply);
         const targetFen = turnStartFen ?? ctrl.node.fen;
         const dice = stratUtils.backgammon.readDice(targetFen, ctrl.data.game.variant.key);
+        activeFenOverride = { fen: targetFen, dice };
+        activeFenOverridePly = ctrl.node.ply;
         ctrl.chessground.set({ fen: targetFen, dice });
-        const myPlayerIndex = c.isP1 ? 'p1' : 'p2';
-        // Why "19/20 19/24" produces two visually distinct arrows but "19/20(3)" cannot:
-        //
-        // "19/20 19/24" — two tokens, same origin, DIFFERENT destinations.
-        //   originUsedCount tracks pieces already gone from 19: the 2nd token gets
-        //   stackOffset:-1 so its tail starts one step lower in the stack. The two arrows
-        //   diverge toward different squares, so they look distinct even with the same
-        //   horizontal origin column.
-        //
-        // "19/20(3)" — one token with count=3, SAME origin AND destination.
-        //   Three arrows orig→dest at stackOffset 0/-1/-2 would all converge to the
-        //   exact same tip pixel, producing three overlapping lines that look like one.
-        //   We draw 1 arrow + blue circles for the extra pieces instead.
-        const originUsedCount = new Map<CgKey, number>();
-        const destArrivedCount = new Map<CgKey, number>();
-        pendingArrows = c.play
-          ? parseGnubgPlay(c.play, c.isP1).flatMap((m): CgDrawShape[] => {
-              if (m.from !== null && m.to !== null) {
-                const fromKey = bgPointToKey(m.from);
-                const destKey = bgPointToKey(m.to);
-                const alreadyLeft = originUsedCount.get(fromKey) ?? 0;
-                originUsedCount.set(fromKey, alreadyLeft + m.count);
-                const arrivedSoFar = destArrivedCount.get(destKey) ?? 0;
-                destArrivedCount.set(destKey, arrivedSoFar + m.count);
-                // destStackOffset: +1 if own pieces already at dest (piece lands on top),
-                // +arrivedSoFar for additional arrows to the same destination.
-                const destPiece = ctrl.chessground.state.pieces.get(destKey);
-                const destIsOwn = destPiece?.playerIndex === myPlayerIndex;
-                const destOffset = (destIsOwn ? 1 : 0) + arrivedSoFar;
-                const shapes: CgDrawShape[] = [{
-                  orig: fromKey, dest: destKey, brush: 'blue',
-                  ...(alreadyLeft > 0 ? { stackOffset: -alreadyLeft } : {}),
-                  ...(destOffset > 0 ? { destStackOffset: destOffset } : {}),
-                }];
-                for (let i = 1; i < m.count; i++)
-                  shapes.push({ orig: fromKey, brush: 'blue', stackOffset: -(alreadyLeft + i) });
-                return shapes;
-              }
-              if (m.from === null && m.to !== null) {
-                // Bar entry: red circle(s) at landing point.
-                // If the destination already has own pieces, the entering piece(s) stack on top.
-                const destKey = bgPointToKey(m.to);
-                const destPiece = ctrl.chessground.state.pieces.get(destKey);
-                const base = destPiece?.playerIndex === myPlayerIndex ? 1 : 0;
-                return Array.from({ length: m.count }, (_, i) => ({
-                  orig: destKey, brush: 'red', ...(base + i > 0 ? { stackOffset: base + i } : {}),
-                }));
-              }
-              if (m.from !== null && m.to === null) {
-                // Bearing off: green circle(s) at origin, downward through the stack.
-                // Use originUsedCount so a bearing off from the same point as an arrow
-                // (e.g. "21/off 21/23") doesn't overlap with it.
-                const fromKey = bgPointToKey(m.from);
-                const alreadyLeft = originUsedCount.get(fromKey) ?? 0;
-                originUsedCount.set(fromKey, alreadyLeft + m.count);
-                return Array.from({ length: m.count }, (_, i) => ({
-                  orig: fromKey, brush: 'green',
-                  ...(alreadyLeft + i > 0 ? { stackOffset: -(alreadyLeft + i) } : {}),
-                }));
-              }
-              return [];
-            })
-          : [];
         // setAutoShapes must come BEFORE redrawAll() because redrawAll() calls redrawNow()
         // synchronously and renders the SVG immediately — stale shapes would flash briefly.
+        pendingArrows = buildArrowShapes(ctrl, c);
         ctrl.chessground?.setAutoShapes(pendingArrows);
         // Dismiss any dice picker overlay so the board stays visible during preview.
         ctrl.controlConfig.dismissBoardOverlay?.();
@@ -389,6 +455,7 @@ export function clearCandidatePreview(ctrl: AnalyseCtrl): void {
   expandedCandidateRank = -1;
   pendingArrows = [];
   lastCandidatePly = -1;
+  activeFenOverride = null;
   ctrl.chessground?.setAutoShapes([]);
 }
 
@@ -400,6 +467,7 @@ export function dismissCandidatePreview(ctrl: AnalyseCtrl): boolean {
   if (expandedCandidateRank === -1) return false;
   expandedCandidateRank = -1;
   pendingArrows = [];
+  activeFenOverride = null;
   ctrl.chessground?.setAutoShapes([]);
   const turnStartPly = ctrl.bgTurnStartPly?.get(ctrl.node.ply);
   if (turnStartPly !== undefined) {
