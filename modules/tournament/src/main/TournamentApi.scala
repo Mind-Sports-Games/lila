@@ -10,6 +10,7 @@ import play.api.i18n.Lang
 import scala.concurrent.duration.*
 import scala.concurrent.Promise
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 
 import lila.common.config.{ MaxPerPage, MaxPerSecond }
 import lila.common.extensions.*
@@ -60,12 +61,12 @@ final class TournamentApi(
     mode: play.api.Mode
 ) {
 
-  private def createWorkQueue(callerName: String) =
+  private val workQueue =
     new lila.hub.DuctSequencers(
       maxSize = 256,
       expiration = 1 minute,
       timeout = 10 seconds,
-      name = s"tournament-$callerName"
+      name = "tournament"
     )
 
   def get(id: Tournament.ID) = tournamentRepo.byId(id)
@@ -948,10 +949,13 @@ final class TournamentApi(
       tourId: Tournament.ID,
       callerName: String
   )(fetch: Tournament.ID => Fu[Option[Tournament]])(run: Tournament => Funit): Funit =
-    createWorkQueue(callerName)(tourId) {
+    workQueue(tourId) {
       fetch(tourId) flatMap {
         _ so run
       }
+    } recoverWith { case NonFatal(e) =>
+      logger.warn(s"TournamentApi Sequencing $callerName failed for $tourId: ${e.getMessage}")
+      Future.failed(e)
     }
 
   private object publish {
