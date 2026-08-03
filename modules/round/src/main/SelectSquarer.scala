@@ -63,7 +63,14 @@ final private[round] class SelectSquarer(
         case Pov(g, playerIndex) if g.playerCanOfferSelectSquares(playerIndex) =>
           proxy
             .save {
-              messenger.system(g, trans.playerIndexOffersSelectSquares(pov.game.playerTrans(playerIndex)).v)
+              val blackDead = squares.count(pos => g.board(pos).exists(_.player.p1))
+              val whiteDead = squares.count(pos => g.board(pos).exists(_.player.p2))
+              messenger.system(
+                g,
+                trans
+                  .playerIndexOffersSelectSquares(pov.game.playerTrans(playerIndex), blackDead, whiteDead)
+                  .v
+              )
               Progress(g) map { _.offerSelectSquares(playerIndex, squares) }
             }
             .andDo(publishSquareOfferEvent(pov)) inject List(
