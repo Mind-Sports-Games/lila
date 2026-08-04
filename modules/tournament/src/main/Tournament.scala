@@ -81,16 +81,13 @@ case class Tournament(
 
   def isMarathonOrUnique = isMarathon || isUnique
 
-  def isMSO =
-    schedule.map(_.freq).contains(Schedule.Freq.MSO21) || schedule.map(_.freq).contains(Schedule.Freq.MSOGP)
-
-  def isMSOWarmUp = schedule.map(_.freq).contains(Schedule.Freq.MSOWarmUp)
-
   def isIntro = schedule.map(_.freq).contains(Schedule.Freq.Introductory)
 
   def isAnnual = schedule.map(_.freq).contains(Schedule.Freq.Annual)
 
   def isScheduled = schedule.isDefined
+
+  def autoAnalysable = !isPrivate && schedule.map(_.freq).exists(Schedule.Freq.autoAnalyse.contains)
 
   def isRated = mode == Mode.Rated
 

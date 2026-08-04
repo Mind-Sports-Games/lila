@@ -20,11 +20,6 @@ object BSONHandlers {
     x => BSONInteger(x.id)
   )
 
-  implicit private[tournament] val scheduleFreqHandler: BSONHandler[Schedule.Freq] =
-    tryHandler[Schedule.Freq](
-      { case BSONString(v) => Schedule.Freq(v).toTry(s"No such freq: $v") },
-      x => BSONString(x.name)
-    )
 
   implicit private[tournament] val scheduleSpeedHandler: BSONHandler[Schedule.Speed] =
     tryHandler[Schedule.Speed](
@@ -68,11 +63,12 @@ object BSONHandlers {
         mVariants.map(_.zipWithIndex.map { case (v, i) =>
           (v, mIntervals.fold(0)(_.lift(i).getOrElse(0)))
         })
+      val clockConfig = r.get[strategygames.ClockConfig]("clock")
       Tournament(
         id = r.str("_id"),
         name = r.str("name"),
         status = r.get[Status]("status"),
-        clock = r.get[strategygames.ClockConfig]("clock"),
+        clock = clockConfig,
         minutes = r.int("minutes"),
         variant = variant,
         medleyVariantsAndIntervals = medleyVariantsAndIntervals,
@@ -88,10 +84,12 @@ object BSONHandlers {
         noStreak = r.boolD("noStreak"),
         statusScoring = r.boolO("statusScoring") getOrElse false,
         schedule = for {
-          doc   <- r.getO[Bdoc]("schedule")
-          freq  <- doc.getAsOpt[Schedule.Freq]("freq")
-          speed <- doc.getAsOpt[Schedule.Speed]("speed")
-        } yield Schedule(freq, speed, variant, position, startsAt, None, None, conditions),
+          doc  <- r.getO[Bdoc]("schedule")
+          freq <- doc.getAsOpt[Schedule.Freq]("freq")
+        } yield {
+          val speed = doc.getAsOpt[Schedule.Speed]("speed") getOrElse Schedule.Speed.fromClock(clockConfig)
+          Schedule(freq, speed, variant, position, startsAt, None, None, conditions)
+        },
         nbPlayers = r.int("nbPlayers"),
         createdAt = r.date("createdAt"),
         createdBy = r.strO("createdBy") getOrElse playstrategyId,

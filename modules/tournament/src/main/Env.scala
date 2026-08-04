@@ -17,7 +17,8 @@ private class TournamentConfig(
     @ConfigName("collection.pairing") val pairingColl: CollName,
     @ConfigName("collection.leaderboard") val leaderboardColl: CollName,
     @ConfigName("collection.shield_table") val shieldTableColl: CollName,
-    @ConfigName("api_actor.name") val apiActorName: String
+    @ConfigName("api_actor.name") val apiActorName: String,
+    @ConfigName("auto_analyse.enabled") val autoAnalyseEnabled: Boolean
 )
 
 @Module
@@ -39,7 +40,8 @@ final class Env(
     // swissApi: lila.swiss.SwissApi,
     trophyApi: lila.user.TrophyApi,
     remoteSocketApi: lila.socket.RemoteSocket,
-    discordApi: lila.irc.DiscordApi
+    discordApi: lila.irc.DiscordApi,
+    fishnet: lila.hub.actors.Fishnet
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
@@ -92,6 +94,8 @@ final class Env(
   )
 
   private lazy val playerIndexHistoryApi = wire[PlayerIndexHistoryApi]
+
+  private lazy val autoAnalyse = new lila.game.AutoAnalyseRequester(fishnet, config.autoAnalyseEnabled)
 
   lazy val api: TournamentApi = wire[TournamentApi]
 

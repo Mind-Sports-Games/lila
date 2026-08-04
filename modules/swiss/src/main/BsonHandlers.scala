@@ -249,6 +249,8 @@ object BsonHandlers {
       )
   }
 
+  implicit val swissScheduleHandler: BSONDocumentHandler[Swiss.Schedule] = Macros.handler[Swiss.Schedule]
+
   implicit val swissHandler: BSONDocumentHandler[Swiss] = Macros.handler[Swiss]
 
   // "featurable" mostly means that the tournament isn't over yet

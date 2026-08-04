@@ -23,7 +23,8 @@ final class Env(
     gameProxyRepo: lila.round.GameProxyRepo,
     roundSocket: lila.round.RoundSocket,
     mongoCache: lila.memo.MongoCache.Api,
-    baseUrl: lila.common.config.BaseUrl
+    baseUrl: lila.common.config.BaseUrl,
+    fishnet: lila.hub.actors.Fishnet
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: akka.actor.ActorSystem,
@@ -52,6 +53,9 @@ final class Env(
   private val statsApi = wire[SwissStatsApi]
 
   lazy val verify = wire[SwissCondition.Verify]
+
+  private lazy val autoAnalyse =
+    new lila.game.AutoAnalyseRequester(fishnet, appConfig.get[Boolean]("swiss.auto_analyse.enabled"))
 
   val api: SwissApi = wire[SwissApi]
 
