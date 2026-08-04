@@ -35,7 +35,7 @@
       "stratops"
     ],
     "overrides": {
-      "chessground": "link:../chessground"
+      "chessground": "github:Mind-Sports-Games/chessground#pla-766-backgammon-integrate-gnubg-to-calculate-pr"
     }
   },
   "devDependencies": {
