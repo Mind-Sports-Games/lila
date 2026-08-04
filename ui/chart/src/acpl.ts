@@ -34,8 +34,7 @@ Chart.register({
   id: 'lockedDots',
   afterDatasetsDraw(chart: Chart) {
     const dots = (chart as any)._lockedDots as
-      | Array<{ x: number; y: number; color: string; rect?: boolean }>
-      | undefined;
+      Array<{ x: number; y: number; color: string; rect?: boolean }> | undefined;
     if (!dots?.length) return;
     const xScale = chart.scales['x'];
     const yScale = chart.scales['y'];

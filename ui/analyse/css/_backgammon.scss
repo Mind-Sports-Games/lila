@@ -141,11 +141,21 @@
   move.h-blunder,
   move.h-mistake,
   move.h-brilliant,
-  move.h-blunder { color: #db3031; }
-  move.h-mistake { color: #d96420; }
-  move.h-brilliant { color: #5ebe5e; }
-  move.h-lucky { color: #8855cc; }
-  move.h-unlucky { color: #d45090; }
+  move.h-blunder {
+    color: #db3031;
+  }
+  move.h-mistake {
+    color: #d96420;
+  }
+  move.h-brilliant {
+    color: #5ebe5e;
+  }
+  move.h-lucky {
+    color: #8855cc;
+  }
+  move.h-unlucky {
+    color: #d45090;
+  }
 
   move.h-lucky.current,
   move.h-unlucky.current,

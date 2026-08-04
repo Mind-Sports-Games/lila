@@ -77,9 +77,7 @@ export type StudySocketSendParams =
 export type EvalCacheSocketParams = [t: 'evalPut', d: EvalPutData] | [t: 'evalGet', d: EvalGetData];
 
 export type AnalyseSocketSendParams =
-  | StudySocketSendParams
-  | EvalCacheSocketParams
-  | [t: 'startWatching', gameId: string];
+  StudySocketSendParams | EvalCacheSocketParams | [t: 'startWatching', gameId: string];
 
 export type StudySocketSend = (...[d, t]: StudySocketSendParams) => void;
 export type AnalyseSocketSend = (...[d, t]: AnalyseSocketSendParams) => void;

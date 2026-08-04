@@ -41,8 +41,8 @@ ui/build --no-context # don't log the context ([sass], [esbuild], etc)
   - **multiple-select** is used to select several options in a select list (used only in insights page which can not be accessed through the browser on playstrategy)
 
 to fetch these 3 submodules in local, run :\
- `git submodule init`\
- `git submodule update`
+`git submodule init`\
+`git submodule update`
 
 #### ui modules :
 
