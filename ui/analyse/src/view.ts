@@ -266,8 +266,7 @@ function controls(ctrl: AnalyseCtrl) {
               if (!dismissCandidatePreview(ctrl)) control.first(ctrl);
             } else if (action === 'last') {
               if (!dismissCandidatePreview(ctrl)) control.last(ctrl);
-            }
-            else if (action === 'explorer') ctrl.toggleExplorer();
+            } else if (action === 'explorer') ctrl.toggleExplorer();
             else if (action === 'practice') ctrl.togglePractice();
             else if (action === 'menu') ctrl.actionMenu.toggle();
             else if (action === 'detail-mode') ctrl.analyseDetail(!ctrl.analyseDetail());
@@ -735,9 +734,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
               'div.analyse__underboard',
               {
                 hook:
-                  ctrl.synthetic || playable(ctrl.data)
-                    ? undefined
-                    : onInsert(elm => serverSideUnderboard(elm, ctrl)),
+                  ctrl.synthetic || playable(ctrl.data) ? undefined : onInsert(elm => serverSideUnderboard(elm, ctrl)),
               },
               study ? studyView.underboard(ctrl) : [inputs(ctrl)],
             ),

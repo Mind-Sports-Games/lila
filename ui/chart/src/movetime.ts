@@ -352,8 +352,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
           titleFont: fontFamily(13),
           displayColors: false,
           callbacks: {
-            title: items =>
-              (isBackgammon ? bgLabelByX.get(items[0].parsed.x) : labels[items[0].parsed.x]) ?? '',
+            title: items => (isBackgammon ? bgLabelByX.get(items[0].parsed.x) : labels[items[0].parsed.x]) ?? '',
             label: () => '',
           },
         },
@@ -364,10 +363,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
             elements[0].index
           ];
           if (pt?.x !== undefined) {
-            playstrategy.pubsub.emit(
-              'analysis.chart.click',
-              isBackgammon ? (bgTurnXToPly.get(pt.x) ?? pt.x) : pt.x,
-            );
+            playstrategy.pubsub.emit('analysis.chart.click', isBackgammon ? (bgTurnXToPly.get(pt.x) ?? pt.x) : pt.x);
           }
         }
       },

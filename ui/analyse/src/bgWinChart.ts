@@ -31,10 +31,10 @@ interface BgProbs {
 }
 interface BgCandidate {
   rank: number;
-  play?: string;         // gnubg move notation e.g. "24/20 8/7*"
+  play?: string; // gnubg move notation e.g. "24/20 8/7*"
   played: boolean;
   equity?: number;
-  equityDelta?: number;  // EMG gap vs rank-1 move (negative for rank 2+; absent on rank 1)
+  equityDelta?: number; // EMG gap vs rank-1 move (negative for rank 2+; absent on rank 1)
   probabilities: BgProbs;
 }
 interface BgMove {
@@ -224,7 +224,8 @@ function chartNodes(ctrl: AnalyseCtrl, turns: TurnVal[]): ChartNode[] {
       // checker move: only emit the LAST one of this turn.
       // A move is last when the next src node is endturn, a different player's node, or EOF.
       const next = src[i + 1];
-      const isLast = !next || next.uci === 'endturn' || (next.playedPlayerIndex !== undefined && next.playedPlayerIndex !== pi);
+      const isLast =
+        !next || next.uci === 'endturn' || (next.playedPlayerIndex !== undefined && next.playedPlayerIndex !== pi);
       if (isLast) {
         const t = turns[turnIdx];
         const node: ChartNode = {
@@ -263,15 +264,18 @@ function buildCandidateMap(
   const src = ctrl.data.treeParts;
 
   const toCandidateUI = (move: BgMove, isP1: boolean): BgCandidateUI[] =>
-    move.candidates.map(c => ({
-      rank: c.rank,
-      play: c.play,
-      played: c.played,
-      isP1,
-      equity: c.equity,
-      equityDelta: c.equityDelta,
-      probabilities: c.probabilities,
-    } as BgCandidateUI));
+    move.candidates.map(
+      c =>
+        ({
+          rank: c.rank,
+          play: c.play,
+          played: c.played,
+          isP1,
+          equity: c.equity,
+          equityDelta: c.equityDelta,
+          probabilities: c.probabilities,
+        }) as BgCandidateUI,
+    );
 
   // Pre-pass: collect the turn-start FEN and ply (first node of each turn, before any checker moves).
   // The dice-roll node is the first node of each player's run but may have no fen of its own
@@ -285,8 +289,8 @@ function buildCandidateMap(
     let prevFen: string = src[0]?.fen ?? '';
     for (let i = 1; i < src.length; i++) {
       const n = src[i];
-      const priorFen = prevFen;           // FEN of the previous non-undefined node, captured before this node
-      if (n.fen) prevFen = n.fen;        // update for subsequent nodes, including endturn
+      const priorFen = prevFen; // FEN of the previous non-undefined node, captured before this node
+      if (n.fen) prevFen = n.fen; // update for subsequent nodes, including endturn
       if (n.uci === 'endturn') continue;
       const pi = n.playedPlayerIndex;
       if (pi !== undefined && pi !== prePrevPi) {
@@ -319,12 +323,13 @@ function buildCandidateMap(
       turnIdx++;
       turnPlies = [];
       prevPi = pi;
-      currentIsP1 = (pi === 'p1');
+      currentIsP1 = pi === 'p1';
     }
     turnPlies.push(n.ply);
 
     const next = src[i + 1];
-    const isLast = !next || next.uci === 'endturn' || (next.playedPlayerIndex !== undefined && next.playedPlayerIndex !== pi);
+    const isLast =
+      !next || next.uci === 'endturn' || (next.playedPlayerIndex !== undefined && next.playedPlayerIndex !== pi);
     if (isLast) {
       const move = allMoves[turnIdx];
       if (move?.candidates?.length) {
@@ -332,13 +337,19 @@ function buildCandidateMap(
         const turnStart = turnStartByIdx.get(turnIdx);
         for (const ply of turnPlies) {
           map.set(ply, mapped);
-          if (turnStart) { fenMap.set(ply, turnStart.fen); plyMap.set(ply, turnStart.ply); }
+          if (turnStart) {
+            fenMap.set(ply, turnStart.fen);
+            plyMap.set(ply, turnStart.ply);
+          }
         }
         // ply 0 is the root node (dice-picker phase); it has no tree entry of its own,
         // so explicitly expose the first turn's candidates there too.
         if (turnIdx === 0) {
           map.set(0, mapped);
-          if (turnStart) { fenMap.set(0, turnStart.fen); plyMap.set(0, turnStart.ply); }
+          if (turnStart) {
+            fenMap.set(0, turnStart.fen);
+            plyMap.set(0, turnStart.ply);
+          }
         }
       } else if (move?.kind === 'Dance') {
         // No-play (forced dance): store empty array so renderCandidates can show "No play".
@@ -361,7 +372,7 @@ function buildCandidateMap(
     if (isRoll2) {
       turnIdx++;
       prevPi = pi2;
-      currentIsP1P2 = (pi2 === 'p1');
+      currentIsP1P2 = pi2 === 'p1';
     }
     const next = src[i + 1];
     if (next?.uci === 'endturn') {
@@ -369,7 +380,10 @@ function buildCandidateMap(
       if (nextMove?.candidates?.length) {
         map.set(next.ply, toCandidateUI(nextMove, !currentIsP1P2));
         const nextTurnStart = turnStartByIdx.get(turnIdx + 1);
-        if (nextTurnStart) { fenMap.set(next.ply, nextTurnStart.fen); plyMap.set(next.ply, nextTurnStart.ply); }
+        if (nextTurnStart) {
+          fenMap.set(next.ply, nextTurnStart.fen);
+          plyMap.set(next.ply, nextTurnStart.ply);
+        }
       } else if (nextMove?.kind === 'Dance') {
         map.set(next.ply, []);
       }

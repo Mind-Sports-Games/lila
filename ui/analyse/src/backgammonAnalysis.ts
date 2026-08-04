@@ -39,13 +39,7 @@ function luckLabel(luck: number): string {
   return 'Neutral';
 }
 
-function renderCount(
-  count: number,
-  symbol: string,
-  label: string,
-  playerIndex: PlayerIndex,
-  locked: boolean,
-): VNode {
+function renderCount(count: number, symbol: string, label: string, playerIndex: PlayerIndex, locked: boolean): VNode {
   const cls = label.toLowerCase().replace(/\s+/g, '-');
   return h(
     `div.advice-summary__${cls}${count ? '.symbol' : ''}`,
@@ -146,7 +140,12 @@ function bgPointToKey(absolutePoint: number): CgKey {
   return (BG_FILES[absolutePoint - 13] + '2') as CgKey;
 }
 
-interface CheckerMove { from: number | null; to: number | null; hit: boolean; count: number; }
+interface CheckerMove {
+  from: number | null;
+  to: number | null;
+  hit: boolean;
+  count: number;
+}
 
 // Parse GNUBG play notation like "24/20 8/7*" or "13/7/3" (multi-hop = one checker, two dice).
 // "A/B/C" generates hops A→B and B→C. "(n)" suffix means n pieces make the same move (doubles).
@@ -163,7 +162,10 @@ function parseGnubgPlay(play: string, isP1: boolean): CheckerMove[] {
       const fromStr = parts[i].replace('*', '');
       const toStr = parts[i + 1];
       const hit = toStr.endsWith('*');
-      const toClean = toStr.replace('*', '').replace(/\(\d+\)$/, '').toLowerCase();
+      const toClean = toStr
+        .replace('*', '')
+        .replace(/\(\d+\)$/, '')
+        .toLowerCase();
       const fromRaw = fromStr.toLowerCase() === 'bar' ? null : parseInt(fromStr, 10);
       const toRaw = toClean === 'off' ? null : parseInt(toClean, 10);
       moves.push({
@@ -176,7 +178,6 @@ function parseGnubgPlay(play: string, isP1: boolean): CheckerMove[] {
   }
   return moves;
 }
-
 
 let expandedCandidateRank = -1;
 let lastCandidatePly = -1;
@@ -243,13 +244,16 @@ function buildArrowShapes(ctrl: AnalyseCtrl, c: BgCandidateUI): CgDrawShape[] {
       const destPiece = ctrl.chessground.state.pieces.get(destKey);
       const destIsOwn = destPiece?.playerIndex === myPlayerIndex;
       const destOffset = (destIsOwn ? 1 : 0) + arrivedSoFar;
-      const shapes: CgDrawShape[] = [{
-        orig: fromKey, dest: destKey, brush: 'blue',
-        ...(alreadyLeft > 0 ? { stackOffset: -alreadyLeft } : {}),
-        ...(destOffset > 0 ? { destStackOffset: destOffset } : {}),
-      }];
-      for (let i = 1; i < m.count; i++)
-        shapes.push({ orig: fromKey, brush: 'blue', stackOffset: -(alreadyLeft + i) });
+      const shapes: CgDrawShape[] = [
+        {
+          orig: fromKey,
+          dest: destKey,
+          brush: 'blue',
+          ...(alreadyLeft > 0 ? { stackOffset: -alreadyLeft } : {}),
+          ...(destOffset > 0 ? { destStackOffset: destOffset } : {}),
+        },
+      ];
+      for (let i = 1; i < m.count; i++) shapes.push({ orig: fromKey, brush: 'blue', stackOffset: -(alreadyLeft + i) });
       return shapes;
     }
     if (m.from === null && m.to !== null) {
@@ -259,7 +263,9 @@ function buildArrowShapes(ctrl: AnalyseCtrl, c: BgCandidateUI): CgDrawShape[] {
       const destPiece = ctrl.chessground.state.pieces.get(destKey);
       const base = destPiece?.playerIndex === myPlayerIndex ? 1 : 0;
       return Array.from({ length: m.count }, (_, i) => ({
-        orig: destKey, brush: 'red', ...(base + i > 0 ? { stackOffset: base + i } : {}),
+        orig: destKey,
+        brush: 'red',
+        ...(base + i > 0 ? { stackOffset: base + i } : {}),
       }));
     }
     if (m.from !== null && m.to === null) {
@@ -270,7 +276,8 @@ function buildArrowShapes(ctrl: AnalyseCtrl, c: BgCandidateUI): CgDrawShape[] {
       const alreadyLeft = originUsedCount.get(fromKey) ?? 0;
       originUsedCount.set(fromKey, alreadyLeft + m.count);
       return Array.from({ length: m.count }, (_, i) => ({
-        orig: fromKey, brush: 'green',
+        orig: fromKey,
+        brush: 'green',
         ...(alreadyLeft + i > 0 ? { stackOffset: -(alreadyLeft + i) } : {}),
       }));
     }
@@ -340,81 +347,84 @@ function renderCandidates(ctrl: AnalyseCtrl): VNode | undefined {
     const p = c.probabilities;
     // key includes ply so Snabbdom recreates elements on ply change,
     // triggering hook.insert with the new candidates' closures.
-    return h(`div.bg-candidates__row${c.played ? '.played' : ''}${expanded ? '.expanded' : ''}`, {
-      key: `${ply}-${c.rank}`,
-      hook: bind('click', () => {
-        const wasSelected = expandedCandidateRank === c.rank;
-        expandedCandidateRank = wasSelected ? -1 : c.rank;
+    return h(
+      `div.bg-candidates__row${c.played ? '.played' : ''}${expanded ? '.expanded' : ''}`,
+      {
+        key: `${ply}-${c.rank}`,
+        hook: bind('click', () => {
+          const wasSelected = expandedCandidateRank === c.rank;
+          expandedCandidateRank = wasSelected ? -1 : c.rank;
 
-        if (wasSelected) {
-          // Deselecting: navigate to the turn-start node so the board shows the dice-rolled
-          // position and all subsequent navigation works from the correct tree position.
-          activeFenOverride = null;
-          pendingArrows = [];
-          ctrl.chessground.setAutoShapes([]);
-          const turnStartPly = ctrl.bgTurnStartPly?.get(ply);
-          if (turnStartPly !== undefined) {
-            ctrl.jumpToMain(turnStartPly); // showGround + afterJump + redraw handled internally
-          } else {
-            ctrl.controlConfig.afterJump?.();
-            ctrl.redraw();
+          if (wasSelected) {
+            // Deselecting: navigate to the turn-start node so the board shows the dice-rolled
+            // position and all subsequent navigation works from the correct tree position.
+            activeFenOverride = null;
+            pendingArrows = [];
+            ctrl.chessground.setAutoShapes([]);
+            const turnStartPly = ctrl.bgTurnStartPly?.get(ply);
+            if (turnStartPly !== undefined) {
+              ctrl.jumpToMain(turnStartPly); // showGround + afterJump + redraw handled internally
+            } else {
+              ctrl.controlConfig.afterJump?.();
+              ctrl.redraw();
+            }
+            return;
           }
-          return;
-        }
 
-        // Selecting: show bgTurnStartFen + arrows as a preview.
-        // If on an endturn node (dice picker), navigate to the roll node first so the
-        // moves tree highlights the current turn rather than the previous turn's last move.
-        const turnStartPly = ctrl.bgTurnStartPly?.get(ply);
-        if (ctrl.node.uci === 'endturn' && turnStartPly !== undefined) {
-          // Update lastCandidatePly before navigating so the ply-change guard in
-          // renderCandidates doesn't reset expandedCandidateRank on the next render.
-          lastCandidatePly = turnStartPly;
-          ctrl.jumpToMain(turnStartPly);
-        }
-        // Set FEN so state.pieces reflects the turn-start position when we build shapes.
-        // Also store it in activeFenOverride so reapplyFenOverride() can re-apply it
-        // after addDests() resets the board (addDests fires async, after redrawAll's rAF,
-        // so without this the shapes render against the post-move pieces, off by 1).
-        const turnStartFen = ctrl.bgTurnStartFen?.get(ply);
-        const targetFen = turnStartFen ?? ctrl.node.fen;
-        const dice = stratUtils.backgammon.readDice(targetFen, ctrl.data.game.variant.key);
-        activeFenOverride = { fen: targetFen, dice };
-        activeFenOverridePly = ctrl.node.ply;
-        ctrl.chessground.set({ fen: targetFen, dice });
-        // setAutoShapes must come BEFORE redrawAll() because redrawAll() calls redrawNow()
-        // synchronously and renders the SVG immediately — stale shapes would flash briefly.
-        pendingArrows = buildArrowShapes(ctrl, c);
-        ctrl.chessground?.setAutoShapes(pendingArrows);
-        // Dismiss any dice picker overlay so the board stays visible during preview.
-        ctrl.controlConfig.dismissBoardOverlay?.();
-        ctrl.chessground.redrawAll();
-        ctrl.redraw();
-      }),
-    }, [
-      h('div.bg-candidates__main', [
-        h('span.bg-candidates__move', (c.play ? (c.isP1 ? c.play : p2PlayToP1Absolute(c.play)) : '—')),
-        h('span.bg-candidates__meta', [
-          h('span.rank', `${c.rank}.`),
-          h(`span.delta${c.equityDelta != null && c.equityDelta < -0.04 ? '.bad' : ''}`, deltaStr),
+          // Selecting: show bgTurnStartFen + arrows as a preview.
+          // If on an endturn node (dice picker), navigate to the roll node first so the
+          // moves tree highlights the current turn rather than the previous turn's last move.
+          const turnStartPly = ctrl.bgTurnStartPly?.get(ply);
+          if (ctrl.node.uci === 'endturn' && turnStartPly !== undefined) {
+            // Update lastCandidatePly before navigating so the ply-change guard in
+            // renderCandidates doesn't reset expandedCandidateRank on the next render.
+            lastCandidatePly = turnStartPly;
+            ctrl.jumpToMain(turnStartPly);
+          }
+          // Set FEN so state.pieces reflects the turn-start position when we build shapes.
+          // Also store it in activeFenOverride so reapplyFenOverride() can re-apply it
+          // after addDests() resets the board (addDests fires async, after redrawAll's rAF,
+          // so without this the shapes render against the post-move pieces, off by 1).
+          const turnStartFen = ctrl.bgTurnStartFen?.get(ply);
+          const targetFen = turnStartFen ?? ctrl.node.fen;
+          const dice = stratUtils.backgammon.readDice(targetFen, ctrl.data.game.variant.key);
+          activeFenOverride = { fen: targetFen, dice };
+          activeFenOverridePly = ctrl.node.ply;
+          ctrl.chessground.set({ fen: targetFen, dice });
+          // setAutoShapes must come BEFORE redrawAll() because redrawAll() calls redrawNow()
+          // synchronously and renders the SVG immediately — stale shapes would flash briefly.
+          pendingArrows = buildArrowShapes(ctrl, c);
+          ctrl.chessground?.setAutoShapes(pendingArrows);
+          // Dismiss any dice picker overlay so the board stays visible during preview.
+          ctrl.controlConfig.dismissBoardOverlay?.();
+          ctrl.chessground.redrawAll();
+          ctrl.redraw();
+        }),
+      },
+      [
+        h('div.bg-candidates__main', [
+          h('span.bg-candidates__move', c.play ? (c.isP1 ? c.play : p2PlayToP1Absolute(c.play)) : '—'),
+          h('span.bg-candidates__meta', [
+            h('span.rank', `${c.rank}.`),
+            h(`span.delta${c.equityDelta != null && c.equityDelta < -0.04 ? '.bad' : ''}`, deltaStr),
+          ]),
         ]),
-      ]),
-      expanded ? h('div.bg-candidates__probs', [
-        h('span', `Win ${(p.win * 100).toFixed(1)}%`),
-        h('span', `G ${(p.winGammon * 100).toFixed(1)}%`),
-        h('span', `BG ${(p.winBackgammon * 100).toFixed(1)}%`),
-        h('span.sep', '|'),
-        h('span', `Lose ${(p.lose * 100).toFixed(1)}%`),
-        h('span', `G ${(p.loseGammon * 100).toFixed(1)}%`),
-        h('span', `BG ${(p.loseBackgammon * 100).toFixed(1)}%`),
-      ]) : null,
-    ]);
+        expanded
+          ? h('div.bg-candidates__probs', [
+              h('span', `Win ${(p.win * 100).toFixed(1)}%`),
+              h('span', `G ${(p.winGammon * 100).toFixed(1)}%`),
+              h('span', `BG ${(p.winBackgammon * 100).toFixed(1)}%`),
+              h('span.sep', '|'),
+              h('span', `Lose ${(p.lose * 100).toFixed(1)}%`),
+              h('span', `G ${(p.loseGammon * 100).toFixed(1)}%`),
+              h('span', `BG ${(p.loseBackgammon * 100).toFixed(1)}%`),
+            ])
+          : null,
+      ],
+    );
   });
 
-  return h('div.bg-candidates', [
-    h('div.bg-candidates__header', 'Top moves'),
-    h('div.bg-candidates__list', rows),
-  ]);
+  return h('div.bg-candidates', [h('div.bg-candidates__header', 'Top moves'), h('div.bg-candidates__list', rows)]);
 }
 
 export function render(ctrl: AnalyseCtrl): VNode | undefined {
