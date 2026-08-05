@@ -264,7 +264,9 @@ private object bits {
       div(cls := "bot_title")("PS Greedy Bot"),
       renderRadios(form("bot"), translatedPSBotChoices),
       div(cls := "bot_title")("Stockfish"),
-      renderRadios(form("bot"), translatedStockfishChoices)
+      renderRadios(form("bot"), translatedStockfishChoices),
+      div(cls := "bot_title")("GNU Backgammon"),
+      renderRadios(form("bot"), translatedGnubgChoices)
     )
 
   def renderRatingRange(field: Field)(implicit ctx: Context) =
