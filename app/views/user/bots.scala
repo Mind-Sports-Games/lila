@@ -59,7 +59,15 @@ object bots {
     case "stockfish-level6"    => 10
     case "stockfish-level7"    => 11
     case "stockfish-level8"    => 12
-    case _                     => 13
+    case "gnubg-level1"        => 13
+    case "gnubg-level2"        => 14
+    case "gnubg-level3"        => 15
+    case "gnubg-level4"        => 16
+    case "gnubg-level5"        => 17
+    case "gnubg-level6"        => 18
+    case "gnubg-level7"        => 19
+    case "gnubg-level8"        => 20
+    case _                     => 21
   }
 
   private def botTable(users: List[User])(implicit ctx: Context) = div(cls := "bots__list")(
