@@ -1,3 +1,8 @@
+// The insight feature is disabled - see the commented out routes in conf/routes
+// for everything that needs uncommenting to bring it back. This controller cannot
+// compile while the routes are commented out, as it depends on the generated
+// routes.Insight reverse router.
+/*
 package controllers
 
 import play.api.libs.json.Json
@@ -119,3 +124,4 @@ final class Insight(env: Env) extends LilaController(env) {
       }
     }
 }
+ */

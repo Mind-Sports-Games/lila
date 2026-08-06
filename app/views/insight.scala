@@ -1,3 +1,8 @@
+// The insight feature is disabled - see the commented out routes in conf/routes
+// for everything that needs uncommenting to bring it back. These views cannot
+// compile while the routes are commented out, as they depend on the generated
+// routes.Insight reverse router.
+/*
 package views.html
 
 import play.api.libs.json.Json
@@ -96,3 +101,4 @@ object insight {
       )
     )
 }
+ */

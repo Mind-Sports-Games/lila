@@ -41,7 +41,10 @@ final class Env(
 
   lazy val api = wire[InsightApi]
 
-  lila.common.Bus.subscribeFun("analysisReady") { case lila.analyse.actorApi.AnalysisReady(game, _) =>
-    api.updateGame(game).discard
-  }
+  // Disabled along with the rest of the insight feature: this opened a connection
+  // to the (undeployed) insight mongo db on every analysed game, which filled the
+  // logs with "[Supervisor-1/insight] Timeout ... IsPrimaryAvailable" warnings.
+  // lila.common.Bus.subscribeFun("analysisReady") { case lila.analyse.actorApi.AnalysisReady(game, _) =>
+  //   api.updateGame(game).discard
+  // }
 }
