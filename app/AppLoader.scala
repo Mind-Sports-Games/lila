@@ -119,7 +119,7 @@ final class LilaComponents(
   lazy val game: Game                     = wire[Game]
   lazy val i18n: I18n                     = wire[I18n]
   lazy val importer: Importer             = wire[Importer]
-  lazy val insight: Insight               = wire[Insight]
+  // lazy val insight: Insight               = wire[Insight] // disabled, see conf/routes
   lazy val irwin: Irwin                   = wire[Irwin]
   lazy val learn: Learn                   = wire[Learn]
   lazy val library: Library               = wire[Library]
