@@ -1,6 +1,6 @@
 package lila.bot
 
-import strategygames.Clock
+import strategygames.{Clock, GameLogic}
 import strategygames.variant.Variant
 import lila.common.LightUser
 
@@ -20,8 +20,13 @@ object BotVsBotConfig {
   private val stockfishVariants: List[Variant] =
     Variant.all.filter(v => v.hasFishnet && !v.fromPositionVariant).toList
 
-  private val nonStockfishVariants: List[Variant] =
-    Variant.all.filter(v => !v.hasFishnet && !v.fromPositionVariant).toList
+  private val nonStockfishOrBackgammonVariants: List[Variant] =
+    Variant.all
+      .filter(v => !v.hasFishnet && !v.fromPositionVariant && v.gameLogic != GameLogic.Backgammon())
+      .toList
+
+  private val backgammonVariants: List[Variant] =
+    Variant.all(GameLogic.Backgammon()).filter(!_.fromPositionVariant)
 
   private def gamesForMatchup(p1: LightUser, p2: LightUser, variants: List[Variant]): List[BotVsBotGame] =
     for {
@@ -37,9 +42,10 @@ object BotVsBotConfig {
         gamesForMatchup(stockfishBots(7), stockfishBots(6), stockfishVariants)
       ),
       BotVsBotStream(
-        "Greedy-Two-Move vs Stockfish-3/One-Move",
+        "Greedy-Two-Move vs Stockfish-3/One-Move/GNUBG-3",
         gamesForMatchup(poolBots(1), stockfishBots(2), stockfishVariants) ++
-          gamesForMatchup(poolBots(1), poolBots(0), nonStockfishVariants)
+          gamesForMatchup(poolBots(1), poolBots(0), nonStockfishOrBackgammonVariants) ++
+          gamesForMatchup(poolBots(1), gnubgBots(2), backgammonVariants)
       ),
     )
   }

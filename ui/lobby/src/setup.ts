@@ -332,7 +332,17 @@ export default class Setup {
     'stockfish-level7',
     'stockfish-level8',
   ];
-  private allBots = this.psBots.concat(this.stockfishBots);
+  private gnubgBots = [
+    'gnubg-level1',
+    'gnubg-level2',
+    'gnubg-level3',
+    'gnubg-level4',
+    'gnubg-level5',
+    'gnubg-level6',
+    'gnubg-level7',
+    'gnubg-level8',
+  ];
+  private allBots = this.psBots.concat(this.stockfishBots).concat(this.gnubgBots);
   private ratedTimeModes = ['1', '3', '4', '5'];
 
   prepareForm = ($modal: Cash) => {
@@ -371,6 +381,7 @@ export default class Setup {
       user = userDetails && userDetails[1] ? userDetails[1].toLowerCase() : '',
       vsPSBot = this.psBots.includes(user),
       vsStockfishBot = this.stockfishBots.includes(user),
+      vsGnubgBot = this.gnubgBots.includes(user),
       $botChoices = $form.find('.bot_choice'),
       $botInput = $form.find('.bot_choice [name=bot]'),
       $opponentInput = $form.find('.opponent_choices [name=opponent]'),
@@ -456,7 +467,7 @@ export default class Setup {
           $submits.toggleClass('nope', false);
         } else {
           $submits.toggleClass('nope', true);
-          if (!botOK && !vsPSBot && !vsStockfishBot) {
+          if (!botOK && !vsPSBot && !vsStockfishBot && !vsGnubgBot) {
             const greedy1CanPlay =
               $botInput.filter(':checked').val() !== 'ps-greedy-one-move' &&
               botCanPlay('ps-greedy-one-move', limit, inc, byo, variantId);
@@ -495,6 +506,9 @@ export default class Setup {
           (variantId[0] === '5' && !['11'].includes(variantId[1])) ||
           //allow all shogi, xiangqi, breakthrough
           ['3', '4', '11'].includes(variantId[0]);
+      } else if (/^gnubg-level[1-8]$/.test(user)) {
+        //only backgammon variants
+        variantCompatible = variantId[0] === '10';
       } else {
         switch (user) {
           case 'ps-greedy-four-move': {
@@ -521,7 +535,7 @@ export default class Setup {
       const isByoyomi = timeMode === '3';
       let clockCompatible = true;
       if (isRealTime()) {
-        if (/^stockfish-level[1-8]$/.test(user)) {
+        if (/^stockfish-level[1-8]$/.test(user) || /^gnubg-level[1-8]$/.test(user)) {
           clockCompatible = limit >= 0.5 || (isByoyomi && byo >= 5) || inc >= 5;
         } else {
           switch (user) {
@@ -553,10 +567,10 @@ export default class Setup {
       }
       return variantCompatible && clockCompatible;
     };
-    const setBaseDefaultOptions = () => {
-      $gameGroupInput.val('0'); //default to chess
-      $variantInput.val('0_1'); //default to standard chess
-      const clockConfig = self.clockDefaults('chess'); //default of chess
+    const setBaseDefaultOptions = (gameGroup = '0', variant = '0_1') => {
+      $gameGroupInput.val(gameGroup); //default to chess
+      $variantInput.val(variant); //default to standard chess
+      const clockConfig = self.clockDefaults(variant);
       $timeModeSelect.val(clockConfig['blitz'].timemode);
       $timeInput.val(clockConfig['blitz'].initial);
       $incrementInput.val(clockConfig['blitz'].increment);
@@ -598,8 +612,10 @@ export default class Setup {
       $timeModeSelect.siblings('label[for="sf_timeMode_0"], label[for="sf_timeMode_2"]').addClass('disabled');
     };
     //default options for challenge against bots
-    if (vsPSBot || vsStockfishBot) {
-      setBaseDefaultOptions();
+    if (vsPSBot || vsStockfishBot || vsGnubgBot) {
+      //gnubg only plays backgammon, so default to it rather than chess
+      if (vsGnubgBot) setBaseDefaultOptions('10', '10_1');
+      else setBaseDefaultOptions();
       $casual.trigger('click');
       if (user !== '') $botInput.val(user);
       disableNonRealTimeModes();
@@ -1177,10 +1193,11 @@ export default class Setup {
         bot = 'ps-greedy-two-move';
       }
 
-      const isKnownBot = this.psBots.includes(bot) || this.stockfishBots.includes(bot);
+      const isKnownBot = this.psBots.includes(bot) || this.stockfishBots.includes(bot) || this.gnubgBots.includes(bot);
       const botName = isKnownBot
         ? bot
             .replace('stockfish-l', 'Stockfish-L')
+            .replace('gnubg-l', 'GNUBG-L')
             .replace('ps-', 'PS-')
             .replace('greedy-', 'Greedy-')
             .replace('-move', '-Move')

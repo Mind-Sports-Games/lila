@@ -416,6 +416,9 @@ trait SetupHelper { self: I18nHelper =>
   def translatedStockfishChoices(implicit @annotation.nowarn("msg=unused") lang: Lang): List[SelectChoice] =
     LightUser.stockfishBotsIDs.map { id => (id.toString(), id.takeRight(1), none) }
 
+  def translatedGnubgChoices(implicit @annotation.nowarn("msg=unused") lang: Lang): List[SelectChoice] =
+    LightUser.gnubgBotsIDs.map { id => (id.toString(), id.takeRight(1), none) }
+
   def translatedAnimationChoices(implicit lang: Lang) =
     List(
       (Pref.Animation.NONE, trans.none.txt()),

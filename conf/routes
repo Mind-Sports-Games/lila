@@ -41,12 +41,16 @@ GET   /@/:username/following           controllers.Relation.following(username: 
 GET   /@/:username/followers           controllers.Relation.followers(username: String, page: Int ?= 1)
 GET   /rel/blocks                      controllers.Relation.blocks(page: Int ?= 1)
 
-# Insight
-POST  /insights/refresh/:username      controllers.Insight.refresh(username: String)
-POST  /insights/data/:username         controllers.Insight.json(username: String)
-GET   /insights/:username              controllers.Insight.index(username: String)
-GET   /insights/:username/:metric/:dimension controllers.Insight.path(username: String, metric: String, dimension: String, filters: String = "")
-GET   /insights/:username/:metric/:dimension/*filters controllers.Insight.path(username: String, metric: String, dimension: String, filters: String)
+# Insight - disabled, the feature is unused and its mongo db is not deployed.
+# Re-enabling means uncommenting these routes, app/controllers/Insight.scala,
+# app/views/insight.scala, the wire in app/AppLoader.scala, the analysisReady
+# subscription in modules/insight/src/main/Env.scala, and the profile link in
+# app/views/user/show/header.scala.
+# POST  /insights/refresh/:username      controllers.Insight.refresh(username: String)
+# POST  /insights/data/:username         controllers.Insight.json(username: String)
+# GET   /insights/:username              controllers.Insight.index(username: String)
+# GET   /insights/:username/:metric/:dimension controllers.Insight.path(username: String, metric: String, dimension: String, filters: String = "")
+# GET   /insights/:username/:metric/:dimension/*filters controllers.Insight.path(username: String, metric: String, dimension: String, filters: String)
 
 # User subpages
 GET   /@/:username/tournaments/:path   controllers.UserTournament.path(username: String, path: String, page: Int ?= 1)
