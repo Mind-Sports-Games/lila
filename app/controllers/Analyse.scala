@@ -46,12 +46,18 @@ final class Analyse(
       }
     }
 
+  private def analysisWithBackgammon(game: lila.game.Game): Fu[(Option[lila.analyse.Analysis], Boolean)] =
+    env.analyse.analyser.get(game) zip {
+      (game.metadata.analysed && game.variant.gameLogic == strategygames.GameLogic.Backgammon()) so
+        env.analyse.analysisBackgammonRepo.exists(game.id)
+    }
+
   def replay(pov: Pov, userTv: Option[lila.user.User])(implicit ctx: Context) =
     if (HTTPRequest.isCrawler(ctx.req)) replayBot(pov)
     else
       env.game.gameRepo.initialFen(pov.gameId) flatMap { initialFen =>
         gameC.preloadUsers(pov.game) >> redirectAtFen(pov, initialFen) {
-          (env.analyse.analyser.get(pov.game)) zip
+          analysisWithBackgammon(pov.game) zip
             (if (!pov.game.metadata.analysed) env.fishnet.api.userAnalysisExists(pov.gameId)
              else fuccess(false)) zip
             pov.game.simulId.so(env.simul.repo.find) zip
@@ -73,7 +79,13 @@ final class Analyse(
               case (
                     (
                       (
-                        (((((analysis, analysisInProgress), simul), chat), crosstable), bookmarked),
+                        (
+                          (
+                            ((((analysis, backgammonAnalysed), analysisInProgress), simul), chat),
+                            crosstable
+                          ),
+                          bookmarked
+                        ),
                         swissPairingGames
                       ),
                       pgn
@@ -104,6 +116,7 @@ final class Analyse(
                         env.analyse.annotator(pgn, pov.game, analysis).toString,
                         sgf,
                         analysis,
+                        backgammonAnalysed,
                         analysisInProgress,
                         simul,
                         crosstable,

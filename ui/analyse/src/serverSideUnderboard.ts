@@ -105,6 +105,10 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
     });
   }
 
+  function showChartLoader(panel: HTMLElement) {
+    if (!panel.querySelector('#acpl-chart-container-loader')) panel.insertAdjacentHTML('beforeend', chartLoader());
+  }
+
   function showBgAnalysing() {
     bgChartInitiated = false;
     $panels
@@ -114,11 +118,21 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
 
   function drawBgWinChart() {
     if (bgChartInitiated) return;
-    bgChartInitiated = true;
-    const panel = $panels.filter('.computer-analysis')[0];
+    const panel = $panels.filter('.computer-analysis')[0] as HTMLElement | undefined;
     if (!panel) return;
-    bgWinChart(ctrl, panel as HTMLElement);
+    bgChartInitiated = true;
+    bgWinChart(ctrl, panel).then(drawn => {
+      if (drawn) return;
+      bgChartInitiated = false;
+      if (panel.querySelector('#acpl-chart-container')) showChartLoader(panel);
+    });
   }
+
+  // Analysis was requested and is still running (server-side marker). Show the spinner
+  // straight away rather than waiting on the analysis fetch to come back empty — otherwise
+  // reloading the page mid-analysis leaves a blank panel where the chart will be.
+  const pendingPanel = document.querySelector('#acpl-chart-container.analysis-pending')?.parentElement;
+  if (pendingPanel) showChartLoader(pendingPanel);
 
   const storage = playstrategy.storage.make('analysis.panel');
   const setPanel = function (panel: string) {

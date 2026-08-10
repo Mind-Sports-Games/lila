@@ -422,7 +422,9 @@ function annotateTreeNodes(ctrl: AnalyseCtrl, turns: TurnVal[]): void {
   }
 }
 
-export default function bgWinChart(ctrl: AnalyseCtrl, panel: HTMLElement): void {
+let handlersRegistered = false;
+
+function registerHandlers(ctrl: AnalyseCtrl): void {
   // Sync category-lock state from the chart into the move tree for node highlighting.
   // Chart nodes have real symbols ('??', '!!') but tree nodes use glyph ids — map here.
   const symbolToGlyphId: Record<string, number> = { '??': 4, '?': 2, '!!': 3, '+': 51, '-': 52, d: 99 };
@@ -507,8 +509,15 @@ export default function bgWinChart(ctrl: AnalyseCtrl, panel: HTMLElement): void 
       }
     }, 0);
   });
+}
 
-  fetch(`/${ctrl.data.game.id}/backgammon-rating.json`, { headers: { Accept: 'application/json' } })
+export default function bgWinChart(ctrl: AnalyseCtrl, panel: HTMLElement): Promise<boolean> {
+  if (!handlersRegistered) {
+    handlersRegistered = true;
+    registerHandlers(ctrl);
+  }
+
+  return fetch(`/${ctrl.data.game.id}/backgammon-rating.json`, { headers: { Accept: 'application/json' } })
     .then(r => {
       if (!r.ok) throw r.status;
       return r.json();
@@ -608,9 +617,7 @@ export default function bgWinChart(ctrl: AnalyseCtrl, panel: HTMLElement): void 
       playstrategy.loadModule('chart.game').then(() => {
         (window as any).PlayStrategyChartGame.acpl(canvas, chartData, nodes, ctrl.trans);
       });
+      return true;
     })
-    .catch(() => {
-      // TODO(bg-analysis): no stored analysis yet (404) or fetch/parse error — no-op
-      // so the request form / existing content is left untouched.
-    });
+    .catch(() => false);
 }
