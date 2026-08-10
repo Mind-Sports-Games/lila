@@ -98,6 +98,20 @@ final class Env(
   val explorerEndpoint  = config.get[String]("explorer.endpoint")
   val tablebaseEndpoint = config.get[String]("explorer.tablebase.endpoint")
 
+  // Measures execution context latency and akka scheduler drift from a dedicated thread, and captures duct
+  // and thread state when either stalls. Set stall.enabled = false to disable.
+  val stallDetector: Option[lila.common.StallDetector] =
+    config
+      .getOptional[Boolean]("stall.enabled")
+      .getOrElse(true)
+      .option(
+        new lila.common.StallDetector(
+          stallThresholdMillis = config.getOptional[Long]("stall.thresholdMillis").getOrElse(1000L),
+          probeIntervalMillis = config.getOptional[Long]("stall.probeIntervalMillis").getOrElse(200L),
+          dumpCooldownMillis = config.getOptional[Long]("stall.dumpCooldownMillis").getOrElse(30000L)
+        )
+      )
+
   val appVersionDate    = config.getOptional[String]("app.version.date")
   val appVersionCommit  = config.getOptional[String]("app.version.commit")
   val appVersionMessage = config.getOptional[String]("app.version.message")
