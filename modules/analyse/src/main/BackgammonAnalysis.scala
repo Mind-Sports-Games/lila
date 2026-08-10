@@ -4,6 +4,8 @@ import org.joda.time.DateTime
 import play.api.libs.json.{ Json, OWrites, Writes }
 import reactivemongo.api.bson.*
 
+import strategygames.Player as PlayerIndex
+
 import lila.db.dsl.*
 
 // Whole-game backgammon analysis, stored alongside (not inside) the chess
@@ -86,6 +88,26 @@ case class BackgammonAnalysis(
     fk:      Option[String]
 ) {
   def id = _id
+
+  private def statsFor(playerIndex: PlayerIndex): List[BgPlayerStats] = {
+    val name = playerIndex.fold(player1, player2)
+    games.flatMap(_.stats.find(_.player == name))
+  }
+
+  /** gnubg's overall error rate (mEMG per decision), averaged over the games of
+    * the match when it holds more than one. */
+  def errorRateFor(playerIndex: PlayerIndex): Option[Double] = {
+    val rates = statsFor(playerIndex).flatMap(_.overallErrorRate)
+    rates.nonEmpty.option(rates.sum / rates.size)
+  }
+
+  /** Performance rating: half the mEMG error rate, the same number the analysis
+    * board shows as "PR". Lower is better. */
+  def prFor(playerIndex: PlayerIndex): Option[Double] = errorRateFor(playerIndex).map(_ / 2)
+
+  /** gnubg's own skill word for the player, e.g. "Expert". */
+  def ratingFor(playerIndex: PlayerIndex): Option[String] =
+    statsFor(playerIndex).flatMap(_.overallRating).headOption
 }
 
 object BackgammonAnalysis {
