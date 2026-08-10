@@ -29,6 +29,14 @@
   transition: $prop $dur;
 }
 
+@mixin hover {
+  @media (hover: hover) {
+    &:hover {
+      @content;
+    }
+  }
+}
+
 @mixin hoverflow {
   overflow-y: auto;
 
