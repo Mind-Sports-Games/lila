@@ -15,6 +15,8 @@ final class Fishnet(env: Env) extends LilaController(env) {
   private def api    = env.fishnet.api
   private val logger = lila.log("fishnet")
 
+  private def analysisMaxBodyLength = 8 * 1024 * 1024L
+
   def acquire(slow: Boolean = false) =
     ClientAction[JsonApi.Request.Acquire] { data => client =>
       api.acquire(client, slow, data.fishnet.variants) addEffect { jobOpt =>
@@ -23,7 +25,7 @@ final class Fishnet(env: Env) extends LilaController(env) {
     }
 
   def analysis(workId: String, slow: Boolean = false, stop: Boolean = false) =
-    ClientAction[JsonApi.Request.PostAnalysisLexicalUci] { data => client =>
+    ClientAction[JsonApi.Request.PostAnalysisLexicalUci](analysisMaxBodyLength) { data => client =>
       import lila.fishnet.FishnetApi.*
       def onComplete =
         if (stop) fuccess(Left(NoContent))
@@ -70,8 +72,12 @@ final class Fishnet(env: Env) extends LilaController(env) {
 
   private def ClientAction[A <: JsonApi.Request](
       f: A => lila.fishnet.Client => Fu[Either[Result, Option[JsonApi.Work]]]
-  )(implicit reads: Reads[A]) =
-    Action.async(parse.tolerantJson) { req =>
+  )(implicit reads: Reads[A]): Action[JsValue] = ClientAction(parse.DefaultMaxTextLength)(f)
+
+  private def ClientAction[A <: JsonApi.Request](maxBodyLength: Long)(
+      f: A => lila.fishnet.Client => Fu[Either[Result, Option[JsonApi.Work]]]
+  )(implicit reads: Reads[A]): Action[JsValue] =
+    Action.async(parse.tolerantJson(maxBodyLength)) { req =>
       req.body
         .validate[A]
         .fold(
