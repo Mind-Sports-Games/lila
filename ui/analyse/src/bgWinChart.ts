@@ -5,7 +5,7 @@ import { clearCandidatePreview, scheduleShowPlayed, reapplyFenOverride } from '.
 
 // NOTE(bg-analysis): reuse the advantage chart (ui/chart/src/acpl.ts via chart.game module)
 // for backgammon. It reads `data.treeParts[].eval.cp`, maps it through a sigmoid to a
-// [-1,1] area chart, and (for backgammon) shows `eval.win` in the tooltip. We feed it
+// [-1,1] area chart, and (for backgammon) derives the tooltip margin from `eval.win`. We feed it
 // the REAL per-action game tree so the line spans every board ply and the highlight
 // tracks as you step.
 //
@@ -425,15 +425,21 @@ function annotateTreeNodes(ctrl: AnalyseCtrl, turns: TurnVal[]): void {
 let handlersRegistered = false;
 
 function registerHandlers(ctrl: AnalyseCtrl): void {
-  // Sync category-lock state from the chart into the move tree for node highlighting.
-  // Chart nodes have real symbols ('??', '!!') but tree nodes use glyph ids — map here.
-  const symbolToGlyphId: Record<string, number> = { '??': 4, '?': 2, '!!': 3, '+': 51, '-': 52, d: 99 };
+  const symbolToGlyphIds: Record<string, number[]> = {
+    '??': [4],
+    '?': [2],
+    '!!': [3],
+    '+': [51],
+    '-': [52],
+    d: [4, 2, 3], // PR: blunders, mistakes, perfect play
+    luck: [51, 52], // lucky and unlucky rolls
+  };
   // Incremented whenever analysis.chart.click fires (whether from acpl's christmasTree jQuery
   // handler or from our own fallback below). Used to detect whether christmasTree already
   // handled a given advice-summary click so we don't emit the pubsub events twice.
   let bgClickGeneration = 0;
   playstrategy.pubsub.on('analysis.chart.category.select', (symbol: string | null) => {
-    ctrl.bgHighlightGlyphId = symbol ? symbolToGlyphId[symbol] : undefined;
+    ctrl.bgHighlightGlyphIds = symbol ? symbolToGlyphIds[symbol] : undefined;
     ctrl.bgHighlightSymbol = symbol || undefined;
     if (!symbol) ctrl.bgHighlightPlayerIndex = undefined;
     clearCandidatePreview(ctrl);
@@ -459,6 +465,14 @@ function registerHandlers(ctrl: AnalyseCtrl): void {
   // Force a redraw on orientation/resize changes so isCol1() recomputes and the
   // detail-mode toggle button appears/disappears correctly on portrait↔landscape rotation.
   window.addEventListener('resize', () => ctrl.redraw());
+
+  document.addEventListener('mousedown', (e: MouseEvent) => {
+    if (e.button !== 0 || !ctrl.bgHighlightSymbol) return;
+    if (!(e.target as HTMLElement).closest?.('div.tview2 move')) return;
+    setTimeout(() => {
+      if (ctrl.bgHighlightSymbol) playstrategy.pubsub.emit('analysis.chart.category.select', null);
+    }, 0);
+  });
 
   // Capture player index when a symbol is clicked so Snabbdom can re-apply the locked
   // class after a mode switch recreates the DOM. Registered before acpl's jQuery handler
@@ -486,13 +500,8 @@ function registerHandlers(ctrl: AnalyseCtrl): void {
       // annotateTreeNodes annotates roll nodes (not decision nodes) with error/luck glyphs,
       // but bgTurnCandidates maps roll-node plies to candidates too, so navigating to the
       // roll ply shows the same candidate panel as navigating to the decision ply would.
-      const glyphIds =
-        symbol === 'luck'
-          ? [51, 52] // lucky (+) and unlucky (-)
-          : symbolToGlyphId[symbol] !== undefined
-            ? [symbolToGlyphId[symbol]]
-            : [];
-      if (!glyphIds.length) return; // 'd' (decisions): id 99 not on tree nodes — skip
+      const glyphIds = symbolToGlyphIds[symbol] ?? [];
+      if (!glyphIds.length) return;
       const plies: number[] = [];
       for (const n of ctrl.data.treeParts) {
         if (n.glyphs?.some(g => glyphIds.includes(g.id)) && n.playedPlayerIndex === pi) {

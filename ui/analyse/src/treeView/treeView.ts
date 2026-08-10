@@ -73,6 +73,7 @@ export function render(ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
 
 export function nodeClasses(ctx: Ctx, node: Tree.Node, path: Tree.Path, fullTurnPath: Tree.Path = path): NodeClasses {
   const glyphIds = ctx.showGlyphs && node.glyphs ? node.glyphs.map(g => g.id) : [];
+  const highlighted = ctx.ctrl.bgHighlightGlyphIds ?? [];
   const rawActivePath = ctx.ctrl.controlConfig.getActivePath?.();
   const activePath = rawActivePath === undefined ? ctx.ctrl.path : rawActivePath;
   return {
@@ -92,11 +93,11 @@ export function nodeClasses(ctx: Ctx, node: Tree.Node, path: Tree.Path, fullTurn
     interesting: glyphIds.includes(5),
     lucky: glyphIds.includes(51),
     unlucky: glyphIds.includes(52),
-    'h-blunder': ctx.ctrl.bgHighlightGlyphId === 4 && glyphIds.includes(4),
-    'h-mistake': ctx.ctrl.bgHighlightGlyphId === 2 && glyphIds.includes(2),
-    'h-brilliant': ctx.ctrl.bgHighlightGlyphId === 3 && glyphIds.includes(3),
-    'h-lucky': ctx.ctrl.bgHighlightGlyphId === 51 && glyphIds.includes(51),
-    'h-unlucky': ctx.ctrl.bgHighlightGlyphId === 52 && glyphIds.includes(52),
+    'h-blunder': highlighted.includes(4) && glyphIds.includes(4),
+    'h-mistake': highlighted.includes(2) && glyphIds.includes(2),
+    'h-brilliant': highlighted.includes(3) && glyphIds.includes(3),
+    'h-lucky': highlighted.includes(51) && glyphIds.includes(51),
+    'h-unlucky': highlighted.includes(52) && glyphIds.includes(52),
   };
 }
 

@@ -139,8 +139,9 @@ export default class AnalyseCtrl {
   bgTurnStartPly?: Map<number, number>;
   // original game node id per ply — used to detect when user is in a variation vs. the actual game
   bgOriginalNodeIdByPly?: Map<number, string>;
-  // glyph id of the currently locked advice-summary category (4=blunder, 3=perfect, 51=lucky, 52=unlucky); undefined = none
-  bgHighlightGlyphId?: number;
+  // glyph ids coloured by the currently locked advice-summary category (4=blunder, 2=mistake,
+  // 3=perfect, 51=lucky, 52=unlucky); the PR and luck headers cover several. undefined = none
+  bgHighlightGlyphIds?: number[];
   // symbol string and player index of the locked advice-summary entry, for re-applying the locked class after Snabbdom re-render
   bgHighlightSymbol?: string;
   bgHighlightPlayerIndex?: PlayerIndex;

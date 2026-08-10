@@ -36,7 +36,16 @@ function luckLabel(luck: number): string {
   if (luck > 0.1) return 'Lucky';
   if (luck < -0.3) return 'Very unlucky';
   if (luck < -0.1) return 'Unlucky';
-  return 'Neutral';
+  return '';
+}
+
+function luckComment(side: BackgammonAnalysisSide): string {
+  const rating = side.luckRating ?? luckLabel(side.luck);
+  return rating === 'None' ? '' : rating;
+}
+
+function renderComment(text: string): VNode[] {
+  return text ? [h('div.advice-summary__comment', { attrs: { title: text } }, text)] : [];
 }
 
 function renderCount(count: number, symbol: string, label: string, playerIndex: PlayerIndex, locked: boolean): VNode {
@@ -55,6 +64,8 @@ function isLocked(ctrl: AnalyseCtrl, symbol: string, pi: PlayerIndex): boolean {
 function renderSide(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, side: BackgammonAnalysisSide): VNode {
   const p = game.getPlayer(ctrl.data, playerIndex);
   const luck = side.luck;
+  const prRating = side.rating || erLabel(side.errorRate);
+  const luckRating = luckComment(side);
   return h('div.advice-summary__side', [
     h('div.advice-summary__player', [
       h(`i.is.playerIndex-icon.${p.playerColor}`),
@@ -66,14 +77,11 @@ function renderSide(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, side: Backgammo
         attrs: {
           'data-symbol': 'd',
           'data-playerindex': playerIndex,
-          title: 'PR: ' + (side.rating || erLabel(side.errorRate)),
+          title: 'PR: ' + prRating,
         },
         class: { locked: isLocked(ctrl, 'd', playerIndex) },
       },
-      [
-        h('strong', (side.errorRate / 2).toFixed(1)),
-        h('span', ['PR ', h('em', side.rating || erLabel(side.errorRate))]),
-      ],
+      [h('strong', (side.errorRate / 2).toFixed(1)), h('span', ['PR ', h('em', prRating)])],
     ),
     renderCount(side.blunders, '??', 'Blunders', playerIndex, isLocked(ctrl, '??', playerIndex)),
     renderCount(side.mistakes, '?', 'Mistakes', playerIndex, isLocked(ctrl, '?', playerIndex)),
@@ -84,17 +92,18 @@ function renderSide(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, side: Backgammo
         attrs: {
           'data-symbol': 'luck',
           'data-playerindex': playerIndex,
-          title: 'Luck: ' + (side.luckRating || luckLabel(luck)),
+          title: luckRating ? 'Luck: ' + luckRating : 'Luck',
         },
         class: { locked: isLocked(ctrl, 'luck', playerIndex) },
       },
       [
         h('strong', { class: { good: luck > 0.1, bad: luck < -0.1 } }, (luck >= 0 ? '+' : '') + luck.toFixed(2)),
-        h('span', ['Luck ', h('em', side.luckRating || luckLabel(luck))]),
+        h('span', 'Luck'),
       ],
     ),
     renderCount(side.luckyRolls, '+', 'Lucky rolls', playerIndex, isLocked(ctrl, '+', playerIndex)),
     renderCount(side.unluckyRolls, '-', 'Unlucky rolls', playerIndex, isLocked(ctrl, '-', playerIndex)),
+    ...renderComment(luckRating),
   ]);
 }
 
@@ -180,6 +189,7 @@ function parseGnubgPlay(play: string, isP1: boolean): CheckerMove[] {
 }
 
 let expandedCandidateRank = -1;
+let shownCandidateRank = -1;
 let lastCandidatePly = -1;
 let pendingArrows: CgDrawShape[] = [];
 let showPlayedOnNextRender = false;
@@ -292,6 +302,7 @@ function renderCandidates(ctrl: AnalyseCtrl): VNode | undefined {
     lastCandidatePly = ply;
     // Start with nothing selected — played row is always visually expanded via c.played.
     expandedCandidateRank = -1;
+    shownCandidateRank = -1;
     pendingArrows = [];
     activeFenOverride = null;
     // Clear arrows immediately on ply change; without this, if the new ply has no
@@ -330,6 +341,7 @@ function renderCandidates(ctrl: AnalyseCtrl): VNode | undefined {
       activeFenOverridePly = ply;
       ctrl.chessground.set({ fen: targetFen, dice });
       pendingArrows = buildArrowShapes(ctrl, played);
+      shownCandidateRank = played.rank;
       ctrl.chessground.setAutoShapes(pendingArrows);
       // Force an immediate synchronous draw so shapes are positioned against PRE-MOVE
       // state.pieces before any subsequent redrawAll() (from needsFullRedrawAfterGround) can
@@ -343,17 +355,19 @@ function renderCandidates(ctrl: AnalyseCtrl): VNode | undefined {
 
   const rows = candidates.map((c: BgCandidateUI) => {
     const expanded = c.played || expandedCandidateRank === c.rank;
+    const showing = shownCandidateRank === c.rank;
     const deltaStr = c.equityDelta != null ? (c.equityDelta >= 0 ? '+' : '') + c.equityDelta.toFixed(3) : '—';
     const p = c.probabilities;
     // key includes ply so Snabbdom recreates elements on ply change,
     // triggering hook.insert with the new candidates' closures.
     return h(
-      `div.bg-candidates__row${c.played ? '.played' : ''}${expanded ? '.expanded' : ''}`,
+      `div.bg-candidates__row${c.played ? '.played' : ''}${expanded ? '.expanded' : ''}${showing ? '.showing' : ''}`,
       {
         key: `${ply}-${c.rank}`,
         hook: bind('click', () => {
           const wasSelected = expandedCandidateRank === c.rank;
           expandedCandidateRank = wasSelected ? -1 : c.rank;
+          shownCandidateRank = wasSelected ? -1 : c.rank;
 
           if (wasSelected) {
             // Deselecting: navigate to the turn-start node so the board shows the dice-rolled
@@ -363,11 +377,14 @@ function renderCandidates(ctrl: AnalyseCtrl): VNode | undefined {
             ctrl.chessground.setAutoShapes([]);
             const turnStartPly = ctrl.bgTurnStartPly?.get(ply);
             if (turnStartPly !== undefined) {
-              ctrl.jumpToMain(turnStartPly); // showGround + afterJump + redraw handled internally
+              ctrl.jumpToMain(turnStartPly); // showGround + afterJump handled internally
             } else {
               ctrl.controlConfig.afterJump?.();
-              ctrl.redraw();
             }
+            // ctrl.jump() does NOT redraw — and when we're already on the turn-start node the
+            // jump is a no-op anyway. Without this the row keeps its highlight after deselect:
+            // setAutoShapes() clears the arrows imperatively, but the list is only vdom.
+            ctrl.redraw();
             return;
           }
 
@@ -463,6 +480,7 @@ export function renderTopMoves(ctrl: AnalyseCtrl): VNode | undefined {
 export function clearCandidatePreview(ctrl: AnalyseCtrl): void {
   if (expandedCandidateRank === -1) return;
   expandedCandidateRank = -1;
+  shownCandidateRank = -1;
   pendingArrows = [];
   lastCandidatePly = -1;
   activeFenOverride = null;
@@ -476,15 +494,16 @@ export function clearCandidatePreview(ctrl: AnalyseCtrl): void {
 export function dismissCandidatePreview(ctrl: AnalyseCtrl): boolean {
   if (expandedCandidateRank === -1) return false;
   expandedCandidateRank = -1;
+  shownCandidateRank = -1;
   pendingArrows = [];
   activeFenOverride = null;
   ctrl.chessground?.setAutoShapes([]);
   const turnStartPly = ctrl.bgTurnStartPly?.get(ctrl.node.ply);
   if (turnStartPly !== undefined) {
-    ctrl.jumpToMain(turnStartPly); // showGround + afterJump + redraw handled internally
+    ctrl.jumpToMain(turnStartPly); // showGround + afterJump handled internally
   } else {
     ctrl.controlConfig.afterJump?.();
-    ctrl.redraw();
   }
+  ctrl.redraw(); // ctrl.jump() does not redraw; the candidate list needs it to drop the highlight
   return true;
 }

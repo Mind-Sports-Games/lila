@@ -677,6 +677,9 @@ export default function (ctrl: AnalyseCtrl): VNode {
           'has-relay-tour': !!tour,
           'analyse-hunter': ctrl.opts.hunter,
           'analyse--detail': isBackgammonVariant(variantKey) && isCol1() && ctrl.analyseDetail() && !menuIsOpen,
+          // A category is locked in the advice-summary: the move tree then colours that
+          // category only, instead of its default blunders + mistakes.
+          'annotation-locked': !!ctrl.bgHighlightSymbol,
         },
       },
       [

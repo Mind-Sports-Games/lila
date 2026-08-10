@@ -38,6 +38,19 @@
   .advice-summary__luck-hdr {
     margin-top: 0.4em;
   }
+
+  .advice-summary__comment,
+  .advice-summary__acpl em {
+    font-style: italic;
+    opacity: 0.7;
+  }
+
+  .advice-summary__comment {
+    padding-left: calc(4ch + 0.3em);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 }
 
 // In detail mode the advice-summary is a grid item directly below the board —
@@ -63,6 +76,11 @@
       border-top: 1px solid rgba(255, 255, 255, 0.15);
       padding-top: 0.2em;
       margin-top: 0.1em;
+    }
+
+    .advice-summary__comment {
+      grid-column: 1 / -1;
+      padding-left: calc(4ch + 0.1em);
     }
 
     > div {
@@ -128,7 +146,6 @@
     display: none;
   }
 
-  // Reset annotation colors from _tree.scss — backgammon shows no color by default.
   move.blunder,
   move.brilliant,
   move.mistake,
@@ -136,11 +153,16 @@
     color: unset;
   }
 
-  // Colors only appear when a category is selected in the advice-summary panel.
-  // Each h-* class is mutually exclusive (only one category selected at a time).
-  move.h-blunder,
-  move.h-mistake,
-  move.h-brilliant,
+  .analyse:not(.annotation-locked) & {
+    move.blunder {
+      color: #db3031;
+    }
+
+    move.mistake {
+      color: #d96420;
+    }
+  }
+
   move.h-blunder {
     color: #db3031;
   }
@@ -205,19 +227,40 @@
     padding: 0.3em 0.4em;
     border-radius: 3px;
     cursor: pointer;
-    border-left: 2px solid transparent;
+    border-left: 4px solid transparent;
 
     &:hover {
       background: rgba(255, 255, 255, 0.06);
     }
 
-    &.played {
-      border-left-color: #4da3d5;
-      background: rgba(77, 163, 213, 0.08);
-    }
-
     &.expanded {
       background: rgba(255, 255, 255, 0.08);
+    }
+
+    &.played {
+      border-left-color: #4da3d5;
+      background: linear-gradient(to right, rgba(77, 163, 213, 0.24), rgba(77, 163, 213, 0.06) 8em);
+    }
+
+    &.showing {
+      border-left-color: #5ebe5e;
+      background: linear-gradient(to right, rgba(94, 190, 94, 0.24), rgba(94, 190, 94, 0.06) 8em);
+      box-shadow: inset 0 0 0 1px rgba(94, 190, 94, 0.9);
+    }
+
+    @include breakpoint($mq-col1-uniboard) {
+      border-left-width: 6px;
+
+      &.played {
+        border-left-color: #6bbceb;
+        background: linear-gradient(to right, rgba(77, 163, 213, 0.32), rgba(77, 163, 213, 0.08) 8em);
+      }
+
+      &.showing {
+        border-left-color: #7ad67a;
+        background: linear-gradient(to right, rgba(94, 190, 94, 0.32), rgba(94, 190, 94, 0.08) 8em);
+        box-shadow: inset 0 0 0 2px rgba(122, 214, 122, 0.9);
+      }
     }
   }
 

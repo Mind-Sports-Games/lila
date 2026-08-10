@@ -187,7 +187,7 @@ function makeDataset(
 
 // Hover/click on blunder/mistake/inaccuracy counts in the advice-summary panel →
 // highlight matching moves on the chart. Click locks the highlights and navigates to the
-// next occurrence (cycling); clicking a graph dot clears the lock.
+// next occurrence (cycling); clicking a graph dot or a move in the tree clears the lock.
 // When locked, pointRadius is set per-point so dots stay visible as the mouse moves elsewhere
 // (Chart.js's internal hover replaces setActiveElements but never touches pointRadius).
 function christmasTree(
@@ -201,6 +201,8 @@ function christmasTree(
   let lockedPi: PlayerIndex | null = null;
 
   // 'luck' is a virtual symbol that expands to both '+' (lucky) and '-' (unlucky).
+  // 'd' (PR) needs no expansion: every decision node carries its own 'd' glyph, so the graph
+  // marks all of them — including the unannotated ones the move tree has no colour for.
   const symbolsFor = (symbol: string): string[] => (symbol === 'luck' ? ['+', '-'] : [symbol]);
 
   const pointsFor = (symbol: string, pi: PlayerIndex) => {
@@ -303,6 +305,11 @@ function christmasTree(
     const ply = nextPlyFor(symbol, pi);
     if (ply !== undefined) playstrategy.pubsub.emit('analysis.chart.click', ply);
   });
+
+  $(document).on('mousedown.ctree touchstart.ctree', 'div.tview2 move', function (e: Event) {
+    if (e.type === 'mousedown' && (e as MouseEvent).button !== 0) return; // right-click opens the context menu
+    state.clearCategoryLock();
+  });
 }
 
 export default function acpl(el: HTMLCanvasElement, data: AnalyseData, mainline: Tree.Node[], trans: Trans): AcplChart {
@@ -343,10 +350,8 @@ export default function acpl(el: HTMLCanvasElement, data: AnalyseData, mainline:
               const ev = node?.eval;
               if (!ev) return '';
               if (ev.win !== undefined) {
-                // backgammon: show leading side's win%, signed
-                const white = ev.win * 100;
-                const pct = white >= 50 ? white : white - 100;
-                return trans('advantage') + ': ' + (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%';
+                const margin = Math.round((2 * ev.win - 1) * 1000) / 10;
+                return trans('advantage') + ': ' + (margin > 0 ? '+' : '') + margin.toFixed(1) + '%';
               }
               if (ev.mate) return trans('advantage') + ': #' + ev.mate;
               if (ev.cp !== undefined) {
