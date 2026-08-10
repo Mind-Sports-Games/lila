@@ -156,11 +156,13 @@ case class Game(
       case seconds                           => seconds.toInt.some
     }
 
-  private def everyOther[A](l: List[A]): List[A] =
-    l match {
-      case a :: _ :: tail => a :: everyOther(tail)
-      case _              => l
-    }
+  private def actionsPerTurn(playerIndex: PlayerIndex): Vector[Int] = {
+    val pivot = startIndex(playerIndex)
+    actionStrs.zipWithIndex.collect { case (t, i) if (i % 2) == pivot => t.size }
+  }
+
+  private def turnOffsets: Vector[(Int, Int)] =
+    actionStrs.map(_.size).scanLeft(0)(_ + _).zip(actionStrs.map(_.size))
 
   def plyTimes(playerIndex: PlayerIndex): Option[List[Centis]] = {
     for {
@@ -180,15 +182,17 @@ case class Game(
           finished,
           status,
           grace,
-          byo
+          byo,
+          actionsPerTurn(playerIndex)
         )
     } yield plyTimes
   } orElse binaryPlyTimes.map { binary =>
     // Thibault TODO: make plyTime.read return List after writes are disabled.
-    // TODO fix for multiaction, when does this get called?
-    val base = BinaryFormat.plyTime.read(binary, playedPlies)
-    val mts  = if (playerIndex == startPlayerIndex) base else base.drop(1)
-    everyOther(mts.toList)
+    val base  = BinaryFormat.plyTime.read(binary, playedPlies)
+    val pivot = startIndex(playerIndex)
+    turnOffsets.zipWithIndex.collect { case ((offset, actions), i) if (i % 2) == pivot =>
+      base.slice(offset, offset + actions)
+    }.flatten.toList
   }
 
   def plyTimes: Option[Vector[Centis]] =
@@ -1462,11 +1466,16 @@ sealed trait ClockHistory {
       finished: Boolean,
       status: Status,
       grace: Centis = Centis(0),
-      byo: Centis = Centis(0)
+      byo: Centis = Centis(0),
+      actionsPerTurn: Vector[Int] = Vector.empty
   ): List[Centis]
   def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis]
   def size: Int
   def bothClockStates(firstMoveBy: PlayerIndex, who: Vector[String]): Vector[Centis]
+
+  protected def isTurnEndAction(actionsPerTurn: Vector[Int]): Int => Boolean =
+    if (actionsPerTurn.forall(_ <= 1)) _ => true
+    else actionsPerTurn.scanLeft(0)(_ + _).drop(1).map(_ - 1).toSet.contains
 }
 
 case class FischerClockHistory(
@@ -1496,7 +1505,8 @@ case class FischerClockHistory(
       finished: Boolean,
       status: Status,
       grace: Centis = Centis(0),
-      byo: Centis = Centis(0)
+      byo: Centis = Centis(0),
+      actionsPerTurn: Vector[Int] = Vector.empty
   ): List[Centis] = {
     val clocks = dbTimes(playerIndex)
     Centis(0) :: {
@@ -1514,10 +1524,12 @@ case class FischerClockHistory(
       val noLastInc =
         finished && (size <= playedPlies) == (playerIndex != turnPlayerIndex)
 
-      pairs.map { case (first, second) =>
+      val isTurnEnd = isTurnEndAction(actionsPerTurn)
+
+      pairs.zipWithIndex.map { case ((first, second), index) =>
         {
           val mt     = first - second
-          val cGrace = (pairs.hasNext || !noLastInc) so grace
+          val cGrace = ((pairs.hasNext || !noLastInc) && isTurnEnd(index + 1)) so grace
 
           mt + cGrace
         } nonNeg
@@ -1585,7 +1597,8 @@ case class DelayClockHistory(
       _finished: Boolean,
       _status: Status,
       _grace: Centis = Centis(0),
-      _byo: Centis = Centis(0)
+      _byo: Centis = Centis(0),
+      _actionsPerTurn: Vector[Int] = Vector.empty
   ): List[Centis] = dbTimes(playerIndex).toList
 
   override def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis] =
@@ -1655,7 +1668,8 @@ case class ByoyomiClockHistory(
       finished: Boolean,
       status: Status,
       grace: Centis = Centis(0),
-      byo: Centis = Centis(0)
+      byo: Centis = Centis(0),
+      actionsPerTurn: Vector[Int] = Vector.empty
   ): List[Centis] = {
     val clocks = dbTimes(playerIndex)
     Centis(0) :: {
@@ -1681,13 +1695,15 @@ case class ByoyomiClockHistory(
       val byoyomiTimeout =
         byoyomiStart.isDefined && (Status.flagged.contains(status)) && (playerIndex == turnPlayerIndex)
 
+      val isTurnEnd = isTurnEndAction(actionsPerTurn)
+
       pairs.zipWithIndex.map { case ((first, second), index) =>
         {
           // byoyomiStart is stored as the 1-based action index of the first byoyomi action.
           val afterByoyomi  = byoyomiStart so (_ <= index + 2)
           // after byoyomi we store movetimes directly, not remaining time
           val mt     = if (afterByoyomi) second else first - second
-          val cGrace = (!afterByoyomi && (pairs.hasNext || !noLastInc)) so grace
+          val cGrace = (!afterByoyomi && (pairs.hasNext || !noLastInc) && isTurnEnd(index + 1)) so grace
 
           if (!pairs.hasNext && byoyomiTimeout) {
             val fullTurnCount   = index + 2 + startedAtTurn / 2
