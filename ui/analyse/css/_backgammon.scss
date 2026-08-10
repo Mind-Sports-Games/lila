@@ -201,7 +201,7 @@
 
     @include breakpoint($mq-col2-uniboard) {
       .analyse:not(.analyse--detail) & {
-        min-height: 12em;
+        max-height: min(15em, 40vh);
       }
     }
   }

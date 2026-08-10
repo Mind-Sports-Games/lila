@@ -849,12 +849,12 @@ $backgammon-pocket-height: 6em;
   grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
 
   @include breakpoint($mq-col2) {
-    grid-template-rows: $backgammon-pocket-height auto $backgammon-pocket-height;
+    grid-template-rows: $backgammon-pocket-height auto $backgammon-pocket-height $col2-uniboard-controls auto;
     grid-template-areas: 'board      gauge pocket-top' 'board      gauge tools' 'board      gauge pocket-bot' 'under      .     controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
   }
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $backgammon-pocket-height $meta-height $chat-height $backgammon-pocket-height;
+    grid-template-rows: $backgammon-pocket-height $meta-height $chat-height $backgammon-pocket-height $col3-uniboard-controls auto;
     grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }
@@ -866,12 +866,12 @@ $backgammon-pocket-height: 6em;
   grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
 
   @include breakpoint($mq-col2) {
-    grid-template-rows: $backgammon-pocket-height auto $backgammon-pocket-height;
+    grid-template-rows: $backgammon-pocket-height auto $backgammon-pocket-height $col2-uniboard-controls auto;
     grid-template-areas: 'board      gauge pocket-top' 'board      gauge tools' 'board      gauge pocket-bot' 'under      .     controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
   }
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $backgammon-pocket-height $meta-height $chat-height $backgammon-pocket-height;
+    grid-template-rows: $backgammon-pocket-height $meta-height $chat-height $backgammon-pocket-height $col3-uniboard-controls auto;
     grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }
