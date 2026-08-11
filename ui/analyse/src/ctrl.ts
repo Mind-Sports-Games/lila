@@ -145,6 +145,8 @@ export default class AnalyseCtrl {
   // symbol string and player index of the locked advice-summary entry, for re-applying the locked class after Snabbdom re-render
   bgHighlightSymbol?: string;
   bgHighlightPlayerIndex?: PlayerIndex;
+  // true while the pointer is acting inside the annotation UI, so its jumps keep the lock
+  bgKeepAnnotationLock = false;
 
   // misc
   cgConfig: any; // latest chessground config (useful for revert)
@@ -480,6 +482,8 @@ export default class AnalyseCtrl {
   userJump = (path: Tree.Path): void => {
     this.autoplay.stop();
     this.withCg(cg => cg.selectSquare(null));
+    if (this.bgHighlightSymbol && !this.bgKeepAnnotationLock)
+      playstrategy.pubsub.emit('analysis.chart.category.select', null);
     if (this.practice) {
       const prev = this.path;
       this.practice.preUserJump(prev, path);

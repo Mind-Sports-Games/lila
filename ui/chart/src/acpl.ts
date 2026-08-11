@@ -266,6 +266,16 @@ function christmasTree(
     return matches.find(p => p > state.currentPly) ?? matches[0];
   };
 
+  // Someone else unlocked (a jump elsewhere in the tree): drop our own lock too, or the
+  // next click on the same symbol would take the "already locked" path and never re-emit.
+  playstrategy.pubsub.on('analysis.chart.category.select', (symbol: string | null) => {
+    if (symbol || !lockedSymbol) return;
+    $('div.advice-summary div.symbol.locked').removeClass('locked');
+    lockedSymbol = null;
+    lockedPi = null;
+    clearHighlight();
+  });
+
   // Expose a way for the chart's onClick to clear the lock without knowing internals.
   state.clearCategoryLock = () => {
     if (!lockedSymbol) return;

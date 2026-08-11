@@ -454,11 +454,16 @@ function registerHandlers(ctrl: AnalyseCtrl): void {
   // so that analysis.change fires with that ply and state.currentPly (in acpl.ts) is
   // set past the glyph node, allowing the next symbol click to cycle to the next match.
   // renderCandidates auto-show overrides the board FEN to the turn-start position.
+  let pointerInAdviceSummary = false;
   playstrategy.pubsub.on('analysis.chart.click', () => {
     bgClickGeneration++;
     clearCandidatePreview(ctrl);
+    if (!pointerInAdviceSummary) {
+      if (ctrl.bgHighlightSymbol) playstrategy.pubsub.emit('analysis.chart.category.select', null);
+      return;
+    }
     const sym = ctrl.bgHighlightSymbol;
-    if (sym === '??' || sym === '?' || sym === '!!') {
+    if (sym === '??' || sym === '?' || sym === '!!' || sym === 'd') {
       scheduleShowPlayed();
       ctrl.redraw();
     }
@@ -468,12 +473,12 @@ function registerHandlers(ctrl: AnalyseCtrl): void {
   window.addEventListener('resize', () => ctrl.redraw());
 
   document.addEventListener('mousedown', (e: MouseEvent) => {
-    if (e.button !== 0 || !ctrl.bgHighlightSymbol) return;
-    if (!(e.target as HTMLElement).closest?.('div.tview2 move')) return;
-    setTimeout(() => {
-      if (ctrl.bgHighlightSymbol) playstrategy.pubsub.emit('analysis.chart.category.select', null);
-    }, 0);
+    const el = e.target as HTMLElement;
+    pointerInAdviceSummary = !!el.closest?.('div.advice-summary');
+    ctrl.bgKeepAnnotationLock = pointerInAdviceSummary || !!el.closest?.('div.bg-candidates');
   });
+  document.addEventListener('keydown', () => (ctrl.bgKeepAnnotationLock = false));
+  document.addEventListener('wheel', () => (ctrl.bgKeepAnnotationLock = false), { passive: true });
 
   // Capture player index when a symbol is clicked so Snabbdom can re-apply the locked
   // class after a mode switch recreates the DOM. Registered before acpl's jQuery handler
