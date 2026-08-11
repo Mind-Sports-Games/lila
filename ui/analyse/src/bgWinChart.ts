@@ -50,6 +50,7 @@ interface BgPlayerStatsJson {
   overallErrorRate?: number;
   luckTotalEmg?: number;
   overallRating?: string;
+  skill?: string; // tier derived from overallErrorRate, computed by BackgammonAnalysis.skillLabel
   luckRating?: string;
 }
 interface BgGame {
@@ -587,14 +588,14 @@ export default function bgWinChart(ctrl: AnalyseCtrl, panel: HTMLElement): Promi
             p1: {
               errorRate: s1.overallErrorRate ?? 0,
               luck: s1.luckTotalEmg ?? 0,
-              rating: s1.overallRating,
+              rating: s1.skill,
               luckRating: s1.luckRating,
               ...cnt.p1,
             },
             p2: {
               errorRate: s2.overallErrorRate ?? 0,
               luck: s2.luckTotalEmg ?? 0,
-              rating: s2.overallRating,
+              rating: s2.skill,
               luckRating: s2.luckRating,
               ...cnt.p2,
             },

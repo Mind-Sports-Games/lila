@@ -101,18 +101,30 @@ case class BackgammonAnalysis(
     rates.nonEmpty.option(rates.sum / rates.size)
   }
 
-  /** Performance rating: half the mEMG error rate, the same number the analysis
-    * board shows as "PR". Lower is better. */
-  def prFor(playerIndex: PlayerIndex): Option[Double] = errorRateFor(playerIndex).map(_ / 2)
+  /** Performance rating: half the mEMG error rate, the same number the analysis board
+    * shows as "PR". Positive by convention — gnubg reports a negative equity loss, but
+    * every published PR scale runs upwards from 0, where lower is better. */
+  def prFor(playerIndex: PlayerIndex): Option[Double] = errorRateFor(playerIndex).map(er => (er / 2).abs)
 
-  /** gnubg's own skill word for the player, e.g. "Expert". */
   def ratingFor(playerIndex: PlayerIndex): Option[String] =
-    statsFor(playerIndex).flatMap(_.overallRating).headOption
+    errorRateFor(playerIndex).map(BackgammonAnalysis.skillLabel)
 }
 
 object BackgammonAnalysis {
 
   type ID = String
+
+  // gnubg's mEMG error rate is twice XG's PR.
+  def skillLabel(errorRate: Double): String = {
+    val er = errorRate.abs
+    if (er < 5) "Super Grandmaster"
+    else if (er < 10) "World Class"
+    else if (er < 15) "Expert"
+    else if (er < 25) "Advanced"
+    else if (er < 35) "Intermediate"
+    else if (er < 45) "Casual"
+    else "Beginner"
+  }
 
   // ── persistence (BSON) ────────────────────────────────────────────────────
   implicit val probabilitiesHandler: BSONDocumentHandler[BgProbabilities] = Macros.handler
@@ -127,7 +139,10 @@ object BackgammonAnalysis {
   implicit val probabilitiesWrites: Writes[BgProbabilities] = Json.writes[BgProbabilities]
   implicit val candidateWrites: Writes[BgCandidate]         = Json.writes[BgCandidate]
   implicit val moveWrites: Writes[BgMove]                   = Json.writes[BgMove]
-  implicit val statsWrites: Writes[BgPlayerStats]           = Json.writes[BgPlayerStats]
+  private val statsBaseWrites: OWrites[BgPlayerStats] = Json.writes[BgPlayerStats]
+  implicit val statsWrites: OWrites[BgPlayerStats] = OWrites { s =>
+    statsBaseWrites.writes(s) ++ Json.obj("skill" -> s.overallErrorRate.map(skillLabel))
+  }
   implicit val winnerWrites: Writes[BgWinner]               = Json.writes[BgWinner]
   implicit val gameWrites: OWrites[BgGame]                  = Json.writes[BgGame]
   implicit val matchWrites: OWrites[BackgammonAnalysis] = OWrites { a =>

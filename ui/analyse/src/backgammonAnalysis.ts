@@ -22,15 +22,6 @@ function playerName(ctrl: AnalyseCtrl, playerIndex: PlayerIndex): string {
   return 'Anonymous';
 }
 
-function erLabel(er: number): string {
-  if (er < 2) return 'World class';
-  if (er < 4) return 'Expert';
-  if (er < 6) return 'Advanced';
-  if (er < 10) return 'Intermediate';
-  if (er < 15) return 'Casual';
-  return 'Beginner';
-}
-
 function luckLabel(luck: number): string {
   if (luck > 0.3) return 'Very lucky';
   if (luck > 0.1) return 'Lucky';
@@ -64,7 +55,7 @@ function isLocked(ctrl: AnalyseCtrl, symbol: string, pi: PlayerIndex): boolean {
 function renderSide(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, side: BackgammonAnalysisSide): VNode {
   const p = game.getPlayer(ctrl.data, playerIndex);
   const luck = side.luck;
-  const prRating = side.rating || erLabel(side.errorRate);
+  const prRating = side.rating ?? '';
   const luckRating = luckComment(side);
   return h('div.advice-summary__side', [
     h('div.advice-summary__player', [
@@ -81,7 +72,7 @@ function renderSide(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, side: Backgammo
         },
         class: { locked: isLocked(ctrl, 'd', playerIndex) },
       },
-      [h('strong', (side.errorRate / 2).toFixed(1)), h('span', ['PR ', h('em', prRating)])],
+      [h('strong', Math.abs(side.errorRate / 2).toFixed(1)), h('span', ['PR ', h('em', prRating)])],
     ),
     renderCount(side.blunders, '??', 'Blunders', playerIndex, isLocked(ctrl, '??', playerIndex)),
     renderCount(side.mistakes, '?', 'Mistakes', playerIndex, isLocked(ctrl, '?', playerIndex)),
