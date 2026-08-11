@@ -208,6 +208,14 @@ export function scheduleShowPlayed(): void {
 // hook in bgWinChart.ts, which intercepts ceval's continuous setAutoShapes calls so they can't
 // overwrite the candidate arrows.
 export function reapplyFenOverride(ctrl: AnalyseCtrl): boolean {
+  // Prevents displaying the dice picker and player dice underneath the picker overlay.
+  if (ctrl.controlConfig.isBoardOverlayActive?.()) {
+    activeFenOverride = null;
+    pendingArrows = [];
+    expandedCandidateRank = -1;
+    shownCandidateRank = -1;
+    return false;
+  }
   if (!activeFenOverride || ctrl.node.ply !== activeFenOverridePly || pendingArrows.length === 0) {
     activeFenOverride = null;
     return false;
