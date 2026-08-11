@@ -315,7 +315,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
         ctx.fillStyle = key === 'p1' ? p1Fill : p2Fill;
         ctx.strokeStyle = barBorderColor(key);
         ctx.beginPath();
-        for (let start = 0; start < bars.length; ) {
+        for (let start = 0; start < bars.length;) {
           let end = start;
           while (end + 1 < bars.length && points[end + 1].x === points[start].x) end++;
           const { x, width } = bars[end];
