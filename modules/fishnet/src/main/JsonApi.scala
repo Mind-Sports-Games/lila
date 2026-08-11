@@ -49,7 +49,7 @@ object JsonApi {
     // its candidates.
     case class BgCandPost(
         play:           String,
-        plies:          Int,
+        evaluator:      Int,
         equity:         Int,
         equityDelta:    Option[Int],
         win:            Int,
@@ -58,10 +58,10 @@ object JsonApi {
         loseGammon:     Int,
         loseBackgammon: Int
     ) {
-      def toModel(rank: Int, played: Boolean) =
+      def toModel(rank: Int, played: Boolean, evaluators: List[String]) =
         lila.analyse.BgCandidate(
           rank = rank,
-          evaluator = s"Cubeful $plies-ply",
+          evaluator = evaluators.lift(evaluator).getOrElse(""),
           play = play,
           equity = BgCandPost.decimal(equity),
           equityDelta = equityDelta.map(BgCandPost.decimal),
@@ -92,8 +92,10 @@ object JsonApi {
         playedIndex: Option[Int],
         candidates:  List[BgCandPost]
     ) {
-      def toModel(number: Int, p1: String, p2: String) = {
-        val cands  = candidates.zipWithIndex.map { case (c, i) => c.toModel(i + 1, playedIndex contains i) }
+      def toModel(number: Int, p1: String, p2: String, evaluators: List[String]) = {
+        val cands = candidates.zipWithIndex.map { case (c, i) =>
+          c.toModel(i + 1, playedIndex contains i, evaluators)
+        }
         val played = playedIndex.flatMap(cands.lift)
         lila.analyse.BgMove(
           number = number,
@@ -147,17 +149,22 @@ object JsonApi {
         stats:  List[BgStatsPost],
         moves:  List[BgMovePost]
     ) {
-      def toModel(p1: String, p2: String) =
+      def toModel(p1: String, p2: String, evaluators: List[String]) =
         lila.analyse.BgGame(
           number,
           winner.map(_.toModel),
           stats.map(_.toModel),
-          moves.zipWithIndex.map { case (m, i) => m.toModel(i + 1, p1, p2) }
+          moves.zipWithIndex.map { case (m, i) => m.toModel(i + 1, p1, p2, evaluators) }
         )
     }
 
-    case class BackgammonPost(player1: String, player2: String, games: List[BgGamePost]) {
-      def toGames: List[lila.analyse.BgGame] = games.map(_.toModel(player1, player2))
+    case class BackgammonPost(
+        player1:    String,
+        player2:    String,
+        evaluators: List[String],
+        games:      List[BgGamePost]
+    ) {
+      def toGames: List[lila.analyse.BgGame] = games.map(_.toModel(player1, player2, evaluators))
     }
 
     case class Acquire(
@@ -394,6 +401,7 @@ object JsonApi {
     implicit val BackgammonPostReads: Reads[Request.BackgammonPost] = (
       (__ \ "p1").read[String] and
         (__ \ "p2").read[String] and
+        (__ \ "e").read[List[String]] and
         (__ \ "g").read[List[Request.BgGamePost]]
     )(Request.BackgammonPost.apply)
 
