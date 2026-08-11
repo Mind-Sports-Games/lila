@@ -184,6 +184,29 @@ $bg-highlight-colors: (
   }
 }
 
+$bg-col2-column-height: 475px;
+
+@include breakpoint($mq-col2-uniboard) {
+  .analyse.backgammon:not(.analyse--detail) {
+    .analyse__underboard__panels {
+      --panel-height: #{$bg-col2-column-height};
+    }
+
+    .analyse__acpl {
+      height: $bg-col2-column-height;
+      display: flex;
+      flex-direction: column;
+
+      .bg-candidates {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+      }
+    }
+  }
+}
+
 .bg-candidates {
   margin-top: 1em;
   font-size: 0.9em;
@@ -195,7 +218,9 @@ $bg-highlight-colors: (
 
     @include breakpoint($mq-col2-uniboard) {
       .analyse:not(.analyse--detail) & {
-        max-height: min(15em, 40vh);
+        flex: 1;
+        min-height: 0;
+        max-height: none;
       }
     }
   }
