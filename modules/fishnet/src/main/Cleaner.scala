@@ -20,8 +20,13 @@ final private class Cleaner(
 
   import BSONHandlers.*
 
-  private def analysisTimeout(plies: Int) = (plies + 1) * 7.seconds
-  private def analysisTimeoutBase         = analysisTimeout(20)
+  private val wholeGameTimeout = 10.minutes
+
+  private def analysisTimeout(work: Work.Analysis) =
+    if (work.game.backgammon.isDefined) wholeGameTimeout
+    else (work.nbMoves + 1) * 7.seconds
+
+  private def analysisTimeoutBase = 21 * 7.seconds
 
   private def durationAgo(d: FiniteDuration) = DateTime.now.minusSeconds(d.toSeconds.toInt)
 
@@ -32,7 +37,7 @@ final private class Cleaner(
       .cursor[Work.Analysis]()
       .documentSource()
       .filter { ana =>
-        ana.acquiredAt.so(_.isBefore(durationAgo(analysisTimeout(ana.nbMoves))))
+        ana.acquiredAt.so(_.isBefore(durationAgo(analysisTimeout(ana))))
       }
       .take(200)
       .mapAsyncUnordered(4) { ana =>

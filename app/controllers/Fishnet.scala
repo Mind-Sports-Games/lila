@@ -39,7 +39,7 @@ final class Fishnet(env: Env) extends LilaController(env) {
             onComplete
           case PostAnalysisResult.CompleteBackgammon(id) =>
             env.round.proxyRepo.updateIfPresent(id)(_.setAnalysed)
-            onComplete
+            fuccess(Left(NoContent))
           case _: PostAnalysisResult.Partial    => fuccess(Left(NoContent))
           case PostAnalysisResult.UnusedPartial => fuccess(Left(NoContent))
         }
