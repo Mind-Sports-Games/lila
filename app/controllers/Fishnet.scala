@@ -15,8 +15,6 @@ final class Fishnet(env: Env) extends LilaController(env) {
   private def api    = env.fishnet.api
   private val logger = lila.log("fishnet")
 
-  private def analysisMaxBodyLength = 8 * 1024 * 1024L
-
   def acquire(slow: Boolean = false) =
     ClientAction[JsonApi.Request.Acquire] { data => client =>
       api.acquire(client, slow, data.fishnet.variants) addEffect { jobOpt =>
@@ -25,7 +23,7 @@ final class Fishnet(env: Env) extends LilaController(env) {
     }
 
   def analysis(workId: String, slow: Boolean = false, stop: Boolean = false) =
-    ClientAction[JsonApi.Request.PostAnalysisLexicalUci](analysisMaxBodyLength) { data => client =>
+    ClientAction[JsonApi.Request.PostAnalysisLexicalUci] { data => client =>
       import lila.fishnet.FishnetApi.*
       def onComplete =
         if (stop) fuccess(Left(NoContent))
