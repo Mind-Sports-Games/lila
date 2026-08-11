@@ -271,22 +271,80 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   );
 
   const blueLineColor = '#3893e8';
+  const barBorderColor = (key: 'p1' | 'p2') => (key === 'p1' ? '#838383' : '#616161');
 
   const moveBarDatasets = (['p1', 'p2'] as const).map(key => ({
     type: 'bar' as const,
     data: isBackgammon
       ? segmentSeries[key].map(p => ({ ...p, y: [p.y[0] / maxMove, p.y[1] / maxMove] as [number, number] }))
       : moveSeries[key].map(p => ({ x: p.x, y: p.y / maxMove })),
-    backgroundColor: key === 'p1' ? p1Fill : p2Fill,
+    backgroundColor: isBackgammon ? 'transparent' : key === 'p1' ? p1Fill : p2Fill,
     grouped: false,
     categoryPercentage: 2,
     barPercentage: 1,
     order: 2,
-    borderColor: key === 'p1' ? '#838383' : '#616161',
-    borderWidth: 1,
-    borderSkipped: isBackgammon ? (false as const) : undefined,
+    borderColor: barBorderColor(key),
+    borderWidth: isBackgammon ? 0 : 1,
+    bgSegmentKey: isBackgammon ? key : undefined,
     datalabels: { display: false },
   })) as unknown as ChartDataset[];
+
+  const bgTurnBars = {
+    id: 'bgTurnBars',
+    beforeDatasetsDraw(chart: Chart) {
+      const zero = chart.scales.y?.getPixelForValue(0);
+      if (zero === undefined) return;
+      const ctx = chart.ctx;
+      const dpr = chart.currentDevicePixelRatio || 1;
+      const weight = Math.max(1, Math.round(dpr)); // line thickness
+      const dev = (v: number) => Math.round(v * dpr); // nearest device pixel
+      const css = (devicePx: number) => devicePx / dpr;
+      const axis = dev(zero);
+      ctx.save();
+      ctx.lineWidth = css(weight);
+      chart.data.datasets.forEach((dataset, i) => {
+        const key = (dataset as { bgSegmentKey?: 'p1' | 'p2' }).bgSegmentKey;
+        const meta = chart.getDatasetMeta(i);
+        if (!key || meta.hidden) return;
+        const bars = meta.data as unknown as { x: number; y: number; base: number; width: number }[];
+        const points = segmentSeries[key];
+        const outerEdge = (bar: { y: number; base: number }) =>
+          Math.abs(bar.y - zero) > Math.abs(bar.base - zero) ? bar.y : bar.base;
+        const inset = (key === 'p1' ? 1 : -1) * (weight / 2);
+        const gap = 2 * weight; // closest two lines may sit before we drop one
+        ctx.fillStyle = key === 'p1' ? p1Fill : p2Fill;
+        ctx.strokeStyle = barBorderColor(key);
+        ctx.beginPath();
+        for (let start = 0; start < bars.length; ) {
+          let end = start;
+          while (end + 1 < bars.length && points[end + 1].x === points[start].x) end++;
+          const { x, width } = bars[end];
+          const outer = outerEdge(bars[end]);
+          if (isFinite(x) && isFinite(width) && isFinite(outer)) {
+            const left = dev(x - width / 2);
+            const right = dev(x + width / 2);
+            const top = dev(outer);
+            ctx.fillRect(css(left), css(Math.min(top, axis)), css(right - left), css(Math.abs(top - axis)));
+            ctx.moveTo(css(left + weight / 2), css(axis));
+            ctx.lineTo(css(left + weight / 2), css(top + inset));
+            ctx.lineTo(css(right + weight / 2), css(top + inset));
+            ctx.lineTo(css(right + weight / 2), css(axis));
+            let last = axis;
+            for (let j = start; j < end; j++) {
+              const edge = dev(outerEdge(bars[j]));
+              if (!isFinite(edge) || Math.abs(edge - last) < gap || Math.abs(top - edge) < gap) continue;
+              last = edge;
+              ctx.moveTo(css(left + weight / 2), css(edge + inset));
+              ctx.lineTo(css(right + weight / 2), css(edge + inset));
+            }
+          }
+          start = end + 1;
+        }
+        ctx.stroke();
+      });
+      ctx.restore();
+    },
+  };
 
   const totalDatasets = (['p1', 'p2'] as const).map(key => ({
     type: 'line' as const,
@@ -335,6 +393,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   const chart = new Chart(el, {
     type: 'line',
     data: { labels, datasets },
+    plugins: isBackgammon ? [bgTurnBars] : [],
     options: {
       maintainAspectRatio: false,
       responsive: true,
@@ -353,6 +412,8 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
           caretPadding: 15,
           titleColor: fontColor,
           titleFont: fontFamily(13),
+          bodyColor: fontColor,
+          bodyFont: fontFamily(13),
           displayColors: false,
           callbacks: {
             title: items => (isBackgammon ? bgLabelByX.get(items[0].parsed.x) : labels[items[0].parsed.x]) ?? '',
