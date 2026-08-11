@@ -1,8 +1,11 @@
 package controllers
 
+import akka.util.ByteString
+import java.io.ByteArrayInputStream
+import java.util.zip.GZIPInputStream
 import play.api.libs.json.*
 import play.api.mvc.*
-import scala.util.{ Failure, Success }
+import scala.util.{ Failure, Success, Try, Using }
 
 import lila.app.*
 import lila.common.HTTPRequest
@@ -75,7 +78,7 @@ final class Fishnet(env: Env) extends LilaController(env) {
   private def ClientAction[A <: JsonApi.Request](maxBodyLength: Long)(
       f: A => lila.fishnet.Client => Fu[Either[Result, Option[JsonApi.Work]]]
   )(implicit reads: Reads[A]): Action[JsValue] =
-    Action.async(parse.tolerantJson(maxBodyLength)) { req =>
+    Action.async(jsonMaybeGzipped(maxBodyLength)) { req =>
       req.body
         .validate[A]
         .fold(
@@ -95,4 +98,33 @@ final class Fishnet(env: Env) extends LilaController(env) {
             }
         )
     }
+
+  private def jsonMaybeGzipped(maxBodyLength: Long): BodyParser[JsValue] =
+    parse.using { req =>
+      if (req.headers.get(CONTENT_ENCODING).exists(_.equalsIgnoreCase("gzip")))
+        parse.byteString(maxBodyLength) validate { gzipped =>
+          gunzip(gzipped, maxBodyLength).flatMap { plain =>
+            Try(Json parse plain.toArray).toEither.left.map { e =>
+              BadRequest(s"Malformed gzipped JSON: ${e.getMessage}")
+            }
+          }
+        }
+      else parse.tolerantJson(maxBodyLength)
+    }
+
+  private def gunzip(gzipped: ByteString, maxLength: Long): Either[Result, ByteString] =
+    Using(new GZIPInputStream(new ByteArrayInputStream(gzipped.toArray))) { in =>
+      val out    = ByteString.newBuilder
+      val buffer = new Array[Byte](16 * 1024)
+      var total  = 0L
+      var read   = in.read(buffer)
+      while (read >= 0 && total <= maxLength) {
+        total += read
+        if (total <= maxLength) out.putBytes(buffer, 0, read)
+        read = in.read(buffer)
+      }
+      (total <= maxLength).option(out.result())
+    }.toEither.left
+      .map(e => BadRequest(s"Could not gunzip request: ${e.getMessage}"))
+      .flatMap(_.toRight(EntityTooLarge(s"Gzipped body inflates beyond $maxLength bytes")))
 }
