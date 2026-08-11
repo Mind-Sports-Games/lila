@@ -43,47 +43,81 @@ object JsonApi {
     // error rate, luck and ratings, plus every candidate play it evaluated.
     case class EngineMeta(name: String, eval: String)
 
-    case class BgProbsPost(
-        win:            Double,
-        winGammon:      Double,
-        winBackgammon:  Double,
-        lose:           Double,
-        loseGammon:     Double,
-        loseBackgammon: Double
+    // Compact wire shape: every number is x1000,
+    // and anything derivable is left off the wire — rank is the index,
+    // lose is 1 - win, and a chequer play's action and equities are read back off
+    // its candidates.
+    case class BgCandPost(
+        play:           String,
+        plies:          Int,
+        equity:         Int,
+        equityDelta:    Option[Int],
+        win:            Int,
+        winGammon:      Int,
+        winBackgammon:  Int,
+        loseGammon:     Int,
+        loseBackgammon: Int
     ) {
-      def toModel =
-        lila.analyse.BgProbabilities(win, winGammon, winBackgammon, lose, loseGammon, loseBackgammon)
+      def toModel(rank: Int, played: Boolean) =
+        lila.analyse.BgCandidate(
+          rank = rank,
+          evaluator = s"Cubeful $plies-ply",
+          play = play,
+          equity = BgCandPost.decimal(equity),
+          equityDelta = equityDelta.map(BgCandPost.decimal),
+          probabilities = lila.analyse.BgProbabilities(
+            win = BgCandPost.decimal(win),
+            winGammon = BgCandPost.decimal(winGammon),
+            winBackgammon = BgCandPost.decimal(winBackgammon),
+            lose = BgCandPost.decimal(1000 - win),
+            loseGammon = BgCandPost.decimal(loseGammon),
+            loseBackgammon = BgCandPost.decimal(loseBackgammon)
+          ),
+          evalClass = none,
+          played = played
+        )
     }
 
-    case class BgCandPost(
-        rank:          Int,
-        evaluator:     String,
-        play:          String,
-        equity:        Double,
-        equityDelta:   Option[Double],
-        probabilities: BgProbsPost,
-        evalClass:     Option[String],
-        played:        Boolean
-    ) {
-      def toModel =
-        lila.analyse.BgCandidate(rank, evaluator, play, equity, equityDelta, probabilities.toModel, evalClass, played)
+    object BgCandPost {
+      def decimal(milli: Int): Double = milli / 1000d
     }
 
     case class BgMovePost(
-        number:       Int,
-        player:       String,
-        kind:         String,
-        dice:         Option[String],
-        action:       String,
-        bestAction:   Option[String],
-        playedEquity: Option[Double],
-        bestEquity:   Option[Double],
-        rollLuck:     Option[Double],
-        cubeAdvice:   Option[String],
-        candidates:   List[BgCandPost]
+        player:      Int,
+        kind:        Int,
+        dice:        Option[String],
+        rollLuck:    Option[Int],
+        action:      Option[String],
+        cubeAdvice:  Option[String],
+        playedIndex: Option[Int],
+        candidates:  List[BgCandPost]
     ) {
-      def toModel =
-        lila.analyse.BgMove(number, player, kind, dice, action, bestAction, playedEquity, bestEquity, rollLuck, cubeAdvice, candidates.map(_.toModel))
+      def toModel(number: Int, p1: String, p2: String) = {
+        val cands  = candidates.zipWithIndex.map { case (c, i) => c.toModel(i + 1, playedIndex contains i) }
+        val played = playedIndex.flatMap(cands.lift)
+        lila.analyse.BgMove(
+          number = number,
+          player = if (player == 1) p1 else p2,
+          kind = BgMovePost.kindName(kind),
+          dice = dice,
+          action = played.map(_.play) orElse action getOrElse "",
+          bestAction = cands.headOption.map(_.play),
+          playedEquity = played.map(_.equity),
+          bestEquity = cands.headOption.map(_.equity),
+          rollLuck = rollLuck.map(BgCandPost.decimal),
+          cubeAdvice = cubeAdvice,
+          candidates = cands
+        )
+      }
+    }
+
+    object BgMovePost {
+      def kindName(code: Int): String = code match {
+        case 0 => "ChequerPlay"
+        case 1 => "Dance"
+        case 2 => "CubeOffer"
+        case _ => "CubeResponse"
+      }
     }
 
     case class BgStatsPost(
@@ -113,12 +147,17 @@ object JsonApi {
         stats:  List[BgStatsPost],
         moves:  List[BgMovePost]
     ) {
-      def toModel =
-        lila.analyse.BgGame(number, winner.map(_.toModel), stats.map(_.toModel), moves.map(_.toModel))
+      def toModel(p1: String, p2: String) =
+        lila.analyse.BgGame(
+          number,
+          winner.map(_.toModel),
+          stats.map(_.toModel),
+          moves.zipWithIndex.map { case (m, i) => m.toModel(i + 1, p1, p2) }
+        )
     }
 
     case class BackgammonPost(player1: String, player2: String, games: List[BgGamePost]) {
-      def toGames: List[lila.analyse.BgGame] = games.map(_.toModel)
+      def toGames: List[lila.analyse.BgGame] = games.map(_.toModel(player1, player2))
     }
 
     case class Acquire(
@@ -319,13 +358,44 @@ object JsonApi {
           else EvaluationReads reads obj map Right.apply map some
       }
     implicit val EngineMetaReads: Reads[Request.EngineMeta]         = Json.reads[Request.EngineMeta]
-    implicit val BgProbsReads: Reads[Request.BgProbsPost]           = Json.reads[Request.BgProbsPost]
-    implicit val BgCandReads: Reads[Request.BgCandPost]             = Json.reads[Request.BgCandPost]
-    implicit val BgMoveReads: Reads[Request.BgMovePost]             = Json.reads[Request.BgMovePost]
-    implicit val BgStatsReads: Reads[Request.BgStatsPost]           = Json.reads[Request.BgStatsPost]
-    implicit val BgWinnerReads: Reads[Request.BgWinnerPost]         = Json.reads[Request.BgWinnerPost]
-    implicit val BgGameReads: Reads[Request.BgGamePost]             = Json.reads[Request.BgGamePost]
-    implicit val BackgammonPostReads: Reads[Request.BackgammonPost] = Json.reads[Request.BackgammonPost]
+    implicit val BgCandReads: Reads[Request.BgCandPost] = Reads[Request.BgCandPost] {
+      case JsArray(a) if a.sizeIs >= 9 =>
+        for {
+          play  <- a(0).validate[String]
+          plies <- a(1).validate[Int]
+          eq    <- a(2).validate[Int]
+          delta <- a(3).validateOpt[Int]
+          w     <- a(4).validate[Int]
+          wg    <- a(5).validate[Int]
+          wbg   <- a(6).validate[Int]
+          lg    <- a(7).validate[Int]
+          lbg   <- a(8).validate[Int]
+        } yield Request.BgCandPost(play, plies, eq, delta, w, wg, wbg, lg, lbg)
+      case _ => JsError("expected a 9-element candidate array")
+    }
+    implicit val BgMoveReads: Reads[Request.BgMovePost] = (
+      (__ \ "u").read[Int] and
+        (__ \ "k").read[Int] and
+        (__ \ "i").readNullable[String] and
+        (__ \ "l").readNullable[Int] and
+        (__ \ "a").readNullable[String] and
+        (__ \ "ca").readNullable[String] and
+        (__ \ "y").readNullable[Int] and
+        (__ \ "c").read[List[Request.BgCandPost]]
+    )(Request.BgMovePost.apply)
+    implicit val BgStatsReads: Reads[Request.BgStatsPost]   = Json.reads[Request.BgStatsPost]
+    implicit val BgWinnerReads: Reads[Request.BgWinnerPost] = Json.reads[Request.BgWinnerPost]
+    implicit val BgGameReads: Reads[Request.BgGamePost] = (
+      (__ \ "n").read[Int] and
+        (__ \ "w").readNullable[Request.BgWinnerPost] and
+        (__ \ "s").read[List[Request.BgStatsPost]] and
+        (__ \ "m").read[List[Request.BgMovePost]]
+    )(Request.BgGamePost.apply)
+    implicit val BackgammonPostReads: Reads[Request.BackgammonPost] = (
+      (__ \ "p1").read[String] and
+        (__ \ "p2").read[String] and
+        (__ \ "g").read[List[Request.BgGamePost]]
+    )(Request.BackgammonPost.apply)
 
     // Lenient: chess clients send {fishnet, stockfish, analysis}; the backgammon
     // worker sends {fishnet, engine, backgammon}. Default the chess-only fields so
