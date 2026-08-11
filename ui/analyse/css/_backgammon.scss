@@ -1,9 +1,36 @@
+// gnubg annotation colours all come from the shared move-quality palette
+// ($c-blunder & friends in ui/common/css/theme/_default.scss) so backgammon reads
+// like chess/draughts analysis rather than carrying its own set of hexes.
+
+// Advice-summary symbol → colour. 'd' is gnubg's doubtful (same tier as an inaccuracy) and
+// 'luck' is the virtual section header covering both '+' (lucky) and '-' (unlucky).
+$bg-annotation-colors: (
+  'd': $c-inaccuracy,
+  '??': $c-blunder,
+  '?': $c-mistake,
+  '!!': $c-brilliant,
+  '+': $c-lucky,
+  '-': $c-unlucky,
+  'luck': $c-lucky,
+);
+
+// Move tree h-* highlight classes (see treeView.ts) → colour.
+$bg-highlight-colors: (
+  'blunder': $c-blunder,
+  'mistake': $c-mistake,
+  'brilliant': $c-brilliant,
+  'lucky': $c-lucky,
+  'unlucky': $c-unlucky,
+);
+
 // Always show both player sides side by side for direct value comparison.
 // _acpl.scss defaults to flex-column and gates the row layout behind $mq-col1;
 // override here so backgammon is always a row on every screen size.
 // Also targets standalone .advice-summary in detail mode (not inside .analyse__acpl).
-.analyse__acpl .advice-summary,
-.analyse.analyse--detail > .advice-summary {
+// .advice-summary is shared with chess (see ui/analyse/src/acpl.ts), so every rule below is
+// scoped to the .backgammon gameFamily class — this partial is bundled into analyse.study too.
+.analyse.backgammon .analyse__acpl .advice-summary,
+.analyse.backgammon.analyse--detail > .advice-summary {
   flex-direction: row;
   align-items: flex-start;
   margin-top: 0;
@@ -27,7 +54,7 @@
 
     &:first-child {
       padding-right: 0.6em;
-      border-right: 1px solid rgba(255, 255, 255, 0.12);
+      border-right: 1px solid fade-out($c-font, 0.88);
     }
 
     &:last-child {
@@ -55,7 +82,7 @@
 
 // In detail mode the advice-summary is a grid item directly below the board —
 // lay out each side's stats in a 2-column inner grid to halve the height.
-.analyse.analyse--detail > .advice-summary {
+.analyse.backgammon.analyse--detail > .advice-summary {
   padding: 0.3em 0.5em;
   font-size: 0.82em;
 
@@ -73,7 +100,7 @@
     // Luck section header spans both columns — acts as a visual divider between skill and dice
     .advice-summary__luck-hdr {
       grid-column: 1 / -1;
-      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      border-top: 1px solid fade-out($c-font, 0.85);
       padding-top: 0.2em;
       margin-top: 0.1em;
     }
@@ -102,91 +129,58 @@
 
 // Advice-summary symbol hover + locked state — colour-coded by annotation type.
 // Attribute selector gives higher specificity than the generic :hover in _acpl.scss.
-.advice-summary__side .symbol {
-  &[data-symbol='d']:hover,
-  &[data-symbol='d'].locked {
-    color: #4da3d5;
-  }
-
-  &[data-symbol='luck']:hover,
-  &[data-symbol='luck'].locked {
-    color: #a060bb;
-  }
-
-  &[data-symbol='??']:hover,
-  &[data-symbol='??'].locked {
-    color: #db3031;
-  }
-
-  &[data-symbol='?']:hover,
-  &[data-symbol='?'].locked {
-    color: #d96420;
-  }
-
-  &[data-symbol='!!']:hover,
-  &[data-symbol='!!'].locked {
-    color: #5ebe5e;
-  }
-
-  &[data-symbol='+']:hover,
-  &[data-symbol='+'].locked {
-    color: #8855cc;
-  }
-
-  &[data-symbol='-']:hover,
-  &[data-symbol='-'].locked {
-    color: #d45090;
+// Chess uses '?' and '??' here too, so scope this or chess studies lose their $c-link hover.
+.analyse.backgammon .advice-summary__side .symbol {
+  @each $symbol, $color in $bg-annotation-colors {
+    &[data-symbol='#{$symbol}']:hover,
+    &[data-symbol='#{$symbol}'].locked {
+      color: $color;
+    }
   }
 }
 
 // Move tree annotation colours for backgammon gnubg analysis.
 // Glyphs have empty symbols; colour only.
-.tview2 {
-  move glyph {
-    display: none;
-  }
-
-  move.blunder,
-  move.brilliant,
-  move.mistake,
-  move.inaccuracy {
-    color: unset;
-  }
-
-  .analyse:not(.annotation-locked) & {
-    move.blunder {
-      color: #db3031;
+// Scoped to the .backgammon gameFamily class on the analyse root: this partial is also
+// bundled into analyse.study, which chess studies load, and unscoped rules would hide
+// their glyphs and strip their annotation colours.
+.analyse.backgammon {
+  .tview2 move {
+    glyph {
+      display: none;
     }
 
-    move.mistake {
-      color: #d96420;
+    // Backgammon only colours blunders and mistakes by default, so drop the shared tree
+    // colours; while a symbol is locked in the advice summary all colour goes, leaving the
+    // h-* highlights below to stand alone.
+    &.blunder,
+    &.brilliant,
+    &.mistake,
+    &.inaccuracy {
+      color: unset;
+    }
+
+    @each $name, $color in $bg-highlight-colors {
+      &.h-#{$name} {
+        color: $color;
+
+        &.current {
+          background: fade-out($c-font, 0.88);
+          border-radius: 2px;
+          outline: 1px solid fade-out($c-font, 0.8);
+        }
+      }
     }
   }
 
-  move.h-blunder {
-    color: #db3031;
-  }
-  move.h-mistake {
-    color: #d96420;
-  }
-  move.h-brilliant {
-    color: #5ebe5e;
-  }
-  move.h-lucky {
-    color: #8855cc;
-  }
-  move.h-unlucky {
-    color: #d45090;
-  }
+  &:not(.annotation-locked) .tview2 move {
+    &.blunder {
+      color: $c-blunder;
+    }
 
-  move.h-lucky.current,
-  move.h-unlucky.current,
-  move.h-blunder.current,
-  move.h-mistake.current,
-  move.h-brilliant.current {
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 2px;
-    outline: 1px solid rgba(255, 255, 255, 0.2);
+    &.mistake {
+      color: $c-mistake;
+    }
   }
 }
 
@@ -221,6 +215,12 @@
     padding: 0.3em 0.4em;
   }
 
+  // Row states are UI affordances rather than move quality, so they use the generic
+  // theme accents: primary (blue) for the move actually played, secondary (green) for
+  // the candidate currently previewed on the board.
+  $c-played: $c-primary;
+  $c-showing: $c-secondary;
+
   &__row {
     display: flex;
     flex-direction: column;
@@ -230,36 +230,37 @@
     border-left: 4px solid transparent;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.06);
+      background: fade-out($c-font, 0.94);
     }
 
     &.expanded {
-      background: rgba(255, 255, 255, 0.08);
+      background: fade-out($c-font, 0.92);
     }
 
     &.played {
-      border-left-color: #4da3d5;
-      background: linear-gradient(to right, rgba(77, 163, 213, 0.24), rgba(77, 163, 213, 0.06) 8em);
+      border-left-color: $c-played;
+      background: linear-gradient(to right, fade-out($c-played, 0.76), fade-out($c-played, 0.94) 8em);
     }
 
     &.showing {
-      border-left-color: #5ebe5e;
-      background: linear-gradient(to right, rgba(94, 190, 94, 0.24), rgba(94, 190, 94, 0.06) 8em);
-      box-shadow: inset 0 0 0 1px rgba(94, 190, 94, 0.9);
+      border-left-color: $c-showing;
+      background: linear-gradient(to right, fade-out($c-showing, 0.76), fade-out($c-showing, 0.94) 8em);
+      box-shadow: inset 0 0 0 1px fade-out($c-showing, 0.1);
     }
 
+    // Narrow screens put the list further from the board, so lift the contrast.
     @include breakpoint($mq-col1-uniboard) {
       border-left-width: 6px;
 
       &.played {
-        border-left-color: #6bbceb;
-        background: linear-gradient(to right, rgba(77, 163, 213, 0.32), rgba(77, 163, 213, 0.08) 8em);
+        border-left-color: c-clearer($c-played, 20%);
+        background: linear-gradient(to right, fade-out($c-played, 0.68), fade-out($c-played, 0.92) 8em);
       }
 
       &.showing {
-        border-left-color: #7ad67a;
-        background: linear-gradient(to right, rgba(94, 190, 94, 0.32), rgba(94, 190, 94, 0.08) 8em);
-        box-shadow: inset 0 0 0 2px rgba(122, 214, 122, 0.9);
+        border-left-color: c-clearer($c-showing, 20%);
+        background: linear-gradient(to right, fade-out($c-showing, 0.68), fade-out($c-showing, 0.92) 8em);
+        box-shadow: inset 0 0 0 2px fade-out(c-clearer($c-showing, 20%), 0.1);
       }
     }
   }
@@ -285,7 +286,7 @@
     }
 
     .delta.bad {
-      color: #db3031;
+      color: $c-blunder;
     }
   }
 

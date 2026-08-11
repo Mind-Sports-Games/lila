@@ -8,6 +8,16 @@ export const orangeAccent = '#d85000';
 export const whiteFill: string = lightTheme ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)';
 export const blackFill: string = lightTheme ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,1)';
 export const fontColor: string = lightTheme ? '#2F2F2F' : 'hsl(0, 0%, 73%)';
+// Move quality palette, mirroring $c-inaccuracy & friends in ui/common/css/theme/_default.scss
+// so charts, the move tree and the advice summary annotate a move with the same colour.
+export const moveQuality = {
+  inaccuracy: 'hsl(202, 78%, 40%)',
+  mistake: 'hsl(41, 100%, 35%)',
+  blunder: 'hsl(0, 68%, 50%)',
+  brilliant: 'hsl(129, 71%, 30%)',
+  lucky: 'hsl(266, 54%, 47%)',
+  unlucky: 'hsl(331, 61%, 48%)',
+} as const;
 export const tooltipBgColor: string = lightTheme ? 'rgba(255, 255, 255, 0.8)' : 'rgba(22, 21, 18, 0.7)';
 
 export function fontFamily(size?: number, weight?: 'bold') {

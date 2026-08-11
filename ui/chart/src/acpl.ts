@@ -17,6 +17,7 @@ import {
   fontColor,
   fontFamily,
   maybeChart,
+  moveQuality,
   orangeAccent,
   oppositeColorVariants,
   plyLine,
@@ -72,12 +73,12 @@ interface AnalyseData {
 type GlyphAdvice = 'blunder' | 'mistake' | 'inaccuracy' | 'best' | 'lucky' | 'unlucky';
 
 const glyphProperties = (node: Tree.Node): { advice?: GlyphAdvice; color?: string } => {
-  if (node.glyphs?.some(g => g.id === 4)) return { advice: 'blunder', color: '#db3031' };
-  if (node.glyphs?.some(g => g.id === 2)) return { advice: 'mistake', color: '#d96420' };
-  if (node.glyphs?.some(g => g.id === 6)) return { advice: 'inaccuracy', color: '#4da3d5' };
-  if (node.glyphs?.some(g => g.id === 3)) return { advice: 'best', color: '#5ebe5e' };
-  if (node.glyphs?.some(g => g.id === 51)) return { advice: 'lucky', color: '#8855cc' };
-  if (node.glyphs?.some(g => g.id === 52)) return { advice: 'unlucky', color: '#d45090' };
+  if (node.glyphs?.some(g => g.id === 4)) return { advice: 'blunder', color: moveQuality.blunder };
+  if (node.glyphs?.some(g => g.id === 2)) return { advice: 'mistake', color: moveQuality.mistake };
+  if (node.glyphs?.some(g => g.id === 6)) return { advice: 'inaccuracy', color: moveQuality.inaccuracy };
+  if (node.glyphs?.some(g => g.id === 3)) return { advice: 'best', color: moveQuality.brilliant };
+  if (node.glyphs?.some(g => g.id === 51)) return { advice: 'lucky', color: moveQuality.lucky };
+  if (node.glyphs?.some(g => g.id === 52)) return { advice: 'unlucky', color: moveQuality.unlucky };
   return {};
 };
 
@@ -102,8 +103,10 @@ function makeDataset(
   const isOppositeColor = oppositeColorVariants.includes(data.game.variant.key);
   const p1Fill = isOppositeColor ? blackFill : whiteFill;
   const p2Fill = isOppositeColor ? whiteFill : blackFill;
+  // Every backgammon decision node carries a 'd' (PR) glyph, so unannotated points get the same
+  // blue as 'd' in the advice summary rather than the generic orange accent.
   const defaultHoverColor = (BackgammonFamily.getVariantKeys() as string[]).includes(data.game.variant.key)
-    ? '#4da3d5'
+    ? moveQuality.inaccuracy
     : orangeAccent;
 
   const blurs = [toBlurArray(data.player), toBlurArray(data.opponent)];
