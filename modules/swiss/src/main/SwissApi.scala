@@ -704,7 +704,7 @@ final class SwissApi(
             if (result.nModified == 0) fuccess(false) // dedup
             else
               {
-                if (swiss.autoAnalysable) autoAnalyse(game.game)
+                if (swiss.autoAnalysable) game.allGames foreach { autoAnalyse(_) }
                 if (swiss.nbOngoing > 0) colls.swiss.update.one($id(swiss.id), $inc("nbOngoing" -> -1))
                 else
                   fuccess {
