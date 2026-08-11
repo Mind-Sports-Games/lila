@@ -19,6 +19,7 @@ private class FishnetConfig(
     @ConfigName("analysis.nodes") val analysisNodes: Int,
     @ConfigName("move.plies") val movePlies: Int,
     @ConfigName("client_min_version") val clientMinVersion: String,
+    @ConfigName("auto_analyse.backgammon.enabled") val autoAnalyseBackgammon: Boolean,
     @ConfigName("redis.uri") val redisUri: String
 )
 
@@ -85,6 +86,9 @@ final class Env(
 
   lazy val analyser = wire[Analyser]
 
+  private lazy val backgammonAutoAnalyser =
+    new BackgammonAutoAnalyser(analyser, config.autoAnalyseBackgammon)
+
   lazy val awaiter = wire[FishnetAwaiter]
 
   lazy val aiPerfApi = wire[AiPerfApi]
@@ -125,6 +129,10 @@ final class Env(
         case "fishnet" :: "client" :: "disable" :: key :: Nil => disable(key) inject "done!"
       }
     }
+
+  Bus.subscribeFun("finishGame") { case lila.game.actorApi.FinishGame(game, _, _) =>
+    backgammonAutoAnalyser(game)
+  }
 
   Bus.subscribeFun("adjustCheater", "adjustBooster", "shadowban") {
     case lila.hub.actorApi.mod.MarkCheater(userId, true) => disable(userId).discard
