@@ -5,7 +5,8 @@ import strategygames.GameLogic
 import lila.game.Game
 
 // Queues gnubg analysis for every finished backgammon game played between two
-// accounts, whether registered users or PS bots. Anonymous games are skipped.
+// accounts, whether registered users or PS bots. Anonymous games are skipped, as
+// are bot-vs-bot games.
 final class BackgammonAutoAnalyser(
     analyser: Analyser,
     enabled: Boolean
@@ -21,5 +22,6 @@ final class BackgammonAutoAnalyser(
   private def analysable(game: Game): Boolean =
     game.variant.gameLogic == GameLogic.Backgammon() &&
       game.analysable &&
-      game.twoUserIds.isDefined
+      game.twoUserIds.isDefined &&
+      !game.players.forall(_.isPSBot)
 }
