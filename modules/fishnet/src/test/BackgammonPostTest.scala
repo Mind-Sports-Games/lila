@@ -1,18 +1,12 @@
 package lila.fishnet
 
-import play.api.libs.json.Json
+import org.joda.time.DateTime
+import play.api.libs.json.{ JsValue, Json }
 
 import lila.fishnet.JsonApi.readers.*
 
-/** The compact wire format mindcube posts, decoded back into the stored model.
-  * mindcube owns the encoder and never decodes, so this is the only test of the
-  * half of the contract lila is responsible for.
-  */
 class BackgammonPostTest extends munit.FunSuite {
 
-  // one chequer play (two candidates, the second one played), one dance, and a
-  // chequer play the game ended before: no candidate is starred, so its action
-  // has to travel on the wire.
   private val payload = Json.parse("""{
     "p1": "alice",
     "p2": "bob",
@@ -34,58 +28,71 @@ class BackgammonPostTest extends munit.FunSuite {
     }]
   }""")
 
-  private val decoded = payload.as[JsonApi.Request.BackgammonPost]
-  private val moves   = decoded.toGames.head.moves
-  private val chequer = moves.head
+  private val post = payload.as[JsonApi.Request.BackgammonPost]
+
+  private val stored = lila.analyse.BackgammonAnalysis(
+    _id = "abcd1234",
+    studyId = None,
+    player1 = post.player1,
+    player2 = post.player2,
+    evaluators = post.evaluators,
+    games = post.toGames,
+    date = DateTime.now,
+    fk = None
+  )
+
+  private val json: JsValue = Json.toJson(stored)(using lila.analyse.BackgammonAnalysis.matchWrites)
+  private val moves         = (json \ "games" \ 0 \ "moves").as[List[JsValue]]
+  private val chequer       = moves.head
+  private val cands         = (chequer \ "candidates").as[List[JsValue]]
 
   test("rank is the candidate's index, and only the played one is flagged") {
-    assertEquals(chequer.candidates.map(_.rank), List(1, 2))
-    assertEquals(chequer.candidates.map(_.played), List(false, true))
+    assertEquals(cands.map(c => (c \ "rank").as[Int]), List(1, 2))
+    assertEquals(cands.map(c => (c \ "played").as[Boolean]), List(false, true))
   }
 
   test("lose is derived as 1 - win") {
-    assertEquals(chequer.candidates.head.probabilities.win, 0.535)
-    assertEquals(chequer.candidates.head.probabilities.lose, 0.465)
+    assertEquals((cands.head \ "probabilities" \ "win").as[Double], 0.535)
+    assertEquals((cands.head \ "probabilities" \ "lose").as[Double], 0.465)
   }
 
   test("evaluator labels come back exactly, cubeless included") {
-    assertEquals(chequer.candidates.map(_.evaluator), List("Cubeful 2-ply", "Cubeless 0-ply"))
+    assertEquals(cands.map(c => (c \ "evaluator").as[String]), List("Cubeful 2-ply", "Cubeless 0-ply"))
   }
 
   test("x1000 integers decode to gnubg's 3dp values") {
-    val c = chequer.candidates(1)
-    assertEquals(c.equity, 0.012)
-    assertEquals(c.equityDelta, Some(-0.057))
-    assertEquals(chequer.rollLuck, Some(0.066))
+    assertEquals((cands(1) \ "equity").as[Double], 0.012)
+    assertEquals((cands(1) \ "equityDelta").as[Double], -0.057)
+    assertEquals((chequer \ "rollLuck").as[Double], 0.066)
   }
 
-  test("rank 1 keeps a null equityDelta rather than a zero") {
-    assertEquals(chequer.candidates.head.equityDelta, None)
+  test("rank 1 omits equityDelta rather than sending a zero") {
+    assertEquals((cands.head \ "equityDelta").toOption, None)
   }
 
   test("a chequer play's action and equities are read off the played candidate") {
-    assertEquals(chequer.action, "24/15")
-    assertEquals(chequer.playedEquity, Some(0.012))
-    assertEquals(chequer.bestAction, Some("24/18 13/10"))
-    assertEquals(chequer.bestEquity, Some(0.069))
+    assertEquals((chequer \ "action").as[String], "24/15")
+    assertEquals((chequer \ "playedEquity").as[Double], 0.012)
+    assertEquals((chequer \ "bestAction").as[String], "24/18 13/10")
+    assertEquals((chequer \ "bestEquity").as[Double], 0.069)
   }
 
   test("a decision with no played candidate keeps the action sent on the wire") {
-    assertEquals(moves(2).action, "(not played)")
-    assertEquals(moves(2).playedEquity, None)
+    assertEquals((moves(2) \ "action").as[String], "(not played)")
+    assertEquals((moves(2) \ "playedEquity").toOption, None)
   }
 
   test("player index and kind code map back to names") {
-    assertEquals(moves.map(_.player), List("alice", "bob", "alice"))
-    assertEquals(moves.map(_.kind), List("ChequerPlay", "Dance", "ChequerPlay"))
+    assertEquals(moves.map(m => (m \ "player").as[String]), List("alice", "bob", "alice"))
+    assertEquals(moves.map(m => (m \ "kind").as[String]), List("ChequerPlay", "Dance", "ChequerPlay"))
   }
 
   test("move number is the index within the game") {
-    assertEquals(moves.map(_.number), List(1, 2, 3))
+    assertEquals(moves.map(m => (m \ "number").as[Int]), List(1, 2, 3))
   }
 
   test("a dance carries its action and no candidates") {
-    assertEquals(moves(1).action, "(no legal moves)")
-    assertEquals(moves(1).candidates, Nil)
+    assertEquals((moves(1) \ "action").as[String], "(no legal moves)")
+    assertEquals((moves(1) \ "candidates").as[List[JsValue]], Nil)
   }
 }

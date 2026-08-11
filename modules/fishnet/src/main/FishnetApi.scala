@@ -116,6 +116,7 @@ final class FishnetApi(
                 studyId = work.game.studyId,
                 player1 = bg.player1,
                 player2 = bg.player2,
+                evaluators = bg.evaluators,
                 games = bg.toGames,
                 date = DateTime.now,
                 fk = none

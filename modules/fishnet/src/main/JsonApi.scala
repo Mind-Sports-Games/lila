@@ -43,10 +43,6 @@ object JsonApi {
     // error rate, luck and ratings, plus every candidate play it evaluated.
     case class EngineMeta(name: String, eval: String)
 
-    // Compact wire shape: every number is x1000,
-    // and anything derivable is left off the wire — rank is the index,
-    // lose is 1 - win, and a chequer play's action and equities are read back off
-    // its candidates.
     case class BgCandPost(
         play:           String,
         evaluator:      Int,
@@ -58,28 +54,8 @@ object JsonApi {
         loseGammon:     Int,
         loseBackgammon: Int
     ) {
-      def toModel(rank: Int, played: Boolean, evaluators: List[String]) =
-        lila.analyse.BgCandidate(
-          rank = rank,
-          evaluator = evaluators.lift(evaluator).getOrElse(""),
-          play = play,
-          equity = BgCandPost.decimal(equity),
-          equityDelta = equityDelta.map(BgCandPost.decimal),
-          probabilities = lila.analyse.BgProbabilities(
-            win = BgCandPost.decimal(win),
-            winGammon = BgCandPost.decimal(winGammon),
-            winBackgammon = BgCandPost.decimal(winBackgammon),
-            lose = BgCandPost.decimal(1000 - win),
-            loseGammon = BgCandPost.decimal(loseGammon),
-            loseBackgammon = BgCandPost.decimal(loseBackgammon)
-          ),
-          evalClass = none,
-          played = played
-        )
-    }
-
-    object BgCandPost {
-      def decimal(milli: Int): Double = milli / 1000d
+      def toModel =
+        lila.analyse.BgCandidate(play, evaluator, equity, equityDelta, win, winGammon, winBackgammon, loseGammon, loseBackgammon)
     }
 
     case class BgMovePost(
@@ -92,34 +68,8 @@ object JsonApi {
         playedIndex: Option[Int],
         candidates:  List[BgCandPost]
     ) {
-      def toModel(number: Int, p1: String, p2: String, evaluators: List[String]) = {
-        val cands = candidates.zipWithIndex.map { case (c, i) =>
-          c.toModel(i + 1, playedIndex contains i, evaluators)
-        }
-        val played = playedIndex.flatMap(cands.lift)
-        lila.analyse.BgMove(
-          number = number,
-          player = if (player == 1) p1 else p2,
-          kind = BgMovePost.kindName(kind),
-          dice = dice,
-          action = played.map(_.play) orElse action getOrElse "",
-          bestAction = cands.headOption.map(_.play),
-          playedEquity = played.map(_.equity),
-          bestEquity = cands.headOption.map(_.equity),
-          rollLuck = rollLuck.map(BgCandPost.decimal),
-          cubeAdvice = cubeAdvice,
-          candidates = cands
-        )
-      }
-    }
-
-    object BgMovePost {
-      def kindName(code: Int): String = code match {
-        case 0 => "ChequerPlay"
-        case 1 => "Dance"
-        case 2 => "CubeOffer"
-        case _ => "CubeResponse"
-      }
+      def toModel =
+        lila.analyse.BgMove(player, kind, dice, rollLuck, action, cubeAdvice, playedIndex, candidates.map(_.toModel))
     }
 
     case class BgStatsPost(
@@ -149,13 +99,8 @@ object JsonApi {
         stats:  List[BgStatsPost],
         moves:  List[BgMovePost]
     ) {
-      def toModel(p1: String, p2: String, evaluators: List[String]) =
-        lila.analyse.BgGame(
-          number,
-          winner.map(_.toModel),
-          stats.map(_.toModel),
-          moves.zipWithIndex.map { case (m, i) => m.toModel(i + 1, p1, p2, evaluators) }
-        )
+      def toModel =
+        lila.analyse.BgGame(number, winner.map(_.toModel), stats.map(_.toModel), moves.map(_.toModel))
     }
 
     case class BackgammonPost(
@@ -164,7 +109,7 @@ object JsonApi {
         evaluators: List[String],
         games:      List[BgGamePost]
     ) {
-      def toGames: List[lila.analyse.BgGame] = games.map(_.toModel(player1, player2, evaluators))
+      def toGames: List[lila.analyse.BgGame] = games.map(_.toModel)
     }
 
     case class Acquire(

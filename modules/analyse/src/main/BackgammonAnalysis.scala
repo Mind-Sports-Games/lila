@@ -1,8 +1,9 @@
 package lila.analyse
 
 import org.joda.time.DateTime
-import play.api.libs.json.{ Json, OWrites, Writes }
+import play.api.libs.json.{ JsObject, Json, OWrites, Writes }
 import reactivemongo.api.bson.*
+import reactivemongo.api.bson.Macros.Annotations.Key
 
 import strategygames.Player as PlayerIndex
 
@@ -14,43 +15,27 @@ import lila.db.dsl.*
 // luck and ratings (no client-side computation), plus, for every decision, every
 // candidate play gnubg evaluated. Mirrors mindcube's MatchAnalysis 1:1.
 
-case class BgProbabilities(
-    win:            Double,
-    winGammon:      Double,
-    winBackgammon:  Double,
-    lose:           Double,
-    loseGammon:     Double,
-    loseBackgammon: Double
-)
-
-/** One ranked candidate play gnubg evaluated for a decision. `played` marks the
-  * play actually chosen (gnubg prefixes its rank line with `*`). */
 case class BgCandidate(
-    rank:          Int,
-    evaluator:     String,         // e.g. "Cubeful 2-ply"
-    play:          String,         // e.g. "24/20 8/7*"
-    equity:        Double,         // EMG
-    equityDelta:   Option[Double], // loss vs. rank 1 (None on rank 1)
-    probabilities: BgProbabilities,
-    evalClass:     Option[String], // e.g. "world class"
-    played:        Boolean
+    @Key("p") play:            String,
+    @Key("e") evaluator:       Int,
+    @Key("q") equity:          Int,
+    @Key("d") equityDelta:     Option[Int],
+    @Key("w") win:             Int,
+    @Key("wg") winGammon:      Int,
+    @Key("wb") winBackgammon:  Int,
+    @Key("lg") loseGammon:     Int,
+    @Key("lb") loseBackgammon: Int
 )
 
-/** One decision (chequer play, dance, cube offer/response). `action` is what was
-  * played, `bestAction` gnubg's best; the equities and `candidates` are gnubg's.
-  */
 case class BgMove(
-    number:       Int,
-    player:       String,
-    kind:         String,          // ChequerPlay | Dance | CubeOffer | CubeResponse
-    dice:         Option[String],
-    action:       String,
-    bestAction:   Option[String],
-    playedEquity: Option[Double],
-    bestEquity:   Option[Double],
-    rollLuck:     Option[Double],
-    cubeAdvice:   Option[String], // gnubg's "Proper cube action" text (cube decisions only)
-    candidates:   List[BgCandidate]
+    @Key("u") player:       Int, // 1 | 2
+    @Key("k") kind:         Int, // ChequerPlay 0, Dance 1, CubeOffer 2, CubeResponse 3
+    @Key("i") dice:         Option[String],
+    @Key("l") rollLuck:     Option[Int],
+    @Key("a") action:       Option[String], // only when no candidate supplies it
+    @Key("ca") cubeAdvice:  Option[String],
+    @Key("y") playedIndex:  Option[Int],
+    @Key("c") candidates:   List[BgCandidate]
 )
 
 /** Per-player statistics — every value a DIRECT gnubg output (error rates in
@@ -79,13 +64,14 @@ case class BgGame(
 )
 
 case class BackgammonAnalysis(
-    _id:     String, // game id, or study chapter id when studyId is set
-    studyId: Option[String],
-    player1: String,
-    player2: String,
-    games:   List[BgGame],
-    date:    DateTime,
-    fk:      Option[String]
+    _id:        String, // game id, or study chapter id when studyId is set
+    studyId:    Option[String],
+    player1:    String,
+    player2:    String,
+    evaluators: List[String],
+    games:      List[BgGame],
+    date:       DateTime,
+    fk:         Option[String]
 ) {
   def id = _id
 
@@ -127,7 +113,6 @@ object BackgammonAnalysis {
   }
 
   // ── persistence (BSON) ────────────────────────────────────────────────────
-  implicit val probabilitiesHandler: BSONDocumentHandler[BgProbabilities] = Macros.handler
   implicit val candidateHandler: BSONDocumentHandler[BgCandidate]         = Macros.handler
   implicit val moveHandler: BSONDocumentHandler[BgMove]                   = Macros.handler
   implicit val statsHandler: BSONDocumentHandler[BgPlayerStats]           = Macros.handler
@@ -136,17 +121,78 @@ object BackgammonAnalysis {
   implicit val analysisHandler: BSONDocumentHandler[BackgammonAnalysis]   = Macros.handler
 
   // ── read endpoint (play-json) ─────────────────────────────────────────────
-  implicit val probabilitiesWrites: Writes[BgProbabilities] = Json.writes[BgProbabilities]
-  implicit val candidateWrites: Writes[BgCandidate]         = Json.writes[BgCandidate]
-  implicit val moveWrites: Writes[BgMove]                   = Json.writes[BgMove]
+  private def decimal(milli: Int): Double = milli / 1000d
+
+  private def kindName(code: Int): String = code match {
+    case 0 => "ChequerPlay"
+    case 1 => "Dance"
+    case 2 => "CubeOffer"
+    case _ => "CubeResponse"
+  }
+
+  private def candidateJson(evaluators: List[String], playedIndex: Option[Int])(
+      c: BgCandidate,
+      i: Int
+  ): JsObject =
+    Json
+      .obj(
+        "rank"      -> (i + 1),
+        "evaluator" -> evaluators.lift(c.evaluator).getOrElse(""),
+        "play"      -> c.play,
+        "equity"    -> decimal(c.equity),
+        "probabilities" -> Json.obj(
+          "win"            -> decimal(c.win),
+          "winGammon"      -> decimal(c.winGammon),
+          "winBackgammon"  -> decimal(c.winBackgammon),
+          "lose"           -> decimal(1000 - c.win),
+          "loseGammon"     -> decimal(c.loseGammon),
+          "loseBackgammon" -> decimal(c.loseBackgammon)
+        ),
+        "played" -> playedIndex.contains(i)
+      )
+      .add("equityDelta" -> c.equityDelta.map(decimal))
+
+  private def moveJson(evaluators: List[String], p1: String, p2: String)(
+      m: BgMove,
+      i: Int
+  ): JsObject = {
+    val cands  = m.candidates.zipWithIndex.map(candidateJson(evaluators, m.playedIndex).tupled)
+    val played = m.playedIndex.flatMap(m.candidates.lift)
+    Json
+      .obj(
+        "number"     -> (i + 1),
+        "player"     -> (if (m.player == 1) p1 else p2),
+        "kind"       -> kindName(m.kind),
+        "action"     -> (played.map(_.play) orElse m.action getOrElse ""),
+        "candidates" -> cands
+      )
+      .add("dice" -> m.dice)
+      .add("bestAction" -> m.candidates.headOption.map(_.play))
+      .add("playedEquity" -> played.map(c => decimal(c.equity)))
+      .add("bestEquity" -> m.candidates.headOption.map(c => decimal(c.equity)))
+      .add("rollLuck" -> m.rollLuck.map(decimal))
+      .add("cubeAdvice" -> m.cubeAdvice)
+  }
   private val statsBaseWrites: OWrites[BgPlayerStats] = Json.writes[BgPlayerStats]
   implicit val statsWrites: OWrites[BgPlayerStats] = OWrites { s =>
     statsBaseWrites.writes(s) ++ Json.obj("skill" -> s.overallErrorRate.map(skillLabel))
   }
   implicit val winnerWrites: Writes[BgWinner]               = Json.writes[BgWinner]
-  implicit val gameWrites: OWrites[BgGame]                  = Json.writes[BgGame]
+  private def gameJson(evaluators: List[String], p1: String, p2: String)(g: BgGame): JsObject =
+    Json
+      .obj(
+        "number" -> g.number,
+        "stats"  -> g.stats,
+        "moves"  -> g.moves.zipWithIndex.map(moveJson(evaluators, p1, p2).tupled)
+      )
+      .add("winner" -> g.winner)
+
   implicit val matchWrites: OWrites[BackgammonAnalysis] = OWrites { a =>
-    Json.obj("id" -> a._id, "player1" -> a.player1, "player2" -> a.player2, "games" -> a.games) ++
-      a.studyId.fold(Json.obj())(s => Json.obj("studyId" -> s))
+    Json.obj(
+      "id"      -> a._id,
+      "player1" -> a.player1,
+      "player2" -> a.player2,
+      "games"   -> a.games.map(gameJson(a.evaluators, a.player1, a.player2))
+    ) ++ a.studyId.fold(Json.obj())(s => Json.obj("studyId" -> s))
   }
 }
