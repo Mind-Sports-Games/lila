@@ -83,7 +83,7 @@ final class Fishnet(env: Env) extends LilaController(env) {
         .validate[A]
         .fold(
           err => {
-            logger.warn(s"Malformed request: $err\n${req.body}")
+            logger.warn(s"Malformed request: $err\n${req.body.toString take 500}")
             BadRequest(jsonError(JsError toJson err)).fuccess
           },
           data =>
