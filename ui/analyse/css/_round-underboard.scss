@@ -93,6 +93,11 @@ $col2-panel-height: 240px;
 
   .future-game-analysis {
     text-align: center;
+
+    &__declined {
+      margin-top: 1em;
+      color: $c-bad;
+    }
   }
 
   .fen-pgn {

@@ -20,7 +20,7 @@ final class Analyse(
   def requestAnalysis(id: String) =
     Auth { implicit ctx => me =>
       OptionFuResult(env.game.gameRepo.game(id)) { game =>
-        env.fishnet.analyser(
+        env.fishnet.analyser.request(
           game,
           lila.fishnet.Work.Sender(
             userId = me.id,
@@ -29,8 +29,8 @@ final class Analyse(
             system = false
           )
         ) map {
-          case true  => NoContent
-          case false => Unauthorized
+          case lila.fishnet.Analyser.Result.Accepted => NoContent
+          case declined                              => Unauthorized(declined.reason)
         }
       }
     }

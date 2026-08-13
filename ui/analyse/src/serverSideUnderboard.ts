@@ -2,7 +2,7 @@ import type AnalyseCtrl from './ctrl';
 import { baseUrl } from './util';
 import { allowFishnetForVariant } from 'stratutils';
 import modal from 'common/modal';
-import { formToXhr } from 'common/xhr';
+import { textRaw } from 'common/xhr';
 import { AnalyseData } from './interfaces';
 import bgWinChart from './bgWinChart';
 
@@ -116,6 +116,12 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
       .html(`<div id="acpl-chart-container"><canvas id="acpl-chart"></canvas></div>${chartLoader()}`);
   }
 
+  function showRequestDeclined(msg: string) {
+    const $form = $panels.find('form.future-game-analysis');
+    $form.find('.future-game-analysis__declined').remove();
+    $form.append($('<p class="future-game-analysis__declined">').text(msg || 'Analysis request declined'));
+  }
+
   function drawBgWinChart() {
     if (bgChartInitiated) return;
     const panel = $panels.filter('.computer-analysis')[0] as HTMLElement | undefined;
@@ -186,7 +192,12 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
         if (confirm(ctrl.trans('youNeedAnAccountToDoThat'))) location.href = '/signup';
         return false;
       }
-      formToXhr(this).then(isBackgammon ? showBgAnalysing : startAdvantageChart, playstrategy.reload);
+      const form = this;
+      textRaw(form.getAttribute('action')!, { method: form.method, body: new FormData(form) }).then(
+        res =>
+          res.ok ? (isBackgammon ? showBgAnalysing : startAdvantageChart)() : res.text().then(showRequestDeclined),
+        playstrategy.reload,
+      );
       return false;
     });
   }

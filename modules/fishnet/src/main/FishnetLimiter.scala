@@ -11,13 +11,23 @@ final private class FishnetLimiter(
     requesterApi: lila.analyse.RequesterApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  def apply(sender: Work.Sender, ignoreConcurrentCheck: Boolean, ownGame: Boolean): Fu[Boolean] =
-    (fuccess(ignoreConcurrentCheck) >>| concurrentCheck(sender)) flatMap {
-      case false => fuFalse
-      case true  => perDayCheck(sender)
-    } flatMap { accepted =>
-      (accepted so requesterApi.add(sender.userId, ownGame)) inject accepted
+  import FishnetLimiter.*
+
+  def apply(sender: Work.Sender, ignoreConcurrentCheck: Boolean, ownGame: Boolean): Fu[Option[Decline]] = {
+    val checked =
+      if (ignoreConcurrentCheck) perDayCheck(sender)
+      else
+        concurrentCheck(sender) flatMap {
+          case declined @ Some(_) => fuccess(declined)
+          case None               => perDayCheck(sender)
+        }
+    checked flatMap {
+      case Some(decline) =>
+        logger.info(s"Declined analysis request by ${sender.userId}: ${decline.reason}")
+        fuccess(decline.some)
+      case None => requesterApi.add(sender.userId, ownGame) inject none
     }
+  }
 
   private val RequestLimitPerIP = new lila.memo.RateLimit[IpAddress](
     credits = 60,
@@ -25,9 +35,9 @@ final private class FishnetLimiter(
     key = "request_analysis.ip"
   )
 
-  private def concurrentCheck(sender: Work.Sender) =
+  private def concurrentCheck(sender: Work.Sender): Fu[Option[Decline]] =
     sender match {
-      case Work.Sender(_, _, mod, system) if mod || system => fuTrue
+      case Work.Sender(_, _, mod, system) if mod || system => fuccess(none)
       case Work.Sender(userId, ip, _, _)                   =>
         analysisColl
           .exists(
@@ -36,23 +46,39 @@ final private class FishnetLimiter(
               $doc("sender.userId" -> userId)
             )
           )
-          .not
+          .map(_.option(Decline.Concurrent))
     }
 
   private val maxPerDay  = 35
   private val maxPerWeek = 160
 
-  private def perDayCheck(sender: Work.Sender) =
+  private def perDayCheck(sender: Work.Sender): Fu[Option[Decline]] =
     sender match {
-      case Work.Sender(_, _, mod, system) if mod || system => fuTrue
+      case Work.Sender(_, _, mod, system) if mod || system => fuccess(none)
       case Work.Sender(userId, ip, _, _)                   =>
-        def perUser =
+        def perUser: Fu[Option[Decline]] =
           requesterApi.countTodayAndThisWeek(userId) map { case (daily, weekly) =>
-            weekly < maxPerWeek &&
-            daily < (if (weekly < maxPerWeek * 2 / 3) maxPerDay else maxPerDay * 2 / 3)
+            val dailyMax = if (weekly < maxPerWeek * 2 / 3) maxPerDay else maxPerDay * 2 / 3
+            if (weekly >= maxPerWeek) Decline.Weekly(weekly, maxPerWeek).some
+            else if (daily >= dailyMax) Decline.Daily(daily, dailyMax).some
+            else none
           }
         ip.fold(perUser) { ipAddress =>
-          RequestLimitPerIP(ipAddress, cost = 1)(perUser)(fuccess(false))
+          RequestLimitPerIP(ipAddress, cost = 1)(perUser)(fuccess(Decline.IpLimit.some))
         }
     }
+}
+
+private object FishnetLimiter {
+
+  sealed abstract class Decline(val reason: String)
+
+  object Decline {
+    case object Concurrent extends Decline("One of your analysis requests is still in the queue")
+    case object IpLimit    extends Decline("Too many analysis requests from your IP address")
+    case class Daily(daily: Int, max: Int)
+        extends Decline(s"Daily analysis request limit reached ($daily/$max)")
+    case class Weekly(weekly: Int, max: Int)
+        extends Decline(s"Weekly analysis request limit reached ($weekly/$max)")
+  }
 }
