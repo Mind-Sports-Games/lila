@@ -66,17 +66,9 @@ $bg-highlight-colors: (
     margin-top: 0.4em;
   }
 
-  .advice-summary__comment,
   .advice-summary__acpl em {
     font-style: italic;
     opacity: 0.7;
-  }
-
-  .advice-summary__comment {
-    padding-left: calc(4ch + 0.3em);
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
   }
 }
 
@@ -103,11 +95,6 @@ $bg-highlight-colors: (
       border-top: 1px solid fade-out($c-font, 0.85);
       padding-top: 0.2em;
       margin-top: 0.1em;
-    }
-
-    .advice-summary__comment {
-      grid-column: 1 / -1;
-      padding-left: calc(4ch + 0.1em);
     }
 
     > div {

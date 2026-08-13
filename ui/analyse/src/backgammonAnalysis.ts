@@ -35,10 +35,6 @@ function luckComment(side: BackgammonAnalysisSide): string {
   return rating === 'None' ? '' : rating;
 }
 
-function renderComment(text: string): VNode[] {
-  return text ? [h('div.advice-summary__comment', { attrs: { title: text } }, text)] : [];
-}
-
 function renderCount(count: number, symbol: string, label: string, playerIndex: PlayerIndex, locked: boolean): VNode {
   const cls = label.toLowerCase().replace(/\s+/g, '-');
   return h(
@@ -94,7 +90,6 @@ function renderSide(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, side: Backgammo
     ),
     renderCount(side.luckyRolls, '+', 'Lucky rolls', playerIndex, isLocked(ctrl, '+', playerIndex)),
     renderCount(side.unluckyRolls, '-', 'Unlucky rolls', playerIndex, isLocked(ctrl, '-', playerIndex)),
-    ...renderComment(luckRating),
   ]);
 }
 
