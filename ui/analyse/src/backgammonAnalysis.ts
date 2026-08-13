@@ -206,7 +206,7 @@ export function reapplyFenOverride(ctrl: AnalyseCtrl): boolean {
     activeFenOverride = null;
     return false;
   }
-  ctrl.chessground.set({ fen: activeFenOverride.fen, dice: activeFenOverride.dice as never });
+  ctrl.chessground.set({ fen: activeFenOverride.fen, dice: activeFenOverride.dice as never, cubeActions: [] });
   ctrl.chessground.setAutoShapes(pendingArrows);
   // showGround() calls cg.redrawAll() synchronously (needsFullRedrawAfterGround=true for
   // backgammon) BEFORE calling setAutoShapes, drawing shapes against POST-MOVE state.pieces.
@@ -333,7 +333,7 @@ function renderCandidates(ctrl: AnalyseCtrl): VNode | undefined {
       const dice = stratUtils.backgammon.readDice(targetFen, ctrl.data.game.variant.key);
       activeFenOverride = { fen: targetFen, dice };
       activeFenOverridePly = ply;
-      ctrl.chessground.set({ fen: targetFen, dice });
+      ctrl.chessground.set({ fen: targetFen, dice, cubeActions: [] });
       pendingArrows = buildArrowShapes(ctrl, played);
       shownCandidateRank = played.rank;
       ctrl.chessground.setAutoShapes(pendingArrows);
@@ -401,7 +401,7 @@ function renderCandidates(ctrl: AnalyseCtrl): VNode | undefined {
           const dice = stratUtils.backgammon.readDice(targetFen, ctrl.data.game.variant.key);
           activeFenOverride = { fen: targetFen, dice };
           activeFenOverridePly = ctrl.node.ply;
-          ctrl.chessground.set({ fen: targetFen, dice });
+          ctrl.chessground.set({ fen: targetFen, dice, cubeActions: [] });
           // setAutoShapes must come BEFORE redrawAll() because redrawAll() calls redrawNow()
           // synchronously and renders the SVG immediately — stale shapes would flash briefly.
           pendingArrows = buildArrowShapes(ctrl, c);
