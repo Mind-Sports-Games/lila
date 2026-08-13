@@ -183,7 +183,8 @@ case class Game(
           status,
           grace,
           byo,
-          actionsPerTurn(playerIndex)
+          actionsPerTurn(playerIndex),
+          clk.clockPlayer(playerIndex).limit
         )
     } yield plyTimes
   } orElse binaryPlyTimes.map { binary =>
@@ -1467,7 +1468,8 @@ sealed trait ClockHistory {
       status: Status,
       grace: Centis = Centis(0),
       byo: Centis = Centis(0),
-      actionsPerTurn: Vector[Int] = Vector.empty
+      actionsPerTurn: Vector[Int] = Vector.empty,
+      initial: Centis = Centis(0)
   ): List[Centis]
   def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis]
   def size: Int
@@ -1476,6 +1478,9 @@ sealed trait ClockHistory {
   protected def isTurnEndAction(actionsPerTurn: Vector[Int]): Int => Boolean =
     if (actionsPerTurn.forall(_ <= 1)) _ => true
     else actionsPerTurn.scanLeft(0)(_ + _).drop(1).map(_ - 1).toSet.contains
+
+  protected def firstPlyTime(clocks: Vector[Centis], initial: Centis): Centis =
+    clocks.headOption.fold(Centis(0))(head => (initial - head).nonNeg)
 }
 
 case class FischerClockHistory(
@@ -1506,10 +1511,11 @@ case class FischerClockHistory(
       status: Status,
       grace: Centis = Centis(0),
       byo: Centis = Centis(0),
-      actionsPerTurn: Vector[Int] = Vector.empty
+      actionsPerTurn: Vector[Int] = Vector.empty,
+      initial: Centis = Centis(0)
   ): List[Centis] = {
     val clocks = dbTimes(playerIndex)
-    Centis(0) :: {
+    firstPlyTime(clocks, initial) :: {
       val pairs = clocks.iterator zip clocks.iterator.drop(1)
 
       // We need to determine if this playerIndex's last clock had grace applied.
@@ -1598,7 +1604,8 @@ case class DelayClockHistory(
       _status: Status,
       _grace: Centis = Centis(0),
       _byo: Centis = Centis(0),
-      _actionsPerTurn: Vector[Int] = Vector.empty
+      _actionsPerTurn: Vector[Int] = Vector.empty,
+      _initial: Centis = Centis(0)
   ): List[Centis] = dbTimes(playerIndex).toList
 
   override def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis] =
@@ -1669,10 +1676,11 @@ case class ByoyomiClockHistory(
       status: Status,
       grace: Centis = Centis(0),
       byo: Centis = Centis(0),
-      actionsPerTurn: Vector[Int] = Vector.empty
+      actionsPerTurn: Vector[Int] = Vector.empty,
+      initial: Centis = Centis(0)
   ): List[Centis] = {
     val clocks = dbTimes(playerIndex)
-    Centis(0) :: {
+    firstPlyTime(clocks, initial) :: {
       val pairs = clocks.iterator zip clocks.iterator.drop(1)
 
       // We need to determine if this playerIndex's last clock had grace applied.

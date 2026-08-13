@@ -30,13 +30,18 @@ Chart.register(LineController, LinearScale, PointElement, LineElement, Tooltip, 
 interface MovePoint {
   x: number;
   y: number;
+  turn?: number;
 }
 
-// One chunk of a backgammon turn's bar: a floating bar spanning [from, to] on the y axis.
-interface SegmentPoint {
+// One action of a backgammon turn. Every action of a turn carries the turn's full bar height so
+// that hovering anywhere in its column hits the bar; `seg` is the action's share of that height,
+// used to draw the dividers inside the bar.
+interface ActionPoint {
   x: number;
-  y: [number, number];
+  y: number;
   ply: number;
+  turn: number;
+  seg: [number, number];
   actionLabel: string;
 }
 
@@ -62,6 +67,9 @@ interface AnalyseData {
 }
 
 const toBlurArray = (player: { blurs?: { bits?: string } }) => player.blurs?.bits?.split('') ?? [];
+
+// Zero-time turns still get a visible stub, so a fast turn reads as "played, ~0s" and not as a gap.
+const bgMinBarPx = 2;
 
 function formatClock(centis: number): string {
   let result = '';
@@ -93,7 +101,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   const firstPly = tree[0]?.ply ?? 0;
 
   const moveSeries: { p1: MovePoint[]; p2: MovePoint[] } = { p1: [], p2: [] };
-  const segmentSeries: { p1: SegmentPoint[]; p2: SegmentPoint[] } = { p1: [], p2: [] };
+  const actionSeries: { p1: ActionPoint[]; p2: ActionPoint[] } = { p1: [], p2: [] };
   const totalSeries: { p1: MovePoint[]; p2: MovePoint[] } = { p1: [], p2: [] };
   const labels: string[] = [];
   for (let i = 0; i <= firstPly; i++) labels.push('');
@@ -101,18 +109,17 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   const blurPoints: { p1: MovePoint[]; p2: MovePoint[] } = { p1: [], p2: [] };
 
   const logC = Math.pow(Math.log(3), 2);
-  let bgBlurPending: { key: 'p1' | 'p2'; point: MovePoint } | undefined;
+  let bgBlurPending: { key: 'p1' | 'p2'; turn: number; point: MovePoint } | undefined;
   let lastBgKey: 'p1' | 'p2' | undefined;
   let bgTurnCentis = 0;
   // Every action of the turn, in order: the dice roll, each checker move, then the end-turn.
   let bgTurnActions: { ply: number; centis: number; san: string }[] = [];
   let bgTurnNotations: string[] = [];
   let bgRollSan = '-'; // san from roll node, used as fallback label when no checker moves (e.g. dance)
-  // For backgammon: use a per-turn index as x so doubles (4 checkers) don't shift subsequent bars.
-  let bgTurnX = firstPly;
-  const bgPlyToTurnX = new Map<number, number>(); // any ply → its turn's x (for selectPly)
-  const bgTurnXToPly = new Map<number, number>(); // turn x → endturn/last-checker ply (for click navigation)
-  const bgLabelByX = new Map<number, string>(); // turn x → tooltip label
+  let bgTurnIdx = -1;
+  let bgTurnTimed = false; // did any action of this turn have a recorded ply time?
+  const bgLabelByTurn = new Map<number, string>(); // turn index → tooltip label
+  const bgUntimedTurns = new Set<number>(); // turns the backend recorded no time for at all
   // For delay clocks: track remaining time per-turn on the frontend so the tooltip and clock line
   // are both correct (delay is applied once per full backgammon turn, not per individual action).
   const bgDelayCentis = (data.clock?.delay ?? 0) * 100;
@@ -123,19 +130,16 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   const flushBgBlur = () => {
     if (!bgBlurPending) return;
     blurPoints[bgBlurPending.key].push(bgBlurPending.point);
-    const x = bgBlurPending.point.x;
-    if (isBackgammon) {
-      const existing = bgLabelByX.get(x) ?? '';
-      const nl = existing.indexOf('\n');
-      bgLabelByX.set(x, nl >= 0 ? existing.slice(0, nl) + ' [blur]' + existing.slice(nl) : existing + ' [blur]');
-    } else {
-      const nl = labels[x].indexOf('\n');
-      labels[x] = nl >= 0 ? labels[x].slice(0, nl) + ' [blur]' + labels[x].slice(nl) : labels[x] + ' [blur]';
-    }
+    const existing = bgLabelByTurn.get(bgBlurPending.turn) ?? '';
+    const nl = existing.indexOf('\n');
+    bgLabelByTurn.set(
+      bgBlurPending.turn,
+      nl >= 0 ? existing.slice(0, nl) + ' [blur]' + existing.slice(nl) : existing + ' [blur]',
+    );
     bgBlurPending = undefined;
   };
 
-  const bgSegmentsForTurn = (isP1: boolean, top: number): SegmentPoint[] => {
+  const bgActionPoints = (isP1: boolean, top: number): ActionPoint[] => {
     const n = bgTurnActions.length;
     if (!n) return [];
     let acc = 0;
@@ -145,34 +149,45 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
       acc = i === n - 1 ? 1 : acc + (bgTurnCentis > 0 ? action.centis / bgTurnCentis : 1 / n);
       const seconds = (action.centis / 100).toFixed(action.centis >= 200 ? 1 : 2);
       return {
-        x: bgTurnX,
-        y: (isP1 ? [from * top, acc * top] : [-acc * top, -from * top]) as [number, number],
+        x: action.ply,
+        y: isP1 ? top : -top,
         ply: action.ply,
-        actionLabel: action.san + ' ' + trans.plural('nbSeconds', Number(seconds)),
+        turn: bgTurnIdx,
+        seg: [from, acc] as [number, number],
+        actionLabel: bgTurnTimed ? action.san + ' ' + trans.plural('nbSeconds', Number(seconds)) : action.san,
       };
     });
   };
 
-  const emitBgTurn = (key: 'p1' | 'p2', isP1: boolean, endPly: number, heading: string, clock: number | undefined) => {
+  const emitBgTurn = (key: 'p1' | 'p2', isP1: boolean, heading: string, clock: number | undefined) => {
     const y = Math.pow(Math.log(0.005 * Math.min(bgTurnCentis, 12e4) + 3), 2) - logC;
-    const movePoint: MovePoint = { x: bgTurnX, y: isP1 ? y : -y };
-    bgTurnXToPly.set(bgTurnX, endPly);
+    // The bar spans every ply of the turn, so its centre is the midpoint of that ply range.
+    const startPly = bgTurnActions[0]?.ply ?? firstPly;
+    const endPly = bgTurnActions[bgTurnActions.length - 1]?.ply ?? startPly;
+    const movePoint: MovePoint = { x: (startPly + endPly) / 2, y: isP1 ? y : -y, turn: bgTurnIdx };
     if (bgBlurPending) bgBlurPending.point = movePoint;
     const seconds = (bgTurnCentis / 100).toFixed(bgTurnCentis >= 200 ? 1 : 2);
     if (bgIsDelayType)
       bgCorrectRemaining[key] = Math.max(0, bgCorrectRemaining[key] - Math.max(0, bgTurnCentis - bgDelayCentis));
     const displayClock = bgIsDelayType ? bgCorrectRemaining[key] : clock;
-    let label = heading + '\n' + trans.plural('nbSeconds', Number(seconds));
+    if (!bgTurnTimed) bgUntimedTurns.add(bgTurnIdx);
+    let label = heading + (bgTurnTimed ? '\n' + trans.plural('nbSeconds', Number(seconds)) : '');
     if (displayClock) label += '\n' + formatClock(displayClock);
-    bgLabelByX.set(bgTurnX, label);
+    bgLabelByTurn.set(bgTurnIdx, label);
     moveSeries[key].push(movePoint);
-    segmentSeries[key].push(...bgSegmentsForTurn(isP1, y));
-    if (displayClock) totalSeries[key].push({ x: bgTurnX, y: isP1 ? displayClock : -displayClock });
+    actionSeries[key].push(...bgActionPoints(isP1, y));
+    if (displayClock)
+      totalSeries[key].push({ x: movePoint.x, y: isP1 ? displayClock : -displayClock, turn: bgTurnIdx });
   };
 
-  plyCentis.forEach((centis, i) => {
+  // Drive the loop off the tree rather than plyCentis: the backend stops recording clock times
+  // once a player's clock history runs out, and the final turn of a game that ends on a bearing-off
+  // move has no entries at all. Iterating plyCentis silently dropped those turns from the chart.
+  const actionCount = Math.max(plyCentis.length, tree.length - 1);
+  for (let i = 0; i < actionCount; i++) {
+    const centis = plyCentis[i] ?? 0;
     const node = tree[i + 1];
-    if (!tree[i]) return;
+    if (!tree[i]) continue;
     const ply = node ? node.ply : tree[i].ply + 1;
     const isP1 = node ? node.playedPlayerIndex === 'p1' : (ply & 1) === 1;
     const key: 'p1' | 'p2' = isP1 ? 'p1' : 'p2';
@@ -182,30 +197,33 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     const san = node ? (node.san === 'NOSAN' ? (node.uci ?? '-') : (node.san ?? '-')) : '-';
 
     if (isBackgammon) {
-      // Handle endturn before isNewTurn: endturn's playedPlayerIndex differs from the checker player,
-      // which would incorrectly trigger a new turn and shift bgTurnX prematurely.
+      // Handle endturn before isNewTurn: it closes the turn its checker moves belong to.
       if (node?.uci === 'endturn') {
         bgTurnCentis += centis;
+        bgTurnTimed ||= i < plyCentis.length;
         bgTurnActions.push({ ply: node.ply, centis, san: 'end' });
-        bgPlyToTurnX.set(node.ply, bgTurnX);
         const moveSan = bgTurnNotations.length > 0 ? BackgammonFamily.combinedNotation(bgTurnNotations) : bgRollSan;
-        emitBgTurn(key, isP1, node.ply, turn + dots + ' ' + moveSan, node.clock);
-        return;
+        emitBgTurn(key, isP1, turn + dots + ' ' + moveSan, node.clock);
+        continue;
       }
 
       const isNewTurn = key !== lastBgKey;
       if (isNewTurn) {
         flushBgBlur();
         lastBgKey = key;
-        bgTurnX++;
+        bgTurnIdx++;
         bgTurnCentis = 0;
+        bgTurnTimed = false;
         bgTurnActions = [];
         bgTurnNotations = [];
         bgRollSan = san; // save the roll's notation for use in the endturn label (e.g. for dances with no checkers)
-        bgBlurPending = blurs[isP1 ? 1 : 0].shift() === '1' ? { key, point: { x: bgTurnX, y: 0 } } : undefined;
+        bgBlurPending =
+          blurs[isP1 ? 1 : 0].shift() === '1'
+            ? { key, turn: bgTurnIdx, point: { x: ply, y: 0, turn: bgTurnIdx } }
+            : undefined;
       }
       bgTurnCentis += centis;
-      bgPlyToTurnX.set(node ? node.ply : ply, bgTurnX);
+      bgTurnTimed ||= i < plyCentis.length;
 
       let actionSan = san;
       if (!isNewTurn && node) {
@@ -224,11 +242,11 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
       // piece auto-ends the turn, or the game ends mid-turn) — detected by a player change in nextNode.
       const nextNode = tree[i + 2];
       const isLastChecker = !nextNode || nextNode.playedPlayerIndex !== key;
-      if (!isLastChecker) return;
+      if (!isLastChecker) continue;
 
       const moveSan = bgTurnNotations.length > 0 ? BackgammonFamily.combinedNotation(bgTurnNotations) : san;
-      emitBgTurn(key, isP1, node ? node.ply : ply, turn + dots + ' ' + moveSan, node?.clock);
-      return;
+      emitBgTurn(key, isP1, turn + dots + ' ' + moveSan, node?.clock);
+      continue;
     }
 
     // Chess / non-backgammon
@@ -260,10 +278,16 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
       label += '\n' + formatClock(clock);
       totalSeries[key].push({ x: movePoint.x, y: isP1 ? clock : -clock });
     }
-  });
+  }
   flushBgBlur();
 
-  const maxMove = Math.max(...moveSeries.p1.map(p => Math.abs(p.y)), ...moveSeries.p2.map(p => Math.abs(p.y)), 0.001);
+  // A single very long think flattens every other turn to a few pixels. When the longest turn is
+  // a clear outlier (> 1.5x the 90th percentile), normalise on that percentile instead and let the
+  // outlier run off the top of the scale — where it draws with no top edge, reading as off-scale.
+  const turnHeights = [...moveSeries.p1, ...moveSeries.p2].map(p => Math.abs(p.y)).sort((a, b) => a - b);
+  const peakMove = turnHeights[turnHeights.length - 1] ?? 0;
+  const p90Move = turnHeights[Math.min(Math.floor(turnHeights.length * 0.9), turnHeights.length - 1)] ?? 0;
+  const maxMove = Math.max(isBackgammon && p90Move > 0 ? Math.min(peakMove, 1.5 * p90Move) : peakMove, 0.001);
   const maxTotal = Math.max(
     ...totalSeries.p1.map(p => Math.abs(p.y)),
     ...totalSeries.p2.map(p => Math.abs(p.y)),
@@ -276,11 +300,13 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   const moveBarDatasets = (['p1', 'p2'] as const).map(key => ({
     type: 'bar' as const,
     data: isBackgammon
-      ? segmentSeries[key].map(p => ({ ...p, y: [p.y[0] / maxMove, p.y[1] / maxMove] as [number, number] }))
+      ? actionSeries[key].map(p => ({ ...p, y: p.y / maxMove }))
       : moveSeries[key].map(p => ({ x: p.x, y: p.y / maxMove })),
     backgroundColor: isBackgammon ? 'transparent' : key === 'p1' ? p1Fill : p2Fill,
     grouped: false,
-    categoryPercentage: 2,
+    // Backgammon: one (invisible) bar per action ply, exactly one ply wide, so a turn's bars tile
+    // its ply range. bgTurnBars paints the turn as a single bar over that range.
+    categoryPercentage: isBackgammon ? 1 : 2,
     barPercentage: 1,
     order: 2,
     borderColor: barBorderColor(key),
@@ -289,66 +315,137 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     datalabels: { display: false },
   })) as unknown as ChartDataset[];
 
+  // Blur markers are placed on the bar edge the plugin actually draws, not on the turn's raw
+  // value: a floored, off-scale or untimed turn draws its edge elsewhere, and a marker left on
+  // the raw value would float free of its bar. Collected while drawing, painted on top after.
+  const bgBlurMarks: { x: number; y: number; key: 'p1' | 'p2' }[] = [];
+  const bgBlurRadius = 4.5;
+  const bgBlurTurns = {
+    p1: new Set(blurPoints.p1.map(p => p.turn)),
+    p2: new Set(blurPoints.p2.map(p => p.turn)),
+  };
+
   const bgTurnBars = {
     id: 'bgTurnBars',
     beforeDatasetsDraw(chart: Chart) {
+      bgBlurMarks.length = 0;
       const zero = chart.scales.y?.getPixelForValue(0);
-      if (zero === undefined) return;
+      const xScale = chart.scales.x;
+      if (zero === undefined || !xScale) return;
       const ctx = chart.ctx;
       const dpr = chart.currentDevicePixelRatio || 1;
       const weight = Math.max(1, Math.round(dpr)); // line thickness
       const dev = (v: number) => Math.round(v * dpr); // nearest device pixel
       const css = (devicePx: number) => devicePx / dpr;
       const axis = dev(zero);
+      const area = chart.chartArea;
       ctx.save();
+      ctx.beginPath();
+      ctx.rect(area.left, area.top, area.right - area.left, area.bottom - area.top);
+      ctx.clip();
       ctx.lineWidth = css(weight);
       chart.data.datasets.forEach((dataset, i) => {
         const key = (dataset as { bgSegmentKey?: 'p1' | 'p2' }).bgSegmentKey;
         const meta = chart.getDatasetMeta(i);
         if (!key || meta.hidden) return;
-        const bars = meta.data as unknown as { x: number; y: number; base: number; width: number }[];
-        const points = segmentSeries[key];
-        const outerEdge = (bar: { y: number; base: number }) =>
-          Math.abs(bar.y - zero) > Math.abs(bar.base - zero) ? bar.y : bar.base;
-        const inset = (key === 'p1' ? 1 : -1) * (weight / 2);
+        const bars = meta.data as unknown as { y: number }[];
+        const points = actionSeries[key];
+        const dir = key === 'p1' ? -1 : 1; // p1 bars grow towards smaller pixel y
+        const inset = -dir * (weight / 2); // keep the border stroke inside the bar
         const gap = 2 * weight; // closest two lines may sit before we drop one
+        const minHeight = Math.max(dev(bgMinBarPx), weight);
+        const untimed: [number, number][] = [];
+        const blurTurns = bgBlurTurns[key];
+        const markY = (t: number) =>
+          Math.min(Math.max(t, dev(area.top + bgBlurRadius)), dev(area.bottom - bgBlurRadius));
         ctx.fillStyle = key === 'p1' ? p1Fill : p2Fill;
         ctx.strokeStyle = barBorderColor(key);
         ctx.beginPath();
         for (let start = 0; start < bars.length;) {
           let end = start;
-          while (end + 1 < bars.length && points[end + 1].x === points[start].x) end++;
-          const { x, width } = bars[end];
-          const outer = outerEdge(bars[end]);
-          if (isFinite(x) && isFinite(width) && isFinite(outer)) {
-            const left = dev(x - width / 2);
-            const right = dev(x + width / 2);
-            const top = dev(outer);
+          if (!points[start]) break;
+          while (end + 1 < bars.length && points[end + 1]?.turn === points[start].turn) end++;
+          // Span the turn's whole ply range, straight off the scale: a turn is as wide as it is long.
+          const left = dev(xScale.getPixelForValue(points[start].x - 0.5));
+          const right = dev(xScale.getPixelForValue(points[end].x + 0.5));
+          let top = dev(bars[end].y);
+          if (bgUntimedTurns.has(points[start].turn)) {
+            if (isFinite(left) && isFinite(right)) {
+              untimed.push([left, right]);
+              if (blurTurns.has(points[start].turn))
+                bgBlurMarks.push({
+                  x: css((left + right) / 2),
+                  y: css(markY(dev(key === 'p1' ? area.top : area.bottom))),
+                  key,
+                });
+            }
+            start = end + 1;
+            continue;
+          }
+          if (isFinite(left) && isFinite(right) && isFinite(top)) {
+            if (Math.abs(top - axis) < minHeight) top = axis + dir * minHeight;
+            if (blurTurns.has(points[start].turn))
+              bgBlurMarks.push({ x: css((left + right) / 2), y: css(markY(top)), key });
             ctx.fillRect(css(left), css(Math.min(top, axis)), css(right - left), css(Math.abs(top - axis)));
             ctx.moveTo(css(left + weight / 2), css(axis));
             ctx.lineTo(css(left + weight / 2), css(top + inset));
-            ctx.lineTo(css(right + weight / 2), css(top + inset));
-            ctx.lineTo(css(right + weight / 2), css(axis));
+            ctx.lineTo(css(right - weight / 2), css(top + inset));
+            ctx.lineTo(css(right - weight / 2), css(axis));
+            const height = top - axis;
             let last = axis;
             for (let j = start; j < end; j++) {
-              const edge = dev(outerEdge(bars[j]));
-              if (!isFinite(edge) || Math.abs(edge - last) < gap || Math.abs(top - edge) < gap) continue;
+              const edge = axis + Math.round(height * points[j].seg[1]);
+              if (Math.abs(edge - last) < gap || Math.abs(top - edge) < gap) continue;
               last = edge;
               ctx.moveTo(css(left + weight / 2), css(edge + inset));
-              ctx.lineTo(css(right + weight / 2), css(edge + inset));
+              ctx.lineTo(css(right - weight / 2), css(edge + inset));
             }
           }
           start = end + 1;
         }
         ctx.stroke();
+        // Turns the backend recorded no time for: a dashed full-height band over the turn's plies,
+        // so the chart stays readable and alignable to the last move instead of flatlining.
+        if (untimed.length) {
+          const edge = dev(key === 'p1' ? area.top : area.bottom);
+          ctx.save();
+          ctx.setLineDash([css(2 * weight), css(2 * weight)]);
+          for (const [left, right] of untimed) {
+            ctx.globalAlpha = 0.35;
+            ctx.fillRect(css(left), css(Math.min(edge, axis)), css(right - left), css(Math.abs(edge - axis)));
+            ctx.globalAlpha = 1;
+            ctx.beginPath();
+            ctx.moveTo(css(left + weight / 2), css(axis));
+            ctx.lineTo(css(left + weight / 2), css(edge));
+            ctx.moveTo(css(right - weight / 2), css(axis));
+            ctx.lineTo(css(right - weight / 2), css(edge));
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
       });
+      ctx.restore();
+    },
+    afterDatasetsDraw(chart: Chart) {
+      if (!bgBlurMarks.length) return;
+      const ctx = chart.ctx;
+      ctx.save();
+      ctx.lineWidth = 1.5;
+      for (const mark of bgBlurMarks) {
+        ctx.fillStyle = mark.key === 'p1' ? '#555555' : '#bbbbbb';
+        ctx.strokeStyle = mark.key === 'p1' ? '#aaaaaa' : '#444444';
+        ctx.beginPath();
+        ctx.rect(mark.x - bgBlurRadius, mark.y - bgBlurRadius, bgBlurRadius * 2, bgBlurRadius * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
       ctx.restore();
     },
   };
 
   const totalDatasets = (['p1', 'p2'] as const).map(key => ({
     type: 'line' as const,
-    data: totalSeries[key].map(p => ({ x: p.x, y: p.y / maxTotal })),
+    data: totalSeries[key].map(p => ({ ...p, y: p.y / maxTotal })),
     backgroundColor: key,
     borderColor: 'rgba(56,147,232,0.5)',
     borderWidth: 1,
@@ -362,13 +459,14 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     datalabels: { display: false },
   }));
 
-  const blurDatasets = (['p1', 'p2'] as const)
+  // Backgammon draws its blur markers in bgTurnBars, on the bar edge it actually traced.
+  const blurDatasets = (isBackgammon ? [] : (['p1', 'p2'] as ('p1' | 'p2')[]))
     .filter(key => blurPoints[key].length > 0)
     .map(key => {
       const blurXSet = new Set(blurPoints[key].map(p => p.x));
       return {
         type: 'line' as const,
-        data: moveSeries[key].map(p => ({ x: p.x, y: p.y / maxMove })),
+        data: moveSeries[key].map(p => ({ ...p, y: p.y / maxMove })),
         borderWidth: 0,
         pointRadius: moveSeries[key].map(p => (blurXSet.has(p.x) ? 4.5 : 0)),
         pointHoverRadius: 5,
@@ -380,6 +478,14 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
         datalabels: { display: false },
       };
     });
+
+  // Backgammon shares the acpl chart's ply axis so both charts' ply lines line up. The acpl chart
+  // (fed by bgWinChart) has no point for endturn nodes, hence the last non-endturn ply as max.
+  const lastPly = tree[tree.length - 1]?.ply ?? firstPly + plyCentis.length;
+  const bgLastPly = (() => {
+    for (let i = tree.length - 1; i > 0; i--) if (tree[i].uci !== 'endturn') return tree[i].ply;
+    return lastPly;
+  })();
 
   const divLines = division(data.game.division, { noarg: (k: string) => k } as Trans);
   const datasets: ChartDataset[] = [
@@ -398,12 +504,9 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
       maintainAspectRatio: false,
       responsive: true,
       animations: animation(
-        800 /
-          Math.max(1, isBackgammon ? Math.max(segmentSeries.p1.length, segmentSeries.p2.length) : labels.length - 1),
+        800 / Math.max(1, isBackgammon ? Math.max(actionSeries.p1.length, actionSeries.p2.length) : labels.length - 1),
       ),
-      scales: isBackgammon
-        ? axisOpts(firstPly + 1, bgTurnX)
-        : axisOpts(firstPly + 1, tree[tree.length - 1]?.ply ?? firstPly + plyCentis.length),
+      scales: axisOpts(firstPly + 1, isBackgammon ? bgLastPly : lastPly),
       plugins: {
         tooltip: {
           borderColor: fontColor,
@@ -416,8 +519,11 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
           bodyFont: fontFamily(13),
           displayColors: false,
           callbacks: {
-            title: items => (isBackgammon ? bgLabelByX.get(items[0].parsed.x) : labels[items[0].parsed.x]) ?? '',
-            label: ctx => (ctx.raw as Partial<SegmentPoint>)?.actionLabel ?? '',
+            title: items =>
+              (isBackgammon
+                ? bgLabelByTurn.get((items[0].raw as Partial<ActionPoint>)?.turn ?? -1)
+                : labels[items[0].parsed.x]) ?? '',
+            label: ctx => (ctx.raw as Partial<ActionPoint>)?.actionLabel ?? '',
           },
         },
       },
@@ -426,12 +532,8 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
           const pt = (
             chart.data.datasets[elements[0].datasetIndex]?.data as { x: number; ply?: number }[] | undefined
           )?.[elements[0].index];
-          if (pt?.x !== undefined) {
-            playstrategy.pubsub.emit(
-              'analysis.chart.click',
-              isBackgammon ? (pt.ply ?? bgTurnXToPly.get(pt.x) ?? pt.x) : pt.x,
-            );
-          }
+          if (pt?.x !== undefined)
+            playstrategy.pubsub.emit('analysis.chart.click', isBackgammon ? (pt.ply ?? Math.round(pt.x)) : pt.x);
         }
       },
     },
@@ -440,8 +542,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   chart.selectPly = selectPly.bind(chart);
 
   playstrategy.pubsub.on('analysis.change', (_fen: string, _path: string, ply: Ply | false) => {
-    const x = ply === false ? firstPly : isBackgammon ? (bgPlyToTurnX.get(ply) ?? firstPly) : ply;
-    chart.selectPly(x);
+    chart.selectPly(ply === false ? firstPly : ply);
   });
   playstrategy.pubsub.emit('analysis.change.trigger');
 

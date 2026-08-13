@@ -10,7 +10,8 @@ class ClockHistoryPlyTimesTest extends munit.FunSuite {
       clocks: Vector[Centis],
       actionsPerTurn: Vector[Int],
       finished: Boolean = false,
-      turnPlayerIndex: PlayerIndex = P1
+      turnPlayerIndex: PlayerIndex = P1,
+      initial: Centis = Centis(0)
   ) =
     FischerClockHistory(p1 = clocks).plyTimes(
       playerIndex = P1,
@@ -21,7 +22,8 @@ class ClockHistoryPlyTimesTest extends munit.FunSuite {
       status = if (finished) Status.Mate else Status.Started,
       grace = grace,
       byo = Centis(0),
-      actionsPerTurn = actionsPerTurn
+      actionsPerTurn = actionsPerTurn,
+      initial = initial
     )
 
   test("single action per turn: increment is added back to every action") {
@@ -52,6 +54,20 @@ class ClockHistoryPlyTimesTest extends munit.FunSuite {
       plyTimes(clocks, Vector.empty),
       List(Centis(0), Centis(300), Centis(300), Centis(20))
     )
+  }
+
+  test("first action: measured against the starting time when the clock was already running") {
+    val clocks = Vector(Centis(17131), Centis(17131), Centis(17131))
+    assertEquals(
+      plyTimes(clocks, Vector(3), initial = Centis(18000)),
+      List(Centis(869), Centis(0), Centis(200))
+    )
+  }
+
+  test("first action: stays 0 when the clock had not started yet") {
+    // the recorded remaining sits just above the limit thanks to lag compensation
+    val clocks = Vector(Centis(18003), Centis(18003))
+    assertEquals(plyTimes(clocks, Vector(2), initial = Centis(18000)), List(Centis(0), Centis(200)))
   }
 
   test("multiaction: turn boundaries are tracked across turns") {
