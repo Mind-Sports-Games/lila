@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.Glyphs
 import strategygames.format.{ Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
-import strategygames.{ Division, Game, Player as PlayerIndex, Replay }
+import strategygames.{ Division, Game, GameLogic, Player as PlayerIndex, Replay }
 import play.api.libs.json.*
 
 import lila.analyse.{ Analysis, Info }
@@ -23,10 +23,16 @@ object ServerEval {
 
     private val onceEvery = lila.memo.OnceEvery(5 minutes)
 
+    // The gnubg worker analyses a whole game from its SGF, which a StudyChapterRequest
+    // does not carry, and the result is never merged back into a chapter. Requesting it
+    // would only mark the chapter started and leave it that way forever.
+    private def analysable(chapter: Chapter) =
+      chapter.setup.variant.gameLogic != GameLogic.Backgammon()
+
     def apply(study: Study, chapter: Chapter, userId: User.ID): Funit =
-      chapter.serverEval.fold(true) { eval =>
+      (analysable(chapter) && chapter.serverEval.fold(true) { eval =>
         !eval.done && onceEvery(chapter.id.value)
-      } so {
+      }) so {
         val unlimitedFu =
           fuccess(userId == User.playstrategyId) >>| userRepo
             .byId(userId)
