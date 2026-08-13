@@ -41,6 +41,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     const parts = fen.split(' ');
     if (parts.length < 8) return [];
     if (parts[1] !== '-' || parts[2] !== '-') return [];
+    if (parts[7] === '1' && parts[0] === ctrl.data.game.initialFen?.split(' ')[0]) return [];
     const player = parts[3];
     const cube = parts[6];
     if (cube === '-') return [];
