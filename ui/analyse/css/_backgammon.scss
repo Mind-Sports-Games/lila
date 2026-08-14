@@ -46,6 +46,13 @@ $bg-highlight-colors: (
 
   .advice-summary__side > div {
     gap: 0.3em;
+
+    // PR and Luck can run to five characters, past the 4ch basis in _acpl.scss, so those rows
+    // sized to their own glyphs and their labels left the counts' column.
+    strong {
+      flex: 0 0 5ch;
+      font-variant-numeric: tabular-nums;
+    }
   }
 
   .advice-summary__side {
