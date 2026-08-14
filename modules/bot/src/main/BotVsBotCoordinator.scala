@@ -4,6 +4,9 @@ import java.util.concurrent.atomic.{ AtomicBoolean, AtomicInteger, AtomicReferen
 import scala.concurrent.ExecutionContext
 import akka.actor.{ Cancellable, Scheduler }
 import play.api.Configuration
+import strategygames.GameFamily
+import strategygames.format.FEN
+import strategygames.variant.Variant
 
 import lila.challenge.{ Challenge, ChallengeApi }
 import lila.common.Bus
@@ -84,6 +87,15 @@ final class BotVsBotCoordinator(
         else findNextAvailableGame(idx + 1, attempts + 1, online)
       }
 
+    // Backgammon draws for the starting player, and every other creation path settles that draw
+    // into an initial FEN before making the challenge. Left to none, ChallengeJoiner builds the
+    // game from a randomly sided Situation while leaving startedAtTurn at 0: startPlayerIndex then
+    // disagrees with the board, and both players' clock histories are attributed to the wrong side
+    // and truncated. Always single point here, the stream never sets backgammonPoints.
+    private def openingFen(variant: Variant): Option[FEN] =
+      (variant.gameFamily == GameFamily.Backgammon())
+        .option(FEN(variant.gameLogic, variant.toBackgammon.fenFromSetupConfig(false).value))
+
     private def createGame(spec: BotVsBotGame, finishedGameId: Option[Game.ID]): Funit = {
       import lila.challenge.Challenge.*
       val timeControl = TimeControl.Clock(spec.clock)
@@ -96,7 +108,7 @@ final class BotVsBotCoordinator(
           val challenge = Challenge.make(
             variant = spec.variant,
             fenVariant = none,
-            initialFen = none,
+            initialFen = openingFen(spec.variant),
             timeControl = timeControl,
             mode = strategygames.Mode.Casual,
             playerIndex = "p1",
