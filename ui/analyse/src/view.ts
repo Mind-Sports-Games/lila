@@ -14,6 +14,7 @@ import {
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
 import isCol1 from 'common/isCol1';
+import isCol3 from 'common/isCol3';
 import { playable } from 'game';
 import * as router from 'game/router';
 import statusView from 'game/view/status';
@@ -751,10 +752,10 @@ export default function (ctrl: AnalyseCtrl): VNode {
                 ? ([renderBgAdviceSummary(ctrl), renderBgTopMoves(ctrl)] as (VNode | undefined)[]).filter(
                     (v): v is VNode => v != null,
                   )
-                : // The summary never changes with the move, so from two columns up it is rendered
-                  // apart from the candidates and placed elsewhere by CSS, leaving the whole right
-                  // hand column to the list.
-                  isBackgammonVariant(variantKey) && !isCol1()
+                : // The summary never changes with the move, so at three columns it is rendered
+                  // apart from the candidates and placed under the chat by CSS, leaving the whole
+                  // right hand column to the list. Narrower layouts have nowhere to put it.
+                  isBackgammonVariant(variantKey) && isCol3()
                   ? (
                       [renderBgAdviceSummary(ctrl), h('div.analyse__acpl', [renderBgTopMoves(ctrl)])] as (
                         VNode | undefined
