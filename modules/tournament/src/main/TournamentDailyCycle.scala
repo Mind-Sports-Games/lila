@@ -9,14 +9,18 @@ import Schedule.Speed.*
 
 /* The daily tournament cycle.
  *
- * A day is laid out on a fixed two hour grid. Four hour *blocks* hold four
- * consecutive hourly arenas, one per game group, always in the same group order.
- * The two hour holes at 12:00 and 18:00 are left for the 1h57 shields, and the
- * remaining hours take a random filler variant.
+ * We define four hour *blocks* hold four consecutive hourly arenas, one per game 
+ * group, always in the same group order. Every hour the blocks and the day's 
+ * shields, medleys and yearly leave empty then takes a random filler variant, so
+ * the day fills itself instead of relying on a hardcoded list of spare hours.
  *
- *   Mon-Thu  blocks at 02, 08, 14, 20   fillers at 00, 01, 06, 07
- *   Sat/Sun  blocks at 02, 08           fillers at 00, 01, 06, 07, 23
- *   Fri      nothing (the 24h yearly owns the day)
+ *   Mon-Thu  blocks at 02, 08, 14, 20
+ *   Sat/Sun  blocks at 02, 08
+ *   Fri      no blocks - the 24h yearly usually owns the day
+ *
+ * With the usual shields in place that leaves fillers at 00, 01, 06, 07 on Mon-Thu
+ * and 00, 01, 06, 07, 22, 23 at the weekend. A week whose shield is missing, or a
+ * friday with no yearly, gets more fillers rather than an empty stretch.
  *
  * Which variant lands in a slot is a pure function of the date, so the scheduler
  * can be run at any time over any horizon and produce the same plan. Adding a new
@@ -126,10 +130,8 @@ object TournamentDailyCycle {
 
   private val friday = 5
 
-  private val weekdayBlockHours  = List(2, 8, 14, 20)
-  private val weekendBlockHours  = List(2, 8)
-  private val weekdayFillerHours = List(0, 1, 6, 7)
-  private val weekendFillerHours = List(0, 1, 6, 7, 23)
+  private val weekdayBlockHours = List(2, 8, 14, 20)
+  private val weekendBlockHours = List(2, 8)
 
   private def isWeekend(day: DateTime) = day.getDayOfWeek > friday
 
@@ -137,11 +139,6 @@ object TournamentDailyCycle {
     if (day.getDayOfWeek == friday) Nil
     else if (isWeekend(day)) weekendBlockHours
     else weekdayBlockHours
-
-  def fillerHours(day: DateTime): List[Int] =
-    if (day.getDayOfWeek == friday) Nil
-    else if (isWeekend(day)) weekendFillerHours
-    else weekdayFillerHours
 
   /* The block counter is absolute: blocks elapsed since a fixed Monday. Every group
    * takes exactly one slot in every block, so this doubles as each group's own
@@ -202,15 +199,17 @@ object TournamentDailyCycle {
       .find(v => !used(v))
       .getOrElse(variantAt(group, block))
 
-  /* Fillers avoid backgammon, and avoid anything else running that day - which is stronger
-   * than only checking neighbouring slots, since nothing repeats anywhere in the day. The
-   * calendar day is the unit, so midnight is a seam: Mon-Thu close on backgammon, which
-   * fillers never pick, leaving only the weekend 23:00 filler able to meet the next day's
-   * 00:00 one. That is left alone, at roughly one repeat every eight months.
+  /* A filler goes in every hour of the day that `busyHours` leaves free - the blocks above
+   * plus whatever the shields, medleys and yearly are running through. Fillers avoid
+   * backgammon, and avoid anything else on that day, which is stronger than only checking
+   * neighbouring slots since nothing repeats anywhere in the day. The calendar day is the
+   * unit, so midnight is a seam: a day's last filler can meet the next day's 00:00 one, at
+   * roughly one repeat every eight months. That is left alone.
    */
-  def fillerSlots(day: DateTime, alreadyUsed: Set[Variant]): List[Slot] = {
+  def fillerSlots(day: DateTime, busyHours: Set[Int], alreadyUsed: Set[Variant]): List[Slot] = {
     val pool = allVariantSpeeds.map(_._1).filterNot(Group.Backgammon.variants.contains)
-    fillerHours(day)
+    (0 until 24).toList
+      .filterNot(busyHours.contains)
       .foldLeft(List.empty[Slot]) { case (acc, hour) =>
         val taken     = alreadyUsed ++ acc.map(_.variant)
         val available = pool.filterNot(taken.contains)

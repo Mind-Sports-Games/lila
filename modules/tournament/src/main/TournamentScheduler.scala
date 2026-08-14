@@ -58,10 +58,8 @@ final private class TournamentScheduler(
     def nextMonthWithDay(dayOfMonth: Int) =
       xMonthWithDay(1)(dayOfMonth)
 
-    def nextDayOfWeeks(dayNumber: Int, weekNumber: Int) =
-      today.plusDays((dayNumber + 7 * weekNumber - today.getDayOfWeek) % (7 * weekNumber))
-    def nextDayOfWeek(number: Int)      = nextDayOfWeeks(number, 1)
-    def nextDayOfFortnight(number: Int) = nextDayOfWeeks(number, 2)
+    def nextDayOfWeek(number: Int) = today.plusDays((number + 7 - today.getDayOfWeek) % 7)
+    def nextDayOfFortnight(number: Int) = nextDayOfWeek(number).plusDays(7)
 
     def monthOfWithWeekAndDayOfWeek(month: OfMonth, weekOfMonth: Int, dayOfWeek: Int) =
       month.firstDay
@@ -203,16 +201,16 @@ final private class TournamentScheduler(
           nextDayOfWeek(ms.dayOfWeek)
         )
       )
-      .flatten filter { _.schedule.at.isAfter(rightNow) }
+      .flatten
 
     // and schedule two weeks in advance
     val nextWeekMedleyShields = TournamentShield.MedleyShield.allWeekly
       .map(ms =>
         scheduleMedleyShield(ms)(
-          nextDayOfFortnight(ms.dayOfWeek + 7)
+          nextDayOfFortnight(ms.dayOfWeek)
         )
       )
-      .flatten filter { _.schedule.at.isAfter(rightNow) }
+      .flatten
 
     // schedule this month
     val thisMonthMedleyShields = TournamentShield.MedleyShield.allMonthly
@@ -221,7 +219,7 @@ final private class TournamentScheduler(
           thisMonthWeekAndDayOfWeek(ms.weekOfMonth.getOrElse(1), ms.dayOfWeek)
         )
       )
-      .flatten filter { _.schedule.at.isAfter(rightNow) }
+      .flatten
 
     // and schedule two months in advance
     val nextMonthMedleyShields = TournamentShield.MedleyShield.allMonthly
@@ -230,7 +228,7 @@ final private class TournamentScheduler(
           nextMonthWeekAndDayOfWeek(ms.weekOfMonth.getOrElse(1), ms.dayOfWeek)
         )
       )
-      .flatten filter { _.schedule.at.isAfter(rightNow) }
+      .flatten
 
     val shieldDuration = Some(TournamentShield.arenaMinutes)
 
@@ -259,7 +257,7 @@ final private class TournamentScheduler(
           }
         }
       )
-      .flatten filter { _.schedule.at.isAfter(rightNow) }
+      .flatten
 
     // and schedule next month
     val nextMonthShields = TournamentShield.Category.all
@@ -286,7 +284,7 @@ final private class TournamentScheduler(
           }
         }
       )
-      .flatten filter { _.schedule.at.isAfter(rightNow) }
+      .flatten
 
     // yearly tournaments 2026
     val yearly2026Tournaments = List(
@@ -439,9 +437,14 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Abalone(strategygames.abalone.variant.GrandAbalone), Delay66)(
         new DateTime(2026, 11, 27, 0, 0)
       )
-    ).flatten filter { _.schedule.at.isAfter(rightNow) }
+    ).flatten
 
-    val scheduledBeforeDailyCycle =
+    /* Everything that is not the daily cycle. Kept unfiltered, because the cycle has to see
+     * what is running now as well as what is still to come: a shield that started ten minutes
+     * ago still owns the hour after it, and a yearly that started at midnight still owns the
+     * whole of its friday.
+     */
+    val otherScheduled =
       yearly2026Tournaments :::
         thisWeekMedleyShields :::
         nextWeekMedleyShields :::
@@ -450,21 +453,36 @@ final private class TournamentScheduler(
         thisMonthShields :::
         nextMonthShields
 
-    // a shield, medley or yearly counts against a day whenever it is running during it,
-    // which for the friday 24h yearly means it reaches into saturday's first filler slot
-    def runsDuring(day: DateTime)(plan: Plan) = {
-      val s = plan.schedule
-      s.at.isBefore(day.plusDays(1)) && s.at.plusMinutes(Schedule.durationFor(s)).isAfter(day)
+    val scheduledBeforeDailyCycle = otherScheduled filter { _.schedule.at.isAfter(rightNow) }
+
+    /* Which hours of `day` a plan is running through. A 1h57 shield at 12:00 takes 12 and 13;
+     * the friday 24h yearly takes the whole of friday and stops exactly at saturday 00:00, so
+     * saturday's first hour comes back free.
+     */
+    def hoursCovered(day: DateTime)(plan: Plan): Set[Int] = {
+      val s    = plan.schedule
+      val ends = s.at.plusMinutes(Schedule.durationFor(s))
+      (0 until 24).filter { hour =>
+        val hourStart = day.plusHours(hour)
+        hourStart.isBefore(ends) && hourStart.plusHours(1).isAfter(s.at)
+      }.toSet
     }
 
-    // daily cycle tournaments, a few weeks in advance
+    /* Daily cycle tournaments, a fortnight in advance. The blocks take their fixed hours and
+     * the fillers take every hour left over, so a day whose shield is missing - or a friday
+     * with no yearly - fills up instead of standing idle. Both the hours and the variants come
+     * from the same set of plans, which is why the medley shield horizon above has to reach at
+     * least as far as dailyCycleDaysAhead.
+     */
     val dailyCycleTournaments = (0 until dailyCycleDaysAhead).toList.flatMap { daysAhead =>
-      val day       = today.plusDays(daysAhead)
-      val blocks    = TournamentDailyCycle.blockSlots(day)
-      val otherwise = scheduledBeforeDailyCycle.filter(runsDuring(day)).flatMap { p =>
-        p.schedule.medleyShield.fold(List(p.schedule.variant))(_.variants)
+      val day          = today.plusDays(daysAhead)
+      val blocks       = TournamentDailyCycle.blockSlots(day)
+      val running      = otherScheduled.map(p => p -> hoursCovered(day)(p)).filter(_._2.nonEmpty)
+      val busyHours    = blocks.map(_.hour).toSet ++ running.flatMap(_._2)
+      val usedVariants = blocks.map(_.variant).toSet ++ running.flatMap { case (plan, _) =>
+        plan.schedule.medleyShield.fold(List(plan.schedule.variant))(_.variants)
       }
-      val fillers = TournamentDailyCycle.fillerSlots(day, blocks.map(_.variant).toSet ++ otherwise)
+      val fillers = TournamentDailyCycle.fillerSlots(day, busyHours, usedVariants)
       (blocks ::: fillers).flatMap(scheduleDailyCycle(_)(day))
     } filter { _.schedule.at.isAfter(rightNow) }
 

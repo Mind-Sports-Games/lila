@@ -12,9 +12,24 @@ class TournamentDailyCycleTest extends munit.FunSuite {
   private val weeks = 52
   private val days  = (0 until weeks * 7).toList.map(start.plusDays)
 
+  /* The hours a fully stocked week has taken by something other than the daily cycle: a 1h57
+   * shield at 12:00 and 18:00 on weekdays, the 12/14/16/18/20 shield and medley chain at the
+   * weekend, and the 24h yearly on friday. The scheduler works these out from the plans it has
+   * already built; here they are just the busy set the fillers have to work around.
+   */
+  private def busyHours(day: DateTime): Set[Int] =
+    day.getDayOfWeek match {
+      case 5     => (0 until 24).toSet
+      case 6 | 7 => (12 to 21).toSet
+      case _     => Set(12, 13, 18, 19)
+    }
+
+  private def fillers(day: DateTime, blocks: List[Slot], busy: Set[Int]): List[Slot] =
+    fillerSlots(day, blocks.map(_.hour).toSet ++ busy, blocks.map(_.variant).toSet)
+
   private def allSlots(day: DateTime): List[Slot] = {
     val blocks = blockSlots(day)
-    blocks ::: fillerSlots(day, blocks.map(_.variant).toSet)
+    blocks ::: fillers(day, blocks, busyHours(day))
   }
 
   private val everyVariant = Group.inBlockOrder.flatMap(_.variants)
@@ -33,7 +48,7 @@ class TournamentDailyCycleTest extends munit.FunSuite {
       val hours = allSlots(day).map(_.hour)
       val expected = day.getDayOfWeek match {
         case 5     => Nil
-        case 6 | 7 => List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 23)
+        case 6 | 7 => List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 22, 23)
         case _     => List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 20, 21, 22, 23)
       }
       assertEquals(hours.sorted, expected, s"$day")
@@ -66,8 +81,7 @@ class TournamentDailyCycleTest extends munit.FunSuite {
 
   test("fillers never pick backgammon") {
     days.foreach { day =>
-      val blocks = blockSlots(day)
-      fillerSlots(day, blocks.map(_.variant).toSet).foreach { slot =>
+      fillers(day, blockSlots(day), busyHours(day)).foreach { slot =>
         assert(!Group.Backgammon.variants.contains(slot.variant), s"$day ${slot.variant.key}")
       }
     }
@@ -77,9 +91,23 @@ class TournamentDailyCycleTest extends munit.FunSuite {
     days.foreach { day =>
       val blocks   = blockSlots(day)
       val reserved = blocks.map(_.variant).toSet + Variant.wrap(strategygames.chess.variant.Atomic)
-      fillerSlots(day, reserved).foreach { slot =>
+      fillerSlots(day, blocks.map(_.hour).toSet ++ busyHours(day), reserved).foreach { slot =>
         assert(!reserved.contains(slot.variant), s"$day ${slot.variant.key}")
       }
+    }
+  }
+
+  /* The point of driving fillers off a busy set rather than a hardcoded hour list: a day that
+   * loses its shields, or a friday that has no yearly, hands those hours to the daily cycle.
+   */
+  test("fillers take the hours a missing shield or yearly leaves behind") {
+    days.foreach { day =>
+      val blocks = blockSlots(day)
+      val filled = fillers(day, blocks, Set.empty)
+      assertEquals(filled.map(_.hour), (0 until 24).toList.filterNot(blocks.map(_.hour).toSet), s"$day")
+      val blockVariants = blocks.map(_.variant).toSet
+      assertEquals(filled.map(_.variant).distinct.size, filled.size, s"$day")
+      assert(filled.forall(s => !blockVariants(s.variant)), s"$day")
     }
   }
 
