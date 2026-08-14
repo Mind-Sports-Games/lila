@@ -70,6 +70,10 @@ const toBlurArray = (player: { blurs?: { bits?: string } }) => player.blurs?.bit
 
 // Zero-time turns still get a visible stub, so a fast turn reads as "played, ~0s" and not as a gap.
 const bgMinBarPx = 2;
+// Turns the backend recorded no time for are marked rather than measured, so they get a low band
+// of their own. A whole run of them can go unrecorded, which full height would turn into a wall.
+const bgUntimedPx = 6;
+const bgUntimedShare = 0.12;
 
 function formatClock(centis: number): string {
   let result = '';
@@ -297,6 +301,23 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   const blueLineColor = '#3893e8';
   const barBorderColor = (key: 'p1' | 'p2') => (key === 'p1' ? '#838383' : '#616161');
 
+  // A turn's bar reaches half way to the neighbouring turn of the same player, so each side reads
+  // as one continuous band. That is the geometry the old per-turn axis produced with
+  // categoryPercentage 2, kept here on the ply axis so the two charts still share a scale.
+  const bgTurnSpan: Record<'p1' | 'p2', Map<number, [number, number]>> = { p1: new Map(), p2: new Map() };
+  (['p1', 'p2'] as const).forEach(key =>
+    moveSeries[key].forEach((p, i) => {
+      const prev = moveSeries[key][i - 1]?.x;
+      const next = moveSeries[key][i + 1]?.x;
+      // the outermost bar mirrors the width of its only neighbour
+      const edge = (next === undefined ? p.x - (prev ?? p.x - 2) : (next ?? p.x + 2) - p.x) / 2;
+      bgTurnSpan[key].set(p.turn ?? i, [
+        prev === undefined ? p.x - edge : (prev + p.x) / 2,
+        next === undefined ? p.x + edge : (p.x + next) / 2,
+      ]);
+    }),
+  );
+
   const moveBarDatasets = (['p1', 'p2'] as const).map(key => ({
     type: 'bar' as const,
     data: isBackgammon
@@ -304,8 +325,8 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
       : moveSeries[key].map(p => ({ x: p.x, y: p.y / maxMove })),
     backgroundColor: isBackgammon ? 'transparent' : key === 'p1' ? p1Fill : p2Fill,
     grouped: false,
-    // Backgammon: one (invisible) bar per action ply, exactly one ply wide, so a turn's bars tile
-    // its ply range. bgTurnBars paints the turn as a single bar over that range.
+    // Backgammon: one (invisible) bar per action ply, carrying that action's tooltip. bgTurnBars
+    // paints the visible bar; hit testing is by nearest ply, so it covers the painted width.
     categoryPercentage: isBackgammon ? 1 : 2,
     barPercentage: 1,
     order: 2,
@@ -354,6 +375,8 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
         const inset = -dir * (weight / 2); // keep the border stroke inside the bar
         const gap = 2 * weight; // closest two lines may sit before we drop one
         const minHeight = Math.max(dev(bgMinBarPx), weight);
+        const halfPlot = Math.abs(dev(key === 'p1' ? area.top : area.bottom) - axis);
+        const untimedEdge = axis + dir * Math.max(dev(bgUntimedPx), Math.round(halfPlot * bgUntimedShare));
         const untimed: [number, number][] = [];
         const blurTurns = bgBlurTurns[key];
         const markY = (t: number) =>
@@ -365,19 +388,15 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
           let end = start;
           if (!points[start]) break;
           while (end + 1 < bars.length && points[end + 1]?.turn === points[start].turn) end++;
-          // Span the turn's whole ply range, straight off the scale: a turn is as wide as it is long.
-          const left = dev(xScale.getPixelForValue(points[start].x - 0.5));
-          const right = dev(xScale.getPixelForValue(points[end].x + 0.5));
+          const span = bgTurnSpan[key].get(points[start].turn);
+          const left = dev(xScale.getPixelForValue(span?.[0] ?? points[start].x - 0.5));
+          const right = dev(xScale.getPixelForValue(span?.[1] ?? points[end].x + 0.5));
           let top = dev(bars[end].y);
           if (bgUntimedTurns.has(points[start].turn)) {
             if (isFinite(left) && isFinite(right)) {
               untimed.push([left, right]);
               if (blurTurns.has(points[start].turn))
-                bgBlurMarks.push({
-                  x: css((left + right) / 2),
-                  y: css(markY(dev(key === 'p1' ? area.top : area.bottom))),
-                  key,
-                });
+                bgBlurMarks.push({ x: css((left + right) / 2), y: css(markY(untimedEdge)), key });
             }
             start = end + 1;
             continue;
@@ -404,21 +423,25 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
           start = end + 1;
         }
         ctx.stroke();
-        // Turns the backend recorded no time for: a dashed full-height band over the turn's plies,
-        // so the chart stays readable and alignable to the last move instead of flatlining.
+        // Turns the backend recorded no time for: a low dashed band, so the chart still reaches the
+        // last move instead of flatlining, while reading as "not measured" rather than as a duration.
         if (untimed.length) {
-          const edge = dev(key === 'p1' ? area.top : area.bottom);
           ctx.save();
           ctx.setLineDash([css(2 * weight), css(2 * weight)]);
           for (const [left, right] of untimed) {
             ctx.globalAlpha = 0.35;
-            ctx.fillRect(css(left), css(Math.min(edge, axis)), css(right - left), css(Math.abs(edge - axis)));
+            ctx.fillRect(
+              css(left),
+              css(Math.min(untimedEdge, axis)),
+              css(right - left),
+              css(Math.abs(untimedEdge - axis)),
+            );
             ctx.globalAlpha = 1;
             ctx.beginPath();
             ctx.moveTo(css(left + weight / 2), css(axis));
-            ctx.lineTo(css(left + weight / 2), css(edge));
-            ctx.moveTo(css(right - weight / 2), css(axis));
-            ctx.lineTo(css(right - weight / 2), css(edge));
+            ctx.lineTo(css(left + weight / 2), css(untimedEdge + inset));
+            ctx.lineTo(css(right - weight / 2), css(untimedEdge + inset));
+            ctx.lineTo(css(right - weight / 2), css(axis));
             ctx.stroke();
           }
           ctx.restore();
@@ -503,6 +526,9 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     options: {
       maintainAspectRatio: false,
       responsive: true,
+      // The painted bar is wider than the one-ply action bars behind it, so hit test on the
+      // nearest ply rather than requiring the pointer to land inside one, as the acpl chart does.
+      ...(isBackgammon ? { interaction: { mode: 'nearest' as const, axis: 'x' as const, intersect: false } } : {}),
       animations: animation(
         800 / Math.max(1, isBackgammon ? Math.max(actionSeries.p1.length, actionSeries.p2.length) : labels.length - 1),
       ),
