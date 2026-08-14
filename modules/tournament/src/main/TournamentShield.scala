@@ -178,12 +178,11 @@ object TournamentShield {
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         newOrder,
         Some(5 * 60),
-        playStrategyMinutes,
+        arenaMinutes,
         playStrategyRounds
       )
     }
-    private val playStrategyMinutes = 120
-    private val playStrategyRounds  = GameGroup.medley.length
+    private val playStrategyRounds = GameGroup.medley.length
 
     case object PlayStrategyMedley
         extends MedleyShield(
@@ -197,7 +196,7 @@ object TournamentShield {
           None,
           7,
           20,
-          playStrategyMinutes,
+          arenaMinutes,
           playStrategyRounds,
           s"${playStrategyRounds} round Swiss with one game from each of the ${GameGroup.medley.length} Game Families picked: ${GameGroup.medley.map(VariantKeys.gameGroupName).sorted.mkString(", ")}.",
           s"${playStrategyRounds} variant Arena with one game from each of the ${GameGroup.medley.length} Game Families picked: ${GameGroup.medley.map(VariantKeys.gameGroupName).sorted.mkString(", ")}.",
@@ -208,12 +207,11 @@ object TournamentShield {
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         Random.shuffle(variants),
         Some(5 * 60),
-        chessVariantMinutes,
+        arenaMinutes,
         chessVariantRounds
       )
     private val chessVariantOptions = Variant.all.filter(_.exoticChessVariant)
-    private val chessVariantMinutes = 90
-    private val chessVariantRounds  = 6
+    private val chessVariantRounds = 6
 
     case object ChessVariantsMedley
         extends MedleyShield(
@@ -227,7 +225,7 @@ object TournamentShield {
           None,
           6,
           20,
-          chessVariantMinutes,
+          arenaMinutes,
           chessVariantRounds,
           s"${chessVariantRounds} round Swiss using micro-match rounds (each pairing plays twice, once each as the start player). ${chessVariantRounds} from the ${chessVariantOptions.length} listed chess variants will be picked.",
           s"${chessVariantRounds} variant Arena where ${chessVariantRounds} from the ${chessVariantOptions.length} listed chess variants are picked.",
@@ -238,15 +236,14 @@ object TournamentShield {
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         Random.shuffle(variants),
         Some(5 * 60),
-        draughtsVariantMinutes,
+        arenaMinutes,
         draughtsRounds
       )
     private val draughtsVariantOptions =
       Variant.all
         .filter(v => v.gameFamily == GameFamily.Draughts() || v.gameFamily == GameFamily.Dameo())
         .filterNot(_.fromPositionVariant)
-    private val draughtsVariantMinutes = 90
-    private val draughtsRounds         = 6
+    private val draughtsRounds = 6
 
     case object DraughtsMedley
         extends MedleyShield(
@@ -260,7 +257,7 @@ object TournamentShield {
           None,
           6,
           14,
-          draughtsVariantMinutes,
+          arenaMinutes,
           draughtsRounds,
           s"${draughtsRounds} round Swiss where ${draughtsRounds} from the ${draughtsVariantOptions.length} listed draughts variants will be picked.",
           s"${draughtsRounds} variant Arena where ${draughtsRounds} from the ${draughtsVariantOptions.length} listed draughts variants are picked.",
@@ -268,15 +265,14 @@ object TournamentShield {
         )
 
     private def loaVariantOrder(variants: List[Variant]) =
-      TournamentMedleyUtil.medleyVariantsAndIntervals(variants, None, loaVariantMinutes, loaRounds)
+      TournamentMedleyUtil.medleyVariantsAndIntervals(variants, None, arenaMinutes, loaRounds)
     private val loaVariants = List(
       Variant.wrap(strategygames.chess.variant.LinesOfAction),
       Variant.wrap(strategygames.chess.variant.ScrambledEggs),
       Variant.wrap(strategygames.chess.variant.LinesOfAction)
     )
 
-    private val loaVariantMinutes = 90
-    private val loaRounds         = loaVariants.size
+    private val loaRounds = loaVariants.size
 
     case object LinesOfActionMedley
         extends MedleyShield(
@@ -290,7 +286,7 @@ object TournamentShield {
           Some(2),
           6,
           16,
-          loaVariantMinutes,
+          arenaMinutes,
           loaRounds,
           "",
           s"An Arena which is divided into ${loaRounds} equal length periods of ${loaVariants.init
@@ -300,15 +296,14 @@ object TournamentShield {
         )
 
     private def shogiVariantOrder(variants: List[Variant]) =
-      TournamentMedleyUtil.medleyVariantsAndIntervals(variants, None, shogiVariantMinutes, shogiRounds)
+      TournamentMedleyUtil.medleyVariantsAndIntervals(variants, None, arenaMinutes, shogiRounds)
     private val shogiVariants = List(
       Variant.wrap(strategygames.fairysf.variant.Shogi),
       Variant.wrap(strategygames.fairysf.variant.MiniShogi),
       Variant.wrap(strategygames.fairysf.variant.Shogi)
     )
 
-    private val shogiVariantMinutes = 90
-    private val shogiRounds         = shogiVariants.size
+    private val shogiRounds = shogiVariants.size
 
     case object ShogiMedley
         extends MedleyShield(
@@ -322,7 +317,7 @@ object TournamentShield {
           Some(3),
           7,
           14,
-          shogiVariantMinutes,
+          arenaMinutes,
           shogiRounds,
           "",
           s"An Arena which is divided into ${shogiRounds} equal length periods of ${shogiVariants.init
@@ -332,15 +327,14 @@ object TournamentShield {
         )
 
     private def xiangqiVariantOrder(variants: List[Variant]) =
-      TournamentMedleyUtil.medleyVariantsAndIntervals(variants, None, xiangqiVariantMinutes, xiangqiRounds)
+      TournamentMedleyUtil.medleyVariantsAndIntervals(variants, None, arenaMinutes, xiangqiRounds)
     private val xiangqiVariants = List(
       Variant.wrap(strategygames.fairysf.variant.Xiangqi),
       Variant.wrap(strategygames.fairysf.variant.MiniXiangqi),
       Variant.wrap(strategygames.fairysf.variant.Xiangqi)
     )
 
-    private val xiangqiVariantMinutes = 90
-    private val xiangqiRounds         = xiangqiVariants.size
+    private val xiangqiRounds = xiangqiVariants.size
 
     case object XiangqiMedley
         extends MedleyShield(
@@ -354,7 +348,7 @@ object TournamentShield {
           Some(2),
           7,
           14,
-          xiangqiVariantMinutes,
+          arenaMinutes,
           xiangqiRounds,
           "",
           s"An Arena which is divided into ${xiangqiRounds} equal length periods of ${xiangqiVariants.init
@@ -367,14 +361,13 @@ object TournamentShield {
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         Random.shuffle(variants),
         Some(5 * 60),
-        othelloVariantMinutes,
+        arenaMinutes,
         othelloRounds
       )
     private val othelloVariants =
       Variant.all.filter(_.gameFamily == GameFamily.Flipello()).filterNot(_.fromPositionVariant)
 
-    private val othelloVariantMinutes = 90
-    private val othelloRounds         = othelloVariants.size
+    private val othelloRounds = othelloVariants.size
 
     case object OthelloMedley
         extends MedleyShield(
@@ -388,7 +381,7 @@ object TournamentShield {
           Some(4),
           7,
           14,
-          othelloVariantMinutes,
+          arenaMinutes,
           othelloRounds,
           "",
           s"Arena which is divided between all ${othelloRounds} variants in the ${VariantKeys.gameFamilyName(GameFamily.Flipello())} family.",
@@ -399,7 +392,7 @@ object TournamentShield {
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         Random.shuffle(mancalaVariantPermuations).head.map(i => variants(i)),
         None,
-        mancalaVariantMinutes,
+        arenaMinutes,
         mancalaRounds
       )
     // all the order perms which allows for randomisation of Oware/Bestemshe order but keeps Togy at start and end
@@ -414,8 +407,7 @@ object TournamentShield {
       Variant.wrap(strategygames.togyzkumalak.variant.Togyzkumalak)
     )
 
-    private val mancalaVariantMinutes = 100
-    private val mancalaRounds         = mancalaVariants.size
+    private val mancalaRounds = mancalaVariants.size
 
     case object MancalaMedley
         extends MedleyShield(
@@ -429,7 +421,7 @@ object TournamentShield {
           Some(1),
           7,
           14,
-          mancalaVariantMinutes,
+          arenaMinutes,
           mancalaRounds,
           "",
           s"An Arena which is divided into ${mancalaRounds} equal length periods of ${mancalaVariants.init
@@ -442,7 +434,7 @@ object TournamentShield {
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         variants,
         None,
-        togyzkumalakVariantMinutes,
+        arenaMinutes,
         togyzkumalakRounds
       )
     private val togyzkumalakVariants = List(
@@ -451,8 +443,7 @@ object TournamentShield {
       Variant.wrap(strategygames.togyzkumalak.variant.Togyzkumalak)
     )
 
-    private val togyzkumalakVariantMinutes = 90
-    private val togyzkumalakRounds         = togyzkumalakVariants.size
+    private val togyzkumalakRounds = togyzkumalakVariants.size
 
     case object TogyzkumalakMedley
         extends MedleyShield(
@@ -466,7 +457,7 @@ object TournamentShield {
           Some(3),
           6,
           16,
-          togyzkumalakVariantMinutes,
+          arenaMinutes,
           togyzkumalakRounds,
           "",
           s"An Arena which is divided into ${togyzkumalakRounds} equal length periods of ${togyzkumalakVariants.init
@@ -480,14 +471,13 @@ object TournamentShield {
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         Random.shuffle(variants),
         Some(3 * 60),
-        backgammonVariantMinutes,
+        arenaMinutes,
         backgammonRounds
       )
     private val backgammonVariants =
       Variant.all.filter(_.gameFamily == GameFamily.Backgammon()).filterNot(_.fromPositionVariant)
 
-    private val backgammonVariantMinutes = 90
-    private val backgammonRounds         = backgammonVariants.size
+    private val backgammonRounds = backgammonVariants.size
 
     case object BackgammonMedley
         extends MedleyShield(
@@ -501,7 +491,7 @@ object TournamentShield {
           Some(1),
           6,
           16,
-          backgammonVariantMinutes,
+          arenaMinutes,
           backgammonRounds,
           "",
           s"Arena which is divided between all ${backgammonRounds} variants in the ${VariantKeys.gameFamilyName(GameFamily.Backgammon())} family.",
@@ -512,7 +502,7 @@ object TournamentShield {
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         variants,
         None,
-        breakthroughVariantMinutes,
+        arenaMinutes,
         breakthroughRounds
       )
     private val breakthroughVariants = List(
@@ -521,8 +511,7 @@ object TournamentShield {
       Variant.wrap(strategygames.fairysf.variant.BreakthroughTroyka)
     )
 
-    private val breakthroughVariantMinutes = 90
-    private val breakthroughRounds         = breakthroughVariants.size
+    private val breakthroughRounds = breakthroughVariants.size
 
     case object BreakthroughMedley
         extends MedleyShield(
@@ -536,7 +525,7 @@ object TournamentShield {
           Some(4),
           6,
           16,
-          breakthroughVariantMinutes,
+          arenaMinutes,
           breakthroughRounds,
           "",
           s"An Arena which is divided into ${breakthroughRounds} equal length periods of ${breakthroughVariants.init
@@ -550,7 +539,7 @@ object TournamentShield {
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         variants,
         None,
-        abaloneVariantMinutes,
+        arenaMinutes,
         abaloneRounds
       )
     private val abaloneVariants = List(
@@ -559,8 +548,7 @@ object TournamentShield {
       Variant.wrap(strategygames.abalone.variant.Abalone)
     )
 
-    private val abaloneVariantMinutes = 90
-    private val abaloneRounds         = abaloneVariants.size
+    private val abaloneRounds = abaloneVariants.size
 
     case object AbaloneMedley
         extends MedleyShield(
@@ -574,7 +562,7 @@ object TournamentShield {
           Some(3),
           7,
           16,
-          abaloneVariantMinutes,
+          arenaMinutes,
           abaloneRounds,
           "",
           s"An Arena which is divided into ${abaloneRounds} equal length periods of ${abaloneVariants.init
@@ -600,7 +588,7 @@ object TournamentShield {
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         Random.shuffle(chessgammonVariantPermuations).head.map(i => variants(i)),
         None,
-        chessgammonMinutes,
+        arenaMinutes,
         chessgammonRounds
       )
     private val chessgammonVariants = List(
@@ -610,8 +598,7 @@ object TournamentShield {
       Variant.wrap(strategygames.backgammon.variant.Nackgammon)
     )
 
-    private val chessgammonMinutes = 80
-    private val chessgammonRounds  = chessgammonVariants.size
+    private val chessgammonRounds = chessgammonVariants.size
 
     case object ChessgammonMedley
         extends MedleyShield(
@@ -625,7 +612,7 @@ object TournamentShield {
           Some(1),
           7,
           16,
-          chessgammonMinutes,
+          arenaMinutes,
           chessgammonRounds,
           "",
           s"An Arena which is divided into ${chessgammonRounds} equal length periods of ${chessgammonVariants
@@ -1090,6 +1077,9 @@ object TournamentShield {
 
     def byKey(k: String): Option[Category] = all.find(_.key == k)
   }
+
+  // shields and medley shields all run 1h57, which is what keeps the day on its two hour grid
+  val arenaMinutes = 117
 
   val defaultShieldHours   = List(18, 12) // UTC
   val alternateShieldHours = defaultShieldHours.reverse

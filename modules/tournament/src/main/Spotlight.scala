@@ -43,6 +43,7 @@ object Spotlight {
         }
       sched.freq match {
         case Hourly                    => canMaybeJoinLimited(tour, user) && playedSinceWeeks(2)
+        case DailyCycle                => playedSinceWeeks(2)
         case Daily                     => playedSinceWeeks(2)
         case Weekly | Weekend          => playedSinceWeeks(4)
         case Unique                    => playedSinceWeeks(4)

@@ -25,13 +25,13 @@ case class FreqWinners(
     yearly: Option[Winner],
     // monthly: Option[Winner],
     shield: Option[Winner],
-    weekly: Option[Winner]
+    dailyCycle: Option[Winner]
     // daily: Option[Winner]
 ) {
 
   lazy val top: Option[Winner] =
     // daily.filter(_.date isAfter DateTime.now.minusHours(2)) orElse
-    weekly.filter(_.date.isAfter(DateTime.now.minusDays(1))) orElse
+    dailyCycle.filter(_.date.isAfter(DateTime.now.minusDays(1))) orElse
       // monthly.filter(_.date isAfter DateTime.now.minusDays(3)) orElse
       shield.filter(_.date.isAfter(DateTime.now.minusDays(3))) orElse
       yearly.filter(_.date.isAfter(DateTime.now.minusDays(28))) orElse
@@ -39,10 +39,10 @@ case class FreqWinners(
       // msoGP.filter(_.date isAfter DateTime.now.minusDays(60)) orElse
       // msoWarmUp.filter(_.date isAfter DateTime.now.minusDays(14)) orElse
       // introductory orElse msoGP orElse mso21 orElse msoWarmUp orElse yearly orElse monthly orElse shield orElse weekly orElse daily
-      introductory orElse yearly orElse shield orElse weekly
+      introductory orElse yearly orElse shield orElse dailyCycle
 
   def userIds =
-    List(introductory, yearly, shield, weekly).flatten.map(_.userId)
+    List(introductory, yearly, shield, dailyCycle).flatten.map(_.userId)
   // List(mso21, msoGP, msoWarmUp, introductory, yearly, monthly, shield, weekly, daily).flatten.map(_.userId)
 }
 
@@ -58,7 +58,7 @@ case class AllWinners(
     yearlies: List[Winner],
     medleyShields: List[Winner],
     shields: List[Winner],
-    weeklies: List[Winner],
+    dailyCycles: List[Winner],
     variants: Map[String, FreqWinners]
 ) {
 
@@ -78,14 +78,14 @@ case class AllWinners(
       yearlies.take(1) ++
       uniqueMedleyShields.take(5) ++
       shields.take(2) ++
-      weeklies.take(1)
+      dailyCycles.take(1)
 
   lazy val top20: List[Winner] =
     annuals.take(2) ++
       yearlies.take(2) ++
       uniqueMedleyShields.take(TournamentShield.MedleyShield.all.size) ++
       shields.take(20 - 6 - TournamentShield.MedleyShield.all.size max 1) ++
-      weeklies.take(2)
+      dailyCycles.take(2)
 
   // lichess top
   // lazy val top: List[Winner] = List(
@@ -99,7 +99,7 @@ case class AllWinners(
   lazy val userIds =
     // List(hyperbullet, bullet, superblitz, blitz, rapid).flatMap(_.userIds) :::
     //  elite.map(_.userId) ::: marathon.map(_.userId) :::
-    (annuals ++ yearlies ++ medleyShields ++ shields ++ weeklies).map(_.userId) ++
+    (annuals ++ yearlies ++ medleyShields ++ shields ++ dailyCycles).map(_.userId) ++
       variants.values.toList.flatMap(_.userIds)
 }
 
@@ -147,7 +147,9 @@ final class WinnersApi(
       // monthlies     <- fetchLastFreq(Freq.Monthly, DateTime.now.minusMonths(2))
       shields       <- fetchLastFreq(Freq.Shield, DateTime.now.minusMonths(2))
       medleyShields <- fetchLastFreq(Freq.MedleyShield, DateTime.now.minusMonths(2))
-      weeklies      <- fetchLastFreq(Freq.Weekly, DateTime.now.minusWeeks(2))
+      // the longest group cycle takes about six days to come round, so a shorter
+      // window would leave most variants without a daily winner to show
+      dailyCycles  <- fetchLastFreq(Freq.DailyCycle, DateTime.now.minusDays(8))
       // dailies       <- fetchLastFreq(Freq.Daily, DateTime.now.minusDays(2))
       // mso21         <- fetchLastFreq(Freq.MSO21, DateTime.now.minusMonths(8))
       // msoGP         <- fetchLastFreq(Freq.MSOGP, DateTime.now.minusMonths(10))
@@ -175,13 +177,13 @@ final class WinnersApi(
         yearlies = yearlies.flatMap(_.winner),
         shields = shields.flatMap(_.winner),
         medleyShields = medleyShields.flatMap(_.winner),
-        weeklies = weeklies.flatMap(_.winner),
+        dailyCycles = dailyCycles.flatMap(_.winner),
         variants = Variant.all.view.map { v =>
           v.key -> FreqWinners(
             yearly = firstVariantWinner(yearlies, v),
             // monthly = firstVariantWinner(monthlies, v),
             shield = firstVariantWinner(shields, v),
-            weekly = firstVariantWinner(weeklies, v),
+            dailyCycle = firstVariantWinner(dailyCycles, v),
             // daily = firstVariantWinner(dailies, v),
             // mso21 = firstVariantWinner(mso21, v),
             // msoGP = firstVariantWinner(msoGP, v),

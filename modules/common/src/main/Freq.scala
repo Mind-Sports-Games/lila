@@ -14,7 +14,9 @@ sealed abstract class Freq(val id: Int, val importance: Int) extends Ordered[Fre
 }
 object Freq {
   // ─── ACTIVE ──────────────────────────────────────────────────────────────────
-  case object Weekly       extends Freq(40, 40) // scheduler (weekly rotation)
+  case object DailyCycle extends Freq(45, 45) { // scheduler (daily cycle blocks + fillers)
+    override val display = "Daily"
+  }
   case object Shield       extends Freq(51, 51) // scheduler (monthly shields)
   case object MedleyShield extends Freq(52, 52) // scheduler (medley shields)
   case object Yearly       extends Freq(70, 70) // scheduler: routine 24h per-variant rotation (NOT the Annual birthday events)
@@ -30,8 +32,9 @@ object Freq {
   // persist `schedule.freq` by name. Removing a case makes `Freq(name)` return None and
   // BREAKS deserialization of those documents (winners, history, shield tables).
   // `db.tournament2.distinct("schedule.freq")` and `db.swiss.distinct("schedule.freq")`.
-  case object Hourly  extends Freq(10, 10) // old auto-scheduler slot
-  case object Daily   extends Freq(20, 20) // old auto-scheduler slot
+  case object Hourly extends Freq(10, 10) // old auto-scheduler slot
+  case object Daily  extends Freq(20, 20) // old auto-scheduler slot
+  case object Weekly extends Freq(40, 40) // superseded by DailyCycle
   // Eastern is disabled (Lichess vestige: the "Daily" tournaments at Asian-timezone hours).
   // To re-enable: uncomment this case object, add it to `all` below, and uncomment the
   // Eastern logic in the tournament module (Schedule / TournamentScheduler / TournamentRepo).
@@ -54,7 +57,7 @@ object Freq {
 
   val all: List[Freq] = List(
     // active
-    Weekly,
+    DailyCycle,
     Shield,
     MedleyShield,
     Yearly,
@@ -65,6 +68,7 @@ object Freq {
     // legacy
     Hourly,
     Daily,
+    Weekly,
     Weekend,
     Monthly,
     Marathon,

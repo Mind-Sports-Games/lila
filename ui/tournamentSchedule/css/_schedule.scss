@@ -119,6 +119,7 @@ $c-tour-max-rating: #8572ff;
     }
   }
 
+  &-dailycycle,
   &-weekly,
   &-weekend,
   &-monthly,
@@ -129,6 +130,7 @@ $c-tour-max-rating: #8572ff;
     background-image: url(../images/grain.png);
   }
 
+  &-dailycycle,
   &-weekly {
     background-color: $c-tour-weekly;
   }

@@ -76,6 +76,7 @@
       }
     }
 
+    &.dailycycle,
     &.weekly,
     &.weekend,
     &.monthly,
@@ -87,6 +88,7 @@
       animation: animatedBackground 50s linear infinite;
     }
 
+    &.dailycycle,
     &.weekly {
       background-color: #d55e00;
     }

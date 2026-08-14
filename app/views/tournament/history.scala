@@ -52,6 +52,7 @@ object history {
     Freq.MedleyMarathon,
     // Freq.Monthly,
     // Freq.Weekend,
+    Freq.DailyCycle,
     Freq.Weekly
     // Freq.Daily,
     // Freq.Hourly
