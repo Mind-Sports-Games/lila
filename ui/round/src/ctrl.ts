@@ -32,6 +32,7 @@ import * as renderUser from './view/user';
 import * as cevalSub from './cevalSub';
 import * as keyboard from './keyboard';
 import * as stratUtils from 'stratutils';
+import BgAnalysisCtrl from './bgAnalysis';
 
 import {
   RoundOpts,
@@ -102,6 +103,7 @@ export default class RoundController {
   preDrop?: cg.Role;
   lastDrawOfferAtPly?: Ply;
   nvui?: NvuiPlugin;
+  bgAnalysis: BgAnalysisCtrl;
   sign: string = Math.random().toString(36);
   private music?: any;
 
@@ -143,6 +145,7 @@ export default class RoundController {
 
     this.moveOn = new MoveOn(this, 'move-on');
     this.transientMove = new TransientMove(this.socket);
+    this.bgAnalysis = new BgAnalysisCtrl(() => this.data);
 
     this.trans = playstrategy.trans(opts.i18n);
     this.noarg = this.trans.noarg;
@@ -1002,6 +1005,7 @@ export default class RoundController {
     this.setLoading(false);
     if (this.keyboardMove) this.keyboardMove.update(d.steps[d.steps.length - 1]);
     this.bindSpaceToEndTurn();
+    this.bgAnalysis.start();
     //redraw board scores/dice, items in CG wrap layer
     if (['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key))
       this.chessground.redrawAll();
@@ -1054,6 +1058,7 @@ export default class RoundController {
     this.redraw();
     this.autoScroll();
     this.onChange();
+    this.bgAnalysis.start();
     if (d.tv) setTimeout(playstrategy.reload, 10000);
     speech.status(this);
   };
@@ -1517,6 +1522,8 @@ export default class RoundController {
       }
 
       this.bindSpaceToEndTurn();
+
+      this.bgAnalysis.start();
 
       if (!this.nvui) keyboard.init(this);
 

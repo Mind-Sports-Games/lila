@@ -1,0 +1,100 @@
+// gnubg's per-player verdict on a finished backgammon game, sat under the crosstable.
+.bg-analysis {
+  @extend %box-neat-force;
+
+  background: $c-bg-box;
+  width: 100%;
+  margin-top: $block-gap;
+  padding: 0.5em 0.8em;
+  font-size: 0.9em;
+  // the whole panel links to the analysis board, so keep the link's own colour off the text
+  display: block;
+  color: $c-font;
+
+  &:hover {
+    background: mix($c-primary, $c-bg-box, 8%);
+    color: $c-font-clear;
+  }
+
+  &__title {
+    @extend %roboto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+    margin-bottom: 0.3em;
+  }
+
+  &__sides {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  &__side {
+    flex: 1;
+    min-width: 0;
+
+    &:first-child {
+      padding-right: 0.6em;
+      border-right: 1px solid fade-out($c-font, 0.88);
+    }
+
+    &:last-child {
+      padding-left: 0.6em;
+    }
+  }
+
+  &__player {
+    @extend %nowrap-ellipsis;
+
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+    font-weight: bold;
+    margin-bottom: 0.2em;
+  }
+
+  &__stat {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3em;
+
+    // The two scores carry the panel, so they lead on size and colour, and their rating word
+    // reads as a separate thing rather than as a tail on the number. One colour for both
+    // whatever the value: a lucky roll is not a good move, and a per-value palette said so.
+    strong {
+      // PR and Luck both run to five characters, so give them a fixed column to line up in
+      flex: 0 0 5ch;
+      font-variant-numeric: tabular-nums;
+      font-size: 1.15em;
+      color: $c-brag;
+    }
+
+    // Long rating words ("Super Grandmaster") truncate rather than wrap on a narrow board.
+    // The full text is on the row's title attribute.
+    span {
+      @extend %nowrap-ellipsis;
+
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    // "PR" names the figure, "Beginner" qualifies it — same split as the analysis board's
+    // advice summary, so keep its contrast: label at full strength, rating word set back.
+    em {
+      font-style: italic;
+      opacity: 0.7;
+    }
+  }
+
+  &--pending {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    opacity: 0.8;
+  }
+}
