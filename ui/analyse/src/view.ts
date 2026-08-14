@@ -751,9 +751,18 @@ export default function (ctrl: AnalyseCtrl): VNode {
                 ? ([renderBgAdviceSummary(ctrl), renderBgTopMoves(ctrl)] as (VNode | undefined)[]).filter(
                     (v): v is VNode => v != null,
                   )
-                : isBackgammonVariant(variantKey)
-                  ? [bgAcplView(ctrl)]
-                  : [acplView(ctrl)],
+                : // The summary never changes with the move, so from two columns up it is rendered
+                  // apart from the candidates and placed elsewhere by CSS, leaving the whole right
+                  // hand column to the list.
+                  isBackgammonVariant(variantKey) && !isCol1()
+                  ? (
+                      [renderBgAdviceSummary(ctrl), h('div.analyse__acpl', [renderBgTopMoves(ctrl)])] as (
+                        VNode | undefined
+                      )[]
+                    ).filter((v): v is VNode => v != null)
+                  : isBackgammonVariant(variantKey)
+                    ? [bgAcplView(ctrl)]
+                    : [acplView(ctrl)],
             ),
         ctrl.embed
           ? null

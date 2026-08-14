@@ -30,6 +30,7 @@ $bg-highlight-colors: (
 // .advice-summary is shared with chess (see ui/analyse/src/acpl.ts), so every rule below is
 // scoped to the .backgammon gameFamily class — this partial is bundled into analyse.study too.
 .analyse.backgammon .analyse__acpl .advice-summary,
+.analyse.backgammon .analyse__detail-extras > .advice-summary,
 .analyse.backgammon.analyse--detail > .advice-summary {
   flex-direction: row;
   align-items: flex-start;
@@ -182,6 +183,9 @@ $bg-highlight-colors: (
 // charts keep the height every other variant gives them, and the column follows the charts rather
 // than the reverse, so the candidates list stays bounded and scrolls instead of growing the page.
 $bg-col2-column-height: 240px;
+// Width the summary takes beside the chat at two columns. Two player columns of stats, so it needs
+// about as much as the right hand table.
+$bg-col2-summary-width: 280px;
 
 @include breakpoint($mq-col2-uniboard) {
   .analyse.backgammon:not(.analyse--detail) {
@@ -196,6 +200,53 @@ $bg-col2-column-height: 240px;
         flex: 1;
         min-height: 0;
       }
+    }
+
+    // view.ts renders the summary as a sibling of the candidates from two columns up, so it can be
+    // placed away from them. Here the left column is far wider than the chat needs, so the two
+    // share the chat area side by side and the summary costs no page height at all.
+    .analyse__detail-extras > .advice-summary {
+      grid-area: chat;
+      justify-self: end;
+      align-self: start;
+      width: $bg-col2-summary-width;
+      // the chat carries this margin, so match it or the two blocks start at different heights
+      margin-top: $block-gap;
+    }
+
+    .mchat {
+      width: calc(100% - #{$bg-col2-summary-width} - #{$block-gap});
+    }
+  }
+}
+
+// At three columns the left column is narrow, so the summary goes under the chat instead, sharing
+// the uchat area with the spectator strip: one line in a tall area, so neither row grows. This
+// block follows the one above so it wins where both breakpoints match.
+@include breakpoint($mq-col3-uniboard) {
+  .analyse.backgammon:not(.analyse--detail) {
+    // uchat spans two rows. Give the spectator strip the first, so it stays directly under the
+    // chat as before, and the summary the second, right below it — using the area's own line names
+    // rather than an offset, which would depend on how tall the strip happens to be.
+    .analyse__detail-extras > .advice-summary {
+      grid-column: uchat-start / uchat-end;
+      grid-row: span 1 / uchat-end;
+      justify-self: stretch;
+      align-self: start;
+      width: auto;
+      margin-top: $block-gap;
+    }
+
+    .mchat {
+      width: auto;
+    }
+
+    // The strip fills its area by default (height: 100% in chat/_members.scss), which would lay it
+    // over the summary. Size it to its content instead.
+    .chat__members {
+      grid-row: uchat-start / span 1;
+      align-self: start;
+      height: auto;
     }
   }
 }
