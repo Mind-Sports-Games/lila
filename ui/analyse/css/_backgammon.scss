@@ -178,14 +178,13 @@ $bg-highlight-colors: (
   }
 }
 
-$bg-col2-column-height: 475px;
+// Mirrors $col2-panel-height in _round-underboard.scss, which this bundle does not import: the
+// charts keep the height every other variant gives them, and the column follows the charts rather
+// than the reverse, so the candidates list stays bounded and scrolls instead of growing the page.
+$bg-col2-column-height: 240px;
 
 @include breakpoint($mq-col2-uniboard) {
   .analyse.backgammon:not(.analyse--detail) {
-    .analyse__underboard__panels {
-      --panel-height: #{$bg-col2-column-height};
-    }
-
     .analyse__acpl {
       height: $bg-col2-column-height;
       display: flex;
