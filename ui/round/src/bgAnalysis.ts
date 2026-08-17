@@ -2,9 +2,10 @@ import { attributesModule, classModule, h, init, VNode } from 'snabbdom';
 import * as round from './round';
 import * as xhr from 'common/xhr';
 import * as status from 'game/status';
+import isCol1 from 'common/isCol1';
 import { defined } from 'common';
 import { game as gameRoute } from 'game/router';
-import { RoundData } from './interfaces';
+import { Redraw, RoundData } from './interfaces';
 
 const patch = init([classModule, attributesModule]);
 
@@ -21,7 +22,6 @@ interface StatsJson {
   overallErrorRate?: number; // mEMG per decision, twice the PR
   luckTotalEmg?: number;
   skill?: string;
-  luckRating?: string;
 }
 interface MatchJson {
   player1: string;
@@ -35,7 +35,6 @@ interface Side {
   pr?: number;
   rating?: string;
   luck?: number;
-  luckRating?: string;
 }
 
 // Mirrors BackgammonAutoAnalyser.analysable: gnubg only runs on finished games between two
@@ -63,7 +62,6 @@ function readSides(d: RoundData, m: MatchJson): [Side, Side] | undefined {
       pr: defined(stat.overallErrorRate) ? Math.abs(stat.overallErrorRate / 2) : undefined,
       rating: stat.skill,
       luck: stat.luckTotalEmg,
-      luckRating: stat.luckRating === 'None' ? undefined : stat.luckRating,
     };
   };
   const p1 = side('p1', m.player1),
@@ -71,16 +69,21 @@ function readSides(d: RoundData, m: MatchJson): [Side, Side] | undefined {
   return p1 && p2 ? [p1, p2] : undefined;
 }
 
+// Neither figure explains itself: a PR runs the opposite way to a rating, and luck is signed.
+// gnubg's own luck wording ("Haha! Bad dice, man!") is deliberately not quoted anywhere.
+// Kept word for word in ui/analyse/src/backgammonAnalysis.ts, which shows the same two rows.
+const prHelp = 'Performance rating. Lower is better. 0 is flawless play.';
+const luckHelp = 'Negative = unlucky, positive = lucky.';
+
 function renderSide(s: Side): VNode {
   const luck = s.luck;
   return h('div.bg-analysis__side', [
     h('div.bg-analysis__player', [h(`i.is.playerIndex-icon.${s.playerColor}`), h('span', s.name)]),
-    h('div.bg-analysis__stat', { attrs: { title: s.rating ? `PR: ${s.rating}` : 'Performance rating' } }, [
+    h('div.bg-analysis__stat', { attrs: { title: prHelp } }, [
       h('strong', defined(s.pr) ? s.pr.toFixed(1) : '–'),
       h('span', ['PR ', s.rating ? h('em', s.rating) : null]),
     ]),
-    // gnubg's luck wording stays on the title only, as in the analysis board's advice summary.
-    h('div.bg-analysis__stat', { attrs: { title: s.luckRating ? `Luck: ${s.luckRating}` : 'Luck' } }, [
+    h('div.bg-analysis__stat', { attrs: { title: luckHelp } }, [
       h('strong', defined(luck) ? (luck >= 0 ? '+' : '') + luck.toFixed(2) : '–'),
       h('span', 'Luck'),
     ]),
@@ -94,8 +97,16 @@ export default class BgAnalysisCtrl {
   private timer?: number;
   private vnode?: VNode;
 
-  // A getter, not the object: RoundController.reload swaps its data wholesale.
-  constructor(private readonly data: () => RoundData) {}
+  constructor(
+    // A getter, not the object: RoundController.reload swaps its data wholesale.
+    private readonly data: () => RoundData,
+    private readonly redraw: Redraw,
+  ) {
+    // Rotating a phone moves the panel between the two homes below, so follow the breakpoint.
+    window.addEventListener('resize', () => {
+      if (this.pending || this.sides) this.render();
+    });
+  }
 
   // Called once the game is over — on page load for an already finished game, and again from
   // endWithData when it ends under us.
@@ -144,7 +155,14 @@ export default class BgAnalysisCtrl {
     );
   };
 
-  private view = (): VNode | undefined => {
+  // Read by view/main.ts, which is the one column home. Empty elsewhere, so the app grid keeps
+  // no row for it.
+  view = (): VNode | undefined => {
+    if (!isCol1()) return undefined;
+    return this.panel();
+  };
+
+  private panel = (): VNode | undefined => {
     if (this.sides)
       return this.link('', [
         h('div.bg-analysis__title', [h('span', 'Computer analysis'), h('i', { attrs: { 'data-icon': 'A' } })]),
@@ -155,25 +173,32 @@ export default class BgAnalysisCtrl {
     return undefined;
   };
 
-  // Lives under the crosstable in the underboard, which sits outside the round app's vnode
-  // tree, so this owns its own mount. boot.ts swaps the crosstable out on game end; the panel
-  // is a sibling after it, so it survives that.
+  // Two homes. At one column the whole page is a single scroll, so the panel goes just above the
+  // rematch buttons where it is in view the moment the game ends: that means living inside the
+  // round app's grid, which only its own vnode tree can do. Wider layouts head the underboard
+  // instead, above the crosstable — outside that tree, hence the mount below. boot.ts swaps the
+  // crosstable out on game end, which leaves a sibling before it alone.
   private render = (): void => {
-    const blueprint = this.view();
-    if (!blueprint) {
-      (this.vnode?.elm as HTMLElement | undefined)?.remove();
-      this.vnode = undefined;
-      return;
-    }
+    if (isCol1()) this.unmount();
+    else this.mount();
+    this.redraw();
+  };
+
+  private mount = (): void => {
+    const blueprint = this.panel();
+    if (!blueprint) return this.unmount();
     if (this.vnode) this.vnode = patch(this.vnode, blueprint);
     else {
       const under = document.querySelector('.round__underboard');
       if (!under) return;
       const el = document.createElement('div');
-      const crosstable = under.querySelector('.crosstable');
-      if (crosstable) crosstable.insertAdjacentElement('afterend', el);
-      else under.prepend(el);
+      under.prepend(el);
       this.vnode = patch(el, blueprint);
     }
+  };
+
+  private unmount = (): void => {
+    (this.vnode?.elm as HTMLElement | undefined)?.remove();
+    this.vnode = undefined;
   };
 }

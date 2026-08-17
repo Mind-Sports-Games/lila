@@ -22,19 +22,6 @@ function playerName(ctrl: AnalyseCtrl, playerIndex: PlayerIndex): string {
   return 'Anonymous';
 }
 
-function luckLabel(luck: number): string {
-  if (luck > 0.3) return 'Very lucky';
-  if (luck > 0.1) return 'Lucky';
-  if (luck < -0.3) return 'Very unlucky';
-  if (luck < -0.1) return 'Unlucky';
-  return '';
-}
-
-function luckComment(side: BackgammonAnalysisSide): string {
-  const rating = side.luckRating ?? luckLabel(side.luck);
-  return rating === 'None' ? '' : rating;
-}
-
 function renderCount(count: number, symbol: string, label: string, playerIndex: PlayerIndex, locked: boolean): VNode {
   const cls = label.toLowerCase().replace(/\s+/g, '-');
   return h(
@@ -48,11 +35,16 @@ function isLocked(ctrl: AnalyseCtrl, symbol: string, pi: PlayerIndex): boolean {
   return ctrl.bgHighlightSymbol === symbol && ctrl.bgHighlightPlayerIndex === pi;
 }
 
+// Neither figure explains itself: a PR runs the opposite way to a rating, and luck is signed.
+// gnubg's own luck wording ("Haha! Bad dice, man!") is deliberately not quoted anywhere.
+// Kept word for word in ui/round/src/bgAnalysis.ts, which shows the same two rows.
+const prHelp = 'Performance rating. Lower is better. 0 is flawless play.';
+const luckHelp = 'Negative = unlucky, positive = lucky.';
+
 function renderSide(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, side: BackgammonAnalysisSide): VNode {
   const p = game.getPlayer(ctrl.data, playerIndex);
   const luck = side.luck;
   const prRating = side.rating ?? '';
-  const luckRating = luckComment(side);
   return h('div.advice-summary__side', [
     h('div.advice-summary__player', [
       h(`i.is.playerIndex-icon.${p.playerColor}`),
@@ -64,7 +56,7 @@ function renderSide(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, side: Backgammo
         attrs: {
           'data-symbol': 'd',
           'data-playerindex': playerIndex,
-          title: 'PR: ' + prRating,
+          title: prHelp,
         },
         class: { locked: isLocked(ctrl, 'd', playerIndex) },
       },
@@ -79,7 +71,7 @@ function renderSide(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, side: Backgammo
         attrs: {
           'data-symbol': 'luck',
           'data-playerindex': playerIndex,
-          title: luckRating ? 'Luck: ' + luckRating : 'Luck',
+          title: luckHelp,
         },
         class: { locked: isLocked(ctrl, 'luck', playerIndex) },
       },

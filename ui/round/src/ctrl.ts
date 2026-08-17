@@ -145,7 +145,7 @@ export default class RoundController {
 
     this.moveOn = new MoveOn(this, 'move-on');
     this.transientMove = new TransientMove(this.socket);
-    this.bgAnalysis = new BgAnalysisCtrl(() => this.data);
+    this.bgAnalysis = new BgAnalysisCtrl(() => this.data, this.redraw);
 
     this.trans = playstrategy.trans(opts.i18n);
     this.noarg = this.trans.noarg;
