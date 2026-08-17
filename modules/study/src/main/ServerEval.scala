@@ -23,9 +23,11 @@ object ServerEval {
 
     private val onceEvery = lila.memo.OnceEvery(5 minutes)
 
-    // The gnubg worker analyses a whole game from its SGF, which a StudyChapterRequest
-    // does not carry, and the result is never merged back into a chapter. Requesting it
-    // would only mark the chapter started and leave it that way forever.
+    // TODO: backgammon study chapters are excluded because StudyChapterRequest carries moves,
+    // not the SGF gnubg needs, and nothing merges a BackgammonAnalysis back into a chapter the
+    // way Merger does for chess. Requesting one would only mark the chapter started forever.
+    // The storage side already handles chapters (BackgammonAnalysis.studyId, set in FishnetApi),
+    // so those branches stay dead until both gaps are closed.
     private def analysable(chapter: Chapter) =
       chapter.setup.variant.gameLogic != GameLogic.Backgammon()
 
