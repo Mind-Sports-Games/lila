@@ -3,7 +3,7 @@ import { BgCandidateUI } from './interfaces';
 import { GameFamily as BackgammonFamily } from 'stratops/variants/backgammon/GameFamily';
 import { clearCandidatePreview, scheduleShowPlayed, reapplyFenOverride } from './backgammonAnalysis';
 
-// NOTE(bg-analysis): reuse the advantage chart (ui/chart/src/acpl.ts via chart.game module)
+// Reuse the advantage chart (ui/chart/src/acpl.ts via chart.game module)
 // for backgammon. It reads `data.treeParts[].eval.cp`, maps it through a sigmoid to a
 // [-1,1] area chart, and (for backgammon) derives the tooltip margin from `eval.win`. We feed it
 // the REAL per-action game tree so the line spans every board ply and the highlight
@@ -19,7 +19,7 @@ import { clearCandidatePreview, scheduleShowPlayed, reapplyFenOverride } from '.
 //  - turns alternate players, so a turn = a maximal run of same `playedPlayerIndex`,
 //    and the FIRST node of a run is the dice roll. Robust to `turnCount` quirks.
 //  - gnubg decisions are in the same order as the board's turns (true with no cube;
-//    TODO(bg-analysis): cube offers/responses are extra decisions — handle for cube play).
+//    TODO: cube offers/responses are extra decisions — handle for cube play).
 
 interface BgProbs {
   win: number;

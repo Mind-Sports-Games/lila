@@ -48,9 +48,9 @@ final class Analyser(
     backgammonRepo.save(analysis) map { _ =>
       if (analysis.studyId.isEmpty) {
         gameRepo.setAnalysed(analysis.id)
-        // TODO(bg-analysis): notify any open game/analysis page so it flips from
-        // "analysing" to the win% graph. Mirrors chess sendAnalysisProgress but
-        // minimal — RoundDuct turns this into a "bgAnalysisProgress" socket message.
+        // Notify any open game/analysis page so it flips from "analysing" to the
+        // win% graph. Mirrors chess sendAnalysisProgress but minimal — RoundDuct
+        // turns this into a "bgAnalysisProgress" socket message.
         Bus.publish(
           TellIfExists(analysis.id, actorApi.BackgammonAnalysisProgress(analysis.id, complete = true)),
           "roundSocket"

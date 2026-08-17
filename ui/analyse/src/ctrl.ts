@@ -978,10 +978,9 @@ export default class AnalyseCtrl {
     this.redraw();
   }
 
-  // TODO(bg-analysis): minimal hook — the backgammon worker finished (socket.ts
-  // "bgAnalysisProgress"). Emit a pubsub the underboard listens to (it fetches
-  // /<id>/backgammon-rating.json and draws the win% graph) and redraw. Colleague:
-  // fold this into the normal analysis lifecycle once the real chart lands.
+  // The backgammon worker finished (socket.ts "bgAnalysisProgress"). Emit a pubsub
+  // the underboard listens to — it fetches /<id>/backgammon-rating.json and draws
+  // the win% graph.
   onBackgammonAnalysisProgress(): void {
     playstrategy.pubsub.emit('analysis.bg.progress');
     this.redraw();
