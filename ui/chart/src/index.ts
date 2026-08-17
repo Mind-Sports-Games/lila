@@ -8,16 +8,40 @@ export const orangeAccent = '#d85000';
 export const whiteFill: string = lightTheme ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)';
 export const blackFill: string = lightTheme ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,1)';
 export const fontColor: string = lightTheme ? '#2F2F2F' : 'hsl(0, 0%, 73%)';
-// Move quality palette, mirroring $c-inaccuracy & friends in ui/common/css/theme/_default.scss
-// so charts, the move tree and the advice summary annotate a move with the same colour.
+// Move quality palette. The values live once, as $c-inaccuracy & friends in
+// ui/common/css/theme/_default.scss, and reach us through the custom properties that
+// base/_elements.scss sets on body — so charts, the move tree and the advice summary
+// cannot drift apart. Read lazily and memoised: getComputedStyle forces a style
+// recalculation, and a chart asks for these once per annotated point.
+const cssColorCache = new Map<string, string>();
+const cssColor = (name: string): string => {
+  let value = cssColorCache.get(name);
+  if (value === undefined) {
+    value = getComputedStyle(document.body).getPropertyValue(name).trim();
+    cssColorCache.set(name, value);
+  }
+  return value;
+};
 export const moveQuality = {
-  inaccuracy: 'hsl(202, 78%, 40%)',
-  mistake: 'hsl(41, 100%, 35%)',
-  blunder: 'hsl(0, 68%, 50%)',
-  brilliant: 'hsl(129, 71%, 30%)',
-  lucky: 'hsl(266, 54%, 47%)',
-  unlucky: 'hsl(331, 61%, 48%)',
-} as const;
+  get inaccuracy() {
+    return cssColor('--c-inaccuracy');
+  },
+  get mistake() {
+    return cssColor('--c-mistake');
+  },
+  get blunder() {
+    return cssColor('--c-blunder');
+  },
+  get brilliant() {
+    return cssColor('--c-brilliant');
+  },
+  get lucky() {
+    return cssColor('--c-lucky');
+  },
+  get unlucky() {
+    return cssColor('--c-unlucky');
+  },
+};
 export const tooltipBgColor: string = lightTheme ? 'rgba(255, 255, 255, 0.8)' : 'rgba(22, 21, 18, 0.7)';
 
 export function fontFamily(size?: number, weight?: 'bold') {

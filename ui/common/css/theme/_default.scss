@@ -106,7 +106,8 @@ $c-fancy: hsl(294, 61%, 62%);
 $c-fancy-over: white;
 
 // Move quality highlights, shared by every game: move tree, advice summary and analysis
-// charts. Mirrored in TS by `moveQuality` in ui/chart/src/index.ts, keep both in sync.
+// charts. These are the single definition — base/_elements.scss exposes them as CSS custom
+// properties on body, and ui/chart/src/index.ts reads them from there.
 
 /* move error highlights */
 $c-inaccuracy: hsl(202, 78%, 40%);
@@ -117,7 +118,7 @@ $c-blunder: hsl(0, 68%, 50%);
 $c-brilliant: hsl(129, 71%, 30%);
 $c-interesting: hsl(307, 80%, 59%);
 
-// dice luck highlights, backgammon only
+// dice luck highlights
 $c-lucky: hsl(266, 54%, 47%);
 $c-unlucky: hsl(331, 61%, 48%);
 
