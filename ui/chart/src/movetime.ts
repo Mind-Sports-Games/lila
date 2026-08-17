@@ -288,12 +288,18 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   flushBgBlur();
 
   // A single very long think flattens every other turn to a few pixels. When the longest turn is
-  // a clear outlier (> 1.5x the 90th percentile), normalise on that percentile instead and let the
+  // a clear outlier (> 1.5x the 95th percentile), normalise on that percentile instead and let the
   // outlier run off the top of the scale — where it draws with no top edge, reading as off-scale.
+  //
+  // The percentile is taken over both players' turns pooled, so a side that answers near-instantly
+  // drags it down: against a bot, half the sample sits at zero. The 95th keeps the cutoff inside
+  // the slower side's own range, where the 90th fell to roughly their 80th and clipped honest
+  // turns along with the outlier.
   const turnHeights = [...moveSeries.p1, ...moveSeries.p2].map(p => Math.abs(p.y)).sort((a, b) => a - b);
   const peakMove = turnHeights[turnHeights.length - 1] ?? 0;
-  const p90Move = turnHeights[Math.min(Math.floor(turnHeights.length * 0.9), turnHeights.length - 1)] ?? 0;
-  const maxMove = Math.max(isBackgammon && p90Move > 0 ? Math.min(peakMove, 1.5 * p90Move) : peakMove, 0.001);
+  const p95Move = turnHeights[Math.min(Math.floor(turnHeights.length * 0.95), turnHeights.length - 1)] ?? 0;
+  const moveScale = isBackgammon && p95Move > 0 ? Math.min(peakMove, 1.5 * p95Move) : peakMove;
+  const maxMove = Math.max(moveScale, 0.001); // maxMove divides every bar, so it can never be zero
   const maxTotal = Math.max(
     ...totalSeries.p1.map(p => Math.abs(p.y)),
     ...totalSeries.p2.map(p => Math.abs(p.y)),
