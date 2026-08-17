@@ -112,7 +112,6 @@ object BackgammonAnalysis {
     else "Beginner"
   }
 
-  // ── persistence (BSON) ────────────────────────────────────────────────────
   implicit val candidateHandler: BSONDocumentHandler[BgCandidate]         = Macros.handler
   implicit val moveHandler: BSONDocumentHandler[BgMove]                   = Macros.handler
   implicit val statsHandler: BSONDocumentHandler[BgPlayerStats]           = Macros.handler
@@ -120,7 +119,6 @@ object BackgammonAnalysis {
   implicit val gameHandler: BSONDocumentHandler[BgGame]                   = Macros.handler
   implicit val analysisHandler: BSONDocumentHandler[BackgammonAnalysis]   = Macros.handler
 
-  // ── read endpoint (play-json) ─────────────────────────────────────────────
   private def decimal(milli: Int): Double = milli / 1000d
 
   private def kindName(code: Int): String = code match {
