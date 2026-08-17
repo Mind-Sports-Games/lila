@@ -75,7 +75,7 @@ private object FishnetLimiter {
 
   object Decline {
     case object Concurrent extends Decline("One of your analysis requests is still in the queue")
-    case object IpLimit    extends Decline("Too many analysis requests from your IP address")
+    case object IpLimit    extends Decline("Too many analysis requests from your account")
     case class Daily(daily: Int, max: Int)
         extends Decline(s"Daily analysis request limit reached ($daily/$max)")
     case class Weekly(weekly: Int, max: Int)
