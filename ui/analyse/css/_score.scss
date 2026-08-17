@@ -995,7 +995,6 @@ $backgammon-pocket-height: 6em;
   &.variant-backgammon,
   &.variant-hyper,
   &.variant-nackgammon {
-    // under (underboard with bgWinChart) acts as "les graphes", promoted above movelist
     grid-template-areas: 'pocket-top' 'board' 'controls' 'advice-summary' 'top-moves' 'under' 'tools' 'side' 'acpl' 'chat' 'uchat';
     // top-moves fixed at 13em so the rows below (under, tools) don't shift with candidate count
     grid-template-rows: 18vw auto auto auto 13em auto minmax(20em, 30vh);

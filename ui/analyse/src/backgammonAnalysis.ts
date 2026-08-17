@@ -85,6 +85,11 @@ function renderSide(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, side: Backgammo
   ]);
 }
 
+// TODO: this gnubg notation <-> board coordinate block belongs in stratops
+// (variants/backgammon/GameFamily, alongside computeMoveNotation). The point mapping
+// below is copied from chessground's calculateBackgammonScores, so the same
+// geometry now lives in three repos with two different width constants.
+//
 // Backgammon board is 13 wide × 2 tall in chessground.
 // Point mapping derived from calculateBackgammonScores (chessground/src/util.ts):
 //   rank 2 (top row):    boardPos = 14 - col  →  point p ≤ 13: col = 14 - p
