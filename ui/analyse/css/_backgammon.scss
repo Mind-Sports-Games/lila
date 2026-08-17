@@ -188,7 +188,10 @@ $bg-col2-column-height: 290px;
 
 @include breakpoint($mq-col2-uniboard) {
   .analyse.backgammon:not(.analyse--detail) {
-    .analyse__acpl {
+    // Sized only when it holds something. With no analysis both render paths in view.ts emit an
+    // empty .analyse__acpl as a grid placeholder, and a height on that left the column's worth
+    // of hole between the controls and the game meta.
+    .analyse__acpl:not(:empty) {
       height: $bg-col2-column-height;
       display: flex;
       flex-direction: column;
