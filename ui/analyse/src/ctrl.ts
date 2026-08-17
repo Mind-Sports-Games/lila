@@ -49,7 +49,7 @@ import { make as makeFork, ForkCtrl } from './fork';
 import { make as makePractice, PracticeCtrl } from './practice/practiceCtrl';
 import { make as makeRetro, RetroCtrl } from './retrospect/retroCtrl';
 import { make as makeSocket, Socket } from './socket';
-import { nextGlyphSymbol } from './nodeFinder';
+
 import { Result } from '@badrap/result';
 import { storedProp, StoredBooleanProp } from 'common/storage';
 import { AnaMove, AnaDrop, AnaPass, StudyCtrl } from './study/interfaces';
@@ -516,12 +516,6 @@ export default class AnalyseCtrl {
   jumpToIndex = (ply: number): void => {
     this.jumpToMain(ply);
   };
-
-  jumpToGlyphSymbol(playerIndex: PlayerIndex, symbol: string): void {
-    const node = nextGlyphSymbol(playerIndex, symbol, this.mainline, this.node.ply);
-    if (node) this.jumpToMain(node.ply);
-    this.redraw();
-  }
 
   reloadData(data: AnalyseData, merge: boolean): void {
     this.initialize(data, merge);

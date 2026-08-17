@@ -182,9 +182,14 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
     ($menuCt.length ? $menuCt : $menu.children(':first-child')).trigger('mousedown');
   }
 
-  // For backgammon, always load analysis data at page load regardless of which
-  // underboard tab was last active — candidates, PR stats, and luck display need it.
+  // Build the chart at page load whatever tab was last active. Backgammon needs the data for
+  // candidates, PR stats and luck; every variant needs it because the advice summary's
+  // clickable counts get their handlers from christmasTree, which only runs once the chart
+  // exists — deferring the build leaves those counts inert while still looking clickable.
+  // Guarded on data.analysis: without one the panel holds the request form, which
+  // startAdvantageChart would overwrite with an empty chart container.
   if (isBackgammon) setTimeout(drawBgWinChart, 200);
+  else if (data.analysis) setTimeout(startAdvantageChart, 200);
 
   if (!data.analysis && allowFishnetForVariant(data.game.variant.key)) {
     $panels.find('form.future-game-analysis').on('submit', function (this: HTMLFormElement) {
