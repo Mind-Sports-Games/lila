@@ -121,8 +121,6 @@ final class Analyser(
       }
     }
 
-  // Backgammon work is the game's SGF, which gnubg reads directly to run a
-  // whole-game `analyse match`. None for any non-backgammon variant.
   private def backgammonWork(game: Game, initialFen: Option[strategygames.format.FEN]): Fu[Option[Work.BgWork]] =
     if (game.variant.gameLogic == strategygames.GameLogic.Backgammon())
       sgfDump(game, initialFen, isTags = true).map(sgf => Work.BgWork(sgf).some)

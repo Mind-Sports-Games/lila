@@ -87,11 +87,7 @@ final class BotVsBotCoordinator(
         else findNextAvailableGame(idx + 1, attempts + 1, online)
       }
 
-    // Backgammon draws for the starting player, and every other creation path settles that draw
-    // into an initial FEN before making the challenge. Left to none, ChallengeJoiner builds the
-    // game from a randomly sided Situation while leaving startedAtTurn at 0: startPlayerIndex then
-    // disagrees with the board, and both players' clock histories are attributed to the wrong side
-    // and truncated. Always single point here, the stream never sets backgammonPoints.
+    // TODO: multipoint is hardcoded to false because the stream currently has no backgammonPoints.
     private def openingFen(variant: Variant): Option[FEN] =
       (variant.gameFamily == GameFamily.Backgammon())
         .option(FEN(variant.gameLogic, variant.toBackgammon.fenFromSetupConfig(false).value))

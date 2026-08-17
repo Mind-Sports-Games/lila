@@ -137,10 +137,8 @@ export default class AnalyseCtrl {
   bgTurnStartFen?: Map<number, string>;
   // mainline ply of the turn-start node for each decision ply (used to jump there on preview dismiss)
   bgTurnStartPly?: Map<number, number>;
-  // original game node id per ply — used to detect when user is in a variation vs. the actual game
+  // detect when user is in a variation vs. the actual game
   bgOriginalNodeIdByPly?: Map<number, string>;
-  // glyph ids coloured by the currently locked advice-summary category (4=blunder, 2=mistake,
-  // 3=perfect, 51=lucky, 52=unlucky); the PR and luck headers cover several. undefined = none
   bgHighlightGlyphIds?: number[];
   // symbol string and player index of the locked advice-summary entry, for re-applying the locked class after Snabbdom re-render
   bgHighlightSymbol?: string;
@@ -978,9 +976,6 @@ export default class AnalyseCtrl {
     this.redraw();
   }
 
-  // The backgammon worker finished (socket.ts "bgAnalysisProgress"). Emit a pubsub
-  // the underboard listens to — it fetches /<id>/backgammon-rating.json and draws
-  // the win% graph.
   onBackgammonAnalysisProgress(): void {
     playstrategy.pubsub.emit('analysis.bg.progress');
     this.redraw();

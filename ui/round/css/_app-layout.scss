@@ -80,8 +80,6 @@
       display: none;
     }
 
-    // Only ever occupied once the game is over, and an unoccupied row costs no height. Sits
-    // above the controls so the figures are in view without scrolling past the rematch buttons.
     .round__bg-analysis {
       grid-area: bg-analysis;
     }

@@ -44,5 +44,4 @@ export default function (div: Division | undefined, trans: Trans): ChartDataset<
   }));
 }
 
-// Re-export plugin so callers can register it once
 export { ChartDataLabels };

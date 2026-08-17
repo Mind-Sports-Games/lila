@@ -9,11 +9,9 @@ import strategygames.Player as PlayerIndex
 
 import lila.db.dsl.*
 
-// Whole-game backgammon analysis, stored alongside (not inside) the chess
-// `Analysis`. The gnubg-backed mindcube worker runs `analyse match` on the whole
-// game and posts the entire result at once: gnubg's OWN per-player error rate,
-// luck and ratings (no client-side computation), plus, for every decision, every
-// candidate play gnubg evaluated. Mirrors mindcube's MatchAnalysis 1:1.
+// The gnubg-backed mindcube worker runs `analyse match` on the whole
+// game and posts the entire result at once, plus, for every decision, every
+// candidate play gnubg evaluated.
 
 case class BgCandidate(
     @Key("p") play:            String,
@@ -38,8 +36,6 @@ case class BgMove(
     @Key("c") candidates:   List[BgCandidate]
 )
 
-/** Per-player statistics — every value a DIRECT gnubg output (error rates in
-  * mEMG, luck in EMG, and gnubg's rating words). */
 case class BgPlayerStats(
     player:           String,
     chequerErrorRate: Option[Double],
@@ -64,7 +60,7 @@ case class BgGame(
 )
 
 case class BackgammonAnalysis(
-    _id:        String, // game id, or study chapter id when studyId is set
+    _id:        String, // game id or study chapter id
     studyId:    Option[String],
     player1:    String,
     player2:    String,
@@ -87,9 +83,6 @@ case class BackgammonAnalysis(
     rates.nonEmpty.option(rates.sum / rates.size)
   }
 
-  /** Performance rating: half the mEMG error rate, the same number the analysis board
-    * shows as "PR". Positive by convention — gnubg reports a negative equity loss, but
-    * every published PR scale runs upwards from 0, where lower is better. */
   def prFor(playerIndex: PlayerIndex): Option[Double] = errorRateFor(playerIndex).map(er => (er / 2).abs)
 
   def ratingFor(playerIndex: PlayerIndex): Option[String] =
@@ -100,7 +93,6 @@ object BackgammonAnalysis {
 
   type ID = String
 
-  // gnubg's mEMG error rate is twice XG's PR.
   def skillLabel(errorRate: Double): String = {
     val er = errorRate.abs
     if (er < 5) "Super Grandmaster"

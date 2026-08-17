@@ -129,34 +129,34 @@ final class FishnetApi(
               val v    = work.game.variant
               val data = lexicalData.toUci(v)
               data.completeOrPartial match {
-            case complete: CompleteAnalysis =>
-              {
-                if (complete.weak && work.game.variant.key == "standard") {
-                  Monitor.weak(work, client, complete)
-                  repo.updateOrGiveUpAnalysis(work.weak) >> fufail(WeakAnalysis(client))
-                } else
-                  analysisBuilder(client, work, complete.analysis) flatMap { analysis =>
-                    monitor.analysis(work, client, complete)
-                    repo
-                      .deleteAnalysis(work)
-                      .inject(PostAnalysisResult.Complete(analysis): PostAnalysisResult)
+                case complete: CompleteAnalysis =>
+                  {
+                    if (complete.weak && work.game.variant.key == "standard") {
+                      Monitor.weak(work, client, complete)
+                      repo.updateOrGiveUpAnalysis(work.weak) >> fufail(WeakAnalysis(client))
+                    } else
+                      analysisBuilder(client, work, complete.analysis) flatMap { analysis =>
+                        monitor.analysis(work, client, complete)
+                        repo
+                          .deleteAnalysis(work)
+                          .inject(PostAnalysisResult.Complete(analysis): PostAnalysisResult)
+                      }
+                  } recoverWith { case e: Exception =>
+                    Monitor.failure(work, client, e)
+                    repo.updateOrGiveUpAnalysis(work.invalid) >> fufail(e)
                   }
-              } recoverWith { case e: Exception =>
-                Monitor.failure(work, client, e)
-                repo.updateOrGiveUpAnalysis(work.invalid) >> fufail(e)
-              }
-            case partial: PartialAnalysis =>
-              {
-                fuccess(work.game.studyId.isDefined) >>| socketExists(work.game.id)
-              }.flatMap[PostAnalysisResult] {
-                case true =>
-                  analysisBuilder.partial(client, work, partial.analysis) map { analysis =>
-                    PostAnalysisResult.Partial(analysis)
+                case partial: PartialAnalysis =>
+                  {
+                    fuccess(work.game.studyId.isDefined) >>| socketExists(work.game.id)
+                  }.flatMap[PostAnalysisResult] {
+                    case true =>
+                      analysisBuilder.partial(client, work, partial.analysis) map { analysis =>
+                        PostAnalysisResult.Partial(analysis)
+                      }
+                    case false => fuccess(PostAnalysisResult.UnusedPartial)
                   }
-                case false => fuccess(PostAnalysisResult.UnusedPartial)
               }
           }
-        }
         case Some(work) =>
           Monitor.notAcquired(work, client)
           fufail(NotAcquired)

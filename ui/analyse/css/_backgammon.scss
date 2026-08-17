@@ -1,9 +1,3 @@
-// gnubg annotation colours all come from the shared move-quality palette
-// ($c-blunder & friends in ui/common/css/theme/_default.scss) so backgammon reads
-// like chess/draughts analysis rather than carrying its own set of hexes.
-
-// Advice-summary symbol → colour. 'd' is gnubg's doubtful (same tier as an inaccuracy) and
-// 'luck' is the virtual section header covering both '+' (lucky) and '-' (unlucky).
 $bg-annotation-colors: (
   'd': $c-inaccuracy,
   '??': $c-blunder,
@@ -14,7 +8,6 @@ $bg-annotation-colors: (
   'luck': $c-lucky,
 );
 
-// Move tree h-* highlight classes (see treeView.ts) → colour.
 $bg-highlight-colors: (
   'blunder': $c-blunder,
   'mistake': $c-mistake,
@@ -23,12 +16,6 @@ $bg-highlight-colors: (
   'unlucky': $c-unlucky,
 );
 
-// Always show both player sides side by side for direct value comparison.
-// _acpl.scss defaults to flex-column and gates the row layout behind $mq-col1;
-// override here so backgammon is always a row on every screen size.
-// Also targets standalone .advice-summary in detail mode (not inside .analyse__acpl).
-// .advice-summary is shared with chess (see ui/analyse/src/acpl.ts), so every rule below is
-// scoped to the .backgammon gameFamily class — this partial is bundled into analyse.study too.
 .analyse.backgammon .analyse__acpl .advice-summary,
 .analyse.backgammon .analyse__detail-extras > .advice-summary,
 .analyse.backgammon.analyse--detail > .advice-summary {
@@ -122,9 +109,6 @@ $bg-highlight-colors: (
   }
 }
 
-// Advice-summary symbol hover + locked state — colour-coded by annotation type.
-// Attribute selector gives higher specificity than the generic :hover in _acpl.scss.
-// Chess uses '?' and '??' here too, so scope this or chess studies lose their $c-link hover.
 .analyse.backgammon .advice-summary__side .symbol {
   @each $symbol, $color in $bg-annotation-colors {
     &[data-symbol='#{$symbol}']:hover,
@@ -134,20 +118,12 @@ $bg-highlight-colors: (
   }
 }
 
-// Move tree annotation colours for backgammon gnubg analysis.
-// Glyphs have empty symbols; colour only.
-// Scoped to the .backgammon gameFamily class on the analyse root: this partial is also
-// bundled into analyse.study, which chess studies load, and unscoped rules would hide
-// their glyphs and strip their annotation colours.
 .analyse.backgammon {
   .tview2 move {
     glyph {
       display: none;
     }
 
-    // Backgammon only colours blunders and mistakes by default, so drop the shared tree
-    // colours; while a symbol is locked in the advice summary all colour goes, leaving the
-    // h-* highlights below to stand alone.
     &.blunder,
     &.brilliant,
     &.mistake,
@@ -179,11 +155,6 @@ $bg-highlight-colors: (
   }
 }
 
-// The right hand column, which holds the summary and the candidates. It used to drive the charts'
-// height, which made them twice as tall as every other variant's; now it stands on its own and the
-// charts keep the 240px $col2-panel-height gives them in _round-underboard.scss, a file this bundle
-// does not import. Two candidate rows past that 240px, at 24.5px each, so the list shows five and a
-// half rows instead of three and a half — the page grows by the same 50px, which is the whole cost.
 $bg-col2-column-height: 290px;
 
 @include breakpoint($mq-col2-uniboard) {
@@ -206,16 +177,8 @@ $bg-col2-column-height: 290px;
   }
 }
 
-// At three columns only, the summary moves under the chat and leaves the whole right hand column
-// to the candidates, sharing the uchat area with the spectator strip: one line in a tall area, so
-// neither row grows. Below that the left column is sized on 70vmin, so a short viewport — a phone
-// held in landscape — leaves no room to seat anything beside the chat, and view.ts keeps the
-// summary with the candidates instead.
 @include breakpoint($mq-col3-uniboard) {
   .analyse.backgammon:not(.analyse--detail) {
-    // uchat spans two rows. Give the spectator strip the first, so it stays directly under the
-    // chat as before, and the summary the second, right below it — using the area's own line names
-    // rather than an offset, which would depend on how tall the strip happens to be.
     .analyse__detail-extras > .advice-summary {
       grid-column: uchat-start / uchat-end;
       grid-row: span 1 / uchat-end;
@@ -223,8 +186,6 @@ $bg-col2-column-height: 290px;
       margin-top: $block-gap;
     }
 
-    // The strip fills its area by default (height: 100% in chat/_members.scss), which would lay it
-    // over the summary. Size it to its content instead.
     .chat__members {
       grid-row: uchat-start / span 1;
       align-self: start;
@@ -266,9 +227,6 @@ $bg-col2-column-height: 290px;
     padding: 0.3em 0.4em;
   }
 
-  // Row states are UI affordances rather than move quality, so they use the generic
-  // theme accents: primary (blue) for the move actually played, secondary (green) for
-  // the candidate currently previewed on the board.
   $c-played: $c-primary;
   $c-showing: $c-secondary;
 

@@ -66,9 +66,6 @@ export function ctrl(initialValue: TreeViewKey = 'column'): TreeView {
   };
 }
 
-// entry point, dispatching to selected view.
-// Upstream also forces inline at one column; we deliberately do not. The stored preference
-// decides at every width, so its default, column, stands on phones too — for every variant.
 export function render(ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
   return ctrl.treeView.inline() && !concealOf ? inline(ctrl) : column(ctrl, concealOf);
 }

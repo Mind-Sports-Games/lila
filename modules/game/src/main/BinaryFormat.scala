@@ -72,8 +72,6 @@ object BinaryFormat {
       Try {
         // `start` is the encoding reference (= config.limit); `initial` is the actual starting clock
         // time used for forward reconstruction.
-        // For SimpleDelay, Timer.remaining = baseLimit + delay (willAdd = delay always), so initial = limit + delay.
-        // For Bronstein, Timer.remaining = baseLimit (willAdd = 0), so initial = limit.
         val initial = if (start == Centis(0)) delay.atLeast(Centis(300))
                       else if (isSimpleDelay) start + delay
                       else start

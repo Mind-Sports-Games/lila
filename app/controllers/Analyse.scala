@@ -35,8 +35,6 @@ final class Analyse(
       }
     }
 
-  // The stored whole-game backgammon analysis: gnubg's own per-player error rate,
-  // luck and ratings plus every candidate play it evaluated.
   def backgammonRating(id: String) =
     Open { implicit ctx =>
       env.analyse.analyser.getBackgammon(id) map {

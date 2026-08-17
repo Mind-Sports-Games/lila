@@ -17,9 +17,4 @@ case class AnalysisProgress(
 
 case class StudyAnalysisProgress(analysis: Analysis, complete: Boolean)
 
-// Backgammon analysis is stored in its own collection (BackgammonAnalysis), not as
-// a chess Analysis + move tree, so it can't reuse AnalysisProgress. This minimal
-// message just signals "the backgammon analysis for this game is ready". RoundDuct
-// turns it into a "bgAnalysisProgress" socket message; the client then fetches the
-// win% series from /<id>/backgammon-rating.json.
 case class BackgammonAnalysisProgress(gameId: String, complete: Boolean)

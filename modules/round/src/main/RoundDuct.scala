@@ -194,9 +194,6 @@ final private[round] class RoundDuct(
         } inject Nil
       }
 
-    // Forward backgammon analysis completion to the browser. The ui/analyse client
-    // (socket.ts "bgAnalysisProgress") reacts by fetching /<id>/backgammon-rating.json
-    // and drawing the win% graph.
     case a: lila.analyse.actorApi.BackgammonAnalysisProgress =>
       fuccess {
         socketSend(RP.Out.tellRoom(roomId, makeMessage("bgAnalysisProgress", Json.obj("complete" -> a.complete))))
