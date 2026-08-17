@@ -791,7 +791,7 @@ $backgammon-pocket-height: 6em;
     }
 
     @include breakpoint($mq-col3) {
-      grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+      grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height $col3-uniboard-controls auto;
       grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
     }
   }
@@ -806,7 +806,7 @@ $backgammon-pocket-height: 6em;
     }
 
     @include breakpoint($mq-col3) {
-      grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+      grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height $col3-uniboard-controls auto;
       grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
     }
   }
@@ -822,7 +822,7 @@ $backgammon-pocket-height: 6em;
   }
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height $col3-uniboard-controls auto;
     grid-template-areas: 'side    . pocket-top gauge tools' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . pocket-bot gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }
@@ -837,7 +837,7 @@ $backgammon-pocket-height: 6em;
   }
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height $col3-uniboard-controls auto;
     grid-template-areas: 'side    . pocket-top gauge tools' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . pocket-bot gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }
@@ -916,7 +916,7 @@ $backgammon-pocket-height: 6em;
   }
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height $col3-uniboard-controls auto;
     grid-template-areas: 'side    . pocket-top gauge tools' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . pocket-bot gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }
@@ -931,7 +931,7 @@ $backgammon-pocket-height: 6em;
   }
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height $col3-uniboard-controls auto;
     grid-template-areas: 'side    . pocket-top gauge tools' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . pocket-bot gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }
