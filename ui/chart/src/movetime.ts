@@ -265,7 +265,6 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     const seconds = (centis / 100).toFixed(centis >= 200 ? 1 : 2);
     label += '\n' + trans.plural('nbSeconds', Number(seconds));
     moveSeries[key].push(movePoint);
-    labels.push(label);
 
     let clock = node ? node.clock : undefined;
     if (clock === undefined) {
@@ -282,6 +281,9 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
       label += '\n' + formatClock(clock);
       totalSeries[key].push({ x: movePoint.x, y: isP1 ? clock : -clock });
     }
+    // After the clock line, not before: label is a string, so pushing it earlier stored a copy
+    // taken before that line existed. One push per iteration keeps labels indexed by ply.
+    labels.push(label);
   }
   flushBgBlur();
 
