@@ -30,6 +30,15 @@ export const configure = (ctrl: AnalyseCtrl): void => {
 
   // Dice picker state
   let dicePickerActive = false;
+  let dicePickerNotified = false;
+  const setDicePicker = (active: boolean) => {
+    dicePickerActive = active;
+    queueMicrotask(() => {
+      if (dicePickerNotified === dicePickerActive) return;
+      dicePickerNotified = dicePickerActive;
+      playstrategy.pubsub.emit('analysis.bg.dicepicker', dicePickerActive, ctrl.onMainline ? ctrl.node.ply : undefined);
+    });
+  };
   let die1Pick: number | null | undefined = undefined; // undefined=not chosen, null=random(?)
   let die2Pick: number | null | undefined = undefined;
   let diceWasPreFilled = false;
@@ -101,7 +110,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
       die2Pick = undefined;
       diceWasPreFilled = false;
     }
-    dicePickerActive = true;
+    setDicePicker(true);
     ctrl.reset();
   };
 
@@ -115,7 +124,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     else die2Pick = die2Pick === value ? undefined : value;
 
     if (die1Pick !== undefined && die2Pick !== undefined) {
-      dicePickerActive = false;
+      setDicePicker(false);
       let d1 = die1Pick !== null ? (die1Pick as number) : Math.ceil(Math.random() * 6);
       let d2 = die2Pick !== null ? (die2Pick as number) : Math.ceil(Math.random() * 6);
       // Opening roll cannot be a double — mirrors the Study page server-side fallback
@@ -278,7 +287,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
 
   ctrl.controlConfig.afterJump = () => {
     const wasDicePickerActive = dicePickerActive;
-    dicePickerActive = false;
+    setDicePicker(false);
     die1Pick = undefined;
     die2Pick = undefined;
     diceWasPreFilled = false;
@@ -404,7 +413,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   };
 
   ctrl.controlConfig.dismissBoardOverlay = () => {
-    dicePickerActive = false;
+    setDicePicker(false);
   };
 
   ctrl.controlConfig.isBoardOverlayActive = () => dicePickerActive;

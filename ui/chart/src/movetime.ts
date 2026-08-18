@@ -18,6 +18,7 @@ import {
   fontFamily,
   maybeChart,
   oppositeColorVariants,
+  orangeAccent,
   plyLine,
   selectPly,
   tooltipBgColor,
@@ -124,6 +125,11 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   let bgTurnTimed = false; // did any action of this turn have a recorded ply time?
   const bgLabelByTurn = new Map<number, string>(); // turn index → tooltip label
   const bgUntimedTurns = new Set<number>(); // turns the backend recorded no time for at all
+  const bgLandingPlyByTurn = new Map<number, number>(); // turn index → ply a click on its bar jumps to
+  const bgTurnByPly = new Map<number, number>(); // ply → the turn it belongs to, for the selection
+  let bgSelectedTurn = -1; // turn under the board's current ply; its bar is outlined
+  let bgAt = firstPly; // last ply the board reported; its slice of the bar is tinted
+  let bgShowPinned: () => void = () => {}; // set once the chart exists; pins the selected tooltip
   // For delay clocks: track remaining time per-turn on the frontend so the tooltip and clock line
   // are both correct (delay is applied once per full backgammon turn, not per individual action).
   const bgDelayCentis = (data.clock?.delay ?? 0) * 100;
@@ -181,9 +187,16 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     // game still reads as one, and a backend that ever times these takes over.
     if (bgTurnIdx < 2 && bgTurnCentis === 0) bgTurnTimed = false;
     if (!bgTurnTimed) bgUntimedTurns.add(bgTurnIdx);
-    let label = heading + (bgTurnTimed ? '\n' + trans.plural('nbSeconds', Number(seconds)) : '');
-    if (displayClock) label += '\n' + formatClock(displayClock);
+    // Two durations sit in one tooltip — the turn's total here, the pointed action's below — so
+    // name them. Without it neither reads as belonging to one rather than the other.
+    let label = heading + (bgTurnTimed ? '\nTurn: ' + trans.plural('nbSeconds', Number(seconds)) : '');
+    if (displayClock) label += '\nClock: ' + formatClock(displayClock);
     bgLabelByTurn.set(bgTurnIdx, label);
+    // Skip the endturn: it leaves the board untouched, and a path pointing at one gets no active
+    // node in the move tree (hence autoScroll's fallback below).
+    const landing = [...bgTurnActions].reverse().find(a => a.san !== 'end') ?? bgTurnActions[bgTurnActions.length - 1];
+    bgLandingPlyByTurn.set(bgTurnIdx, landing?.ply ?? endPly);
+    for (const action of bgTurnActions) bgTurnByPly.set(action.ply, bgTurnIdx);
     moveSeries[key].push(movePoint);
     actionSeries[key].push(...bgActionPoints(isP1, y));
     if (displayClock)
@@ -360,6 +373,16 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     p2: new Set(blurPoints.p2.map(p => p.turn)),
   };
 
+  const pinKeeper = {
+    id: 'movetimePin',
+    afterEvent(chart: Chart, args: { inChartArea: boolean; changed?: boolean }) {
+      if (pinnedPly() === undefined) return;
+      if (args.inChartArea && (chart.tooltip?.getActiveElements()?.length ?? 0) > 0) return;
+      bgShowPinned();
+      args.changed = true;
+    },
+  };
+
   const bgTurnBars = {
     id: 'bgTurnBars',
     beforeDatasetsDraw(chart: Chart) {
@@ -393,6 +416,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
         const untimedEdge = axis + dir * Math.max(dev(bgUntimedPx), Math.round(halfPlot * bgUntimedShare));
         const untimed: [number, number][] = [];
         const offScale: [number, number][] = [];
+        let selected: [number, number, number] | undefined; // left, right, top of the selected turn
         const plotEdge = dev(key === 'p1' ? area.top : area.bottom);
         const blurTurns = bgBlurTurns[key];
         const markY = (t: number) =>
@@ -411,6 +435,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
           if (bgUntimedTurns.has(points[start].turn)) {
             if (isFinite(left) && isFinite(right)) {
               untimed.push([left, right]);
+              if (points[start].turn === bgSelectedTurn) selected = [left, right, untimedEdge];
               if (blurTurns.has(points[start].turn))
                 bgBlurMarks.push({ x: css((left + right) / 2), y: css(markY(untimedEdge)), key });
             }
@@ -423,6 +448,27 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
               bgBlurMarks.push({ x: css((left + right) / 2), y: css(markY(top)), key });
             ctx.fillRect(css(left), css(Math.min(top, axis)), css(right - left), css(Math.abs(top - axis)));
             if (dir * (top - plotEdge) > 0) offScale.push([left, right]);
+            if (points[start].turn === bgSelectedTurn) {
+              selected = [left, right, top];
+              // Tint the slice of the bar the board is on, so stepping through a turn shows which
+              // share of its time is being read. A brief action would be a hairline, so give it the
+              // same floor as a whole bar, grown about its centre and kept inside the bar.
+              const cur = points.slice(start, end + 1).find(pt => pt.ply === bgAt);
+              if (cur) {
+                const lo = Math.min(top, axis);
+                const hi = Math.max(top, axis);
+                const from = axis + (top - axis) * cur.seg[0];
+                const to = axis + (top - axis) * cur.seg[1];
+                const grow = Math.max(0, minHeight - Math.abs(to - from)) / 2;
+                const y0 = Math.max(lo, Math.min(from, to) - grow);
+                const y1 = Math.min(hi, Math.max(from, to) + grow);
+                ctx.save();
+                ctx.fillStyle = orangeAccent;
+                ctx.globalAlpha = 0.45;
+                ctx.fillRect(css(left), css(y0), css(right - left), css(y1 - y0));
+                ctx.restore();
+              }
+            }
             ctx.moveTo(css(left + weight / 2), css(axis));
             ctx.lineTo(css(left + weight / 2), css(top + inset));
             ctx.lineTo(css(right - weight / 2), css(top + inset));
@@ -440,6 +486,21 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
           start = end + 1;
         }
         ctx.stroke();
+        // The whole turn is what a click selects, so outline the whole bar rather than leave the
+        // ply line to mark one action inside it. Same accent as that line, so both read as "here".
+        if (selected) {
+          const [left, right, top] = selected;
+          ctx.save();
+          ctx.strokeStyle = orangeAccent;
+          ctx.lineWidth = css(2 * weight);
+          ctx.strokeRect(
+            css(left + weight),
+            css(Math.min(top, axis)),
+            css(right - left - 2 * weight),
+            css(Math.abs(top - axis)),
+          );
+          ctx.restore();
+        }
         // A turn far longer than the rest runs past the top of the scale, and the clip takes the
         // segment that would close its outline — leaving two sides rising to nothing. Cap it at the
         // boundary in the font colour, a shade brighter than the bar borders: the bar then reads as
@@ -556,7 +617,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   const chart = new Chart(el, {
     type: 'line',
     data: { labels, datasets },
-    plugins: isBackgammon ? [bgTurnBars] : [],
+    plugins: isBackgammon ? [bgTurnBars, pinKeeper] : [pinKeeper],
     options: {
       maintainAspectRatio: false,
       responsive: true,
@@ -587,13 +648,33 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
           },
         },
       },
+      onHover(_event, elements, chart) {
+        chart.canvas.style.cursor = elements.length ? 'pointer' : 'default';
+      },
       onClick(_event, elements, chart) {
         if (elements[0]) {
           const pt = (
-            chart.data.datasets[elements[0].datasetIndex]?.data as { x: number; ply?: number }[] | undefined
+            chart.data.datasets[elements[0].datasetIndex]?.data as
+              { x: number; ply?: number; turn?: number }[] | undefined
           )?.[elements[0].index];
-          if (pt?.x !== undefined)
-            playstrategy.pubsub.emit('analysis.chart.click', isBackgammon ? (pt.ply ?? Math.round(pt.x)) : pt.x);
+          if (pt?.x === undefined) return;
+          if (!isBackgammon) return playstrategy.pubsub.emit('analysis.chart.click', pt.x);
+          // Land after the whole turn wherever in the bar the click fell, matching every other
+          // variant: there a turn is one ply and clicking its bar shows the position it produced.
+          // Selecting the pointed action instead would land mid-turn, and the actions are spread
+          // horizontally while the bar's dividers read vertically, so it never matches the segment
+          // the pointer is over anyway.
+          if (pt.turn !== undefined && pt.turn === bgSelectedTurn) {
+            // Clicking the selected bar again dismisses the marker and its pinned tooltip. The
+            // board stays where it is: this undoes the highlight, not the navigation that set it.
+            bgSelectedTurn = -1;
+            bgShowPinned();
+            chart.update('none');
+            return;
+          }
+          const landing = pt.turn === undefined ? undefined : bgLandingPlyByTurn.get(pt.turn);
+          const target = landing ?? pt.ply ?? Math.round(pt.x);
+          playstrategy.pubsub.emit('analysis.chart.click', target);
         }
       },
     },
@@ -601,8 +682,56 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
 
   chart.selectPly = selectPly.bind(chart);
 
+  let bgDicePicker = false;
+
+  const pinnedPly = (): number | undefined => {
+    if (!isBackgammon) return bgAt;
+    // Off the selected turn — the dice picker marks the next one, where the board is not — there
+    // is no current action, so fall back to the one a click would land on.
+    return bgTurnByPly.get(bgAt) === bgSelectedTurn ? bgAt : bgLandingPlyByTurn.get(bgSelectedTurn);
+  };
+
+  bgShowPinned = () => {
+    const ply = pinnedPly();
+    // Both series carry the ply as x, so one lookup serves either.
+    const series = isBackgammon ? actionSeries : moveSeries;
+    const at = (side: 'p1' | 'p2') => series[side].findIndex(p => p.x === ply);
+    const ds = ply === undefined ? -1 : at('p1') >= 0 ? 0 : at('p2') >= 0 ? 1 : -1;
+    const i = ds < 0 ? -1 : at(ds ? 'p2' : 'p1');
+    if (i < 0) return chart.tooltip?.setActiveElements([], { x: 0, y: 0 });
+    const el = chart.getDatasetMeta(ds).data[i] as unknown as { x: number; y: number } | undefined;
+    chart.tooltip?.setActiveElements([{ datasetIndex: ds, index: i }], { x: el?.x ?? 0, y: el?.y ?? 0 });
+  };
+
+  const bgApplySelection = () => {
+    const base = bgTurnByPly.get(bgAt) ?? -1;
+    // With the picker open the board still sits at the end of a turn, but the dice being chosen
+    // belong to the next one, so that is the bar to mark. At the root there is no current turn,
+    // and -1 + 1 lands on the first — which is exactly what the opening roll picks for.
+    const turn = bgDicePicker ? base + 1 : base;
+    bgSelectedTurn = bgLandingPlyByTurn.has(turn) ? turn : -1;
+  };
+
   playstrategy.pubsub.on('analysis.change', (_fen: string, _path: string, ply: Ply | false) => {
-    chart.selectPly(ply === false ? firstPly : ply);
+    const at = ply === false ? firstPly : ply;
+    // jump() emits this from showGround, at its start, while afterJump only recomputes the picker
+    // at its end. Carrying the flag over would shift the selection a turn ahead for the position
+    // we just left. Take the picker as closed on arrival; afterJump re-announces it if it reopens.
+    if (at !== bgAt) bgDicePicker = false;
+    bgAt = at;
+    bgApplySelection();
+    chart.selectPly(bgAt); // repaints, which redraws the outline above
+    bgShowPinned(); // after selectPly: its update() would drop the tooltip
+    chart.update('none');
+  });
+
+  playstrategy.pubsub.on('analysis.bg.dicepicker', (active: boolean, ply?: number) => {
+    if (!isBackgammon) return;
+    bgDicePicker = active;
+    if (ply !== undefined) bgAt = ply; // the event carries it: analysis.change may still be throttled
+    bgApplySelection();
+    bgShowPinned();
+    chart.update('none');
   });
   playstrategy.pubsub.emit('analysis.change.trigger');
 
