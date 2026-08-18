@@ -3,6 +3,7 @@ import * as round from './round';
 import * as xhr from 'common/xhr';
 import * as status from 'game/status';
 import isCol1 from 'common/isCol1';
+import { allowFishnetForVariant } from 'stratutils';
 import { defined } from 'common';
 import { game as gameRoute } from 'game/router';
 import { Redraw, RoundData } from './interfaces';
@@ -41,6 +42,7 @@ interface Side {
 // accounts, and never bot vs bot.
 function expectsAnalysis(d: RoundData): boolean {
   if (!backgammonVariants.includes(d.game.variant.key)) return false;
+  if (!allowFishnetForVariant(d.game.variant.key)) return false;
   if (!status.finished(d) || d.game.turns - (d.game.startedAtTurn ?? 0) <= 4) return false;
   const users = [d.player.user, d.opponent.user];
   if (users.some(u => !u)) return false;
