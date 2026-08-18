@@ -386,6 +386,8 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
         const halfPlot = Math.abs(dev(key === 'p1' ? area.top : area.bottom) - axis);
         const untimedEdge = axis + dir * Math.max(dev(bgUntimedPx), Math.round(halfPlot * bgUntimedShare));
         const untimed: [number, number][] = [];
+        const offScale: [number, number][] = [];
+        const plotEdge = dev(key === 'p1' ? area.top : area.bottom);
         const blurTurns = bgBlurTurns[key];
         const markY = (t: number) =>
           Math.min(Math.max(t, dev(area.top + bgBlurRadius)), dev(area.bottom - bgBlurRadius));
@@ -414,6 +416,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
             if (blurTurns.has(points[start].turn))
               bgBlurMarks.push({ x: css((left + right) / 2), y: css(markY(top)), key });
             ctx.fillRect(css(left), css(Math.min(top, axis)), css(right - left), css(Math.abs(top - axis)));
+            if (dir * (top - plotEdge) > 0) offScale.push([left, right]);
             ctx.moveTo(css(left + weight / 2), css(axis));
             ctx.lineTo(css(left + weight / 2), css(top + inset));
             ctx.lineTo(css(right - weight / 2), css(top + inset));
@@ -431,6 +434,23 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
           start = end + 1;
         }
         ctx.stroke();
+        // A turn far longer than the rest runs past the top of the scale, and the clip takes the
+        // segment that would close its outline — leaving two sides rising to nothing. Cap it at the
+        // boundary in the font colour, a shade brighter than the bar borders: the bar then reads as
+        // capped rather than merely cut off. The tooltip still gives the turn's real duration.
+        if (offScale.length) {
+          ctx.save();
+          ctx.strokeStyle = fontColor;
+          ctx.lineWidth = css(2 * weight);
+          ctx.beginPath();
+          const capY = plotEdge - dir * weight; // inset by half the stroke, or the clip halves it
+          for (const [left, right] of offScale) {
+            ctx.moveTo(css(left + weight / 2), css(capY));
+            ctx.lineTo(css(right - weight / 2), css(capY));
+          }
+          ctx.stroke();
+          ctx.restore();
+        }
         // Turns the backend recorded no time for: a low dashed band, so the chart still reaches the
         // last move instead of flatlining, while reading as "not measured" rather than as a duration.
         if (untimed.length) {
