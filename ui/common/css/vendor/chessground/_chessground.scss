@@ -1254,6 +1254,7 @@ cg-container .cg-custom-svgs svg {
     justify-content: center;
     position: absolute;
     pointer-events: none;
+    z-index: z('cg__dice');
     dice {
       @include breakpoint($mq-col1-uniboard) {
         margin: 0vw 0.75vw;

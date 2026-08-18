@@ -17,6 +17,17 @@ body {
   color: $c-font;
   overflow-x: hidden;
 
+  // Move quality palette, exposed so the analysis charts can read it at runtime
+  // (ui/chart/src/index.ts) instead of repeating the values. The $c-* variables in
+  // theme/_default.scss stay the single definition.
+  --c-inaccuracy: #{$c-inaccuracy};
+  --c-mistake: #{$c-mistake};
+  --c-blunder: #{$c-blunder};
+  --c-brilliant: #{$c-brilliant};
+  --c-interesting: #{$c-interesting};
+  --c-lucky: #{$c-lucky};
+  --c-unlucky: #{$c-unlucky};
+
   &.fixed-scroll {
     /* prevents scroll bar flicker when dragging a piece out */
     overflow-y: scroll;

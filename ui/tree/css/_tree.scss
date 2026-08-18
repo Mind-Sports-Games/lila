@@ -24,37 +24,37 @@ $c-bg-interesting-hover: c-dimmer($c-interesting, 70%);
 
     &.inaccuracy {
       color: $c-inaccuracy;
-      &:hover {
+      @include hover {
         background: $c-bg-inaccuracy-hover;
       }
     }
     &.mistake {
       color: $c-mistake;
-      &:hover {
+      @include hover {
         background: $c-bg-mistake-hover;
       }
     }
     &.blunder {
       color: $c-blunder;
-      &:hover {
+      @include hover {
         background: $c-bg-blunder-hover;
       }
     }
     &.good {
       color: $c-good;
-      &:hover {
+      @include hover {
         background: $c-bg-good-hover;
       }
     }
     &.brilliant {
       color: $c-brilliant;
-      &:hover {
+      @include hover {
         background: $c-bg-brilliant-hover;
       }
     }
     &.interesting {
       color: $c-interesting;
-      &:hover {
+      @include hover {
         background: $c-bg-interesting-hover;
       }
     }
@@ -96,17 +96,21 @@ $c-bg-interesting-hover: c-dimmer($c-interesting, 70%);
     font-style: italic;
   }
 
-  move:not(.empty, .blunder, .mistake, .inaccuracy, .good, .brilliant, .interesting):hover {
-    &,
-    index,
-    eval {
-      background: $c-primary;
-      color: $c-primary-over;
+  move:not(.empty, .blunder, .mistake, .inaccuracy, .good, .brilliant, .interesting) {
+    @include hover {
+      &,
+      index,
+      eval {
+        background: $c-primary;
+        color: $c-primary-over;
+      }
     }
   }
 
-  &-inline move:hover {
-    @extend %box-radius;
+  &-inline move {
+    @include hover {
+      @include box-radius;
+    }
   }
 
   move.empty {

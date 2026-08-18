@@ -16,3 +16,5 @@ case class AnalysisProgress(
 )
 
 case class StudyAnalysisProgress(analysis: Analysis, complete: Boolean)
+
+case class BackgammonAnalysisProgress(gameId: String, complete: Boolean)

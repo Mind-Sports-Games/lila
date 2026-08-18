@@ -7,28 +7,6 @@ function hasCompChild(node: Tree.Node): boolean {
   });
 }
 
-export function nextGlyphSymbol(
-  playerIndex: PlayerIndex,
-  symbol: string,
-  mainline: Tree.Node[],
-  fromPly: number,
-): Tree.Node | undefined {
-  const len = mainline.length;
-  if (!len) return;
-  const fromIndex = fromPly - mainline[0].ply;
-  for (let i = 1; i < len; i++) {
-    const node = mainline[(fromIndex + i) % len];
-    const found =
-      node.playedPlayerIndex === playerIndex &&
-      node.glyphs &&
-      node.glyphs.find(function (g) {
-        return g.symbol === symbol;
-      });
-    if (found) return node;
-  }
-  return;
-}
-
 export function evalSwings(mainline: Tree.Node[], nodeFilter: (node: Tree.Node) => boolean): Tree.Node[] {
   const found: Tree.Node[] = [];
   const threshold = 0.1;

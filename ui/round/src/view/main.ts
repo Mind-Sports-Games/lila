@@ -321,6 +321,7 @@ export function main(ctrl: RoundController): VNode {
           ctrl.data.hasGameScore
             ? renderPlayerScore(bottomScore, 'bottom', bottomPlayerIndex, variantKey, captures)
             : null,
+          ctrl.bgAnalysis.view(),
           ctrl.keyboardMove ? keyboardMove(ctrl.keyboardMove) : null,
         ],
       );

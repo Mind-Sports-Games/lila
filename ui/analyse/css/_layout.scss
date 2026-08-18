@@ -48,6 +48,12 @@ body {
     grid-area: acpl;
   }
 
+  // Transparent wrapper: its children participate directly in the CSS grid.
+  // Keeps siblings (aside, chat) at a stable position regardless of what's inside.
+  &__detail-extras {
+    display: contents;
+  }
+
   .chat__members {
     grid-area: uchat;
   }

@@ -148,6 +148,43 @@ export interface AnalysisSide {
   blunder: number;
 }
 
+export interface BgCandidateProbs {
+  win: number;
+  winGammon: number;
+  winBackgammon: number;
+  lose: number;
+  loseGammon: number;
+  loseBackgammon: number;
+}
+
+export interface BgCandidateUI {
+  rank: number;
+  play?: string;
+  played: boolean;
+  isP1: boolean; // true = P1 (player1) made this move; affects GNUBG point-number interpretation
+  equity?: number;
+  equityDelta?: number;
+  probabilities: BgCandidateProbs;
+}
+
+export interface BackgammonAnalysisSide {
+  errorRate: number; // overall error rate in mEMG/move (lower is better)
+  luck: number; // total luck in EMG (positive = lucky)
+  rating?: string;
+  luckRating?: string;
+  blunders: number;
+  mistakes: number;
+  perfectPlay: number;
+  luckyRolls: number;
+  unluckyRolls: number;
+  decisions: number; // number of real decisions (excludes forced moves and dances)
+}
+
+export interface BackgammonAnalysis {
+  p1: BackgammonAnalysisSide;
+  p2: BackgammonAnalysisSide;
+}
+
 export interface AnalyseOpts {
   element: HTMLElement;
   data: AnalyseData;

@@ -4,13 +4,14 @@ import AnalyseCtrl from './ctrl';
 import { h, VNode } from 'snabbdom';
 import { modal } from './modal';
 import { spinner } from './util';
+import { dismissCandidatePreview } from './backgammonAnalysis';
 
 export const bind = (ctrl: AnalyseCtrl) => {
   const kbd = window.Mousetrap;
   if (!kbd) return;
   kbd
     .bind(['left', 'k'], () => {
-      control.prev(ctrl);
+      if (!dismissCandidatePreview(ctrl)) control.prev(ctrl);
       ctrl.redraw();
     })
     .bind(['shift+left', 'shift+k'], () => {
@@ -18,7 +19,7 @@ export const bind = (ctrl: AnalyseCtrl) => {
       ctrl.redraw();
     })
     .bind(['right', 'j'], () => {
-      if (!ctrl.fork.proceed()) control.next(ctrl);
+      if (!dismissCandidatePreview(ctrl) && !ctrl.fork.proceed()) control.next(ctrl);
       ctrl.redraw();
     })
     .bind(['shift+right', 'shift+j'], () => {
@@ -26,11 +27,11 @@ export const bind = (ctrl: AnalyseCtrl) => {
       ctrl.redraw();
     })
     .bind(['up', '0'], () => {
-      if (!ctrl.fork.prev()) control.first(ctrl);
+      if (!dismissCandidatePreview(ctrl) && !ctrl.fork.prev()) control.first(ctrl);
       ctrl.redraw();
     })
     .bind(['down', '$'], () => {
-      if (!ctrl.fork.next()) control.last(ctrl);
+      if (!dismissCandidatePreview(ctrl) && !ctrl.fork.next()) control.last(ctrl);
       ctrl.redraw();
     })
     .bind('shift+c', () => {

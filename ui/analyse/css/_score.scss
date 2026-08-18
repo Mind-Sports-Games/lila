@@ -791,7 +791,7 @@ $backgammon-pocket-height: 6em;
     }
 
     @include breakpoint($mq-col3) {
-      grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+      grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height $col3-uniboard-controls auto;
       grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
     }
   }
@@ -806,7 +806,7 @@ $backgammon-pocket-height: 6em;
     }
 
     @include breakpoint($mq-col3) {
-      grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+      grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height $col3-uniboard-controls auto;
       grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
     }
   }
@@ -822,7 +822,7 @@ $backgammon-pocket-height: 6em;
   }
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height $col3-uniboard-controls auto;
     grid-template-areas: 'side    . pocket-top gauge tools' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . pocket-bot gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }
@@ -837,7 +837,7 @@ $backgammon-pocket-height: 6em;
   }
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height $col3-uniboard-controls auto;
     grid-template-areas: 'side    . pocket-top gauge tools' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . pocket-bot gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }
@@ -849,12 +849,12 @@ $backgammon-pocket-height: 6em;
   grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
 
   @include breakpoint($mq-col2) {
-    grid-template-rows: $backgammon-pocket-height auto $backgammon-pocket-height;
+    grid-template-rows: $backgammon-pocket-height auto $backgammon-pocket-height $col2-uniboard-controls auto;
     grid-template-areas: 'board      gauge pocket-top' 'board      gauge tools' 'board      gauge pocket-bot' 'under      .     controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
   }
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $backgammon-pocket-height $meta-height $chat-height $backgammon-pocket-height;
+    grid-template-rows: $backgammon-pocket-height $meta-height $chat-height $backgammon-pocket-height $col3-uniboard-controls auto;
     grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }
@@ -866,12 +866,12 @@ $backgammon-pocket-height: 6em;
   grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
 
   @include breakpoint($mq-col2) {
-    grid-template-rows: $backgammon-pocket-height auto $backgammon-pocket-height;
+    grid-template-rows: $backgammon-pocket-height auto $backgammon-pocket-height $col2-uniboard-controls auto;
     grid-template-areas: 'board      gauge pocket-top' 'board      gauge tools' 'board      gauge pocket-bot' 'under      .     controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
   }
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $backgammon-pocket-height $meta-height $chat-height $backgammon-pocket-height;
+    grid-template-rows: $backgammon-pocket-height $meta-height $chat-height $backgammon-pocket-height $col3-uniboard-controls auto;
     grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }
@@ -916,7 +916,7 @@ $backgammon-pocket-height: 6em;
   }
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height $col3-uniboard-controls auto;
     grid-template-areas: 'side    . pocket-top gauge tools' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . pocket-bot gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }
@@ -931,7 +931,7 @@ $backgammon-pocket-height: 6em;
   }
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height $col3-uniboard-controls auto;
     grid-template-areas: 'side    . pocket-top gauge tools' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . pocket-bot gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }
@@ -977,5 +977,38 @@ $backgammon-pocket-height: 6em;
     padding-bottom: calc(365.555 * 100% / 640);
     margin-top: 5px;
     margin-bottom: 5px;
+  }
+}
+
+// Detail mode: show Analysis block above Moves on col1 (backgammon family only).
+// The class is only added by JS when isCol1(), so no @media guard needed here.
+.analyse.analyse--detail {
+  // Place split sections in their own grid areas
+  .advice-summary {
+    grid-area: advice-summary;
+  }
+
+  .bg-candidates {
+    grid-area: top-moves;
+  }
+
+  &.variant-backgammon,
+  &.variant-hyper,
+  &.variant-nackgammon {
+    grid-template-areas: 'pocket-top' 'board' 'controls' 'advice-summary' 'top-moves' 'under' 'tools' 'side' 'acpl' 'chat' 'uchat';
+    // top-moves fixed at 13em so the rows below (under, tools) don't shift with candidate count
+    grid-template-rows: 18vw auto auto auto 13em auto minmax(20em, 30vh);
+  }
+
+  &.has-players.variant-backgammon,
+  &.has-players.variant-hyper,
+  &.has-players.variant-nackgammon {
+    grid-template-areas: 'pocket-top' 'board' 'controls' 'advice-summary' 'top-moves' 'under' 'tools' 'side' 'acpl' 'chat' 'uchat';
+    grid-template-rows: 23vw auto auto auto 13em auto minmax(20em, 30vh);
+  }
+
+  // movelist is now at row 7 (minmax above) — no extra min-height needed
+  .analyse__moves {
+    min-height: unset;
   }
 }

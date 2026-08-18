@@ -25,6 +25,7 @@ object replay {
       pgn: String,
       sgf: String,
       analysis: Option[lila.analyse.Analysis],
+      backgammonAnalysed: Boolean,
       analysisStarted: Boolean,
       simul: Option[lila.simul.Simul],
       cross: Option[lila.game.Crosstable.WithMatchup],
@@ -35,6 +36,8 @@ object replay {
   )(implicit ctx: Context) = {
 
     import pov.*
+
+    val analysisAvailable = analysis.isDefined || backgammonAnalysed
 
     val chatJson = chatOption map { c =>
       views.html.chat.json(
@@ -145,7 +148,11 @@ object replay {
                 div(cls := "analyse__underboard__panels")(
                   game.analysable.option(
                     div(cls := "computer-analysis")(
-                      if (analysis.isDefined || analysisStarted) div(id := "acpl-chart")
+                      if (analysisAvailable || analysisStarted)
+                        div(
+                          id  := "acpl-chart-container",
+                          cls := (!analysisAvailable && analysisStarted).option("analysis-pending")
+                        )(canvas(id := "acpl-chart"))
                       else
                         postForm(
                           cls    := s"future-game-analysis${ctx.isAnon so " must-login"}",
@@ -158,7 +165,7 @@ object replay {
                     )
                   ),
                   div(cls := "move-times")(
-                    (game.plies > 1).option(div(id := "movetimes-chart"))
+                    (game.plies > 1).option(canvas(id := "movetimes-chart"))
                   ),
                   div(cls := "fen-pgn")(
                     div(

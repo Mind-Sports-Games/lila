@@ -68,11 +68,19 @@ object BinaryFormat {
     def readSide(start: Centis, ba: ByteArray, flagged: Boolean) =
       fischerClockHistory.readSide(start, ba, flagged)
 
-    def read(start: Centis, bw: ByteArray, bb: ByteArray, flagged: Option[PlayerIndex]) =
+    def read(delay: Centis, start: Centis, bw: ByteArray, bb: ByteArray, flagged: Option[PlayerIndex], isSimpleDelay: Boolean = false) =
       Try {
-        DelayClockHistory( // NOTE: this is the only difference from the above fischerClockHistory
-          readSide(start, bw, flagged.contains(P1)),
-          readSide(start, bb, flagged.contains(P2))
+        // `start` is the encoding reference (= config.limit); `initial` is the actual starting clock
+        // time used for forward reconstruction.
+        val initial = if (start == Centis(0)) delay.atLeast(Centis(300))
+                      else if (isSimpleDelay) start + delay
+                      else start
+        DelayClockHistory(
+          p1ActionTimes = readSide(start, bw, flagged.contains(P1)),
+          p2ActionTimes = readSide(start, bb, flagged.contains(P2)),
+          delay = delay,
+          initial = initial,
+          isSimpleDelay = isSimpleDelay
         )
       }.fold(
         e => { logger.warn(s"Exception decoding history", e); none },

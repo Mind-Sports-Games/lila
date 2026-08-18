@@ -1102,10 +1102,10 @@ object BSONHandlers {
                 .read(fc.limit, bw, bb, Status.flagged.contains(light.status).option(turnPlayerIndex))
             case bdc: Clock.BronsteinConfig =>
               BinaryFormat.delayClockHistory
-                .read(bdc.limit, bw, bb, Status.flagged.contains(light.status).option(turnPlayerIndex))
+                .read(bdc.delay, bdc.limit, bw, bb, Status.flagged.contains(light.status).option(turnPlayerIndex))
             case sdc: Clock.SimpleDelayConfig =>
               BinaryFormat.delayClockHistory
-                .read(sdc.limit, bw, bb, Status.flagged.contains(light.status).option(turnPlayerIndex))
+                .read(sdc.delay, sdc.limit, bw, bb, Status.flagged.contains(light.status).option(turnPlayerIndex), isSimpleDelay = true)
             case bc: ByoyomiClock.Config =>
               BinaryFormat.byoyomiClockHistory
                 .read(

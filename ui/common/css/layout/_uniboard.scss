@@ -7,6 +7,12 @@ body {
   }
 }
 
+@include breakpoint($mq-col3-uniboard) {
+  body {
+    --col3: 1;
+  }
+}
+
 @include breakpoint($mq-col1-uniboard) {
   body {
     --col1: 1;

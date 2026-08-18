@@ -1070,13 +1070,11 @@ export default function (token: string) {
    */
   async function validateAndSendBoardMove(boardMove: NormalMove) {
     //While there is not an active game, keep trying to find one so the move is not lost
-    while (
-      !(
-        gameStateMap.has(currentGameId) &&
-        gameConnectionMap.get(currentGameId)!.connected &&
-        gameStateMap.get(currentGameId).status == 'started'
-      )
-    ) {
+    while (!(
+      gameStateMap.has(currentGameId) &&
+      gameConnectionMap.get(currentGameId)!.connected &&
+      gameStateMap.get(currentGameId).status == 'started'
+    )) {
       //Wait a few seconds to see if the games reconnects or starts and give some space to other code to run
       console.warn('validateAndSendBoardMove - Cannot send move while disconnected. Re-Trying in 2 seconds...');
       await sleep(2000);

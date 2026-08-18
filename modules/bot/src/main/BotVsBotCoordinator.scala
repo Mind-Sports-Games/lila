@@ -4,6 +4,9 @@ import java.util.concurrent.atomic.{ AtomicBoolean, AtomicInteger, AtomicReferen
 import scala.concurrent.ExecutionContext
 import akka.actor.{ Cancellable, Scheduler }
 import play.api.Configuration
+import strategygames.GameFamily
+import strategygames.format.FEN
+import strategygames.variant.Variant
 
 import lila.challenge.{ Challenge, ChallengeApi }
 import lila.common.Bus
@@ -84,6 +87,11 @@ final class BotVsBotCoordinator(
         else findNextAvailableGame(idx + 1, attempts + 1, online)
       }
 
+    // TODO: multipoint is hardcoded to false because the stream currently has no backgammonPoints.
+    private def openingFen(variant: Variant): Option[FEN] =
+      (variant.gameFamily == GameFamily.Backgammon())
+        .option(FEN(variant.gameLogic, variant.toBackgammon.fenFromSetupConfig(false).value))
+
     private def createGame(spec: BotVsBotGame, finishedGameId: Option[Game.ID]): Funit = {
       import lila.challenge.Challenge.*
       val timeControl = TimeControl.Clock(spec.clock)
@@ -96,7 +104,7 @@ final class BotVsBotCoordinator(
           val challenge = Challenge.make(
             variant = spec.variant,
             fenVariant = none,
-            initialFen = none,
+            initialFen = openingFen(spec.variant),
             timeControl = timeControl,
             mode = strategygames.Mode.Casual,
             playerIndex = "p1",

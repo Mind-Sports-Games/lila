@@ -4,23 +4,33 @@ $c-fork: $c-primary;
   @extend %flex-center;
 
   flex: 0 0 auto;
-
-  @include breakpoint($mq-col1) {
-    display: none;
-  }
+  flex-wrap: wrap;
 
   move {
-    @extend %san, %flex-center;
+    @extend %san;
 
+    display: flex;
+    align-items: center;
+    gap: 0.2em;
     background: mix($c-fork, $c-bg-box, 25%);
     color: $c-font-clear;
     flex: 0 0 50%;
+    min-width: 0;
     cursor: pointer;
-    padding: 0.2em 1em;
+    padding: 0.35em 0.5em;
     border-bottom: 1px solid $c-bg-box;
 
     &:nth-child(odd) {
       border-right: 1px solid $c-bg-box;
+    }
+
+    // truncate the inner move notation so long backgammon moves don't overflow
+    > move {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1 1 0;
+      min-width: 0;
     }
   }
 

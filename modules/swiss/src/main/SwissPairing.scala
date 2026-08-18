@@ -129,6 +129,8 @@ case class SwissPairingGames(
   def lastGame: Game =
     multiMatchGames.fold(game)(_.reverse.headOption.getOrElse(game))
 
+  def allGames: List[Game] = multiMatchGames.foldLeft(List(game))(_ ++ _)
+
   def isMultiPoint: Boolean = game.metadata.multiPointState.nonEmpty
 
   def finishedOrAborted =
@@ -138,8 +140,7 @@ case class SwissPairingGames(
       !requireMoreGamesInMultipoint
 
   private def multiMatchGamesScoreDiff: Int =
-    multiMatchGames
-      .foldLeft(List(game))(_ ++ _)
+    allGames
       .map(g => g.winnerPlayerIndex)
       .zipWithIndex
       .map { case (outcome, index) =>

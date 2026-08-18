@@ -23,7 +23,17 @@ import explorerCtrl from './explorer/explorerCtrl';
 import GamebookPlayCtrl from './study/gamebook/gamebookPlayCtrl';
 import makeStudy from './study/studyCtrl';
 import throttle from 'common/throttle';
-import { AnalyseOpts, AnalyseData, ServerEvalData, Key, JustCaptured, NvuiPlugin, Redraw } from './interfaces';
+import {
+  AnalyseOpts,
+  AnalyseData,
+  ServerEvalData,
+  Key,
+  JustCaptured,
+  NvuiPlugin,
+  Redraw,
+  BackgammonAnalysis,
+  BgCandidateUI,
+} from './interfaces';
 import { Autoplay, AutoplayDelay } from './autoplay';
 import { build as makeTree, path as treePath, ops as treeOps, TreeWrapper } from 'tree';
 import { compute as computeAutoShapes } from './autoShape';
@@ -39,7 +49,7 @@ import { make as makeFork, ForkCtrl } from './fork';
 import { make as makePractice, PracticeCtrl } from './practice/practiceCtrl';
 import { make as makeRetro, RetroCtrl } from './retrospect/retroCtrl';
 import { make as makeSocket, Socket } from './socket';
-import { nextGlyphSymbol } from './nodeFinder';
+
 import { Result } from '@badrap/result';
 import { storedProp, StoredBooleanProp } from 'common/storage';
 import { AnaMove, AnaDrop, AnaPass, StudyCtrl } from './study/interfaces';
@@ -96,6 +106,8 @@ export default class AnalyseCtrl {
   showGauge: StoredBooleanProp = storedProp('show-gauge', true);
   showComputer: StoredBooleanProp = storedProp('show-computer', true);
   showMoveAnnotation: StoredBooleanProp = storedProp('show-move-annotation', true);
+  showMoveList: StoredBooleanProp = storedProp('analyse.show-move-list', true);
+  analyseDetail: StoredBooleanProp = storedProp('analyse.detail-mode', false);
   keyboardHelp: boolean = location.hash === '#keyboard';
   threatMode: Prop<boolean> = prop(false);
   treeView: TreeView;
@@ -116,6 +128,23 @@ export default class AnalyseCtrl {
 
   // per-variant navigation overrides
   controlConfig: ControlConfig = {};
+
+  // backgammon analysis stats (populated by bgWinChart after fetch)
+  bgAnalysis?: BackgammonAnalysis;
+  // candidates per decision ply (keyed by last-checker ply), populated by bgWinChart after fetch
+  bgTurnCandidates?: Map<number, BgCandidateUI[]>;
+  // turn-start FEN per ply: position after dice rolled, before any checker moves
+  bgTurnStartFen?: Map<number, string>;
+  // mainline ply of the turn-start node for each decision ply (used to jump there on preview dismiss)
+  bgTurnStartPly?: Map<number, number>;
+  // detect when user is in a variation vs. the actual game
+  bgOriginalNodeIdByPly?: Map<number, string>;
+  bgHighlightGlyphIds?: number[];
+  // symbol string and player index of the locked advice-summary entry, for re-applying the locked class after Snabbdom re-render
+  bgHighlightSymbol?: string;
+  bgHighlightPlayerIndex?: PlayerIndex;
+  // true while the pointer is acting inside the annotation UI, so its jumps keep the lock
+  bgKeepAnnotationLock = false;
 
   // misc
   cgConfig: any; // latest chessground config (useful for revert)
@@ -451,6 +480,8 @@ export default class AnalyseCtrl {
   userJump = (path: Tree.Path): void => {
     this.autoplay.stop();
     this.withCg(cg => cg.selectSquare(null));
+    if (this.bgHighlightSymbol && !this.bgKeepAnnotationLock)
+      playstrategy.pubsub.emit('analysis.chart.category.select', null);
     if (this.practice) {
       const prev = this.path;
       this.practice.preUserJump(prev, path);
@@ -480,15 +511,9 @@ export default class AnalyseCtrl {
     this.userJump(this.mainlinePathToPly(ply));
   };
 
-  jumpToIndex = (index: number): void => {
-    this.jumpToMain(index + 1 + this.tree.root.ply);
+  jumpToIndex = (ply: number): void => {
+    this.jumpToMain(ply);
   };
-
-  jumpToGlyphSymbol(playerIndex: PlayerIndex, symbol: string): void {
-    const node = nextGlyphSymbol(playerIndex, symbol, this.mainline, this.node.ply);
-    if (node) this.jumpToMain(node.ply);
-    this.redraw();
-  }
 
   reloadData(data: AnalyseData, merge: boolean): void {
     this.initialize(data, merge);
@@ -948,6 +973,11 @@ export default class AnalyseCtrl {
     if (this.retro) this.retro.onMergeAnalysisData();
     if (this.study) this.study.serverEval.onMergeAnalysisData();
     playstrategy.pubsub.emit('analysis.server.progress', this.data);
+    this.redraw();
+  }
+
+  onBackgammonAnalysisProgress(): void {
+    playstrategy.pubsub.emit('analysis.bg.progress');
     this.redraw();
   }
 

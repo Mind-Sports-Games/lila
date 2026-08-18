@@ -37,23 +37,36 @@ final class FishnetApi(
     else repo.getEnabledClient(req.fishnet.apikey)
   } map {
     case None         => Failure(new Exception("Can't authenticate: invalid key or disabled client"))
-    case Some(client) => clientVersion.accept(req.fishnet.version) map (_ => client)
+    case Some(client) =>
+      // variant-declaring workers (e.g. the backgammon/gnubg worker) version on their
+      // own track, so the stockfish client_min_version gate only applies to default clients
+      if (req.fishnet.variants.exists(_.nonEmpty)) Success(client)
+      else clientVersion.accept(req.fishnet.version) map (_ => client)
   } flatMap {
     case Success(client) => repo.updateClientInstance(client, req.instance(ip)) map Success.apply
     case failure         => fuccess(failure)
   }
 
-  def acquire(client: Client, slow: Boolean): Fu[Option[JsonApi.Work]] =
+  def acquire(client: Client, slow: Boolean, variants: Option[List[String]]): Fu[Option[JsonApi.Work]] =
     (client.skill match {
       case Skill.Move                 => fufail(s"Can't acquire a move directly on playstrategy! $client")
-      case Skill.Analysis | Skill.All => acquireAnalysis(client, slow)
+      case Skill.Analysis | Skill.All => acquireAnalysis(client, slow, variants)
     }).monSuccess(_.fishnet.acquire)
       .recover { case e: Exception =>
         logger.error("Fishnet.acquire", e)
         none
       }
 
-  private def acquireAnalysis(client: Client, slow: Boolean): Fu[Option[JsonApi.Work]] =
+  private def acquireAnalysis(
+      client: Client,
+      slow: Boolean,
+      variants: Option[List[String]]
+  ): Fu[Option[JsonApi.Work]] = {
+    val allowedLogicIds = FishnetVariants.allowedLogicIds(variants)
+    logger.debug(
+      s"acquire by ${client.fullId} variants=${variants.fold("<default>")(_.mkString(","))} " +
+        s"allowedLogics=${allowedLogicIds.toList.sorted.mkString(",")} slow=$slow"
+    )
     workQueue {
       analysisColl
         .find(
@@ -61,7 +74,7 @@ final class FishnetApi(
             !client.offline so $doc("lastTryByKey".$ne(client.key)) // client alternation
           } ++ {
             slow so $doc("sender.system" -> true)
-          }
+          } ++ $doc("game.variant.gl".$in(allowedLogicIds)) // only variants this client handles
         )
         .sort(
           $doc(
@@ -72,10 +85,15 @@ final class FishnetApi(
         .one[Work.Analysis]
         .flatMap {
           _ so { work =>
+            logger.info(
+              s"assign ${work.id} variant=${work.game.variant.key}(gl=${work.game.variant.gameLogic.id}) " +
+                s"to ${client.fullId}"
+            )
             repo.updateAnalysis(work.assignTo(client)) inject work.some
           }
         }
     }.map { _ map JsonApi.analysisFromWork(config.analysisNodes) }
+  }
 
   def postAnalysis(
       workId: Work.Id,
@@ -88,53 +106,75 @@ final class FishnetApi(
         case None =>
           Monitor.notFound(workId, client)
           fufail(WorkNotFound)
-        case Some(work) if work.isAcquiredBy(client) => {
-          val v    = work.game.variant
-          val data = lexicalData.toUci(v)
-          data.completeOrPartial match {
-            case complete: CompleteAnalysis =>
-              {
-                if (complete.weak && work.game.variant.key == "standard") {
-                  Monitor.weak(work, client, complete)
-                  repo.updateOrGiveUpAnalysis(work.weak) >> fufail(WeakAnalysis(client))
-                } else
-                  analysisBuilder(client, work, complete.analysis) flatMap { analysis =>
-                    monitor.analysis(work, client, complete)
-                    repo
-                      .deleteAnalysis(work)
-                      .inject(PostAnalysisResult.Complete(analysis): PostAnalysisResult)
+        case Some(work) if work.isAcquiredBy(client) =>
+          lexicalData.backgammon match {
+            case Some(bg) =>
+              // store gnubg's whole-game analysis (ER, luck, ratings + every
+              // candidate play), mark analysed, and free the work. Posted once.
+              val analysis = lila.analyse.BackgammonAnalysis(
+                _id = work.game.id,
+                studyId = work.game.studyId,
+                player1 = bg.player1,
+                player2 = bg.player2,
+                evaluators = bg.evaluators,
+                games = bg.toGames,
+                date = DateTime.now,
+                fk = none
+              )
+              sink.saveBackgammon(analysis) >>
+                repo
+                  .deleteAnalysis(work)
+                  .inject(PostAnalysisResult.CompleteBackgammon(work.game.id): PostAnalysisResult)
+            case None =>
+              val v    = work.game.variant
+              val data = lexicalData.toUci(v)
+              data.completeOrPartial match {
+                case complete: CompleteAnalysis =>
+                  {
+                    if (complete.weak && work.game.variant.key == "standard") {
+                      Monitor.weak(work, client, complete)
+                      repo.updateOrGiveUpAnalysis(work.weak) >> fufail(WeakAnalysis(client))
+                    } else
+                      analysisBuilder(client, work, complete.analysis) flatMap { analysis =>
+                        monitor.analysis(work, client, complete)
+                        repo
+                          .deleteAnalysis(work)
+                          .inject(PostAnalysisResult.Complete(analysis): PostAnalysisResult)
+                      }
+                  } recoverWith { case e: Exception =>
+                    Monitor.failure(work, client, e)
+                    repo.updateOrGiveUpAnalysis(work.invalid) >> fufail(e)
                   }
-              } recoverWith { case e: Exception =>
-                Monitor.failure(work, client, e)
-                repo.updateOrGiveUpAnalysis(work.invalid) >> fufail(e)
-              }
-            case partial: PartialAnalysis =>
-              {
-                fuccess(work.game.studyId.isDefined) >>| socketExists(work.game.id)
-              }.flatMap[PostAnalysisResult] {
-                case true =>
-                  analysisBuilder.partial(client, work, partial.analysis) map { analysis =>
-                    PostAnalysisResult.Partial(analysis)
+                case partial: PartialAnalysis =>
+                  {
+                    fuccess(work.game.studyId.isDefined) >>| socketExists(work.game.id)
+                  }.flatMap[PostAnalysisResult] {
+                    case true =>
+                      analysisBuilder.partial(client, work, partial.analysis) map { analysis =>
+                        PostAnalysisResult.Partial(analysis)
+                      }
+                    case false => fuccess(PostAnalysisResult.UnusedPartial)
                   }
-                case false => fuccess(PostAnalysisResult.UnusedPartial)
               }
           }
-        }
         case Some(work) =>
           Monitor.notAcquired(work, client)
           fufail(NotAcquired)
       }
       .chronometer
       .logIfSlow(200, logger) {
-        case PostAnalysisResult.Complete(res) => s"post analysis for ${res.id}"
-        case PostAnalysisResult.Partial(res)  => s"partial analysis for ${res.id}"
-        case PostAnalysisResult.UnusedPartial => s"unused partial analysis"
+        case PostAnalysisResult.Complete(res)          => s"post analysis for ${res.id}"
+        case PostAnalysisResult.Partial(res)           => s"partial analysis for ${res.id}"
+        case PostAnalysisResult.UnusedPartial          => s"unused partial analysis"
+        case PostAnalysisResult.CompleteBackgammon(id) => s"post backgammon analysis for $id"
       }
       .result
       .flatMap {
-        case r @ PostAnalysisResult.Complete(res) => sink.save(res) inject r
-        case r @ PostAnalysisResult.Partial(res)  => sink.progress(res) inject r
-        case r @ PostAnalysisResult.UnusedPartial => fuccess(r)
+        case r @ PostAnalysisResult.Complete(res)         => sink.save(res) inject r
+        case r @ PostAnalysisResult.Partial(res)          => sink.progress(res) inject r
+        case r @ PostAnalysisResult.UnusedPartial         => fuccess(r)
+        // backgammon analysis is already saved in the match above
+        case r @ PostAnalysisResult.CompleteBackgammon(_) => fuccess(r)
       }
   }
 
@@ -216,5 +256,8 @@ object FishnetApi {
     case class Complete(analysis: lila.analyse.Analysis) extends PostAnalysisResult
     case class Partial(analysis: lila.analyse.Analysis)  extends PostAnalysisResult
     case object UnusedPartial                            extends PostAnalysisResult
+    // Backgammon analysis is saved when posted; this only carries enough to
+    // drive the HTTP response and "next work" acquisition.
+    case class CompleteBackgammon(id: String) extends PostAnalysisResult
   }
 }

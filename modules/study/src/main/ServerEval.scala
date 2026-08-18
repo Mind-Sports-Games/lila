@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.Glyphs
 import strategygames.format.{ Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
-import strategygames.{ Division, Game, Player as PlayerIndex, Replay }
+import strategygames.{ Division, Game, GameLogic, Player as PlayerIndex, Replay }
 import play.api.libs.json.*
 
 import lila.analyse.{ Analysis, Info }
@@ -23,10 +23,18 @@ object ServerEval {
 
     private val onceEvery = lila.memo.OnceEvery(5 minutes)
 
+    // TODO: backgammon study chapters are excluded because StudyChapterRequest carries moves,
+    // not the SGF gnubg needs, and nothing merges a BackgammonAnalysis back into a chapter the
+    // way Merger does for chess. Requesting one would only mark the chapter started forever.
+    // The storage side already handles chapters (BackgammonAnalysis.studyId, set in FishnetApi),
+    // so those branches stay dead until both gaps are closed.
+    private def analysable(chapter: Chapter) =
+      chapter.setup.variant.gameLogic != GameLogic.Backgammon()
+
     def apply(study: Study, chapter: Chapter, userId: User.ID): Funit =
-      chapter.serverEval.fold(true) { eval =>
+      (analysable(chapter) && chapter.serverEval.fold(true) { eval =>
         !eval.done && onceEvery(chapter.id.value)
-      } so {
+      }) so {
         val unlimitedFu =
           fuccess(userId == User.playstrategyId) >>| userRepo
             .byId(userId)

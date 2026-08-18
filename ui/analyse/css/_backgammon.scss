@@ -1,3 +1,318 @@
+$bg-annotation-colors: (
+  'd': $c-inaccuracy,
+  '??': $c-blunder,
+  '?': $c-mistake,
+  '!!': $c-brilliant,
+  '+': $c-lucky,
+  '-': $c-unlucky,
+  'luck': $c-lucky,
+);
+
+$bg-highlight-colors: (
+  'blunder': $c-blunder,
+  'mistake': $c-mistake,
+  'brilliant': $c-brilliant,
+  'lucky': $c-lucky,
+  'unlucky': $c-unlucky,
+);
+
+.analyse.backgammon .analyse__acpl .advice-summary,
+.analyse.backgammon .analyse__detail-extras > .advice-summary,
+.analyse.backgammon.analyse--detail > .advice-summary {
+  flex-direction: row;
+  align-items: flex-start;
+  margin-top: 0;
+
+  > hr {
+    display: none;
+  }
+
+  .advice-summary__player {
+    justify-content: flex-start;
+    margin-bottom: 0.4em;
+  }
+
+  .advice-summary__side > div {
+    gap: 0.3em;
+
+    // PR and Luck can run to five characters, past the 4ch basis in _acpl.scss, so those rows
+    // sized to their own glyphs and their labels left the counts' column.
+    strong {
+      flex: 0 0 5ch;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  .advice-summary__side {
+    flex: 1;
+    min-width: 0; // prevent flex blowout on narrow screens
+
+    &:first-child {
+      padding-right: 0.6em;
+      border-right: 1px solid fade-out($c-font, 0.88);
+    }
+
+    &:last-child {
+      padding-left: 0.6em;
+    }
+  }
+
+  .advice-summary__luck-hdr {
+    margin-top: 0.4em;
+  }
+
+  .advice-summary__acpl em {
+    font-style: italic;
+    opacity: 0.7;
+  }
+}
+
+// In detail mode the advice-summary is a grid item directly below the board —
+// lay out each side's stats in a 2-column inner grid to halve the height.
+.analyse.backgammon.analyse--detail > .advice-summary {
+  padding: 0.3em 0.5em;
+  font-size: 0.82em;
+
+  .advice-summary__side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 0.4em;
+    row-gap: 0.1em;
+
+    .advice-summary__player {
+      grid-column: 1 / -1;
+      margin-bottom: 0.1em;
+    }
+
+    // Luck section header spans both columns — acts as a visual divider between skill and dice
+    .advice-summary__luck-hdr {
+      grid-column: 1 / -1;
+      border-top: 1px solid fade-out($c-font, 0.85);
+      padding-top: 0.2em;
+      margin-top: 0.1em;
+    }
+
+    > div {
+      gap: 0.1em;
+      min-width: 0;
+
+      // Truncate long labels (e.g. "Intermediate", "Perfect play") with ellipsis.
+      // Full text is in the title attribute (desktop hover / iOS long-press).
+      > span {
+        flex: 1 1 0;
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}
+
+.analyse.backgammon .advice-summary__side .symbol {
+  @each $symbol, $color in $bg-annotation-colors {
+    &[data-symbol='#{$symbol}']:hover,
+    &[data-symbol='#{$symbol}'].locked {
+      color: $color;
+    }
+  }
+}
+
+.analyse.backgammon {
+  .tview2 move {
+    glyph {
+      display: none;
+    }
+
+    &.blunder,
+    &.brilliant,
+    &.mistake,
+    &.inaccuracy {
+      color: unset;
+    }
+
+    @each $name, $color in $bg-highlight-colors {
+      &.h-#{$name} {
+        color: $color;
+
+        &.current {
+          background: fade-out($c-font, 0.88);
+          border-radius: 2px;
+          outline: 1px solid fade-out($c-font, 0.8);
+        }
+      }
+    }
+  }
+
+  &:not(.annotation-locked) .tview2 move {
+    &.blunder {
+      color: $c-blunder;
+    }
+
+    &.mistake {
+      color: $c-mistake;
+    }
+  }
+}
+
+$bg-col2-column-height: 290px;
+
+@include breakpoint($mq-col2-uniboard) {
+  .analyse.backgammon:not(.analyse--detail) {
+    // Sized only when it holds something. With no analysis both render paths in view.ts emit an
+    // empty .analyse__acpl as a grid placeholder, and a height on that left the column's worth
+    // of hole between the controls and the game meta.
+    .analyse__acpl:not(:empty) {
+      height: $bg-col2-column-height;
+      display: flex;
+      flex-direction: column;
+
+      .bg-candidates {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+      }
+    }
+  }
+}
+
+@include breakpoint($mq-col3-uniboard) {
+  .analyse.backgammon:not(.analyse--detail) {
+    .analyse__detail-extras > .advice-summary {
+      grid-column: uchat-start / uchat-end;
+      grid-row: span 1 / uchat-end;
+      align-self: start;
+      margin-top: $block-gap;
+    }
+
+    .chat__members {
+      grid-row: uchat-start / span 1;
+      align-self: start;
+      height: auto;
+    }
+  }
+}
+
+.bg-candidates {
+  margin-top: 1em;
+  font-size: 0.9em;
+
+  &__list {
+    max-height: 12em;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    @include breakpoint($mq-col2-uniboard) {
+      .analyse:not(.analyse--detail) & {
+        flex: 1;
+        min-height: 0;
+        max-height: none;
+      }
+    }
+  }
+
+  &__header {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.8em;
+    opacity: 0.6;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4em;
+  }
+
+  &__no-play {
+    font-style: italic;
+    opacity: 0.5;
+    padding: 0.3em 0.4em;
+  }
+
+  $c-played: $c-primary;
+  $c-showing: $c-secondary;
+
+  &__row {
+    display: flex;
+    flex-direction: column;
+    padding: 0.3em 0.4em;
+    border-radius: 3px;
+    cursor: pointer;
+    border-left: 4px solid transparent;
+
+    &:hover {
+      background: fade-out($c-font, 0.94);
+    }
+
+    &.expanded {
+      background: fade-out($c-font, 0.92);
+    }
+
+    &.played {
+      border-left-color: $c-played;
+      background: linear-gradient(to right, fade-out($c-played, 0.76), fade-out($c-played, 0.94) 8em);
+    }
+
+    &.showing {
+      border-left-color: $c-showing;
+      background: linear-gradient(to right, fade-out($c-showing, 0.76), fade-out($c-showing, 0.94) 8em);
+      box-shadow: inset 0 0 0 1px fade-out($c-showing, 0.1);
+    }
+
+    // Narrow screens put the list further from the board, so lift the contrast.
+    @include breakpoint($mq-col1-uniboard) {
+      border-left-width: 6px;
+
+      &.played {
+        border-left-color: c-clearer($c-played, 20%);
+        background: linear-gradient(to right, fade-out($c-played, 0.68), fade-out($c-played, 0.92) 8em);
+      }
+
+      &.showing {
+        border-left-color: c-clearer($c-showing, 20%);
+        background: linear-gradient(to right, fade-out($c-showing, 0.68), fade-out($c-showing, 0.92) 8em);
+        box-shadow: inset 0 0 0 2px fade-out(c-clearer($c-showing, 20%), 0.1);
+      }
+    }
+  }
+
+  &__main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__move {
+    font-family: monospace;
+    font-size: 1em;
+  }
+
+  &__meta {
+    display: flex;
+    gap: 0.4em;
+    opacity: 0.75;
+
+    .rank {
+      opacity: 0.5;
+    }
+
+    .delta.bad {
+      color: $c-blunder;
+    }
+  }
+
+  &__probs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3em 0.6em;
+    margin-top: 0.3em;
+    font-size: 0.85em;
+    opacity: 0.8;
+
+    .sep {
+      opacity: 0.3;
+    }
+  }
+}
+
 .analyse__board {
   .dice-picker {
     position: absolute;

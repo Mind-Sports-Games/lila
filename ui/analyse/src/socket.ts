@@ -77,9 +77,7 @@ export type StudySocketSendParams =
 export type EvalCacheSocketParams = [t: 'evalPut', d: EvalPutData] | [t: 'evalGet', d: EvalGetData];
 
 export type AnalyseSocketSendParams =
-  | StudySocketSendParams
-  | EvalCacheSocketParams
-  | [t: 'startWatching', gameId: string];
+  StudySocketSendParams | EvalCacheSocketParams | [t: 'startWatching', gameId: string];
 
 export type StudySocketSend = (...[d, t]: StudySocketSendParams) => void;
 export type AnalyseSocketSend = (...[d, t]: AnalyseSocketSendParams) => void;
@@ -169,6 +167,9 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     },
     analysisProgress(data: ServerEvalData) {
       ctrl.mergeAnalysisData(data);
+    },
+    bgAnalysisProgress(_data: { complete: boolean }) {
+      ctrl.onBackgammonAnalysisProgress();
     },
     evalHit(e: CachedEval) {
       ctrl.evalCache.onCloudEval(e);
