@@ -98,7 +98,12 @@ function turnValues(a: BgAnalysis): TurnVal[] {
   for (const g of a.games)
     for (const m of g.moves) {
       const cands = m.candidates || [];
-      const played = cands.find(c => c.played) || cands[0];
+      // gnubg also rates decisions nobody played — a game abandoned on the roll leaves one, with
+      // no candidate marked played. Keep the best one so the chart still has a value, but do not
+      // let the fallback pass it off as the move made: that scored an unplayed position as perfect
+      // play, counted in the advice summary yet impossible to reach, no node carrying its glyph.
+      const playedCand = cands.find(c => c.played);
+      const played = playedCand || cands[0];
       const best = cands.find(c => c.rank === 1) || played;
       if (!played) {
         // dance / no legal play: no error judgement possible
@@ -132,9 +137,9 @@ function turnValues(a: BgAnalysis): TurnVal[] {
         error: emgLoss,
         player: m.player,
         luck: m.rollLuck,
-        topMove: played.rank === 1,
+        topMove: playedCand?.rank === 1,
         topMoveGap,
-        noAnnotation: forced,
+        noAnnotation: forced || !playedCand,
       });
     }
   return out;
