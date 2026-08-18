@@ -14,6 +14,7 @@ import {
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
 import isCol1 from 'common/isCol1';
+import isCol3 from 'common/isCol3';
 import { playable } from 'game';
 import * as router from 'game/router';
 import statusView from 'game/view/status';
@@ -39,6 +40,13 @@ import * as studyView from './study/studyView';
 import * as studyPracticeView from './study/practice/studyPracticeView';
 import { view as forkView } from './fork';
 import { render as acplView } from './acpl';
+import {
+  render as bgAcplView,
+  isBackgammonVariant,
+  renderAdviceSummary as renderBgAdviceSummary,
+  renderTopMoves as renderBgTopMoves,
+  dismissCandidatePreview,
+} from './backgammonAnalysis';
 import AnalyseCtrl from './ctrl';
 import { ConcealOf, Position } from './interfaces';
 import relayManager from './study/relay/relayManagerView';
@@ -49,7 +57,6 @@ import serverSideUnderboard from './serverSideUnderboard';
 import * as gridHacks from './gridHacks';
 import { allowedForVariant as allowClientEvalForVariant, allowPracticeWithComputer, allowPv } from 'ceval/src/util';
 import { variantKeyToRules } from 'stratops/variants/util';
-
 function renderResult(ctrl: AnalyseCtrl): VNode[] {
   let result: string | undefined;
   let statusNodes: (string | VNode | null)[] | undefined;
@@ -112,8 +119,10 @@ function wheel(ctrl: AnalyseCtrl, e: WheelEvent) {
   const target = e.target as HTMLElement;
   if (target.tagName !== 'PIECE' && target.tagName !== 'SQUARE' && target.tagName !== 'CG-BOARD') return;
   e.preventDefault();
-  if (e.deltaY > 0) control.next(ctrl);
-  else if (e.deltaY < 0) control.prev(ctrl);
+  if (!dismissCandidatePreview(ctrl)) {
+    if (e.deltaY > 0) control.next(ctrl);
+    else if (e.deltaY < 0) control.prev(ctrl);
+  }
   ctrl.redraw();
   return false;
 }
@@ -252,12 +261,16 @@ function controls(ctrl: AnalyseCtrl) {
           el,
           e => {
             const action = dataAct(e);
-            if (action === 'prev' || action === 'next') repeater(ctrl, action, e);
-            else if (action === 'first') control.first(ctrl);
-            else if (action === 'last') control.last(ctrl);
-            else if (action === 'explorer') ctrl.toggleExplorer();
+            if (action === 'prev' || action === 'next') {
+              if (!dismissCandidatePreview(ctrl)) repeater(ctrl, action, e);
+            } else if (action === 'first') {
+              if (!dismissCandidatePreview(ctrl)) control.first(ctrl);
+            } else if (action === 'last') {
+              if (!dismissCandidatePreview(ctrl)) control.last(ctrl);
+            } else if (action === 'explorer') ctrl.toggleExplorer();
             else if (action === 'practice') ctrl.togglePractice();
             else if (action === 'menu') ctrl.actionMenu.toggle();
+            else if (action === 'detail-mode') ctrl.analyseDetail(!ctrl.analyseDetail());
           },
           ctrl.redraw,
         );
@@ -313,13 +326,23 @@ function controls(ctrl: AnalyseCtrl) {
                         },
                       })
                     : null,
+                  isCol1() && isBackgammonVariant(ctrl.data.game.variant.key)
+                    ? h('button.fbt', {
+                        attrs: {
+                          title: noarg('analysis'),
+                          'data-act': 'detail-mode',
+                          'data-icon': 'A',
+                        },
+                        class: { active: ctrl.analyseDetail() },
+                      })
+                    : null,
                 ],
           ),
       h('div.jumps', [
-        jumpButton('W', 'first', canJumpPrev),
+        isCol1() ? null : jumpButton('W', 'first', canJumpPrev),
         jumpButton('Y', 'prev', canJumpPrev),
         jumpButton('X', 'next', canJumpNext),
-        jumpButton('V', 'last', canJumpNext),
+        isCol1() ? null : jumpButton('V', 'last', canJumpNext),
       ]),
       ctrl.studyPractice
         ? h('div.noop')
@@ -654,6 +677,10 @@ export default function (ctrl: AnalyseCtrl): VNode {
           'has-clocks': !!clocks,
           'has-relay-tour': !!tour,
           'analyse-hunter': ctrl.opts.hunter,
+          'analyse--detail': isBackgammonVariant(variantKey) && isCol1() && ctrl.analyseDetail() && !menuIsOpen,
+          // A category is locked in the advice-summary: the move tree then colours that
+          // category only, instead of its default blunders + mistakes.
+          'annotation-locked': !!ctrl.bgHighlightSymbol,
         },
       },
       [
@@ -715,7 +742,29 @@ export default function (ctrl: AnalyseCtrl): VNode {
               },
               study ? studyView.underboard(ctrl) : [inputs(ctrl)],
             ),
-        tour ? null : acplView(ctrl),
+        // Stable wrapper so siblings (aside, chat) never shift position when detail mode
+        // toggles. display:contents (via CSS) makes children participate in the grid directly.
+        tour
+          ? null
+          : h(
+              'div.analyse__detail-extras',
+              isBackgammonVariant(variantKey) && isCol1() && ctrl.analyseDetail()
+                ? ([renderBgAdviceSummary(ctrl), renderBgTopMoves(ctrl)] as (VNode | undefined)[]).filter(
+                    (v): v is VNode => v != null,
+                  )
+                : // The summary never changes with the move, so at three columns it is rendered
+                  // apart from the candidates and placed under the chat by CSS, leaving the whole
+                  // right hand column to the list. Narrower layouts have nowhere to put it.
+                  isBackgammonVariant(variantKey) && isCol3()
+                  ? (
+                      [renderBgAdviceSummary(ctrl), h('div.analyse__acpl', [renderBgTopMoves(ctrl)])] as (
+                        VNode | undefined
+                      )[]
+                    ).filter((v): v is VNode => v != null)
+                  : isBackgammonVariant(variantKey)
+                    ? [bgAcplView(ctrl)]
+                    : [acplView(ctrl)],
+            ),
         ctrl.embed
           ? null
           : ctrl.studyPractice

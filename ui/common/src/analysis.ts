@@ -68,6 +68,7 @@ const fishnetVariants: VariantKey[] = [
   'octagonflipello',
   'breakthroughtroyka',
   'minibreakthroughtroyka',
+  'backgammon',
 ];
 
 export function hasFishnet(variant: VariantKey) {

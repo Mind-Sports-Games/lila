@@ -48,12 +48,19 @@ object Work {
       initialFen: Option[FEN],
       studyId: Option[String],
       variant: Variant,
-      moves: String
+      moves: String,
+      // For backgammon work: the game's SGF, which the gnubg-backed mindcube
+      // worker reads directly. Chess work leaves it None.
+      backgammon: Option[BgWork] = None
   ) {
 
     def uciList: List[Uci] =
       ~Uci.readList(variant.gameLogic, variant.gameFamily, moves)
   }
+
+  /** The backgammon-specific part of a work item: the game's SGF, which gnubg
+    * reads directly to run a whole-game `analyse match`. */
+  case class BgWork(sgf: String)
 
   case class Sender(
       userId: lila.user.User.ID,

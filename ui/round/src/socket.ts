@@ -119,6 +119,9 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
       ctrl.redraw();
     },
     endData: ctrl.endWithData,
+    bgAnalysisProgress() {
+      ctrl.bgAnalysis.onProgress();
+    },
     rematchOffer(by: PlayerIndex) {
       ctrl.data.player.offeringRematch = by === ctrl.data.player.playerIndex;
       if ((ctrl.data.opponent.offeringRematch = by === ctrl.data.opponent.playerIndex))

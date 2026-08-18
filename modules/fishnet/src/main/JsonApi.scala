@@ -26,13 +26,90 @@ object JsonApi {
     case class Fishnet(
         version: Client.Version,
         python: Option[Client.Python],
-        apikey: Client.Key
+        apikey: Client.Key,
+        // Variant (or family) keys this client can analyse. Absent or empty means
+        // default routing: chess + fairysf only, never backgammon. See FishnetVariants.
+        variants: Option[List[String]] = None
     )
 
     case class Stockfish(
         flavor: Option[String]
     ) {
       def isNnue = flavor.contains("nnue")
+    }
+
+    // Whole-game backgammon analysis, posted once by the gnubg-backed mindcube
+    // worker. Maps 1:1 onto lila.analyse's backgammon model: gnubg's OWN per-player
+    // error rate, luck and ratings, plus every candidate play it evaluated.
+    case class EngineMeta(name: String, eval: String)
+
+    case class BgCandPost(
+        play:           String,
+        evaluator:      Int,
+        equity:         Int,
+        equityDelta:    Option[Int],
+        win:            Int,
+        winGammon:      Int,
+        winBackgammon:  Int,
+        loseGammon:     Int,
+        loseBackgammon: Int
+    ) {
+      def toModel =
+        lila.analyse.BgCandidate(play, evaluator, equity, equityDelta, win, winGammon, winBackgammon, loseGammon, loseBackgammon)
+    }
+
+    case class BgMovePost(
+        player:      Int,
+        kind:        Int,
+        dice:        Option[String],
+        rollLuck:    Option[Int],
+        action:      Option[String],
+        cubeAdvice:  Option[String],
+        playedIndex: Option[Int],
+        candidates:  List[BgCandPost]
+    ) {
+      def toModel =
+        lila.analyse.BgMove(player, kind, dice, rollLuck, action, cubeAdvice, playedIndex, candidates.map(_.toModel))
+    }
+
+    case class BgStatsPost(
+        player:           String,
+        chequerErrorRate: Option[Double],
+        cubeErrorRate:    Option[Double],
+        overallErrorRate: Option[Double],
+        snowieErrorRate:  Option[Double],
+        luckTotalEmg:     Option[Double],
+        luckRateEmg:      Option[Double],
+        chequerRating:    Option[String],
+        cubeRating:       Option[String],
+        overallRating:    Option[String],
+        luckRating:       Option[String]
+    ) {
+      def toModel =
+        lila.analyse.BgPlayerStats(player, chequerErrorRate, cubeErrorRate, overallErrorRate, snowieErrorRate, luckTotalEmg, luckRateEmg, chequerRating, cubeRating, overallRating, luckRating)
+    }
+
+    case class BgWinnerPost(player: String, points: Int, winType: String) {
+      def toModel = lila.analyse.BgWinner(player, points, winType)
+    }
+
+    case class BgGamePost(
+        number: Int,
+        winner: Option[BgWinnerPost],
+        stats:  List[BgStatsPost],
+        moves:  List[BgMovePost]
+    ) {
+      def toModel =
+        lila.analyse.BgGame(number, winner.map(_.toModel), stats.map(_.toModel), moves.map(_.toModel))
+    }
+
+    case class BackgammonPost(
+        player1:    String,
+        player2:    String,
+        evaluators: List[String],
+        games:      List[BgGamePost]
+    ) {
+      def toGames: List[lila.analyse.BgGame] = games.map(_.toModel)
     }
 
     case class Acquire(
@@ -42,7 +119,9 @@ object JsonApi {
     case class PostAnalysisLexicalUci(
         fishnet: Fishnet,
         stockfish: Stockfish,
-        analysis: List[Option[Evaluation.OrSkipped[LexicalUci]]]
+        analysis: List[Option[Evaluation.OrSkipped[LexicalUci]]],
+        engine: Option[EngineMeta] = None,
+        backgammon: Option[BackgammonPost] = None
     ) extends Request
         with Result {
 
@@ -187,7 +266,8 @@ object JsonApi {
       id: String,
       game: Game,
       nodes: Int,
-      skipPositions: List[Int]
+      skipPositions: List[Int],
+      backgammon: Option[W.BgWork] = None
   ) extends Work
 
   def analysisFromWork(nodes: Int)(m: Work.Analysis) =
@@ -195,7 +275,8 @@ object JsonApi {
       id = m.id.value,
       game = fromGame(m.game),
       nodes = nodes,
-      skipPositions = m.skipPositions
+      skipPositions = m.skipPositions,
+      backgammon = m.game.backgammon
     )
 
   object readers {
@@ -228,12 +309,64 @@ object JsonApi {
           if (~obj.boolean("skipped")) JsSuccess(Left(Request.Evaluation.Skipped).some)
           else EvaluationReads reads obj map Right.apply map some
       }
-    implicit val PostAnalysisReads: Reads[Request.PostAnalysisLexicalUci] =
-      Json.reads[Request.PostAnalysisLexicalUci]
+    implicit val EngineMetaReads: Reads[Request.EngineMeta]         = Json.reads[Request.EngineMeta]
+    implicit val BgCandReads: Reads[Request.BgCandPost] = Reads[Request.BgCandPost] {
+      case JsArray(a) if a.sizeIs >= 9 =>
+        for {
+          play  <- a(0).validate[String]
+          plies <- a(1).validate[Int]
+          eq    <- a(2).validate[Int]
+          delta <- a(3).validateOpt[Int]
+          w     <- a(4).validate[Int]
+          wg    <- a(5).validate[Int]
+          wbg   <- a(6).validate[Int]
+          lg    <- a(7).validate[Int]
+          lbg   <- a(8).validate[Int]
+        } yield Request.BgCandPost(play, plies, eq, delta, w, wg, wbg, lg, lbg)
+      case _ => JsError("expected a 9-element candidate array")
+    }
+    implicit val BgMoveReads: Reads[Request.BgMovePost] = (
+      (__ \ "u").read[Int] and
+        (__ \ "k").read[Int] and
+        (__ \ "i").readNullable[String] and
+        (__ \ "l").readNullable[Int] and
+        (__ \ "a").readNullable[String] and
+        (__ \ "ca").readNullable[String] and
+        (__ \ "y").readNullable[Int] and
+        (__ \ "c").read[List[Request.BgCandPost]]
+    )(Request.BgMovePost.apply)
+    implicit val BgStatsReads: Reads[Request.BgStatsPost]   = Json.reads[Request.BgStatsPost]
+    implicit val BgWinnerReads: Reads[Request.BgWinnerPost] = Json.reads[Request.BgWinnerPost]
+    implicit val BgGameReads: Reads[Request.BgGamePost] = (
+      (__ \ "n").read[Int] and
+        (__ \ "w").readNullable[Request.BgWinnerPost] and
+        (__ \ "s").read[List[Request.BgStatsPost]] and
+        (__ \ "m").read[List[Request.BgMovePost]]
+    )(Request.BgGamePost.apply)
+    implicit val BackgammonPostReads: Reads[Request.BackgammonPost] = (
+      (__ \ "p1").read[String] and
+        (__ \ "p2").read[String] and
+        (__ \ "e").read[List[String]] and
+        (__ \ "g").read[List[Request.BgGamePost]]
+    )(Request.BackgammonPost.apply)
+
+    // Lenient: chess clients send {fishnet, stockfish, analysis}; the backgammon
+    // worker sends {fishnet, engine, backgammon}. Default the chess-only fields so
+    // both shapes parse through the one /fishnet/analysis endpoint.
+    implicit val PostAnalysisReads: Reads[Request.PostAnalysisLexicalUci] = (
+      (__ \ "fishnet").read[Request.Fishnet] and
+        (__ \ "stockfish").readNullable[Request.Stockfish].map(_ getOrElse Request.Stockfish(None)) and
+        (__ \ "analysis")
+          .readNullable[List[Option[Request.Evaluation.OrSkipped[LexicalUci]]]]
+          .map(_ getOrElse Nil) and
+        (__ \ "engine").readNullable[Request.EngineMeta] and
+        (__ \ "backgammon").readNullable[Request.BackgammonPost]
+    )((f, s, a, e, b) => Request.PostAnalysisLexicalUci(f, s, a, e, b))
   }
 
   object writers {
-    implicit val VariantWrites: Writes[Variant] = Writes[Variant] { v => JsString(v.fishnetKey) }
+    implicit val VariantWrites: Writes[Variant]          = Writes[Variant] { v => JsString(v.fishnetKey) }
+    implicit val BgWorkWrites: OWrites[W.BgWork]          = Json.writes[W.BgWork]
     implicit val GameWrites: Writes[UciGame]    = Writes[UciGame] { g =>
       Json.obj(
         "game_id"  -> g.game_id,
@@ -261,7 +394,7 @@ object JsonApi {
               "timeout" -> Cleaner.timeoutPerPly.toMillis
             ),
             "skipPositions" -> a.skipPositions
-          )
+          ) ++ a.backgammon.fold(Json.obj())(bg => Json.obj("backgammon" -> Json.toJson(bg)))
       }) ++ Json.toJson(work.game.toUci).as[JsObject]
     }
   }

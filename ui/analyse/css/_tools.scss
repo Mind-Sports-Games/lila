@@ -86,5 +86,14 @@
     ::before {
       vertical-align: middle;
     }
+
+    @include breakpoint($mq-col1-uniboard) {
+      height: 4rem;
+      font-size: 1.3em;
+
+      .fbt {
+        flex: 1 1 auto;
+      }
+    }
   }
 }

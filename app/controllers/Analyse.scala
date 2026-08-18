@@ -20,7 +20,7 @@ final class Analyse(
   def requestAnalysis(id: String) =
     Auth { implicit ctx => me =>
       OptionFuResult(env.game.gameRepo.game(id)) { game =>
-        env.fishnet.analyser(
+        env.fishnet.analyser.request(
           game,
           lila.fishnet.Work.Sender(
             userId = me.id,
@@ -29,10 +29,25 @@ final class Analyse(
             system = false
           )
         ) map {
-          case true  => NoContent
-          case false => Unauthorized
+          case lila.fishnet.Analyser.Result.Accepted => NoContent
+          case declined                              => Unauthorized(declined.reason)
         }
       }
+    }
+
+  def backgammonRating(id: String) =
+    Open { implicit ctx =>
+      env.analyse.analyser.getBackgammon(id) map {
+        case None           => NotFound("no backgammon analysis stored")
+        case Some(analysis) =>
+          Ok(play.api.libs.json.Json.toJson(analysis)(using lila.analyse.BackgammonAnalysis.matchWrites))
+      }
+    }
+
+  private def analysisWithBackgammon(game: lila.game.Game): Fu[(Option[lila.analyse.Analysis], Boolean)] =
+    env.analyse.analyser.get(game) zip {
+      (game.metadata.analysed && game.variant.gameLogic == strategygames.GameLogic.Backgammon()) so
+        env.analyse.analysisBackgammonRepo.exists(game.id)
     }
 
   def replay(pov: Pov, userTv: Option[lila.user.User])(implicit ctx: Context) =
@@ -40,7 +55,7 @@ final class Analyse(
     else
       env.game.gameRepo.initialFen(pov.gameId) flatMap { initialFen =>
         gameC.preloadUsers(pov.game) >> redirectAtFen(pov, initialFen) {
-          (env.analyse.analyser.get(pov.game)) zip
+          analysisWithBackgammon(pov.game) zip
             (if (!pov.game.metadata.analysed) env.fishnet.api.userAnalysisExists(pov.gameId)
              else fuccess(false)) zip
             pov.game.simulId.so(env.simul.repo.find) zip
@@ -62,7 +77,13 @@ final class Analyse(
               case (
                     (
                       (
-                        (((((analysis, analysisInProgress), simul), chat), crosstable), bookmarked),
+                        (
+                          (
+                            ((((analysis, backgammonAnalysed), analysisInProgress), simul), chat),
+                            crosstable
+                          ),
+                          bookmarked
+                        ),
                         swissPairingGames
                       ),
                       pgn
@@ -93,6 +114,7 @@ final class Analyse(
                         env.analyse.annotator(pgn, pov.game, analysis).toString,
                         sgf,
                         analysis,
+                        backgammonAnalysed,
                         analysisInProgress,
                         simul,
                         crosstable,

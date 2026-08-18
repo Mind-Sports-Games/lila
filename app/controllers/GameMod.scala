@@ -24,9 +24,10 @@ final class GameMod(env: Env)(implicit mat: akka.stream.Materializer) extends Li
         env.tournament.leaderboardApi.recentByUser(user, 1) zip
           env.activity.read.recentSwissRanks(user.id) zip
           fetchGames(user, filter) flatMap { case ((arenas, swisses), povs) =>
-            env.mod.assessApi.makeAndGetFullOrBasicsFor(povs) map { games =>
-              Ok(views.html.mod.games(user, form, games, arenas.currentPageResults, swisses))
-            }
+            env.mod.assessApi.makeAndGetFullOrBasicsFor(povs) zip
+              fetchBackgammonPrs(povs) map { case (games, prs) =>
+                Ok(views.html.mod.games(user, form, games, prs, arenas.currentPageResults, swisses))
+              }
           }
       }
     }
@@ -46,6 +47,23 @@ final class GameMod(env: Env)(implicit mat: akka.stream.Materializer) extends Li
           .toMat(Sink.seq)(Keep.right)
           .run()
           .map(_.toList)
+      }
+  }
+
+  private def fetchBackgammonPrs(povs: List[lila.game.Pov]): Fu[Map[lila.game.Game.ID, BackgammonPr]] = {
+    val bgPovs = povs.filter { pov =>
+      pov.game.metadata.analysed && pov.game.variant.gameFamily == strategygames.GameFamily.Backgammon()
+    }
+    if bgPovs.isEmpty then fuccess(Map.empty)
+    else
+      env.analyse.analysisBackgammonRepo.byIds(bgPovs.map(_.gameId)).map { analyses =>
+        bgPovs.view.flatMap { pov =>
+          analyses.get(pov.gameId).flatMap { a =>
+            a.prFor(pov.playerIndex).map { pr =>
+              pov.gameId -> BackgammonPr(pr, a.ratingFor(pov.playerIndex))
+            }
+          }
+        }.toMap
       }
   }
 
@@ -115,6 +133,8 @@ final class GameMod(env: Env)(implicit mat: akka.stream.Materializer) extends Li
 object GameMod {
 
   val nbGames = 100
+
+  case class BackgammonPr(pr: Double, rating: Option[String])
 
   case class Filter(
       arena: Option[String],

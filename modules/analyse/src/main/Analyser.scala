@@ -10,7 +10,8 @@ import strategygames.format.FEN
 
 final class Analyser(
     gameRepo: GameRepo,
-    analysisRepo: AnalysisRepo
+    analysisRepo: AnalysisRepo,
+    backgammonRepo: BackgammonAnalysisRepo
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def get(game: Game): Fu[Option[Analysis]] =
@@ -37,6 +38,20 @@ final class Analyser(
     }
 
   def progress(analysis: Analysis): Funit = sendAnalysisProgress(analysis, complete = false)
+
+  def getBackgammon(id: BackgammonAnalysis.ID): Fu[Option[BackgammonAnalysis]] =
+    backgammonRepo.byId(id)
+
+  def saveBackgammon(analysis: BackgammonAnalysis): Funit =
+    backgammonRepo.save(analysis) map { _ =>
+      if (analysis.studyId.isEmpty) {
+        gameRepo.setAnalysed(analysis.id)
+        Bus.publish(
+          TellIfExists(analysis.id, actorApi.BackgammonAnalysisProgress(analysis.id, complete = true)),
+          "roundSocket"
+        )
+      }
+    }
 
   private def sendAnalysisProgress(analysis: Analysis, complete: Boolean): Funit =
     analysis.studyId match {

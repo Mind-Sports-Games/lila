@@ -20,6 +20,7 @@ object games {
       user: User,
       filterForm: Form[GameMod.Filter],
       games: List[(Pov, Either[PlayerAssessment, PlayerAssessment.Basics])],
+      backgammonPrs: Map[lila.game.Game.ID, GameMod.BackgammonPr],
       arenas: Seq[TourEntry],
       swisses: Seq[(Swiss.IdName, Int)]
   )(implicit
@@ -89,7 +90,7 @@ object games {
                 th(iconTag('g')),
                 dataSortNumberTh("Moves"),
                 dataSortNumberTh("Result"),
-                dataSortNumberTh("ACPL", br, "(Avg ± SD)"),
+                dataSortNumberTh("ACPL", br, "(Avg ± SD) / PR"),
                 dataSortNumberTh("Times", br, "(Avg ± SD)"),
                 dataSortNumberTh("Blur"),
                 dataSortNumberTh(dataSortDefault)("Date")
@@ -149,9 +150,18 @@ object games {
                       case _                => span("-")
                     }
                   ),
-                  assessment match {
-                    case Left(full) => td(dataSort := full.analysis.avg)(full.analysis.toString)
-                    case _          => td
+                  backgammonPrs.get(pov.gameId) match {
+                    case Some(bg) =>
+                      val pr = ((bg.pr * 10).round / 10d).toString
+                      td(
+                        dataSort := pr,
+                        title    := bg.rating.fold("Performance rating")(r => s"Performance rating: $r")
+                      )(pr, " PR")
+                    case None =>
+                      assessment match {
+                        case Left(full) => td(dataSort := full.analysis.avg)(full.analysis.toString)
+                        case _          => td
+                      }
                   },
                   assessment.fold(_.basics, identity) pipe { basics =>
                     frag(

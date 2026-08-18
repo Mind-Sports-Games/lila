@@ -156,11 +156,13 @@ case class Game(
       case seconds                           => seconds.toInt.some
     }
 
-  private def everyOther[A](l: List[A]): List[A] =
-    l match {
-      case a :: _ :: tail => a :: everyOther(tail)
-      case _              => l
-    }
+  private def actionsPerTurn(playerIndex: PlayerIndex): Vector[Int] = {
+    val pivot = startIndex(playerIndex)
+    actionStrs.zipWithIndex.collect { case (t, i) if (i % 2) == pivot => t.size }
+  }
+
+  private def turnOffsets: Vector[(Int, Int)] =
+    actionStrs.map(_.size).scanLeft(0)(_ + _).zip(actionStrs.map(_.size))
 
   def plyTimes(playerIndex: PlayerIndex): Option[List[Centis]] = {
     for {
@@ -180,15 +182,18 @@ case class Game(
           finished,
           status,
           grace,
-          byo
+          byo,
+          actionsPerTurn(playerIndex),
+          clk.clockPlayer(playerIndex).limit
         )
     } yield plyTimes
   } orElse binaryPlyTimes.map { binary =>
     // Thibault TODO: make plyTime.read return List after writes are disabled.
-    // TODO fix for multiaction, when does this get called?
-    val base = BinaryFormat.plyTime.read(binary, playedPlies)
-    val mts  = if (playerIndex == startPlayerIndex) base else base.drop(1)
-    everyOther(mts.toList)
+    val base  = BinaryFormat.plyTime.read(binary, playedPlies)
+    val pivot = startIndex(playerIndex)
+    turnOffsets.zipWithIndex.collect { case ((offset, actions), i) if (i % 2) == pivot =>
+      base.slice(offset, offset + actions)
+    }.flatten.toList
   }
 
   def plyTimes: Option[Vector[Centis]] =
@@ -208,7 +213,58 @@ case class Game(
       actionStrs.zipWithIndex.flatMap { case (t, i) =>
         t.map(_ => { if (i % 2 == 0) "a" else "b" })
       }
-    clockHistory.map(_.bothClockStates(startPlayerIndex, who))
+    clockHistory.map { ch =>
+      val result = ch.bothClockStates(startPlayerIndex, who)
+      // For delay clocks, fix the last turn of each player using the actual remaining
+      // from the stored clock state (c field). The action-time reconstruction
+      // underestimates consumed time (lag, pauses, etc.).
+      ch match {
+        // Only for finished games: override the last turn values with the actual remaining
+        // from the stored clock state. For ongoing games, the clock is still running so
+        // remainingTime() includes in-flight elapsed — we must not use it.
+        case dch: DelayClockHistory if finished =>
+          stratGame.clock.fold(result) { clk =>
+            // remainingTime is the internal remaining (SimpleDelay includes the delay credit);
+            // strip the same offset bothClockStates applies so the override stays on the
+            // displayed scale.
+            val offset       = if (dch.isSimpleDelay) dch.delay else Centis(0)
+            def displayRem(p: PlayerIndex) = (clk.remainingTime(p) - offset).nonNeg
+            val aActualRem   = startPlayerIndex.fold(displayRem(P1), displayRem(P2))
+            val bActualRem   = startPlayerIndex.fold(displayRem(P2), displayRem(P1))
+            // A player who lost on time has remainingTime == 0, but they flagged on a turn
+            // with no recorded ply (absent from `who`); overriding their last *completed*
+            // turn to 0 would drop their clock a turn early. Keep the reconstruction for them.
+            val aFlagged     = flagged.contains(startPlayerIndex)
+            val bFlagged     = flagged.contains(!startPlayerIndex)
+            fixLastTurnDelayClockStates(result, who, aActualRem, bActualRem, aFlagged, bFlagged)
+          }
+        case _ => result
+      }
+    }
+  }
+
+  private def fixLastTurnDelayClockStates(
+      result: Vector[Centis],
+      who: Vector[String],
+      aActualRem: Centis,
+      bActualRem: Centis,
+      aFlagged: Boolean,
+      bFlagged: Boolean
+  ): Vector[Centis] = {
+    val lastAIdx = if (aFlagged) -1 else who.lastIndexOf("a")
+    val lastBIdx = if (bFlagged) -1 else who.lastIndexOf("b")
+    if (lastAIdx < 0 && lastBIdx < 0) result
+    else {
+      var lastAStart = lastAIdx
+      while (lastAStart > 0 && who(lastAStart - 1) == "a") lastAStart -= 1
+      var lastBStart = lastBIdx
+      while (lastBStart > 0 && who(lastBStart - 1) == "b") lastBStart -= 1
+      result.zipWithIndex.map { case (rem, i) =>
+        if (lastAIdx >= 0 && i >= lastAStart && i <= lastAIdx) aActualRem
+        else if (lastBIdx >= 0 && i >= lastBStart && i <= lastBIdx) bActualRem
+        else rem
+      }
+    }
   }
 
   def draughtsActionStrsConcat(fullCaptures: Boolean = false, dropGhosts: Boolean = false): ActionStrs =
@@ -1411,11 +1467,20 @@ sealed trait ClockHistory {
       finished: Boolean,
       status: Status,
       grace: Centis = Centis(0),
-      byo: Centis = Centis(0)
+      byo: Centis = Centis(0),
+      actionsPerTurn: Vector[Int] = Vector.empty,
+      initial: Centis = Centis(0)
   ): List[Centis]
   def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis]
   def size: Int
   def bothClockStates(firstMoveBy: PlayerIndex, who: Vector[String]): Vector[Centis]
+
+  protected def isTurnEndAction(actionsPerTurn: Vector[Int]): Int => Boolean =
+    if (actionsPerTurn.forall(_ <= 1)) _ => true
+    else actionsPerTurn.scanLeft(0)(_ + _).drop(1).map(_ - 1).toSet.contains
+
+  protected def firstPlyTime(clocks: Vector[Centis], initial: Centis): Centis =
+    clocks.headOption.fold(Centis(0))(head => (initial - head).nonNeg)
 }
 
 case class FischerClockHistory(
@@ -1445,10 +1510,12 @@ case class FischerClockHistory(
       finished: Boolean,
       status: Status,
       grace: Centis = Centis(0),
-      byo: Centis = Centis(0)
+      byo: Centis = Centis(0),
+      actionsPerTurn: Vector[Int] = Vector.empty,
+      initial: Centis = Centis(0)
   ): List[Centis] = {
     val clocks = dbTimes(playerIndex)
-    Centis(0) :: {
+    firstPlyTime(clocks, initial) :: {
       val pairs = clocks.iterator zip clocks.iterator.drop(1)
 
       // We need to determine if this playerIndex's last clock had grace applied.
@@ -1463,10 +1530,12 @@ case class FischerClockHistory(
       val noLastInc =
         finished && (size <= playedPlies) == (playerIndex != turnPlayerIndex)
 
-      pairs.map { case (first, second) =>
+      val isTurnEnd = isTurnEndAction(actionsPerTurn)
+
+      pairs.zipWithIndex.map { case ((first, second), index) =>
         {
           val mt     = first - second
-          val cGrace = (pairs.hasNext || !noLastInc) so grace
+          val cGrace = ((pairs.hasNext || !noLastInc) && isTurnEnd(index + 1)) so grace
 
           mt + cGrace
         } nonNeg
@@ -1486,18 +1555,24 @@ case class DelayClockHistory(
     p1ActionTimes: Vector[Centis] = Vector.empty,
     p2ActionTimes: Vector[Centis] = Vector.empty,
     p1RemainingTime: Option[Centis] = None,
-    p2RemainingTime: Option[Centis] = None
+    p2RemainingTime: Option[Centis] = None,
+    delay: Centis = Centis(0),
+    initial: Centis = Centis(0),
+    // SimpleDelay bakes the delay credit into `initial` (= limit + delay); Bronstein does not.
+    // Used to derive the *displayed* remaining time in bothClockStates.
+    isSimpleDelay: Boolean = false
 ) extends ClockHistory {
-  // In this case, our case class stores the time moves took as the primary
-  // attribue but, we need to produce the time remaining after each move.
-  // We do this by working backwards from the prevsRemainingTime and adding in the move times
-  // and then reversing it.
-  // TODO this doesn't work as remaingtime is always None, would need clock details to work out remaining time?
-  // Issues seen in analysis clock times (not correct for delay)
-  private def timeRemaining(moveTimes: Vector[Centis], remainingTime: Option[Centis]): Vector[Centis] =
-    moveTimes.reverse.scanLeft(remainingTime.getOrElse(Centis(0)))(_ + _).reverse
-  val p1: Vector[Centis] = timeRemaining(p1ActionTimes, p1RemainingTime)
-  val p2: Vector[Centis] = timeRemaining(p2ActionTimes, p2RemainingTime)
+  // Stores raw move times (wall-clock elapsed minus lag comp) per ply.
+  // Reconstruct remaining time at each ply forward from the initial clock time:
+  // Bronstein/SimpleDelay consume max(0, moveTime - delay) per move.
+  private def timeRemaining(moveTimes: Vector[Centis]): Vector[Centis] =
+    moveTimes
+      .scanLeft(initial) { (remaining, moveTime) =>
+        (remaining - (moveTime - delay).nonNeg).nonNeg
+      }
+      .tail
+  val p1: Vector[Centis] = timeRemaining(p1ActionTimes)
+  val p2: Vector[Centis] = timeRemaining(p2ActionTimes)
 
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
     playerIndex.fold(copy(p1ActionTimes = f(p1ActionTimes)), copy(p2ActionTimes = f(p2ActionTimes)))
@@ -1528,7 +1603,9 @@ case class DelayClockHistory(
       _finished: Boolean,
       _status: Status,
       _grace: Centis = Centis(0),
-      _byo: Centis = Centis(0)
+      _byo: Centis = Centis(0),
+      _actionsPerTurn: Vector[Int] = Vector.empty,
+      _initial: Centis = Centis(0)
   ): List[Centis] = dbTimes(playerIndex).toList
 
   override def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis] =
@@ -1537,10 +1614,45 @@ case class DelayClockHistory(
   def size = p1.size + p2.size
 
   // first state is of the playerIndex that moved first.
+  // Delay is applied once per turn (all plies of a turn share one delay credit): group
+  // consecutive same-player plies from `who` and apply the delay to the summed turn time.
+  // Returns the *displayed* remaining time.
   override def bothClockStates(firstMoveBy: PlayerIndex, who: Vector[String]): Vector[Centis] = {
-    val a = firstMoveBy.fold(p1, p2)
-    val b = firstMoveBy.fold(p2, p1)
-    Game.combinePlyTimes(a.toList, b.toList, who, Vector.empty)
+    val aActionTimes   = firstMoveBy.fold(p1ActionTimes, p2ActionTimes)
+    val bActionTimes   = firstMoveBy.fold(p2ActionTimes, p1ActionTimes)
+    val displayInitial = if (isSimpleDelay) (initial - delay).nonNeg else initial
+    var aRem           = displayInitial
+    var bRem           = displayInitial
+    var ai             = 0
+    var bi             = 0
+    val result         = scala.collection.mutable.ArrayBuffer.empty[Centis]
+    var i              = 0
+    var stop           = false
+    while (i < who.size && !stop) {
+      val isA = who(i) == "a"
+      // Match combinePlyTimes' early termination: once the side about to move has no
+      // recorded action time left, stop emitting so trailing nodes report no clock
+      // (via `_ lift idx` returning None) instead of a stale repeated remaining value.
+      if ((isA && ai >= aActionTimes.size) || (!isA && bi >= bActionTimes.size)) stop = true
+      else {
+        val turnStart = i
+        var turnTime  = Centis(0)
+        while (i < who.size && (who(i) == "a") == isA) {
+          val plyTime = if (isA) aActionTimes.applyOrElse(ai, (_: Int) => Centis(0))
+                        else bActionTimes.applyOrElse(bi, (_: Int) => Centis(0))
+          if (isA) ai += 1 else bi += 1
+          turnTime = turnTime + plyTime
+          i += 1
+        }
+        val consumed = (turnTime - delay).nonNeg
+        if (isA) aRem = (aRem - consumed).nonNeg
+        else bRem = (bRem - consumed).nonNeg
+        val rem = if (isA) aRem else bRem
+        var j = turnStart
+        while (j < i) { result += rem; j += 1 }
+      }
+    }
+    result.toVector
   }
 }
 
@@ -1563,10 +1675,12 @@ case class ByoyomiClockHistory(
       finished: Boolean,
       status: Status,
       grace: Centis = Centis(0),
-      byo: Centis = Centis(0)
+      byo: Centis = Centis(0),
+      actionsPerTurn: Vector[Int] = Vector.empty,
+      initial: Centis = Centis(0)
   ): List[Centis] = {
     val clocks = dbTimes(playerIndex)
-    Centis(0) :: {
+    firstPlyTime(clocks, initial) :: {
       val pairs = clocks.iterator zip clocks.iterator.drop(1)
 
       // We need to determine if this playerIndex's last clock had grace applied.
@@ -1589,16 +1703,18 @@ case class ByoyomiClockHistory(
       val byoyomiTimeout =
         byoyomiStart.isDefined && (Status.flagged.contains(status)) && (playerIndex == turnPlayerIndex)
 
+      val isTurnEnd = isTurnEndAction(actionsPerTurn)
+
       pairs.zipWithIndex.map { case ((first, second), index) =>
         {
-          // TODO multiaction need to calculate fullTurncount (expand on pairs to get an actual full turn of times)
-          val fullTurnCount = index + 2 + startedAtTurn / 2
-          val afterByoyomi  = byoyomiStart so (_ <= fullTurnCount)
+          // byoyomiStart is stored as the 1-based action index of the first byoyomi action.
+          val afterByoyomi  = byoyomiStart so (_ <= index + 2)
           // after byoyomi we store movetimes directly, not remaining time
           val mt     = if (afterByoyomi) second else first - second
-          val cGrace = (!afterByoyomi && (pairs.hasNext || !noLastInc)) so grace
+          val cGrace = (!afterByoyomi && (pairs.hasNext || !noLastInc) && isTurnEnd(index + 1)) so grace
 
           if (!pairs.hasNext && byoyomiTimeout) {
+            val fullTurnCount   = index + 2 + startedAtTurn / 2
             val prevTurnByoyomi = byoyomiStart so (_ < fullTurnCount)
             (if (prevTurnByoyomi) byo else first) + byo * countSpentPeriods(playerIndex, fullTurnCount)
           } else mt + cGrace
@@ -1623,12 +1739,17 @@ case class ByoyomiClockHistory(
 
     val timeToStore = if (isUsingByoyomi) clock.lastMoveTimeOf(playerIndex) else curClock.time
 
-    updateInternal(playerIndex, _ :+ timeToStore)
-      .updatePeriods(
-        playerIndex,
-        _.padTo(initiatePeriods so 1, 0)
-          .padTo(curClock.periods.atMost(PeriodEntries.maxPeriods), fullTurnCount)
-      )
+    // Store the 1-based action index (not fullTurnCount) so that plyTimes and padWithByo
+    // correctly identify the byoyomi boundary for multi-action games (backgammon).
+    // For single-action games (Go/Shogi), actionIndex ≈ fullTurnCount, so existing data
+    // stored with fullTurnCount values remains compatible.
+    val newHistory   = updateInternal(playerIndex, _ :+ timeToStore)
+    val actionIndex  = newHistory.apply(playerIndex).size
+    newHistory.updatePeriods(
+      playerIndex,
+      _.padTo(initiatePeriods so 1, 0)
+        .padTo(curClock.periods.atMost(PeriodEntries.maxPeriods), actionIndex)
+    )
   }
 
   override def reset(playerIndex: PlayerIndex) =

@@ -26,7 +26,20 @@ object BuildSettings {
       Compile / packageDoc / publishArtifact := false,
       Compile / packageSrc / publishArtifact := false,
       Compile / run / fork                   := true,
-      Compile / run / javaOptions ++= Seq("-Xms64m", "-Xmx512m")
+      Compile / run / javaOptions ++= Seq("-Xms64m", "-Xmx512m"),
+      // strategygames initialises its variants in a cycle: chess.variant.Variant lists Standard,
+      // and Standard's pieces call back into Variant.symmetricRank. A single thread walks that
+      // cycle re-entrantly, which the JVM allows, but two suites entering it at once each hold the
+      // class initialisation monitor the other is waiting on, and the run hangs for good — with no
+      // output, since the deadlock is in the JVM rather than in any test. Walk it once here, before
+      // any suite starts: the classes end up initialised, so no later access can lock, and suites
+      // keep running in parallel. Variant.all covers every game logic, not just the chess cycle.
+      Test / testOptions += Tests.Setup { (loader: ClassLoader) =>
+        try {
+          val variant = loader.loadClass("strategygames.variant.Variant$")
+          val _       = variant.getMethod("all").invoke(variant.getField("MODULE$").get(null))
+        } catch { case _: ClassNotFoundException => () }
+      }
     )
 
   lazy val defaultLibs: Seq[ModuleID] =

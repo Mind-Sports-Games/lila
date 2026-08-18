@@ -1,13 +1,5 @@
 type State =
-  | 'off'
-  | 'opening'
-  | 'getting-media'
-  | 'ready'
-  | 'calling'
-  | 'answering'
-  | 'getting-stream'
-  | 'on'
-  | 'stopping';
+  'off' | 'opening' | 'getting-media' | 'ready' | 'calling' | 'answering' | 'getting-stream' | 'on' | 'stopping';
 
 export function palantir(opts: PalantirOpts) {
   const devices = navigator.mediaDevices;

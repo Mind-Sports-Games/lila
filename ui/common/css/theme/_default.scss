@@ -105,6 +105,10 @@ $c-bad-over: $c-error-over;
 $c-fancy: hsl(294, 61%, 62%);
 $c-fancy-over: white;
 
+// Move quality highlights, shared by every game: move tree, advice summary and analysis
+// charts. These are the single definition — base/_elements.scss exposes them as CSS custom
+// properties on body, and ui/chart/src/index.ts reads them from there.
+
 /* move error highlights */
 $c-inaccuracy: hsl(202, 78%, 40%);
 $c-mistake: hsl(41, 100%, 35%);
@@ -113,6 +117,10 @@ $c-blunder: hsl(0, 68%, 50%);
 /* good move highlights */
 $c-brilliant: hsl(129, 71%, 30%);
 $c-interesting: hsl(307, 80%, 59%);
+
+// dice luck highlights
+$c-lucky: hsl(266, 54%, 47%);
+$c-unlucky: hsl(331, 61%, 48%);
 
 /* text over brag background */
 

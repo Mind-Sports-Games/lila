@@ -3,7 +3,7 @@ package lila.study
 import akka.stream.scaladsl.*
 import strategygames.format.sgf.{ Dumper, Tag, Tags }
 import strategygames.format.FEN
-import strategygames.{ ActionStrs, GameFamily, GameLogic }
+import strategygames.{ ActionStrs, GameFamily, GameLogic, P1 }
 import strategygames.variant.Variant
 import org.joda.time.format.DateTimeFormat
 
@@ -66,7 +66,8 @@ final class SgfDump(
   private val dateFormat = DateTimeFormat.forPattern("yyyy.MM.dd")
 
   private def makeTags(study: Study, chapter: Chapter): Tags = {
-    val isGo = chapter.setup.variant.gameFamily == GameFamily.Go()
+    val isGo         = chapter.setup.variant.gameFamily == GameFamily.Go()
+    val isBackgammon = chapter.setup.variant.gameFamily == GameFamily.Backgammon()
     Tags {
       List(
         Tag(_.FF, 4),
@@ -74,7 +75,7 @@ final class SgfDump(
         Tag(_.EV, s"${study.name}: ${chapter.name}"),
         Tag(_.PC, chapterUrl(study.id, chapter.id)),
         Tag(_.DT, Tag.DT.format.print(chapter.createdAt))
-      ) ::: (!chapter.root.fen.initial && !isGo).so(
+      ) ::: (!chapter.root.fen.initial && !isGo && !isBackgammon).so(
         List(
           Tag(_.IP, chapter.root.fen.value)
         )
@@ -118,17 +119,8 @@ final class SgfDump(
               Tag(_.RU, "Chinese")
             )
           case GameFamily.Backgammon() =>
-            List(
-              Tag(_.GM, 6),
-              // Tag(_.RU, "Crawford"), // multipoint info
-              Tag(_.CV, 1),
-              Tag(_.CO, "n"),
-              Tag.matchInfo(1, 1, 0, 0), // multipoint info
-              Tag(
-                _.SU,
-                if (chapter.setup.variant.key == "backgammon") "Standard" else chapter.setup.variant.name
-              )
-            )
+            backgammonTags(chapter.setup.variant) :::
+              playerTags(chapter.setup.variant, chapter.tags(_.P1), chapter.tags(_.P2))
           case _ => List()
         }
       )
@@ -137,6 +129,34 @@ final class SgfDump(
 }
 
 object SgfDump {
+
+  // gnubg takes the backgammon variant from RU alone — SU is ignored — so without this
+  // line a hyper/nackgammon chapter replays onto the standard starting position. Same
+  // strings as lila.game.SgfDump so the two dumps cannot drift.
+  def backgammonTags(variant: Variant): List[Tag] = {
+    val crawfordVariantLine =
+      if (variant.key == "hyper") ":Hypergammon3"
+      else if (variant.key == "nackgammon") ":Nackgammon"
+      else ""
+    List(
+      Tag(_.GM, 6),
+      Tag(_.RU, "Crawford" + crawfordVariantLine),
+      Tag(_.CV, 1),
+      Tag(_.CO, "n"),
+      Tag.matchInfo(1, 0, 0, 0) // a chapter is always a single game
+    )
+  }
+
+  // SGF names players by colour, so map the chapter's PGN player tags onto PB/PW the way
+  // the variant assigns colours. An absent name is dropped: a chapter made from a FEN or
+  // a blank board has no players, and gnubg tolerates their absence.
+  def playerTags(variant: Variant, p1: Option[String], p2: Option[String]): List[Tag] = {
+    val isP1Black = variant.gameFamily.playerColors.get(P1) == Some("black")
+    List(
+      (if (isP1Black) p1 else p2).map(name => Tag(_.PB, name)),
+      (if (isP1Black) p2 else p1).map(name => Tag(_.PW, name))
+    ).flatten
+  }
 
   def toActionStrs(line: Vector[Node]): ActionStrs =
     line

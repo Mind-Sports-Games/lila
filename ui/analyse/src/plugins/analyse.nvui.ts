@@ -276,13 +276,15 @@ function requestAnalysisButton(ctrl: AnalyseController, inProgress: Prop<boolean
     {
       hook: bind('click', _ =>
         xhr
-          .text(`/${ctrl.data.game.id}/request-analysis`, {
+          .textRaw(`/${ctrl.data.game.id}/request-analysis`, {
             method: 'post',
           })
           .then(
-            () => {
+            res => {
+              if (!res.ok) return res.text().then(msg => notify(msg || 'Cannot run server-side analysis'));
               inProgress(true);
               notify('Server-side analysis in progress');
+              return;
             },
             _ => notify('Cannot run server-side analysis'),
           ),

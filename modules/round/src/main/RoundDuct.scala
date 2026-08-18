@@ -194,6 +194,11 @@ final private[round] class RoundDuct(
         } inject Nil
       }
 
+    case a: lila.analyse.actorApi.BackgammonAnalysisProgress =>
+      fuccess {
+        socketSend(RP.Out.tellRoom(roomId, makeMessage("bgAnalysisProgress", Json.obj("complete" -> a.complete))))
+      }
+
     case a: lila.analyse.actorApi.AnalysisProgress =>
       fuccess {
         socketSend(
