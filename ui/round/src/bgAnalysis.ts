@@ -110,19 +110,18 @@ export default class BgAnalysisCtrl {
     });
   }
 
-  // Called once the game is over — on page load for an already finished game, and again from
-  // endWithData when it ends under us.
-  start = (): void => {
+  start = (justFinished = false): void => {
     if (this.pending || this.sides || !expectsAnalysis(this.data())) return;
-    this.pending = true;
-    this.deadline = performance.now() + giveUpAfter;
-    this.render();
+    if (justFinished) {
+      this.pending = true;
+      this.deadline = performance.now() + giveUpAfter;
+      this.render();
+    }
     this.fetch();
   };
 
-  // "bgAnalysisProgress" — gnubg has posted its result.
   onProgress = (): void => {
-    if (this.pending) this.fetch();
+    if (!this.sides) this.fetch();
   };
 
   private fetch = (): void => {
@@ -131,7 +130,7 @@ export default class BgAnalysisCtrl {
       .json(`/${this.data().game.id}/backgammon-rating.json`)
       .then((m: MatchJson) => {
         this.sides = readSides(this.data(), m);
-        this.pending = !this.sides;
+        this.pending = this.pending && !this.sides;
         this.render();
         if (this.pending) this.retry();
       })

@@ -1058,7 +1058,7 @@ export default class RoundController {
     this.redraw();
     this.autoScroll();
     this.onChange();
-    this.bgAnalysis.start();
+    this.bgAnalysis.start(true);
     if (d.tv) setTimeout(playstrategy.reload, 10000);
     speech.status(this);
   };
