@@ -174,6 +174,12 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     if (bgIsDelayType)
       bgCorrectRemaining[key] = Math.max(0, bgCorrectRemaining[key] - Math.max(0, bgTurnCentis - bgDelayCentis));
     const displayClock = bgIsDelayType ? bgCorrectRemaining[key] : clock;
+    // The clock only starts once both sides have acted, so the first turn of each is never
+    // measured — every variant records zeros there, and a backgammon turn spans several actions,
+    // which turns two invisible half-moves into two bars sitting at the axis. Read them as
+    // unmeasured instead. Guarded on the recorded total, so a genuine instant turn later in the
+    // game still reads as one, and a backend that ever times these takes over.
+    if (bgTurnIdx < 2 && bgTurnCentis === 0) bgTurnTimed = false;
     if (!bgTurnTimed) bgUntimedTurns.add(bgTurnIdx);
     let label = heading + (bgTurnTimed ? '\n' + trans.plural('nbSeconds', Number(seconds)) : '');
     if (displayClock) label += '\n' + formatClock(displayClock);
