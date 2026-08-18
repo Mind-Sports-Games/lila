@@ -345,6 +345,8 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     }),
   );
 
+  const multiAction = tree.some((n, i) => i > 1 && n.playedPlayerIndex === tree[i - 1]?.playedPlayerIndex);
+
   const moveBarDatasets = (['p1', 'p2'] as const).map(key => ({
     type: 'bar' as const,
     data: isBackgammon
@@ -352,9 +354,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
       : moveSeries[key].map(p => ({ x: p.x, y: p.y / maxMove })),
     backgroundColor: isBackgammon ? 'transparent' : key === 'p1' ? p1Fill : p2Fill,
     grouped: false,
-    // Backgammon: one (invisible) bar per action ply, carrying that action's tooltip. bgTurnBars
-    // paints the visible bar; hit testing is by nearest ply, so it covers the painted width.
-    categoryPercentage: isBackgammon ? 1 : 2,
+    categoryPercentage: multiAction ? 1 : 2,
     barPercentage: 1,
     order: 2,
     borderColor: barBorderColor(key),
