@@ -4,18 +4,18 @@ import org.joda.time.DateTime
 
 import strategygames.variant.Variant
 
-import TournamentDailyCycle.*
+import TournamentDaySchedule.*
 
-class TournamentDailyCycleTest extends munit.FunSuite {
+class TournamentDayScheduleTest extends munit.FunSuite {
 
   private val start = new DateTime(2026, 3, 2, 0, 0) // a Monday
   private val weeks = 52
   private val days  = (0 until weeks * 7).toList.map(start.plusDays)
 
-  /* The hours a fully stocked week has taken by something other than the daily cycle: a 1h57
+  /* The hours a fully stocked week has taken by something other than the day schedule: a 1h57
    * shield at 12:00 and 18:00 on weekdays, the 12/14/16/18/20 shield and medley chain at the
    * weekend, and the 24h yearly on friday. The scheduler works these out from the plans it has
-   * already built; here they are just the busy set the fillers have to work around.
+   * already built; here they are just the busy set the wildcards have to work around.
    */
   private def busyHours(day: DateTime): Set[Int] =
     day.getDayOfWeek match {
@@ -24,12 +24,12 @@ class TournamentDailyCycleTest extends munit.FunSuite {
       case _     => Set(12, 13, 18, 19)
     }
 
-  private def fillers(day: DateTime, blocks: List[Slot], busy: Set[Int]): List[Slot] =
-    fillerSlots(day, blocks.map(_.hour).toSet ++ busy, blocks.map(_.variant).toSet)
+  private def wildcards(day: DateTime, blocks: List[Slot], busy: Set[Int]): List[Slot] =
+    wildcardSlots(day, blocks.map(_.hour).toSet ++ busy, blocks.map(_.variant).toSet)
 
   private def allSlots(day: DateTime): List[Slot] = {
     val blocks = blockSlots(day)
-    blocks ::: fillers(day, blocks, busyHours(day))
+    blocks ::: wildcards(day, blocks, busyHours(day))
   }
 
   private val everyVariant = Group.inBlockOrder.flatMap(_.variants)
@@ -40,7 +40,7 @@ class TournamentDailyCycleTest extends munit.FunSuite {
   }
 
   test("every group entry has a speed") {
-    assertEquals(TournamentDailyCycle.allVariantSpeeds.map(_._1).toSet, everyVariant.toSet)
+    assertEquals(TournamentDaySchedule.allVariantSpeeds.map(_._1).toSet, everyVariant.toSet)
   }
 
   test("hours match the grid, and no two slots on a day collide") {
@@ -79,31 +79,31 @@ class TournamentDailyCycleTest extends munit.FunSuite {
     }
   }
 
-  test("fillers never pick backgammon") {
+  test("wildcards never pick backgammon") {
     days.foreach { day =>
-      fillers(day, blockSlots(day), busyHours(day)).foreach { slot =>
+      wildcards(day, blockSlots(day), busyHours(day)).foreach { slot =>
         assert(!Group.Backgammon.variants.contains(slot.variant), s"$day ${slot.variant.key}")
       }
     }
   }
 
-  test("fillers avoid variants already running that day") {
+  test("wildcards avoid variants already running that day") {
     days.foreach { day =>
       val blocks   = blockSlots(day)
       val reserved = blocks.map(_.variant).toSet + Variant.wrap(strategygames.chess.variant.Atomic)
-      fillerSlots(day, blocks.map(_.hour).toSet ++ busyHours(day), reserved).foreach { slot =>
+      wildcardSlots(day, blocks.map(_.hour).toSet ++ busyHours(day), reserved).foreach { slot =>
         assert(!reserved.contains(slot.variant), s"$day ${slot.variant.key}")
       }
     }
   }
 
-  /* The point of driving fillers off a busy set rather than a hardcoded hour list: a day that
-   * loses its shields, or a friday that has no yearly, hands those hours to the daily cycle.
+  /* The point of driving wildcards off a busy set rather than a hardcoded hour list: a day that
+   * loses its shields, or a friday that has no yearly, hands those hours to the wildcards.
    */
-  test("fillers take the hours a missing shield or yearly leaves behind") {
+  test("wildcards take the hours a missing shield or yearly leaves behind") {
     days.foreach { day =>
       val blocks = blockSlots(day)
-      val filled = fillers(day, blocks, Set.empty)
+      val filled = wildcards(day, blocks, Set.empty)
       assertEquals(filled.map(_.hour), (0 until 24).toList.filterNot(blocks.map(_.hour).toSet), s"$day")
       val blockVariants = blocks.map(_.variant).toSet
       assertEquals(filled.map(_.variant).distinct.size, filled.size, s"$day")
@@ -143,7 +143,7 @@ class TournamentDailyCycleTest extends munit.FunSuite {
     }
   }
 
-  /* The scheduler treats a daily cycle slot as taken by whatever already occupies it,
+  /* The scheduler treats an arena slot as taken by whatever already occupies it,
    * whatever the variant, which is what lets a group's variant list be edited without
    * doubling up tournaments that have already gone out. That rests on two arenas in the
    * same slot overlapping, and on neighbouring slots not overlapping.
@@ -152,7 +152,7 @@ class TournamentDailyCycleTest extends munit.FunSuite {
     val day = start
     val built = allSlots(day).map { slot =>
       slot.hour -> Tournament.scheduleAs(
-        Schedule(Schedule.Freq.DailyCycle, slot.speed, slot.variant, None, day.plusHours(slot.hour)),
+        Schedule(Schedule.Freq.GroupCycle, slot.speed, slot.variant, None, day.plusHours(slot.hour)),
         arenaMinutes
       )
     }

@@ -304,7 +304,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
           case Monthly                 => 6 * 60
           case Weekend                 => 3 * 60
           case Weekly                  => 1 * 60 * 8
-          case DailyCycle              => 1 * 60
+          case GroupCycle | Wildcard   => 1 * 60
           case Daily                   => 1 * 60
           case Shield                  => 1 * 60 * 24 * 7
           case MedleyShield            => 1 * 60 * 24 * 7 // 7 days
@@ -332,7 +332,8 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
   private[tournament] def onLibraryPage: Fu[List[Tournament]] =
     scheduledStillWorthEntering zip byScheduleCategory(
       List(
-        Schedule.Freq.DailyCycle,
+        Schedule.Freq.GroupCycle,
+        Schedule.Freq.Wildcard,
         Schedule.Freq.Shield,
         Schedule.Freq.MedleyShield,
         Schedule.Freq.Yearly

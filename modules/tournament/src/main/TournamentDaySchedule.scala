@@ -7,29 +7,30 @@ import strategygames.variant.Variant
 
 import Schedule.Speed.*
 
-/* The daily tournament cycle.
+/* A day's automatic tournament schedule, in two kinds of slot: group cycle and wildcard.
  *
- * We define four hour *blocks* hold four consecutive hourly arenas, one per game 
- * group, always in the same group order. Every hour the blocks and the day's 
- * shields, medleys and yearly leave empty then takes a random filler variant, so
- * the day fills itself instead of relying on a hardcoded list of spare hours.
+ * We define four hour *blocks* hold four consecutive hourly arenas, one per game
+ * group, always in the same group order; these are scheduled as Freq.GroupCycle.
+ * Every hour the blocks and the day's shields, medleys and yearly leave empty then
+ * takes a random variant as a Freq.Wildcard, so the day fills itself instead of
+ * relying on a hardcoded list of spare hours.
  *
  *   Mon-Thu  blocks at 02, 08, 14, 20
  *   Sat/Sun  blocks at 02, 08
  *   Fri      no blocks - the 24h yearly usually owns the day
  *
- * With the usual shields in place that leaves fillers at 00, 01, 06, 07 on Mon-Thu
+ * With the usual shields in place that leaves wildcards at 00, 01, 06, 07 on Mon-Thu
  * and 00, 01, 06, 07, 22, 23 at the weekend. A week whose shield is missing, or a
- * friday with no yearly, gets more fillers rather than an empty stretch.
+ * friday with no yearly, gets more wildcards rather than an empty stretch.
  *
  * Which variant lands in a slot is a pure function of the date, so the scheduler
  * can be run at any time over any horizon and produce the same plan. Adding a new
  * variant is a single line in the relevant group below: the group's cycle simply
  * gets one longer, and `TournamentScheduler.overlaps` treats an already occupied
- * daily slot as taken regardless of variant, so no duplicate is ever created for a
+ * hourly slot as taken regardless of variant, so no duplicate is ever created for a
  * tournament that has already gone out.
  */
-object TournamentDailyCycle {
+object TournamentDaySchedule {
 
   sealed abstract class Group(val key: String, val variantSpeeds: List[(Variant, Schedule.Speed)]) {
     val variants: List[Variant] = variantSpeeds.map(_._1)
@@ -199,14 +200,14 @@ object TournamentDailyCycle {
       .find(v => !used(v))
       .getOrElse(variantAt(group, block))
 
-  /* A filler goes in every hour of the day that `busyHours` leaves free - the blocks above
-   * plus whatever the shields, medleys and yearly are running through. Fillers avoid
+  /* A wildcard goes in every hour of the day that `busyHours` leaves free - the blocks above
+   * plus whatever the shields, medleys and yearly are running through. Wildcards avoid
    * backgammon, and avoid anything else on that day, which is stronger than only checking
    * neighbouring slots since nothing repeats anywhere in the day. The calendar day is the
-   * unit, so midnight is a seam: a day's last filler can meet the next day's 00:00 one, at
+   * unit, so midnight is a seam: a day's last wildcard can meet the next day's 00:00 one, at
    * roughly one repeat every eight months. That is left alone.
    */
-  def fillerSlots(day: DateTime, busyHours: Set[Int], alreadyUsed: Set[Variant]): List[Slot] = {
+  def wildcardSlots(day: DateTime, busyHours: Set[Int], alreadyUsed: Set[Variant]): List[Slot] = {
     val pool = allVariantSpeeds.map(_._1).filterNot(Group.Backgammon.variants.contains)
     (0 until 24).toList
       .filterNot(busyHours.contains)

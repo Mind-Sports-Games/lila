@@ -17,7 +17,7 @@ final private class TournamentScheduler(
 
   implicit def ec: ExecutionContextExecutor = context.dispatcher
 
-  private val dailyCycleDaysAhead = 14
+  private val scheduleDaysAhead = 14
 
   /* Month plan:
    * First week: Shield standard tournaments
@@ -170,15 +170,16 @@ final private class TournamentScheduler(
         }
       }
 
-    def scheduleDailyCycle(slot: TournamentDailyCycle.Slot)(day: DateTime) =
+    def scheduleArena(freq: Schedule.Freq)(slot: TournamentDaySchedule.Slot)(day: DateTime) =
       at(day, slot.hour) map { date =>
+        val variantName = VariantKeys.variantName(slot.variant)
         Schedule(
-          DailyCycle,
+          freq,
           slot.speed,
           slot.variant,
           none,
           date,
-          Some(TournamentDailyCycle.arenaMinutes),
+          Some(TournamentDaySchedule.arenaMinutes),
           statusScoring = slot.variant.key == "backgammon" || slot.variant.key == "nackgammon"
         ).plan {
           _.copy(
@@ -186,7 +187,9 @@ final private class TournamentScheduler(
               Spotlight(
                 iconFont = slot.variant.perfIcon.toString.some,
                 headline = "",
-                description = s"A daily tournament for ${VariantKeys.variantName(slot.variant)}",
+                description =
+                  if (freq == Wildcard) s"A wildcard tournament for $variantName"
+                  else s"A group cycle tournament for $variantName",
                 homepageHours = 1.some
               )
             )
@@ -439,10 +442,10 @@ final private class TournamentScheduler(
       )
     ).flatten
 
-    /* Everything that is not the daily cycle. Kept unfiltered, because the cycle has to see
-     * what is running now as well as what is still to come: a shield that started ten minutes
-     * ago still owns the hour after it, and a yearly that started at midnight still owns the
-     * whole of its friday.
+    /* Everything that is not a day schedule arena. Kept unfiltered, because the day schedule
+     * has to see what is running now as well as what is still to come: a shield that started
+     * ten minutes ago still owns the hour after it, and a yearly that started at midnight still
+     * owns the whole of its friday.
      */
     val otherScheduled =
       yearly2026Tournaments :::
@@ -453,7 +456,7 @@ final private class TournamentScheduler(
         thisMonthShields :::
         nextMonthShields
 
-    val scheduledBeforeDailyCycle = otherScheduled filter { _.schedule.at.isAfter(rightNow) }
+    val otherPlanned = otherScheduled filter { _.schedule.at.isAfter(rightNow) }
 
     /* Which hours of `day` a plan is running through. A 1h57 shield at 12:00 takes 12 and 13;
      * the friday 24h yearly takes the whole of friday and stops exactly at saturday 00:00, so
@@ -468,26 +471,28 @@ final private class TournamentScheduler(
       }.toSet
     }
 
-    /* Daily cycle tournaments, a fortnight in advance. The blocks take their fixed hours and
-     * the fillers take every hour left over, so a day whose shield is missing - or a friday
-     * with no yearly - fills up instead of standing idle. Both the hours and the variants come
-     * from the same set of plans, which is why the medley shield horizon above has to reach at
-     * least as far as dailyCycleDaysAhead.
+    /* The day schedule, a fortnight in advance. The group cycle blocks take their fixed
+     * hours and the wildcards take every hour left over, so a day whose shield is missing - or a
+     * friday with no yearly - fills up instead of standing idle. Both the hours and the variants
+     * come from the same set of plans, which is why the medley shield horizon above has to reach
+     * at least as far as scheduleDaysAhead. Blocks come first so that pruning gives them the
+     * slot whenever the two collide.
      */
-    val dailyCycleTournaments = (0 until dailyCycleDaysAhead).toList.flatMap { daysAhead =>
+    val dayScheduleTournaments = (0 until scheduleDaysAhead).toList.flatMap { daysAhead =>
       val day          = today.plusDays(daysAhead)
-      val blocks       = TournamentDailyCycle.blockSlots(day)
+      val blocks       = TournamentDaySchedule.blockSlots(day)
       val running      = otherScheduled.map(p => p -> hoursCovered(day)(p)).filter(_._2.nonEmpty)
       val busyHours    = blocks.map(_.hour).toSet ++ running.flatMap(_._2)
       val usedVariants = blocks.map(_.variant).toSet ++ running.flatMap { case (plan, _) =>
         plan.schedule.medleyShield.fold(List(plan.schedule.variant))(_.variants)
       }
-      val fillers = TournamentDailyCycle.fillerSlots(day, busyHours, usedVariants)
-      (blocks ::: fillers).flatMap(scheduleDailyCycle(_)(day))
+      val wildcards = TournamentDaySchedule.wildcardSlots(day, busyHours, usedVariants)
+      blocks.flatMap(scheduleArena(GroupCycle)(_)(day)) :::
+        wildcards.flatMap(scheduleArena(Wildcard)(_)(day))
     } filter { _.schedule.at.isAfter(rightNow) }
 
-    // order matters for pruning daily/yearly tournaments
-    scheduledBeforeDailyCycle ::: dailyCycleTournaments
+    // order matters for pruning group cycle / yearly tournaments
+    otherPlanned ::: dayScheduleTournaments
   }
 
 //          List( // lichess shield tournaments!
@@ -1075,6 +1080,8 @@ private object TournamentScheduler {
 
   import Schedule.Freq.*
 
+  private val autoArenaFreqs: Set[Schedule.Freq] = Set(GroupCycle, Wildcard)
+
   private[tournament] def pruneConflicts(scheds: List[Tournament], newTourns: List[Tournament]) =
     newTourns
       .foldLeft(List[Tournament]()) { case (tourns, t) =>
@@ -1087,8 +1094,10 @@ private object TournamentScheduler {
     t.schedule exists { s =>
       ts exists { t2 =>
         t2.schedule.so { s2 =>
-          // Daily cycle and yearly tournaments own their slot outright
-          if (s.freq == DailyCycle && s2.freq == DailyCycle) t.overlaps(t2)
+          // Day schedule arenas and yearly tournaments own their slot outright. A group cycle
+          // block and a wildcard are the same hourly slot wearing different labels, so they
+          // conflict with each other exactly as two blocks would.
+          if (autoArenaFreqs(s.freq) && autoArenaFreqs(s2.freq)) t.overlaps(t2)
           else if (s.freq == Yearly && s2.freq == Yearly) s.sameDay(s2)
           else
             ((!t.isMedley && !t2.isMedley && t.variant == t2.variant) ||

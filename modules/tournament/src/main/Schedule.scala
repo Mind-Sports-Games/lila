@@ -27,8 +27,10 @@ case class Schedule(
     import lila.i18n.I18nKeys.tourname.*
 
     freq match {
-      case DailyCycle if full => dailyXArena.txt(VariantKeys.variantName(variant))
-      case DailyCycle         => dailyX.txt(VariantKeys.variantName(variant))
+      case GroupCycle if full => cycleXArena.txt(VariantKeys.variantName(variant))
+      case GroupCycle         => cycleX.txt(VariantKeys.variantName(variant))
+      case Wildcard if full   => wildcardXArena.txt(VariantKeys.variantName(variant))
+      case Wildcard           => wildcardX.txt(VariantKeys.variantName(variant))
       case Weekly if full     => weeklyXArena.txt(VariantKeys.variantName(variant))
       case Weekly             =>
         weeklyX.txt(VariantKeys.variantName(variant))
