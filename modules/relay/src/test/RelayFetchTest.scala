@@ -135,4 +135,57 @@ class RelayFetchTest extends munit.FunSuite {
     }
     assert(err.getMessage.nonEmpty)
   }
+
+  /* Anything a broken or unexpected source can send must come back as a failed
+   * future carrying a message, never as a thrown exception escaping the cache:
+   * RelayFetch only recovers Exception, and the message is what the broadcaster
+   * reads in the sync log panel. */
+  private def failureOf(pgn: String): String =
+    intercept[Exception](games(pgn)).getMessage
+
+  test("an empty body is reported, not silently accepted") {
+    assert(failureOf("").startsWith("Found an empty PGN"))
+  }
+
+  test("an HTML error page served instead of PGN fails with a parse message") {
+    assert(failureOf("<html><body>404 Not Found</body></html>").nonEmpty)
+  }
+
+  test("JSON served where PGN was expected fails with a parse message") {
+    assert(failureOf("""{"games":[{"moves":"e4 e5"}]}""").nonEmpty)
+  }
+
+  test("an illegal move fails with a parse message") {
+    assert(failureOf("""[Event "X"]
+[Result "*"]
+
+1. e4 e5 2. Ke2 Ke7 3. Qxz9 *""").nonEmpty)
+  }
+
+  test("unbalanced variation parens fail rather than hanging") {
+    val pgn = """[Event "X"]
+[Result "*"]
+
+1. e4 """ + ("(" * 200) + "e5" + (")" * 200) + " *"
+    assert(failureOf(pgn).nonEmpty)
+  }
+
+  test("every failure carries a message for the sync log") {
+    List("", "<html>nope</html>", "%%%%", """{"a":1}""") foreach { body =>
+      val msg = failureOf(body)
+      assert(msg != null && msg.nonEmpty, s"empty message for: $body")
+    }
+  }
+
+  test("tags the parser does not know are dropped without failing the game") {
+    val gs = games("""[Foo "bar"]
+[Baz "qux"]
+[White "A"]
+[Black "B"]
+[Result "*"]
+
+1. e4 e5 *""")
+    assertEquals(gs.size, 1)
+    assertEquals(gs.head.tags(_.P1), Some("A"))
+  }
 }

@@ -93,7 +93,7 @@ final private class RelayFetch(
             .map { res =>
               res -> rt.round
                 .withSync(_.addLog(SyncLog.event(res.moves, none)))
-                .copy(finished = games.forall(_.end.isDefined))
+                .copy(finished = RelayFetch.allGamesEnded(games))
             }
         }
         .recover { case e: Exception =>
@@ -120,28 +120,32 @@ final private class RelayFetch(
     }
 
   def continueRelay(rt: RelayRound.WithTour): RelayRound =
-    rt.round.sync.upstream.fold(rt.round) { upstream =>
-      val seconds =
-        if (rt.round.sync.log.alwaysFails && !upstream.local) {
-          rt.round.sync.log.events.lastOption
-            .filterNot(_.isTimeout)
-            .flatMap(_.error)
-            .ifTrue(rt.tour.official && rt.round.hasStarted) foreach { error =>
-            slackApi.broadcastError(rt.round.id.value, rt.round.name, error)
-          }
-          60
-        } else
-          rt.round.sync.delay getOrElse {
-            if (upstream.local) 3 else 6
-          }
-      rt.round.withSync {
-        _.copy(
-          nextAt = DateTime.now plusSeconds {
-            seconds atLeast { if (rt.round.sync.log.justTimedOut) 10 else 2 }
-          } some
-        )
+    if (rt.round.finished) {
+      logger.info(s"Finish by all games ended ${rt.round}")
+      rt.round.finish
+    } else
+      rt.round.sync.upstream.fold(rt.round) { upstream =>
+        val seconds =
+          if (rt.round.sync.log.alwaysFails && !upstream.local) {
+            rt.round.sync.log.events.lastOption
+              .filterNot(_.isTimeout)
+              .flatMap(_.error)
+              .ifTrue(rt.tour.official && rt.round.hasStarted) foreach { error =>
+              slackApi.broadcastError(rt.round.id.value, rt.round.name, error)
+            }
+            60
+          } else
+            rt.round.sync.delay getOrElse {
+              if (upstream.local) 3 else 6
+            }
+        rt.round.withSync {
+          _.copy(
+            nextAt = DateTime.now plusSeconds {
+              seconds atLeast { if (rt.round.sync.log.justTimedOut) 10 else 2 }
+            } some
+          )
+        }
       }
-    }
 
   import com.github.benmanes.caffeine.cache.Cache
   import RelayFetch.GamesSeenBy
@@ -253,6 +257,9 @@ final private class RelayFetch(
 private object RelayFetch {
 
   case class GamesSeenBy(games: Fu[RelayGames], seenBy: Set[RelayRound.Id])
+
+  def allGamesEnded(games: RelayGames): Boolean =
+    games.nonEmpty && games.forall(_.end.isDefined)
 
   def maxChapters(tour: RelayTour) =
     lila.study.Study.maxChapters * (if (tour.official) 2 else 1)

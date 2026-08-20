@@ -195,7 +195,7 @@ final class RelayApi(
     WithRelay(id) { relay =>
       relay.sync.upstream.flatMap(_.asUrl).map(_.withRound) foreach formatApi.refresh
       update(relay) { r =>
-        if (v) r.withSync(_.play) else r.withSync(_.pause)
+        if (v) r.resume else r.withSync(_.pause)
       } void
     }
 
