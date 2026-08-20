@@ -24,9 +24,21 @@ final class MongoCache[K, V: BSONHandler] private (
 
   implicit private val entryBSONHandler: BSONDocumentHandler[Entry] = Macros.handler[Entry]
 
+  /* A value stored by an earlier shape of V no longer decodes: renaming or adding a field
+   * makes the macro handler fail on every read. Treat that as a miss rather than letting it
+   * reach the caller, since the loader below upserts and so heals the entry on first use. A
+   * cache should degrade to recomputing, never take down the pages that read it.
+   */
+  private def readEntry(dbKey: String): Fu[Option[Entry]] =
+    coll.one[Entry]($id(dbKey)).recover {
+      case e: reactivemongo.api.bson.exceptions.HandlerException =>
+        logger.warn(s"mongo cache $name: discarding unreadable entry $dbKey", e)
+        None
+    }
+
   private val cache = build { loader => k =>
     val dbKey = makeDbKey(k)
-    coll.one[Entry]($id(dbKey)) flatMap {
+    readEntry(dbKey) flatMap {
       case None =>
         lila.mon.mongoCache.request(name, hit = false).increment()
         loader(k)

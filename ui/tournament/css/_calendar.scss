@@ -41,11 +41,17 @@
   }
 
   .tournament {
-    @extend %box-radius, %flex-center;
+    @extend %box-radius, %flex-center-nowrap;
 
+    container-type: inline-size;
+    container-name: calendarTournament;
+
+    /* Every bar is the height of its lane, less a hairline gap, rather than being
+     * sized by its contents: an icon-only bar has no .body to give it height and
+     * would otherwise come out visibly shorter than its neighbours. */
     position: absolute;
     top: 0;
-    padding: 4px 0;
+    bottom: 2px;
     background-color: #303e43;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
     transition: filter 0.13s;
@@ -76,6 +82,8 @@
       }
     }
 
+    &.groupcycle,
+    &.wildcard,
     &.weekly,
     &.weekend,
     &.monthly,
@@ -87,8 +95,13 @@
       animation: animatedBackground 50s linear infinite;
     }
 
+    &.groupcycle,
     &.weekly {
       background-color: #d55e00;
+    }
+
+    &.wildcard {
+      background-color: #009e73;
     }
 
     &.monthly {
@@ -117,15 +130,34 @@
       padding-right: 5px;
     }
 
+    /* Flex, so the glyph is centred against the bar. %data-icon gives the ::before a
+     * `vertical-align: middle`, which sits it half an x-height above the baseline and
+     * so reads as too low; vertical-align does not apply to a flex item. */
     .icon {
+      display: flex;
+      align-items: center;
       font-size: 1.3em;
-      margin: 2px 1px -1px 3px;
+      margin: 0 1px 0 3px;
     }
 
     .body {
       flex: 1 0;
       margin-right: 0;
       overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Too narrow for a legible name: drop it and let the icon own the bar. */
+    @container calendarTournament (max-width: 100px) {
+      .icon {
+        flex: 1 1 auto;
+        justify-content: center;
+        margin: 0;
+      }
+
+      .body {
+        display: none;
+      }
     }
   }
 

@@ -17,6 +17,8 @@ final private class TournamentScheduler(
 
   implicit def ec: ExecutionContextExecutor = context.dispatcher
 
+  private val scheduleDaysAhead = 14
+
   /* Month plan:
    * First week: Shield standard tournaments
    * Second week: Yearly tournament
@@ -56,17 +58,8 @@ final private class TournamentScheduler(
     def nextMonthWithDay(dayOfMonth: Int) =
       xMonthWithDay(1)(dayOfMonth)
 
-    def nextDayOfWeeks(dayNumber: Int, weekNumber: Int) =
-      today.plusDays((dayNumber + 7 * weekNumber - today.getDayOfWeek) % (7 * weekNumber))
-    def nextDayOfWeek(number: Int)      = nextDayOfWeeks(number, 1)
-    def nextDayOfFortnight(number: Int) = nextDayOfWeeks(number, 2)
-    val nextMonday                      = nextDayOfWeek(1)
-    val nextTuesday                     = nextDayOfWeek(2)
-    val nextWednesday                   = nextDayOfWeek(3)
-    val nextThursday                    = nextDayOfWeek(4)
-    val nextFriday                      = nextDayOfWeek(5)
-    val nextSaturday                    = nextDayOfWeek(6)
-    val nextSunday                      = nextDayOfWeek(7)
+    def nextDayOfWeek(number: Int) = today.plusDays((number + 7 - today.getDayOfWeek) % 7)
+    def nextDayOfFortnight(number: Int) = nextDayOfWeek(number).plusDays(7)
 
     def monthOfWithWeekAndDayOfWeek(month: OfMonth, weekOfMonth: Int, dayOfWeek: Int) =
       month.firstDay
@@ -177,26 +170,27 @@ final private class TournamentScheduler(
         }
       }
 
-    def scheduleWeekly(speed: Schedule.Speed, variant: Variant)(
-        day: DateTime,
-        hour: Int
-    ) =
-      at(day, hour) map { date =>
+    def scheduleArena(freq: Schedule.Freq)(slot: TournamentDaySchedule.Slot)(day: DateTime) =
+      at(day, slot.hour) map { date =>
+        val variantName = VariantKeys.variantName(slot.variant)
         Schedule(
-          Weekly,
-          speed,
-          variant,
+          freq,
+          slot.speed,
+          slot.variant,
           none,
           date,
-          statusScoring = variant.key == "backgammon" || variant.key == "nackgammon"
+          Some(TournamentDaySchedule.arenaMinutes),
+          statusScoring = slot.variant.key == "backgammon" || slot.variant.key == "nackgammon"
         ).plan {
           _.copy(
             spotlight = Some(
               Spotlight(
-                iconFont = variant.perfIcon.toString.some,
+                iconFont = slot.variant.perfIcon.toString.some,
                 headline = "",
-                description = s"A weekly tournament for ${VariantKeys.variantName(variant)}",
-                homepageHours = 24.some
+                description =
+                  if (freq == Wildcard) s"A wildcard tournament for $variantName"
+                  else s"A group cycle tournament for $variantName",
+                homepageHours = 1.some
               )
             )
           )
@@ -210,16 +204,16 @@ final private class TournamentScheduler(
           nextDayOfWeek(ms.dayOfWeek)
         )
       )
-      .flatten filter { _.schedule.at.isAfter(rightNow) }
+      .flatten
 
     // and schedule two weeks in advance
     val nextWeekMedleyShields = TournamentShield.MedleyShield.allWeekly
       .map(ms =>
         scheduleMedleyShield(ms)(
-          nextDayOfFortnight(ms.dayOfWeek + 7)
+          nextDayOfFortnight(ms.dayOfWeek)
         )
       )
-      .flatten filter { _.schedule.at.isAfter(rightNow) }
+      .flatten
 
     // schedule this month
     val thisMonthMedleyShields = TournamentShield.MedleyShield.allMonthly
@@ -228,7 +222,7 @@ final private class TournamentScheduler(
           thisMonthWeekAndDayOfWeek(ms.weekOfMonth.getOrElse(1), ms.dayOfWeek)
         )
       )
-      .flatten filter { _.schedule.at.isAfter(rightNow) }
+      .flatten
 
     // and schedule two months in advance
     val nextMonthMedleyShields = TournamentShield.MedleyShield.allMonthly
@@ -237,9 +231,9 @@ final private class TournamentScheduler(
           nextMonthWeekAndDayOfWeek(ms.weekOfMonth.getOrElse(1), ms.dayOfWeek)
         )
       )
-      .flatten filter { _.schedule.at.isAfter(rightNow) }
+      .flatten
 
-    val shieldDuration = Some(90)
+    val shieldDuration = Some(TournamentShield.arenaMinutes)
 
     // schedule this months shields
     val thisMonthShields = TournamentShield.Category.all
@@ -266,7 +260,7 @@ final private class TournamentScheduler(
           }
         }
       )
-      .flatten filter { _.schedule.at.isAfter(rightNow) }
+      .flatten
 
     // and schedule next month
     val nextMonthShields = TournamentShield.Category.all
@@ -293,136 +287,7 @@ final private class TournamentScheduler(
           }
         }
       )
-      .flatten filter { _.schedule.at.isAfter(rightNow) }
-
-    val weeklySchedule = List(
-      (nextMonday, 1),
-      (nextMonday, 3),
-      (nextMonday, 6),
-      (nextMonday, 9),
-      (nextMonday, 11),
-      (nextMonday, 15),
-      (nextMonday, 21),
-      (nextTuesday, 2),
-      (nextTuesday, 5),
-      (nextTuesday, 8),
-      (nextTuesday, 11),
-      (nextTuesday, 14),
-      (nextTuesday, 16),
-      (nextTuesday, 20),
-      (nextTuesday, 22),
-      (nextWednesday, 1),
-      (nextWednesday, 4),
-      (nextWednesday, 7),
-      (nextWednesday, 10),
-      (nextWednesday, 15),
-      (nextWednesday, 21),
-      (nextThursday, 0),
-      (nextThursday, 3),
-      (nextThursday, 6),
-      (nextThursday, 9),
-      (nextThursday, 11),
-      (nextThursday, 14),
-      (nextThursday, 16),
-      (nextThursday, 20),
-      (nextThursday, 23),
-      (nextFriday, 1),
-      (nextFriday, 3),
-      (nextFriday, 5),
-      (nextFriday, 8),
-      (nextFriday, 11),
-      (nextFriday, 15),
-      (nextFriday, 21),
-      (nextSaturday, 1),
-      (nextSaturday, 4),
-      (nextSaturday, 7),
-      (nextSaturday, 10),
-      (nextSaturday, 22),
-      (nextSunday, 1),
-      (nextSunday, 4),
-      (nextSunday, 7),
-      (nextSunday, 10),
-      (nextSunday, 23)
-    )
-
-    val nextWeeklySchedule = weeklySchedule.map { case (day, hour) => (day.plusDays(7), hour) }
-
-    // How to add a new variant and slot without breaking the current schedule:
-    // Decide on a new timeslot and add to `weeklySchedule`
-    // Look at the current schedule on the site, and work out when that new slot is next going to be used
-    // Add the new variant to the list below between the two variants it would be between when that slot is first used
-    // Work out how many full cycles of weeklys there have been in the year
-    // This is basically 0 if the week number of the year is less than the number of different variants, or 1 if it's greater than
-    // Shuffle that many variants (0 or 1) from the start of the list to the bottom
-    // Because we create two weeks in advance we will then need to delete one tournament in the second week where the new variant has cycled into. It should just be one, if not its gone wrong
-    // Practise locally, can always delete any newly created tournaments and try again
-    val weeklyVariants: List[(Variant, Schedule.Speed)] = List(
-      (Variant.Chess(strategygames.chess.variant.LinesOfAction), Blitz32),
-      (Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello), Rapid8),
-      (Variant.Chess(strategygames.chess.variant.FiveCheck), Blitz32),
-      (Variant.Draughts(strategygames.draughts.variant.Frysk), Blitz21),
-      (Variant.FairySF(strategygames.fairysf.variant.Amazons), Blitz35),
-      (Variant.Chess(strategygames.chess.variant.Horde), Blitz53),
-      (Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe), Blitz32),
-      (Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka), Blitz21),
-      (Variant.Abalone(strategygames.abalone.variant.Abalone), Delay62),
-      (Variant.Draughts(strategygames.draughts.variant.Portuguese), Blitz32),
-      (Variant.Samurai(strategygames.samurai.variant.Oware), Blitz32),
-      (Variant.Chess(strategygames.chess.variant.Antichess), Blitz32),
-      (Variant.Draughts(strategygames.draughts.variant.Standard), Blitz53),
-      (Variant.Go(strategygames.go.variant.Go9x9), Byoyomi210x5),
-      (Variant.FairySF(strategygames.fairysf.variant.Xiangqi), Blitz53),
-      (Variant.Chess(strategygames.chess.variant.Monster), Blitz32),
-      (Variant.Chess(strategygames.chess.variant.KingOfTheHill), Blitz32),
-      (Variant.FairySF(strategygames.fairysf.variant.AntiFlipello), Blitz),
-      (Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32),
-      (Variant.Abalone(strategygames.abalone.variant.GrandAbalone), Delay66),
-      (Variant.FairySF(strategygames.fairysf.variant.Shogi), Byoyomi510),
-      (Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka), Blitz32),
-      (Variant.Chess(strategygames.chess.variant.RacingKings), Blitz32),
-      (Variant.Draughts(strategygames.draughts.variant.Russian), Blitz32),
-      (Variant.FairySF(strategygames.fairysf.variant.Flipello10), Rapid8),
-      (Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay1510),
-      (Variant.Chess(strategygames.chess.variant.NoCastling), Blitz32),
-      (Variant.Draughts(strategygames.draughts.variant.Frisian), Blitz53),
-      (Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak), Blitz52),
-      (Variant.Chess(strategygames.chess.variant.Chess960), Blitz32),
-      (Variant.Draughts(strategygames.draughts.variant.English), Blitz32),
-      (Variant.Chess(strategygames.chess.variant.ScrambledEggs), Blitz32),
-      (Variant.Chess(strategygames.chess.variant.ThreeCheck), Blitz32),
-      (Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi), Blitz32),
-      (Variant.Backgammon(strategygames.backgammon.variant.Hyper), Delay110),
-      (Variant.Dameo(strategygames.dameo.variant.Dameo), Blitz53),
-      (Variant.Go(strategygames.go.variant.Go13x13), Byoyomi310x5),
-      (Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay210),
-      (Variant.Chess(strategygames.chess.variant.Standard), Blitz32),
-      (Variant.Draughts(strategygames.draughts.variant.Antidraughts), Blitz53),
-      (Variant.FairySF(strategygames.fairysf.variant.MiniShogi), Byoyomi35),
-      (Variant.Chess(strategygames.chess.variant.Atomic), Blitz32),
-      (Variant.Go(strategygames.go.variant.Go19x19), Byoyomi510x5),
-      (Variant.Draughts(strategygames.draughts.variant.Breakthrough), Blitz53),
-      (Variant.FairySF(strategygames.fairysf.variant.Flipello), Blitz),
-      (Variant.Chess(strategygames.chess.variant.Crazyhouse), Blitz32),
-      (Variant.Draughts(strategygames.draughts.variant.Pool), Blitz32)
-    )
-
-    val weeklyVariantDefault: (Variant, Schedule.Speed) =
-      (Variant.Chess(strategygames.chess.variant.Standard), Blitz32)
-
-    def rotate[A](l: List[A], x: Int): List[A] =
-      if (x <= 0 || l.size <= 1) l
-      else if (x >= l.size) rotate(l, x % l.size)
-      else rotate(l.tail ++ List(l.head), x - 1)
-
-    // weekly tournaments
-    val weeklyTourmaments = (weeklySchedule.zipWithIndex ++ nextWeeklySchedule.zipWithIndex).map {
-      case (date, i) => {
-        val rotatedVariants = rotate(weeklyVariants, date._1.weekOfWeekyear().get())
-        (date, rotatedVariants.lift(i).getOrElse(weeklyVariantDefault))
-      }
-    } flatMap { case ((day, hour), (variant, speed)) =>
-      scheduleWeekly(speed, variant)(day, hour)
-    } filter { _.schedule.at.isAfter(rightNow) }
+      .flatten
 
     // yearly tournaments 2026
     val yearly2026Tournaments = List(
@@ -575,17 +440,59 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Abalone(strategygames.abalone.variant.GrandAbalone), Delay66)(
         new DateTime(2026, 11, 27, 0, 0)
       )
-    ).flatten filter { _.schedule.at.isAfter(rightNow) }
+    ).flatten
 
-    // order matters for pruning weekly/yearly tournaments
-    yearly2026Tournaments :::
-      thisWeekMedleyShields :::
-      nextWeekMedleyShields :::
-      thisMonthMedleyShields :::
-      nextMonthMedleyShields :::
-      thisMonthShields :::
-      nextMonthShields :::
-      weeklyTourmaments
+    /* Everything that is not a day schedule arena. Kept unfiltered, because the day schedule
+     * has to see what is running now as well as what is still to come: a shield that started
+     * ten minutes ago still owns the hour after it, and a yearly that started at midnight still
+     * owns the whole of its friday.
+     */
+    val otherScheduled =
+      yearly2026Tournaments :::
+        thisWeekMedleyShields :::
+        nextWeekMedleyShields :::
+        thisMonthMedleyShields :::
+        nextMonthMedleyShields :::
+        thisMonthShields :::
+        nextMonthShields
+
+    val otherPlanned = otherScheduled filter { _.schedule.at.isAfter(rightNow) }
+
+    /* Which hours of `day` a plan is running through. A 1h57 shield at 12:00 takes 12 and 13;
+     * the friday 24h yearly takes the whole of friday and stops exactly at saturday 00:00, so
+     * saturday's first hour comes back free.
+     */
+    def hoursCovered(day: DateTime)(plan: Plan): Set[Int] = {
+      val s    = plan.schedule
+      val ends = s.at.plusMinutes(Schedule.durationFor(s))
+      (0 until 24).filter { hour =>
+        val hourStart = day.plusHours(hour)
+        hourStart.isBefore(ends) && hourStart.plusHours(1).isAfter(s.at)
+      }.toSet
+    }
+
+    /* The day schedule, a fortnight in advance. The group cycle blocks take their fixed
+     * hours and the wildcards take every hour left over, so a day whose shield is missing - or a
+     * friday with no yearly - fills up instead of standing idle. Both the hours and the variants
+     * come from the same set of plans, which is why the medley shield horizon above has to reach
+     * at least as far as scheduleDaysAhead. Blocks come first so that pruning gives them the
+     * slot whenever the two collide.
+     */
+    val dayScheduleTournaments = (0 until scheduleDaysAhead).toList.flatMap { daysAhead =>
+      val day          = today.plusDays(daysAhead)
+      val blocks       = TournamentDaySchedule.blockSlots(day)
+      val running      = otherScheduled.map(p => p -> hoursCovered(day)(p)).filter(_._2.nonEmpty)
+      val busyHours    = blocks.map(_.hour).toSet ++ running.flatMap(_._2)
+      val usedVariants = blocks.map(_.variant).toSet ++ running.flatMap { case (plan, _) =>
+        plan.schedule.medleyShield.fold(List(plan.schedule.variant))(_.variants)
+      }
+      val wildcards = TournamentDaySchedule.wildcardSlots(day, busyHours, usedVariants)
+      blocks.flatMap(scheduleArena(GroupCycle)(_)(day)) :::
+        wildcards.flatMap(scheduleArena(Wildcard)(_)(day))
+    } filter { _.schedule.at.isAfter(rightNow) }
+
+    // order matters for pruning group cycle / yearly tournaments
+    otherPlanned ::: dayScheduleTournaments
   }
 
 //          List( // lichess shield tournaments!
@@ -1132,34 +1039,9 @@ Thank you all, you rock!"""
   // ).flatten filter { _.schedule.at isAfter rightNow }
 
   private[tournament] def pruneConflicts(scheds: List[Tournament], newTourns: List[Tournament]) =
-    newTourns
-      .foldLeft(List[Tournament]()) { case (tourns, t) =>
-        if (overlaps(t, tourns) || overlaps(t, scheds)) tourns
-        else t :: tourns
-      }
-      .reverse
+    TournamentScheduler.pruneConflicts(scheds, newTourns)
 
   private case class ScheduleNowWith(dbScheds: List[Tournament])
-
-  private def overlaps(t: Tournament, ts: List[Tournament]): Boolean =
-    t.schedule exists { s =>
-      ts exists { t2 =>
-        ((!t.isMedley && !t2.isMedley && t.variant == t2.variant) || (t.isMedley && t2.isMedley && t.trophy1st == t2.trophy1st)) && t2.schedule
-          .so {
-            // prevent daily && weekly on the same day - we don't care about this.
-            // case s2 if s.freq.isDailyOrBetter && s2.freq.isDailyOrBetter && s.sameSpeed(s2) => s sameDay s2
-            // dont let yearly's block shields and vice versa
-            case s2 if s.freq == Shield || s.freq == MedleyShield   => s2.freq == s.freq && (s.sameDay(s2))
-            case s2 if s2.freq == Shield || s2.freq == MedleyShield => false
-            case s2                                                 =>
-              (
-                t.variant.exotic ||  // overlapping exotic variant
-                  s.hasMaxRating ||  // overlapping same rating limit
-                  s.similarSpeed(s2) // overlapping similar
-              ) && s.similarConditions(s2) && t.overlaps(t2)
-          }
-      }
-    }
 
   private def at(day: DateTime, hour: Int, minute: Int = 0): Option[DateTime] =
     try
@@ -1195,4 +1077,42 @@ Thank you all, you rock!"""
 private object TournamentScheduler {
 
   case object ScheduleNow
+
+  import Schedule.Freq.*
+
+  private val autoArenaFreqs: Set[Schedule.Freq] = Set(GroupCycle, Wildcard)
+
+  private[tournament] def pruneConflicts(scheds: List[Tournament], newTourns: List[Tournament]) =
+    newTourns
+      .foldLeft(List[Tournament]()) { case (tourns, t) =>
+        if (overlaps(t, tourns) || overlaps(t, scheds)) tourns
+        else t :: tourns
+      }
+      .reverse
+
+  private[tournament] def overlaps(t: Tournament, ts: List[Tournament]): Boolean =
+    t.schedule exists { s =>
+      ts exists { t2 =>
+        t2.schedule.so { s2 =>
+          // Day schedule arenas and yearly tournaments own their slot outright. A group cycle
+          // block and a wildcard are the same hourly slot wearing different labels, so they
+          // conflict with each other exactly as two blocks would.
+          if (autoArenaFreqs(s.freq) && autoArenaFreqs(s2.freq)) t.overlaps(t2)
+          else if (s.freq == Yearly && s2.freq == Yearly) s.sameDay(s2)
+          else
+            ((!t.isMedley && !t2.isMedley && t.variant == t2.variant) ||
+              (t.isMedley && t2.isMedley && t.trophy1st == t2.trophy1st)) && (s2 match {
+              // dont let yearly's block shields and vice versa
+              case _ if s.freq == Shield || s.freq == MedleyShield   => s2.freq == s.freq && (s.sameDay(s2))
+              case _ if s2.freq == Shield || s2.freq == MedleyShield => false
+              case _                                                 =>
+                (
+                  t.variant.exotic ||  // overlapping exotic variant
+                    s.hasMaxRating ||  // overlapping same rating limit
+                    s.similarSpeed(s2) // overlapping similar
+                ) && s.similarConditions(s2) && t.overlaps(t2)
+            })
+        }
+      }
+    }
 }

@@ -1009,18 +1009,25 @@ final class TournamentApi(
   private[tournament] def subscribeBotsToArenas: Funit =
     subscribeBots(
       List(
-        Schedule.Freq.Weekly,
+        Schedule.Freq.GroupCycle,
+        Schedule.Freq.Wildcard,
         Schedule.Freq.Yearly,
         Schedule.Freq.MedleyMarathon
       ) ::: Schedule.Freq.shields,
       TournamentShield.MedleyShield.medleyTeamIDs
     )
 
+  // the day schedule is built weeks ahead, so only look at what is about to start
+  private val subscribeBotsLookahead = 48
+
   private[tournament] def subscribeBots(freq: List[Schedule.Freq], teamIds: List[TeamID]): Funit =
     fuccess(
       for {
         botUsers <- userRepo.byIds(LightUser.tourBotsIDs)
-        tours    <- tournamentRepo.byScheduleCategory(freq)
+        tours    <- tournamentRepo.byScheduleCategory(
+          freq,
+          startingBefore = DateTime.now.plusHours(subscribeBotsLookahead).some
+        )
       } for {
         botUser <- botUsers
         tour    <- tours

@@ -10,6 +10,10 @@
   <string name="dailyClassical">Daily Classical</string>
   <string name="dailyXArena">Daily %s Arena</string>
   <string name="dailyX">Daily %s</string>
+  <string name="cycleXArena">Cycle %s Arena</string>
+  <string name="cycleX">Cycle %s</string>
+  <string name="wildcardXArena">Wildcard %s Arena</string>
+  <string name="wildcardX">Wildcard %s</string>
   <string name="easternRapidArena">Eastern Rapid Arena</string>
   <string name="easternRapid">Eastern Rapid</string>
   <string name="easternClassicalArena">Eastern Classical Arena</string>
