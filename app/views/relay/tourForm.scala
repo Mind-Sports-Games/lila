@@ -1,19 +1,16 @@
 package views.html.relay
 
-/*
-import controllers.routes
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.relay.RelayTourForm.Data
-import lila.relay.{ RelayRound, RelayTour }
-*/
+import lila.relay.RelayTour
 
 object tourForm {
-  /*
-  import trans.broadcast._
+
+  import trans.broadcast.*
 
   def create(form: Form[Data])(implicit ctx: Context) =
     layout(newBroadcast.txt())(
@@ -71,5 +68,4 @@ object tourForm {
       )
     else form3.hidden(form("official"))
   )
-   */
 }

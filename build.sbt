@@ -392,7 +392,7 @@ lazy val study = module("study",
 
 lazy val relay = module("relay",
   Seq(common, study),
-  Seq(scalaUri) ++ reactivemongo.bundle
+  Seq(scalaUri) ++ tests.bundle ++ reactivemongo.bundle
 )
 
 lazy val studySearch = module("studySearch",

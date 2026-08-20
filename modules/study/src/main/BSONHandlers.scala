@@ -525,6 +525,7 @@ object BSONHandlers {
       name = name,
       players = tags flatMap StudyMultiBoard.ChapterPreview.players,
       orientation = doc.getAsOpt[PlayerIndex]("orientation") | PlayerIndex.P1,
+      variant = variant,
       fen = fen,
       lastMove = lastMove,
       playing = lastMove.isDefined && tags.flatMap(_(_.Result)).contains("*")

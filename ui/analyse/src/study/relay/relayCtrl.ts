@@ -61,7 +61,9 @@ export default class RelayCtrl {
   private socketHandlers = {
     relayData: (d: RelayData) => {
       if (d.sync) d.sync.log = this.data.sync?.log || [];
-      this.data = d;
+      // the tour-wide push carries no sync section; it is broadcaster-only, so
+      // keep the one we were given at page load rather than dropping the panel
+      this.data = { ...d, sync: d.sync || this.data.sync };
       this.redraw();
     },
     relaySync: (sync: RelaySync) => {

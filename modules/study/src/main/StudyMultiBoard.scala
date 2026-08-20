@@ -4,6 +4,7 @@ import BSONHandlers.*
 import strategygames.Player as PlayerIndex
 import strategygames.format.pgn.Tags
 import strategygames.format.{ FEN, Uci }
+import strategygames.variant.Variant
 import com.github.blemale.scaffeine.AsyncLoadingCache
 import JsonView.*
 import play.api.libs.json.*
@@ -76,6 +77,7 @@ final class StudyMultiBoard(
                     )
                   ),
                   "orientation" -> "$setup.orientation",
+                  "variant"     -> "$setup.variant",
                   "name"        -> true
                 )
               )
@@ -104,7 +106,20 @@ final class StudyMultiBoard(
         Json.obj("p1" -> players.p1, "p2" -> players.p2)
     }
 
-    implicit val previewWriter: Writes[ChapterPreview] = Json.writes[ChapterPreview]
+    implicit val previewWriter: Writes[ChapterPreview] = Writes[ChapterPreview] { p =>
+      Json
+        .obj(
+          "id"          -> p.id,
+          "name"        -> p.name,
+          "orientation" -> p.orientation,
+          "variantKey"  -> p.variant.key,
+          "gameFamily"  -> p.variant.gameFamily.key,
+          "fen"         -> p.fen,
+          "playing"     -> p.playing
+        )
+        .add("players" -> p.players)
+        .add("lastMove" -> p.lastMove)
+    }
   }
 }
 
@@ -115,6 +130,7 @@ object StudyMultiBoard {
       name: Chapter.Name,
       players: Option[ChapterPreview.Players],
       orientation: PlayerIndex,
+      variant: Variant,
       fen: FEN,
       lastMove: Option[Uci],
       playing: Boolean

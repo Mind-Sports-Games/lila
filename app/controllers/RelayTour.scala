@@ -1,9 +1,16 @@
 package controllers
 
-import lila.app.*
+import play.api.mvc.*
+import scala.annotation.nowarn
+import views.*
 
-final class RelayTour(env: Env, @annotation.nowarn("msg=unused") apiC: => Api) extends LilaController(env) {
-  /*
+import lila.api.Context
+import lila.app.{ *, given }
+import lila.relay.{ RelayRound as RoundModel, RelayTour as TourModel }
+import lila.common.config.MaxPerSecond
+
+final class RelayTour(env: Env, apiC: => Api) extends LilaController(env) {
+
   def index(page: Int) =
     Open { implicit ctx =>
       Reasonable(page) {
@@ -14,27 +21,31 @@ final class RelayTour(env: Env, @annotation.nowarn("msg=unused") apiC: => Api) e
       }
     }
 
-  def form = Auth { implicit ctx => me =>
-    NoLameOrBot {
-      Ok(html.relay.tourForm.create(env.relay.tourForm.create)).fuccess
+  def form = Auth { implicit ctx => _ =>
+    IfGranted(_.Relay) {
+      NoLameOrBot {
+        Ok(html.relay.tourForm.create(env.relay.tourForm.create)).fuccess
+      }
     }
   }
 
   def create = AuthBody { implicit ctx => me =>
-    NoLameOrBot {
-      env.relay.tourForm.create
-        .bindFromRequest()(ctx.body, formBinding)
-        .fold(
-          err => BadRequest(html.relay.tourForm.create(err)).fuccess,
-          setup =>
-            env.relay.api.tourCreate(setup, me) map { tour =>
-              Redirect(routes.RelayRound.form(tour.id.value)).flashSuccess
-            }
-        )
+    IfGranted(_.Relay) {
+      NoLameOrBot {
+        env.relay.tourForm.create
+          .bindFromRequest()(using ctx.body, formBinding)
+          .fold(
+            err => BadRequest(html.relay.tourForm.create(err)).fuccess,
+            setup =>
+              env.relay.api.tourCreate(setup, me) map { tour =>
+                Redirect(routes.RelayRound.form(tour.id.value)).flashSuccess
+              }
+          )
+      }
     }
   }
 
-  def edit(id: String) = Auth { implicit ctx => me =>
+  def edit(id: String) = Auth { implicit ctx => _ =>
     WithTourCanUpdate(id) { tour =>
       Ok(html.relay.tourForm.edit(tour, env.relay.tourForm.edit(tour))).fuccess
     }
@@ -44,7 +55,7 @@ final class RelayTour(env: Env, @annotation.nowarn("msg=unused") apiC: => Api) e
     WithTourCanUpdate(id) { tour =>
       env.relay.tourForm
         .edit(tour)
-        .bindFromRequest()(ctx.body, formBinding)
+        .bindFromRequest()(using ctx.body, formBinding)
         .fold(
           err => BadRequest(html.relay.tourForm.edit(tour, err)).fuccess,
           setup =>
@@ -55,9 +66,9 @@ final class RelayTour(env: Env, @annotation.nowarn("msg=unused") apiC: => Api) e
   }
 
   def redirect(@nowarn("msg=unused") slug: String, anyId: String) = Open { implicit ctx =>
-    env.relay.api byIdWithTour RoundModel.Id(anyId) flatMap {
+    env.relay.api.byIdWithTour(RoundModel.Id(anyId)) flatMap {
       case Some(rt) => Redirect(rt.path).fuccess // BC old broadcast URLs
-      case None     => env.relay.api tourById TourModel.Id(anyId) flatMap { _ so redirectToTour }
+      case None     => env.relay.api.tourById(TourModel.Id(anyId)) flatMap { _ so redirectToTour }
     }
   }
 
@@ -71,9 +82,10 @@ final class RelayTour(env: Env, @annotation.nowarn("msg=unused") apiC: => Api) e
     }
 
   private def redirectToTour(tour: TourModel)(implicit ctx: Context): Fu[Result] =
-    env.relay.api.activeTourNextRound(tour) orElse env.relay.api.tourLastRound(tour) flatMap {
+    env.relay.api.activeTourNextRound(tour).orElse(env.relay.api.tourLastRound(tour)) flatMap {
       case None =>
-        ctx.me.so { env.relay.api.canUpdate(_, tour) } flatMap {
+        // no point sending a contributor to a round form they are not allowed to use
+        ctx.me.so { me => isGranted(_.Relay) so env.relay.api.canUpdate(me, tour) } flatMap {
           _ so Redirect(routes.RelayRound.form(tour.id.value)).fuccess
         }
       case Some(round) => Redirect(round.withTour(tour).path).fuccess
@@ -82,7 +94,7 @@ final class RelayTour(env: Env, @annotation.nowarn("msg=unused") apiC: => Api) e
   private def WithTour(id: String)(
       f: TourModel => Fu[Result]
   )(implicit ctx: Context): Fu[Result] =
-    OptionFuResult(env.relay.api tourById TourModel.Id(id))(f)
+    OptionFuResult(env.relay.api.tourById(TourModel.Id(id)))(f)
 
   private def WithTourCanUpdate(id: String)(
       f: TourModel => Fu[Result]
@@ -92,5 +104,4 @@ final class RelayTour(env: Env, @annotation.nowarn("msg=unused") apiC: => Api) e
         _ so f(tour)
       }
     }
-   */
 }

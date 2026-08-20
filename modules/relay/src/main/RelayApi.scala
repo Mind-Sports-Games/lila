@@ -20,7 +20,8 @@ final class RelayApi(
     studyRepo: StudyRepo,
     multiboard: StudyMultiBoard,
     jsonView: JsonView,
-    formatApi: RelayFormatApi
+    formatApi: RelayFormatApi,
+    cacheApi: lila.memo.CacheApi
 )(implicit ec: scala.concurrent.ExecutionContext, mat: akka.stream.Materializer) {
 
   import BSONHandlers.*
@@ -118,6 +119,13 @@ final class RelayApi(
         } yield RelayTour.ActiveWithNextRound(tour, round)
       }
 
+  /* The homepage asks for this on every hit, and officialActive is an
+   * aggregation, so keep the answer around for a few seconds. */
+  val officialActiveCache = cacheApi.unit[List[RelayTour.ActiveWithNextRound]] {
+    _.refreshAfterWrite(5 seconds)
+      .buildAsyncFuture(_ => officialActive)
+  }
+
   def tourById(id: RelayTour.Id) = tourRepo.coll.byId[RelayTour](id.value)
 
   private[relay] def toSync: Fu[List[RelayRound.WithTour]] =
@@ -179,7 +187,8 @@ final class RelayApi(
           )
         ) >>
         tourRepo.setActive(tour.id, true) >>
-        studyApi.addTopics(relay.studyId, List("Broadcast")) inject relay
+        studyApi.addTopics(relay.studyId, List("Broadcast")) >>
+        notifyRounds(tour.id) inject relay
     }
 
   def requestPlay(id: RelayRound.Id, v: Boolean): Funit =
@@ -205,6 +214,12 @@ final class RelayApi(
           )
         } >> {
           (round.finished != from.finished) so denormalizeTourActive(round.tourId)
+        } >> {
+          val roundsChanged =
+            round.finished != from.finished ||
+              round.hasStarted != from.hasStarted ||
+              round.name != from.name
+          roundsChanged so notifyRounds(round.tourId)
         }.andDo {
           round.sync.log.events.lastOption.ifTrue(round.sync.log != from.sync.log).foreach { event =>
             sendToContributors(round.id, "relayLog", JsonView.syncLogEventWrites writes event)
@@ -221,7 +236,8 @@ final class RelayApi(
     byIdWithTour(roundId) flatMap {
       _ so { rt =>
         roundRepo.coll.delete.one($id(rt.round.id)) >>
-          denormalizeTourActive(rt.tour.id) inject rt.tour.some
+          denormalizeTourActive(rt.tour.id) >>
+          notifyRounds(rt.tour.id) inject rt.tour.some
       }
     }
 
@@ -313,6 +329,24 @@ final class RelayApi(
 
   private[relay] def onStudyRemove(studyId: String) =
     roundRepo.coll.delete.one($id(RelayRound.Id(studyId))).void
+
+  /* Pushes the tournament and its rounds to everyone watching any round of it,
+   * so that a spectator sitting on a round that just finished sees the next one
+   * go live, and gets a link to it, without reloading the page.
+   * Only the round list is sent: `sync` is broadcaster-only and each client
+   * keeps the one it already has. */
+  private def notifyRounds(tourId: RelayTour.Id): Funit =
+    tourById(tourId) flatMap {
+      _ so { tour =>
+        withRounds(tour) map { trs =>
+          import JsonView.roundIdWrites
+          val data = jsonView(trs)
+          trs.rounds foreach { round =>
+            studyApi.notifyRoom(round.studyId, "relayData", data ++ Json.obj("id" -> round.id))
+          }
+        }
+      }
+    }
 
   private def sendToContributors(id: RelayRound.Id, t: String, msg: JsObject): Funit =
     studyApi.members(Study.Id(id.value)) map {

@@ -336,24 +336,26 @@ private object RelayFetch {
 
     private def compute(pgn: String): Try[Int => RelayGame] = {
       implicit val variant: Variant = Variant.Chess(ChessVariant.default)
-      lila.study
-        .PgnImport(pgn, Nil)
-        .fold(
-          err => Failure(LilaException(err)),
-          res =>
-            Success(index =>
-              RelayGame(
-                index = index,
-                tags = res.tags,
-                variant = res.variant,
-                root = res.root.copy(
-                  comments = Comments.empty,
-                  children = res.root.children.updateMainline(_.copy(comments = Comments.empty))
-                ),
-                end = res.end
+      if (!RelayGame.isChessOnly(pgn)) Failure(LilaException(RelayGame.unsupportedVariant))
+      else
+        Try(lila.study.PgnImport(RelayGame.withPlayStrategyPlayerTags(pgn), Nil)) flatMap {
+          _.fold(
+            err => Failure(LilaException(err)),
+            res =>
+              Success(index =>
+                RelayGame(
+                  index = index,
+                  tags = res.tags,
+                  variant = res.variant,
+                  root = res.root.copy(
+                    comments = Comments.empty,
+                    children = res.root.children.updateMainline(_.copy(comments = Comments.empty))
+                  ),
+                  end = res.end
+                )
               )
-            )
-        )
+          )
+        }
     }
   }
 }

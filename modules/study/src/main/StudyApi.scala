@@ -895,9 +895,14 @@ final class StudyApi(
   private def Contribute[A](userId: User.ID, study: Study)(f: => A)(implicit default: Zero[A]): A =
     if (study.canContribute(userId)) f else default.zero
 
+  /* Lets the relay module push a message to everyone watching a study,
+   * spectators included - sendToContributors only reaches the broadcasters. */
+  def notifyRoom(studyId: Study.Id, tpe: String, data: play.api.libs.json.JsObject): Unit =
+    sendTo(studyId)(_.notifyRoom(tpe, data))
+
   // work around circular dependency
-  private var socket: Option[StudySocket]                                         = None
-  private[study] def registerSocket(s: StudySocket)                               = { socket = s.some }
+  private var socket: Option[StudySocket]           = None
+  private[study] def registerSocket(s: StudySocket) = { socket = s.some }
   private def sendTo(studyId: Study.Id)(f: StudySocket => Study.Id => Unit): Unit =
     socket foreach { s =>
       f(s)(studyId)

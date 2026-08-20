@@ -16,14 +16,18 @@ final class RelayPager(tourRepo: RelayTourRepo, roundRepo: RelayRoundRepo)(impli
     Paginator(
       adapter = new AdapterLike[RelayTour.WithLastRound] {
 
-        def nbResults: Fu[Int] = fuccess(9999)
+        private val selector = tourRepo.selectors.official ++ tourRepo.selectors.inactive
+
+        def nbResults: Fu[Int] = tourRepo.coll.countSel(selector)
 
         def slice(offset: Int, length: Int): Fu[List[RelayTour.WithLastRound]] =
           tourRepo.coll
             .aggregateList(maxDocs = length, ReadPreference.secondaryPreferred) { framework =>
               import framework.*
-              Match(tourRepo.selectors.official ++ tourRepo.selectors.inactive) -> List(
+              Match(selector) -> List(
                 Sort(Descending("syncedAt")),
+                Skip(offset),
+                Limit(length),
                 PipelineOperator(
                   $doc(
                     "$lookup" -> $doc(

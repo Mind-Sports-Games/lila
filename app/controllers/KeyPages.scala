@@ -25,6 +25,7 @@ final class KeyPages(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
         tours = env.tournament.cached.onHomepage.getUnit.recoverDefault,
         events = env.event.api.promoteTo(ctx.req).recoverDefault,
         simuls = env.simul.allCreatedFeaturable.get {}.recoverDefault,
+        relays = env.relay.api.officialActiveCache.getUnit.recoverDefault,
         streamerSpots = env.streamer.homepageMaxSetting.get(),
         weeklyChallenge = env.lobby.weeklyChallenge,
         chatOption = ctx.noKid so env.chat.api.userChat.cached

@@ -8,6 +8,7 @@ import lila.forum.MiniForumPost
 import lila.game.{ Game, Pov }
 import lila.lobby.WeeklyChallenge
 import lila.playban.TempBan
+import lila.relay.RelayTour
 import lila.simul.{ Simul, SimulIsFeaturable }
 import lila.streamer.LiveStreams
 import lila.timeline.Entry
@@ -43,6 +44,7 @@ final class Preload(
       tours: Fu[List[Tournament]],
       events: Fu[List[Event]],
       simuls: Fu[List[Simul]],
+      relays: Fu[List[RelayTour.ActiveWithNextRound]],
       streamerSpots: Int,
       weeklyChallenge: WeeklyChallenge,
       chatOption: Fu[Option[lila.chat.UserChat.Mine]],
@@ -74,7 +76,8 @@ final class Preload(
               .preloadMany {
                 tWinners.map(_.userId) ::: posts.flatMap(_.userId) ::: entries.flatMap(_.userIds).toList
               }
-              .mon(_.lobby.segment("lightUsers")) map { case (currentGame, _) =>
+              .mon(_.lobby.segment("lightUsers")) zip
+            relays.mon(_.lobby.segment("relays")) map { case ((currentGame, _), relays) =>
               Homepage(
                 data,
                 entries,
@@ -82,6 +85,7 @@ final class Preload(
                 tours,
                 events,
                 simuls,
+                relays,
                 feat,
                 lead,
                 tWinners,
@@ -132,6 +136,7 @@ object Preload {
       tours: List[Tournament],
       events: List[Event],
       simuls: List[Simul],
+      relays: List[RelayTour.ActiveWithNextRound],
       featured: Option[Game],
       leaderboard: List[User.LightPerf],
       tournamentWinners: List[Winner],
