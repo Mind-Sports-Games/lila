@@ -52,7 +52,7 @@ final class Env(
   system.actorOf(Props(wire[RelayFetch]))
 
   system.scheduler.scheduleWithFixedDelay(1 minute, 1 minute) { () =>
-    api.autoStart >> api.autoFinishNotSyncing
+    api.autoStart >> api.autoFinishNotSyncing >> api.autoFinishNeverStarted
     ()
   }
 

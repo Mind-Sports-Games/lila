@@ -324,6 +324,22 @@ final class RelayApi(
         .void
     }
 
+  private[relay] def autoFinishNeverStarted: Funit =
+    roundRepo.coll.list[RelayRound](
+      $doc(
+        "sync.until".$exists(false),
+        "startedAt".$exists(false),
+        "finished" -> false
+      )
+    ) flatMap { relays =>
+      Future
+        .sequence(relays.filter(_.shouldGiveUp).map { relay =>
+          logger.info(s"Finish for lack of start $relay")
+          update(relay)(_.finish)
+        })
+        .void
+    }
+
   private[relay] def WithRelay[A: Zero](id: RelayRound.Id)(f: RelayRound => Fu[A]): Fu[A] =
     byId(id) flatMap { _ so f }
 

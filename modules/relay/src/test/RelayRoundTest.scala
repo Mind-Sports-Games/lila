@@ -85,4 +85,44 @@ class RelayRoundTest extends munit.FunSuite {
     assert(again.sync.playing)
     assert(again.sync.ongoing)
   }
+
+  /* autoFinishNeverStarted selects on the three flags and then defers the
+   * decision to shouldGiveUp, so these are the rule it actually applies. The
+   * round it exists for is the one with no start date at all: nothing else
+   * finishes that, and while it stays unfinished its tour stays active and an
+   * official one holds the homepage spotlight. */
+  test("a round with no start date is given up on a day after creation") {
+    assert(!round.copy(createdAt = DateTime.now.minusHours(23)).shouldGiveUp)
+    assert(round.copy(createdAt = DateTime.now.minusDays(2)).shouldGiveUp)
+  }
+
+  test("a round with a start date is given up on three hours after it") {
+    val at = round.copy(createdAt = DateTime.now.minusDays(9))
+    assert(!at.copy(startsAt = DateTime.now.plusDays(1).some).shouldGiveUp)
+    assert(!at.copy(startsAt = DateTime.now.minusHours(2).some).shouldGiveUp)
+    assert(at.copy(startsAt = DateTime.now.minusHours(4).some).shouldGiveUp)
+  }
+
+  /* autoStart only looks back a day, so a startsAt older than that is never
+   * picked up - the case where lila was down across the window. */
+  test("a round whose start date is long past is still given up on") {
+    assert(round.copy(startsAt = DateTime.now.minusDays(30).some).shouldGiveUp)
+  }
+
+  test("a round that has started is never given up on, however old") {
+    val started = round.copy(
+      startedAt = DateTime.now.minusDays(30).some,
+      createdAt = DateTime.now.minusDays(30),
+      startsAt = DateTime.now.minusDays(30).some
+    )
+    assert(!started.shouldGiveUp)
+  }
+
+  /* Giving up is not destructive: connecting the round by hand resumes it,
+   * which is what makes this safe to apply to a round someone created early. */
+  test("a round given up on can be connected again") {
+    val revived = round.finish.resume
+    assert(!revived.finished)
+    assert(revived.sync.ongoing)
+  }
 }

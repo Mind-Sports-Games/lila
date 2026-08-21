@@ -70,6 +70,20 @@
   }
 }
 
+.analyse.has-relay-tour {
+  @include breakpoint($mq-col1) {
+    grid-template-rows: auto auto auto;
+  }
+
+  @include breakpoint($mq-col2) {
+    .relay-admin {
+      grid-area: tools;
+      align-self: start;
+      margin-top: 0;
+    }
+  }
+}
+
 main.has-relay-tour .mchat {
   max-height: 48vh;
 }
