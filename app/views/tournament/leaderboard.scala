@@ -35,8 +35,11 @@ object leaderboard {
         fws.shield.map { w =>
           freqWinner(w, "Shield")
         },
-        fws.weekly.map { w =>
-          freqWinner(w, "Weekly")
+        fws.groupCycle.map { w =>
+          freqWinner(w, "Group Cycle")
+        },
+        fws.wildcard.map { w =>
+          freqWinner(w, "Wildcard")
         },
         // fws.daily.map { w =>
         //  freqWinner(w, "Daily")

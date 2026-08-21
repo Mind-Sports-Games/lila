@@ -9,11 +9,18 @@ const patch = init([classModule, attributesModule]);
 export function PlayStrategyTournamentCalendar(element: HTMLElement, env: any) {
   // enrich tournaments
   env.data.tournaments.forEach((t: any) => {
-    if (!t.bounds)
+    if (!t.bounds) {
+      // Scheduled tournaments carry a random 0-59s start jitter (Tournament.scheduleAs) so they
+      // do not all start on the same tick. Bars are positioned to the minute, so drop those
+      // seconds before deriving bounds: otherwise the jitter decides at random whether a 24h
+      // yearly still overlaps the midnight arena that follows it, and lane packing wanders.
+      const start = new Date(t.startsAt);
+      start.setSeconds(0, 0);
       t.bounds = {
-        start: new Date(t.startsAt),
-        end: new Date(t.startsAt + t.minutes * 60 * 1000),
+        start,
+        end: new Date(start.getTime() + t.minutes * 60 * 1000),
       };
+    }
   });
 
   const ctrl: Ctrl = {

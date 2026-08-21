@@ -7,6 +7,7 @@ $c-tour-monthly: #c93d3d;
 $c-tour-yearly: $c-brag;
 $c-tour-weekend: $c-brag;
 $c-tour-marathon: #66558c;
+$c-tour-wildcard: #009e73;
 $c-tour-unique: $c-brag;
 $c-tour-max-rating: #8572ff;
 
@@ -119,6 +120,8 @@ $c-tour-max-rating: #8572ff;
     }
   }
 
+  &-groupcycle,
+  &-wildcard,
   &-weekly,
   &-weekend,
   &-monthly,
@@ -129,8 +132,13 @@ $c-tour-max-rating: #8572ff;
     background-image: url(../images/grain.png);
   }
 
+  &-groupcycle,
   &-weekly {
     background-color: $c-tour-weekly;
+  }
+
+  &-wildcard {
+    background-color: $c-tour-wildcard;
   }
 
   &-monthly {
