@@ -5,6 +5,7 @@ import strategygames.format.pgn.{ Tag, Tags, Turn }
 import com.github.blemale.scaffeine.LoadingCache
 import io.lemonlabs.uri.Url
 import org.joda.time.DateTime
+import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
 import play.api.libs.ws.StandaloneWSClient
 import RelayRound.Sync.{ UpstreamIds, UpstreamUrl }
@@ -93,7 +94,7 @@ final private class RelayFetch(
             .map { res =>
               res -> rt.round
                 .withSync(_.addLog(SyncLog.event(res.moves, none)))
-                .copy(finished = games.forall(_.end.isDefined))
+                .copy(finished = RelayFetch.allGamesEnded(games))
             }
         }
         .recover { case e: Exception =>
@@ -120,28 +121,32 @@ final private class RelayFetch(
     }
 
   def continueRelay(rt: RelayRound.WithTour): RelayRound =
-    rt.round.sync.upstream.fold(rt.round) { upstream =>
-      val seconds =
-        if (rt.round.sync.log.alwaysFails && !upstream.local) {
-          rt.round.sync.log.events.lastOption
-            .filterNot(_.isTimeout)
-            .flatMap(_.error)
-            .ifTrue(rt.tour.official && rt.round.hasStarted) foreach { error =>
-            slackApi.broadcastError(rt.round.id.value, rt.round.name, error)
-          }
-          60
-        } else
-          rt.round.sync.delay getOrElse {
-            if (upstream.local) 3 else 6
-          }
-      rt.round.withSync {
-        _.copy(
-          nextAt = DateTime.now plusSeconds {
-            seconds atLeast { if (rt.round.sync.log.justTimedOut) 10 else 2 }
-          } some
-        )
+    if (rt.round.finished) {
+      logger.info(s"Finish by all games ended ${rt.round}")
+      rt.round.finish
+    } else
+      rt.round.sync.upstream.fold(rt.round) { upstream =>
+        val seconds =
+          if (rt.round.sync.log.alwaysFails && !upstream.local) {
+            rt.round.sync.log.events.lastOption
+              .filterNot(_.isTimeout)
+              .flatMap(_.error)
+              .ifTrue(rt.tour.official && rt.round.hasStarted) foreach { error =>
+              slackApi.broadcastError(rt.round.id.value, rt.round.name, error)
+            }
+            60
+          } else
+            rt.round.sync.delay getOrElse {
+              if (upstream.local) 3 else 6
+            }
+        rt.round.withSync {
+          _.copy(
+            nextAt = DateTime.now plusSeconds {
+              seconds atLeast { if (rt.round.sync.log.justTimedOut) 10 else 2 }
+            } some
+          )
+        }
       }
-    }
 
   import com.github.benmanes.caffeine.cache.Cache
   import RelayFetch.GamesSeenBy
@@ -254,10 +259,13 @@ private object RelayFetch {
 
   case class GamesSeenBy(games: Fu[RelayGames], seenBy: Set[RelayRound.Id])
 
+  def allGamesEnded(games: RelayGames): Boolean =
+    games.nonEmpty && games.forall(_.end.isDefined)
+
   def maxChapters(tour: RelayTour) =
     lila.study.Study.maxChapters * (if (tour.official) 2 else 1)
 
-  private object DgtJson {
+  private[relay] object DgtJson {
     case class PairingPlayer(
         fname: Option[String],
         mname: Option[String],
@@ -290,9 +298,17 @@ private object RelayFetch {
         )
     }
     case class RoundJson(pairings: List[RoundJsonPairing])
-    implicit val pairingPlayerReads: Reads[PairingPlayer]   = Json.reads[PairingPlayer]
-    implicit val roundPairingReads: Reads[RoundJsonPairing] = Json.reads[RoundJsonPairing]
-    implicit val roundReads: Reads[RoundJson]               = Json.reads[RoundJson]
+
+    implicit val pairingPlayerReads: Reads[PairingPlayer] = Json.reads[PairingPlayer]
+
+    // LCC (livechesscloud) keys the two players "white" and "black", never "p1"/"p2"
+    implicit val roundPairingReads: Reads[RoundJsonPairing] = (
+      (__ \ "white").read[PairingPlayer] and
+        (__ \ "black").read[PairingPlayer] and
+        (__ \ "result").read[String]
+    )(RoundJsonPairing.apply)
+
+    implicit val roundReads: Reads[RoundJson] = Json.reads[RoundJson]
 
     // This is compatible with multiaction if turns include comma separated actions
     case class GameJson(turns: List[String], result: Option[String]) {
@@ -306,7 +322,13 @@ private object RelayFetch {
         s"$extraTags\n\n$strTurns"
       }
     }
-    implicit val gameReads: Reads[GameJson] = Json.reads[GameJson]
+    /* LCC calls the move list "moves". The "result" it carries alongside is a
+     * word - WHITEWIN, BLACKWIN, DRAW - not a PGN result, which is why toPgn
+     * ignores it: the usable result comes from the pairing in index.json. */
+    implicit val gameReads: Reads[GameJson] = (
+      (__ \ "moves").read[List[String]] and
+        (__ \ "result").readNullable[String]
+    )(GameJson.apply)
   }
 
   object multiPgnToGames {
@@ -336,24 +358,26 @@ private object RelayFetch {
 
     private def compute(pgn: String): Try[Int => RelayGame] = {
       implicit val variant: Variant = Variant.Chess(ChessVariant.default)
-      lila.study
-        .PgnImport(pgn, Nil)
-        .fold(
-          err => Failure(LilaException(err)),
-          res =>
-            Success(index =>
-              RelayGame(
-                index = index,
-                tags = res.tags,
-                variant = res.variant,
-                root = res.root.copy(
-                  comments = Comments.empty,
-                  children = res.root.children.updateMainline(_.copy(comments = Comments.empty))
-                ),
-                end = res.end
+      if (!RelayGame.isChessOnly(pgn)) Failure(LilaException(RelayGame.unsupportedVariant))
+      else
+        Try(lila.study.PgnImport(RelayGame.withPlayStrategyPlayerTags(pgn), Nil)) flatMap {
+          _.fold(
+            err => Failure(LilaException(err)),
+            res =>
+              Success(index =>
+                RelayGame(
+                  index = index,
+                  tags = res.tags,
+                  variant = res.variant,
+                  root = res.root.copy(
+                    comments = Comments.empty,
+                    children = res.root.children.updateMainline(_.copy(comments = Comments.empty))
+                  ),
+                  end = res.end
+                )
               )
-            )
-        )
+          )
+        }
     }
   }
 }

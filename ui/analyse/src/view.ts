@@ -358,14 +358,15 @@ function controls(ctrl: AnalyseCtrl) {
   );
 }
 
+// The relay tour view replaces the main board, so there is no ground to configure.
 function forceNoCoords(ctrl: AnalyseCtrl) {
-  if (ctrl.data.pref.coords !== CgCoords.Hidden) {
+  if (ctrl.chessground && ctrl.data.pref.coords !== CgCoords.Hidden) {
     ctrl.chessground.displayCoordinates(CgCoords.Hidden);
   }
 }
 
 function forceOutterCoords(ctrl: AnalyseCtrl, v: boolean) {
-  if (v) {
+  if (v && ctrl.chessground) {
     ctrl.chessground.displayCoordinates(CgCoords.Outside);
   }
 }
@@ -373,7 +374,7 @@ function forceOutterCoords(ctrl: AnalyseCtrl, v: boolean) {
 function forceInnerCoords(ctrl: AnalyseCtrl, v: boolean) {
   if (v) {
     changeColorHandle();
-    ctrl.chessground.displayCoordinates(CgCoords.Inside);
+    if (ctrl.chessground) ctrl.chessground.displayCoordinates(CgCoords.Inside);
   }
 }
 

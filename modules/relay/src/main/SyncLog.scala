@@ -14,7 +14,7 @@ case class SyncLog(events: Vector[SyncLog.Event]) extends AnyVal {
 
   def add(event: SyncLog.Event) =
     copy(
-      events = events.take(SyncLog.historySize - 1) :+ event
+      events = events.takeRight(SyncLog.historySize - 1) :+ event
     )
 }
 
@@ -39,7 +39,7 @@ object SyncLog {
       moves = moves,
       error = e map {
         case _: java.util.concurrent.TimeoutException => "Request timeout"
-        case e: Exception                             => e.getMessage take 100
+        case e: Exception => Option(e.getMessage).filter(_.nonEmpty).fold(e.getClass.getSimpleName)(_ take 100)
       },
       at = DateTime.now
     )

@@ -217,6 +217,8 @@ export interface ChapterPreview {
     p2: ChapterPreviewPlayer;
   };
   orientation: PlayerIndex;
+  variantKey: VariantKey;
+  gameFamily: string;
   fen: string;
   lastMove?: string;
   playing: boolean;

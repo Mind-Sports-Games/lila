@@ -1,20 +1,17 @@
 package views.html.relay
 
-/*
-import controllers.routes
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.relay.RelayRound.Sync.UpstreamUrl.LccRegex
 import lila.relay.RelayRoundForm.Data
 import lila.relay.{ RelayRound, RelayTour }
-*/
 
 object roundForm {
-  /*
-  import trans.broadcast._
+
+  import trans.broadcast.*
 
   def create(form: Form[Data], tour: RelayTour)(implicit ctx: Context) =
     layout(newBroadcast.txt())(
@@ -83,7 +80,7 @@ object roundForm {
       form3
         .group(form("syncUrlRound"), roundNumber(), help = frag("Only for livechesscloud source URLs").some)(
           form3.input(_, typ = "number")
-        )(ctx)(cls := (!isLcc).option("none")),
+        )(using ctx)(cls := (!isLcc).option("none")),
       form3.split(
         form3.group(
           form("startsAt"),
@@ -91,18 +88,19 @@ object roundForm {
           help = startDateHelp().some,
           half = true
         )(form3.flatpickr(_)),
-        isGranted(_.Relay) option
+        isGranted(_.Relay).option(
           form3.group(
             form("throttle"),
             raw("Throttle in seconds"),
             help = raw("Optional, to manually throttle requests. Min 2s, max 60s.").some,
             half = true
           )(form3.input(_, typ = "number"))
+        )
       ),
       form3.actions(
         a(href := routes.RelayTour.redirect(t.slug, t.id.value))(trans.cancel()),
         form3.submit(trans.apply())
       )
     )
-  }*/
+  }
 }

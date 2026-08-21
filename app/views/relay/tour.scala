@@ -1,20 +1,15 @@
 package views.html.relay
 
-/*
-import play.api.mvc.Call
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 
-import controllers.routes
-import lila.relay.{ RelayRound, RelayTour }
-*/
+import lila.relay.RelayTour
 
 object tour {
-  /*
-  import trans.broadcast._
+
+  import trans.broadcast.*
 
   def index(
       active: List[RelayTour.ActiveWithNextRound],
@@ -28,11 +23,13 @@ object tour {
       main(cls := "relay-index page-small box")(
         div(cls := "box__top")(
           h1(liveBroadcasts()),
-          a(
-            href := routes.RelayTour.form,
-            cls := "new button button-empty",
-            title := newBroadcast.txt(),
-            dataIcon := "O"
+          isGranted(_.Relay).option(
+            a(
+              href := routes.RelayTour.form,
+              cls := "new button button-empty",
+              title := newBroadcast.txt(),
+              dataIcon := "O"
+            )
           )
         ),
         st.section(
@@ -71,5 +68,4 @@ object tour {
         )
       )
     }
-   */
 }

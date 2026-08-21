@@ -69,6 +69,7 @@ export default function (token: string) {
   const gameStateMap = new Map(); //A collection of key values to store the changing state of all open games
   const gameConnectionMap = new Map<string, { connected: boolean; lastEvent: number }>(); //A collection of key values to store the network status of a game
   const gameChessBoardMap = new Map<string, Chess>(); //A collection of stratops Boards representing the current board of the games
+  const dgtCompatibleVariantKeys = ['standard', 'chess960']; //The only variants a DGT board can represent and stratops Chess can rule on
   let eventSteamStatus = { connected: false, lastEvent: time.getTime() }; //An object to store network status of the main eventStream
   const keywordsBase = [
     'p1',
@@ -206,6 +207,17 @@ export default function (token: string) {
       });
   }
 
+  /**
+   * The DGT board and all the stratops calls on this page assume standard chess rules,
+   * so any other game logic or chess variant must be ignored instead of taking over the board
+   *
+   * @param {string} variantKey - The variant key as sent by the event stream or the board game stream
+   * @returns {boolean} - True if the game can be played with a DGT board
+   */
+  function isDgtCompatibleVariant(variantKey: string | undefined): boolean {
+    return variantKey !== undefined && dgtCompatibleVariantKeys.includes(variantKey);
+  }
+
   /** 
     GET /api/stream/event
     Stream incoming events
@@ -250,12 +262,19 @@ export default function (token: string) {
             //JSON data found, let's check if this is a game that started. field type is mandatory except on http 4xx
             if (data.type == 'gameStart') {
               if (verbose) console.log('connectToEventStream - gameStart event arrived. GameId: ' + data.game.id);
-              try {
-                //Connect to that game's stream
-                connectToGameStream(data.game.id);
-              } catch (error) {
-                //This will trigger if connectToGameStream fails
-                console.error('connectToEventStream - Failed to connect to game stream. ' + error);
+              if (!isDgtCompatibleVariant(data.game.variant?.key)) {
+                //Never track this game, otherwise it would be offered to the board as a playable game
+                console.warn(
+                  `connectToEventStream - Ignoring game ${data.game.id}. Variant not supported by the DGT board: ${data.game.variant?.key}`,
+                );
+              } else {
+                try {
+                  //Connect to that game's stream
+                  connectToGameStream(data.game.id);
+                } catch (error) {
+                  //This will trigger if connectToGameStream fails
+                  console.error('connectToEventStream - Failed to connect to game stream. ' + error);
+                }
               }
             } else if (data.type == 'challenge') {
               //Challenge received
@@ -346,6 +365,16 @@ export default function (token: string) {
             const data = JSON.parse(jsonArray[i]);
             //The first line is always of type gameFull.
             if (data.type == 'gameFull') {
+              if (!isDgtCompatibleVariant(data.variant?.key)) {
+                //Reached through the reconnection loop, or if the event stream did not carry a variant
+                console.warn(
+                  `connectToGameStream - Ignoring game ${gameId}. Variant not supported by the DGT board: ${data.variant?.key}`,
+                );
+                //Forget the game completely so the reconnection loop does not attempt to pick it up again
+                gameConnectionMap.delete(gameId);
+                await reader.cancel();
+                return;
+              }
               if (!verbose) console.clear();
               //Log game Summary
               //logGameSummary(data);

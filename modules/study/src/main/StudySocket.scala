@@ -390,7 +390,11 @@ final private class StudySocket(
       )
     )
   private[study] def reloadChapters(chapters: List[Chapter.Metadata]) = version("chapters", chapters)
-  def reloadAll                                                       = version("reload", JsNull)
+  /* Unversioned room broadcast, for the relay module: it pushes the same
+   * tournament state to every round of a tournament, so it must not consume a
+   * version of each of their studies. */
+  private[study] def notifyRoom(tpe: String, data: JsObject) = notify(tpe, data)
+  def reloadAll = version("reload", JsNull)
   def changeChapter(pos: Position.Ref, who: Who) = version("changeChapter", Json.obj("p" -> pos, "w" -> who))
   def updateChapter(chapterId: Chapter.Id, who: Who) =
     version("updateChapter", Json.obj("chapterId" -> chapterId, "w" -> who))

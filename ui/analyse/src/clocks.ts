@@ -24,10 +24,11 @@ export default function renderClocks(ctrl: AnalyseCtrl): [VNode, VNode] | undefi
   }
 
   const p1Pov = ctrl.bottomIsP1();
-  const isP1Turn = node.playedPlayerIndex === 'p1';
+  const justPlayedP1 = node.playedPlayerIndex === 'p1';
+  const isP1Turn = node.playerIndex === 'p1';
   const centis: Array<number | undefined> = [clockOfOpponentAtPath(ctrl.path), clock];
 
-  if (isP1Turn) centis.reverse();
+  if (justPlayedP1) centis.reverse();
 
   const study = ctrl.study,
     relay = study && study.data.chapter.relay;

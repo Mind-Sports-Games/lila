@@ -19,9 +19,14 @@ final private class RelayFormatApi(ws: StandaloneWSClient, cacheApi: CacheApi)(i
   import RelayFormat.*
   import RelayRound.Sync.UpstreamUrl
 
+  /* Deliberately no refreshAfterWrite. The upstream URL is user supplied, and a
+   * failed refresh leaves the entry stale, so an unreachable source refreshes
+   * again on the very next read - once per sync tick, each one several requests
+   * from guessFormat, each one a Caffeine stack trace. Loading on demand instead
+   * reports failures through the sync log, where the broadcaster can see them.
+   * Use refresh() to re-guess the format of a source that has changed. */
   private val cache = cacheApi[UpstreamUrl.WithRound, RelayFormat](8, "relay.format") {
-    _.refreshAfterWrite(10 minutes)
-      .expireAfterAccess(20 minutes)
+    _.expireAfterAccess(20 minutes)
       .buildAsyncFuture(guessFormat)
   }
 
@@ -91,7 +96,8 @@ final private class RelayFormatApi(ws: StandaloneWSClient, cacheApi: CacheApi)(i
     // TODO: Only support chess PGN for now.
     implicit val variant: Variant = Variant.Chess(ChessVariant.default)
     MultiPgn.split(body, 1).value.headOption so { pgn =>
-      lila.study.PgnImport(pgn, Nil).isValid
+      RelayGame.isChessOnly(pgn) &&
+      scala.util.Try(lila.study.PgnImport(pgn, Nil).isValid).getOrElse(false)
     }
   }
   private def looksLikePgn(url: Url): Fu[Boolean] = httpGet(url).map { _ exists looksLikePgn }

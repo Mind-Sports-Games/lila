@@ -56,6 +56,12 @@ db.ranking.createIndex({ perf: 1, rating: -1 }, { partialFilterExpression: { sta
 db.ranking.createIndex({ perf: 1, rating: -1, expiresAt: -1 }, { partialFilterExpression: { stable: true } });
 db.ranking.createIndex({ perf: 1, rating: -1 });
 
+db.relay.createIndex({ tourId: 1, finished: 1 });
+db.relay.createIndex({ 'sync.nextAt': 1 }, { partialFilterExpression: { 'sync.nextAt': { $exists: true } } });
+db.relay.createIndex({ startsAt: 1 }, { partialFilterExpression: { startsAt: { $exists: true } } });
+db.relay.createIndex({ startedAt: 1 }, { partialFilterExpression: { startedAt: { $exists: true } } });
+db.relay_tour.createIndex({ official: 1, active: 1, syncedAt: -1 });
+
 db.simul.createIndex({ hostId: 1 }, { partialFilterExpression: { status: 10 } });
 db.simul.createIndex({ hostSeenAt: -1 }, { partialFilterExpression: { status: 10, featurable: true } });
 

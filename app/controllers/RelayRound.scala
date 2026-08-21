@@ -1,22 +1,29 @@
 package controllers
 
-import lila.app.*
+import play.api.data.Form
+import play.api.mvc.*
+import scala.annotation.nowarn
+import views.*
 
-// import lila.common.config.MaxPerSecond
+import lila.api.Context
+import lila.app.{ *, given }
+import lila.relay.{ RelayRound as RoundModel, RelayTour as TourModel, RelayRoundForm }
+import lila.user.{ User as UserModel }
 
 final class RelayRound(
     env: Env,
-    @annotation.nowarn("msg=unused") studyC: => Study
-    // apiC: => Api
+    studyC: => Study
 ) extends LilaController(env) {
-  /*
+
   import lila.relay.JsonView.roundWrites
 
   def form(tourId: String) =
-    Auth { implicit ctx => me =>
-      NoLameOrBot {
-        WithTourAndRoundsCanUpdate(tourId) { trs =>
-          Ok(html.relay.roundForm.create(env.relay.roundForm.create(trs), trs.tour)).fuccess
+    Auth { implicit ctx => _ =>
+      IfGranted(_.Relay) {
+        NoLameOrBot {
+          WithTourAndRoundsCanUpdate(tourId) { trs =>
+            Ok(html.relay.roundForm.create(env.relay.roundForm.create(trs), trs.tour)).fuccess
+          }
         }
       }
     }
@@ -25,37 +32,41 @@ final class RelayRound(
     AuthOrScopedBody(_.Study.Write)(
       auth = implicit ctx =>
         me =>
-          NoLameOrBot {
-            WithTourAndRoundsCanUpdate(tourId) { trs =>
-              val tour = trs.tour
-              env.relay.roundForm
-                .create(trs)
-                .bindFromRequest()(ctx.body, formBinding)
-                .fold(
-                  err => BadRequest(html.relay.roundForm.create(err, tour)).fuccess,
-                  setup =>
-                    env.relay.api.create(setup, me, tour) map { round =>
-                      Redirect(routes.RelayRound.show(tour.slug, round.slug, round.id.value))
-                    }
-                )
+          IfGranted(_.Relay) {
+            NoLameOrBot {
+              WithTourAndRoundsCanUpdate(tourId) { trs =>
+                val tour = trs.tour
+                env.relay.roundForm
+                  .create(trs)
+                  .bindFromRequest()(using ctx.body, formBinding)
+                  .fold(
+                    err => BadRequest(html.relay.roundForm.create(err, tour)).fuccess,
+                    setup =>
+                      env.relay.api.create(setup, me, tour) map { round =>
+                        Redirect(routes.RelayRound.show(tour.slug, round.slug, round.id.value))
+                      }
+                  )
+              }
             }
           },
       scoped = req =>
         me =>
-          env.relay.api tourById TourModel.Id(tourId) flatMap {
-            _ so { tour =>
-              env.relay.api.withRounds(tour) flatMap { trs =>
-                !(me.isBot || me.lame) so
-                  env.relay.roundForm
-                    .create(trs)
-                    .bindFromRequest()(req, formBinding)
-                    .fold(
-                      err => BadRequest(apiFormError(err)).fuccess,
-                      setup =>
-                        env.relay.api
-                          .create(setup, me, tour)
-                          .map(JsonOk(_))
-                    )
+          IfGranted(_.Relay, req, me) {
+            env.relay.api.tourById(TourModel.Id(tourId)) flatMap {
+              _ so { tour =>
+                env.relay.api.withRounds(tour) flatMap { trs =>
+                  !(me.isBot || me.lame) so
+                    env.relay.roundForm
+                      .create(trs)
+                      .bindFromRequest()(using req, formBinding)
+                      .fold(
+                        err => BadRequest(apiFormError(err)).fuccess,
+                        setup =>
+                          env.relay.api
+                            .create(setup, me, tour)
+                            .map(JsonOk(_))
+                      )
+                }
               }
             }
           }
@@ -72,7 +83,7 @@ final class RelayRound(
     AuthOrScopedBody(_.Study.Write)(
       auth = implicit ctx =>
         me =>
-          doUpdate(id, me)(ctx.body) flatMap {
+          doUpdate(id, me)(using ctx.body) flatMap {
             case None => notFound
             case Some(res) =>
               res
@@ -84,7 +95,7 @@ final class RelayRound(
           },
       scoped = req =>
         me =>
-          doUpdate(id, me)(req) map {
+          doUpdate(id, me)(using req) map {
             case None => NotFound(jsonError("No such broadcast"))
             case Some(res) =>
               res.fold(
@@ -95,7 +106,7 @@ final class RelayRound(
     )
 
   private def doUpdate(id: String, me: UserModel)(implicit
-      req: Request[_]
+      req: Request[?]
   ): Fu[Option[Either[(RoundModel.WithTour, Form[RelayRoundForm.Data]), RoundModel.WithTour]]] =
     env.relay.api.byIdAndContributor(id, me) flatMap {
       _ so { rt =>
@@ -105,8 +116,8 @@ final class RelayRound(
           .fold(
             err => fuccess(Left(rt -> err)),
             data =>
-              env.relay.api.update(rt.round) { data.update(_, me) }.dmap(_ withTour rt.tour) dmap Right.apply
-          ) dmap some
+              env.relay.api.update(rt.round) { data.update(_, me) }.dmap(_.withTour(rt.tour)).dmap(Right.apply)
+          ).dmap(some)
       }
     }
 
@@ -124,13 +135,13 @@ final class RelayRound(
         WithRoundAndTour(ts, rs, id) { rt =>
           val sc =
             if (rt.round.sync.ongoing)
-              env.study.chapterRepo relaysAndTagsByStudyId rt.round.studyId flatMap { chapters =>
+              env.study.chapterRepo.relaysAndTagsByStudyId(rt.round.studyId) flatMap { chapters =>
                 chapters.find(_.looksAlive) orElse chapters.headOption match {
                   case Some(chapter) => env.study.api.byIdWithChapter(rt.round.studyId, chapter.id)
-                  case None          => env.study.api byIdWithChapter rt.round.studyId
+                  case None          => env.study.api.byIdWithChapter(rt.round.studyId)
                 }
               }
-            else env.study.api byIdWithChapter rt.round.studyId
+            else env.study.api.byIdWithChapter(rt.round.studyId)
           sc flatMap { _ so { doShow(rt, _) } }
         }
       },
@@ -159,10 +170,10 @@ final class RelayRound(
       }
     }
 
-  private def WithRoundAndTour(ts: String, rs: String, id: String)(
+  private def WithRoundAndTour(@nowarn("msg=unused") ts: String, @nowarn("msg=unused") rs: String, id: String)(
       f: RoundModel.WithTour => Fu[Result]
   )(implicit ctx: Context): Fu[Result] =
-    OptionFuResult(env.relay.api byIdWithTour id) { rt =>
+    OptionFuResult(env.relay.api.byIdWithTour(id)) { rt =>
       if (!ctx.req.path.startsWith(rt.path)) Redirect(rt.path).fuccess
       else f(rt)
     }
@@ -170,7 +181,7 @@ final class RelayRound(
   private def WithTour(id: String)(
       f: TourModel => Fu[Result]
   )(implicit ctx: Context): Fu[Result] =
-    OptionFuResult(env.relay.api tourById TourModel.Id(id))(f)
+    OptionFuResult(env.relay.api.tourById(TourModel.Id(id)))(f)
 
   private def WithTourAndRoundsCanUpdate(id: String)(
       f: TourModel.WithRounds => Fu[Result]
@@ -178,7 +189,7 @@ final class RelayRound(
     WithTour(id) { tour =>
       ctx.me.so { env.relay.api.canUpdate(_, tour) } flatMap {
         _ so {
-          env.relay.api withRounds tour flatMap f
+          env.relay.api.withRounds(tour) flatMap f
         }
       }
     }
@@ -191,7 +202,7 @@ final class RelayRound(
         (sc, studyData) <- studyC.getJsonData(oldSc)
         rounds          <- env.relay.api.byTourOrdered(rt.tour)
         data = env.relay.jsonView.makeData(
-          rt.tour withRounds rounds.map(_.round),
+          rt.tour.withRounds(rounds.map(_.round)),
           rt.round.id,
           studyData,
           ctx.userId exists sc.study.canContribute
@@ -200,11 +211,10 @@ final class RelayRound(
         sVersion  <- env.study.version(sc.study.id)
         streamers <- studyC.streamersOf(sc.study)
       } yield EnableSharedArrayBuffer(
-        Ok(html.relay.show(rt withStudy sc.study, data, chat, sVersion, streamers))
+        Ok(html.relay.show(rt.withStudy(sc.study), data, chat, sVersion, streamers))
       )
     }
 
   implicit private def makeRelayId(id: String): RoundModel.Id           = RoundModel.Id(id)
   implicit private def makeChapterId(id: String): lila.study.Chapter.Id = lila.study.Chapter.Id(id)
-   */
 }
