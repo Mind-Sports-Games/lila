@@ -327,6 +327,7 @@ final class RelayApi(
   private[relay] def autoFinishNeverStarted: Funit =
     roundRepo.coll.list[RelayRound](
       $doc(
+        "sync.upstream".$exists(true),
         "sync.until".$exists(false),
         "startedAt".$exists(false),
         "finished" -> false

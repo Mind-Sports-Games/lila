@@ -124,7 +124,7 @@ object RelayRound {
     }
     object UpstreamUrl {
       case class WithRound(url: String, round: Option[Int])
-      val LccRegex = """.*view\.livechesscloud\.com/#?([0-9a-f\-]+)""".r
+      val LccRegex = """(?i).*view\.livechesscloud\.com/#?([0-9a-f\-]+)""".r
     }
     case class UpstreamIds(ids: List[lila.game.Game.ID]) extends Upstream
   }

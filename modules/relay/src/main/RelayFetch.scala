@@ -5,6 +5,7 @@ import strategygames.format.pgn.{ Tag, Tags, Turn }
 import com.github.blemale.scaffeine.LoadingCache
 import io.lemonlabs.uri.Url
 import org.joda.time.DateTime
+import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
 import play.api.libs.ws.StandaloneWSClient
 import RelayRound.Sync.{ UpstreamIds, UpstreamUrl }
@@ -264,7 +265,7 @@ private object RelayFetch {
   def maxChapters(tour: RelayTour) =
     lila.study.Study.maxChapters * (if (tour.official) 2 else 1)
 
-  private object DgtJson {
+  private[relay] object DgtJson {
     case class PairingPlayer(
         fname: Option[String],
         mname: Option[String],
@@ -297,9 +298,17 @@ private object RelayFetch {
         )
     }
     case class RoundJson(pairings: List[RoundJsonPairing])
-    implicit val pairingPlayerReads: Reads[PairingPlayer]   = Json.reads[PairingPlayer]
-    implicit val roundPairingReads: Reads[RoundJsonPairing] = Json.reads[RoundJsonPairing]
-    implicit val roundReads: Reads[RoundJson]               = Json.reads[RoundJson]
+
+    implicit val pairingPlayerReads: Reads[PairingPlayer] = Json.reads[PairingPlayer]
+
+    // LCC (livechesscloud) keys the two players "white" and "black", never "p1"/"p2"
+    implicit val roundPairingReads: Reads[RoundJsonPairing] = (
+      (__ \ "white").read[PairingPlayer] and
+        (__ \ "black").read[PairingPlayer] and
+        (__ \ "result").read[String]
+    )(RoundJsonPairing.apply)
+
+    implicit val roundReads: Reads[RoundJson] = Json.reads[RoundJson]
 
     // This is compatible with multiaction if turns include comma separated actions
     case class GameJson(turns: List[String], result: Option[String]) {
@@ -313,7 +322,13 @@ private object RelayFetch {
         s"$extraTags\n\n$strTurns"
       }
     }
-    implicit val gameReads: Reads[GameJson] = Json.reads[GameJson]
+    /* LCC calls the move list "moves". The "result" it carries alongside is a
+     * word - WHITEWIN, BLACKWIN, DRAW - not a PGN result, which is why toPgn
+     * ignores it: the usable result comes from the pairing in index.json. */
+    implicit val gameReads: Reads[GameJson] = (
+      (__ \ "moves").read[List[String]] and
+        (__ \ "result").readNullable[String]
+    )(GameJson.apply)
   }
 
   object multiPgnToGames {

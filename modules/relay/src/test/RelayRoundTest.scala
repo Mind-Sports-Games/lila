@@ -118,6 +118,21 @@ class RelayRoundTest extends munit.FunSuite {
     assert(!started.shouldGiveUp)
   }
 
+  /* A push round is driven from outside: RelayPush never calls ensureStarted and
+   * never sets sync.until, so on the flags alone a broadcast being actively
+   * pushed to is indistinguishable from one that never started. Only the absent
+   * upstream tells them apart, which is why the sweep selects on it - otherwise
+   * a live pushed broadcast gets finished 3h after its start time. */
+  test("a push round looks unstarted on every flag the sweep selects on") {
+    val push = round.copy(startsAt = DateTime.now.minusHours(4).some).withSync(_.copy(upstream = none))
+    assert(push.sync.upstream.isEmpty)
+    assertEquals(push.sync.until, none)
+    assert(!push.hasStarted)
+    assert(!push.finished)
+    // so shouldGiveUp alone would finish it mid-broadcast
+    assert(push.shouldGiveUp)
+  }
+
   /* Giving up is not destructive: connecting the round by hand resumes it,
    * which is what makes this safe to apply to a round someone created early. */
   test("a round given up on can be connected again") {

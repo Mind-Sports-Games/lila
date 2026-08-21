@@ -21,7 +21,7 @@ final class RelayTourForm {
     )(Data.apply)(unapply)
   )
 
-  def create = form
+  def create = form.fill(Data(official = true.some))
 
   def edit(t: RelayTour) = form.fill(Data.make(t))
 }
@@ -29,10 +29,10 @@ final class RelayTourForm {
 object RelayTourForm {
 
   case class Data(
-      name: String,
-      description: String,
-      markup: Option[String],
-      official: Option[Boolean]
+      name: String = "",
+      description: String = "",
+      markup: Option[String] = None,
+      official: Option[Boolean] = None
   ) {
 
     def update(tour: RelayTour, user: User) =
