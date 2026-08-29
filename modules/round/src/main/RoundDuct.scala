@@ -621,9 +621,11 @@ final private[round] class RoundDuct(
     case e: Exception =>
       val sw = new StringWriter
       e.printStackTrace(new PrintWriter(sw))
+      // The stack trace of the actual error is already in the message above. Thread.dumpStack additionally
+      // wrote the *current* thread's stack to the globally synchronised System.err, which serialises every
+      // thread that logs during an error burst.
       logger.warn(s"$name: ${e.getMessage} with stack trace: ${sw.toString}")
       val _ = lila.mon.round.error.other.increment()
-      Thread.dumpStack()
   }
 
   def roomId = RoomId(gameId)

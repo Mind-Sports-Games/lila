@@ -49,15 +49,31 @@ final private class RelayFetch(
     { val _ = context.system.scheduler.scheduleOnce(500 millis, self, Tick) }
   }
 
+  /* Self-clocking actor: the next Tick is only scheduled once the current one finishes. A ReceiveTimeout
+   * therefore means either the previous tick never completed, or it did and the scheduled Tick was never
+   * delivered. Note also that `api.toSync` failing skips scheduleNext entirely, which is a third way to get
+   * here; pending will read true in that case, with the elapsed time telling you it stopped early.
+   */
+  @volatile private var tickId        = 0L
+  @volatile private var tickStartedAt = 0L
+  @volatile private var tickPending   = false
+
   def receive = {
 
     case ReceiveTimeout =>
-      val msg = "RelaySync timed out!"
-      logger.error(msg)
+      val stuckForMillis = if (tickPending) (System.nanoTime() - tickStartedAt) / 1000000 else -1L
+      val msg            = "RelaySync timed out!"
+      logger.error(
+        s"$msg tick=$tickId pending=$tickPending stuckFor=${stuckForMillis}ms\n" +
+          s"ducts:\n${lila.common.DuctRegistry.dump()}"
+      )
       lila.mon.relay.timeout.increment()
       throw new RuntimeException(msg)
 
     case Tick =>
+      tickId += 1
+      tickStartedAt = System.nanoTime()
+      tickPending = true
       api.toSync.flatMap { relays =>
         List(true, false) foreach { official =>
           lila.mon.relay.ongoing(official).update(relays.count(_.tour.official == official))
@@ -76,7 +92,10 @@ final private class RelayFetch(
               api.update(rt.round)(_.finish)
             } else fuccess(rt.round)
           })
-          .addEffectAnyway(scheduleNext())
+          .addEffectAnyway {
+            tickPending = false
+            scheduleNext()
+          }
       }.discard
   }
 

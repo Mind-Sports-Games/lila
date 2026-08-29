@@ -39,14 +39,32 @@ final private[round] class Titivate(
 
   def scheduleNext(): Unit = { val _ = scheduler.scheduleOnce(5 seconds, self, Run) }
 
+  /* This actor clocks itself: it only schedules its next Run once the current one has completed. So a
+   * ReceiveTimeout means one of two very different things, and the logged message alone cannot tell them
+   * apart. Either the previous run's future never completed (runPending), which points at the stream or
+   * whatever it awaits, or the run did complete and the scheduled Run message never arrived, which points at
+   * the scheduler or the dispatcher. Recording that distinction is the point of the fields below.
+   */
+  // written from the stream's completion callback, read from the actor thread
+  @volatile private var runId        = 0L
+  @volatile private var runStartedAt = 0L
+  @volatile private var runPending   = false
+
   def receive = {
     case ReceiveTimeout =>
-      val msg = "Titivate timed out!"
-      logBranch.error(msg)
+      val stuckForMillis = if (runPending) (System.nanoTime() - runStartedAt) / 1000000 else -1L
+      val msg            = "Titivate timed out!"
+      logBranch.error(
+        s"$msg run=$runId pending=$runPending stuckFor=${stuckForMillis}ms\n" +
+          s"ducts:\n${lila.common.DuctRegistry.dump()}"
+      )
       lila.mon.round.titivate.timeout.increment()
       throw new RuntimeException(msg)
 
     case Run =>
+      runId += 1
+      runStartedAt = System.nanoTime()
+      runPending = true
       gameRepo.count(_.checkable) foreach { total =>
         lila.mon.round.titivate.total.record(total)
         gameRepo
@@ -64,7 +82,10 @@ final private[round] class Titivate(
           )
           .monSuccess(_.round.titivate.time)
           .logFailure(logBranch)
-          .addEffectAnyway(scheduleNext())
+          .addEffectAnyway {
+            runPending = false
+            scheduleNext()
+          }
       }
   }
 

@@ -206,6 +206,23 @@ object mon {
   }
   object duct {
     def overflow(name: String) = counter("duct.overflow").withTag("name", name)
+    // milliseconds a task spent queued before the duct started running it
+    def queueWait(name: String) = histogram("duct.queue.wait").withTag("name", name)
+    // milliseconds a task took once started, measured on the real future rather than the timeout race
+    def runTime(name: String) = histogram("duct.run.time").withTag("name", name)
+    def timeout(name: String) = counter("duct.timeout").withTag("name", name)
+    // tasks that outlived their own timeout; a rate below duct.timeout means tasks are vanishing entirely
+    def lateCompletion(name: String) = histogram("duct.late.completion").withTag("name", name)
+    // a duct's process function threw synchronously, which would have deadlocked it permanently
+    def wedged(name: String) = counter("duct.wedged").withTag("name", name)
+    def depth(name: String)  = histogram("duct.depth").withTag("name", name)
+  }
+  object stall {
+    // milliseconds between submitting a no-op task and the default execution context running it
+    val contextLatency = histogram("stall.context.latency").withoutTags()
+    // milliseconds by which the akka scheduler overshot a short timer
+    val schedulerDrift = histogram("stall.scheduler.drift").withoutTags()
+    val detected       = counter("stall.detected").withoutTags()
   }
   object user {
     val online = gauge("user.online").withoutTags()

@@ -218,6 +218,25 @@ final class RoundSocket(
     val _ = lila.mon.round.ductCount.update(rounds.size)
   }
 
+  /* Round ducts are unbounded and have no overflow counter, so a game whose duct stops draining accumulates
+   * messages invisibly: every Tick, every QuietFlag, every move. Reporting the deepest queue makes that
+   * visible, and registering it lets a stall dump attribute the backlog to round play.
+   */
+  system.scheduler.scheduleWithFixedDelay(60 seconds, 60 seconds) { () =>
+    val _ = lila.mon.duct.depth("round").record(deepestRoundQueue().toLong)
+  }
+
+  private def deepestRoundQueue(): Int = {
+    var deepest = 0
+    rounds.foreachValue { duct =>
+      val size = duct.queueSize
+      if (size > deepest) deepest = size
+    }
+    deepest
+  }
+
+  lila.common.DuctRegistry.register("round.deepest", () => deepestRoundQueue())
+
   private val terminationDelay = new TerminationDelay(system.scheduler, 1 minute, finishRound)
 }
 

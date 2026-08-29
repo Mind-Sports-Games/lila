@@ -52,8 +52,25 @@ final class BoundedDuct(maxSize: Int, name: String, logging: Boolean = true)(pro
    */
   private val stateRef: AtomicReference[State] = new AtomicReference(None)
 
+  /* `process` is expected to return a future; if it instead throws synchronously, the state ref is left
+   * marked busy and this duct never runs another task for the lifetime of the JVM. Callers then see their
+   * futures hang rather than fail, which is close to invisible in the logs. Draining the queue anyway keeps
+   * the duct alive and makes the event loud. The exception is still rethrown so that callers observe exactly
+   * what they observe today.
+   */
   private def run(msg: Any): Unit =
-    process.applyOrElse(msg, fallback).onComplete(postRun)
+    try process.applyOrElse(msg, fallback).onComplete(postRun)
+    catch {
+      case e: Throwable =>
+        lila.mon.duct.wedged(name).increment()
+        lila.log("duct").error(
+          s"[$name] process threw synchronously on ${msg.getClass.getSimpleName}; " +
+            "duct would have wedged permanently, draining queue instead",
+          e
+        )
+        postRun(())
+        throw e
+    }
 
   private val postRun = (_: Any) => stateRef.getAndUpdate(postRunUpdate).flatMap(_.headOption).foreach(run)
 

@@ -33,8 +33,26 @@ abstract class Duct(implicit ec: scala.concurrent.ExecutionContext) extends lila
    */
   private val stateRef: AtomicReference[State] = new AtomicReference(None)
 
+  /* Number of messages this duct still has to process, including the one in flight. Unbounded ducts have no
+   * backpressure and no overflow counter, so without this a backlog is entirely invisible.
+   */
+  def queueSize: Int = stateRef.get().fold(0)(_.size + 1)
+
+  // See the equivalent guard in BoundedDuct: a synchronous throw from `process` would otherwise wedge this
+  // duct permanently, silently hanging every future that depends on it.
   private def run(msg: Any): Unit =
-    process.applyOrElse(msg, Duct.fallback).onComplete(postRun)
+    try process.applyOrElse(msg, Duct.fallback).onComplete(postRun)
+    catch {
+      case e: Throwable =>
+        lila.mon.duct.wedged("unbounded").increment()
+        lila.log("duct").error(
+          s"process threw synchronously on ${msg.getClass.getSimpleName}; " +
+            "duct would have wedged permanently, draining queue instead",
+          e
+        )
+        postRun(())
+        throw e
+    }
 
   private val postRun = (_: Any) => stateRef.getAndUpdate(postRunUpdate).flatMap(_.headOption).foreach(run)
 }
