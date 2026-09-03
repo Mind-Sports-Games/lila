@@ -112,11 +112,12 @@ final class RelayApi(
         )
       }
       .map { docs =>
-        for {
+        val relays = for {
           doc   <- docs
           tour  <- doc.asOpt[RelayTour]
           round <- doc.getAsOpt[RelayRound]("round")
         } yield RelayTour.ActiveWithNextRound(tour, round)
+        relays.sortBy(r => (!r.ongoing, r.round.startsAt.fold(Long.MaxValue)(_.getMillis)))
       }
 
   /* The homepage asks for this on every hit, and officialActive is an
