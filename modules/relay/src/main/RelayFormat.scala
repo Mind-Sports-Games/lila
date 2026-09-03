@@ -22,31 +22,47 @@ final private class RelayFormatApi(ws: StandaloneWSClient, cacheApi: CacheApi)(i
   /* Deliberately no refreshAfterWrite. The upstream URL is user supplied, and a
    * failed refresh leaves the entry stale, so an unreachable source refreshes
    * again on the very next read - once per sync tick, each one several requests
-   * from guessFormat, each one a Caffeine stack trace. Loading on demand instead
-   * reports failures through the sync log, where the broadcaster can see them.
+   * from guessFormat. Loading on demand instead reports failures through the
+   * sync log, where the broadcaster can see them.
+   * The cached value is an Either, so guessFormat never fails - it reports 
+   * "not found yet" as a Left, which get() turns into a failed future for callers,
+   * invalidating the entry so the next sync tick tries again from scratch.
    * Use refresh() to re-guess the format of a source that has changed. */
-  private val cache = cacheApi[UpstreamUrl.WithRound, RelayFormat](8, "relay.format") {
+  private val cache = cacheApi[UpstreamUrl.WithRound, Either[String, RelayFormat]](8, "relay.format") {
     _.expireAfterAccess(20 minutes)
       .buildAsyncFuture(guessFormat)
   }
 
-  def get(upstream: UpstreamUrl.WithRound): Fu[RelayFormat] = cache get upstream
+  def get(upstream: UpstreamUrl.WithRound): Fu[RelayFormat] =
+    cache get upstream flatMap {
+      case Right(format) => fuccess(format)
+      case Left(reason)  =>
+        cache.invalidate(upstream)
+        fufail(reason)
+    }
 
   def refresh(upstream: UpstreamUrl.WithRound): Unit = cache.invalidate(upstream)
 
-  private def guessFormat(upstream: UpstreamUrl.WithRound): Fu[RelayFormat] = {
+  private def guessFormat(upstream: UpstreamUrl.WithRound): Fu[Either[String, RelayFormat]] = {
 
     val originalUrl = Url parse upstream.url
 
     // http://view.livechesscloud.com/ed5fb586-f549-4029-a470-d590f8e30c76
-    def guessLcc(url: Url): Fu[Option[RelayFormat]] =
+    // The tournament is often linked days ahead of the round starting, so the
+    // index is reachable long before it lists any games: that is expected and
+    // gets its own reason, distinct from a source that is simply wrong.
+    def guessLcc(url: Url): Fu[Option[Either[String, RelayFormat]]] =
       url.toString match {
         case UpstreamUrl.LccRegex(id) =>
-          guessManyFiles(
+          guessManyFilesDetailed(
             Url.parse(
               s"http://1.pool.livechesscloud.com/get/$id/round-${upstream.round | 1}/index.json"
             )
-          )
+          ) map {
+            case IndexResult.Found(format)    => Right(format).some
+            case IndexResult.NoGamesYet       => Left(noGamesYetReason).some
+            case IndexResult.IndexUnreachable => Left(notFoundReason).some
+          }
         case _ => fuccess(none)
       }
 
@@ -60,27 +76,41 @@ final private class RelayFormatApi(ws: StandaloneWSClient, cacheApi: CacheApi)(i
         SingleFile(pgnDoc(u))
       }
 
-    def guessManyFiles(url: Url): Fu[Option[RelayFormat]] =
+    def guessManyFilesDetailed(url: Url): Fu[IndexResult] =
       lila.common.LilaFuture.find(
         List(url) ::: mostCommonIndexNames.filterNot(url.path.parts.contains).map(addPart(url, _))
       )(looksLikeJson) flatMap {
-        _ so { index =>
+        case None => fuccess(IndexResult.IndexUnreachable)
+        case Some(index) =>
           val jsonUrl = (n: Int) => jsonDoc(replaceLastPart(index, s"game-$n.json"))
           val pgnUrl  = (n: Int) => pgnDoc(replaceLastPart(index, s"game-$n.pgn"))
           looksLikeJson(jsonUrl(1).url)
             .map(_.option(jsonUrl))
-            .orElse(looksLikePgn(pgnUrl(1).url).map(_.option(pgnUrl))) dmap2 {
-            ManyFiles(index, _)
+            .orElse(looksLikePgn(pgnUrl(1).url).map(_.option(pgnUrl))) map {
+            case Some(doc) => IndexResult.Found(ManyFiles(index, doc))
+            case None      => IndexResult.NoGamesYet
           }
-        }
       }
 
-    guessLcc(originalUrl)
-      .orElse(guessSingleFile(originalUrl))
-      .orElse(guessManyFiles(originalUrl))
-      .orFail("No games found, check your source URL")
-  } addEffect { format =>
-    logger.info(s"guessed format of $upstream: $format")
+    def guessManyFiles(url: Url): Fu[Option[RelayFormat]] =
+      guessManyFilesDetailed(url) map {
+        case IndexResult.Found(format) => format.some
+        case _                         => none
+      }
+
+    guessLcc(originalUrl) flatMap {
+      case Some(outcome) => fuccess(outcome)
+      case None =>
+        guessSingleFile(originalUrl)
+          .orElse(guessManyFiles(originalUrl))
+          .map {
+            case Some(format) => Right(format)
+            case None         => Left(notFoundReason)
+          }
+    }
+  } addEffect {
+    case Right(format) => logger.info(s"guessed format of $upstream: $format")
+    case Left(_)       => ()
   }
 
   private def httpGet(url: Url): Fu[Option[String]] =
@@ -146,4 +176,14 @@ private object RelayFormat {
 
   val mostCommonSingleFileName = "games.pgn"
   val mostCommonIndexNames     = List("round.json", "index.json")
+
+  val notFoundReason   = "No games found, check your source URL"
+  val noGamesYetReason = "Connected to LiveChessCloud, no games published yet"
+
+  sealed trait IndexResult
+  object IndexResult {
+    case object IndexUnreachable extends IndexResult
+    case object NoGamesYet       extends IndexResult
+    case class Found(format: RelayFormat) extends IndexResult
+  }
 }

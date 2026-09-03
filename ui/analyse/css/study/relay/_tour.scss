@@ -17,6 +17,18 @@
     max-height: 50vh;
     overflow-y: auto;
 
+    img,
+    iframe {
+      max-width: 100%;
+      height: auto;
+    }
+
+    table {
+      max-width: 100%;
+      display: block;
+      overflow-x: auto;
+    }
+
     .slist {
       margin-bottom: 1em;
     }
