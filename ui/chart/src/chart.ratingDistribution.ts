@@ -21,8 +21,6 @@ interface Data {
 
 const ratingAt = (i: number) => 600 + i * 25;
 
-// A two-point dataset stands in for the vertical marker Highcharts drew with
-// plotLines; chartjs-plugin-annotation is not worth its bundle size.
 function marker(rating: number, label: string, max: number): ChartDataset<'line'> {
   return {
     type: 'line',

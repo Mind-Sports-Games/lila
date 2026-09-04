@@ -3,7 +3,6 @@
 // eslint-disable-next-line
 /// <reference path="./cash.d.ts" />
 
-
 // file://./../../site/src/site.ts
 interface PlayStrategy {
   load: Promise<void>; // window.onload promise

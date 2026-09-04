@@ -3,8 +3,6 @@ import { fontColor, fontFamily, gridColor, maybeChart } from './index';
 
 Chart.register(DoughnutController, ArcElement);
 
-// chart.js has no gauge type, so a half doughnut carries the coloured bands and a
-// plugin draws the needle over it.
 declare module 'chart.js' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface PluginOptionsByType<TType extends ChartType> {

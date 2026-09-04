@@ -10,8 +10,6 @@ export const blackFill: string = lightTheme ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,1)
 export const fontColor: string = lightTheme ? '#2F2F2F' : 'hsl(0, 0%, 73%)';
 export const gridColor: string = lightTheme ? '#ccc' : '#404040';
 export const hoverBorderColor: string = lightTheme ? gridColor : 'white';
-// The Highcharts default palette, kept so the rating distribution and library
-// charts do not change colour as they move to chart.js.
 export const colorSeries = [
   '#DDDF0D',
   '#7798BF',

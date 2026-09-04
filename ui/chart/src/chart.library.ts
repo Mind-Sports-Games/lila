@@ -11,8 +11,6 @@ import {
 } from 'chart.js';
 import { colorSeries, fontColor, fontFamily, gridColor, maybeChart, tooltipOpts } from './index';
 
-// Legend is registered for its default click-to-toggle behaviour, which is how the
-// Highcharts version let you hide a game family.
 Chart.register(LineController, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
 interface Data {
