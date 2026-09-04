@@ -34,7 +34,7 @@ export function ctrl(data: ColorData, trans: Trans, redraw: Redraw, close: Close
   const announceFail = () => playstrategy.announce({ msg: 'Failed to save color preference' });
 
   const reloadAllTheThings = () => {
-    if (window.Highcharts) playstrategy.reload();
+    if ($('canvas').length) playstrategy.reload();
   };
 
   return {

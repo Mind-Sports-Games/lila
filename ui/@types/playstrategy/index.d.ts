@@ -3,7 +3,6 @@
 // eslint-disable-next-line
 /// <reference path="./cash.d.ts" />
 
-/// <reference types="highcharts" />
 
 // file://./../../site/src/site.ts
 interface PlayStrategy {
@@ -44,6 +43,8 @@ interface PlayStrategy {
   studyTour(study: Study): void;
   studyTourChapter(study: Study): void;
   libraryChart?: (data: any, allowedVariants?: string[]) => void;
+  ratingDistributionChart?: (data: any) => void;
+  ratingHistoryChart?: (data: any, singlePerfName?: string) => void;
 
   trans(i18n: I18nDict): Trans;
   quantity(n: number): 'zero' | 'one' | 'few' | 'many' | 'other';
@@ -246,7 +247,6 @@ interface Window {
   moment: any;
   Mousetrap: any;
   Chessground: any;
-  Highcharts: Highcharts.Static;
   libraryChartData?: any;
   InfiniteScroll(selector: string): void;
   playstrategyReplayMusic: () => {

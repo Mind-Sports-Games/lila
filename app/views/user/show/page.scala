@@ -82,7 +82,7 @@ object page {
       jsModule("user"),
       info.ratingChart.map { ratingChart =>
         frag(
-          jsTag("chart/ratingHistory.js"),
+          jsModule("chart.ratingHistory"),
           embedJsUnsafeLoadThen(s"playstrategy.ratingHistoryChart($ratingChart)")
         )
       },

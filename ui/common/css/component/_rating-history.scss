@@ -1,0 +1,143 @@
+// Layout for the rating history chart, plus the slice of the noUiSlider stylesheet
+// its range navigator needs, scoped so it cannot leak into anything else.
+.rating-history-container {
+  display: flex;
+  flex-flow: column nowrap;
+  position: relative;
+
+  .chart-container {
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+    background: linear-gradient(
+      to bottom,
+      rgba(128, 128, 128, 0) 0%,
+      rgba(128, 128, 128, 0) 15%,
+      rgba(128, 128, 128, 0.12) 50%,
+      rgba(128, 128, 128, 0) 85%,
+      rgba(128, 128, 128, 0) 100%
+    );
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .time-selector-buttons {
+    display: flex;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+    margin-bottom: 3px;
+
+    .btn-rack__btn {
+      padding: 0 0.7em;
+      font-size: 0.9em;
+
+      &.active {
+        background: mix($c-primary, $c-bg-box, 40%);
+        color: $c-primary-over;
+      }
+    }
+  }
+
+  .time-range-slider {
+    flex: 0 0 auto;
+    margin: 0 1em 2.2em 1em;
+    height: 10px;
+    position: relative;
+    direction: ltr;
+    box-sizing: border-box;
+    background: $c-bg-zebra;
+    border-radius: 3px;
+
+    * {
+      box-sizing: border-box;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .noUi-base,
+    .noUi-connects {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .noUi-connects {
+      border-radius: 3px;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .noUi-connect,
+    .noUi-origin {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: 100%;
+      transform-origin: 0 0;
+      transform-style: flat;
+      will-change: transform;
+      z-index: 1;
+    }
+
+    .noUi-connect {
+      background: $c-primary;
+    }
+
+    .noUi-origin {
+      height: 0;
+      left: auto;
+    }
+
+    .noUi-handle {
+      position: absolute;
+      width: 14px;
+      height: 20px;
+      top: -5px;
+      right: -7px;
+      background: $c-bg-box;
+      border: 1px solid $c-primary;
+      border-radius: 3px;
+      cursor: ew-resize;
+      outline: none;
+    }
+
+    .noUi-touch-area {
+      width: 100%;
+      height: 100%;
+    }
+
+    .noUi-pips {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      height: 1.6em;
+      color: $c-font-dimmer;
+      font-size: 0.8em;
+    }
+
+    .noUi-marker {
+      position: absolute;
+      background: $c-font-dimmer;
+      width: 1px;
+      height: 4px;
+    }
+
+    .noUi-value {
+      position: absolute;
+      white-space: nowrap;
+      text-align: center;
+      transform: translate(-50%, 6px);
+    }
+  }
+}

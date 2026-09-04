@@ -13,11 +13,7 @@ object lag {
       title = "Is PlayStrategy lagging?",
       active = "lag",
       moreCss = cssTag("lag"),
-      moreJs = frag(
-        highchartsLatestTag,
-        highchartsMoreTag,
-        jsTag("lag.js")
-      )
+      moreJs = jsModule("chart.lag")
     ) {
       div(cls := "box box-pad lag")(
         h1(
@@ -35,14 +31,14 @@ object lag {
         div(cls := "sections")(
           st.section(cls := "server")(
             h2(playstrategyServerLatency()),
-            div(cls := "meter"),
+            div(cls := "meter")(canvas),
             p(
               playstrategyServerLatencyExplanation()
             )
           ),
           st.section(cls := "network")(
             h2(networkBetweenPlayStrategyAndYou()),
-            div(cls := "meter"),
+            div(cls := "meter")(canvas),
             p(
               networkBetweenPlayStrategyAndYouExplanation()
             )

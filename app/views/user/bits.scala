@@ -9,6 +9,14 @@ import lila.user.User
 
 object bits {
 
+  val ratingHistoryContainer =
+    div(cls := "rating-history-container")(
+      div(cls := "time-selector-buttons")(span(cls := "btn-rack")),
+      spinner,
+      div(cls := "chart-container")(canvas(cls := "rating-history")),
+      div(cls := "time-range-slider")
+    )
+
   def communityMenu(active: String)(implicit ctx: Context) =
     st.nav(cls := "page-menu__menu subnav")(
       a(cls := active.active("leaderboard"), href := routes.User.list)(trans.leaderboard()),

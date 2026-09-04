@@ -2,14 +2,35 @@
   "name": "chart",
   "private": true,
   "type": "module",
+  "module": "index.js",
+  "typings": "index",
+  "exports": {
+    ".": "./dist/index.js",
+    "./*": "./dist/*.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
   "dependencies": {
     "chart.js": "^4.4.8",
+    "chartjs-adapter-dayjs-4": "^1.0.4",
     "chartjs-plugin-datalabels": "^2.2.0",
-    "common": "workspace:*"
+    "chartjs-plugin-zoom": "^2.2.0",
+    "common": "workspace:*",
+    "dayjs": "^1.11.19",
+    "nouislider": "^15.8.1"
   },
   "playstrategy": {
     "bundles": [
-      "src/chart.game.ts"
+      "src/chart.game.ts",
+      "src/chart.lag.ts",
+      "src/chart.ratingDistribution.ts",
+      "src/chart.library.ts",
+      "src/chart.ratingHistory.ts"
     ]
   }
 }

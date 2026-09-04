@@ -94,7 +94,6 @@ public/
       * (submodule) ChessPursuit
       * (submodule) shepherd
       * stockfish folders
-      * highcharts folders
       * tagify ?
 </pre>
 

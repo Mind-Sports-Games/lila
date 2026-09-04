@@ -28,7 +28,7 @@ object perfStat {
         jsModule("user"),
         ratingChart.map { rc =>
           frag(
-            jsTag("chart/ratingHistory.js"),
+            jsModule("chart.ratingHistory"),
             embedJsUnsafeLoadThen(
               s"playstrategy.ratingHistoryChart($rc,'${perfType.trans(using lila.i18n.defaultLang)}');"
             )
@@ -56,7 +56,7 @@ object perfStat {
               bits.perfTrophies(u, rankMap.view.filterKeys(perfType.==).toMap)
             )
           ),
-          ratingChart.isDefined.option(div(cls := "rating-history")(spinner)),
+          ratingChart.isDefined.option(views.html.user.bits.ratingHistoryContainer),
           div(cls := "box__pad perf-stat__content")(
             glicko(u, perfType, u.perfs(perfType), percentile),
             counter(stat.count),

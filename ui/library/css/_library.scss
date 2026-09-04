@@ -244,10 +244,17 @@
     box-sizing: border-box;
     #library_chart {
       width: 100%;
+      height: 100%;
       max-width: 100%;
       min-width: 250px;
       box-sizing: border-box;
       margin-left: -1em;
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
     }
   }
 

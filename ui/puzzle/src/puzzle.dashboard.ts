@@ -1,4 +1,7 @@
-import { Chart } from 'chart.js';
+import { Chart, Filler, LineElement, PointElement, RadarController, RadialLinearScale } from 'chart.js';
+import { fontColor, fontFamily, maybeChart } from 'chart';
+
+Chart.register(RadarController, RadialLinearScale, PointElement, LineElement, Filler);
 
 interface RadarData {
   radar: {
@@ -12,9 +15,8 @@ interface RadarData {
 
 export function PlayStrategyPuzzleDashboard(data: RadarData) {
   const canvas = document.querySelector('.puzzle-dashboard__radar') as HTMLCanvasElement;
-  if (!canvas) return; // Defend against missing canvas
+  if (!canvas || maybeChart(canvas)) return; // Defend against missing canvas
   const d = data.radar;
-  const dark = $('body').hasClass('dark');
   d.datasets[0] = {
     ...d.datasets[0],
     ...{
@@ -23,32 +25,33 @@ export function PlayStrategyPuzzleDashboard(data: RadarData) {
       pointBackgroundColor: 'rgb(189,130,35,1)',
     },
   };
-  const fontColor = dark ? '#bababa' : '#4d4d4d';
   const lineColor = 'rgba(127, 127, 127, .3)';
 
   new Chart(canvas, {
     type: 'radar',
     data: d,
     options: {
-      legend: {
-        display: false,
+      plugins: {
+        legend: { display: false },
       },
-      scale: {
-        ticks: {
+      scales: {
+        r: {
           beginAtZero: false,
           suggestedMin: Math.min(...d.datasets[0].data) - 100,
-          fontColor,
-          showLabelBackdrop: false, // hide square behind text
-        },
-        pointLabels: {
-          fontSize: 16,
-          fontColor,
-        },
-        gridLines: {
-          color: lineColor,
-        },
-        angleLines: {
-          color: lineColor,
+          ticks: {
+            color: fontColor,
+            showLabelBackdrop: false, // hide square behind text
+          },
+          pointLabels: {
+            font: fontFamily(16),
+            color: fontColor,
+          },
+          grid: {
+            color: lineColor,
+          },
+          angleLines: {
+            color: lineColor,
+          },
         },
       },
     },

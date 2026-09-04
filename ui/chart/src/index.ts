@@ -8,6 +8,23 @@ export const orangeAccent = '#d85000';
 export const whiteFill: string = lightTheme ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)';
 export const blackFill: string = lightTheme ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,1)';
 export const fontColor: string = lightTheme ? '#2F2F2F' : 'hsl(0, 0%, 73%)';
+export const gridColor: string = lightTheme ? '#ccc' : '#404040';
+export const hoverBorderColor: string = lightTheme ? gridColor : 'white';
+// The Highcharts default palette, kept so the rating distribution and library
+// charts do not change colour as they move to chart.js.
+export const colorSeries = [
+  '#DDDF0D',
+  '#7798BF',
+  '#55BF3B',
+  '#DF5353',
+  '#aaeeee',
+  '#ff0066',
+  '#eeaaee',
+  '#55BF3B',
+  '#DF5353',
+  '#7798BF',
+  '#aaeeee',
+];
 // Move quality palette. The values live once, as $c-inaccuracy & friends in
 // ui/common/css/theme/_default.scss, and reach us through the custom properties that
 // base/_elements.scss sets on body — so charts, the move tree and the advice summary
@@ -43,6 +60,25 @@ export const moveQuality = {
   },
 };
 export const tooltipBgColor: string = lightTheme ? 'rgba(255, 255, 255, 0.8)' : 'rgba(22, 21, 18, 0.7)';
+
+// ChartOptions is already a deep partial, so indexing into it gives the shape
+// chart.js actually accepts for a tooltip override.
+export type TooltipOpts = NonNullable<NonNullable<ChartOptions['plugins']>['tooltip']>;
+
+export function tooltipOpts(overrides: TooltipOpts = {}): TooltipOpts {
+  return {
+    borderColor: fontColor,
+    borderWidth: 1,
+    backgroundColor: tooltipBgColor,
+    bodyColor: fontColor,
+    titleColor: fontColor,
+    titleFont: fontFamily(13),
+    bodyFont: fontFamily(13),
+    caretPadding: 10,
+    displayColors: false,
+    ...overrides,
+  };
+}
 
 export function fontFamily(size?: number, weight?: 'bold') {
   return {
