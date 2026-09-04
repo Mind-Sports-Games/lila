@@ -22,6 +22,10 @@ interface Data {
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+// colorSeries repeats once it runs out, so each further cycle through it gets a
+// dash pattern to stay distinguishable.
+const dashStyles: number[][] = [[], [8, 4], [2, 3], [12, 3, 2, 3]];
+
 // One tick per year, at the middle month of that year.
 function yearTicks(allMonths: string[]): Map<number, string> {
   const byYear = new Map<string, number[]>();
@@ -69,8 +73,9 @@ export function libraryChart(el: HTMLCanvasElement, data: Data, allowedVariants?
       }),
       borderColor: colorSeries[idx % colorSeries.length],
       backgroundColor: colorSeries[idx % colorSeries.length],
+      borderDash: dashStyles[Math.floor(idx / colorSeries.length) % dashStyles.length],
       borderWidth: 4,
-      pointRadius: idx < colorSeries.length ? 0 : 5,
+      pointRadius: 0,
       pointHoverRadius: 5,
     } as ChartDataset<'line'>;
   });

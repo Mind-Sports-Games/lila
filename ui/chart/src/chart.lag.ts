@@ -52,12 +52,12 @@ const needle = {
 
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    const font = fontFamily(13, 'bold');
-    ctx.font = `${font.weight} ${font.size}px ${font.family}`;
-    ctx.fillText(opts.label, arc.x, arc.y + 12);
-    const value_ = fontFamily(16, 'bold');
-    ctx.font = `${value_.weight} ${value_.size}px ${value_.family}`;
-    ctx.fillText(`${Math.round(opts.value)} ms`, arc.x, arc.y + 28);
+    const labelFont = fontFamily(12, 'bold');
+    ctx.font = `${labelFont.weight} ${labelFont.size}px ${labelFont.family}`;
+    ctx.fillText(opts.label, arc.x, arc.y + 10);
+    const valueFont = fontFamily(20, 'bold');
+    ctx.font = `${valueFont.weight} ${valueFont.size}px ${valueFont.family}`;
+    ctx.fillText(`${Math.round(opts.value)} ms`, arc.x, arc.y + 26);
     ctx.restore();
   },
 };
@@ -84,6 +84,10 @@ function gauge(el: HTMLCanvasElement, label: string): Chart {
       cutout: '70%',
       maintainAspectRatio: false,
       responsive: true,
+      // A half doughnut puts the arc centre at the bottom of its own box, and the
+      // readout is drawn below that centre — so the arc has to be kept clear of
+      // the canvas floor or the value gets cut off.
+      layout: { padding: { bottom: 52 } },
       plugins: {
         legend: { display: false },
         tooltip: { enabled: false },

@@ -9,6 +9,7 @@ import {
   Tooltip,
   type ChartConfiguration,
   type ChartDataset,
+  type Plugin,
   type PointStyle,
 } from 'chart.js';
 import zoomPlugin from 'chartjs-plugin-zoom';
@@ -49,34 +50,43 @@ const dateFormat = (() => {
     })());
 })();
 
-// Carry each rating forward day by day, then keep one point every `step` days so
-// long histories stay cheap to draw and to hover.
-function fill(points: [number, number, number, number][], step: number): { x: number; y: number }[] {
-  if (!points.length) return [];
+// Every series is sampled on one shared grid of dates, so index N means the same
+// day in all of them — that is what lets a single hover report every variant at
+// once, the way Highstock's shared tooltip did. Outside a variant's own span the
+// value is null, so each line still starts and stops where its games do.
+function fill(
+  points: [number, number, number, number][],
+  step: number,
+  gridStart: number,
+  gridEnd: number,
+): { x: number; y: number | null }[] {
   const stamped = points.map(p => ({ x: Date.UTC(p[0], p[1], p[2]), y: p[3] }));
-  const out: { x: number; y: number }[] = [];
+  const lastPlayed = stamped.length ? stamped[stamped.length - 1].x : -Infinity;
+  const out: { x: number; y: number | null }[] = [];
   let i = 0;
-  let last = stamped[0].y;
-  const begin = stamped[0].x;
-  const end = stamped[stamped.length - 1].x;
-  for (let d = begin; d <= end; d += oneDay * step) {
+  let last: number | null = null;
+  for (let d = gridStart; d <= gridEnd; d += oneDay * step) {
     while (i < stamped.length && stamped[i].x <= d) last = stamped[i++].y;
-    out.push({ x: d, y: last });
+    out.push({ x: d, y: d > lastPlayed ? null : last });
   }
-  // The most recent rating must survive downsampling.
-  const latest = stamped[stamped.length - 1];
-  if (out[out.length - 1]?.x !== latest.x) out.push(latest);
   return out;
 }
 
-function datasets(data: Serie[], singlePerfName: string | undefined, step: number): ChartDataset<'line'>[] {
+function datasets(
+  data: Serie[],
+  singlePerfName: string | undefined,
+  step: number,
+  gridStart: number,
+  gridEnd: number,
+): ChartDataset<'line'>[] {
   return data
     .map((serie, i) => ({ serie, i }))
     .filter(({ serie }) => !singlePerfName || serie.name === singlePerfName)
     .map(({ serie, i }) => ({
       type: 'line' as const,
       label: serie.name,
-      data: fill(serie.points, step),
+      // chart.js renders a null y as a gap, but its Point type does not admit one.
+      data: fill(serie.points, step, gridStart, gridEnd) as unknown as ChartDataset<'line'>['data'],
       borderColor: seriesColor(i),
       backgroundColor: seriesColor(i),
       borderDash: dashStyles[i % dashStyles.length],
@@ -89,16 +99,15 @@ function datasets(data: Serie[], singlePerfName: string | undefined, step: numbe
       pointHoverBorderWidth: 2,
       pointHoverBackgroundColor: '#fff',
       pointHoverBorderColor: seriesColor(i),
-      spanGaps: true,
       normalized: true,
     }));
 }
 
 // A vertical guide at the hovered position, so a value on one line is easy to read
 // off against the others.
-const crosshair = {
+const crosshair: Plugin<'line'> = {
   id: 'crosshair',
-  afterDraw(chart: Chart) {
+  afterDraw(chart) {
     const active = chart.getActiveElements();
     if (!active.length) return;
     const { ctx, chartArea } = chart;
@@ -143,7 +152,7 @@ interface EndLabelBox {
 
 // Per-chart state for endLabels, keyed off the instance rather than the plugin
 // object, so the plugin stays reentrant if more than one chart is ever on a page.
-const endLabelState = new WeakMap<Chart, { boxes: EndLabelBox[]; hovered?: EndLabelBox }>();
+const endLabelState = new WeakMap<Chart<'line'>, { boxes: EndLabelBox[]; hovered?: EndLabelBox }>();
 
 // Rating badges pinned to the right edge, one per visible line, showing the value
 // at the current right edge of the view — so panning updates them like a readout.
@@ -151,24 +160,30 @@ const endLabelState = new WeakMap<Chart, { boxes: EndLabelBox[]; hovered?: EndLa
 const endLabelWidth = 44;
 const idealBadgeGap = 15;
 const denseGapThreshold = 13;
+const maxTooltipRows = 14;
 
-const endLabels = {
+const endLabels: Plugin<'line'> = {
   id: 'endLabels',
-  afterDraw(chart: Chart) {
+  afterDraw(chart) {
     const { ctx, chartArea, scales } = chart;
     const xMax = scales.x.max;
+    const xMin = scales.x.min;
     const entries: { y: number; text: string; color: string; label: string }[] = [];
     chart.data.datasets.forEach((ds, i) => {
       if (chart.getDatasetMeta(i).hidden) return;
-      const points = ds.data as unknown as { x: number; y: number }[];
+      const points = ds.data as unknown as { x: number; y: number | null }[];
+      // Last rating this variant actually held within the visible window, skipping
+      // the nulls it carries outside its own span.
       let last: { x: number; y: number } | undefined;
       for (let j = points.length - 1; j >= 0; j--) {
-        if (points[j].x <= xMax) {
-          last = points[j];
+        if (points[j].x <= xMax && points[j].y !== null && points[j].y !== undefined) {
+          last = points[j] as { x: number; y: number };
           break;
         }
       }
-      if (!last) return;
+      // A line that ended before this window starts is not on screen, so it gets
+      // no badge either.
+      if (!last || last.x < xMin) return;
       entries.push({
         y: scales.y.getPixelForValue(last.y),
         text: String(Math.round(last.y)),
@@ -282,7 +297,7 @@ const endLabels = {
       ctx.restore();
     }
   },
-  afterEvent(chart: Chart, args: { event: { type: string; x: number | null; y: number | null }; changed?: boolean }) {
+  afterEvent(chart, args) {
     const state = endLabelState.get(chart);
     if (!state) return;
     const { event } = args;
@@ -337,7 +352,7 @@ export function ratingHistoryChart(el: HTMLElement, data: Serie[], singlePerfNam
   const startDate = minDate - (singleDay ? oneDay : 0);
   const endDate = maxDate + (singleDay ? oneDay : 0);
 
-  const steps = [1, 7, 14].map(step => datasets(data, singlePerfName, step));
+  const steps = [1, 7, 14].map(step => datasets(data, singlePerfName, step, startDate, endDate));
   const stepFor = (span: number) => (span > 4 * 365 * oneDay ? 2 : span > 2 * 365 * oneDay ? 1 : 0);
   let currentStep = -1;
 
@@ -353,7 +368,9 @@ export function ratingHistoryChart(el: HTMLElement, data: Serie[], singlePerfNam
       normalized: true,
       parsing: false,
       layout: { padding: { left: 4, right: endLabelWidth } },
-      interaction: { mode: 'nearest', axis: 'x', intersect: false },
+      // 'index' reports every series at the hovered date, matching the shared
+      // tooltip Highstock gave us. It relies on all series sharing one x grid.
+      interaction: { mode: 'index', axis: 'x', intersect: false },
       scales: {
         x: { type: 'time', display: false, min: startDate, max: endDate, grid: { display: false } },
         y: {
@@ -371,9 +388,30 @@ export function ratingHistoryChart(el: HTMLElement, data: Serie[], singlePerfNam
           boxHeight: 8,
           boxPadding: 2,
           rtl: document.dir === 'rtl',
+          // Highest rating first, and drop variants with no games yet at this date.
+          itemSort: (a, b) => (b.parsed.y ?? 0) - (a.parsed.y ?? 0),
+          filter: (item, _i, all) => {
+            if (item.parsed.y === null || item.parsed.y === undefined) return false;
+            const rated = all.filter(t => t.parsed.y !== null && t.parsed.y !== undefined);
+            if (rated.length <= maxTooltipRows) return true;
+            // Past a readable height the tooltip would run off the chart, so keep
+            // the top rows and let the footer account for the rest.
+            const cutoff = rated.map(t => t.parsed.y).sort((a, b) => b - a)[maxTooltipRows - 1];
+            return item.parsed.y >= cutoff;
+          },
           callbacks: {
             title: items => dateFormat()(items[0].parsed.x),
             label: item => `${item.dataset.label}: ${item.parsed.y}`,
+            footer: items => {
+              const total = items[0]?.chart.data.datasets.filter((_ds, di) => {
+                const p = items[0].chart.data.datasets[di].data[items[0].dataIndex] as {
+                  y: number | null;
+                } | null;
+                return p && p.y !== null && p.y !== undefined;
+              }).length;
+              const hidden = (total ?? 0) - items.length;
+              return hidden > 0 ? `+${hidden} more` : '';
+            },
           },
         }),
         zoom: {
