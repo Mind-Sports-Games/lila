@@ -27,15 +27,23 @@ final private class CreatedOrganizer(
     { val _ = scheduler.scheduleOnce(2 seconds, self, Tick) }
   }
 
+  @volatile private var tickId        = 0L
+  @volatile private var tickStartedAt = 0L
+  @volatile private var tickPending   = false
+
   def receive = {
 
     case ReceiveTimeout =>
-      val msg = "tournament.CreatedOrganizer timed out!"
-      pairingLogger.error(msg)
+      val stuckForMillis = if (tickPending) (System.nanoTime() - tickStartedAt) / 1000000 else -1L
+      val msg            = "tournament.CreatedOrganizer timed out!"
+      pairingLogger.error(s"$msg tick=$tickId pending=$tickPending stuckFor=${stuckForMillis}ms")
       lila.mon.tournament.createdOrganizer.timeout.increment()
       throw new RuntimeException(msg)
 
     case Tick =>
+      tickId += 1
+      tickStartedAt = System.nanoTime()
+      tickPending = true
       tournamentRepo.shouldStartCursor
         .documentSource()
         .mapAsync(1) { tour =>
@@ -48,7 +56,10 @@ final private class CreatedOrganizer(
         .toMat(Sink.ignore)(Keep.right)
         .run()
         .monSuccess(_.tournament.createdOrganizer.tick)
-        .addEffectAnyway(scheduleNext())
+        .addEffectAnyway {
+          tickPending = false
+          scheduleNext()
+        }
         .discard
   }
 }
