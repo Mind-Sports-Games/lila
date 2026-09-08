@@ -55,4 +55,21 @@ object DuctHealth {
     val lines = deep ::: stuck
     if (lines.isEmpty) None else Some(lines.mkString("\n"))
   }
+
+  private val intervalMillis  = 10000L
+  private val minRunMillis    = 5000L
+  private val minDepth        = 8
+
+  private val reporter = new Thread(
+    () =>
+      while (true) {
+        Thread.sleep(intervalMillis)
+        report(System.nanoTime(), minRunMillis, minDepth) foreach { lines =>
+          lila.log("duct").info(s"health\n$lines")
+        }
+      },
+    "lila-duct-health"
+  )
+  reporter.setDaemon(true)
+  reporter.start()
 }
