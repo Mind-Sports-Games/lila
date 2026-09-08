@@ -30,21 +30,22 @@ object Dependencies {
     val lila     = org %% "scalalib-lila"      % version
     def bundle   = Seq(core, model, playJson, lila)
   }
-  val hasher        = "com.roundeights"      %% "hasher"                          % "1.3.1"
-  val jodaTime      = "joda-time"             % "joda-time"                       % "2.10.10"
-  val compression   = "org.lichess"           % "compression_3"                   % "2.0"
-  val strategyGames = "org.playstrategy"     %% "strategygames"                   % "10.2.1-s3-ps11-gorewrite1"
-  val maxmind       = "com.maxmind.geoip2"    % "geoip2"                          % "4.2.0"
-  val prismic       = "io.prismic"           %% "scala-kit"                       % "1.2.19_lila-3.2"
-  val scrimage      = "com.sksamuel.scrimage" % "scrimage-core"                   % "4.3.0"
-  val scaffeine     = "com.github.blemale"   %% "scaffeine"                       % "5.2.1" % "compile"
-  val googleOAuth   = "com.google.auth"       % "google-auth-library-oauth2-http" % "1.47.0"
-  val scalaUri      = "io.lemonlabs"         %% "scala-uri"                       % "4.0.3"
-  val scalatags     = "com.lihaoyi"          %% "scalatags"                       % "0.13.1"
-  val lettuce       = "io.lettuce"            % "lettuce-core"                    % "7.5.2.RELEASE"
-  val nettyTransport = ("io.netty" % s"netty-transport-native-$notifier" % "4.2.14.Final").classifier(s"$os-$arch")
-  val scalatest = "org.scalatest" %% "scalatest"                    % "3.2.18" % Test
-  val uaparser  = "org.uaparser"  %% "uap-scala"                    % "0.21.0"
+  val hasher        = "com.roundeights"      %% "hasher"        % "1.3.1"
+  val jodaTime      = "joda-time"             % "joda-time"     % "2.10.10"
+  val compression   = "org.lichess"           % "compression_3" % "2.0"
+  val strategyGames = "org.playstrategy"     %% "strategygames" % "10.2.1-s3-ps11-gorewrite2"
+  val maxmind       = "com.maxmind.geoip2"    % "geoip2"        % "4.2.0"
+  val prismic       = "io.prismic"           %% "scala-kit"     % "1.2.19_lila-3.2"
+  val scrimage      = "com.sksamuel.scrimage" % "scrimage-core" % "4.3.0"
+  val scaffeine     = "com.github.blemale"   %% "scaffeine"     % "5.2.1" % "compile"
+  val googleOAuth    = "com.google.auth" % "google-auth-library-oauth2-http" % "1.47.0"
+  val scalaUri       = "io.lemonlabs"   %% "scala-uri"                       % "4.0.3"
+  val scalatags      = "com.lihaoyi"    %% "scalatags"                       % "0.13.1"
+  val lettuce        = "io.lettuce"      % "lettuce-core"                    % "7.5.2.RELEASE"
+  val nettyTransport =
+    ("io.netty" % s"netty-transport-native-$notifier" % "4.2.14.Final").classifier(s"$os-$arch")
+  val scalatest   = "org.scalatest"              %% "scalatest"      % "3.2.18" % Test
+  val uaparser    = "org.uaparser"               %% "uap-scala"      % "0.21.0"
   val apacheText  = "org.apache.commons"          % "commons-text"   % "1.12.0"
   val cats        = "org.typelevel"              %% "cats-core"      % "2.13.0"
   val alleycats   = "org.typelevel"              %% "alleycats-core" % "2.13.0"
@@ -52,8 +53,8 @@ object Dependencies {
   val kittens     = "org.typelevel"              %% "kittens"        % "3.5.0"
   val bloomFilter = "com.github.alexandrnikitin" %% "bloom-filter"   % "0.13.1_lila-1"
 
-  val commonsLang3  = "org.apache.commons" % "commons-lang3"   % "3.18.0"
-  val jakartaMail   = "com.sun.mail"       % "jakarta.mail"    % "1.6.8"
+  val commonsLang3 = "org.apache.commons" % "commons-lang3" % "3.18.0"
+  val jakartaMail  = "com.sun.mail"       % "jakarta.mail"  % "1.6.8"
 
   val munit      = "org.scalameta"  %% "munit"            % "1.2.1"  % Test
   val scalacheck = "org.scalacheck" %% "scalacheck"       % "1.19.0" % Test
@@ -83,9 +84,9 @@ object Dependencies {
   object reactivemongo {
     val version = "1.1.0-RC20"
 
-    val driver = "org.reactivemongo" %% "reactivemongo"                          % version
-    val stream = "org.reactivemongo" %% "reactivemongo-akkastream"               % version
-    val kamon  = "org.reactivemongo" %% "reactivemongo-kamon"                    % version
+    val driver = "org.reactivemongo" %% "reactivemongo"                              % version
+    val stream = "org.reactivemongo" %% "reactivemongo-akkastream"                   % version
+    val kamon  = "org.reactivemongo" %% "reactivemongo-kamon"                        % version
     val shaded = "org.reactivemongo"  % s"reactivemongo-shaded-native-$os-$dashArch" % version
     def bundle = Seq(driver, stream)
   }
