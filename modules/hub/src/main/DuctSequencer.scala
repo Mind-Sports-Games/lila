@@ -1,6 +1,7 @@
 package lila.hub
 
 import com.github.blemale.scaffeine.LoadingCache
+import java.util.concurrent.atomic.AtomicLong
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.Promise
 
@@ -16,23 +17,31 @@ final class DuctSequencer(maxSize: Int, timeout: FiniteDuration, name: String, l
 
   def apply[A](fu: => Fu[A]): Fu[A] = run(() => fu)
 
-  def run[A](task: Task[A]): Fu[A] = duct.ask[A](TaskWithPromise(task, _))
+  private val nextId = new AtomicLong(0)
 
-  private val duct = new BoundedDuct(maxSize, name, logging)({ case TaskWithPromise(task, promise) =>
-    promise.completeWith {
-      task()
-        .withTimeout(timeout, s"$name DuctSequencer")
-        .transform(
-          identity,
-          {
-            case LilaTimeout(msg) =>
-              val fullMsg = s"$name DuctSequencer $msg"
-              if (logging) lila.log("duct").warn(fullMsg)
-              LilaTimeout(fullMsg)
-            case e => e
-          }
-        )
-    }.future
+  def run[A](task: Task[A]): Fu[A] =
+    duct.ask[A](TaskWithPromise(task, _, nextId.incrementAndGet(), System.nanoTime(), duct.queueSize))
+
+  private val duct: BoundedDuct = new BoundedDuct(maxSize, name, logging)({
+    case TaskWithPromise(task, promise, id, enqueuedAtNanos, depthAtEnqueue) =>
+      val startedAtNanos = System.nanoTime()
+      val waitMillis     = (startedAtNanos - enqueuedAtNanos) / 1000000
+      promise.completeWith {
+        task()
+          .withTimeout(timeout, s"$name DuctSequencer")
+          .transform(
+            identity,
+            {
+              case LilaTimeout(msg) =>
+                val fullMsg =
+                  s"$name DuctSequencer $msg [id=$id wait=${waitMillis}ms " +
+                    s"depthAtEnqueue=$depthAtEnqueue depthNow=${duct.queueSize}]"
+                if (logging) lila.log("duct").warn(fullMsg)
+                LilaTimeout(fullMsg)
+              case e => e
+            }
+          )
+      }.future
   })
 }
 
@@ -62,5 +71,11 @@ final class DuctSequencers(
 object DuctSequencer {
 
   private type Task[A] = () => Fu[A]
-  private case class TaskWithPromise[A](task: Task[A], promise: Promise[A])
+  private case class TaskWithPromise[A](
+      task: Task[A],
+      promise: Promise[A],
+      id: Long,
+      enqueuedAtNanos: Long,
+      depthAtEnqueue: Int
+  )
 }
