@@ -1,8 +1,9 @@
 package lila.common
 
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.{ AtomicInteger, AtomicReferenceArray }
 import scala.jdk.CollectionConverters.*
+import scala.util.control.NonFatal
 
 object DuctHealth {
 
@@ -14,7 +15,7 @@ object DuctHealth {
   private val queues  = new ConcurrentHashMap[String, () => Int](64)
   private val running = new ConcurrentHashMap[Long, Running](256)
 
-  private val recent      = new Array[Finished](recentCapacity)
+  private val recent      = new AtomicReferenceArray[Finished](recentCapacity)
   private val recentIndex = new AtomicInteger(0)
 
   def register(name: String, queueSize: () => Int): Unit = {
@@ -30,17 +31,22 @@ object DuctHealth {
   def finished(id: Long, name: String, waitMillis: Long, runMillis: Long, outcome: String): Unit = {
     running.remove(id)
     val slot = math.floorMod(recentIndex.getAndIncrement(), recentCapacity)
-    recent.synchronized {
-      recent(slot) = Finished(name, waitMillis, runMillis, outcome)
-    }
-    ()
+    recent.set(slot, Finished(name, waitMillis, runMillis, outcome))
   }
 
-  def recentSize: Int = recent.synchronized(recent.count(_ != null))
+  def recentSize: Int = (0 until recentCapacity).count(recent.get(_) != null)
+
+  private def safeSize(name: String, size: () => Int): Option[Int] =
+    try Some(size())
+    catch {
+      case NonFatal(e) =>
+        lila.log("duct").warn(s"health: $name queue size threw", e)
+        None
+    }
 
   def report(nowNanos: Long, minRunMillis: Long, minDepth: Int): Option[String] = {
     val deep = queues.asScala.toList
-      .map { case (name, size) => name -> size() }
+      .flatMap { case (name, size) => safeSize(name, size).map(name -> _) }
       .filter { case (_, depth) => depth >= minDepth }
       .sortBy { case (_, depth) => -depth }
       .map { case (name, depth) => s"  deep $name depth=$depth" }
@@ -64,8 +70,12 @@ object DuctHealth {
     () =>
       while (true) {
         Thread.sleep(intervalMillis)
-        report(System.nanoTime(), minRunMillis, minDepth) foreach { lines =>
-          lila.log("duct").info(s"health\n$lines")
+        try
+          report(System.nanoTime(), minRunMillis, minDepth) foreach { lines =>
+            lila.log("duct").info(s"health\n$lines")
+          }
+        catch {
+          case NonFatal(e) => lila.log("duct").warn("health: reporting pass failed", e)
         }
       },
     "lila-duct-health"

@@ -31,6 +31,6 @@ class DuctHealthTest extends munit.FunSuite {
     (1 to 1000).foreach { i =>
       DuctHealth.finished(i.toLong, s"n$i", 0L, 1L, "success")
     }
-    assert(DuctHealth.recentSize <= 256, DuctHealth.recentSize)
+    assertEquals(DuctHealth.recentSize, 256)
   }
 }
