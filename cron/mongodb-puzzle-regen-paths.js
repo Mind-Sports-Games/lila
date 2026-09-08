@@ -10,6 +10,12 @@
  * OK to skip runs.
  * NOT OK to run concurrently.
  *
+ * The pipeline buckets by rating, sorts by vote and slices each bucket into
+ * tiers; shuffling and chunking into paths happen in JS below. Two $sample
+ * stages used to do the shuffling server side — one over the whole mix match,
+ * one inside every $facet branch — and each one cost a full random-key sort.
+ * See PLA-1687.
+ *
  * might require this mongodb config: (https://jira.mongodb.org/browse/SERVER-44174)
  * setParameter:
  *   internalQueryMaxPushBytes: 314572800
@@ -20,10 +26,7 @@ const puzzleColl = db.puzzle2_puzzle;
 const pathCollName = 'puzzle2_path';
 const pathColl = db[pathCollName];
 const pathNextColl = db.puzzle2_path_next;
-const maxRatingBuckets = 20;
 const maxPathLength = 200;
-const maxPuzzlesPerTheme = 3800000; // avoids memory restrictions in some envs, like:
-// MongoServerError: document constructed by $facet is 104948160 bytes, which exceeds the limit of 104857600 bytes
 const maxPathsPerGroup = 30;
 
 const sep = '|';
@@ -75,6 +78,18 @@ function chunkify(a, n) {
 }
 const padRating = r => (r < 1000 ? '0' : '') + r;
 
+// Fisher-Yates, in place. Replaces the per-tier $sample shuffle so that a path
+// is not a run of consecutive votes.
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const t = a[i];
+    a[i] = a[j];
+    a[j] = t;
+  }
+  return a;
+}
+
 let anyBuggy = false;
 
 variantKeys.forEach(variantkey => {
@@ -122,7 +137,6 @@ variantKeys.forEach(variantkey => {
       {
         $match: selector,
       },
-      ...(theme == 'mix' ? [{ $sample: { size: maxPuzzlesPerTheme } }] : []),
       ...bucketStages,
       {
         $unwind: '$puzzle',
@@ -151,7 +165,6 @@ variantKeys.forEach(variantkey => {
               [name]: [
                 {
                   $project: {
-                    total: 1,
                     puzzles: {
                       $slice: [
                         '$puzzles',
@@ -162,28 +175,6 @@ variantKeys.forEach(variantkey => {
                         },
                       ],
                     },
-                  },
-                },
-                {
-                  $unwind: '$puzzles',
-                },
-                {
-                  $sample: {
-                    // shuffle
-                    size: 10 * 1000 * 1000,
-                  },
-                },
-                {
-                  $group: {
-                    _id: '$_id',
-                    puzzles: {
-                      $addToSet: '$puzzles',
-                    },
-                  },
-                },
-                {
-                  $sort: {
-                    '_id.min': 1,
                   },
                 },
                 {
@@ -227,6 +218,12 @@ variantKeys.forEach(variantkey => {
         comment: 'regen-paths',
       })
       .forEach(bucket => {
+        // The $unwind that used to drop empty tiers is gone, so a ratio that
+        // rounds down to zero now arrives here as an empty bucket.
+        if (!bucket.puzzles.length) return;
+
+        shuffle(bucket.puzzles);
+
         if (prevTier == bucket.tier) indexInTier++;
         else {
           indexInTier = 0;
