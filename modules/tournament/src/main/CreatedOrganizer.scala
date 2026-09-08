@@ -53,11 +53,17 @@ final private class CreatedOrganizer(
           }
         }
         .log(getClass.getName)
-        .toMat(Sink.ignore)(Keep.right)
+        .toMat(lila.common.LilaStream.sinkCount)(Keep.right)
         .run()
         .monSuccess(_.tournament.createdOrganizer.tick)
+        .addEffect { tours =>
+          if (tours > 0) pairingLogger.info(s"CreatedOrganizer tick=$tickId tours=$tours")
+        }
         .addEffectAnyway {
+          val elapsed = (System.nanoTime() - tickStartedAt) / 1000000
           tickPending = false
+          if (elapsed > 3000)
+            pairingLogger.info(s"CreatedOrganizer slow tick=$tickId elapsed=${elapsed}ms")
           scheduleNext()
         }
         .discard
