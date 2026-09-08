@@ -7,6 +7,7 @@ import scala.concurrent.Promise
 import scala.util.{ Failure, Success }
 
 import lila.base.LilaTimeout
+import lila.common.DuctHealth
 
 final class DuctSequencer(maxSize: Int, timeout: FiniteDuration, name: String, logging: Boolean = true)(
     implicit
@@ -28,10 +29,13 @@ final class DuctSequencer(maxSize: Int, timeout: FiniteDuration, name: String, l
       val startedAtNanos = System.nanoTime()
       val waitMillis     = (startedAtNanos - enqueuedAtNanos) / 1000000
 
+      DuctHealth.started(id, name, startedAtNanos)
+
       val real = task()
 
       real.onComplete { result =>
         val runMillis = (System.nanoTime() - startedAtNanos) / 1000000
+        DuctHealth.finished(id, name, waitMillis, runMillis, "done")
         if (runMillis > timeout.toMillis) {
           val outcome = result match {
             case Success(_) => "success"
@@ -61,6 +65,8 @@ final class DuctSequencer(maxSize: Int, timeout: FiniteDuration, name: String, l
           )
       }.future
   })
+
+  DuctHealth.register(name, () => duct.queueSize)
 }
 
 // Distributes tasks to many sequencers
