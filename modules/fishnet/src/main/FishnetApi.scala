@@ -99,7 +99,7 @@ final class FishnetApi(
             val updateMs = (doneAt - foundAt) / 1000000
             val totalMs  = (doneAt - startedAt) / 1000000
             if (totalMs > 1000)
-              logger.info(s"acquire slow find=${findMs}ms update=${updateMs}ms total=${totalMs}ms")
+              logger.info(s"acquire slow find=${findMs}ms update=${updateMs}ms")
           }
         }
     }.map { _ map JsonApi.analysisFromWork(config.analysisNodes) }

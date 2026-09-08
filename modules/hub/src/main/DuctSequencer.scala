@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicLong
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.Promise
 import scala.util.{ Failure, Success }
+import scala.util.control.NonFatal
 
 import lila.base.LilaTimeout
 import lila.common.DuctHealth
@@ -19,7 +20,7 @@ final class DuctSequencer(maxSize: Int, timeout: FiniteDuration, name: String, l
 
   def apply[A](fu: => Fu[A]): Fu[A] = run(() => fu)
 
-  private val nextId = new AtomicLong(0)
+  private val lastLateWarnNanos = new AtomicLong(0)
 
   def run[A](task: Task[A]): Fu[A] =
     duct.ask[A](TaskWithPromise(task, _, nextId.incrementAndGet(), System.nanoTime(), duct.queueSize))
@@ -31,22 +32,35 @@ final class DuctSequencer(maxSize: Int, timeout: FiniteDuration, name: String, l
 
       DuctHealth.started(id, name, startedAtNanos)
 
-      val real = task()
+      val real =
+        try task()
+        catch {
+          case NonFatal(e) =>
+            DuctHealth.finished(id)
+            throw e
+        }
 
       real.onComplete { result =>
+        DuctHealth.finished(id)
         val runMillis = (System.nanoTime() - startedAtNanos) / 1000000
-        DuctHealth.finished(id, name, waitMillis, runMillis, "done")
-        if (runMillis > timeout.toMillis) {
-          val outcome = result match {
-            case Success(_) => "success"
-            case Failure(e) => s"failure:${e.getClass.getSimpleName}"
+        if (logging && runMillis > timeout.toMillis) {
+          val nowNanos  = System.nanoTime()
+          val lastNanos = lastLateWarnNanos.get()
+          if (
+            nowNanos - lastNanos >= lateWarnIntervalNanos &&
+            lastLateWarnNanos.compareAndSet(lastNanos, nowNanos)
+          ) {
+            val outcome = result match {
+              case Success(_) => "success"
+              case Failure(e) => s"failure:${e.getClass.getSimpleName}"
+            }
+            lila.log("duct").warn(
+              s"[$name#$id] completed AFTER its ${timeout.toMillis}ms timeout: " +
+                s"wait=${waitMillis}ms run=${runMillis}ms depthAtEnqueue=$depthAtEnqueue outcome=$outcome"
+            )
           }
-          lila.log("duct").warn(
-            s"[$name#$id] completed AFTER its ${timeout.toMillis}ms timeout: " +
-              s"wait=${waitMillis}ms run=${runMillis}ms depthAtEnqueue=$depthAtEnqueue outcome=$outcome"
-          )
         }
-      }
+      }(using scala.concurrent.ExecutionContext.parasitic)
 
       promise.completeWith {
         real
@@ -93,6 +107,10 @@ final class DuctSequencers(
 }
 
 object DuctSequencer {
+
+  private val nextId = new AtomicLong(0)
+
+  private val lateWarnIntervalNanos = 1000000000L
 
   private type Task[A] = () => Fu[A]
   private case class TaskWithPromise[A](

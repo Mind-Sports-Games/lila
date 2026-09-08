@@ -18,19 +18,12 @@ class DuctHealthTest extends munit.FunSuite {
     DuctHealth.started(1L, "slowOne", 0L)
     val out = DuctHealth.report(5000000000L, 1000L, Int.MaxValue)
     assert(out.exists(_.contains("slowOne")), out)
-    DuctHealth.finished(1L, "slowOne", 0L, 5000L, "success")
+    DuctHealth.finished(1L)
   }
 
   test("forget a task once it finishes") {
     DuctHealth.started(2L, "quickOne", 0L)
-    DuctHealth.finished(2L, "quickOne", 0L, 1L, "success")
+    DuctHealth.finished(2L)
     assertEquals(DuctHealth.report(5000000000L, 1000L, Int.MaxValue), None)
-  }
-
-  test("bound the recent completions buffer") {
-    (1 to 1000).foreach { i =>
-      DuctHealth.finished(i.toLong, s"n$i", 0L, 1L, "success")
-    }
-    assertEquals(DuctHealth.recentSize, 256)
   }
 }

@@ -57,7 +57,7 @@ final private class CreatedOrganizer(
         .run()
         .monSuccess(_.tournament.createdOrganizer.tick)
         .addEffect { tours =>
-          if (tours > 0) pairingLogger.info(s"CreatedOrganizer tick=$tickId tours=$tours")
+          if (tours > 1) pairingLogger.info(s"CreatedOrganizer tick=$tickId tours=$tours")
         }
         .addEffectAnyway {
           val elapsed = (System.nanoTime() - tickStartedAt) / 1000000
