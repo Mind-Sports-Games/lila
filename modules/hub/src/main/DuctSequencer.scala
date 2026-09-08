@@ -4,6 +4,7 @@ import com.github.blemale.scaffeine.LoadingCache
 import java.util.concurrent.atomic.AtomicLong
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.Promise
+import scala.util.{ Failure, Success }
 
 import lila.base.LilaTimeout
 
@@ -26,8 +27,25 @@ final class DuctSequencer(maxSize: Int, timeout: FiniteDuration, name: String, l
     case TaskWithPromise(task, promise, id, enqueuedAtNanos, depthAtEnqueue) =>
       val startedAtNanos = System.nanoTime()
       val waitMillis     = (startedAtNanos - enqueuedAtNanos) / 1000000
+
+      val real = task()
+
+      real.onComplete { result =>
+        val runMillis = (System.nanoTime() - startedAtNanos) / 1000000
+        if (runMillis > timeout.toMillis) {
+          val outcome = result match {
+            case Success(_) => "success"
+            case Failure(e) => s"failure:${e.getClass.getSimpleName}"
+          }
+          lila.log("duct").warn(
+            s"[$name#$id] completed AFTER its ${timeout.toMillis}ms timeout: " +
+              s"wait=${waitMillis}ms run=${runMillis}ms depthAtEnqueue=$depthAtEnqueue outcome=$outcome"
+          )
+        }
+      }
+
       promise.completeWith {
-        task()
+        real
           .withTimeout(timeout, s"$name DuctSequencer")
           .transform(
             identity,
