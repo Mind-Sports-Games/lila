@@ -33,6 +33,8 @@ abstract class Duct(implicit ec: scala.concurrent.ExecutionContext) extends lila
    */
   private val stateRef: AtomicReference[State] = new AtomicReference(None)
 
+  def queueSize: Int = stateRef.get().fold(0)(_.size + 1)
+
   private def run(msg: Any): Unit =
     process.applyOrElse(msg, Duct.fallback).onComplete(postRun)
 
