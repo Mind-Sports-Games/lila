@@ -71,6 +71,17 @@ case class Game(
   def plies        = stratGame.plies
   def clock        = stratGame.clock
   def actionStrs   = stratGame.actionStrs
+
+  def grandAbaloneTurns: ActionStrs = {
+    val flat = actionStrs.flatten.toVector
+    if (flat.isEmpty) Vector.empty
+    else Vector(Vector(flat.head)) ++ flat.tail.grouped(2).map(_.toVector).toVector
+  }
+
+  def turnActionStrs: ActionStrs = variant match {
+    case Variant.Abalone(v) if v.hasPrevPlayer => grandAbaloneTurns
+    case _                                     => actionStrs
+  }
   def activePlayer = stratGame.situation.player
 
   val gameRecordFormat = variant match {
@@ -158,11 +169,13 @@ case class Game(
 
   private def actionsPerTurn(playerIndex: PlayerIndex): Vector[Int] = {
     val pivot = startIndex(playerIndex)
-    actionStrs.zipWithIndex.collect { case (t, i) if (i % 2) == pivot => t.size }
+    turnActionStrs.zipWithIndex.collect { case (t, i) if (i % 2) == pivot => t.size }.toVector
   }
 
-  private def turnOffsets: Vector[(Int, Int)] =
-    actionStrs.map(_.size).scanLeft(0)(_ + _).zip(actionStrs.map(_.size))
+  private def turnOffsets: Vector[(Int, Int)] = {
+    val sizes = turnActionStrs.map(_.size).toVector
+    sizes.scanLeft(0)(_ + _).zip(sizes)
+  }
 
   def plyTimes(playerIndex: PlayerIndex): Option[List[Centis]] = {
     for {
@@ -202,17 +215,17 @@ case class Game(
       b <- plyTimes(!startPlayerIndex)
     } yield {
       val who =
-        actionStrs.zipWithIndex.flatMap { case (t, i) =>
+        turnActionStrs.zipWithIndex.flatMap { case (t, i) =>
           t.map(_ => { if (i % 2 == 0) "a" else "b" })
-        }
+        }.toVector
       Game.combinePlyTimes(a, b, who, Vector.empty)
     }
 
   def bothClockStates: Option[Vector[Centis]] = {
     val who: Vector[String] =
-      actionStrs.zipWithIndex.flatMap { case (t, i) =>
+      turnActionStrs.zipWithIndex.flatMap { case (t, i) =>
         t.map(_ => { if (i % 2 == 0) "a" else "b" })
-      }
+      }.toVector
     clockHistory.map { ch =>
       val result = ch.bothClockStates(startPlayerIndex, who)
       // For delay clocks, fix the last turn of each player using the actual remaining

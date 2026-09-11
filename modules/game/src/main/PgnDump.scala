@@ -77,14 +77,10 @@ final class PgnDump(
               offsetPlies.toVector.map(Vector(_))
             }
             case Variant.Abalone(variant) if variant.hasPrevPlayer =>
-              // Grand Abalone: P1's first turn = 1 ply, all subsequent turns = 2 plies each
-              val flat    = game.actionStrs.flatten.toVector
-              val grouped =
-                if (flat.isEmpty) Vector.empty[Vector[String]]
-                else Vector(Vector(flat.head)) ++ flat.tail.grouped(2).map(_.toVector).toVector
               (flags.keepDelayIf(game.playable) applyDelay {
-                if (fenSituation.exists(_.situation.player.p2)) Vector("..") +: grouped
-                else grouped
+                val turns = game.grandAbaloneTurns
+                if (fenSituation.exists(_.situation.player.p2)) Vector("..") +: turns
+                else turns
               }).toVector
             case _ =>
               (flags.keepDelayIf(game.playable) applyDelay {
