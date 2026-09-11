@@ -9,7 +9,7 @@ import {
   Tooltip,
   type ChartDataset,
 } from 'chart.js';
-import { colorSeries, fontColor, fontFamily, gridColor, maybeChart, tooltipOpts } from './index';
+import { fontColor, fontFamily, gridColor, maybeChart, seriesColor, seriesDash, tooltipOpts } from './index';
 
 Chart.register(LineController, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
@@ -21,10 +21,6 @@ interface Data {
 }
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-// colorSeries repeats once it runs out, so each further cycle through it gets a
-// dash pattern to stay distinguishable.
-const dashStyles: number[][] = [[], [8, 4], [2, 3], [12, 3, 2, 3]];
 
 // One tick per year, at the middle month of that year.
 function yearTicks(allMonths: string[]): Map<number, string> {
@@ -71,9 +67,9 @@ export function libraryChart(el: HTMLCanvasElement, data: Data, allowedVariants?
         const found = cumulative.get(m);
         return found === undefined ? null : Math.max(found, 1);
       }),
-      borderColor: colorSeries[idx % colorSeries.length],
-      backgroundColor: colorSeries[idx % colorSeries.length],
-      borderDash: dashStyles[Math.floor(idx / colorSeries.length) % dashStyles.length],
+      borderColor: seriesColor(idx),
+      backgroundColor: seriesColor(idx),
+      borderDash: seriesDash(idx),
       borderWidth: 4,
       pointRadius: 0,
       pointHoverRadius: 5,

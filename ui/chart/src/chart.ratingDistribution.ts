@@ -9,7 +9,11 @@ import {
   type ChartDataset,
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { colorSeries, fontColor, fontFamily, gridColor, maybeChart, tooltipOpts } from './index';
+import { chartPalette, fontColor, fontFamily, gridColor, maybeChart, tooltipOpts, withAlpha } from './index';
+
+const playersColor = chartPalette[1];
+const cumulativeColor = chartPalette[9];
+const myRatingColor = chartPalette[5];
 
 Chart.register(LineController, LinearScale, PointElement, LineElement, Tooltip, Filler, ChartDataLabels);
 
@@ -29,7 +33,7 @@ function marker(rating: number, label: string, max: number): ChartDataset<'line'
       { x: rating, y: 0 },
       { x: rating, y: max },
     ],
-    borderColor: colorSeries[2],
+    borderColor: myRatingColor,
     borderWidth: 3,
     pointRadius: 0,
     pointHoverRadius: 0,
@@ -37,7 +41,7 @@ function marker(rating: number, label: string, max: number): ChartDataset<'line'
     datalabels: {
       display: 'auto',
       align: 'top',
-      color: colorSeries[2],
+      color: myRatingColor,
       font: fontFamily(12, 'bold'),
       formatter: (v: { y: number }) => (v.y === 0 ? '' : label),
     },
@@ -59,15 +63,15 @@ export function ratingDistributionChart(el: HTMLCanvasElement, data: Data): void
 
   const ctx = el.getContext('2d')!;
   const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-  gradient.addColorStop(0, colorSeries[1]);
-  gradient.addColorStop(1, 'rgba(119,152,191,0)');
+  gradient.addColorStop(0, playersColor);
+  gradient.addColorStop(1, withAlpha(playersColor, 0));
 
   const datasets: ChartDataset<'line'>[] = [
     {
       type: 'line',
       label: trans.noarg('players'),
       data: freq.map((nb, i) => ({ x: ratingAt(i), y: nb })),
-      borderColor: colorSeries[1],
+      borderColor: playersColor,
       backgroundColor: gradient,
       borderWidth: 4,
       fill: true,
@@ -81,7 +85,7 @@ export function ratingDistributionChart(el: HTMLCanvasElement, data: Data): void
       label: trans.noarg('cumulative'),
       yAxisID: 'y2',
       data: cumulative.map((p, i) => ({ x: ratingAt(i), y: p })),
-      borderColor: colorSeries[10],
+      borderColor: cumulativeColor,
       borderWidth: 2,
       pointRadius: 1,
       pointHitRadius: 200,

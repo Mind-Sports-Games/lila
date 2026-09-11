@@ -16,7 +16,18 @@ import zoomPlugin from 'chartjs-plugin-zoom';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { PipsMode, create as createSlider, type API as NoUiSlider } from 'nouislider';
-import { fontColor, fontFamily, gridColor, hoverBorderColor, maybeChart, tooltipBgColor, tooltipOpts } from './index';
+import {
+  contrastText,
+  fontColor,
+  fontFamily,
+  gridColor,
+  hoverBorderColor,
+  maybeChart,
+  seriesColor,
+  seriesDash,
+  tooltipBgColor,
+  tooltipOpts,
+} from './index';
 
 Chart.register(LineController, LinearScale, TimeScale, PointElement, LineElement, Tooltip, zoomPlugin);
 Chart.defaults.font = fontFamily();
@@ -28,9 +39,7 @@ interface Serie {
 }
 
 const oneDay = 86400000;
-const dashStyles: number[][] = [[], [6, 3], [2, 2], [10, 5]];
 const pointStyles: PointStyle[] = ['circle', 'triangle', 'rectRot', 'rect', 'rectRounded'];
-const seriesColor = (i: number) => `hsl(${Math.round((i * 360) / 30) % 360}, 80%, 50%)`;
 
 const dateFormat = (() => {
   let formatter: (ts: number) => string;
@@ -89,7 +98,7 @@ function datasets(
       data: fill(serie.points, step, gridStart, gridEnd) as unknown as ChartDataset<'line'>['data'],
       borderColor: seriesColor(i),
       backgroundColor: seriesColor(i),
-      borderDash: dashStyles[i % dashStyles.length],
+      borderDash: seriesDash(i),
       borderCapStyle: 'round',
       borderJoinStyle: 'round',
       pointStyle: pointStyles[i % pointStyles.length],
@@ -132,12 +141,6 @@ function roundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: num
   ctx.arcTo(x, y + h, x, y, r);
   ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();
-}
-
-// hsl(h, 80%, 50%): yellow/green hues read lightest, so keep their badge text dark.
-function textColorFor(hsl: string): string {
-  const hue = Number(/hsl\((\d+)/.exec(hsl)?.[1] ?? 0);
-  return hue > 40 && hue < 170 ? '#1a1a1a' : '#fff';
 }
 
 interface EndLabelBox {
@@ -262,7 +265,7 @@ const endLabels: Plugin<'line'> = {
         roundedRect(ctx, x, y - pillHeight / 2, pillWidth, pillHeight, pillHeight / 2);
         ctx.fillStyle = color;
         ctx.fill();
-        ctx.fillStyle = textColorFor(color);
+        ctx.fillStyle = contrastText(color);
         ctx.fillText(text, x + pillWidth / 2, y + 0.5);
         boxes.push({ x, y: y - pillHeight / 2, w: pillWidth, h: pillHeight, label, text, color });
       });
@@ -473,9 +476,18 @@ export function ratingHistoryChart(el: HTMLElement, data: Serie[], singlePerfNam
   }
 
   if (sliderEl) {
-    const years = new Map<number, string>();
-    for (let y = dayjs.utc(startDate).year(); y <= dayjs.utc(endDate).year(); y++)
-      years.set(Date.UTC(y, 0, 1), String(y));
+    const labels = new Map<number, string>();
+    for (let y = dayjs.utc(startDate).year(); y <= dayjs.utc(endDate).year(); y++) {
+      const jan = Date.UTC(y, 0, 1);
+      if (jan > startDate && jan < endDate) labels.set(jan, String(y));
+    }
+
+    if (labels.size < 2) {
+      labels.clear();
+      labels.set(startDate, dayjs.utc(startDate).format('MMM YYYY'));
+      labels.set(endDate, dayjs.utc(endDate).format('MMM YYYY'));
+    }
+    const pipValues = [...labels.keys()];
     slider = createSlider(sliderEl, {
       start: [startDate, endDate],
       connect: true,
@@ -485,9 +497,9 @@ export function ratingHistoryChart(el: HTMLElement, data: Serie[], singlePerfNam
       margin: oneDay * 7,
       pips: {
         mode: PipsMode.Values,
-        values: [...years.keys()].filter((_, i, a) => a.length < 7 || i % 2 === 0) as unknown as number[],
+        values: pipValues.filter((_, i) => pipValues.length < 7 || i % 2 === 0) as unknown as number[],
         density: 100,
-        format: { to: (v: number) => years.get(v) ?? '', from: Number },
+        format: { to: (v: number) => labels.get(v) ?? '', from: Number },
       },
     });
     slider.on('update', (values: (string | number)[]) => {

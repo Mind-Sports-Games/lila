@@ -1,7 +1,9 @@
 import { Chart, Filler, LineElement, PointElement, RadarController, RadialLinearScale } from 'chart.js';
-import { fontColor, fontFamily, maybeChart } from 'chart';
+import { chartPalette, fontColor, fontFamily, maybeChart, withAlpha } from 'chart';
 
 Chart.register(RadarController, RadialLinearScale, PointElement, LineElement, Filler);
+
+const radarColor = chartPalette[7];
 
 interface RadarData {
   radar: {
@@ -20,9 +22,9 @@ export function PlayStrategyPuzzleDashboard(data: RadarData) {
   d.datasets[0] = {
     ...d.datasets[0],
     ...{
-      backgroundColor: 'rgba(189,130,35,0.2)',
-      borderColor: 'rgba(189,130,35,1)',
-      pointBackgroundColor: 'rgb(189,130,35,1)',
+      backgroundColor: withAlpha(radarColor, 0.2),
+      borderColor: radarColor,
+      pointBackgroundColor: radarColor,
     },
   };
   const lineColor = 'rgba(127, 127, 127, .3)';

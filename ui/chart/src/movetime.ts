@@ -15,6 +15,7 @@ import {
   animation,
   axisOpts,
   blackFill,
+  blackFillBorder,
   fontColor,
   fontFamily,
   maybeChart,
@@ -24,6 +25,7 @@ import {
   selectPly,
   tooltipBgColor,
   whiteFill,
+  whiteFillBorder,
 } from './index';
 import division from './division';
 
@@ -346,7 +348,9 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   );
 
   const blueLineColor = '#3893e8';
-  const barBorderColor = (key: 'p1' | 'p2') => (key === 'p1' ? '#838383' : '#616161');
+  // Follows the fill rather than the player: opposite-colour variants swap which side
+  // gets the white bar, and the separator has to contrast with whatever it is drawn on.
+  const barBorderColor = (key: 'p1' | 'p2') => ((key === 'p1') !== isOppositeColor ? whiteFillBorder : blackFillBorder);
 
   // A turn's bar reaches half way to the neighbouring turn of the same player, so each side reads
   // as one continuous band. That is the geometry the old per-turn axis produced with
