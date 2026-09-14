@@ -15,6 +15,8 @@ object home {
 
   def apply(homepage: Homepage)(implicit ctx: Context) = {
     import homepage.*
+    // officialActive is already ordered ongoing-first then soonest; only one gets a spotlight
+    val relays = homepage.relays.take(1)
 
     val chatJson = chatOption map { chat =>
       views.html.chat.json(

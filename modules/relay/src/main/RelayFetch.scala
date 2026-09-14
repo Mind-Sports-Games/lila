@@ -98,12 +98,14 @@ final private class RelayFetch(
             }
         }
         .recover { case e: Exception =>
+          val wasAlreadyFailing = rt.round.sync.log.events.lastOption.exists(_.isKo)
           (e match {
             case SyncResult.Timeout =>
               if (rt.tour.official) logger.info(s"Sync timeout ${rt.round}")
               SyncResult.Timeout
             case _ =>
-              if (rt.tour.official) logger.info(s"Sync error ${rt.round} ${e.getMessage take 80}")
+              if (rt.tour.official && !wasAlreadyFailing)
+                logger.info(s"Sync error ${rt.round} ${e.getMessage take 80}")
               SyncResult.Error(e.getMessage)
           }) -> rt.round.withSync(_.addLog(SyncLog.event(0, e.some)))
         }

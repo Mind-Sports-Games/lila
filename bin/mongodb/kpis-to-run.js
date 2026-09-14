@@ -62,6 +62,14 @@ const PS_BOT_IDS = [
   'stockfish-level7',
   'stockfish-level8',
   'ps-random-mover',
+  'gnubg-level1',
+  'gnubg-level2',
+  'gnubg-level3',
+  'gnubg-level4',
+  'gnubg-level5',
+  'gnubg-level6',
+  'gnubg-level7',
+  'gnubg-level8',
 ];
 db.game5.aggregate([
   {
