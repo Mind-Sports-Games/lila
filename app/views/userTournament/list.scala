@@ -56,7 +56,10 @@ object list {
                 ),
                 td(cls := "games")(e.entry.nbGames),
                 td(cls := "score")(if (shieldLeaderboard) e.entry.metaPoints else e.entry.score),
-                td(cls := "rank")(strong(e.entry.rank), " / ", e.tour.nbPlayers)
+                td(cls := "rank")(
+                  if (e.entry.disqualified) strong("DQ")
+                  else frag(strong(e.entry.rank), " / ", e.tour.nbPlayers)
+                )
               )
             },
             pagerNextTable(pager, np => routes.UserTournament.path(u.username, path, np).url)
