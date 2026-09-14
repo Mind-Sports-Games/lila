@@ -27,6 +27,7 @@ import {
   seriesDash,
   tooltipBgColor,
   tooltipOpts,
+  withAlpha,
 } from './index';
 
 Chart.register(LineController, LinearScale, TimeScale, PointElement, LineElement, Tooltip, zoomPlugin);
@@ -148,14 +149,59 @@ interface EndLabelBox {
   y: number;
   w: number;
   h: number;
+  // Clickable band: the full column width, meeting the neighbours halfway.
+  hitTop: number;
+  hitBottom: number;
   label: string;
   text: string;
   color: string;
 }
 
+interface EndLabelState {
+  boxes: EndLabelBox[];
+  hovered?: EndLabelBox;
+  // Series singled out by clicking their badge; empty means everything is shown as usual.
+  focus: Set<string>;
+  baseColor: Map<string, string>;
+  onFocusChange?: () => void;
+}
+
 // Per-chart state for endLabels, keyed off the instance rather than the plugin
 // object, so the plugin stays reentrant if more than one chart is ever on a page.
-const endLabelState = new WeakMap<Chart<'line'>, { boxes: EndLabelBox[]; hovered?: EndLabelBox }>();
+const endLabelState = new WeakMap<Chart<'line'>, EndLabelState>();
+
+function getState(chart: Chart<'line'>): EndLabelState {
+  let state = endLabelState.get(chart);
+  if (!state) {
+    state = { boxes: [], focus: new Set(), baseColor: new Map() };
+    endLabelState.set(chart, state);
+  }
+  return state;
+}
+
+const isFocused = (chart: Chart<'line'>, label: string) => {
+  const { focus } = getState(chart);
+  return !focus.size || focus.has(label);
+};
+
+const dimmedLineAlpha = 0.15;
+const dimmedBadgeAlpha = 0.3;
+
+// Focused lines come forward, the rest fade back. Datasets are swapped wholesale
+// when the day-step changes, so this runs on every fresh set as well as on click.
+function applyFocus(chart: Chart<'line'>): void {
+  const { focus, baseColor } = getState(chart);
+  chart.data.datasets.forEach(ds => {
+    const label = ds.label as string;
+    const color = baseColor.get(label) ?? (ds.borderColor as string);
+    const on = !focus.size || focus.has(label);
+    ds.borderColor = on ? color : withAlpha(color, dimmedLineAlpha);
+    ds.borderWidth = focus.size && on ? 3 : 2;
+  });
+}
+
+const hitBox = (chart: Chart<'line'>, x: number, y: number) =>
+  x >= chart.chartArea.right ? getState(chart).boxes.find(b => y >= b.hitTop && y <= b.hitBottom) : undefined;
 
 // Rating badges pinned to the right edge, one per visible line, showing the value
 // at the current right edge of the view — so panning updates them like a readout.
@@ -163,12 +209,14 @@ const endLabelState = new WeakMap<Chart<'line'>, { boxes: EndLabelBox[]; hovered
 const endLabelWidth = 44;
 const idealBadgeGap = 15;
 const denseGapThreshold = 13;
+const denseBarWidth = 20;
 const maxTooltipRows = 14;
 
 const endLabels: Plugin<'line'> = {
   id: 'endLabels',
   afterDraw(chart) {
     const { ctx, chartArea, scales } = chart;
+    const state = getState(chart);
     const xMax = scales.x.max;
     const xMin = scales.x.min;
     const entries: { y: number; text: string; color: string; label: string }[] = [];
@@ -190,15 +238,13 @@ const endLabels: Plugin<'line'> = {
       entries.push({
         y: scales.y.getPixelForValue(last.y),
         text: String(Math.round(last.y)),
-        color: ds.borderColor as string,
+        color: state.baseColor.get(ds.label as string) ?? (ds.borderColor as string),
         label: (ds.label as string) ?? '',
       });
     });
 
-    const state = endLabelState.get(chart) ?? { boxes: [] };
     if (!entries.length) {
       state.boxes = [];
-      endLabelState.set(chart, state);
       return;
     }
 
@@ -233,25 +279,16 @@ const endLabels: Plugin<'line'> = {
     const boxes: EndLabelBox[] = [];
     ctx.save();
     if (dense) {
-      // Below readable pill size: a dot carries the colour only, value and name
-      // surface together on hover.
+      // Below readable pill size: a short bar carries the colour only, value and
+      // name surface together on hover.
       const radius = Math.max(2, Math.min(4, gap / 2 - 1));
       entries.forEach(({ y, color, text, label }) => {
-        const x = chartArea.right + 6 + radius;
-        ctx.beginPath();
+        const x = chartArea.right + 6;
+        ctx.globalAlpha = isFocused(chart, label) ? 1 : dimmedBadgeAlpha;
+        roundedRect(ctx, x, y - radius, denseBarWidth, radius * 2, radius);
         ctx.fillStyle = color;
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
         ctx.fill();
-        const pad = 4;
-        boxes.push({
-          x: x - radius - pad,
-          y: y - radius - pad,
-          w: radius * 2 + pad * 2,
-          h: radius * 2 + pad * 2,
-          label,
-          text,
-          color,
-        });
+        boxes.push({ x, y: y - radius, w: denseBarWidth, h: radius * 2, hitTop: 0, hitBottom: 0, label, text, color });
       });
     } else {
       const pillHeight = Math.min(15, Math.max(10, gap - 2));
@@ -262,19 +299,35 @@ const endLabels: Plugin<'line'> = {
       entries.forEach(({ y, text, color, label }) => {
         const pillWidth = Math.max(ctx.measureText(text).width + 10, endLabelWidth - 6);
         const x = chartArea.right + 6;
+        ctx.globalAlpha = isFocused(chart, label) ? 1 : dimmedBadgeAlpha;
         roundedRect(ctx, x, y - pillHeight / 2, pillWidth, pillHeight, pillHeight / 2);
         ctx.fillStyle = color;
         ctx.fill();
         ctx.fillStyle = contrastText(color);
         ctx.fillText(text, x + pillWidth / 2, y + 0.5);
-        boxes.push({ x, y: y - pillHeight / 2, w: pillWidth, h: pillHeight, label, text, color });
+        boxes.push({
+          x,
+          y: y - pillHeight / 2,
+          w: pillWidth,
+          h: pillHeight,
+          hitTop: 0,
+          hitBottom: 0,
+          label,
+          text,
+          color,
+        });
       });
     }
     ctx.restore();
 
+    const centers = boxes.map(b => b.y + b.h / 2);
+    boxes.forEach((b, i) => {
+      b.hitTop = i === 0 ? chartArea.top : (centers[i - 1] + centers[i]) / 2;
+      b.hitBottom = i === boxes.length - 1 ? chartArea.bottom : (centers[i] + centers[i + 1]) / 2;
+    });
+
     state.boxes = boxes;
     state.hovered = boxes.find(b => b.label === state.hovered?.label);
-    endLabelState.set(chart, state);
 
     if (state.hovered) {
       const { hovered } = state;
@@ -301,8 +354,7 @@ const endLabels: Plugin<'line'> = {
     }
   },
   afterEvent(chart, args) {
-    const state = endLabelState.get(chart);
-    if (!state) return;
+    const state = getState(chart);
     const { event } = args;
     if (event.type === 'mouseout') {
       if (state.hovered) {
@@ -312,10 +364,18 @@ const endLabels: Plugin<'line'> = {
       }
       return;
     }
-    if (event.type !== 'mousemove' || event.x === null || event.y === null) return;
-    const hit = state.boxes.find(
-      b => event.x! >= b.x && event.x! <= b.x + b.w && event.y! >= b.y && event.y! <= b.y + b.h,
-    );
+    if (event.x === null || event.y === null) return;
+    const hit = hitBox(chart, event.x, event.y);
+    if (event.type === 'click') {
+      if (!hit) return;
+      if (state.focus.has(hit.label)) state.focus.delete(hit.label);
+      else state.focus.add(hit.label);
+      applyFocus(chart);
+      chart.update('none');
+      state.onFocusChange?.();
+      return;
+    }
+    if (event.type !== 'mousemove') return;
     if ((hit?.label ?? null) === (state.hovered?.label ?? null)) return;
     state.hovered = hit;
     chart.canvas.style.cursor = hit ? 'pointer' : 'default';
@@ -335,7 +395,8 @@ const ranges: [string, (end: dayjs.Dayjs) => dayjs.Dayjs][] = [
 export function ratingHistoryChart(el: HTMLElement, data: Serie[], singlePerfName?: string): void {
   const canvas = el.querySelector('canvas') as HTMLCanvasElement | null;
   const sliderEl = el.querySelector('.time-range-slider') as HTMLElement | null;
-  const buttonsEl = el.querySelector('.time-selector-buttons .btn-rack') as HTMLElement | null;
+  const buttonsEl = el.querySelector('.time-selector-buttons .btn-rack:not(.focus-reset)') as HTMLElement | null;
+  const resetEl = el.querySelector('.time-selector-buttons .focus-reset') as HTMLElement | null;
   if (!canvas || maybeChart(canvas)) return;
 
   const shown = data.filter(s => !singlePerfName || s.name === singlePerfName);
@@ -395,7 +456,11 @@ export function ratingHistoryChart(el: HTMLElement, data: Serie[], singlePerfNam
           itemSort: (a, b) => (b.parsed.y ?? 0) - (a.parsed.y ?? 0),
           filter: (item, _i, all) => {
             if (item.parsed.y === null || item.parsed.y === undefined) return false;
-            const rated = all.filter(t => t.parsed.y !== null && t.parsed.y !== undefined);
+            const chart = item.chart as Chart<'line'>;
+            if (!isFocused(chart, item.dataset.label as string)) return false;
+            const rated = all.filter(
+              t => t.parsed.y !== null && t.parsed.y !== undefined && isFocused(chart, t.dataset.label as string),
+            );
             if (rated.length <= maxTooltipRows) return true;
             // Past a readable height the tooltip would run off the chart, so keep
             // the top rows and let the footer account for the rest.
@@ -403,16 +468,16 @@ export function ratingHistoryChart(el: HTMLElement, data: Serie[], singlePerfNam
             return item.parsed.y >= cutoff;
           },
           callbacks: {
-            title: items => dateFormat()(items[0].parsed.x),
+            title: items => (items.length ? dateFormat()(items[0].parsed.x) : ''),
             label: item => `${item.dataset.label}: ${item.parsed.y}`,
             footer: items => {
-              const total = items[0]?.chart.data.datasets.filter((_ds, di) => {
-                const p = items[0].chart.data.datasets[di].data[items[0].dataIndex] as {
-                  y: number | null;
-                } | null;
-                return p && p.y !== null && p.y !== undefined;
+              const chart = items[0]?.chart as Chart<'line'> | undefined;
+              if (!chart) return '';
+              const total = chart.data.datasets.filter(ds => {
+                const p = ds.data[items[0].dataIndex] as { y: number | null } | null;
+                return p && p.y !== null && p.y !== undefined && isFocused(chart, ds.label as string);
               }).length;
-              const hidden = (total ?? 0) - items.length;
+              const hidden = total - items.length;
               return hidden > 0 ? `+${hidden} more` : '';
             },
           },
@@ -435,6 +500,22 @@ export function ratingHistoryChart(el: HTMLElement, data: Serie[], singlePerfNam
     plugins: [crosshair, endLabels],
   };
   const chart = new Chart(canvas, config);
+  const state = getState(chart);
+  data.forEach((serie, i) => state.baseColor.set(serie.name, seriesColor(i)));
+
+  function clearFocus() {
+    state.focus.clear();
+    applyFocus(chart);
+    chart.update('none');
+    state.onFocusChange?.();
+  }
+  if (resetEl) {
+    state.onFocusChange = () => resetEl.classList.toggle('none', !state.focus.size);
+    resetEl.addEventListener('click', clearFocus);
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && state.focus.size) clearFocus();
+  });
 
   // Hovering while dragging is pure cost, so events go away for the duration.
   function toggleEvents(c: Chart, stop: boolean) {
@@ -448,6 +529,7 @@ export function ratingHistoryChart(el: HTMLElement, data: Serie[], singlePerfNam
     if (step === currentStep) return;
     currentStep = step;
     chart.data.datasets = steps[step];
+    applyFocus(chart);
   }
 
   let slider: NoUiSlider | undefined;

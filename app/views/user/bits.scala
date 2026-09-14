@@ -9,9 +9,14 @@ import lila.user.User
 
 object bits {
 
-  val ratingHistoryContainer =
+  def ratingHistoryContainer(implicit lang: Lang) =
     div(cls := "rating-history-container")(
-      div(cls := "time-selector-buttons")(span(cls := "btn-rack")),
+      div(cls := "time-selector-buttons")(
+        span(cls := "btn-rack focus-reset none")(
+          button(cls := "btn-rack__btn text", dataIcon := "L")(trans.reset())
+        ),
+        span(cls := "btn-rack")
+      ),
       spinner,
       div(cls := "chart-container")(canvas(cls := "rating-history")),
       div(cls := "time-range-slider")
