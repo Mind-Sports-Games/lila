@@ -188,6 +188,13 @@ function makeDataset(
   };
 }
 
+// Shared between the chart config (onClick), christmasTree and destroy.
+interface ChartState {
+  currentPly: number;
+  clearCategoryLock: () => void;
+  offCategorySelect?: () => void;
+}
+
 // Hover/click on blunder/mistake/inaccuracy counts in the advice-summary panel →
 // highlight matching moves on the chart. Click locks the highlights and navigates to the
 // next occurrence (cycling); clicking a graph dot or a move in the tree clears the lock.
@@ -198,7 +205,7 @@ function christmasTree(
   mainline: Tree.Node[],
   hoverColors: string[],
   pointBorderColors: string[],
-  state: { currentPly: number; clearCategoryLock: () => void },
+  state: ChartState,
 ) {
   let lockedSymbol: string | null = null;
   let lockedPi: PlayerIndex | null = null;
@@ -268,13 +275,16 @@ function christmasTree(
 
   // Someone else unlocked (a jump elsewhere in the tree): drop our own lock too, or the
   // next click on the same symbol would take the "already locked" path and never re-emit.
-  playstrategy.pubsub.on('analysis.chart.category.select', (symbol: string | null) => {
+  const onCategorySelect = (symbol: string | null) => {
     if (symbol || !lockedSymbol) return;
     $('div.advice-summary div.symbol.locked').removeClass('locked');
     lockedSymbol = null;
     lockedPi = null;
     clearHighlight();
-  });
+  };
+  state.offCategorySelect?.();
+  playstrategy.pubsub.on('analysis.chart.category.select', onCategorySelect);
+  state.offCategorySelect = () => playstrategy.pubsub.off('analysis.chart.category.select', onCategorySelect);
 
   // Expose a way for the chart's onClick to clear the lock without knowing internals.
   state.clearCategoryLock = () => {
@@ -390,8 +400,7 @@ export default function acpl(el: HTMLCanvasElement, data: AnalyseData, mainline:
     },
   };
 
-  // Shared state between the chart config (onClick) and christmasTree.
-  const state = { currentPly: firstPly, clearCategoryLock: () => {} };
+  const state: ChartState = { currentPly: firstPly, clearCategoryLock: () => {} };
 
   const chart = new Chart(el, config) as AcplChart;
   chart.selectPly = selectPly.bind(chart);
@@ -403,10 +412,18 @@ export default function acpl(el: HTMLCanvasElement, data: AnalyseData, mainline:
     chart.update('none');
   };
 
-  playstrategy.pubsub.on('analysis.change', (_fen: string, _path: string, ply: Ply | false) => {
+  const onAnalysisChange = (_fen: string, _path: string, ply: Ply | false) => {
     state.currentPly = ply === false ? firstPly : ply;
     chart.selectPly(state.currentPly);
-  });
+  };
+  playstrategy.pubsub.on('analysis.change', onAnalysisChange);
+  const destroy = chart.destroy.bind(chart);
+  chart.destroy = () => {
+    playstrategy.pubsub.off('analysis.change', onAnalysisChange);
+    state.offCategorySelect?.();
+    $(document).off('.ctree');
+    destroy();
+  };
   // Trigger initial selection
   playstrategy.pubsub.emit('analysis.change.trigger');
 

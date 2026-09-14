@@ -9,7 +9,21 @@
   }
 
   &.ready {
+    position: relative;
     height: 15em;
+    overflow: hidden;
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .study__message {
+      position: absolute;
+      inset: 0;
+      padding: 0;
+    }
   }
 }
 
