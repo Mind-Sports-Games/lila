@@ -10,20 +10,21 @@ export const blackFill: string = lightTheme ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,1)
 export const fontColor: string = lightTheme ? '#2F2F2F' : 'hsl(0, 0%, 73%)';
 export const gridColor: string = lightTheme ? '#ccc' : '#404040';
 export const hoverBorderColor: string = lightTheme ? gridColor : 'white';
-// The palette comes from ColorBrewer
+// ColorBrewer "Paired", strong shades first so a chart with few series gets
+// distinct hues; the pale partner of each follows six places later.
 export const chartPalette = [
-  '#a6cee3',
   '#1f78b4',
-  '#b2df8a',
   '#33a02c',
-  '#fb9a99',
   '#e31a1c',
-  '#fdbf6f',
   '#ff7f00',
-  '#cab2d6',
   '#6a3d9a',
-  '#ffff99',
   '#b15928',
+  '#a6cee3',
+  '#b2df8a',
+  '#fb9a99',
+  '#fdbf6f',
+  '#cab2d6',
+  '#e7298a',
 ];
 
 // Colour varies faster than line style

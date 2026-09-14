@@ -3,7 +3,7 @@ import { chartPalette, fontColor, fontFamily, maybeChart, withAlpha } from 'char
 
 Chart.register(RadarController, RadialLinearScale, PointElement, LineElement, Filler);
 
-const radarColor = chartPalette[7];
+const radarColor = chartPalette[3];
 
 interface RadarData {
   radar: {

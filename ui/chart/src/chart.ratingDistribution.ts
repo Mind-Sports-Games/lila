@@ -11,9 +11,9 @@ import {
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { chartPalette, fontColor, fontFamily, gridColor, maybeChart, tooltipOpts, withAlpha } from './index';
 
-const playersColor = chartPalette[1];
-const cumulativeColor = chartPalette[9];
-const myRatingColor = chartPalette[5];
+const playersColor = chartPalette[0];
+const cumulativeColor = chartPalette[4];
+const myRatingColor = chartPalette[2];
 
 Chart.register(LineController, LinearScale, PointElement, LineElement, Tooltip, Filler, ChartDataLabels);
 
