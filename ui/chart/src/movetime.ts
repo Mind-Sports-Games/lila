@@ -46,7 +46,6 @@ interface ActionPoint {
   turn: number;
   seg: [number, number];
   actionLabel: string;
-  blur: boolean;
 }
 
 interface AnalyseData {
@@ -133,8 +132,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   let lastTurnKey: 'p1' | 'p2' | undefined;
   let turnCentis = 0;
   // Every action of the turn, in order (in backgammon: the dice roll, each checker move, the end-turn).
-  let turnActions: { ply: number; centis: number; san: string; blur: boolean }[] = [];
-  const blurCountByTurn = new Map<number, number>(); // turn index → how many of its actions were blurred
+  let turnActions: { ply: number; centis: number; san: string }[] = [];
   let turnNotations: string[] = [];
   let bgRollSan = '-'; // san from roll node, used as fallback label when no checker moves (e.g. dance)
   let turnIdx = -1;
@@ -157,9 +155,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     blurPoints[blurPending.key].push(blurPending.point);
     const existing = labelByTurn.get(blurPending.turn) ?? '';
     const nl = existing.indexOf('\n');
-    // The heading counts them; which actions they were is spelled out on the action lines below it.
-    const nb = blurCountByTurn.get(blurPending.turn) ?? 1;
-    const tag = nb > 1 ? ` [${nb} blurs]` : ' [blur]';
+    const tag = ' [blur]';
     labelByTurn.set(blurPending.turn, nl >= 0 ? existing.slice(0, nl) + tag + existing.slice(nl) : existing + tag);
     blurPending = undefined;
   };
@@ -179,14 +175,9 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
         ply: action.ply,
         turn: turnIdx,
         seg: [from, acc] as [number, number],
-        blur: action.blur,
-        // A turn of one action is already spelled out by the tooltip's heading and total, blur tag
-        // included. Past that, each action says for itself whether it was the blurred one.
+        // A turn of one action is already spelled out by the tooltip's heading and total.
         actionLabel:
-          n === 1
-            ? ''
-            : (turnTimed ? action.san + ' ' + trans.plural('nbSeconds', Number(seconds)) : action.san) +
-              (action.blur ? ' [blur]' : ''),
+          n === 1 ? '' : turnTimed ? action.san + ' ' + trans.plural('nbSeconds', Number(seconds)) : action.san,
       };
     });
   };
@@ -197,7 +188,6 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     const startPly = turnActions[0]?.ply ?? firstPly;
     const endPly = turnActions[turnActions.length - 1]?.ply ?? startPly;
     const movePoint: MovePoint = { x: (startPly + endPly) / 2, y: isP1 ? y : -y, turn: turnIdx };
-    blurCountByTurn.set(turnIdx, turnActions.filter(a => a.blur).length);
     if (blurPending) blurPending.point = movePoint;
     const seconds = (turnCentis / 100).toFixed(turnCentis >= 200 ? 1 : 2);
     // node.clock already spends the delay once per turn (Game.bothClockStates) and takes the last
@@ -244,8 +234,8 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     const san = node ? (node.san === 'NOSAN' ? (node.uci ?? '-') : (node.san ?? '-')) : '-';
     // Consumed for every action, ahead of any branch that skips the rest of the body.
     const isBlur = blurs[isP1 ? 1 : 0][blurAt[key]++] === '1';
-    // A turn carries one marker however many of its actions were blurred: the marker sits on the
-    // bar, and the bar is the turn.
+    // Flags the turn as containing a blur; a single-action turn is marked on the bar,
+    // a multi-action one marks its blurred actions individually.
     const markBlur = () => {
       if (!blurPending) blurPending = { key, turn: turnIdx, point: { x: ply, y: 0, turn: turnIdx } };
     };
@@ -254,7 +244,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
       if (node?.uci === 'endturn') {
         turnCentis += centis;
         turnTimed ||= i < plyCentis.length;
-        turnActions.push({ ply: node.ply, centis, san: 'end', blur: isBlur });
+        turnActions.push({ ply: node.ply, centis, san: 'end' });
         if (isBlur) markBlur();
         const moveSan = turnNotations.length > 0 ? combinedNotation(turnNotations) : bgRollSan;
         emitTurn(key, isP1, turn + dots + ' ' + moveSan, node.clock);
@@ -281,7 +271,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
         actionSan = actionNotation(node, tree[i].fen ?? '');
         turnNotations.push(actionSan);
       }
-      turnActions.push({ ply: node ? node.ply : ply, centis, san: actionSan, blur: isBlur });
+      turnActions.push({ ply: node ? node.ply : ply, centis, san: actionSan });
 
       // For turns with an explicit endturn node, the bar is emitted in the endturn branch above.
       // Here we only emit for turns that end WITHOUT one (every other multi-action variant, plus
@@ -392,7 +382,6 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   const blurRadius = 4.5;
   // The per-action markers are the detail under the turn's own marker, so they read as smaller
   // notes on it rather than competing with it for the eye.
-  const blurActionRadius = 2.75;
   const blurTurns = {
     p1: new Set(blurPoints.p1.map(p => p.turn)),
     p2: new Set(blurPoints.p2.map(p => p.turn)),
@@ -479,23 +468,6 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
             };
             if (sideBlurTurns.has(points[start].turn))
               blurMarks.push({ x: css((left + right) / 2), y: css(markY(top)), r: blurRadius, key });
-            const actionHalf = dev(blurActionRadius);
-            const markX = (px: number) => {
-              const lo = left + actionHalf;
-              const hi = right - actionHalf;
-              return css(lo < hi ? Math.min(Math.max(px, lo), hi) : (left + right) / 2);
-            };
-            if (end > start)
-              for (let j = start; j <= end; j++) {
-                if (!points[j]?.blur) continue;
-                const [y0, y1] = band(points[j].seg);
-                blurMarks.push({
-                  x: markX(dev(xScale.getPixelForValue(points[j].x))),
-                  y: css(markY((y0 + y1) / 2)),
-                  r: blurActionRadius,
-                  key,
-                });
-              }
             ctx.fillRect(css(left), css(Math.min(top, axis)), css(right - left), css(Math.abs(top - axis)));
             if (dir * (top - plotEdge) > 0) offScale.push([left, right]);
             if (points[start].turn === selectedTurn) {

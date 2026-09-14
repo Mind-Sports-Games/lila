@@ -306,7 +306,7 @@ case class Game(
     def copyPlayer(player: Player) =
       if (blur && action.player == player.playerIndex)
         player.copy(
-          blurs = player.blurs.add(playerMoves(player.playerIndex))
+          blurs = player.blurs.add(playerTurns(player.playerIndex))
         )
       else player
 
@@ -989,13 +989,16 @@ case class Game(
   def playerMoves(playerIndex: PlayerIndex): Int =
     actionStrs.zipWithIndex.filter(_._2 % 2 == startIndex(playerIndex)).map(_._1.size).sum
 
+  def playerTurns(playerIndex: PlayerIndex): Int =
+    turnActionStrs.zipWithIndex.count(_._2 % 2 == startIndex(playerIndex))
+
   // if a player has completed their first full turn
   def playerHasMoved(playerIndex: PlayerIndex) =
     // does this actually confirm the full turn is completed?
     if (startIndex(playerIndex) == 0) onePlayerHasMoved else bothPlayersHaveMoved
 
   def playerBlurPercent(playerIndex: PlayerIndex): Int =
-    if (playedTurns > 5) (player(playerIndex).blurs.nb * 100) / playerMoves(playerIndex)
+    if (playedTurns > 5) (player(playerIndex).blurs.nb * 100) / playerTurns(playerIndex)
     else 0
 
   def isBeingPlayed = !isPgnImport && !finishedOrAborted
