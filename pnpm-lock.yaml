@@ -15,8 +15,8 @@ importers:
         specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.38
         version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/383a8bd99184d4ed06ff2d943502cc457f8efc93
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.30
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/1d823d7d48b62a1330110222a37d357cab91ed88
+        specifier: github:Mind-Sports-Games/stratops#combined-notation-generic
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/da469547e30a6414e6f74579a800c24833489057
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -745,8 +745,8 @@ packages:
     resolution: {integrity: sha512-cDF0/Gf81QpY3xYyJKDV14Zwdmid5+uuENhjH2EqFaF0ni+yAyq/LzMaIJdhNJXZI7uLzwIlA+V7oWoyn6Curg==}
     engines: {node: ^18.18.0 || >=20.0.0}
 
-  '@ungap/structured-clone@1.3.3':
-    resolution: {integrity: sha512-60YRaenCQcVjYEKOcG824+DRGGIQ3VKErcBoAEDJZz5bKIs2ZG+X/H9Nk+Q6EVkwJk5QNApxbrc5QtBSwtrXAg==}
+  '@ungap/structured-clone@1.4.0':
+    resolution: {integrity: sha512-1mEZtMKPM09vDmQt5y7YvmN2+DFTP7Tg0EWXdic8/C6VRnpb33e4ghisCIE3WZjsE2N8mf+QV1Zqh7ZFYLWInQ==}
 
   '@yaireo/tagify@4.38.0':
     resolution: {integrity: sha512-/ZyG2NWQGNcTK4ay2aPE3ka/ZQmhTo+bUKb81SqjtQlt3VrGoxCNhmvKTV/mBJbY69BOXXeBEi+a5JLrvp6wLA==}
@@ -1009,8 +1009,8 @@ packages:
   fast-levenshtein@2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
 
-  fastq@1.20.1:
-    resolution: {integrity: sha512-GGToxJ/w1x32s/D2EKND7kTil4n8OVk/9mycTc4VDza13lOvpUZTGX3mFSCtV9ksdGBVzvsyAVLM6mHFThxXxw==}
+  fastq@1.20.3:
+    resolution: {integrity: sha512-XKv5nnLs6nLF71NgiKJLIZFLkPyIEuOselLG7ujZnGrRfQK8HpvY+WqKhAJUAdLomwVHErVS4LfxFlPq0/FTAw==}
 
   file-entry-cache@6.0.1:
     resolution: {integrity: sha512-7Gps/XWymbLk2QLYK4NzpMOrYjMhdIxXuIvy2QBsLE6ljuodKvdkWs/cpyJJ3CVIVpH0Oi1Hvg1ovbMzLdFBBg==}
@@ -1147,8 +1147,8 @@ packages:
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
-  js-yaml@4.3.1:
-    resolution: {integrity: sha512-CY6crGq313MX8GkwvB7tzgp99vjQxY1++5y10/BKN/GUfHqWaOGQMNZkBvqSzsZKWk/ijwHlWzzkLulsGHhjWQ==}
+  js-yaml@4.3.2:
+    resolution: {integrity: sha512-SFNOvSJ+Dgf/9An904Yx+CgSlIPCkIpao4qo51lpee25TIRejdH3rhR4EZMGoNx3/TP3O+wzWuiTFl4sqbltzA==}
     hasBin: true
 
   json-buffer@3.0.1:
@@ -1421,8 +1421,8 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/1d823d7d48b62a1330110222a37d357cab91ed88:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/1d823d7d48b62a1330110222a37d357cab91ed88}
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/da469547e30a6414e6f74579a800c24833489057:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/da469547e30a6414e6f74579a800c24833489057}
     version: 0.8.1-pstrat5.30
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1565,7 +1565,7 @@ snapshots:
       globals: 13.24.0
       ignore: 5.3.2
       import-fresh: 3.3.1
-      js-yaml: 4.3.1
+      js-yaml: 4.3.2
       minimatch: 3.1.5
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
@@ -1601,7 +1601,7 @@ snapshots:
   '@nodelib/fs.walk@1.2.8':
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
-      fastq: 1.20.1
+      fastq: 1.20.3
 
   '@types/chart.js@2.9.41':
     dependencies:
@@ -1718,7 +1718,7 @@ snapshots:
       '@typescript-eslint/types': 7.18.0
       eslint-visitor-keys: 3.4.3
 
-  '@ungap/structured-clone@1.3.3': {}
+  '@ungap/structured-clone@1.4.0': {}
 
   '@yaireo/tagify@4.38.0(prop-types@15.8.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
@@ -1911,7 +1911,7 @@ snapshots:
       '@humanwhocodes/config-array': 0.13.0
       '@humanwhocodes/module-importer': 1.0.1
       '@nodelib/fs.walk': 1.2.8
-      '@ungap/structured-clone': 1.3.3
+      '@ungap/structured-clone': 1.4.0
       ajv: 6.15.0
       chalk: 4.1.2
       cross-spawn: 7.0.6
@@ -1933,7 +1933,7 @@ snapshots:
       imurmurhash: 0.1.4
       is-glob: 4.0.3
       is-path-inside: 3.0.3
-      js-yaml: 4.3.1
+      js-yaml: 4.3.2
       json-stable-stringify-without-jsonify: 1.0.1
       levn: 0.4.1
       lodash.merge: 4.6.2
@@ -1995,7 +1995,7 @@ snapshots:
 
   fast-levenshtein@2.0.6: {}
 
-  fastq@1.20.1:
+  fastq@1.20.3:
     dependencies:
       reusify: 1.1.0
 
@@ -2117,7 +2117,7 @@ snapshots:
 
   js-tokens@4.0.0: {}
 
-  js-yaml@4.3.1:
+  js-yaml@4.3.2:
     dependencies:
       argparse: 2.0.1
 
@@ -2363,7 +2363,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/1d823d7d48b62a1330110222a37d357cab91ed88:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/da469547e30a6414e6f74579a800c24833489057:
     dependencies:
       '@badrap/result': 0.2.13
 
