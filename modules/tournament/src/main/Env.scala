@@ -152,7 +152,7 @@ final class Env(
         case "shield-leaderboards" :: "recalc" :: Nil =>
           shieldTableApi.recalculateAll inject "Done!"
         case "tournament" :: "dq" :: username :: id :: Nil =>
-          api.disqualify(id, username) inject s"Byebye $username from $id"
+          api.disqualify(id, User.normalize(username))
       }
     }
 }

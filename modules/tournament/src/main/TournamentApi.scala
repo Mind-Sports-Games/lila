@@ -433,10 +433,12 @@ final class TournamentApi(
       promise: Option[Promise[Tournament.JoinResult]]
   ): Funit =
     Sequencing(tourId, "join")(tournamentRepo.enterableById) { tour =>
-      playerRepo.exists(tour.id, me.id) flatMap { playerExists =>
+      playerRepo.find(tour.id, me.id) flatMap { player =>
         import Tournament.JoinResult
+        val playerExists = player.isDefined
         val fuResult: Fu[JoinResult] =
-          if (!playerExists && tour.password.exists(p => !password.contains(p)))
+          if (player.exists(_.disqualified)) fuccess(JoinResult.Disqualified)
+          else if (!playerExists && tour.password.exists(p => !password.contains(p)))
             fuccess(JoinResult.WrongPassword)
           else if (!tour.botsAllowed && me.isBot) fuccess(JoinResult.NoBotsAllowed)
           else
@@ -738,8 +740,36 @@ final class TournamentApi(
         })
       }
 
-  def disqualify(tourId: Tournament.ID, userId: User.ID): Funit =
-    ejectPlayerAndRewriteHistory(tourId, userId, true, true)
+  def disqualify(tourId: Tournament.ID, userId: User.ID): Fu[String] =
+    tournamentRepo.byId(tourId) zip playerRepo.exists(tourId, userId) flatMap {
+      case (None, _)                   => fuccess(s"No such tournament: $tourId")
+      case (_, false)                  => fuccess(s"$userId is not a player in $tourId")
+      case (Some(t), _) if t.isCreated => fuccess(s"$tourId has not started; remove the player instead")
+      case (Some(t), _) if t.isFinished =>
+        ejectPlayerAndRewriteHistory(tourId, userId, true, true) inject
+          s"Disqualified $userId from finished tournament $tourId"
+      case _ =>
+        disqualifyRunning(tourId, userId) inject
+          s"Disqualified $userId from running tournament $tourId"
+    }
+
+  // flags the player, withdraws them and aborts their current game.
+  // unlike ejectLameFromEnterable, their past games are not forfeited.
+  private def disqualifyRunning(tourId: Tournament.ID, userId: User.ID): Funit =
+    Sequencing(tourId, "disqualifyRunning")(tournamentRepo.startedById) { tour =>
+      playerRepo.disqualify(tour.id, userId) >>
+        playerRepo.withdraw(tour.id, userId) >> {
+          pairingRepo.findPlaying(tour.id, userId).map {
+            _ foreach { currentPairing =>
+              tellRound(currentPairing.gameId, AbortForce)
+            }
+          }
+        }.andDo {
+          socket.reload(tour.id)
+          updateTournamentStanding(tour)
+          publish()
+        }
+    }
 
   private val tournamentTopNb    = 20
   private val tournamentTopCache = cacheApi[Tournament.ID, TournamentTop](16, "tournament.top") {

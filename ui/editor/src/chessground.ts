@@ -147,8 +147,7 @@ function makeConfig(ctrl: EditorCtrl): CgConfig {
       enabled: false,
     },
     drawable: {
-      enabled: true,
-      defaultSnapToValidMove: (playstrategy.storage.get('arrow.snap') || 1) != '0',
+      enabled: false,
     },
     draggable: {
       showGhost: true,

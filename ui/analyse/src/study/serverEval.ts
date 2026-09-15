@@ -1,11 +1,12 @@
 import AnalyseCtrl from '../ctrl';
 import { h, VNode } from 'snabbdom';
 import { Prop, prop } from 'common';
-import { spinner, bind, onInsert } from '../util';
+import { spinner, bind } from '../util';
 
 interface AcplChart {
   selectPly(ply: number): void;
   updateData(data: any, mainline: Tree.Node[]): void;
+  destroy(): void;
 }
 
 export interface ServerEvalCtrl {
@@ -59,32 +60,38 @@ export function view(ctrl: ServerEvalCtrl): VNode {
   if (!ctrl.root.showComputer()) return disabled();
   if (!analysis) return ctrl.requested() ? requested() : requestButton(ctrl);
 
-  return h(
-    'div.study__server-eval.ready.' + analysis.id,
-    {
-      hook: onInsert(container => {
-        ctrl.lastPly(false);
-        const canvas = document.createElement('canvas');
-        canvas.id = 'acpl-chart';
-        container.appendChild(canvas);
-        playstrategy.requestIdleCallback(
-          () =>
-            playstrategy.loadModule('chart.game').then(() => {
-              const chart = (window as any).PlayStrategyChartGame.acpl(
-                canvas,
-                ctrl.root.data,
-                ctrl.root.mainline,
-                ctrl.root.trans,
-              );
-              (canvas as any).__acplChart = chart;
-              ctrl.chartEl(canvas);
-            }),
-          800,
-        );
-      }),
-    },
-    [h('div.study__message', spinner())],
-  );
+  return h('div.study__server-eval.ready.' + analysis.id, [
+    ctrl.chartEl() ? null : h('div.study__message', spinner()),
+    h('canvas#acpl-chart', {
+      hook: {
+        insert: vnode => {
+          const canvas = vnode.elm as HTMLCanvasElement;
+          ctrl.lastPly(false);
+          playstrategy.requestIdleCallback(
+            () =>
+              playstrategy.loadModule('chart.game').then(() => {
+                const chart = (window as any).PlayStrategyChartGame.acpl(
+                  canvas,
+                  ctrl.root.data,
+                  ctrl.root.mainline,
+                  ctrl.root.trans,
+                );
+                (canvas as any).__acplChart = chart;
+                ctrl.chartEl(canvas);
+                ctrl.root.redraw();
+              }),
+            800,
+          );
+        },
+        destroy: vnode => {
+          const canvas = vnode.elm as HTMLCanvasElement;
+          const chart: AcplChart | undefined = (canvas as any).__acplChart;
+          chart?.destroy();
+          if (ctrl.chartEl() === canvas) ctrl.chartEl(null);
+        },
+      },
+    }),
+  ]);
 }
 
 function disabled(): VNode {

@@ -233,7 +233,8 @@ object BSONHandlers {
         freq = r.intO("f") flatMap Schedule.Freq.byId,
         speed = r.intO("p") flatMap Schedule.Speed.byId,
         perf = PerfType.byId.get(r.int("v")).err("Invalid leaderboard perf"),
-        date = r.date("d")
+        date = r.date("d"),
+        disqualified = r.boolD("dq")
       )
 
     def writes(w: BSON.Writer, o: LeaderboardApi.Entry) =
@@ -250,7 +251,8 @@ object BSONHandlers {
         "f"   -> o.freq.map(_.id),
         "p"   -> o.speed.map(_.id),
         "v"   -> o.perf.id,
-        "d"   -> w.date(o.date)
+        "d"   -> w.date(o.date),
+        "dq"  -> w.boolO(o.disqualified)
       )
   }
 

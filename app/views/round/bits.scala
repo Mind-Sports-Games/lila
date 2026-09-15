@@ -58,7 +58,7 @@ object bits {
                 withOnline = false,
                 mod = true
               ),
-              s" ${p.blurs.nb}/${game.playerMoves(p.playerIndex)} blurs ",
+              s" ${p.blurs.nb}/${game.playerTurns(p.playerIndex)} blurs ",
               strong(game.playerBlurPercent(p.playerIndex), "%")
             )
           }

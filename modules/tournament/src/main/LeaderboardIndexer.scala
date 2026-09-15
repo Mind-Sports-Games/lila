@@ -83,12 +83,15 @@ final private class LeaderboardIndexer(
           score = player.score,
           rank = rank,
           rankRatio = Ratio(if (tour.nbPlayers > 0) rank.toDouble / tour.nbPlayers else 0),
-          metaPoints = metaPointsFromRank(tour.schedule.map(_.freq), rank),
+          metaPoints =
+            if (player.disqualified) none
+            else metaPointsFromRank(tour.schedule.map(_.freq), rank),
           shieldKey = shieldKeyFromTour(tour),
           freq = tour.schedule.map(_.freq),
           speed = tour.schedule.map(_.speed),
           perf = tour.perfType,
-          date = tour.startsAt
+          date = tour.startsAt,
+          disqualified = player.disqualified
         )
       }
     }

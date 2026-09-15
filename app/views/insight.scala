@@ -2,6 +2,9 @@
 // for everything that needs uncommenting to bring it back. These views cannot
 // compile while the routes are commented out, as they depend on the generated
 // routes.Insight reverse router.
+// Reviving it also means porting ui/insight/src/chart.js off Highcharts, which no
+// longer ships: model it on lichess's ui/insight/src/chart.ts, which reuses the
+// helpers exported from ui/chart/src/index.ts.
 /*
 package views.html
 
@@ -26,7 +29,6 @@ object insight {
     views.html.base.layout(
       title = s"${u.username}'s chess insights",
       moreJs = frag(
-        highchartsLatestTag,
         jsAtCJS("javascripts/vendor/jquery.min.js"),
         jsAtCJS("javascripts/vendor/multiple-select.min.js"),
         jsModule("insight"),
