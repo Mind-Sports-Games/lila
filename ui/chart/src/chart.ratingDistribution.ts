@@ -11,9 +11,9 @@ import {
 } from 'chart.js';
 import { chartPalette, fontColor, fontFamily, gridColor, maybeChart, tooltipOpts, withAlpha } from './index';
 
-const playersColor = chartPalette[0];
+const playersColor = chartPalette[2];
 const cumulativeColor = chartPalette[4];
-const myRatingColor = chartPalette[2];
+const myRatingColor = chartPalette[0];
 
 Chart.register(LineController, LinearScale, PointElement, LineElement, Tooltip, Filler);
 

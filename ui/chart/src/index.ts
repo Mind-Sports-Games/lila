@@ -13,15 +13,15 @@ export const hoverBorderColor: string = lightTheme ? gridColor : 'white';
 // ColorBrewer "Paired", strong shades first so a chart with few series gets
 // distinct hues; the pale partner of each follows six places later.
 export const chartPalette = [
-  '#1f78b4',
-  '#33a02c',
   '#e31a1c',
+  '#33a02c',
+  '#1f78b4',
   '#ff7f00',
   '#6a3d9a',
   '#b15928',
-  '#a6cee3',
-  '#b2df8a',
   '#fb9a99',
+  '#b2df8a',
+  '#a6cee3',
   '#fdbf6f',
   '#cab2d6',
   '#e7298a',
