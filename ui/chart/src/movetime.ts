@@ -126,9 +126,9 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
 
   const logC = Math.pow(Math.log(3), 2);
   let blurPending: { key: 'p1' | 'p2'; turn: number; point: MovePoint } | undefined;
-  // The backend indexes blur bits by Game.playerMoves, which sums actionStrs turn sizes — one bit
-  // per action, not per turn, so a backgammon turn spans a roll, its checker moves and an endturn.
-  const blurAt: Record<'p1' | 'p2', number> = { p1: 0, p2: 0 };
+  // One blur bit per turn of each side, whatever the number of actions in it.
+  const blurAt: Record<'p1' | 'p2', number> = { p1: -1, p2: -1 };
+  const blurTurnSeen: Record<'p1' | 'p2', number> = { p1: 0, p2: 0 };
   let lastTurnKey: 'p1' | 'p2' | undefined;
   let turnCentis = 0;
   // Every action of the turn, in order (in backgammon: the dice roll, each checker move, the end-turn).
@@ -232,8 +232,12 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     const turn = parentNode ? Math.floor((parentNode.turnCount ?? 0) / 2) + 1 : (ply + 1) >> 1;
     const dots = isP1 ? '.' : '...';
     const san = node ? (node.san === 'NOSAN' ? (node.uci ?? '-') : (node.san ?? '-')) : '-';
-    // Consumed for every action, ahead of any branch that skips the rest of the body.
-    const isBlur = blurs[isP1 ? 1 : 0][blurAt[key]++] === '1';
+    // Advanced on the side's first action of a turn, ahead of any branch that skips the rest of the body.
+    if (blurTurnSeen[key] !== turn) {
+      blurTurnSeen[key] = turn;
+      blurAt[key]++;
+    }
+    const isBlur = blurs[isP1 ? 1 : 0][blurAt[key]] === '1';
     // Flags the turn as containing a blur; a single-action turn is marked on the bar,
     // a multi-action one marks its blurred actions individually.
     const markBlur = () => {

@@ -303,10 +303,16 @@ case class Game(
       blur: Boolean = false
   ): Progress = {
 
+    def currentTurnIndex(playerIndex: PlayerIndex) = {
+      val turns      = turnActionStrs
+      val continuing = turns.nonEmpty && (turns.size - 1) % 2 == startIndex(playerIndex)
+      playerTurns(playerIndex) - (if (continuing) 1 else 0)
+    }
+
     def copyPlayer(player: Player) =
       if (blur && action.player == player.playerIndex)
         player.copy(
-          blurs = player.blurs.add(playerTurns(player.playerIndex))
+          blurs = player.blurs.add(currentTurnIndex(player.playerIndex))
         )
       else player
 
