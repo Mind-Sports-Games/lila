@@ -7,45 +7,51 @@ import {
   PointElement,
   Tooltip,
   type ChartDataset,
+  type Plugin,
 } from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { chartPalette, fontColor, fontFamily, gridColor, maybeChart, tooltipOpts, withAlpha } from './index';
 
 const playersColor = chartPalette[0];
 const cumulativeColor = chartPalette[4];
 const myRatingColor = chartPalette[2];
 
-Chart.register(LineController, LinearScale, PointElement, LineElement, Tooltip, Filler, ChartDataLabels);
+Chart.register(LineController, LinearScale, PointElement, LineElement, Tooltip, Filler);
 
 interface Data {
   freq: number[];
-  myRating?: number;
+  myRating?: { rating: number; provisional: boolean };
   i18n: I18nDict;
 }
 
 const ratingAt = (i: number) => 600 + i * 25;
 
-function marker(rating: number, label: string, max: number): ChartDataset<'line'> {
+// Drawn rather than plotted, so the line never turns up in the tooltip or the
+// nearest-point search.
+function ratingMarker(rating: number, label: string): Plugin<'line'> {
   return {
-    type: 'line',
-    label,
-    data: [
-      { x: rating, y: 0 },
-      { x: rating, y: max },
-    ],
-    borderColor: myRatingColor,
-    borderWidth: 3,
-    pointRadius: 0,
-    pointHoverRadius: 0,
-    segment: { borderDash: () => [10] },
-    datalabels: {
-      display: 'auto',
-      align: 'top',
-      color: myRatingColor,
-      font: fontFamily(12, 'bold'),
-      formatter: (v: { y: number }) => (v.y === 0 ? '' : label),
+    id: 'ratingMarker',
+    afterDatasetsDraw(chart) {
+      const { ctx, chartArea, scales } = chart;
+      const x = scales.x.getPixelForValue(rating);
+      if (x < chartArea.left || x > chartArea.right) return;
+      ctx.save();
+      ctx.strokeStyle = myRatingColor;
+      ctx.lineWidth = 3;
+      ctx.setLineDash([10]);
+      ctx.beginPath();
+      ctx.moveTo(x, chartArea.top);
+      ctx.lineTo(x, chartArea.bottom);
+      ctx.stroke();
+      const font = fontFamily(12, 'bold');
+      ctx.font = `${font.weight} ${font.size}px ${font.family}`;
+      ctx.fillStyle = myRatingColor;
+      ctx.textBaseline = 'top';
+      const fitsRight = x + 6 + ctx.measureText(label).width <= chartArea.right;
+      ctx.textAlign = fitsRight ? 'left' : 'right';
+      ctx.fillText(label, fitsRight ? x + 6 : x - 6, chartArea.top + 4);
+      ctx.restore();
     },
-  } as ChartDataset<'line'>;
+  };
 }
 
 export function ratingDistributionChart(el: HTMLCanvasElement, data: Data): void {
@@ -78,7 +84,6 @@ export function ratingDistributionChart(el: HTMLCanvasElement, data: Data): void
       pointRadius: 4,
       pointHoverRadius: 6,
       pointHitRadius: 200,
-      datalabels: { display: false },
     },
     {
       type: 'line',
@@ -89,15 +94,19 @@ export function ratingDistributionChart(el: HTMLCanvasElement, data: Data): void
       borderWidth: 2,
       pointRadius: 1,
       pointHitRadius: 200,
-      datalabels: { display: false },
     },
   ];
 
-  if (data.myRating) datasets.push(marker(data.myRating, trans.noarg('yourRating'), Math.max(...freq)));
+  const plugins: Plugin<'line'>[] = [];
+  if (data.myRating) {
+    const { rating, provisional } = data.myRating;
+    plugins.push(ratingMarker(rating, `${trans.noarg('yourRating')}: ${rating}${provisional ? '?' : ''}`));
+  }
 
-  new Chart(el, {
+  new Chart<'line'>(el, {
     type: 'line',
     data: { datasets },
+    plugins,
     options: {
       locale: document.documentElement.lang,
       maintainAspectRatio: false,

@@ -21,7 +21,9 @@ object ratingDistribution {
         embedJsUnsafeLoadThen(s"""playstrategy.ratingDistributionChart(${safeJsonValue(
             Json.obj(
               "freq"     -> data,
-              "myRating" -> ctx.me.map(_.perfs(perfType).intRating),
+              "myRating" -> ctx.me.map(_.perfs(perfType)).filter(_.nb > 0).map { perf =>
+                Json.obj("rating" -> perf.intRating, "provisional" -> perf.provisional)
+              },
               "i18n"     -> i18nJsObject(i18nKeys)
             )
           )})""")
