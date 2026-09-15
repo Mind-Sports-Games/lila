@@ -3,23 +3,27 @@ import {
   BarElement,
   Chart,
   type ChartDataset,
+  Interaction,
+  type InteractionItem,
+  type InteractionModeFunction,
   LineController,
   LineElement,
   LinearScale,
   PointElement,
   Tooltip,
 } from 'chart.js';
+import { getRelativePosition } from 'chart.js/helpers';
 import { GameFamilyKey } from 'stratops/variants/types';
 import { variantClassFromKey } from 'stratops/variants/util';
 import {
   animation,
   axisOpts,
+  layoutOpts,
+  markerClip,
   blackFill,
   blackFillBorder,
   fontColor,
   fontFamily,
-  layoutOpts,
-  markerClip,
   maybeChart,
   oppositeColorVariants,
   orangeAccent,
@@ -49,6 +53,63 @@ interface ActionPoint {
   seg: [number, number];
   actionLabel: string;
 }
+
+// The rectangle turnBars drew for one action, in CSS pixels, so the pointer can be matched to
+// the slice it is over rather than to the nearest column.
+interface ActionBand {
+  datasetIndex: number;
+  index: number;
+  ply: number;
+  turn: number;
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
+const drawnBands = new WeakMap<Chart, ActionBand[]>();
+
+const bandAt = (chart: Chart, x: number, y: number): ActionBand | undefined =>
+  drawnBands.get(chart)?.find(b => x >= b.left && x <= b.right && y >= b.top && y <= b.bottom);
+
+declare module 'chart.js' {
+  interface InteractionModeMap {
+    actionBand: InteractionModeFunction;
+  }
+}
+
+// The slice under the pointer wins; anywhere else the nearest action by ply, so the tooltip and a
+// click always agree on which action is meant. Only the action bars take part: the totals line,
+// the ply line and the division lines carry points too, and the totals sit at turn midpoints —
+// between two actions, where a search over everything would land on them instead.
+Interaction.modes.actionBand = (chart, e, _options, useFinalPosition) => {
+  const pos = getRelativePosition(e, chart);
+  if (pos.x === null || pos.y === null || !chart.isPointInArea(pos)) return [];
+  const hit = bandAt(chart, pos.x, pos.y);
+  if (hit) {
+    const element = chart.getDatasetMeta(hit.datasetIndex).data[hit.index];
+    return [{ element, datasetIndex: hit.datasetIndex, index: hit.index }];
+  }
+  let best: InteractionItem | undefined;
+  let bestDistance = Infinity;
+  chart.data.datasets.forEach((ds, datasetIndex) => {
+    if (!(ds as { segmentKey?: string }).segmentKey) return;
+    const meta = chart.getDatasetMeta(datasetIndex);
+    if (meta.hidden) return;
+    meta.data.forEach((element, index) => {
+      const x = (element as unknown as { getCenterPoint(final?: boolean): { x: number } }).getCenterPoint(
+        useFinalPosition,
+      ).x;
+      if (x < chart.chartArea.left || x > chart.chartArea.right) return;
+      const distance = Math.abs(x - pos.x!);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = { element, datasetIndex, index };
+      }
+    });
+  });
+  return best ? [best] : [];
+};
 
 interface AnalyseData {
   game: {
@@ -141,7 +202,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   let turnTimed = false; // did any action of this turn have a recorded ply time?
   const labelByTurn = new Map<number, string>(); // turn index → tooltip label
   const untimedTurns = new Set<number>(); // turns the backend recorded no time for at all
-  const landingPlyByTurn = new Map<number, number>(); // turn index → ply a click on its bar jumps to
+  const landingPlyByTurn = new Map<number, number>(); // turn index → ply the pinned tooltip sits on off-turn
   const turnByPly = new Map<number, number>(); // ply → the turn it belongs to, for the selection
   let selectedTurn = -1; // turn under the board's current ply; its bar is outlined
   let atPly = firstPly; // last ply the board reported; its slice of the bar is tinted
@@ -407,6 +468,8 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
     id: 'turnBars',
     beforeDatasetsDraw(chart: Chart) {
       blurMarks.length = 0;
+      const bands: ActionBand[] = [];
+      drawnBands.set(chart, bands);
       const zero = chart.scales.y?.getPixelForValue(0);
       const xScale = chart.scales.x;
       if (zero === undefined || !xScale) return;
@@ -472,6 +535,19 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
                 Math.min(Math.max(top, axis), Math.max(from, to) + grow),
               ];
             };
+            for (let j = start; j <= end; j++) {
+              const [y0, y1] = band(points[j].seg);
+              bands.push({
+                datasetIndex: i,
+                index: j,
+                ply: points[j].ply,
+                turn: points[j].turn,
+                left: css(left),
+                right: css(right),
+                top: css(y0),
+                bottom: css(y1),
+              });
+            }
             if (sideBlurTurns.has(points[start].turn))
               blurMarks.push({ x: css((left + right) / 2), y: css(markY(top)), r: blurRadius, key });
             ctx.fillRect(css(left), css(Math.min(top, axis)), css(right - left), css(Math.abs(top - axis)));
@@ -508,8 +584,8 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
           start = end + 1;
         }
         ctx.stroke();
-        // The whole turn is what a click selects, so outline the whole bar rather than leave the
-        // ply line to mark one action inside it. Same accent as that line, so both read as "here".
+        // The turn is the unit of selection, so outline its whole bar; the tinted slice above says
+        // which action inside it the board is on. Same accent as the ply line, so both read as "here".
         if (selected) {
           const [left, right, top] = selected;
           ctx.save();
@@ -613,6 +689,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
         pointBackgroundColor: key === 'p1' ? '#555555' : '#bbbbbb',
         pointBorderColor: key === 'p1' ? '#aaaaaa' : '#444444',
         pointBorderWidth: 1.5,
+        clip: markerClip,
         order: 0,
         datalabels: { display: false },
       };
@@ -644,11 +721,12 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
       responsive: true,
       // The painted bar is wider than the one-ply action bars behind it, so hit test on the
       // nearest ply rather than requiring the pointer to land inside one, as the acpl chart does.
-      ...(stacked ? { interaction: { mode: 'nearest' as const, axis: 'x' as const, intersect: false } } : {}),
+      ...(stacked ? { interaction: { mode: 'actionBand' as const, axis: 'x' as const, intersect: false } } : {}),
       animations: animation(
         800 / Math.max(1, stacked ? Math.max(actionSeries.p1.length, actionSeries.p2.length) : labels.length - 1),
       ),
       scales: axisOpts(firstPly + 1, isBackgammon ? bgLastPly : lastPly),
+      layout: layoutOpts,
       plugins: {
         tooltip: {
           borderColor: fontColor,
@@ -672,32 +750,30 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
       onHover(_event, elements, chart) {
         chart.canvas.style.cursor = elements.length ? 'pointer' : 'default';
       },
-      onClick(_event, elements, chart) {
-        if (elements[0]) {
+      onClick(event, elements, chart) {
+        // A click goes where the tooltip points: the slice under the pointer, else the nearest
+        // action by ply — so a turn's actions can be stepped through by clicking along its bar.
+        const hit = stacked && event.x !== null && event.y !== null ? bandAt(chart, event.x, event.y) : undefined;
+        let target: { ply: number; turn?: number } | undefined = hit;
+        if (!target && elements[0]) {
           const pt = (
             chart.data.datasets[elements[0].datasetIndex]?.data as
               { x: number; ply?: number; turn?: number }[] | undefined
           )?.[elements[0].index];
           if (pt?.x === undefined) return;
           if (!stacked) return playstrategy.pubsub.emit('analysis.chart.click', pt.x);
-          // Land after the whole turn wherever in the bar the click fell, matching single-action
-          // variants: there a turn is one ply and clicking its bar shows the position it produced.
-          // Selecting the pointed action instead would land mid-turn, and the actions are spread
-          // horizontally while the bar's dividers read vertically, so it never matches the segment
-          // the pointer is over anyway.
-          if (pt.turn !== undefined && pt.turn === selectedTurn) {
-            // Clicking the selected bar again dismisses the marker and its pinned tooltip. The
-            // board stays where it is: this undoes the highlight, not the navigation that set it.
-            selectedTurn = -1;
-        clip: markerClip,
-            showPinned();
-            chart.update('none');
-            return;
-          }
-          const landing = pt.turn === undefined ? undefined : landingPlyByTurn.get(pt.turn);
-          const target = landing ?? pt.ply ?? Math.round(pt.x);
-          playstrategy.pubsub.emit('analysis.chart.click', target);
+          target = { ply: pt.ply ?? Math.round(pt.x), turn: pt.turn };
         }
+        if (!target) return;
+        if (target.ply === atPly && target.turn === selectedTurn) {
+          // Clicking the action the board is already on dismisses the marker and its pinned
+          // tooltip. The board stays where it is: this undoes the highlight, not the navigation.
+          selectedTurn = -1;
+          showPinned();
+          chart.update('none');
+          return;
+        }
+        playstrategy.pubsub.emit('analysis.chart.click', target.ply);
       },
     },
   }) as Chart & { selectPly(ply: number): void };
@@ -726,7 +802,6 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   };
 
   const applySelection = () => {
-      layout: layoutOpts,
     const base = turnByPly.get(atPly) ?? -1;
     // With the picker open the board still sits at the end of a turn, but the dice being chosen
     // belong to the next one, so that is the bar to mark. At the root there is no current turn,
