@@ -13,6 +13,8 @@ import {
 import {
   animation,
   axisOpts,
+  layoutOpts,
+  markerClip,
   blackFill,
   fontColor,
   fontFamily,
@@ -171,6 +173,7 @@ function makeDataset(
       },
       pointRadius: hasBlurs ? pointSizes : 0,
       pointHoverRadius: 5,
+      clip: markerClip,
       pointHitRadius: 100,
       borderColor: orangeAccent,
       pointBackgroundColor: pointColors,
@@ -340,7 +343,12 @@ export default function acpl(el: HTMLCanvasElement, data: AnalyseData, mainline:
   if (existing) return existing as AcplChart;
 
   const dataset = makeDataset(data, mainline);
-  const firstPly = mainline[0]?.ply ?? 0;
+  // Axis bounds come from the game as served, like the movetime chart's, so the two ply lines
+  // stay on top of each other: the mainline can outgrow the game once a move is played on from
+  // its final position.
+  const game = data.treeParts;
+  const firstPly = game[0]?.ply ?? mainline[0]?.ply ?? 0;
+  const lastPly = game[game.length - 1]?.ply ?? mainline[mainline.length - 1]?.ply ?? mainline.length + firstPly;
   const divLines = division(data.game.division, trans);
 
   const config: ChartConfiguration<'line'> = {
@@ -351,7 +359,8 @@ export default function acpl(el: HTMLCanvasElement, data: AnalyseData, mainline:
     },
     options: {
       interaction: { mode: 'nearest', axis: 'x', intersect: false },
-      scales: axisOpts(firstPly + 1, mainline[mainline.length - 1]?.ply ?? mainline.length + firstPly),
+      scales: axisOpts(firstPly + 1, lastPly),
+      layout: layoutOpts,
       animations: animation(500 / Math.max(1, mainline.length - 1)),
       maintainAspectRatio: false,
       responsive: true,

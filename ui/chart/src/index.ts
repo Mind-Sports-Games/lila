@@ -125,6 +125,13 @@ export function fontFamily(size?: number, weight?: 'bold') {
   };
 }
 
+// The acpl and movetime charts sit on top of each other and must keep one x axis. Chart.js
+// would otherwise pad the plot for whatever overflows its edge — a blur marker on the last
+// ply — on one chart and not the other. Reserve the marker's room here, once, for both.
+export const layoutOpts: ChartOptions<'line'>['layout'] = { autoPadding: false, padding: { right: 7 } };
+// Lets an edge marker use that room and the axis strip on the left, and nothing more.
+export const markerClip = { left: 8, right: 7, top: 0, bottom: 0 };
+
 export const axisOpts = (xmin: number, xmax: number): ChartOptions<'line'>['scales'] => ({
   x: {
     display: false,

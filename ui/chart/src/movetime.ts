@@ -18,6 +18,8 @@ import {
   blackFillBorder,
   fontColor,
   fontFamily,
+  layoutOpts,
+  markerClip,
   maybeChart,
   oppositeColorVariants,
   orangeAccent,
@@ -687,6 +689,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
             // Clicking the selected bar again dismisses the marker and its pinned tooltip. The
             // board stays where it is: this undoes the highlight, not the navigation that set it.
             selectedTurn = -1;
+        clip: markerClip,
             showPinned();
             chart.update('none');
             return;
@@ -723,6 +726,7 @@ export default function movetime(el: HTMLCanvasElement, data: AnalyseData, trans
   };
 
   const applySelection = () => {
+      layout: layoutOpts,
     const base = turnByPly.get(atPly) ?? -1;
     // With the picker open the board still sits at the end of a turn, but the dice being chosen
     // belong to the next one, so that is the bar to mark. At the root there is no current turn,
