@@ -35,6 +35,7 @@ trait ChessgroundHelper {
               case Pos.Go(p)           => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case Pos.Backgammon(p)   => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case Pos.Abalone(p)      => orient.fold(8 - p.y, p.y - 1) * 12.5
+              case Pos.Entropy(p)      => orient.fold(6 - p.rank.index, p.rank.index) * 100.0 / 7
               case _                   => sys.error("Invalid Pos type")
             }
             def left(p: Pos) = p match {
@@ -46,6 +47,7 @@ trait ChessgroundHelper {
               case Pos.Go(p)           => orient.fold(p.file.index, 7 - p.file.index) * 12.5
               case Pos.Backgammon(p)   => orient.fold(p.file.index, 7 - p.file.index) * 12.5
               case Pos.Abalone(p)      => orient.fold(p.x - 1, 8 - p.x) * 12.5
+              case Pos.Entropy(p)      => orient.fold(p.file.index, 6 - p.file.index) * 100.0 / 7
               case _                   => sys.error("Invalid Pos type")
             }
             val highlights = ctx.pref.highlight so lastMove.distinct.map { pos =>
@@ -152,6 +154,14 @@ trait ChessgroundHelper {
           }
         )
       case (board: Board.Abalone, history: History.Abalone) =>
+        chessground(
+          board = board,
+          orient = pov.playerIndex,
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
+            List(orig, dest)
+          }
+        )
+      case (board: Board.Entropy, history: History.Entropy) =>
         chessground(
           board = board,
           orient = pov.playerIndex,

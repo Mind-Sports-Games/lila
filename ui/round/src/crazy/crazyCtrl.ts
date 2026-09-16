@@ -9,6 +9,7 @@ import * as stratUtils from 'stratutils';
 export const pieceRoles: cg.Role[] = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece'];
 export const pieceShogiRoles: cg.Role[] = ['p-piece', 'l-piece', 'n-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
 export const pieceMiniShogiRoles: cg.Role[] = ['p-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
+export const pieceEntropyRoles: cg.Role[] = ['w-piece', 'k-piece', 'y-piece', 'g-piece', 'r-piece', 'b-piece', 'p-piece'];
 
 let dropWithKey = false;
 let dropWithDrag = false;

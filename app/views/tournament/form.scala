@@ -376,7 +376,8 @@ final private class TourFields(form: Form[?], tour: Option[Tournament])(implicit
       medleyGameGroup(GameGroup.BreakthroughTroyka()),
       medleyGameGroup(GameGroup.Go()),
       medleyGameGroup(GameGroup.Backgammon()),
-      medleyGameGroup(GameGroup.Abalone())
+      medleyGameGroup(GameGroup.Abalone()),
+      medleyGameGroup(GameGroup.Entropy())
     )
   private def onePerGameFamily =
     frag(

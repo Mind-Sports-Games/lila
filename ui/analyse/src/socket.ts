@@ -9,6 +9,7 @@ import {
   AnaMove,
   AnaPass,
   AnaRoll,
+  AnaDrawCounter,
   AnaEndTurn,
   ChapterData,
   EditChapterData,
@@ -63,6 +64,7 @@ export type StudySocketSendParams =
   | [t: 'anaLift', d: AnaLift & MoveOpts]
   | [t: 'anaPass', d: AnaPass & MoveOpts]
   | [t: 'anaRoll', d: AnaRoll & MoveOpts]
+  | [t: 'anaDrawCounter', d: AnaDrawCounter & MoveOpts]
   | [t: 'anaEndTurn', d: AnaEndTurn & MoveOpts]
   | [t: 'anaDests', d: AnaDestsReq]
   | [t: 'like', d: { liked: boolean }]
@@ -90,6 +92,7 @@ export interface Socket {
   sendAnaLift(d: AnaLift): void;
   sendAnaPass(d: AnaPass): void;
   sendAnaRoll(d: AnaRoll): void;
+  sendAnaDrawCounter(d: AnaDrawCounter): void;
   sendAnaEndTurn(d: AnaEndTurn): void;
   sendAnaDests(d: AnaDestsReq): void;
   clearCache(): void;
@@ -236,6 +239,14 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     // No retry: dice are random, a retry would produce different values
   }
 
+  function sendAnaDrawCounter(req: AnaDrawCounter) {
+    clearTimeout(anaMoveTimeout);
+    withoutStandardVariant(req);
+    addStudyData(req, true);
+    send('anaDrawCounter', req);
+    anaMoveTimeout = setTimeout(() => sendAnaDrawCounter(req), 3000);
+  }
+
   function sendAnaEndTurn(req: AnaEndTurn) {
     clearTimeout(anaMoveTimeout);
     withoutStandardVariant(req);
@@ -258,6 +269,7 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     sendAnaLift,
     sendAnaPass,
     sendAnaRoll,
+    sendAnaDrawCounter,
     sendAnaEndTurn,
     sendAnaDests,
     clearCache,

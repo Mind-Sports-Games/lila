@@ -338,6 +338,7 @@ export default class RoundController {
         'nackgammon',
         'abalone',
         'grandabalone',
+        'entropy',
       ].includes(this.data.game.variant.key)
     )
       return false;
@@ -774,6 +775,11 @@ export default class RoundController {
             this.data.player.playerIndex === this.data.game.player,
         });
       }
+      // a draw opens every Chaos turn, so it is where the board catches up with the server,
+      // including the empty board that starts the second round
+      if (d.game.variant.key === 'entropy' && o.uci.startsWith('draw')) {
+        this.chessground.set({ fen: o.fen });
+      }
       if (d.onlyDropsVariant) {
         this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);
       }
@@ -927,6 +933,15 @@ export default class RoundController {
     this.resign(false);
     this.doubleConfirm = undefined;
     this.actualSendMove('diceroll', roll);
+  };
+
+  sendDrawCounter = (variant: VariantKey): void => {
+    const draw: SocketDoRoll = {
+      variant: variant,
+    };
+    if (blur.get()) draw.b = 1;
+    this.resign(false);
+    this.actualSendMove('drawcounter', draw);
   };
 
   sendLift = (variant: VariantKey, key: cg.Key): void => {
@@ -1289,7 +1304,8 @@ export default class RoundController {
   };
 
   canPassTurn = (): boolean =>
-    ['go9x9', 'go13x13', 'go19x19'].includes(this.data.game.variant.key) &&
+    (['go9x9', 'go13x13', 'go19x19'].includes(this.data.game.variant.key) ||
+      (this.data.game.variant.key === 'entropy' && stratUtils.entropy.isOrderTurn(round.lastStep(this.data).fen))) &&
     this.isPlaying() &&
     !this.replaying() &&
     this.data.player.playerIndex === this.data.game.player &&
@@ -1468,6 +1484,7 @@ export default class RoundController {
       ) {
         this.forcePass(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
       }
+      if (d.game.variant.key === 'entropy') this.doEntropyForcedActions();
       //backgammon roll dice at start of turn or end turn when no moves
       if (['backgammon', 'hyper', 'nackgammon'].includes(d.game.variant.key)) {
         if (d.canOnlyRollDice) setTimeout(() => this.forceRollDice(d.game.variant.key), this.forcedActionDelayMillis);
@@ -1475,6 +1492,26 @@ export default class RoundController {
           setTimeout(() => this.forceRollDice(d.game.variant.key), this.forcedActionDelayMillis);
         } else if (d.pref.playForcedAction > 0) this.playForcedAction();
       }
+    }
+  };
+
+  private entropyDrawPending = false;
+
+  // the draw is blind, so there is nothing for Chaos to decide: draw at once, then
+  // hold the drawn counter ready to place
+  private doEntropyForcedActions = (): void => {
+    const d = this.data,
+      fen = round.lastStep(d).fen;
+    if (stratUtils.entropy.mustDraw(fen)) {
+      if (this.entropyDrawPending) return;
+      this.entropyDrawPending = true;
+      setTimeout(() => {
+        this.entropyDrawPending = false;
+        if (stratUtils.entropy.mustDraw(round.lastStep(this.data).fen)) this.sendDrawCounter(d.game.variant.key);
+      }, this.forcedActionDelayMillis);
+    } else {
+      const role = stratUtils.entropy.isChaosTurn(fen) && stratUtils.entropy.counterInPocket(fen);
+      if (role) setDropMode(this.chessground.state, { playerIndex: d.game.player, role });
     }
   };
 

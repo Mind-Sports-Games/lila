@@ -227,7 +227,7 @@ final private[round] class RoundDuct(
     case p: HumanPlay =>
       handle(p.playerId) { pov =>
         if (pov.player.isAi) fufail(s"player $pov can't play AI")
-        else if (pov.game.outoftime(withGrace = true)) finisher.outOfTime(pov.game)
+        else if (pov.game.outoftime(withGrace = true)) player.outOfTime(pov.game)
         else {
           recordLag(pov)
           player.human(p, this)(pov)
@@ -248,7 +248,7 @@ final private[round] class RoundDuct(
       val res = proxy
         .withPov(PlayerId(p.playerId)) {
           _ so { pov =>
-            if (pov.game.outoftime(withGrace = true)) finisher.outOfTime(pov.game)
+            if (pov.game.outoftime(withGrace = true)) player.outOfTime(pov.game)
             else player.bot(p.uci, this)(pov)
           }
         }
@@ -330,7 +330,7 @@ final private[round] class RoundDuct(
     // checks if any player can safely (grace) be flagged
     case QuietFlag =>
       handle { game =>
-        game.outoftime(withGrace = true) so finisher.outOfTime(game)
+        game.outoftime(withGrace = true) so player.outOfTime(game)
       }
 
     // flags a specific player, possibly without grace if self
@@ -338,7 +338,7 @@ final private[round] class RoundDuct(
       handle { game =>
         (game.turnPlayerIndex == playerIndex) so {
           val toSelf = from.contains(PlayerId(game.player(playerIndex).id))
-          game.outoftime(withGrace = !toSelf) so finisher.outOfTime(game)
+          game.outoftime(withGrace = !toSelf) so player.outOfTime(game)
         }
       }
 

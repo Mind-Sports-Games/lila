@@ -173,6 +173,10 @@ $loa-variants: ('linesOfAction', 'scrambledEggs');
 
 $dameo-variants: ('dameo');
 
+$entropy-board-files: (
+  'wood': 'wood.svg',
+);
+
 $shogi-variants: ('shogi'); //must use same board
 
 $xiangqi-variants: ('xiangqi'); // must use same board
@@ -198,6 +202,12 @@ $abalone-variants: ('abalone', 'grandabalone');
 @each $color, $file in $chess-board-files {
   .dameo-#{$color} .variant-dameo.is2d cg-board {
     background-image: url(../images/board/dameo/#{$file});
+  }
+}
+
+@each $color, $file in $entropy-board-files {
+  .entropy-#{$color} .variant-entropy.is2d cg-board {
+    background-image: url(../images/board/entropy/#{$file});
   }
 }
 
@@ -343,6 +353,12 @@ $abalone-variants: ('abalone', 'grandabalone');
     .dameo-#{$color} .is2d .variant-#{$variant} cg-board {
       background-image: url(../images/board/dameo/#{$file});
     }
+  }
+}
+
+@each $color, $file in $entropy-board-files {
+  .entropy-#{$color} .is2d .variant-entropy cg-board {
+    background-image: url(../images/board/entropy/#{$file});
   }
 }
 

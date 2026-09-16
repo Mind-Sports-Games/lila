@@ -39,6 +39,7 @@ type variantConfirmsType = {
   nackgammon: string;
   abalone: string;
   grandabalone: string;
+  entropy: string;
 };
 
 const variantConfirms: variantConfirmsType = {
@@ -101,6 +102,8 @@ const variantConfirms: variantConfirmsType = {
     "This is an Abalone game!\n\nThe aim of the game is to be the first to push six of your opponent's marbles off the board.",
   grandabalone:
     "This is a Grand Abalone game!\n\nThe aim of the game is to be the first to push ten of your opponent's marbles off the board.",
+  entropy:
+    'This is an Entropy game!\n\nThe game is played over two rounds with roles swapped. Chaos draws and places counters; Order slides them to build symmetric colour patterns, scoring as it goes. The higher score wins.',
 };
 
 function storageKey(key: string) {

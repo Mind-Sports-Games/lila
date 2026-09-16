@@ -10,6 +10,10 @@
   flex: 0 0 calc(100% / 5);
 }
 
+.variant-entropy .pocket-c1 {
+  flex: 0 0 calc(100% / 7);
+}
+
 .pocket {
   @extend %box-radius;
 

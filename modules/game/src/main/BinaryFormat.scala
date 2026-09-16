@@ -25,6 +25,7 @@ import strategygames.go
 import strategygames.backgammon
 import strategygames.abalone
 import strategygames.dameo
+import strategygames.entropy
 import org.joda.time.DateTime
 import org.lichess.compression.clock.Encoder as ClockEncoder
 import scala.util.Try
@@ -685,6 +686,27 @@ object BinaryFormat {
         .to(Map)
     }
 
+    def writeEntropy(pieces: entropy.PieceMap): ByteArray = {
+      def posInt(pos: entropy.Pos): Int =
+        (pieces get pos).fold(0) { piece =>
+          // 0 is an empty square, so roles are stored one above their binaryInt
+          piece.player.fold(0, 128) + piece.role.binaryInt + 1
+        }
+      ByteArray(entropy.Pos.all.map(posInt(_).toByte).toArray)
+    }
+
+    def readEntropy(ba: ByteArray): entropy.PieceMap = {
+      def intPiece(int: Int): Option[entropy.Piece] =
+        entropy.Role.allByBinaryInt.get((int & 127) - 1) map { role =>
+          entropy.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
+        }
+      (entropy.Pos.all zip ba.value).view
+        .flatMap { case (pos, int) =>
+          intPiece(int) map (pos -> _)
+        }
+        .to(Map)
+    }
+
     // cache standard start position
     def standard(lib: GameLogic) = lib match {
       case GameLogic.Chess()    => writeChess(chess.Board.init(chess.variant.Standard).pieces)
@@ -701,6 +723,7 @@ object BinaryFormat {
         writeBackgammon(backgammon.Board.init(backgammon.variant.Backgammon).pieces)
       case GameLogic.Abalone() => writeAbalone(abalone.Board.init(abalone.variant.Abalone))
       case GameLogic.Dameo()   => writeDameo(dameo.Board.init(dameo.variant.Dameo).pieces)
+      case GameLogic.Entropy() => writeEntropy(entropy.Board.init(entropy.variant.Entropy).pieces)
       case _                   =>
         sys.error("Cant write to binary for lib")
     }

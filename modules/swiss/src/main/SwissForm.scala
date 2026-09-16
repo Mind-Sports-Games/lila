@@ -49,7 +49,8 @@ final class SwissForm(implicit mode: Mode) {
           "breakthroughtroyka" -> optional(boolean),
           "go"                 -> optional(boolean),
           "backgammon"         -> optional(boolean),
-          "abalone"            -> optional(boolean)
+          "abalone"            -> optional(boolean),
+          "entropy"            -> optional(boolean)
         )(MedleyGameFamilies.apply)(unapply),
         "rated"   -> optional(boolean),
         "mcmahon" -> mapping(
@@ -142,7 +143,8 @@ final class SwissForm(implicit mode: Mode) {
           breakthroughtroyka = true.some,
           go = true.some,
           backgammon = true.some,
-          abalone = true.some
+          abalone = true.some,
+          entropy = true.some
         ),
         rated = true.some,
         mcmahon = McMahon(
@@ -205,7 +207,8 @@ final class SwissForm(implicit mode: Mode) {
             gameGroupInMedley(s.settings.medleyVariants, GameGroup.BreakthroughTroyka()).some,
           go = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Go()).some,
           backgammon = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Backgammon()).some,
-          abalone = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Abalone()).some
+          abalone = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Abalone()).some,
+          entropy = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Entropy()).some
         ),
         rated = s.settings.rated.some,
         mcmahon = McMahon(
@@ -549,7 +552,8 @@ object SwissForm {
       breakthroughtroyka: Option[Boolean],
       go: Option[Boolean],
       backgammon: Option[Boolean],
-      abalone: Option[Boolean]
+      abalone: Option[Boolean],
+      entropy: Option[Boolean]
   ) {
 
     lazy val ggList: List[GameGroup] = GameGroup.medley
@@ -567,5 +571,6 @@ object SwissForm {
       .filterNot(gg => if (!go.getOrElse(false)) gg == GameGroup.Go() else false)
       .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
       .filterNot(gg => if (!abalone.getOrElse(false)) gg == GameGroup.Abalone() else false)
+      .filterNot(gg => if (!entropy.getOrElse(false)) gg == GameGroup.Entropy() else false)
   }
 }

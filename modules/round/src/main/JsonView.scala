@@ -47,7 +47,7 @@ final class JsonView(
   private def onlyDropsVariantForCurrentAction(pov: Pov): Boolean =
     pov.game.variant.onlyDropsVariant ||
       (pov.game.situation.canOnlyDrop &&
-        !List("crazyhouse", "minishogi", "shogi").contains(pov.game.variant.key))
+        !List("crazyhouse", "minishogi", "shogi", "entropy").contains(pov.game.variant.key))
 
   private def coordSystemForVariant(prefCoordSystem: Int, gameVariant: Variant): Int =
     gameVariant match {
@@ -442,6 +442,10 @@ final class JsonView(
         pov.game
           .playableBy(pov.player)
           .option(Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion))
+      case (Situation.Entropy(_), Variant.Entropy(_)) =>
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion))
       case _ => sys.error("Mismatch of types for possibleMoves")
     }
 
@@ -468,6 +472,10 @@ final class JsonView(
       case (Situation.Abalone(_), Variant.Abalone(_))   => None
       case (Situation.Dameo(_), Variant.Dameo(_))       => None
       case (Situation.Draughts(_), Variant.Draughts(_)) => None
+      case (Situation.Entropy(_), Variant.Entropy(_))   =>
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty)))
       case _ => sys.error("Mismatch of types for possibleDropsByrole")
     }
 

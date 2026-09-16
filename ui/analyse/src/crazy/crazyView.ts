@@ -3,12 +3,15 @@ import { h } from 'snabbdom';
 import * as cg from 'chessground/types';
 import { onInsert } from '../util';
 import AnalyseCtrl from '../ctrl';
+import * as stratUtils from 'stratutils';
+import { isDrawingFromBag } from './crazyCtrl';
 
 const eventNames1 = ['mousedown', 'touchmove'];
 const eventNames2 = ['click', 'touchstart'];
 const pieceRoles: cg.Role[] = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece'];
 const pieceShogiRoles: cg.Role[] = ['p-piece', 'l-piece', 'n-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
 const pieceMiniShogiRoles: cg.Role[] = ['p-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
+const pieceEntropyRoles: cg.Role[] = ['w-piece', 'k-piece', 'y-piece', 'g-piece', 'r-piece', 'b-piece', 'p-piece'];
 
 type Position = 'top' | 'bottom';
 
@@ -23,7 +26,13 @@ export default function (ctrl: AnalyseCtrl, playerIndex: PlayerIndex, position: 
   const shogiPlayer = position === 'top' ? 'enemy' : 'ally';
   const variantKey = ctrl.data.game.variant.key;
   const oKeys =
-    variantKey == 'crazyhouse' ? pieceRoles : variantKey == 'minishogi' ? pieceMiniShogiRoles : pieceShogiRoles;
+    variantKey == 'crazyhouse'
+      ? pieceRoles
+      : variantKey == 'minishogi'
+        ? pieceMiniShogiRoles
+        : variantKey == 'entropy'
+          ? pieceEntropyRoles
+          : pieceShogiRoles;
   const captured =
     capturedPiece &&
     ((variantKey === 'shogi' || variantKey === 'minishogi') && capturedPiece['promoted']
@@ -33,10 +42,18 @@ export default function (ctrl: AnalyseCtrl, playerIndex: PlayerIndex, position: 
         : capturedPiece.role);
   const activePlayerIndex = playerIndex === ctrl.turnPlayerIndex();
   const usable = !ctrl.embed && activePlayerIndex;
+  // entropy: Chaos's pocket shows the bag until a counter is drawn, and picking one draws it (selectToDrop)
+  const bag = activePlayerIndex && isDrawingFromBag(ctrl) ? stratUtils.entropy.bag(ctrl.node.fen) : undefined;
+
   return h(
     `div.pocket.is2d.pocket-${position}.pos-${ctrl.bottomPlayerIndex()}`,
     {
-      class: { usable },
+      class: { usable, bag: !!bag },
+      // entropy has a score and a pocket competing for the same space, so the score rides on the pocket
+      attrs:
+        variantKey === 'entropy'
+          ? { 'data-score': stratUtils.getScore(variantKey, ctrl.node.fen, playerIndex) ?? 0 }
+          : {},
       hook: onInsert(el => {
         if (ctrl.embed) return;
         eventNames1.forEach(name => {
@@ -48,9 +65,9 @@ export default function (ctrl: AnalyseCtrl, playerIndex: PlayerIndex, position: 
       }),
     },
     oKeys.map(role => {
-      let nb = pocket[role] || 0;
+      let nb = bag ? bag.get(role) || 0 : pocket[role] || 0;
       const selectedSquare = dropMode?.active && dropPiece?.role == role && dropPiece?.playerIndex == playerIndex;
-      if (activePlayerIndex) {
+      if (activePlayerIndex && !bag) {
         if (dropped === role) nb--;
         if (captured === role) nb++;
       }

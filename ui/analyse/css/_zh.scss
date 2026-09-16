@@ -22,7 +22,7 @@ $pocket-height: 60px;
   }
 }
 
-@each $variant in ('crazyhouse', 'shogi', 'minishogi') {
+@each $variant in ('crazyhouse', 'shogi', 'minishogi', 'entropy') {
   .analyse.variant-#{$variant} {
     grid-template-rows: $pocket-col1-height auto $pocket-col1-height auto 50vh;
     grid-template-areas: 'pocket-top' 'board' 'pocket-bot' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
@@ -37,4 +37,27 @@ $pocket-height: 60px;
       grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
     }
   }
+}
+
+.variant-entropy .pocket {
+  position: relative;
+
+  &::after {
+    @extend %active, %box-radius;
+
+    content: attr(data-score);
+    top: 0;
+    right: 0;
+    position: absolute;
+    line-height: 0.9em;
+    padding: 3px 0.3em;
+    font-weight: bold;
+    font-size: 1.5em;
+  }
+}
+
+// the bag Chaos draws from, shown in its pocket until a counter is drawn
+.variant-entropy .pocket.bag {
+  outline: 2px dashed $c-primary;
+  outline-offset: -2px;
 }

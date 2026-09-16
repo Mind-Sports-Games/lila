@@ -841,3 +841,20 @@ $non-square-pocket-margin-top-mobile: 5vw;
     }
   }
 }
+
+.variant-entropy .pocket {
+  position: relative;
+
+  &::after {
+    @extend %active, %box-radius;
+
+    content: attr(data-score);
+    top: 0;
+    right: 0;
+    position: absolute;
+    line-height: 0.9em;
+    padding: 3px 0.3em;
+    font-weight: bold;
+    font-size: 1.5em;
+  }
+}

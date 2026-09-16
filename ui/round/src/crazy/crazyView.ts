@@ -1,10 +1,19 @@
 import { h } from 'snabbdom';
 import * as round from '../round';
-import { drag, crazyKeys, pieceRoles, pieceShogiRoles, pieceMiniShogiRoles, selectToDrop } from './crazyCtrl';
+import {
+  drag,
+  crazyKeys,
+  pieceRoles,
+  pieceShogiRoles,
+  pieceMiniShogiRoles,
+  pieceEntropyRoles,
+  selectToDrop,
+} from './crazyCtrl';
 import * as cg from 'chessground/types';
 import RoundController from '../ctrl';
 import { onInsert } from '../util';
 import { Position } from '../interfaces';
+import * as stratUtils from 'stratutils';
 
 const eventNames1 = ['mousedown', 'touchmove'];
 const eventNames2 = ['click'];
@@ -13,7 +22,13 @@ export default function pocket(ctrl: RoundController, playerIndex: PlayerIndex, 
   const step = round.plyStep(ctrl.data, ctrl.ply);
   const variantKey = ctrl.data.game.variant.key;
   const dropRoles =
-    variantKey == 'crazyhouse' ? pieceRoles : variantKey == 'minishogi' ? pieceMiniShogiRoles : pieceShogiRoles;
+    variantKey == 'crazyhouse'
+      ? pieceRoles
+      : variantKey == 'minishogi'
+        ? pieceMiniShogiRoles
+        : variantKey == 'entropy'
+          ? pieceEntropyRoles
+          : pieceShogiRoles;
   if (!step.crazy || ctrl.data.onlyDropsVariant) return;
   if (['backgammon', 'hyper', 'nackgammon', 'amazons'].includes(ctrl.data.game.variant.key)) return;
   const droppedRole = ctrl.justDropped,
@@ -37,6 +52,8 @@ export default function pocket(ctrl: RoundController, playerIndex: PlayerIndex, 
     'div.pocket.is2d.pocket-' + position,
     {
       class: { usable },
+      // entropy has a score and a pocket competing for the same space, so the score rides on the pocket
+      attrs: variantKey === 'entropy' ? { 'data-score': stratUtils.getScore(variantKey, step.fen, playerIndex) ?? 0 } : {},
       hook: onInsert(el => {
         eventNames1.forEach(name =>
           el.addEventListener(name, (e: cg.MouchEvent) => {

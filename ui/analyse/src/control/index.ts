@@ -45,11 +45,16 @@ export interface ControlConfig {
 
   // Drop mode
   showDropDestsInDropMode?(): boolean;
+  // the piece to drop on a drop-only ply, when the variant cannot name it from the player alone
+  dropModePiece?(node: Tree.Node): CgPiece | undefined;
   alwaysCancelDropMode?(): boolean;
 
   // Sound
   nodeSoundOverride?(node: Tree.Node): string | false | undefined;
   dropSoundOverride?(piece: CgPiece, pos: CgKey, captured?: CgPiece): string | undefined;
+
+  // Variant action buttons beside the analysis controls (e.g. pass)
+  renderControlActions?(): VNode | null;
 
   // Board overlay (e.g. dice picker)
   renderBoardOverlay?(): VNode | null;

@@ -66,6 +66,9 @@ flipello_themes = [
   ['stone_flipello', 'svg'],
   ['disc_flipello', 'svg']
 ]
+entropy_themes = [
+  ['classic_entropy', 'svg']
+]
 amazons_themes = [
   ['queen', 'svg'],
   ['arrow', 'svg'],
@@ -151,6 +154,9 @@ xiangqi_colors = ['B','R']
 xiangqi_variants = ['xiangqi', 'minixiangqi']
 flipello_variants = ['flipello', 'flipello10', 'antiflipello', 'octagonflipello']
 amazons_variants = ['amazons']
+entropy_variants = ['entropy']
+# a counter's owner changes as it lands, so both players share the one image per colour
+entropy_roles = ['w-piece', 'k-piece', 'y-piece', 'g-piece', 'r-piece', 'b-piece', 'p-piece']
 oware_roles=['s1-piece','s2-piece','s3-piece','s4-piece','s5-piece','s6-piece','s7-piece','s8-piece','s9-piece','s10-piece',
 's11-piece','s12-piece','s13-piece','s14-piece','s15-piece','s16-piece','s17-piece','s18-piece','s19-piece','s20-piece',
 's21-piece','s22-piece','s23-piece','s24-piece','s25-piece','s26-piece','s27-piece','s28-piece','s29-piece','s30-piece',
@@ -591,6 +597,41 @@ amazons_themes.map { |theme|
     }
   }.flatten
   File.open(dest_dir + 'amazons-' + name + '.external.css', 'w') { |f| f.puts (classes_amazons_game + classes_amazons_variant).join("\n") }
+}
+
+# inline SVG entropy
+entropy_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_entropy = (['.entropy.is2d'] + entropy_variants.map { |variant| '.is2d .variant-' + variant }).map { |scope|
+    colors.map { |color|
+      entropy_roles.map { |role|
+        file = source_dir + 'entropy/' + name + '/' + role.upcase[0] + '.' + ext
+        File.open(file, 'r') do|image_file|
+          image = image_file.read
+          base64 = Base64.strict_encode64(image)
+          scope + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+            "background-image:url('data:image/" + types[ext] + base64 + "')}"
+        end
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'entropy-' + name + '.css', 'w') { |f| f.puts classes_entropy.join("\n") }
+}
+
+# external SVG entropy
+entropy_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_entropy = (['.entropy.is2d'] + entropy_variants.map { |variant| '.is2d .variant-' + variant }).map { |scope|
+    colors.map { |color|
+      entropy_roles.map { |role|
+        scope + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+          "background-image:url('/assets/piece/" + 'entropy/' + name + "/" + role.upcase[0] + "." + ext + "')}"
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'entropy-' + name + '.external.css', 'w') { |f| f.puts classes_entropy.join("\n") }
 }
 
 # inline SVG oware

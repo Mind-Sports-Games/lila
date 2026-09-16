@@ -195,6 +195,8 @@ function renderFullMoveOf(
           });
         }),
         notation,
+        variant.key,
+        fullTurnNodes.map(n => n.uci || ''),
       ),
     ];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => content.push(moveView.renderGlyph(g)));

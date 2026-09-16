@@ -7,6 +7,7 @@ import { NotationStyle } from 'stratops/variants/types';
 import { variantClassFromKey } from 'stratops/variants/util';
 import { GameFamily as BackgammonFamily } from 'stratops/variants/backgammon/GameFamily';
 import { GameFamily as DameoFamily } from 'stratops/variants/dameo/GameFamily';
+import { GameFamily as EntropyFamily } from 'stratops/variants/entropy/GameFamily';
 
 export interface Ctx {
   withDots?: boolean;
@@ -63,7 +64,14 @@ export function renderMove(ctx: Ctx, node: Tree.ParentedNode): VNode[] {
   return nodes;
 }
 
-export function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {
+export function combinedNotationOfTurn(
+  actionNotations: string[],
+  notation: NotationStyle,
+  variantKey?: VariantKey,
+  ucis: string[] = [],
+): string {
+  // an entropy draw is shown by the drop that follows it; a line stopped after the draw shows the draw
+  if (variantKey === 'entropy') return EntropyFamily.combinedNotation(actionNotations) || ucis.join(' ');
   return notation === NotationStyle.bkg
     ? BackgammonFamily.combinedNotation(actionNotations)
     : notation === NotationStyle.dmo
@@ -89,6 +97,8 @@ export function renderFullMove(ctx: Ctx, node: Tree.ParentedNode, style: Notatio
           });
         }),
         style,
+        variant.key,
+        fullTurnNodes.map(n => n.uci || ''),
       ),
     ),
   ];
