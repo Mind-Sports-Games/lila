@@ -58,8 +58,7 @@
   }
 }
 
-/* The variant select is what says this is not just a chess board. In 3-col it heads the side
-   column beside the board; below that the side column would fall under the tools, so the select
+/* Below 3-col, the side column would fall under the tools, so the select
    takes a full-width row above the board instead. div.analyse outranks the shared layout and the
    pocket layout of analyse.zh, which is loaded after this sheet. */
 div.analyse {
