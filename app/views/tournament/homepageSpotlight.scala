@@ -17,7 +17,7 @@ object homepageSpotlight {
     tour.spotlight map { spot =>
       div(
         a(href := routes.Tournament.show(tour.id), cls := tourClass)(
-          if (tour.isStarted && !tour.isFinished) span(cls := "ribbon")(span("live")),
+          (tour.isStarted && !tour.isFinished).option(span(cls := "ribbon")(span("live"))),
           frag(
             spot.iconImg map { i =>
               img(cls := "img", src := staticAssetUrl(s"images/$i"))

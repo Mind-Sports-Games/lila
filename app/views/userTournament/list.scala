@@ -28,7 +28,7 @@ object list {
               th(
                 h1(
                   userLink(u, withOnline = true),
-                  if (shieldLeaderboard) a(href := routes.Tournament.shields)(" shield leaderboard"),
+                  shieldLeaderboard.option(a(href := routes.Tournament.shields)(" shield leaderboard")),
                   " tournaments"
                 )
               ),
