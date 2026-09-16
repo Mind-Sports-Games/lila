@@ -6,13 +6,7 @@ const pubsub: Pubsub = {
     subs[name].push(cb);
   },
   off(name: string, cb) {
-    if (subs[name])
-      for (const i in subs[name]) {
-        if (subs[name][i] === cb) {
-          subs[name].splice(i);
-          break;
-        }
-      }
+    if (subs[name]) subs[name] = subs[name].filter(f => f !== cb);
   },
   emit(name: string, ...args: any[]) {
     if (subs[name]) for (const i in subs[name]) subs[name][i].apply(null, args);

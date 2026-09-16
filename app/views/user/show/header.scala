@@ -201,7 +201,7 @@ object header {
           val hideTroll = u.marks.troll && !ctx.is(u)
           div(id := "us_profile")(
             if (info.ratingChart.isDefined && (!u.lame || ctx.is(u) || isGranted(_.UserModView)))
-              div(cls := "rating-history")(spinner)
+              views.html.user.bits.ratingHistoryContainer
             else ctx.is(u).option(newPlayer(u)),
             div(cls := "profile-side")(
               div(cls := "user-infos")(

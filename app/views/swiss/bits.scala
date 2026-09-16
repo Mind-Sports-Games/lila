@@ -123,6 +123,7 @@ object bits {
             }
           )
         )
+      else emptyFrag
     )
 
   def jsI18n(implicit ctx: Context) = i18nJsObject(i18nKeys)

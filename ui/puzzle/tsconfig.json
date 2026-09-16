@@ -7,6 +7,7 @@
   "isolatedModules": true,
   "references": [
     { "path": "../ceval/tsconfig.json" },
+    { "path": "../chart/tsconfig.json" },
     { "path": "../common/tsconfig.json" },
     { "path": "../nvui/tsconfig.json" },
     { "path": "../stratutils/tsconfig.json" },

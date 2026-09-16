@@ -71,7 +71,7 @@ final private[api] class Cli(
     case "swiss" :: "update" :: "score" :: id :: Nil =>
       swiss.api.recomputeScore(id).map(_ => s"Updated score for Swiss $id")
     case "swiss" :: "dq" :: username :: id :: Nil =>
-      swiss.api.disqualify(id, username).map(_ => s"Byebye $username from $id")
+      swiss.api.disqualify(id, lila.user.User.normalize(username))
     case "gdpr" :: "erase" :: username :: "forever" :: Nil =>
       userRepo.named(username) map {
         case None                       => "No such user."

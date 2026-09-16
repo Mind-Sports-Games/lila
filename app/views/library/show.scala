@@ -33,7 +33,7 @@ object show {
       moreCss = cssTag("library"),
       moreJs = frag(
         jsModule("libraryVariant"),
-        jsTag("chart/library.js"),
+        jsModule("chart.library"),
         embedJsUnsafeLoadThen(s"""playstrategy.libraryChart(${safeJsonValue(
             Json.obj(
               "freq" -> bits
@@ -157,7 +157,7 @@ object show {
           bits.statsRow("Draws", bits.winRateDraws(variant, winRates))
         ),
         div(id := "library_chart_area")(
-          div(id := "library_chart")(spinner)
+          div(id := "library_chart")(canvas)
         )
       )
     )

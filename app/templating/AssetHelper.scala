@@ -100,11 +100,9 @@ trait AssetHelper { self: I18nHelper & SecurityHelper =>
 
   def chessgroundTag = staticJsAtESM("chessground.min.js", "npm/")
 
-  def draughtsgroundTag   = jsAtCJS("javascripts/vendor/draughtsground.min.js")
-  def fingerprintTag      = staticJsAtESM("fipr.js", "javascripts/")
-  def tagifyTag           = staticJsAtESM("tagify.js", "vendor/tagify/")
-  def highchartsLatestTag = staticJsAtESM("highcharts.js", "vendor/highcharts-4.2.5/")
-  def highchartsMoreTag   = staticJsAtESM("highcharts-more.js", "vendor/highcharts-4.2.5/")
+  def draughtsgroundTag = jsAtCJS("javascripts/vendor/draughtsground.min.js")
+  def fingerprintTag    = staticJsAtESM("fipr.js", "javascripts/")
+  def tagifyTag         = staticJsAtESM("tagify.js", "vendor/tagify/")
 
   def prismicJs(implicit ctx: Context): Frag =
     raw {

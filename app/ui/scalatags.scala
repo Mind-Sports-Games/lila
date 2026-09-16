@@ -114,6 +114,11 @@ trait ScalatagsTemplate
   val trans = lila.i18n.I18nKeys
   def main  = scalatags.Text.tags2.main
 
+  // Scala 3 types `if (c) frag` without else as Unit, which scalatags renders as nothing: fail the build instead
+  @annotation.nowarn("msg=overrides concrete, non-deprecated")
+  @deprecated("a Unit here renders nothing: use `cond.option(frag)` instead of `if (cond) frag`", "")
+  implicit override def UnitFrag(u: Unit): Text.StringFrag = new Text.StringFrag("")
+
   /* Convert play URLs to scalatags attributes with toString */
   implicit val playCallAttr: AttrValue[Call] = genericAttr[play.api.mvc.Call]
 }

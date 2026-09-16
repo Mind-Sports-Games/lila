@@ -10,7 +10,7 @@ import { defined, prop, Prop } from 'common';
 import { replacePocketsInFen } from 'common/editor';
 import throttle from 'common/throttle';
 import { variantClass, variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
-import { Variant as CGVariant } from 'chessground/types';
+import { Key, Variant as CGVariant } from 'chessground/types';
 
 export default class EditorCtrl {
   cfg: Editor.Config;
@@ -160,6 +160,7 @@ export default class EditorCtrl {
 
   onChange(): void {
     const variant = variantClassFromKey(this.variantKey);
+    this.removeUnplayablePieces(variant.unplayableSquares);
     let fen = this.getFenFromSetup();
     let legalFen = this.getLegalFen();
     const enPassantOptions = variant.allowEnPassant() && legalFen ? (variant as any).getEnPassantOptions(legalFen) : [];
@@ -187,6 +188,14 @@ export default class EditorCtrl {
     playstrategy.pageVariant = this.variantKey; // update variant for dasher
     this.options.onChange && this.options.onChange(newFen);
     this.redraw();
+  }
+
+  private removeUnplayablePieces(squares: Square[]): void {
+    if (!squares.length || !this.chessground) return;
+    const keys = squares
+      .map(sq => makeSquare(this.rules)(sq) as Key)
+      .filter(k => this.chessground!.state.pieces.has(k));
+    if (keys.length) this.chessground.setPieces(new Map(keys.map(k => [k, undefined])));
   }
 
   getState(): EditorState {

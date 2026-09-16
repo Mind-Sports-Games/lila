@@ -210,11 +210,12 @@ object replay {
             )
           )
         ),
-        if (ctx.blind)
+        ctx.blind.option(
           div(cls := "blind-content none")(
             h2(s"${game.gameRecordFormat.toUpperCase} downloads"),
             gameRecordLinks
           )
+        )
       )
     )
   }

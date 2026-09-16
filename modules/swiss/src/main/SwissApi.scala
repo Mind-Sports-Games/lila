@@ -503,35 +503,47 @@ final class SwissApi(
       }.void
     } >> recomputeAndUpdateAll(id)
 
-  def disqualify(id: String, userId: User.ID) =
-    Sequencing(Swiss.Id(id))(finishedById) { swiss =>
-      SwissPlayer
-        .fields { f =>
-          val selId = $id(SwissPlayer.makeId(swiss.id, userId))
-          colls.player.updateField(selId, f.disqualified, true)
+  def disqualify(id: String, userId: User.ID): Fu[String] =
+    byId(Swiss.Id(id)) flatMap {
+      case None        => fuccess(s"No such swiss: $id")
+      case Some(swiss) =>
+        doDisqualify(swiss.id, userId) map {
+          case false                    => s"$userId is not a player in $id"
+          case true if swiss.isFinished => s"Disqualified $userId from finished swiss $id"
+          case true                     => s"Disqualified $userId from running swiss $id"
         }
-        .void
-        .andDo {
-          getWinner(swiss.id).flatMap { winnerUserId =>
-            colls.swiss.update
-              .one(
-                $id(swiss.id),
-                $set("winnerId" -> winnerUserId)
-              )
-              .void
-          }.discard
-          trophyApi
-            .trophiesByUrl(Swiss.swissUrl(swiss.id))
-            .map(_.filter(_.user == userId))
-            .flatMap { trophyList =>
-              trophyList.headOption so { trophy =>
-                trophyApi.removeTrophiesByUrl(Swiss.swissUrl(swiss.id)) >>
-                  awardTrophies(swiss, trophy.date)
+    }
+
+  private def doDisqualify(id: Swiss.Id, userId: User.ID): Fu[Boolean] =
+    Sequencing(id)(byId) { swiss =>
+      SwissPlayer.fields { f =>
+        val selId = $id(SwissPlayer.makeId(swiss.id, userId))
+        colls.player.updateField(selId, f.disqualified, true)
+      } flatMap { res =>
+        (res.n == 1) so {
+          swiss.isFinished so {
+            getWinner(swiss.id).flatMap { winnerUserId =>
+              colls.swiss.update
+                .one(
+                  $id(swiss.id),
+                  $set("winnerId" -> winnerUserId)
+                )
+                .void
+            }.discard
+            trophyApi
+              .trophiesByUrl(Swiss.swissUrl(swiss.id))
+              .map(_.filter(_.user == userId))
+              .flatMap { trophyList =>
+                trophyList.headOption so { trophy =>
+                  trophyApi.removeTrophiesByUrl(Swiss.swissUrl(swiss.id)) >>
+                    awardTrophies(swiss, trophy.date)
+                }
               }
-            }
-            .discard
-        } >>
-        recomputeAndUpdateAll(swiss.id).andDo(socket.reload(swiss.id))
+              .discard
+          }
+          recomputeAndUpdateAll(swiss.id).andDo(socket.reload(swiss.id))
+        } inject (res.n == 1)
+      }
     }
 
   def recomputeScore(id: String): Funit =
