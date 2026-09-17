@@ -732,9 +732,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
                       retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),
                     ]),
               ])),
-        tour || !showScoreBox
-          ? null
-          : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey),
+        tour || !showScoreBox ? null : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey),
         tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'bottom'),
         tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
         gamebookPlayView || tour ? null : controls(ctrl),

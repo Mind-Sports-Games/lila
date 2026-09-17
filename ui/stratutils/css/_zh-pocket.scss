@@ -12,6 +12,40 @@
 
 .variant-entropy .pocket-c1 {
   flex: 0 0 calc(100% / 7);
+
+  // an eighth slot is left free for the score
+  @include breakpoint($mq-col2-uniboard) {
+    flex-basis: calc(100% / 8);
+  }
+}
+
+// entropy shows its score beside its pocket: in the room the narrow pocket leaves, or in its eighth slot
+.variant-entropy .pocket {
+  position: relative;
+
+  &::after {
+    @extend %active, %box-radius;
+
+    content: attr(data-score);
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-left: 0.5em;
+    transform: translateY(-50%);
+    line-height: 0.9em;
+    padding: 3px 0.3em;
+    font-weight: bold;
+    font-size: 1.5em;
+
+    @include breakpoint($mq-col2-uniboard) {
+      position: static;
+      flex: 0 0 auto;
+      align-self: center;
+      margin: 0 auto;
+      transform: none;
+      font-size: 1.2em;
+    }
+  }
 }
 
 .pocket {

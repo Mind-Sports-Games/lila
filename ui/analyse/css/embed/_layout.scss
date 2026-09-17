@@ -52,23 +52,9 @@
     grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
   }
 }
-
-// entropy shows its score on the pocket
-.variant-entropy .pocket {
-  position: relative;
-
-  &::after {
-    @extend %active, %box-radius;
-
-    content: attr(data-score);
-    top: 0;
-    right: 0;
-    position: absolute;
-    line-height: 0.9em;
-    padding: 3px 0.3em;
-    font-weight: bold;
-    font-size: 1.5em;
-  }
+// entropy's rows fit its eight-slot pocket; the fixed maximum keeps the board's height going to tools
+.analyse.variant-entropy {
+  grid-template-rows: minmax(min-content, 0) auto 3rem minmax(min-content, 0);
 }
 
 //score for games (togyzkumalak and Oware has own layout below)

@@ -39,20 +39,17 @@ $pocket-height: 60px;
   }
 }
 
-.variant-entropy .pocket {
-  position: relative;
+// eight slots leave entropy's counters shorter than the fixed pocket row, so the row fits them instead;
+// its fixed maximum keeps the board's extra height going to the middle rows, as a fixed row does
+$entropy-pocket-height: minmax(min-content, 0);
 
-  &::after {
-    @extend %active, %box-radius;
+.analyse.variant-entropy {
+  @include breakpoint($mq-col2) {
+    grid-template-rows: $entropy-pocket-height auto $entropy-pocket-height;
+  }
 
-    content: attr(data-score);
-    top: 0;
-    right: 0;
-    position: absolute;
-    line-height: 0.9em;
-    padding: 3px 0.3em;
-    font-weight: bold;
-    font-size: 1.5em;
+  @include breakpoint($mq-col3) {
+    grid-template-rows: $entropy-pocket-height $meta-height $chat-height $entropy-pocket-height;
   }
 }
 

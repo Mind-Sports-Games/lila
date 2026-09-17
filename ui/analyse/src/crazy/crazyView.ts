@@ -1,10 +1,9 @@
-import { drag, selectToDrop } from './crazyCtrl';
+import { drag, selectToDrop, isDrawingFromBag } from './crazyCtrl';
 import { h } from 'snabbdom';
 import * as cg from 'chessground/types';
 import { onInsert } from '../util';
 import AnalyseCtrl from '../ctrl';
 import * as stratUtils from 'stratutils';
-import { isDrawingFromBag } from './crazyCtrl';
 
 const eventNames1 = ['mousedown', 'touchmove'];
 const eventNames2 = ['click', 'touchstart'];

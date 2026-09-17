@@ -53,7 +53,8 @@ export default function pocket(ctrl: RoundController, playerIndex: PlayerIndex, 
     {
       class: { usable },
       // entropy has a score and a pocket competing for the same space, so the score rides on the pocket
-      attrs: variantKey === 'entropy' ? { 'data-score': stratUtils.getScore(variantKey, step.fen, playerIndex) ?? 0 } : {},
+      attrs:
+        variantKey === 'entropy' ? { 'data-score': stratUtils.getScore(variantKey, step.fen, playerIndex) ?? 0 } : {},
       hook: onInsert(el => {
         eventNames1.forEach(name =>
           el.addEventListener(name, (e: cg.MouchEvent) => {
