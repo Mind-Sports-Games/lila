@@ -214,7 +214,8 @@ object layout {
       chessground: Boolean = true,
       zoomable: Boolean = false,
       csp: Option[ContentSecurityPolicy] = None,
-      wrapClass: String = ""
+      wrapClass: String = "",
+      canonicalPath: Option[String] = None
   )(body: Frag)(implicit ctx: Context): Frag = {
     updateManifest()
 
@@ -246,6 +247,8 @@ object layout {
           link(rel := "mask-icon", href := staticAssetUrl("logo/playstrategy.svg"), color := "black"),
           favicons,
           (!robots).option(raw("""<meta content="noindex, nofollow" name="robots">""")),
+          // languages share URLs and query strings never change the page identity
+          robots.option(link(rel := "canonical", href := s"$netBaseUrl${canonicalPath | ctx.req.path}")),
           noTranslate,
           openGraph.map(_.frags),
           link(
