@@ -31,10 +31,11 @@ object home {
     views.html.base.layout(
       title = "",
       fullTitle = Some {
-        s"playstrategy.${if (netConfig.isProd) "org" else "dev"} • ${trans.playstrategySiteTitleShort.txt()}"
+        s"${trans.playstrategySiteTitleShort.txt()} • playstrategy.${if (netConfig.isProd) "org" else "dev"}"
       },
       moreJs = frag(
         jsModule("lobby"),
+        organizationJsonLd,
         embedJsUnsafeLoadThen(
           s"""PlayStrategyLobby(${safeJsonValue(
               Json.obj(
@@ -257,4 +258,20 @@ object home {
     trans.unlimited,
     trans.anonymous
   ).map(_.key)
+
+  // structured data tying the site to the Mind Sports Olympiad
+  private def organizationJsonLd(implicit ctx: Context) =
+    raw(
+      s"""<script type="application/ld+json">${safeJsonValue(
+          Json.obj(
+            "@context"    -> "https://schema.org",
+            "@type"       -> "Organization",
+            "name"        -> "PlayStrategy",
+            "url"         -> netBaseUrl,
+            "logo"        -> staticAssetUrl("logo/playstrategy-tile.png"),
+            "sameAs"      -> Json.arr("https://mindsportsolympiad.com", "https://github.com/Mind-Sports-Games"),
+            "description" -> trans.playstrategySiteDescription.txt()
+          )
+        )}</script>"""
+    )
 }

@@ -125,7 +125,7 @@ final class Main(
 
   val robots = Action { (req: play.api.mvc.RequestHeader) =>
     Ok {
-      if (env.net.crawlable && req.domain == env.net.domain.value) """User-agent: *
+      if (env.net.crawlable && req.domain == env.net.domain.value) s"""User-agent: *
 Allow: /
 Disallow: /game/export/
 Disallow: /games/export/
@@ -133,9 +133,45 @@ Allow: /game/export/gif/thumbnail/
 
 User-agent: Twitterbot
 Allow: /
+
+Sitemap: ${env.net.baseUrl.value}${routes.Main.sitemap.url}
+Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
 """
       else "User-agent: *\nDisallow: /"
     }
+  }
+
+  // every game's library and rules page, its puzzle trainer where it has one, plus the static hubs
+  val sitemap = Action {
+    if (!env.net.crawlable) NotFound
+    else sitemapXml
+  }
+
+  private lazy val sitemapXml = {
+    val base     = env.net.baseUrl.value
+    val variants = strategygames.variant.Variant.all.filterNot(_.fromPositionVariant)
+    val paths    =
+      List(
+        "/",
+        routes.Library.home.url,
+        routes.Page.variantHome.url,
+        routes.Tournament.home.url,
+        routes.Swiss.home.url,
+        routes.Puzzle.base.url,
+        routes.Study.allDefault().url,
+        routes.Learn.index.url,
+        routes.Blog.index().url
+      ) :::
+        variants.map(v => routes.Library.variant(v.key).url) :::
+        variants.map(v => routes.Page.variant(v.key).url) :::
+        lila.puzzle.Puzzle.puzzleVariants.map(v => routes.Puzzle.home(v.key).url)
+    Ok(
+      s"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${paths.map(p => s"  <url><loc>$base$p</loc></url>").mkString("\n")}
+</urlset>
+"""
+    ).as(XML).withHeaders(CACHE_CONTROL -> "max-age=86400")
   }
 
   def manifest =

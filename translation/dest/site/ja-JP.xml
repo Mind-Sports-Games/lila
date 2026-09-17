@@ -827,4 +827,17 @@
   <string name="refundXpointsTimeControlY">レーティングの復活：%1$s %2$s 点。</string>
   <string name="timeAlmostUp">残り時間わずか！</string>
   <string name="clickToRevealEmailAddress">[ クリックでメールアドレスを表示 ]</string>
+  <string name="playstrategySiteTitle">ボードゲームを無料でオンライン対戦 — チェス、チェッカー、囲碁、バックギャモン、オセロなど</string>
+  <string name="playstrategySiteTitleShort">ボードゲームを無料でオンライン対戦 — チェス、チェッカー、囲碁、バックギャモン</string>
+  <string name="playstrategySiteDescription">ボードゲームを無料でオンライン対戦：チェスとその変則ルール、チェッカー、囲碁、バックギャモン、オセロ、将棋、シャンチー、マンカラ、アバロンなど。Mind Sports Olympiad 公式オンラインプラットフォーム。無料・オープンソース、リアルタイム対局と通信対局に対応。</string>
+  <string name="playstrategyAboutSummary">%1$s は2人用ボードゲームのリアルタイム対戦プラットフォームであり、Mind Sports Olympiad の公式オンラインプラットフォームです。チェス、囲碁、オセロ、マンカラ、チェッカー、バックギャモン、アバロンなど40種類以上のゲームを、この無料・オープンソースのサイトで。</string>
+  <string name="playVariantOnlineFree">%s を無料でオンライン対戦：リアルタイムまたは通信対局、レーティング戦またはカジュアル戦で、世界中のプレイヤーと。</string>
+  <string name="playVariantOnlineFreeTitle">%s を無料でオンライン対戦</string>
+  <string name="variantRulesTitle">%1$s のルール — %2$s の遊び方</string>
+  <string name="variantRulesDescription">%s のルールを学ぶ：初期配置、駒の動き、取り方、勝利条件をインタラクティブなチュートリアルで。そのあとは PlayStrategy で無料オンライン対戦。</string>
+  <string name="playVariantOnlineFreeDescription">世界中のプレイヤーと %s を無料でオンライン対戦。リアルタイム対局と通信対局、トーナメント、レーティング、解析を PlayStrategy で。</string>
+  <string name="variantPuzzles">%s の問題</string>
+  <string name="libraryTitle">無料でオンライン対戦できるボードゲーム — PlayStrategy ライブラリ</string>
+  <string name="libraryDescription">PlayStrategy のすべてのゲーム：チェスとその変則ルール、チェッカー、囲碁、バックギャモン、オセロ、将棋、シャンチー、マンカラ、アバロン、Lines of Action など。ルール、チュートリアル、トーナメント、統計付き。</string>
+  <string name="recurringTournaments">定期トーナメント</string>
 </resources>

@@ -82,9 +82,51 @@
     }
   }
 
+  .library-intro {
+    max-width: 60ch;
+    margin: 1em auto 0;
+    text-align: center;
+    line-height: 1.5;
+  }
+
   .start {
     margin: 2em 0em;
     font-size: 175%;
+  }
+
+  .library__series,
+  .library__wc {
+    @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
+      .selected-color-#{$c} & .color-choice {
+        background: map-get($c-color-choice-map, $c);
+        color: $c-color-choice-font-default;
+        text-shadow: 0 1px 0 map-get($c-color-choice-map, $c);
+      }
+    }
+
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 1em;
+
+    .title {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5em 1em;
+      align-items: center;
+
+      ::before {
+        font-size: 2.2em;
+      }
+
+      h2 {
+        font-size: 1.3em;
+        font-weight: bold;
+      }
+    }
+
+    p {
+      margin: 0.6em 1em;
+    }
   }
 
   .library__tv,

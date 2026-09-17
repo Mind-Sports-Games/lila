@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="abalone">ボードゲーム</string>
+  <string name="antichess">アンチチェス</string>
+  <string name="atomic">チェスの変則ルール</string>
+  <string name="backgammon">バックギャモン</string>
+  <string name="chess960">フィッシャーランダム</string>
+  <string name="crazyhouse">チェスの変則ルール</string>
+  <string name="english">チェッカー</string>
+  <string name="fiveCheck">5チェック・チェス</string>
+  <string name="flipello">オセロ・リバーシ</string>
+  <string name="flipello10">オセロ 10x10</string>
+  <string name="go13x13">囲碁 13路盤</string>
+  <string name="go19x19">囲碁 19路盤</string>
+  <string name="go9x9">囲碁 9路盤</string>
+  <string name="horde">チェスの変則ルール</string>
+  <string name="international">国際チェッカー、10x10</string>
+  <string name="kingOfTheHill">キング・オブ・ザ・ヒル</string>
+  <string name="linesOfAction">LOA ボードゲーム</string>
+  <string name="minishogi">5五将棋</string>
+  <string name="minixiangqi">シャンチー 7x7</string>
+  <string name="monster">チェスの変則ルール</string>
+  <string name="noCastling">キャスリングなしチェス</string>
+  <string name="oware">マンカラ</string>
+  <string name="racingKings">チェスの変則ルール</string>
+  <string name="scrambledEggs">クロード・スーシーによる Lines of Action の変則ルール</string>
+  <string name="shogi">日本将棋</string>
+  <string name="threeCheck">3チェック・チェス</string>
+  <string name="xiangqi">シャンチー、中国将棋</string>
+</resources>

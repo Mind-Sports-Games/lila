@@ -32,9 +32,15 @@ object tournaments {
             ),
             div(cls := "team-tournaments__past")(
               h2("Completed tournaments"),
-              table(cls := "slist slist-pad")(
-                renderList(tours.past)
-              )
+              // one section per year so a long-running series (MSO Grand Prix) stays readable and linkable
+              tours.past.groupBy(_.startsAt.getYear).toList.sortBy(-_._1) map { case (year, yearTours) =>
+                frag(
+                  h3(id := year.toString, cls := "team-tournaments__year")(year),
+                  table(cls := "slist slist-pad")(
+                    renderList(yearTours)
+                  )
+                )
+              }
             )
           )
         )

@@ -1209,7 +1209,7 @@ export default class Setup {
       const botText = $form.find('.opponent_bot.choice');
       botText.empty();
       botText.append(
-        `<span class="user-link"><span class="utitle" data-bot="data-bot" title="Robot">BOT</span>&nbsp${botName}</span>`,
+        `<a class="user-link ulpt" href="/@/${bot}"><span class="utitle" data-bot="data-bot" title="Robot">BOT</span>&nbsp${botName}</a>`,
       );
 
       if ($opponentInput.filter(':checked').val() !== 'bot') return;

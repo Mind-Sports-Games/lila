@@ -41,10 +41,26 @@
       opacity: 1;
     }
 
-    .defender::before {
+    .defender::before,
+    .series-nav::before {
       font-size: 1.6em;
       vertical-align: -0.26em;
       margin: 0 0.15em 0 -0.15em;
+    }
+
+    .series-nav {
+      margin-top: 0.2em;
+    }
+
+    // the next section's 3rem icon already pads the text below; keep the gap even
+    &.spotlight {
+      margin-bottom: calc(#{$block-gap} * 0.4);
+    }
+
+    // the label is the link to the previous edition, so it reads as one
+    .defender__edition {
+      color: $c-link;
+      margin-right: 0.3em;
     }
 
     &.conditions {

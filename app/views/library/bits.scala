@@ -1,7 +1,8 @@
 package views.html.library
 
-import lila.i18n.I18nKeys as trans
+import lila.i18n.{ I18nKeys as trans, VariantKeys }
 import lila.app.ui.ScalatagsTemplate.*
+import play.api.i18n.Lang
 import strategygames.variant.Variant
 import strategygames.GameLogic
 import org.joda.time.DateTime
@@ -77,6 +78,79 @@ object bits {
       case _               => None
     }
   }
+
+  val msoTeamId = "mind-sports-olympiad"
+
+  // In-person Mind Sports Olympiad events whose games are published on PlayStrategy: msodb
+  // event code, whether the MSO awards a world championship title for it, and the study
+  // holding the latest edition's games (the MSO hub study CTu6f0Mp links every year's)
+  case class MsoEvent(eventCode: String, worldChampionship: Boolean, studyId: Option[String]) {
+    def resultsUrl = s"https://msodb.playstrategy.org/Report/EventResults?eventCode=$eventCode"
+  }
+
+  def msoEvent(variant: Variant): Option[MsoEvent] =
+    variant.key match {
+      case "abalone"            => Some(MsoEvent("ABOC", worldChampionship = true, Some("JG7Zf7mE")))
+      case "linesOfAction"      => Some(MsoEvent("LOWC", worldChampionship = true, Some("IyudHHhm")))
+      case "amazons"            => Some(MsoEvent("AMZOC", worldChampionship = false, Some("m8N1ERm6")))
+      case "breakthroughtroyka" => Some(MsoEvent("BTOC", worldChampionship = false, Some("EkVLAnIi")))
+      case "international"      => Some(MsoEvent("DRDA", worldChampionship = false, Some("CTu6f0Mp")))
+      case "oware"              => Some(MsoEvent("OWOC", worldChampionship = false, Some("C7hHSwaw")))
+      case "flipello"           => Some(MsoEvent("OTOC", worldChampionship = false, Some("PuMKTeH2")))
+      case "togyzkumalak"       => Some(MsoEvent("TOOC", worldChampionship = false, None))
+      case "backgammon"         => Some(MsoEvent("BAOC", worldChampionship = false, None))
+      case _                    => None
+    }
+
+  // variants named by a bare adjective ("Russian", "Atomic") are searched with their family word
+  private val adjectiveNames = Set(
+    "crazyhouse",
+    "kingOfTheHill",
+    "threeCheck",
+    "fiveCheck",
+    "atomic",
+    "horde",
+    "racingKings",
+    "noCastling",
+    "monster",
+    "international",
+    "frisian",
+    "frysk",
+    "breakthrough",
+    "russian",
+    "brazilian",
+    "pool",
+    "portuguese",
+    "english"
+  )
+
+  // "Russian Draughts", "Atomic Chess", "Othello"
+  def searchName(variant: Variant)(implicit lang: Lang) =
+    if (adjectiveNames(variant.key))
+      s"${VariantKeys.variantName(variant)} ${VariantKeys.gameFamilyName(variant.gameFamily)}"
+    else VariantKeys.variantName(variant)
+
+  // "Othello (Reversi)", "Abalone (board game)", "Backgammon"
+  def nameWithAlias(variant: Variant)(implicit lang: Lang) =
+    VariantKeys.variantAlias(variant).fold(searchName(variant)) { alias =>
+      s"${searchName(variant)} ($alias)"
+    }
+
+  // "Play Othello online free — Reversi"
+  def pageTitle(variant: Variant)(implicit lang: Lang) =
+    VariantKeys.variantAlias(variant).foldLeft(
+      trans.playVariantOnlineFreeTitle.txt(searchName(variant))
+    )(_ + " — " + _)
+
+  def pageDescription(variant: Variant)(implicit lang: Lang) =
+    s"${trans.playVariantOnlineFreeDescription.txt(nameWithAlias(variant))} ${VariantKeys.variantTitle(variant)}."
+
+  // "Othello rules — how to play Othello (Reversi)"
+  def rulesTitle(variant: Variant)(implicit lang: Lang) =
+    trans.variantRulesTitle.txt(searchName(variant), nameWithAlias(variant))
+
+  def rulesDescription(variant: Variant)(implicit lang: Lang) =
+    trans.variantRulesDescription.txt(nameWithAlias(variant))
 
   def winRatePlayer1(variant: Variant, winRates: List[WinRatePercentages]): String =
     winRates
