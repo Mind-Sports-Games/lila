@@ -881,4 +881,24 @@
   <string name="refundXpointsTimeControlY">Rückerstattung: %1$s %2$s Wertungspunkte.</string>
   <string name="timeAlmostUp">Die Zeit ist fast abgelaufen!</string>
   <string name="clickToRevealEmailAddress">[Klicke, um die E-Mail-Adresse anzuzeigen]</string>
+  <string name="playstrategySiteTitle">Brettspiele kostenlos online spielen — Schach, Dame, Go, Backgammon, Othello und mehr</string>
+  <string name="playstrategySiteTitleShort">Brettspiele kostenlos online spielen — Schach, Dame, Go, Backgammon</string>
+  <string name="playstrategySiteDescription">Brettspiele kostenlos online spielen: Schach und Schachvarianten, Dame, Go, Backgammon, Othello, Shogi, Xiangqi, Mancala, Abalone und mehr. Die offizielle Online-Plattform der Mind Sports Olympiad. Kostenlos, Open Source, live oder als Fernpartie.</string>
+  <string name="playstrategyAboutSummary">%1$s ist eine Echtzeit-Plattform für Brettspiele zu zweit und die offizielle Online-Plattform der Mind Sports Olympiad. Über 40 verschiedene Spiele, darunter Schach, Go, Othello, Mancala, Dame, Backgammon, Abalone … auf dieser kostenlosen Open-Source-Seite.</string>
+  <string name="playVariantOnlineFree">Spiele %s kostenlos online: live oder als Fernpartie, gewertet oder ungewertet, gegen Spieler aus aller Welt.</string>
+  <string name="playVariantOnlineFreeTitle">%s online spielen, kostenlos</string>
+  <string name="variantRulesTitle">%1$s Regeln — so spielt man %2$s</string>
+  <string name="variantRulesDescription">Lerne die Regeln von %s: Aufstellung, Züge, Schlagen und Gewinnbedingungen, mit interaktivem Tutorial. Dann spiele kostenlos online auf PlayStrategy.</string>
+  <string name="playVariantOnlineFreeDescription">Spiele %s kostenlos online gegen Spieler aus aller Welt. Live- und Fernpartien, Turniere, Wertungen und Analyse auf PlayStrategy.</string>
+  <string name="variantPuzzles">%s-Aufgaben</string>
+  <string name="libraryTitle">Brettspiele, die du kostenlos online spielen kannst — die PlayStrategy-Bibliothek</string>
+  <string name="libraryDescription">Jedes Spiel auf PlayStrategy: Schach und seine Varianten, Dame, Go, Backgammon, Othello, Shogi, Xiangqi, Mancala, Abalone, Lines of Action und mehr — mit Regeln, Tutorials, Turnieren und Statistiken.</string>
+  <string name="recurringTournaments">Regelmäßige Turniere</string>
+  <string name="msoWorldChampionship">%s-Weltmeisterschaft</string>
+  <string name="msoWorldChampionshipVenue">Die %s-Weltmeisterschaft der Mind Sports Olympiad wird vor Ort gespielt; ihre Partien werden auf PlayStrategy veröffentlicht, wo auch der Online-Grand-Prix der MSO ausgetragen wird.</string>
+  <string name="msoEvent">%s bei der Mind Sports Olympiad</string>
+  <string name="msoEventVenue">Das %s-Turnier der Mind Sports Olympiad wird vor Ort gespielt; seine Partien werden auf PlayStrategy veröffentlicht, wo auch der Online-Grand-Prix der MSO ausgetragen wird.</string>
+  <string name="msoResultsAndMedallists">Ergebnisse und Medaillengewinner</string>
+  <string name="msoEventGames">Turnierpartien</string>
+  <string name="msoGrandPrix">MSO Grand Prix</string>
 </resources>
