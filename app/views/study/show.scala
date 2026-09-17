@@ -1,6 +1,6 @@
 package views.html.study
 
-import play.api.libs.json.Json
+import play.api.libs.json.{ JsObject, Json }
 
 import lila.api.Context
 import lila.app.templating.Environment.*
@@ -58,7 +58,7 @@ object show {
         .OpenGraph(
           title = s.name.value,
           url = s"$netBaseUrl${routes.Study.show(s.id.value).url}",
-          description = s"A chess study by ${usernameOrId(s.ownerId)}"
+          description = description(s, data)
         )
         .some
     )(
@@ -69,4 +69,19 @@ object show {
     )
 
   def socketUrl(id: String) = s"/study/$id/socket/v$apiVersion"
+
+  // chapters are client-rendered, so the description is the only place their names reach crawlers
+  private def description(s: lila.study.Study, data: lila.study.JsonView.JsData) = {
+    val chapters = (data.study \ "chapters")
+      .asOpt[List[JsObject]]
+      .so(_.flatMap(c => (c \ "name").asOpt[String]))
+    val intro = s.description
+      .map(_.replaceAll("\\s+", " ").trim)
+      .filter(_.nonEmpty)
+      .getOrElse(s"A study by ${usernameOrId(s.ownerId)} on PlayStrategy")
+    val withChapters =
+      if (chapters.sizeIs > 1) s"$intro. ${chapters.size} chapters: ${chapters.take(6).mkString(", ")}"
+      else intro
+    lila.common.String.shorten(withChapters, 250, "…")
+  }
 }
