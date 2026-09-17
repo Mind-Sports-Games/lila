@@ -882,4 +882,24 @@
   <string name="refundXpointsTimeControlY">Reembolso: %1$s %2$s pontos de classificação.</string>
   <string name="timeAlmostUp">O tempo está quase acabando!</string>
   <string name="clickToRevealEmailAddress">[Clique para revelar o endereço de e-mail]</string>
+  <string name="playstrategySiteTitle">Jogue jogos de tabuleiro online grátis — xadrez, damas, go, gamão, Othello e mais</string>
+  <string name="playstrategySiteTitleShort">Jogue jogos de tabuleiro online grátis — xadrez, damas, go, gamão</string>
+  <string name="playstrategySiteDescription">Jogue jogos de tabuleiro online grátis: xadrez e suas variantes, damas, go, gamão, Othello, shogi, xiangqi, mancala, Abalone e mais. A plataforma online oficial da Mind Sports Olympiad. Grátis, de código aberto, ao vivo ou por correspondência.</string>
+  <string name="playstrategyAboutSummary">%1$s é uma plataforma em tempo real para jogos de tabuleiro para dois jogadores, e a plataforma online oficial da Mind Sports Olympiad. Mais de 40 jogos diferentes, incluindo xadrez, go, Othello, mancala, damas, gamão, Abalone… neste site gratuito e de código aberto.</string>
+  <string name="playVariantOnlineFree">Jogue %s online grátis: ao vivo ou por correspondência, valendo rating ou amistoso, contra jogadores do mundo todo.</string>
+  <string name="playVariantOnlineFreeTitle">Jogar %s online grátis</string>
+  <string name="variantRulesTitle">Regras de %1$s — como jogar %2$s</string>
+  <string name="variantRulesDescription">Aprenda as regras de %s: posição inicial, movimentos, capturas e como vencer, com um tutorial interativo. Depois jogue online grátis no PlayStrategy.</string>
+  <string name="playVariantOnlineFreeDescription">Jogue %s online grátis contra jogadores do mundo todo. Partidas ao vivo e por correspondência, torneios, ratings e análise no PlayStrategy.</string>
+  <string name="variantPuzzles">Problemas de %s</string>
+  <string name="libraryTitle">Jogos de tabuleiro para jogar online grátis — a biblioteca do PlayStrategy</string>
+  <string name="libraryDescription">Todos os jogos do PlayStrategy: xadrez e suas variantes, damas, go, gamão, Othello, shogi, xiangqi, mancala, Abalone, Lines of Action e mais — com regras, tutoriais, torneios e estatísticas.</string>
+  <string name="recurringTournaments">Torneios recorrentes</string>
+  <string name="msoWorldChampionship">Campeonato Mundial de %s</string>
+  <string name="msoWorldChampionshipVenue">O Campeonato Mundial de %s da Mind Sports Olympiad é disputado presencialmente; suas partidas são publicadas no PlayStrategy, que também recebe o Grand Prix MSO online.</string>
+  <string name="msoEvent">%s na Mind Sports Olympiad</string>
+  <string name="msoEventVenue">O torneio de %s da Mind Sports Olympiad é disputado presencialmente; suas partidas são publicadas no PlayStrategy, que também recebe o Grand Prix MSO online.</string>
+  <string name="msoResultsAndMedallists">Resultados e medalhistas</string>
+  <string name="msoEventGames">Partidas do torneio</string>
+  <string name="msoGrandPrix">Grand Prix MSO</string>
 </resources>

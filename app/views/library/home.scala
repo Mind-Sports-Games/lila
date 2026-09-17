@@ -20,7 +20,7 @@ object home {
       // botOrHumanGames: (Int, Int)
   )(implicit ctx: Context) =
     views.html.base.layout(
-      title = "Library of Games",
+      title = trans.libraryTitle.txt(),
       moreCss = cssTag("library"),
       moreJs = frag(
         jsModule("library"),
@@ -44,12 +44,13 @@ object home {
       ),
       openGraph = lila.app.ui
         .OpenGraph(
-          title = "Library of Games",
+          title = trans.libraryTitle.txt(),
           url = s"$netBaseUrl${routes.Library.home.url}",
-          description = "Games you can play on PlayStrategy."
+          description = trans.libraryDescription.txt()
         )
         .some,
-      zoomable = true
+      zoomable = true,
+      canonicalPath = routes.Library.home.url.some
     )(
       main(
         id  := "library-section",

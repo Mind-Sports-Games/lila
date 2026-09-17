@@ -954,4 +954,24 @@
   <string name="refundXpointsTimeControlY">Возврат: %1$s %2$s рейтинговых очков.</string>
   <string name="timeAlmostUp">Время почти вышло!</string>
   <string name="clickToRevealEmailAddress">[Нажмите, чтобы раскрыть адрес электронной почты]</string>
+  <string name="playstrategySiteTitle">Играйте в настольные игры онлайн бесплатно — шахматы, шашки, го, нарды, реверси и другие</string>
+  <string name="playstrategySiteTitleShort">Играйте в настольные игры онлайн бесплатно — шахматы, шашки, го, нарды</string>
+  <string name="playstrategySiteDescription">Играйте в настольные игры онлайн бесплатно: шахматы и их варианты, шашки, го, нарды, реверси, сёги, сянци, манкала, Abalone и другие. Официальная онлайн-платформа Mind Sports Olympiad. Бесплатно, с открытым исходным кодом, в реальном времени или по переписке.</string>
+  <string name="playstrategyAboutSummary">%1$s — платформа для настольных игр на двоих в реальном времени и официальная онлайн-платформа Mind Sports Olympiad. Более 40 игр: шахматы, го, реверси, манкала, шашки, нарды, Abalone… на этом бесплатном сайте с открытым исходным кодом.</string>
+  <string name="playVariantOnlineFree">Играйте в %s онлайн бесплатно: в реальном времени или по переписке, на рейтинг или без, с игроками со всего мира.</string>
+  <string name="playVariantOnlineFreeTitle">Играть в %s онлайн бесплатно</string>
+  <string name="variantRulesTitle">Правила %1$s — как играть в %2$s</string>
+  <string name="variantRulesDescription">Изучите правила игры %s: расстановка, ходы, взятия и условия победы, с интерактивным обучением. Затем играйте онлайн бесплатно на PlayStrategy.</string>
+  <string name="playVariantOnlineFreeDescription">Играйте в %s онлайн бесплатно с игроками со всего мира. Партии в реальном времени и по переписке, турниры, рейтинги и анализ на PlayStrategy.</string>
+  <string name="variantPuzzles">Задачи: %s</string>
+  <string name="libraryTitle">Настольные игры, в которые можно играть онлайн бесплатно — библиотека PlayStrategy</string>
+  <string name="libraryDescription">Все игры PlayStrategy: шахматы и их варианты, шашки, го, нарды, реверси, сёги, сянци, манкала, Abalone, Lines of Action и другие — с правилами, обучением, турнирами и статистикой.</string>
+  <string name="recurringTournaments">Регулярные турниры</string>
+  <string name="msoWorldChampionship">Чемпионат мира по %s</string>
+  <string name="msoWorldChampionshipVenue">Чемпионат мира Mind Sports Olympiad по %s проходит очно; его партии публикуются на PlayStrategy, где также проводится онлайн Гран-при MSO.</string>
+  <string name="msoEvent">%s на Mind Sports Olympiad</string>
+  <string name="msoEventVenue">Турнир Mind Sports Olympiad по %s проходит очно; его партии публикуются на PlayStrategy, где также проводится онлайн Гран-при MSO.</string>
+  <string name="msoResultsAndMedallists">Результаты и призёры</string>
+  <string name="msoEventGames">Партии турнира</string>
+  <string name="msoGrandPrix">Гран-при MSO</string>
 </resources>

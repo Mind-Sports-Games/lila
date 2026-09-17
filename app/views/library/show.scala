@@ -17,6 +17,8 @@ import play.api.i18n.Lang
 import strategygames.variant.Variant
 import strategygames.Speed
 
+import lila.tournament.Schedule.Freq
+
 object show {
 
   def apply(
@@ -29,7 +31,7 @@ object show {
       dailyPuzzle: Option[DailyPuzzle.WithHtml] = None
   )(implicit ctx: Context) =
     views.html.base.layout(
-      title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
+      title = bits.pageTitle(variant),
       moreCss = cssTag("library"),
       moreJs = frag(
         jsModule("libraryVariant"),
@@ -50,12 +52,13 @@ object show {
       ),
       openGraph = lila.app.ui
         .OpenGraph(
-          title = "Library of Games",
-          url = s"$netBaseUrl${routes.Library.home.url}",
-          description = s"Play ${VariantKeys.variantTitle(variant)} on PlayStrategy."
+          title = bits.pageTitle(variant),
+          url = s"$netBaseUrl${routes.Library.variant(variant.key).url}",
+          description = bits.pageDescription(variant)
         )
         .some,
-      zoomable = true
+      zoomable = true,
+      canonicalPath = routes.Library.variant(variant.key).url.some
     )(
       main(
         id  := "library-section",
@@ -107,6 +110,12 @@ object show {
             )
           )
         ),
+        p(cls := "library-intro")(
+          trans.playVariantOnlineFree(bits.nameWithAlias(variant)),
+          " ",
+          VariantKeys.variantTitle(variant),
+          "."
+        ),
         div(cls := "start")(
           a(
             href := s"/?variant=${variant.key}#game",
@@ -138,6 +147,8 @@ object show {
           )
         },
         tours.nonEmpty.option(tournamentList(tours)),
+        recurringSeries(variant),
+        bits.msoEvent(variant).map(msoEvent(variant, _)),
         leaderboard.nonEmpty.option(userTopPerf(leaderboard, PerfType(variant, Speed.Blitz))),
         div(cls := "library-stats-table")(
           div(cls := "library-stats-title color-choice")(
@@ -173,6 +184,48 @@ object show {
         views.html.tournament.bits.enterable(tours)
       )
     )
+
+  // the stable, linkable page of each recurring series, since every edition has its own URL
+  private def recurringSeries(variant: Variant)(implicit ctx: Context) =
+    div(cls := "library__series")(
+      div(cls := "color-choice title")(
+        div(dataIcon := "g"),
+        h2(trans.recurringTournaments()),
+        div(" ")
+      ),
+      p(
+        (List(Freq.Yearly, Freq.Weekly).map { freq =>
+          a(href := routes.Tournament.history(freq.name, 1, variant.key.some))(
+            s"${freq.display} ${VariantKeys.variantName(variant)}"
+          )
+        } ::: lila.tournament.TournamentShield.Category.byKey(variant.key).toList.map { categ =>
+          a(href := routes.Tournament.categShields(categ.key))(s"${categ.name} Shield")
+        }).reduce[Frag]((a, b) => frag(a, " · ", b))
+      )
+    )
+
+  private def msoEvent(variant: Variant, mso: bits.MsoEvent)(implicit ctx: Context) = {
+    val name = VariantKeys.variantName(variant)
+    div(cls := "library__wc")(
+      div(cls := "color-choice title")(
+        div(dataIcon := "g"),
+        h2(if (mso.worldChampionship) trans.msoWorldChampionship(name) else trans.msoEvent(name)),
+        div(" ")
+      ),
+      p(
+        if (mso.worldChampionship) trans.msoWorldChampionshipVenue(name)
+        else trans.msoEventVenue(name)
+      ),
+      p(
+        a(href := mso.resultsUrl)(trans.msoResultsAndMedallists()),
+        mso.studyId.map { id =>
+          frag(" · ", a(href := routes.Study.show(id))(trans.msoEventGames()))
+        },
+        " · ",
+        a(href := routes.Team.tournaments(bits.msoTeamId))(trans.msoGrandPrix())
+      )
+    )
+  }
 
   @annotation.nowarn("msg=unused")
   private def userTopPerf(users: List[User.LightPerf], perfType: PerfType)(implicit lang: Lang) =

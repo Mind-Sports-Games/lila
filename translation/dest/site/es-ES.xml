@@ -880,4 +880,24 @@
   <string name="refundXpointsTimeControlY">Has recuperado %1$s puntos en %2$s.</string>
   <string name="timeAlmostUp">¡Te queda poco tiempo!</string>
   <string name="clickToRevealEmailAddress">[Haz clic para mostrar la dirección de correo electrónico]</string>
+  <string name="playstrategySiteTitle">Juega a juegos de mesa online gratis — ajedrez, damas, go, backgammon, Othello y más</string>
+  <string name="playstrategySiteTitleShort">Juega a juegos de mesa online gratis — ajedrez, damas, go, backgammon</string>
+  <string name="playstrategySiteDescription">Juega a juegos de mesa online gratis: ajedrez y sus variantes, damas, go, backgammon, Othello, shogi, xiangqi, mancala, Abalone y más. La plataforma online oficial de las Mind Sports Olympiad. Gratis, de código abierto, en directo o por correspondencia.</string>
+  <string name="playstrategyAboutSummary">%1$s es una plataforma en tiempo real para jugar a juegos de mesa de dos jugadores, y la plataforma online oficial de las Mind Sports Olympiad. Más de 40 juegos distintos, entre ellos ajedrez, go, Othello, mancala, damas, backgammon, Abalone… en este sitio gratuito y de código abierto.</string>
+  <string name="playVariantOnlineFree">Juega a %s online gratis: en directo o por correspondencia, con o sin puntuación, contra jugadores de todo el mundo.</string>
+  <string name="playVariantOnlineFreeTitle">Jugar a %s online gratis</string>
+  <string name="variantRulesTitle">Reglas de %1$s — cómo jugar a %2$s</string>
+  <string name="variantRulesDescription">Aprende las reglas de %s: colocación, movimientos, capturas y cómo ganar, con un tutorial interactivo. Después juega online gratis en PlayStrategy.</string>
+  <string name="playVariantOnlineFreeDescription">Juega a %s online gratis contra jugadores de todo el mundo. Partidas en directo y por correspondencia, torneos, clasificaciones y análisis en PlayStrategy.</string>
+  <string name="variantPuzzles">Problemas de %s</string>
+  <string name="libraryTitle">Juegos de mesa a los que puedes jugar online gratis — la biblioteca de PlayStrategy</string>
+  <string name="libraryDescription">Todos los juegos de PlayStrategy: ajedrez y sus variantes, damas, go, backgammon, Othello, shogi, xiangqi, mancala, Abalone, Lines of Action y más, con reglas, tutoriales, torneos y estadísticas.</string>
+  <string name="recurringTournaments">Torneos periódicos</string>
+  <string name="msoWorldChampionship">Campeonato del mundo de %s</string>
+  <string name="msoWorldChampionshipVenue">El campeonato del mundo de %s de las Mind Sports Olympiad se juega de forma presencial; sus partidas se publican en PlayStrategy, que también acoge el Gran Premio MSO online.</string>
+  <string name="msoEvent">%s en las Mind Sports Olympiad</string>
+  <string name="msoEventVenue">El torneo de %s de las Mind Sports Olympiad se juega de forma presencial; sus partidas se publican en PlayStrategy, que también acoge el Gran Premio MSO online.</string>
+  <string name="msoResultsAndMedallists">Resultados y medallistas</string>
+  <string name="msoEventGames">Partidas del torneo</string>
+  <string name="msoGrandPrix">Gran Premio MSO</string>
 </resources>

@@ -887,4 +887,25 @@
   <string name="refundXpointsTimeControlY">Remboursement : %1$s point(s) de cote – %2$s.</string>
   <string name="timeAlmostUp">Vous n\'avez presque plus de temps!</string>
   <string name="clickToRevealEmailAddress">[Cliquer pour révéler l\'adresse courriel]</string>
+  <string name="playstrategySiteTitle">Jouez aux jeux de société en ligne gratuitement — échecs, dames, go, backgammon, Othello et plus</string>
+  <string name="playstrategySiteTitleShort">Jouez aux jeux de société en ligne gratuitement — échecs, dames, go, backgammon</string>
+  <string name="playstrategySiteDescription">Jouez aux jeux de société en ligne gratuitement : échecs et variantes, dames, go, backgammon, Othello, shogi, xiangqi, mancala, Abalone et plus. La plateforme en ligne officielle des Mind Sports Olympiad. Gratuit, open source, en direct ou par correspondance.</string>
+  <string name="playstrategyAboutSummary">%1$s est une plateforme en temps réel pour jouer aux jeux de société à deux, et la plateforme en ligne officielle des Mind Sports Olympiad. Plus de 40 jeux différents dont les échecs, le go, Othello, le mancala, les dames, le backgammon, Abalone… sur ce site gratuit et open source.</string>
+  <string name="playVariantOnlineFree">Jouez à %s en ligne gratuitement : en direct ou par correspondance, classé ou amical, contre des joueurs du monde entier.</string>
+  <string name="playVariantOnlineFreeTitle">Jouer à %s en ligne gratuitement</string>
+  <string name="variantRulesTitle">Règles de %1$s — comment jouer à %2$s</string>
+  <string name="variantRulesDescription">Apprenez les règles de %s : mise en place, déplacements, prises et conditions de victoire, avec un tutoriel interactif. Puis jouez en ligne gratuitement sur PlayStrategy.</string>
+  <string name="playVariantOnlineFreeDescription">Jouez à %s en ligne gratuitement contre des joueurs du monde entier. Parties en direct et par correspondance, tournois, classements et analyse sur PlayStrategy.</string>
+  <string name="variantPuzzles">Problèmes de %s</string>
+  <string name="libraryTitle">Jeux de société à jouer en ligne gratuitement — la ludothèque PlayStrategy</string>
+  <string name="libraryDescription">Tous les jeux de PlayStrategy : les échecs et leurs variantes, les dames, le go, le backgammon, Othello, le shogi, le xiangqi, le mancala, Abalone, Lines of Action et plus — avec règles, tutoriels, tournois et statistiques.</string>
+  <string name="recurringTournaments">Tournois récurrents</string>
+  <string name="msoWorldChampionship">Championnat du monde de %s</string>
+  <string name="msoWorldChampionshipVenue">Le championnat du monde de %s des Mind Sports Olympiad se joue en présentiel ; ses parties sont publiées sur PlayStrategy, qui accueille aussi le Grand Prix MSO en ligne.</string>
+  <string name="msoEvent">%s aux Mind Sports Olympiad</string>
+  <string name="msoEventVenue">Le tournoi de %s des Mind Sports Olympiad se joue en présentiel ; ses parties sont publiées sur PlayStrategy, qui accueille aussi le Grand Prix MSO en ligne.</string>
+  <string name="msoResultsAndMedallists">Résultats et médaillés</string>
+  <string name="msoEventGames">Parties du tournoi</string>
+  <string name="msoGrandPrix">Grand Prix MSO</string>
+  <string name="gameLibrary">Ludothèque</string>
 </resources>

@@ -27,7 +27,6 @@ object calendar {
     ) {
       main(cls := "box")(
         h1("Tournament calendar"),
-        bits.freqKey,
         div(id := "tournament-calendar")
       )
     }

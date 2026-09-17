@@ -203,6 +203,249 @@ $narrow-user-list-width: 30ch;
   margin-left: 0.6em;
 }
 
+.tournament-categ-shields__intro {
+  margin: 0 var(--box-padding) 1em;
+  line-height: 1.5;
+}
+
+// the index box pads itself; the intro sits directly under the title
+.tournament-shields-page {
+  .box-pad > h1 {
+    margin-bottom: 0.4em;
+  }
+
+  .tournament-shields__intro {
+    margin: 0 0 1.5em;
+    line-height: 1.5;
+  }
+
+  .tournament-shields__hint {
+    margin: 0;
+    color: $c-font-dim;
+  }
+}
+
+// the box title's 5vh bottom padding reads as a gap when prose follows it
+main.tournament-categ-shields .box > h1 {
+  padding-bottom: 1rem;
+}
+
+.shield-section {
+  margin: 1.5em var(--box-padding) 0.6em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid $c-border;
+  font-size: 1.2em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $c-font-dim;
+}
+
+// the reigning holder, laid out like the medley shield page
+.categ-shield-holder {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  gap: 0.2em;
+  margin: 0.5em var(--box-padding) 1em;
+  padding: 1.2em 1em;
+  background: $c-bg-zebra;
+  border-radius: 6px;
+  text-align: center;
+
+  &__trophy {
+    display: block;
+    width: 96px;
+    height: 114px;
+    margin-bottom: 0.4em;
+    background: img-url('trophy/shield-gold.png') no-repeat center / contain;
+    font-family: 'playstrategy' !important;
+    font-size: 56px;
+    line-height: 108px;
+    text-transform: none;
+    letter-spacing: normal;
+    color: #333;
+    text-shadow: 0 0 6px #fff;
+    filter: drop-shadow(0 0 10px $c-brag);
+  }
+
+  // a yearly champion gets the gold cup rather than the shield
+  &__trophy--cup {
+    background-image: img-url('trophy/Gold-Cup.png');
+    line-height: 96px;
+  }
+
+  &__label {
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $c-font-dim;
+  }
+
+  &__since {
+    color: $c-font-dim;
+  }
+
+  &__challenge {
+    max-width: 44ch;
+    margin: 0.8em 0 0;
+    line-height: 1.5;
+  }
+
+  &__next {
+    margin-top: 0.6em;
+  }
+}
+
+.shield-record {
+  margin: 0 var(--box-padding) 1em;
+  padding: 0.7em 1em;
+  border: 1px solid $c-border;
+  border-radius: 6px;
+
+  &__label {
+    display: block;
+    margin-bottom: 0.3em;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $c-font-dim;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.2em 0.9em;
+      padding: 0.15em 0;
+    }
+  }
+
+  &__value {
+    font-weight: bold;
+  }
+
+  &__span {
+    color: $c-font-dim;
+    font-variant-numeric: tabular-nums;
+
+    // the base stylesheet resets em to upright (icons use <i>)
+    em {
+      font-style: italic;
+    }
+  }
+}
+
+// the headhunter page: defenders on a streak, longest first
+.shield-headhunter {
+  &__intro {
+    margin: 0 var(--box-padding) 1em;
+    color: $c-font-dim;
+  }
+
+  &__list td {
+    vertical-align: middle;
+  }
+
+  &__game {
+    width: 28%;
+
+    a {
+      font-weight: bold;
+    }
+  }
+
+  &__list td:nth-child(2) {
+    width: 22%;
+  }
+
+  &__streak {
+    white-space: nowrap;
+
+    strong {
+      font-size: 1.2em;
+    }
+  }
+
+  &__next {
+    width: 1%; // shrink to the button
+    text-align: right;
+    white-space: nowrap;
+
+    .button {
+      display: block;
+      min-width: 17em; // every row's button the same width whatever the date
+      text-transform: none;
+      text-align: center;
+    }
+  }
+}
+
+// most shields held: medal badges for the top three, plain numbers after
+.shield-podium {
+  list-style: none;
+  margin: 0 var(--box-padding) 1em;
+  padding: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.9em;
+    padding: 0.45em 0.6em;
+    border-bottom: 1px solid $c-border;
+  }
+
+  .rank {
+    flex: 0 0 auto;
+    width: 1.9em;
+    height: 1.9em;
+    border-radius: 50%;
+    background: $c-bg-zebra;
+    color: $c-font-dim;
+    font-size: 0.9em;
+    font-weight: bold;
+    line-height: 1.9em;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .count {
+    margin-left: auto;
+    color: $c-font-dim;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .podium {
+    font-weight: bold;
+
+    .rank {
+      color: #222;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+  }
+
+  .podium--1 {
+    font-size: 1.15em;
+
+    .rank {
+      background: #e2b93b;
+    }
+  }
+
+  .podium--2 .rank {
+    background: #b9bcc2;
+  }
+
+  .podium--3 .rank {
+    background: #c98a4b;
+  }
+}
+
 .tournament-categ-shields,
 .tournament-medley-shields {
   font-size: 1.1em;
@@ -212,7 +455,7 @@ $narrow-user-list-width: 30ch;
     transform: scale(0.7);
   }
 
-  li {
+  .shield-roll li {
     @extend %flex-between;
 
     position: relative;

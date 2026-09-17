@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="abalone">trò chơi bàn cờ</string>
+  <string name="antichess">cờ vua thua là thắng</string>
+  <string name="atomic">biến thể cờ vua</string>
+  <string name="chess960">cờ vua 960, Fischer Random</string>
+  <string name="crazyhouse">biến thể cờ vua</string>
+  <string name="english">cờ đam, checkers</string>
+  <string name="fiveCheck">biến thể cờ vua 5 chiếu</string>
+  <string name="flipello">cờ lật, Reversi</string>
+  <string name="go13x13">cờ vây, bàn 13x13</string>
+  <string name="go19x19">cờ vây, bàn 19x19</string>
+  <string name="go9x9">cờ vây, bàn 9x9</string>
+  <string name="horde">biến thể cờ vua</string>
+  <string name="international">cờ đam quốc tế, 10x10</string>
+  <string name="kingOfTheHill">biến thể cờ vua, vua trên đồi</string>
+  <string name="linesOfAction">board game LOA</string>
+  <string name="minishogi">cờ shogi 5x5</string>
+  <string name="minixiangqi">cờ tướng 7x7</string>
+  <string name="monster">biến thể cờ vua</string>
+  <string name="noCastling">cờ vua không nhập thành</string>
+  <string name="oware">mancala</string>
+  <string name="racingKings">biến thể cờ vua</string>
+  <string name="scrambledEggs">biến thể Lines of Action của Claude Soucie</string>
+  <string name="shogi">cờ shogi, cờ Nhật</string>
+  <string name="threeCheck">biến thể cờ vua 3 chiếu</string>
+  <string name="xiangqi">cờ tướng</string>
+</resources>

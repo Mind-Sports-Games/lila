@@ -146,10 +146,11 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .map(_.flatMap(_.asOpt[Tournament]))
       .dmap { new lila.db.paginator.StaticAdapter(_) }
 
-  def finishedByFreqAdapter(freq: Schedule.Freq) =
+  def finishedByFreqAdapter(freq: Schedule.Freq, variant: Option[Variant] = None) =
     new lila.db.paginator.Adapter[Tournament](
       collection = coll,
-      selector = $doc("schedule.freq" -> freq, "status" -> Status.Finished.id),
+      selector = $doc("schedule.freq" -> freq, "status" -> Status.Finished.id) ++
+        variant.so(v => libSelect(v.gameLogic) ++ variantSelect(v)),
       projection = none,
       sort = $sort.desc("startsAt"),
       readPreference = ReadPreference.secondaryPreferred
@@ -492,6 +493,44 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .sort($sort.desc("startsAt"))
       .cursor[Tournament]()
       .list()
+
+  def nextScheduled(freq: Schedule.Freq, variant: Variant): Fu[Option[Tournament]] =
+    coll
+      .find(createdSelect ++ $doc("schedule.freq" -> freq.name) ++ libSelect(variant.gameLogic) ++ variantSelect(variant))
+      .sort($sort.asc("startsAt"))
+      .cursor[Tournament]()
+      .headOption
+
+  def nextShield(variant: Variant): Fu[Option[Tournament]] = nextScheduled(Schedule.Freq.Shield, variant)
+
+  // every scheduled shield arena not yet finished, soonest first
+  def upcomingShields: Fu[List[Tournament]] =
+    coll
+      .find(unfinishedSelect ++ $doc("schedule.freq" -> Schedule.Freq.Shield.name))
+      .sort($sort.asc("startsAt"))
+      .cursor[Tournament]()
+      .list()
+
+  // the last finished edition of a scheduled series before this one
+  def previousEdition(tour: Tournament): Fu[Option[Tournament]] =
+    tour.schedule.so { sched =>
+      coll
+        .find(
+          finishedSelect ++ $doc("schedule.freq" -> sched.freq.name, "startsAt".$lt(tour.startsAt)) ++
+            libSelect(tour.variant.gameLogic) ++ variantSelect(tour.variant)
+        )
+        .sort($sort.desc("startsAt"))
+        .cursor[Tournament]()
+        .headOption
+    }
+
+  // every finished edition of a series, newest first (a yearly series stays small)
+  def finishedSeries(freq: Schedule.Freq, variant: Variant, max: Int = 100): Fu[List[Tournament]] =
+    coll
+      .find(finishedSelect ++ $doc("schedule.freq" -> freq.name) ++ libSelect(variant.gameLogic) ++ variantSelect(variant))
+      .sort($sort.desc("startsAt"))
+      .cursor[Tournament]()
+      .list(max)
 
   def nextByTrophy(trophy: String): Fu[Option[Tournament]] =
     coll

@@ -19,7 +19,7 @@ object faq {
           a(href := routes.Tournament.home, dataIcon := "I", cls := "text"),
           "Arena Tournament FAQ"
         ),
-        div(cls := "body")(apply(), bits.freqDescriptions)
+        div(cls := "body")(apply())
       )
     }
 
