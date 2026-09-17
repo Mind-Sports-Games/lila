@@ -1511,6 +1511,8 @@ export default class RoundController {
       }, this.forcedActionDelayMillis);
     } else {
       const role = stratUtils.entropy.isChaosTurn(fen) && stratUtils.entropy.counterInPocket(fen);
+      // enforce drop when chaos only action
+      this.chessground.state.onlyDropsVariant = !!role;
       if (role) setDropMode(this.chessground.state, { playerIndex: d.game.player, role });
     }
   };
