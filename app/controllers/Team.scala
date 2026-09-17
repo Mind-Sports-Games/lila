@@ -108,7 +108,7 @@ final class Team(
     Open { implicit ctx =>
       api.teamEnabled(teamId) flatMap {
         _ so { team =>
-          env.teamInfo.tournaments(team, 30, 30) map { tours =>
+          env.teamInfo.tournaments(team, 100, 30) map { tours =>
             Ok(html.team.tournaments.page(team, tours))
           }
         }

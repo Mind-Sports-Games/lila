@@ -825,4 +825,17 @@
   <string name="refundXpointsTimeControlY">退回 %1$s %2$s 等级分。</string>
   <string name="timeAlmostUp">时间快到了！</string>
   <string name="clickToRevealEmailAddress">[点击显示电子邮件地址]</string>
+  <string name="playstrategySiteTitle">免费在线玩桌游 — 国际象棋、跳棋、围棋、双陆棋、黑白棋等</string>
+  <string name="playstrategySiteTitleShort">免费在线玩桌游 — 国际象棋、跳棋、围棋、双陆棋</string>
+  <string name="playstrategySiteDescription">免费在线玩桌游：国际象棋及其变体、跳棋、围棋、双陆棋、黑白棋、将棋、中国象棋、播棋、Abalone 等。Mind Sports Olympiad 官方在线平台。免费、开源，支持实时对局和通信对局。</string>
+  <string name="playstrategyAboutSummary">%1$s 是一个双人桌游实时对战平台，也是 Mind Sports Olympiad 的官方在线平台。40 多种游戏，包括国际象棋、围棋、黑白棋、播棋、跳棋、双陆棋、Abalone……尽在这个免费开源的网站。</string>
+  <string name="playVariantOnlineFree">免费在线玩 %s：实时或通信对局，积分或休闲，对手来自世界各地。</string>
+  <string name="playVariantOnlineFreeTitle">免费在线玩 %s</string>
+  <string name="variantRulesTitle">%1$s 规则 — %2$s 怎么玩</string>
+  <string name="variantRulesDescription">学习 %s 的规则：布局、走法、吃子与胜负判定，附交互式教程。然后在 PlayStrategy 免费在线对局。</string>
+  <string name="playVariantOnlineFreeDescription">与世界各地的玩家免费在线玩 %s。实时与通信对局、锦标赛、积分和分析，尽在 PlayStrategy。</string>
+  <string name="variantPuzzles">%s 谜题</string>
+  <string name="libraryTitle">可免费在线玩的桌游 — PlayStrategy 游戏库</string>
+  <string name="libraryDescription">PlayStrategy 的所有游戏：国际象棋及其变体、跳棋、围棋、双陆棋、黑白棋、将棋、中国象棋、播棋、Abalone、Lines of Action 等——附规则、教程、锦标赛和统计。</string>
+  <string name="recurringTournaments">定期锦标赛</string>
 </resources>

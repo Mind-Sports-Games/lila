@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="abalone">보드게임</string>
+  <string name="antichess">안티체스</string>
+  <string name="atomic">체스 변형</string>
+  <string name="backgammon">백개먼</string>
+  <string name="chess960">피셔 랜덤 체스</string>
+  <string name="crazyhouse">체스 변형</string>
+  <string name="english">체커</string>
+  <string name="fiveCheck">5체크 체스 변형</string>
+  <string name="flipello">오델로, 리버시</string>
+  <string name="go13x13">바둑 13줄판</string>
+  <string name="go19x19">바둑 19줄판</string>
+  <string name="go9x9">바둑 9줄판</string>
+  <string name="horde">체스 변형</string>
+  <string name="international">국제 체커, 10x10</string>
+  <string name="kingOfTheHill">킹 오브 더 힐 체스 변형</string>
+  <string name="linesOfAction">LOA 보드게임</string>
+  <string name="minishogi">쇼기 5x5</string>
+  <string name="minixiangqi">샹치 7x7</string>
+  <string name="monster">체스 변형</string>
+  <string name="noCastling">캐슬링 없는 체스</string>
+  <string name="oware">만칼라</string>
+  <string name="racingKings">체스 변형</string>
+  <string name="scrambledEggs">클로드 수시의 Lines of Action 변형</string>
+  <string name="shogi">쇼기, 일본 장기</string>
+  <string name="threeCheck">3체크 체스 변형</string>
+  <string name="xiangqi">샹치, 중국 장기</string>
+</resources>

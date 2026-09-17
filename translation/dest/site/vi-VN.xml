@@ -810,4 +810,17 @@
   <string name="youCannotPostYetPlaySomeGames">Bạn bây giờ chưa thể đăng bài lên diễn đàng được. Chơi vài trận đi!</string>
   <string name="subscribe">Đăng kí</string>
   <string name="unsubscribe">Hủy đăng ký</string>
+  <string name="playstrategySiteTitle">Chơi board game trực tuyến miễn phí — cờ vua, cờ đam, cờ vây, backgammon, Othello và hơn thế nữa</string>
+  <string name="playstrategySiteTitleShort">Chơi board game trực tuyến miễn phí — cờ vua, cờ đam, cờ vây, backgammon</string>
+  <string name="playstrategySiteDescription">Chơi board game trực tuyến miễn phí: cờ vua và các biến thể, cờ đam, cờ vây, backgammon, Othello, shogi, cờ tướng, mancala, Abalone và nhiều hơn nữa. Nền tảng trực tuyến chính thức của Mind Sports Olympiad. Miễn phí, mã nguồn mở, chơi trực tiếp hoặc theo lượt.</string>
+  <string name="playstrategyAboutSummary">%1$s là nền tảng thời gian thực để chơi các board game hai người, và là nền tảng trực tuyến chính thức của Mind Sports Olympiad. Hơn 40 trò chơi khác nhau gồm cờ vua, cờ vây, Othello, mancala, cờ đam, backgammon, Abalone… trên trang web miễn phí và mã nguồn mở này.</string>
+  <string name="playVariantOnlineFree">Chơi %s trực tuyến miễn phí: trực tiếp hoặc theo lượt, có xếp hạng hoặc giao hữu, với người chơi trên toàn thế giới.</string>
+  <string name="playVariantOnlineFreeTitle">Chơi %s trực tuyến miễn phí</string>
+  <string name="variantRulesTitle">Luật chơi %1$s — cách chơi %2$s</string>
+  <string name="variantRulesDescription">Học luật chơi %s: cách bày bàn cờ, nước đi, cách ăn quân và cách thắng, kèm hướng dẫn tương tác. Sau đó chơi trực tuyến miễn phí trên PlayStrategy.</string>
+  <string name="playVariantOnlineFreeDescription">Chơi %s trực tuyến miễn phí với người chơi trên toàn thế giới. Ván đấu trực tiếp và theo lượt, giải đấu, xếp hạng và phân tích trên PlayStrategy.</string>
+  <string name="variantPuzzles">Câu đố %s</string>
+  <string name="libraryTitle">Các board game có thể chơi trực tuyến miễn phí — thư viện PlayStrategy</string>
+  <string name="libraryDescription">Mọi trò chơi trên PlayStrategy: cờ vua và các biến thể, cờ đam, cờ vây, backgammon, Othello, shogi, cờ tướng, mancala, Abalone, Lines of Action và hơn thế nữa — kèm luật chơi, hướng dẫn, giải đấu và thống kê.</string>
+  <string name="recurringTournaments">Giải đấu định kỳ</string>
 </resources>
