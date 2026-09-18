@@ -30,6 +30,7 @@ object form {
             form3.split(fields.mcmahon, fields.mcmahonCutoff),
             form3.split(fields.handicapped, fields.inputPlayerRatings),
             fields.backgammonPoints,
+            fields.victoryPoints,
             fields.xGamesChoiceRow1,
             fields.xGamesChoiceRow2,
             form3.split(fields.drawTables, fields.perPairingDrawTables),
@@ -80,6 +81,7 @@ object form {
             form3.split(fields.mcmahon, fields.mcmahonCutoff),
             form3.split(fields.handicapped, fields.inputPlayerRatings),
             fields.backgammonPoints,
+            fields.victoryPoints,
             fields.xGamesChoiceRow1,
             fields.xGamesChoiceRow2,
             form3.split(fields.drawTables, fields.perPairingDrawTables),
@@ -237,6 +239,18 @@ final private class SwissFields(form: Form[?], swiss: Option[Swiss])(implicit ct
       help = trans.backgammonPointsDefinition().some
     )(
       form3.select(_, SwissForm.backgammonPointsChoices)
+    )
+  def victoryPoints =
+    form3.checkbox(
+      form("variantSettings.victoryPoints"),
+      "Use victory points",
+      klass = "victoryPoints",
+      half = true,
+      help = frag(
+        "Score each game from 0 to 100 by the difference in Order scores, instead of 1 for a win",
+        br,
+        a(href := s"${routes.Swiss.home}#faqVictoryPoints", target := "_blank")("More detail here")
+      ).some
     )
   def matchScore =
     frag(

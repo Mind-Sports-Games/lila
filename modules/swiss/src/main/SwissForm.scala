@@ -62,7 +62,8 @@ final class SwissForm(implicit mode: Mode) {
             "handicapped"        -> optional(boolean),
             "inputPlayerRatings" -> optional(cleanNonEmptyText)
           )(Handicaps.apply)(unapply),
-          "backgammonPoints" -> optional(numberIn(backgammonPoints))
+          "backgammonPoints" -> optional(numberIn(backgammonPoints)),
+          "victoryPoints"    -> optional(boolean)
         )(VariantSettings.apply)(unapply),
         "xGamesChoice" -> mapping(
           "bestOfX"         -> optional(boolean),
@@ -101,6 +102,14 @@ final class SwissForm(implicit mode: Mode) {
         .verifying(
           "Best of x or Play x and Match Score can only be used if number of games per round is greater than 1",
           _.validNumberofGames
+        )
+        .verifying(
+          "Victory points cannot be used with Best of X, Play X, Match Score or more than one game per round",
+          _.validVictoryPoints
+        )
+        .verifying(
+          s"Victory points can be used for at most ${SwissVictoryPoints.maxRounds} rounds",
+          _.validVictoryPointsRounds
         )
         .verifying(
           "Handicapped mode requires a Go variant, non-rated, non-multimatch and non-medley",
@@ -156,7 +165,8 @@ final class SwissForm(implicit mode: Mode) {
             handicapped = false.some,
             inputPlayerRatings = none
           ),
-          backgammonPoints = none
+          backgammonPoints = none,
+          victoryPoints = false.some
         ),
         xGamesChoice = XGamesChoice(
           bestOfX = false.some,
@@ -220,7 +230,8 @@ final class SwissForm(implicit mode: Mode) {
             handicapped = s.settings.handicapped.some,
             inputPlayerRatings = s.settings.inputPlayerRatings.some.filter(_.nonEmpty)
           ),
-          backgammonPoints = s.settings.backgammonPoints
+          backgammonPoints = s.settings.backgammonPoints,
+          victoryPoints = s.settings.isVictoryPoints.some
         ),
         xGamesChoice = XGamesChoice(
           bestOfX = s.settings.isBestOfX.some,
@@ -446,6 +457,8 @@ object SwissForm {
       if (gameLogic == GameLogic.Backgammon()) variantSettings.backgammonPoints else None
     def inputPlayerRatings = if (isHandicapped || isMcMahon) handicaps.inputPlayerRatings else None
     def isMatchScore       = xGamesChoice.matchScore | false
+    def isVictoryPoints    =
+      gameLogic == GameLogic.Entropy() && !isMedley && (variantSettings.victoryPoints | false)
     def isBestOfX          = xGamesChoice.bestOfX | false
     def isPlayX            = xGamesChoice.playX | false
     def nbGamesPerRound    = xGamesChoice.nbGamesPerRound
@@ -454,7 +467,10 @@ object SwissForm {
     def validMatchScoreSetup = !isMatchScore || !(isBestOfX && nbGamesPerRound % 2 == 1)
     def validNumberofGames   =
       (nbGamesPerRound > 1 && (isBestOfX || isPlayX)) || (nbGamesPerRound == 1 && !isMatchScore)
-    def validRatedVariant =
+    def validVictoryPoints =
+      !isVictoryPoints || (!isBestOfX && !isPlayX && !isMatchScore && nbGamesPerRound == 1)
+    def validVictoryPointsRounds = !isVictoryPoints || nbRounds <= SwissVictoryPoints.maxRounds
+    def validRatedVariant        =
       !isRated ||
         lila.game.Game.allowRated(realVariant, clock.some)
     def validHandicapped =
@@ -519,7 +535,8 @@ object SwissForm {
 
   case class VariantSettings(
       handicaps: Handicaps,
-      backgammonPoints: Option[Int]
+      backgammonPoints: Option[Int],
+      victoryPoints: Option[Boolean]
   )
 
   case class Handicaps(

@@ -72,7 +72,9 @@ object side {
                   s" (${s.settings.nbGamesPerRound} games per round"
                 },
                 if (s.settings.isMatchScore)
-                  a(href := s"${routes.Swiss.home}#faqMatchScore")(" using match score"),
+                  a(href := s"${routes.Swiss.home}#faqMatchScore")(" using match score")
+                else if (s.settings.isVictoryPoints)
+                  a(href := s"${routes.Swiss.home}#faqVictoryPoints")(" using victory points"),
                 if (s.settings.isBestOfX || s.settings.isPlayX) ")"
                 else ""
               ),

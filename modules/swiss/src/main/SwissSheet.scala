@@ -17,19 +17,23 @@ private case class SwissSheet(outcomes: List[List[SwissSheet.Outcome]]) {
 
 private object SwissSheet {
 
-  sealed trait Outcome
+  sealed trait Outcome {
+    def result: Outcome = this
+  }
   case object Bye     extends Outcome
   case object Absent  extends Outcome
   case object Ongoing extends Outcome
   case object Win     extends Outcome
   case object Loss    extends Outcome
   case object Draw    extends Outcome
+  case class VictoryPoints(override val result: Outcome, points: Int) extends Outcome
 
   def pointsFor(outcome: Outcome): Int =
     outcome match {
-      case Win | Bye => 2
-      case Draw      => 1
-      case _         => 0
+      case VictoryPoints(_, points) => points * 2
+      case Win | Bye                => 2
+      case Draw                     => 1
+      case _                        => 0
     }
 
   def pointsFor(outcome: List[Outcome]): Int =
@@ -37,11 +41,18 @@ private object SwissSheet {
 
   // BBpairings can only handle the same points for a win, loss or draw therefore we have to lie to it
   def pointsForTrf(outcome: List[Outcome]): Int =
-    pointsFor(outcome) match {
-      case score if score > outcome.length  => 2
-      case score if score == outcome.length => 1
-      case _                                => 0
+    outcome match {
+      case List(VictoryPoints(result, _)) => pointsFor(result)
+      case _                              =>
+        pointsFor(outcome) match {
+          case score if score > outcome.length  => 2
+          case score if score == outcome.length => 1
+          case _                                => 0
+        }
     }
+
+  def victoryPoints(outcomes: List[List[Outcome]]): Int =
+    outcomes.flatten.collect { case VictoryPoints(_, points) => points }.sum
 
   def many(
       swiss: Swiss,
@@ -62,8 +73,9 @@ private object SwissSheet {
         pairingMap get round match {
           case Some(pairing) =>
             pairing.status match {
-              case Left(_)     => List(Ongoing)
-              case Right(None) =>
+              case Left(_)                                    => List(Ongoing)
+              case Right(_) if swiss.settings.isVictoryPoints => List(victoryPointsOutcome(player, pairing))
+              case Right(None)                                =>
                 if (swiss.settings.isMatchScore) outcomeListFromMultiMatch(player, pairing)
                 else List(Draw)
               case Right(Some(playerIndex)) =>
@@ -72,7 +84,8 @@ private object SwissSheet {
                 else List(Loss)
             }
           case None if player.byes(round) =>
-            if (swiss.settings.isMatchScore)
+            if (swiss.settings.isVictoryPoints) List(VictoryPoints(Bye, SwissVictoryPoints.max))
+            else if (swiss.settings.isMatchScore)
               if (swiss.settings.isBestOfX)
                 List.fill(swiss.settings.nbGamesPerRound / 2 + 1)(
                   Bye
@@ -83,6 +96,14 @@ private object SwissSheet {
         }
       }
     }
+
+  def victoryPointsOutcome(player: SwissPlayer, pairing: SwissPairing): Outcome = {
+    val result = pairing.resultFor(player.userId).fold[Outcome](Draw)(if (_) Win else Loss)
+    VictoryPoints(
+      result,
+      pairing.victoryPointsFor(player.userId) | pointsFor(result) * SwissVictoryPoints.max / 2
+    )
+  }
 
   def outcomeListFromMultiMatch(player: SwissPlayer, pairing: SwissPairing): List[Outcome] =
     pairing.matchStatus match {

@@ -25,7 +25,9 @@ final class SwissTrf(
         forbiddenPairings(swiss, playerIds) concat sheetApi
           .source(swiss, sort = sorted.so($doc(f.inputRating -> -1, f.rating -> -1)))
           .map(playerLine(swiss, playerIds).tupled)
-          .map(formatLine) concat (if (swiss.settings.mcmahon || swiss.settings.isMatchScore)
+          .map(formatLine) concat (if (
+                                     swiss.settings.mcmahon || swiss.settings.isMatchScore || swiss.settings.isVictoryPoints
+                                   )
                                      sheetApi
                                        .source(
                                          swiss,
@@ -70,7 +72,11 @@ final class SwissTrf(
     }
 
   private def additionalPoints(swiss: Swiss, player: SwissPlayer, sheet: SwissSheet, round: Int): Double =
-    if (swiss.settings.isMatchScore) {
+    if (swiss.settings.isVictoryPoints) {
+      val outcomesSoFar = sheet.outcomes.slice(0, round - 1)
+      SwissSheet.victoryPoints(outcomesSoFar).toDouble / SwissVictoryPoints.perTrfPoint -
+        Swiss.Points(outcomesSoFar.map(SwissSheet.pointsForTrf).sum).value
+    } else if (swiss.settings.isMatchScore) {
       val outcomesSoFar = sheet.outcomes.slice(0, round - 1)
       Swiss
         .Points {
@@ -104,18 +110,20 @@ final class SwissTrf(
           97 -> pairing.map(_.bbpPairingPlayerIndexOf(p.userId)).so(_.fold("w", "b")),
           99 -> {
             import SwissSheet.*
+            def trfResult(single: Outcome): String =
+              single match {
+                case Absent                   => "-"
+                case Bye                      => "U"
+                case Draw                     => "="
+                case Win                      => "1"
+                case Loss                     => "0"
+                case Ongoing                  => "Z"
+                case VictoryPoints(result, _) => trfResult(result)
+              }
             outcome match {
-              case res if outcome.length == 1 =>
-                res(0) match {
-                  case Absent  => "-"
-                  case Bye     => "U"
-                  case Draw    => "="
-                  case Win     => "1"
-                  case Loss    => "0"
-                  case Ongoing => "Z"
-                }
-              case _ if outcome(0) == Bye => "U"
-              case l                      =>
+              case res if outcome.length == 1 => trfResult(res(0))
+              case _ if outcome(0) == Bye     => "U"
+              case l                          =>
                 pointsForTrf(l) match {
                   case 2 => "1"
                   case 1 => "="

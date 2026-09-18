@@ -180,6 +180,7 @@ object Swiss {
       backgammonPoints: Option[Int] = None,
       inputPlayerRatings: String,
       isMatchScore: Boolean,
+      isVictoryPoints: Boolean = false,
       isBestOfX: Boolean,
       isPlayX: Boolean,
       nbGamesPerRound: Int,
