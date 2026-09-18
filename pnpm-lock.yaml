@@ -12,11 +12,11 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/e391b56a82b7c71e7663082a797f6fc21b18776d
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.38
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/383a8bd99184d4ed06ff2d943502cc457f8efc93
+        specifier: github:Mind-Sports-Games/chessground#pla-1709-add-entropy-lila-supporting-repos
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/ed48f91e01385d3caf4e06630f366e24715c6fb6
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.31
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/951e538e6e013bbca5471877449dcee5a06398b0
+        specifier: github:Mind-Sports-Games/stratops#pla-1709-add-entropy-lila-supporting-repos
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/68d7a9b283eb7f1961a219f7f11654d5515ea896
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -47,7 +47,7 @@ importers:
         version: 7.1.0
       prettier:
         specifier: ^3.9.6
-        version: 3.9.6
+        version: 3.9.8
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -862,9 +862,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/383a8bd99184d4ed06ff2d943502cc457f8efc93:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/383a8bd99184d4ed06ff2d943502cc457f8efc93}
-    version: 7.11.1-pstrat3.38
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/ed48f91e01385d3caf4e06630f366e24715c6fb6:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/ed48f91e01385d3caf4e06630f366e24715c6fb6}
+    version: 7.11.1-pstrat3.39
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   chokidar@3.6.0:
@@ -1040,8 +1040,8 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  get-east-asian-width@1.6.0:
-    resolution: {integrity: sha512-QRbvDIbx6YklUe6RxeTeleMR0yv3cYH6PsPZHcnVn7xv7zO1BHN8r0XETu8n6Ye3Q+ahtSarc3WgtNWmehIBfA==}
+  get-east-asian-width@1.7.0:
+    resolution: {integrity: sha512-XjH1AECxf0giL2V1aU8vKyRR2ppRUb5c0EvT7zuJTokQ74bNo52zOtghqdWIqrhUD79fo3x0WfKZdOqxF6LG1Q==}
     engines: {node: '>=18'}
 
   get-stream@8.0.1:
@@ -1320,8 +1320,8 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier@3.9.6:
-    resolution: {integrity: sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g==}
+  prettier@3.9.8:
+    resolution: {integrity: sha512-WRFq3Wn3WId7LLROfMLdH7xaFr2jR62wU8nLO6rQUOLOxNZUviyJQs1M0iIhLexSFy+L+w0ch66wtoO2jRjG0A==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -1420,9 +1420,9 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/951e538e6e013bbca5471877449dcee5a06398b0:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/951e538e6e013bbca5471877449dcee5a06398b0}
-    version: 0.8.1-pstrat5.31
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/68d7a9b283eb7f1961a219f7f11654d5515ea896:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/68d7a9b283eb7f1961a219f7f11654d5515ea896}
+    version: 0.8.1-pstrat5.32
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   string-argv@0.3.2:
@@ -1806,7 +1806,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/383a8bd99184d4ed06ff2d943502cc457f8efc93: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/ed48f91e01385d3caf4e06630f366e24715c6fb6: {}
 
   chokidar@3.6.0:
     dependencies:
@@ -2011,7 +2011,7 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  get-east-asian-width@1.6.0: {}
+  get-east-asian-width@1.7.0: {}
 
   get-stream@8.0.1: {}
 
@@ -2085,7 +2085,7 @@ snapshots:
 
   is-fullwidth-code-point@5.1.0:
     dependencies:
-      get-east-asian-width: 1.6.0
+      get-east-asian-width: 1.7.0
 
   is-glob@4.0.3:
     dependencies:
@@ -2271,7 +2271,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier@3.9.6: {}
+  prettier@3.9.8: {}
 
   prop-types@15.8.1:
     dependencies:
@@ -2347,7 +2347,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/951e538e6e013bbca5471877449dcee5a06398b0:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/68d7a9b283eb7f1961a219f7f11654d5515ea896:
     dependencies:
       '@badrap/result': 0.2.13
 
@@ -2356,7 +2356,7 @@ snapshots:
   string-width@7.2.0:
     dependencies:
       emoji-regex: 10.6.0
-      get-east-asian-width: 1.6.0
+      get-east-asian-width: 1.7.0
       strip-ansi: 7.2.0
 
   strip-ansi@6.0.1:

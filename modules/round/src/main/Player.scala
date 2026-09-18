@@ -3,9 +3,12 @@ package lila.round
 import strategygames.format.{ Forsyth, Uci }
 import strategygames.{
   Action,
+  Board,
   Centis,
   CubeAction as StratCubeAction,
   DiceRoll as StratDiceRoll,
+  DrawCounter as StratDrawCounter,
+  Game as StratGame,
   Drop as StratDrop,
   EndTurn as StratEndTurn,
   Lift as StratLift,
@@ -54,7 +57,7 @@ final private class Player(
               .leftMap(e => s"$pov $e")
               .fold(errs => fufail(ClientError(errs)), fuccess)
               .flatMap {
-                case Flagged                         => finisher.outOfTime(game)
+                case Flagged                         => outOfTime(game)
                 case ActionApplied(progress, action) =>
                   proxy.save(progress) >>
                     postHumanOrBotPlay(round, pov, progress, action)
@@ -78,7 +81,7 @@ final private class Player(
         applyUci(game, uci, blur = false, botLag)
           .fold(errs => fufail(ClientError(errs)), fuccess)
           .flatMap {
-            case Flagged                         => finisher.outOfTime(game)
+            case Flagged                         => outOfTime(game)
             case ActionApplied(progress, action) =>
               proxy.save(progress) >> postHumanOrBotPlay(round, pov, progress, action)
           }
@@ -110,16 +113,54 @@ final private class Player(
         }
       scheduleExpiration(progress.game)
       if (progress.game.selectSquaresPossible) scheduleActionExpiration(progress.game)
-      fuccess(progress.events)
+      if (!progress.game.flagEndsGame && progress.game.outoftime(withGrace = false))
+        playFlaggedActions(progress.game) dmap { progress.events ::: _ }
+      else fuccess(progress.events)
     }
   }
+
+  private[round] def outOfTime(game: Game)(implicit proxy: GameProxy): Fu[Events] =
+    if (game.flagEndsGame) finisher.outOfTime(game)
+    else playFlaggedActions(game)
+
+  // A flagged player keeps their turns but is restricted to the flagged action, played for them
+  // at once. Their clock is held at zero so increment never buys back choice; the reset at the
+  // round swap is what frees them.
+  private def playFlaggedActions(game: Game)(implicit proxy: GameProxy): Fu[Events] =
+    game.situation.flaggedAction match {
+      case Some(action) if game.playable && game.outoftime(withGrace = false) =>
+        val progress = game.update(holdClockAtZero(game, game.stratGame.apply(action)), action)
+        proxy.save(progress) >> {
+          notifyMove(action, progress.game)
+          if (progress.game.finished) moveFinish(progress.game) dmap { progress.events ::: _ }
+          else playFlaggedActions(progress.game) dmap { progress.events ::: _ }
+        }
+      case _ => fuccess(Nil)
+    }
+
+  // The flagged action takes at least the time left, so the clock step hard-stops the clock. It is
+  // restarted here, or the opponent's clock would never run and the stopped clock would read as
+  // them being flagged too.
+  private def holdClockAtZero(before: Game, after: StratGame): StratGame =
+    if (round(before.stratGame) != round(after)) after
+    else
+      after.clock.fold(after) { clock =>
+        val held = clock.setRemainingTime(before.turnPlayerIndex, Centis(0))
+        after.copy(clock = Some(if (after.situation.status.isEmpty) held.start else held))
+      }
+
+  private def round(game: StratGame): Int =
+    game.situation.board match {
+      case Board.Entropy(board) => board.round
+      case _                    => 0
+    }
 
   private[round] def fishnet(game: Game, ply: Int, uci: Uci)(implicit proxy: GameProxy): Fu[Events] =
     if (game.playable && game.player.isAi && game.playedPlies == ply)
       applyUci(game, uci, blur = false, metrics = fishnetLag)
         .fold(errs => fufail(ClientError(errs)), fuccess)
         .flatMap {
-          case Flagged                         => finisher.outOfTime(game)
+          case Flagged                         => outOfTime(game)
           case ActionApplied(progress, action) =>
             proxy
               .save(progress)
@@ -175,6 +216,7 @@ final private class Player(
         case l: StratLift           => l.toUci.uci
         case et: StratEndTurn       => et.toUci.uci
         case dr: StratDiceRoll      => dr.toUci.uci
+        case dc: StratDrawCounter   => dc.toUci.uci
         case ca: StratCubeAction    => ca.toUci.uci
         case u: StratUndo           => u.toUci.uci
         case ss: StratSelectSquares => ss.toUci.uci

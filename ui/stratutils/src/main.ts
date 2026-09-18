@@ -9,6 +9,7 @@ import { variantClassFromKey } from 'stratops/variants/util';
 export * as promotion from './promotion';
 export * as dameo from './dameo';
 export * as backgammon from './backgammon';
+export * as entropy from './entropy';
 
 export const initialFen: Fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
@@ -81,6 +82,7 @@ export const uci2move = (uci: string): cg.Key[] | undefined => {
     uci == 'roll' ||
     uci == 'endturn' ||
     uci == 'undo' ||
+    uci.startsWith('draw') ||
     uci.includes('/') ||
     uci.substring(0, 3) == 'ss:' ||
     uci.substring(0, 4) == 'cube'
@@ -176,6 +178,7 @@ const noFishnetVariants: VariantKey[] = [
   'hyper',
   'abalone',
   'grandabalone',
+  'entropy',
 ];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;

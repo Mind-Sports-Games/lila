@@ -173,17 +173,21 @@ export function makeConfig(ctrl: RoundController): Config {
                         ? 'https://playstrategy.org/assets/piece/backgammon/' +
                           data.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
                           '/'
-                        : variantKey === 'abalone' || variantKey === 'grandabalone'
-                          ? 'https://playstrategy.org/assets/piece/abalone/' +
-                            data.pref.pieceSet.filter(ps => ps.gameFamily === 'abalone')[0].name +
+                        : variantKey === 'entropy'
+                          ? 'https://playstrategy.org/assets/piece/entropy/' +
+                            data.pref.pieceSet.filter(ps => ps.gameFamily === 'entropy')[0].name +
                             '/'
-                          : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
-                            ? 'https://playstrategy.org/assets/piece/xiangqi/' +
-                              data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                          : variantKey === 'abalone' || variantKey === 'grandabalone'
+                            ? 'https://playstrategy.org/assets/piece/abalone/' +
+                              data.pref.pieceSet.filter(ps => ps.gameFamily === 'abalone')[0].name +
                               '/'
-                            : 'https://playstrategy.org/assets/piece/chess/' +
-                              data.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
-                              '/',
+                            : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
+                              ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+                                data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                                '/'
+                              : 'https://playstrategy.org/assets/piece/chess/' +
+                                data.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+                                '/',
       },
     },
     disableContextMenu: true,

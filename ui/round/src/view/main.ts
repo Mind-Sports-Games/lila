@@ -285,9 +285,12 @@ export function main(ctrl: RoundController): VNode {
     'nackgammon',
     'abalone',
     'grandabalone',
+    'entropy',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';
+
+  const showScoreBox = ctrl.data.hasGameScore && variantKey !== 'entropy';
 
   return ctrl.nvui
     ? ctrl.nvui.render(ctrl)
@@ -311,16 +314,14 @@ export function main(ctrl: RoundController): VNode {
             },
             [renderGround(ctrl), promotion.view(ctrl)],
           ),
-          ctrl.data.hasGameScore ? renderPlayerScore(topScore, 'top', topPlayerIndex, variantKey, captures) : null,
-          ctrl.data.hasGameScore ? renderPlayerScoreNames(ctrl.data.player, ctrl.data.opponent, topPlayerIndex) : null,
+          showScoreBox ? renderPlayerScore(topScore, 'top', topPlayerIndex, variantKey, captures) : null,
+          showScoreBox ? renderPlayerScoreNames(ctrl.data.player, ctrl.data.opponent, topPlayerIndex) : null,
           crazyView(ctrl, topPlayerIndex, 'top') ||
             renderMaterial(material[topPlayerIndex], -score, 'top', d.hasGameScore, checks[topPlayerIndex]),
           ...renderTable(ctrl),
           crazyView(ctrl, bottomPlayerIndex, 'bottom') ||
             renderMaterial(material[bottomPlayerIndex], score, 'bottom', d.hasGameScore, checks[bottomPlayerIndex]),
-          ctrl.data.hasGameScore
-            ? renderPlayerScore(bottomScore, 'bottom', bottomPlayerIndex, variantKey, captures)
-            : null,
+          showScoreBox ? renderPlayerScore(bottomScore, 'bottom', bottomPlayerIndex, variantKey, captures) : null,
           ctrl.bgAnalysis.view(),
           ctrl.keyboardMove ? keyboardMove(ctrl.keyboardMove) : null,
         ],

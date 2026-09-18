@@ -14,6 +14,7 @@ import strategygames.{
   ClockConfig,
   CubeAction,
   DiceRoll,
+  DrawCounter,
   Drop,
   EndTurn,
   Game as StratGame,
@@ -379,6 +380,8 @@ case class Game(
           Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
         case r: DiceRoll =>
           Event.DiceRoll(r, game.situation, state, clockEvent, updated.board.pocketData)
+        case dc: DrawCounter =>
+          Event.DrawCounter(dc, game.situation, state, clockEvent, updated.board.pocketData)
         case ca: CubeAction =>
           Event.CubeAction(ca, game.situation, state, clockEvent, updated.board.pocketData)
         case et: EndTurn =>
@@ -409,6 +412,8 @@ case class Game(
         (updated.board.variant.gameFamily == GameFamily.Backgammon()) so List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
+      else if (updated.board.variant.gameLogic == GameLogic.Entropy())
+        List(Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2))
       // TODO Abalone is this how we want to represent score? Maybe look at Backgammon
       else if (updated.board.variant.gameLogic == GameLogic.Abalone())
         // Is this even necessary as score is in the fen?
@@ -447,6 +452,7 @@ case class Game(
         score.toString()
       case "togyzkumalak" | "bestemshe"    => history.score(playerIndex).toString()
       case "abalone" | "grandabalone"      => history.score(playerIndex).toString()
+      case "entropy"                       => history.score(playerIndex).toString()
       case "go9x9" | "go13x13" | "go19x19" =>
         val fen   = Forsyth.>>(variant.gameLogic, situation)
         val score = (if (playerIndex.name == "p1") fen.player1Score else fen.player2Score) / 10.0
@@ -461,7 +467,7 @@ case class Game(
 
   def displayScore: Option[Score] =
     if variant.gameLogic == GameLogic.Togyzkumalak() || variant.gameLogic == GameLogic
-        .Backgammon() || variant.gameLogic == GameLogic.Abalone()
+        .Backgammon() || variant.gameLogic == GameLogic.Abalone() || variant.gameLogic == GameLogic.Entropy()
     then history.score.some
     else if (variant.gameLogic == GameLogic.Go()) {
       if (finished || selectSquaresPossible) history.score.some
@@ -477,6 +483,7 @@ case class Game(
       case _: Uci.Undo          => "undo"
       case _: Uci.Pass          => "pass"
       case _: Uci.DiceRoll      => "roll"
+      case _: Uci.DrawCounter   => "draw"
       case _: Uci.CubeAction    => "cube"
       case _: Uci.SelectSquares => "ss:"
       case _                    => sys.error("Type Error")
@@ -846,6 +853,9 @@ case class Game(
   def lostBy(c: PlayerIndex): Option[Boolean] = winner map (_.playerIndex != c)
 
   def drawn = finished && winner.isEmpty
+
+  // entropy degrades a flagged player's play instead of ending the game, but only live clocks
+  def flagEndsGame: Boolean = variant.gameLogic != GameLogic.Entropy() || isCorrespondence
 
   def outoftime(withGrace: Boolean): Boolean =
     if (isCorrespondence) outoftimeCorrespondence else outoftimeClock(withGrace)
@@ -1350,6 +1360,8 @@ object Game {
     val unusedDice      = "ud"
     val cubeData        = "bcd"
     val multiPointState = "mps"
+    // entropy
+    val round = "rd"
     // go
     val selectedSquares     = "ss" // the dead stones selected in go
     val deadStoneOfferState = "os" // state of the dead stone offer

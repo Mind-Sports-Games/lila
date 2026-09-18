@@ -65,6 +65,7 @@ object home {
                   s" (${s.settings.nbGamesPerRound} games per round"
                 } else "",
                 if (s.settings.isMatchScore) " using match score"
+                else if (s.settings.isVictoryPoints) " using victory points"
                 else "",
                 if (s.settings.isBestOfX || s.settings.isPlayX) ")"
                 else ""
@@ -194,6 +195,19 @@ object home {
         "For example, if you won 2.5-1.5 (in a best of 4), you would score 2.5 (and opponent 1.5) instead of the usual 1 (and opponent 0)",
         br,
         "A bye will score the maximum points possible when using match score."
+      )
+    ),
+    div(cls := "faq", id := "faqVictoryPoints")(
+      i("?"),
+      p(
+        strong("In an Entropy Swiss tournament what does it mean by using victory points?"),
+        "Instead of 1 point for a win, each game is worth 100 victory points, shared between the players by the difference between their Order scores:",
+        br,
+        lila.swiss.SwissVictoryPoints.table
+          .map { case (difference, winner) => s"$difference: $winner-${lila.swiss.SwissVictoryPoints.max - winner}" }
+          .mkString(", "),
+        br,
+        "A game won by resignation, running out of time or abandonment scores 100-0, a game drawn by agreement scores 50-50, and a bye scores 100."
       )
     ),
     div(cls := "faq")(

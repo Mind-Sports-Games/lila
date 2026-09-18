@@ -148,9 +148,11 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                     p.outcome == 'absent'
                       ? '-'
                       : p.outcome == 'bye'
-                        ? isMatchScore
-                          ? matchScoreDisplay(multiMatchByeScore(ctrl))
-                          : '1'
+                        ? ctrl.data.isVictoryPoints
+                          ? '100'
+                          : isMatchScore
+                            ? matchScoreDisplay(multiMatchByeScore(ctrl))
+                            : '1'
                         : '½',
                   ),
                 ],
@@ -254,6 +256,7 @@ function multiPointResult(p: MultiMatchPairing, selectedUserId: string, multiPoi
 }
 
 function result(p: MultiMatchPairing): string {
+  if (p.vp !== undefined) return '' + p.vp;
   if (p.ms) {
     return matchScoreDisplay(p.mp);
   }
