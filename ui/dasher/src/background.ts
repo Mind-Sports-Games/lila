@@ -36,7 +36,7 @@ export function ctrl(data: BackgroundData, trans: Trans, redraw: Redraw, close: 
   const announceFail = () => playstrategy.announce({ msg: 'Failed to save background preference' });
 
   const reloadAllTheThings = () => {
-    if (window.Highcharts) playstrategy.reload();
+    if ($('canvas').length) playstrategy.reload();
   };
 
   return {

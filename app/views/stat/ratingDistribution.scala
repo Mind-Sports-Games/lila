@@ -17,11 +17,13 @@ object ratingDistribution {
       moreCss = cssTag("user.rating.stats"),
       wrapClass = "full-screen-force",
       moreJs = frag(
-        jsTag("chart/ratingDistribution.js"),
+        jsModule("chart.ratingDistribution"),
         embedJsUnsafeLoadThen(s"""playstrategy.ratingDistributionChart(${safeJsonValue(
             Json.obj(
               "freq"     -> data,
-              "myRating" -> ctx.me.map(_.perfs(perfType).intRating),
+              "myRating" -> ctx.me.map(_.perfs(perfType)).filter(_.nb > 0).map { perf =>
+                Json.obj("rating" -> perf.intRating, "provisional" -> perf.provisional)
+              },
               "i18n"     -> i18nJsObject(i18nKeys)
             )
           )})""")
@@ -68,7 +70,7 @@ object ratingDistribution {
               trans.youDoNotHaveAnEstablishedPerfTypeRating(perfType.trans)
             )
           ),
-          div(id := "rating_distribution_chart")(spinner)
+          div(id := "rating_distribution_chart")(canvas)
         )
       )
     }

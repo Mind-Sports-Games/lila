@@ -192,7 +192,7 @@ object bits {
           "highlighted" -> (e.isNow || !e.countdown)
         )
       )(
-        if (e.isNow || !e.countdown) span(cls := "ribbon")(span("live")),
+        (e.isNow || !e.countdown).option(span(cls := "ribbon")(span("live"))),
         views.html.event.iconOf(e),
         span(cls := "content")(
           span(cls := "name")(e.title),

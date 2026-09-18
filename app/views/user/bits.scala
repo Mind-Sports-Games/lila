@@ -9,6 +9,19 @@ import lila.user.User
 
 object bits {
 
+  def ratingHistoryContainer(implicit lang: Lang) =
+    div(cls := "rating-history-container")(
+      div(cls := "time-selector-buttons")(
+        span(cls := "btn-rack focus-reset none")(
+          button(cls := "btn-rack__btn text", dataIcon := "L")(trans.reset())
+        ),
+        span(cls := "btn-rack")
+      ),
+      spinner,
+      div(cls := "chart-container")(canvas(cls := "rating-history")),
+      div(cls := "time-range-slider")
+    )
+
   def communityMenu(active: String)(implicit ctx: Context) =
     st.nav(cls := "page-menu__menu subnav")(
       a(cls := active.active("leaderboard"), href := routes.User.list)(trans.leaderboard()),

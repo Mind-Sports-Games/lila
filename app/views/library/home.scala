@@ -24,7 +24,7 @@ object home {
       moreCss = cssTag("library"),
       moreJs = frag(
         jsModule("library"),
-        jsTag("chart/library.js"),
+        jsModule("chart.library"),
         embedJsUnsafeLoadThen(s"""window.libraryChartData = ${safeJsonValue(
             Json.obj(
               "freq"         -> bits.transformData(monthlyGameData),
@@ -76,7 +76,7 @@ object home {
           })
         ),
         div(id := "library_chart_area")(
-          div(id := "library_chart")(spinner)
+          div(id := "library_chart")(canvas)
         ),
         div(cls := "library-stats-table")(
           div(cls := "library-stats-title color-choice")(

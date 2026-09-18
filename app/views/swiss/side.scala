@@ -70,11 +70,13 @@ object side {
                   s" (best of ${s.settings.nbGamesPerRound} games"
                 } else if (s.settings.isPlayX) {
                   s" (${s.settings.nbGamesPerRound} games per round"
-                },
-                if (s.settings.isMatchScore)
+                } else "",
+                s.settings.isMatchScore.option(
                   a(href := s"${routes.Swiss.home}#faqMatchScore")(" using match score")
-                else if (s.settings.isVictoryPoints)
-                  a(href := s"${routes.Swiss.home}#faqVictoryPoints")(" using victory points"),
+                ),
+                s.settings.isVictoryPoints.option(
+                  a(href := s"${routes.Swiss.home}#faqVictoryPoints")(" using victory points")
+                ),
                 if (s.settings.isBestOfX || s.settings.isPlayX) ")"
                 else ""
               ),

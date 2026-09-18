@@ -63,7 +63,7 @@ object home {
                   s" (best of ${s.settings.nbGamesPerRound} games"
                 } else if (s.settings.isPlayX) {
                   s" (${s.settings.nbGamesPerRound} games per round"
-                },
+                } else "",
                 if (s.settings.isMatchScore) " using match score"
                 else if (s.settings.isVictoryPoints) " using victory points"
                 else "",

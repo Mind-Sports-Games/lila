@@ -1260,11 +1260,8 @@ cg-container .cg-custom-svgs svg {
     pointer-events: none;
     z-index: z('cg__dice');
     dice {
-      @include breakpoint($mq-col1-uniboard) {
-        margin: 0vw 0.75vw;
-      }
       width: calc(100% * 15 * 7 / 600);
-      margin: 0vw 0.25vw;
+      margin: 0 1.5%;
       &.unavailable {
         opacity: 0.35;
       }

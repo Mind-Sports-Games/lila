@@ -104,7 +104,7 @@ object mini {
       )(
         playerUsername(pov.player, withRating = false),
         span(cls := "rating")(lila.game.Namer.ratingString(pov.player)),
-        if (pov.player.berserk) iconTag("`")
+        pov.player.berserk.option(iconTag("`"))
       ),
       span(cls := s"mini-game__score--${pov.playerIndex.name}")(
         if (!pov.game.finished) calculateScore(pov) else ""

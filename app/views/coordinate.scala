@@ -35,10 +35,9 @@ object coordinate {
         div(cls := "coord-trainer__side")(
           div(cls := "box")(
             h1(trans.coordinates.coordinates()),
-            if (ctx.isAuth)
-              scoreOption.map { score =>
-                div(cls := "scores")(scoreCharts(score))
-              }
+            scoreOption.filter(_ => ctx.isAuth).map { score =>
+              div(cls := "scores")(scoreCharts(score))
+            }
           ),
           form(cls := "playerIndex buttons", action := routes.Coordinate.playerIndex, method := "post")(
             st.group(cls := "radio")(
