@@ -15,15 +15,40 @@ object history {
   // every finished edition of a series plus the next scheduled one
   case class Summary(all: List[Tournament], next: Option[Tournament])
 
+  private val perVariant: Set[Freq] =
+    Set(Freq.Shield, Freq.Yearly, Freq.Weekly, Freq.GroupCycle, Freq.Wildcard)
+
+  def hasSeries(freq: Freq) = perVariant(freq)
+
+  def freqNav(current: Freq, variant: Option[Variant]) =
+    st.nav(cls := "page-menu__menu subnav")(
+      allFreqs.map { f =>
+        a(cls := current.name.active(f.name), href := url(f, variant))(nameOf(f))
+      }
+    )
+
+  def url(freq: Freq, variant: Option[Variant], page: Int = 1) =
+    variant.filter(_ => hasSeries(freq)).fold(routes.Tournament.history(freq.name, page).url) { v =>
+      lila.tournament.TournamentShield.Category
+        .byKey(v.key)
+        .filter(_ => freq == Freq.Shield)
+        .fold(routes.Tournament.historyVariant(freq.name, v.key, page).url)(c =>
+          routes.Tournament.categShields(c.key).url
+        )
+    }
+
   // filtered by variant, this is the one stable page for a recurring series ("Yearly Abalone")
   def apply(freq: Freq, variant: Option[Variant], pager: Paginator[Tournament], summary: Option[Summary] = None)(
       implicit ctx: Context
   ) = {
-    val variantKey = variant.map(_.key)
-    val heading    = variant.fold(s"${nameOf(freq)} tournaments") { v =>
+    val heading = variant.fold(s"${nameOf(freq)} tournaments") { v =>
       s"${nameOf(freq)} ${VariantKeys.variantName(v)} tournaments"
     }
-    val stats = summary.map(s => series.Stats(s.all.flatMap(t => t.winnerId.map(w => series.Win(w, t.startsAt, t.id)))))
+    val stats = summary.map { s =>
+      series.Stats(s.all.flatMap { t =>
+        t.winnerId.map(w => series.Win(w, t.startsAt, routes.Tournament.show(t.id).url))
+      })
+    }
     val wording = variant.map { v =>
       series.Wording(
         holderLabel = "Reigning champion",
@@ -38,50 +63,46 @@ object history {
       title = variant.fold("Tournament history")(_ => s"$heading — every edition and winner"),
       moreJs = infiniteScrollTag,
       moreCss = frag(cssTag("tournament.history"), summary.isDefined.option(cssTag("tournament.leaderboard"))),
-      canonicalPath = routes.Tournament.history(freq.name, 1, variantKey).url.some,
+      canonicalPath = url(freq, variant).some,
       openGraph = variant.map { v =>
         lila.app.ui.OpenGraph(
           title = s"$heading — every edition and winner",
-          url = s"$netBaseUrl${routes.Tournament.history(freq.name, 1, variantKey).url}",
+          url = s"$netBaseUrl${url(freq, variant)}",
           description = s"Every edition of the ${nameOf(freq)} ${VariantKeys.variantName(v)} arena on PlayStrategy, with its winner." +
             (stats zip wording).map { case (st, w) => series.description(st, w) }.getOrElse("")
         )
       }
     ) {
       main(cls := "page-menu arena-history")(
-        st.nav(cls := "page-menu__menu subnav")(
-          allFreqs.map { f =>
-            a(cls := freq.name.active(f.name), href := routes.Tournament.history(f.name, 1, variantKey))(
-              nameOf(f)
-            )
-          }
-        ),
+        freqNav(freq, variant),
         div(cls := "page-menu__content box")(
           h1(heading),
           // one link per game: the series page of that game for this frequency
-          div(cls := "arena-history__variants")(
-            a(cls := List("text" -> true, "active" -> variant.isEmpty), href := routes.Tournament.history(freq.name, 1, none))("All games"),
-            Variant.all.filterNot(_.fromPositionVariant).map { v =>
-              a(
-                cls      := List("text" -> true, "active" -> variant.contains(v)),
-                dataIcon := v.perfIcon,
-                href     := routes.Tournament.history(freq.name, 1, v.key.some)
-              )(VariantKeys.variantName(v))
-            }
+          hasSeries(freq).option(
+            div(cls := "series-links")(
+              a(cls := List("text" -> true, "active" -> variant.isEmpty), href := url(freq, none))("All games"),
+              Variant.all.filterNot(_.fromPositionVariant).map { v =>
+                a(
+                  cls      := List("text" -> true, "active" -> variant.contains(v)),
+                  dataIcon := v.perfIcon,
+                  href     := url(freq, v.some)
+                )(VariantKeys.variantName(v))
+              }
+            )
           ),
           variant.map { v =>
             p(cls := "arena-history__intro")(
               a(href := routes.Library.variant(v.key))(trans.playVariantOnlineFreeTitle(VariantKeys.variantName(v))),
               " · ",
-              a(href := routes.Tournament.history(freq.name, 1, none))(s"${nameOf(freq)} tournaments of every game")
+              a(href := url(freq, none))(s"${nameOf(freq)} tournaments of every game")
             )
           },
-          (stats zip wording zip variant zip summary).map { case (((st, w), v), sm) =>
+          (stats zip wording zip summary).map { case ((st, w), sm) =>
             frag(
               series.holderCard(
                 st,
-                sm.next,
-                span(cls := "categ-shield-holder__trophy categ-shield-holder__trophy--cup")(v.perfIcon.toString),
+                sm.next.map(t => series.Next(routes.Tournament.show(t.id).url, t.startsAt)),
+                emptyFrag,
                 w
               ),
               series.podium(st, w),
@@ -92,7 +113,7 @@ object history {
             table(cls := "slist slist-pad")(
               tbody(cls := "infinite-scroll")(
                 pager.currentPageResults map finishedList.apply,
-                pagerNextTable(pager, p => routes.Tournament.history(freq.name, p, variantKey).url)
+                pagerNextTable(pager, p => url(freq, variant, p))
               )
             )
           )

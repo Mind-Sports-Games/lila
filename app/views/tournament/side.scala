@@ -231,11 +231,13 @@ object side {
       val variantName = VariantKeys.variantName(tour.variant)
       val (seriesUrl, seriesLabel) =
         if (tour.isShield && TournamentShield.Category.byKey(tour.variant.key).isDefined)
-          routes.Tournament.categShields(tour.variant.key) -> s"$variantName Shield: Leaderboard"
+          routes.Tournament.categShields(tour.variant.key).url -> s"$variantName Shield: Leaderboard"
         else if (sched.freq == Schedule.Freq.Yearly)
-          routes.Tournament.history(sched.freq.name, 1, tour.variant.key.some) -> s"${sched.freq.display} $variantName: Leaderboard"
+          history.url(sched.freq, tour.variant.some) -> s"${sched.freq.display} $variantName: Leaderboard"
+        else if (history.hasSeries(sched.freq))
+          history.url(sched.freq, tour.variant.some) -> s"${sched.freq.display} $variantName: all editions"
         else
-          routes.Tournament.history(sched.freq.name, 1, tour.variant.key.some) -> s"${sched.freq.display} $variantName: all editions"
+          history.url(sched.freq, none) -> s"${sched.freq.display}: all editions"
       p(cls := "series-nav", dataIcon := "g")(a(href := seriesUrl)(seriesLabel))
     }
 }

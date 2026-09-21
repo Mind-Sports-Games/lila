@@ -1,3 +1,5 @@
+@import '../../common/css/component/series-links';
+
 $medley-list-width: 50ch;
 $user-list-width: 35ch;
 $narrow-user-list-width: 30ch;
@@ -187,10 +189,8 @@ $narrow-user-list-width: 30ch;
 }
 
 .one-medley-shield-trophy {
-  width: 12em;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 10px;
+  width: 8em;
+  margin: 0 auto 0.4em;
   display: block;
 }
 
@@ -266,12 +266,6 @@ main.tournament-categ-shields .box > h1 {
     color: #333;
     text-shadow: 0 0 6px #fff;
     filter: drop-shadow(0 0 10px $c-brag);
-  }
-
-  // a yearly champion gets the gold cup rather than the shield
-  &__trophy--cup {
-    background-image: img-url('trophy/Gold-Cup.png');
-    line-height: 96px;
   }
 
   &__label {

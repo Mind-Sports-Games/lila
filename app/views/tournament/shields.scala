@@ -95,7 +95,9 @@ object shields {
   def streaks(history: TournamentShield.History, upcoming: List[Tournament])(implicit ctx: Context) = {
     val bounties = history.sorted
       .flatMap { case (categ, awards) =>
-        val stats = series.Stats(awards.map(aw => series.Win(aw.owner.value, aw.date, aw.tourId)))
+        val stats = series.Stats(
+      awards.map(aw => series.Win(aw.owner.value, aw.date, routes.Tournament.show(aw.tourId).url))
+    )
         stats.currentReign.filter(_.count > 1).map { reign =>
           (categ, reign, upcoming.find(_.variant == categ.variant))
         }
@@ -177,8 +179,8 @@ object shields {
         )
         .some
     ) {
-      main(cls := "page-menu page-small tournament-categ-shields")(
-        views.html.user.bits.communityMenu("shield"),
+      main(cls := "page-menu page-small tournament-categ-shields arena-history")(
+        history.freqNav(lila.tournament.Schedule.Freq.Shield, categ.variant.some),
         div(cls := "page-menu__content box")(
           h1(
             a(href := routes.Tournament.shields, dataIcon := "I", cls := "text"),
@@ -192,11 +194,11 @@ object shields {
           ),
           series.holderCard(
             stats,
-            next,
+            next.map(t => series.Next(routes.Tournament.show(t.id).url, t.startsAt)),
             span(cls := "categ-shield-holder__trophy")(categ.iconChar.toString),
             wording
           ),
-          series.longestReign(stats, wording),
+          series.record(stats, wording),
           series.podium(stats, wording),
           h2(cls := "shield-section")("Roll of honour"),
           ol(cls := "shield-roll")(awards.map { aw =>
@@ -263,102 +265,78 @@ object shields {
       history: List[Either[Tournament, Swiss]]
   )(implicit
       ctx: Context
-  ) =
+  ) = {
+    def editionUrl(e: Either[Tournament, Swiss]) =
+      e.fold(arena => routes.Tournament.show(arena.id).url, swiss => routes.Swiss.show(swiss.id.value).url)
+    val name  = s"${medleyShield.name} Medley Shield"
+    val title = s"$name — tournament champions"
+    val stats = series.Stats(history.flatMap { e =>
+      e.fold(_.winnerId, _.winnerId).map(w => series.Win(w, e.fold(_.startsAt, _.startsAt), editionUrl(e)))
+    })
+    val wording = series.Wording(
+      holderLabel = "Current holder",
+      unit = "shield",
+      unitsName = s"$name shields",
+      arenaName = "medley shield",
+      takeLabel = "Take the shield"
+    )
     views.html.base.layout(
-      title = s"${medleyShield.name} Medley Shield",
-      moreCss = frag(cssTag("tournament.leaderboard"), cssTag("slist"))
+      title = title,
+      moreCss = frag(cssTag("tournament.leaderboard"), cssTag("slist")),
+      openGraph = lila.app.ui
+        .OpenGraph(
+          title = title,
+          url = s"$netBaseUrl${routes.Tournament.medleyShield(medleyShield.key).url}",
+          description = s"Every holder of the $name on PlayStrategy." + series.description(stats, wording)
+        )
+        .some
     ) {
-      main(cls := "page-menu page-small tournament-medley-shields")(
+      main(cls := "page-menu page-small tournament-medley-shields tournament-categ-shields")(
         views.html.user.bits.communityMenu("shield"),
         div(cls := "page-menu__content box")(
-          h1(
-            a(href := routes.Tournament.shields, dataIcon := "I", cls := "text"),
-            medleyShield.name,
-            " Medley Shield"
+          h1(a(href := routes.Tournament.shields, dataIcon := "I", cls := "text"), name),
+          p(cls := "tournament-categ-shields__intro")(
+            s"The $name is played across several variants of the same family; its winner holds the shield until the next edition."
           ),
-          div(cls := "page-medley-current")(
+          series.holderCard(
+            stats,
+            next.map(n => series.Next(editionUrl(n), n.fold(_.startsAt, _.startsAt))),
             img(
               cls := "one-medley-shield-trophy",
               src := staticAssetUrl(s"images/trophy/${medleyShield.key}.png")
             ),
-            history.headOption.map { latest =>
-              span(
-                a(
-                  href := latest.fold(
-                    arena => routes.Tournament.show(arena.id),
-                    swiss => routes.Swiss.show(swiss.id.value)
-                  )
-                )("Holder"),
-                br
-              )
-            },
-            history.headOption.map { latest =>
-              span(
-                userIdLink(
-                  userIdOption = latest.fold(_.winnerId, _.winnerId),
-                  cssClass = "reigning-shield-holder".some,
-                  withOnline = false
-                )
-              )
-            }
+            wording
           ),
-          h2("Next Tournament"),
-          next.map { next =>
-            a(
-              cls  := "next-tournament",
-              href := next.fold(
-                arena => routes.Tournament.show(arena.id),
-                swiss => routes.Swiss.show(swiss.id.value)
-              )
-            )(
-              h2(
-                s"${next.fold(_.name, _.name)} @ ",
-                absClientDateTime(next.fold(_.startsAt, _.startsAt))
-              )
-            )
-          },
-          h2("Current Tournament Format"),
-          h4(medleyShield.arenaFormatFull),
-          h2("Variants Used in this Medley"),
-          if (medleyShield.hasAllVariants) {
-            h4(
-              a(
-                cls  := "all-variants",
-                href := routes.Page.variantHome
-              )("All variants on PlayStrategy!")
-            )
-          } else {
+          series.record(stats, wording),
+          series.podium(stats, wording),
+          h2(cls := "shield-section")("Format"),
+          p(medleyShield.arenaFormatFull),
+          h2(cls := "shield-section")("Variants in this medley"),
+          if (medleyShield.hasAllVariants)
+            p(a(cls := "all-variants", href := routes.Page.variantHome)("All variants on PlayStrategy!"))
+          else
             div(cls := "medley-variants")(
               medleyShield.eligibleVariants.map { variant =>
                 section(
                   h2(
                     a(
                       cls      := "medley-variant",
-                      href     := routes.Page.variant(variant.key),
+                      href     := routes.Library.variant(variant.key),
                       dataIcon := variant.perfIcon
-                    )(
-                      span(cls := "medley-variant-name")(
-                        VariantKeys.variantName(variant)
-                      )
-                    )
+                    )(span(cls := "medley-variant-name")(VariantKeys.variantName(variant)))
                   )
                 )
               }
-            )
-          },
-          h2(cls := "shield-section")("Roll of Honour"),
+            ),
+          h2(cls := "shield-section")("Roll of honour"),
           ol(cls := "shield-roll")(history.map { aw =>
             li(
               userIdLink(aw.fold(_.winnerId, _.winnerId)),
-              a(
-                href := aw.fold(
-                  arena => routes.Tournament.show(arena.id),
-                  swiss => routes.Swiss.show(swiss.id.value)
-                )
-              )(showDate(aw.fold(_.startsAt, _.startsAt)))
+              a(href := editionUrl(aw))(showDate(aw.fold(_.startsAt, _.startsAt)))
             )
           })
         )
       )
     }
+  }
 }
