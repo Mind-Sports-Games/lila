@@ -52,6 +52,7 @@ object bits {
         div(
           tag(cls := "study-name")(s.study.name.value),
           span(
+            (s.study.isTrash && canUnfeature).option(frag(featureForm(s), " ")),
             (!s.study.isPublic).option(
               frag(
                 iconTag("a")(cls := "private", ariaTitle(trans.study.`private`.txt())),
@@ -89,6 +90,25 @@ object bits {
     streamers.nonEmpty.option(
       div(cls := "context-streamers none")(
         streamers map views.html.streamer.bits.contextual
+      )
+    )
+
+  def canUnfeature(implicit ctx: Context) = isGranted(_.StudyAdmin) || isGranted(_.Shadowban)
+
+  // mods: an unfeatured study wears its state, and the tag puts it back in the listings
+  private def featureForm(s: lila.study.Study.WithChaptersAndLiked) =
+    postForm(cls := "study-feature", action := routes.Study.feature(s.study.id.value))(
+      submitButton(title := "Feature again")("unfeatured")
+    )
+
+  // mods: take all of a user's studies out of the all/hot/popular/topic listings, or put them back
+  def featureOwnerForms(owner: lila.user.User) =
+    div(cls := "study-feature-owner")(
+      postForm(action := routes.Study.featureByOwner(owner.username, false))(
+        submitButton(cls := "button button-red button-empty confirm text", dataIcon := "q")("Unfeature all")
+      ),
+      postForm(action := routes.Study.featureByOwner(owner.username, true))(
+        submitButton(cls := "button button-empty text", dataIcon := "E")("Feature all")
       )
     )
 }

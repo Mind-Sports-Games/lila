@@ -141,37 +141,48 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
     }
   }
 
-  // every game's library and rules page, its puzzle trainer where it has one, plus the static hubs
-  val sitemap = Action {
-    if (!env.net.crawlable) NotFound
-    else sitemapXml
+  import scala.concurrent.duration.*
+  import lila.memo.CacheApi.*
+  // every game's library and rules page, its puzzle trainer where it has one, the static hubs,
+  // and the studies a crawler is allowed to see (Study.notable)
+  def sitemap = Action.async {
+    if (!env.net.crawlable) fuccess(NotFound)
+    else sitemapCache.getUnit map { Ok(_).as(XML).withHeaders(CACHE_CONTROL -> "max-age=86400") }
   }
 
-  private lazy val sitemapXml = {
-    val base     = env.net.baseUrl.value
-    val variants = strategygames.variant.Variant.all.filterNot(_.fromPositionVariant)
-    val paths    =
-      List(
-        "/",
-        routes.Library.home.url,
-        routes.Page.variantHome.url,
-        routes.Tournament.home.url,
-        routes.Swiss.home.url,
-        routes.Puzzle.base.url,
-        routes.Study.allDefault().url,
-        routes.Learn.index.url,
-        routes.Blog.index().url
-      ) :::
-        variants.map(v => routes.Library.variant(v.key).url) :::
-        variants.map(v => routes.Page.variant(v.key).url) :::
-        lila.puzzle.Puzzle.puzzleVariants.map(v => routes.Puzzle.home(v.key).url)
-    Ok(
-      s"""<?xml version="1.0" encoding="UTF-8"?>
+  private val sitemapCache = env.memo.cacheApi.unit[String] {
+    _.refreshAfterWrite(1.day)
+      .buildAsyncFuture { _ =>
+        val base     = env.net.baseUrl.value
+        val variants = strategygames.variant.Variant.all.filterNot(_.fromPositionVariant)
+        val paths    =
+          List(
+            "/",
+            routes.Library.home.url,
+            routes.Page.variantHome.url,
+            routes.Tournament.home.url,
+            routes.Swiss.home.url,
+            routes.Puzzle.base.url,
+            routes.Study.allDefault().url,
+            routes.Learn.index.url,
+            routes.Blog.index().url
+          ) :::
+            variants.map(v => routes.Library.variant(v.key).url) :::
+            variants.map(v => routes.Page.variant(v.key).url) :::
+            lila.puzzle.Puzzle.puzzleVariants.map(v => routes.Puzzle.home(v.key).url)
+        env.study.studyRepo.notableForSitemap(10000) map { studies =>
+          val urls =
+            paths.map(p => s"  <url><loc>$base$p</loc></url>") :::
+              studies.map { case (id, updatedAt) =>
+                s"  <url><loc>$base${routes.Study.show(id.value).url}</loc><lastmod>${updatedAt.toString("yyyy-MM-dd")}</lastmod></url>"
+              }
+          s"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${paths.map(p => s"  <url><loc>$base$p</loc></url>").mkString("\n")}
+${urls.mkString("\n")}
 </urlset>
 """
-    ).as(XML).withHeaders(CACHE_CONTROL -> "max-age=86400")
+        }
+      }
   }
 
   def manifest =

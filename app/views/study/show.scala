@@ -50,7 +50,7 @@ object show {
             )
           )}""")
       ),
-      robots = s.isPublic,
+      robots = s.isPublic && s.notable,
       chessground = false,
       zoomable = true,
       csp = defaultCsp.withWebAssembly.withPeer.some,

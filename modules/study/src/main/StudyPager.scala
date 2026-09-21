@@ -21,6 +21,7 @@ final class StudyPager(
     selectOwnerId,
     selectPrivateOrUnlisted,
     selectPublic,
+    selectPublicFeaturable,
     selectTopic
   }
 
@@ -35,7 +36,7 @@ final class StudyPager(
 
   def byOwner(owner: User, me: Option[User], order: Order, page: Int) =
     paginator(
-      selectOwnerId(owner.id) ++ accessSelect(me),
+      selectOwnerId(owner.id) ++ accessSelect(me, trash = true),
       me,
       order,
       page
@@ -75,7 +76,7 @@ final class StudyPager(
 
   def mineLikes(me: User, order: Order, page: Int) =
     paginator(
-      selectLiker(me.id) ++ accessSelect(me.some) ++ $doc("ownerId".$ne(me.id)),
+      selectLiker(me.id) ++ accessSelect(me.some, trash = true) ++ $doc("ownerId".$ne(me.id)),
       me.some,
       order,
       page
@@ -92,10 +93,12 @@ final class StudyPager(
     )
   }
 
-  private def accessSelect(me: Option[User]) =
-    me.fold(selectPublic) { u =>
-      $or(selectPublic, selectMemberId(u.id))
+  private def accessSelect(me: Option[User], trash: Boolean = false) = {
+    val public = if (trash) selectPublic else selectPublicFeaturable
+    me.fold(public) { u =>
+      $or(public, selectMemberId(u.id))
     }
+  }
 
   private def paginator(
       selector: Bdoc,
