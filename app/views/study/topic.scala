@@ -50,6 +50,7 @@ object topic {
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = topic.value,
+      robots = pag.currentPage == 1,
       moreCss = cssTag("study.index"),
       wrapClass = "full-screen-force",
       moreJs = infiniteScrollTag

@@ -65,13 +65,15 @@ final class Study(
 
   def byOwner(username: String, order: String, page: Int) =
     Open { implicit ctx =>
-      env.user.repo.named(username).flatMap {
-        _.fold(notFound(using ctx)) { owner =>
-          env.study.pager.byOwner(owner, ctx.me, Order(order), page) flatMap { pag =>
-            negotiate(
-              html = Ok(html.study.list.byOwner(pag, Order(order), owner)).fuccess,
-              api = _ => apiStudies(pag)
-            )
+      Reasonable(page) {
+        env.user.repo.named(username).flatMap {
+          _.fold(notFound(using ctx)) { owner =>
+            env.study.pager.byOwner(owner, ctx.me, Order(order), page) flatMap { pag =>
+              negotiate(
+                html = Ok(html.study.list.byOwner(pag, Order(order), owner)).fuccess,
+                api = _ => apiStudies(pag)
+              )
+            }
           }
         }
       }
@@ -133,13 +135,15 @@ final class Study(
 
   def byTopic(name: String, order: String, page: Int) =
     Open { implicit ctx =>
-      lila.study.StudyTopic.fromStr(name) match {
-        case None        => notFound
-        case Some(topic) =>
-          env.study.pager.byTopic(topic, ctx.me, Order(order), page) zip
-            ctx.me.so(u => env.study.topicApi.userTopics(u.id).dmap(some)) map { case (pag, topics) =>
-              Ok(html.study.topic.show(topic, pag, Order(order), topics))
-            }
+      Reasonable(page) {
+        lila.study.StudyTopic.fromStr(name) match {
+          case None        => notFound
+          case Some(topic) =>
+            env.study.pager.byTopic(topic, ctx.me, Order(order), page) zip
+              ctx.me.so(u => env.study.topicApi.userTopics(u.id).dmap(some)) map { case (pag, topics) =>
+                Ok(html.study.topic.show(topic, pag, Order(order), topics))
+              }
+        }
       }
     }
 
@@ -168,7 +172,8 @@ final class Study(
   private def showQuery(query: Fu[Option[WithChapter]])(implicit ctx: Context): Fu[Result] =
     OptionFuResult(query) { oldSc =>
       CanViewResult(oldSc.study) {
-        for {
+        if (!oldSc.study.notable && HTTPRequest.isCrawler(ctx.req)) notFound
+        else for {
           (sc, data) <- getJsonData(oldSc)
           res        <- negotiate(
             html = for {
@@ -287,14 +292,36 @@ final class Study(
         )
     }
 
+  private val CreateLimitPerUser = new lila.memo.RateLimit[lila.user.User.ID](
+    credits = 30 * 2,
+    duration = 24.hour,
+    key = "study.create.user"
+  )
+
+  private val CreateLimitPerIP = new lila.memo.RateLimit[IpAddress](
+    credits = 50 * 2,
+    duration = 24.hour,
+    key = "study.create.ip"
+  )
+
   private def createStudy(data: lila.study.StudyForm.importGame.Data, me: lila.user.User)(implicit
       ctx: Context
-  ) =
-    env.study.api.importGame(lila.study.StudyMaker.ImportGame(data), me) flatMap {
-      _.fold(notFound) { sc =>
-        Redirect(routes.Study.show(sc.study.id.value)).fuccess
-      }
-    }
+  ) = {
+    // adding a chapter to an existing study is free; a new study costs a normal user 2 credits
+    val cost =
+      if (data.as != lila.study.StudyForm.importGame.AsNewStudy) 0
+      else if (isGranted(_.Coach) || me.hasTitle) 1
+      else 2
+    CreateLimitPerUser(me.id, cost = cost) {
+      CreateLimitPerIP(HTTPRequest.ipAddress(ctx.req), cost = cost) {
+        env.study.api.importGame(lila.study.StudyMaker.ImportGame(data), me) flatMap {
+          _.fold(notFound) { sc =>
+            Redirect(routes.Study.show(sc.study.id.value)).fuccess
+          }
+        }
+      }(rateLimitedFu)
+    }(rateLimitedFu)
+  }
 
   def delete(id: String) =
     Auth { _ => me =>
@@ -337,6 +364,29 @@ final class Study(
     Secure(_.StudyAdmin) { _ => me =>
       env.study.api.adminInvite(id, me) inject Redirect(routes.Study.show(id))
     }
+
+  // featured = shown in the all/hot/popular/topic listings, served to crawlers and listed in the sitemap;
+  // an unfeatured study is still reachable by its URL
+  def feature(id: String) =
+    SecureF(canUnfeature) { implicit ctx => me =>
+      OptionFuResult(env.study.api.byId(id)) { study =>
+        env.study.studyRepo.feature(study.id) >>
+          env.mod.logApi.studyFeature(me.id, study.id.value, study.name.value) inject
+          Redirect(HTTPRequest.referer(ctx.req) | routes.Study.show(id).url)
+      }
+    }
+
+  def featureByOwner(username: String, v: Boolean) =
+    SecureF(canUnfeature) { implicit ctx => me =>
+      OptionFuResult(env.user.repo.named(username)) { owner =>
+        env.study.studyRepo.setTrashByOwner(owner.id, !v) flatMap { nb =>
+          env.mod.logApi.studyFeatureByOwner(me.id, owner.id, v, nb) inject
+            Redirect(routes.Study.byOwnerDefault(owner.username))
+        }
+      }
+    }
+
+  private def canUnfeature(u: lila.user.User) = isGranted(_.StudyAdmin, u) || isGranted(_.Shadowban, u)
 
   def embed(id: String, chapterId: String) =
     Action.async { implicit req =>

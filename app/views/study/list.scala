@@ -30,7 +30,8 @@ object list {
       order = order,
       pag = pag,
       searchFilter = s"owner:${owner.username}",
-      url = o => routes.Study.byOwner(owner.username, o)
+      url = o => routes.Study.byOwner(owner.username, o),
+      modActions = bits.canUnfeature.option(bits.featureOwnerForms(owner))
     )
 
   def mine(pag: Paginator[WithChaptersAndLiked], order: Order, me: User, topics: StudyTopics)(implicit
@@ -95,6 +96,7 @@ object list {
   def search(pag: Paginator[WithChaptersAndLiked], text: String)(implicit ctx: Context) =
     views.html.base.layout(
       title = text,
+      robots = pag.currentPage == 1,
       moreCss = cssTag("study.index"),
       wrapClass = "full-screen-force",
       moreJs = infiniteScrollTag
@@ -157,10 +159,13 @@ object list {
       pag: Paginator[WithChaptersAndLiked],
       url: String => Call,
       searchFilter: String,
-      topics: Option[StudyTopics] = None
+      topics: Option[StudyTopics] = None,
+      modActions: Option[Frag] = None
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = title,
+      // only the first page of a listing is worth indexing; the rest is a crawl path into every study
+      robots = pag.currentPage == 1,
       moreCss = cssTag("study.index"),
       wrapClass = "full-screen-force",
       moreJs = infiniteScrollTag
@@ -171,7 +176,8 @@ object list {
           div(cls := "box__top")(
             searchForm(title, s"$searchFilter${searchFilter.nonEmpty so " "}"),
             bits.orderSelect(order, active, url),
-            bits.newForm()
+            bits.newForm(),
+            modActions
           ),
           topics map { ts =>
             div(cls := "box__pad")(

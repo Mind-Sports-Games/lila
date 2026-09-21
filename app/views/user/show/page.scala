@@ -35,7 +35,7 @@ object page {
         cssTag("user.show"),
         isGranted(_.UserModView).option(cssTag("mod.user"))
       ),
-      robots = u.count.game >= 10
+      robots = u.crawlable
     ) {
       main(cls := "page-menu", dataUsername := u.username)(
         st.aside(cls := "page-menu__menu")(side(u, info.ranks, none)),
@@ -65,7 +65,7 @@ object page {
         (filters.current.name == "search").option(cssTag("user.show.search")),
         isGranted(_.UserModView).option(cssTag("mod.user"))
       ),
-      robots = u.count.game >= 10
+      robots = u.crawlable
     ) {
       main(cls := "page-menu", dataUsername := u.username)(
         st.aside(cls := "page-menu__menu")(side(u, info.ranks, none)),

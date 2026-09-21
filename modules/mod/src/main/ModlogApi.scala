@@ -152,6 +152,21 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
       )
     }
 
+  def studyFeature(mod: User.ID, id: String, name: String) =
+    add {
+      Modlog(mod, none, Modlog.studyFeature, details = s"$id / $name".take(200).some)
+    }
+
+  def studyFeatureByOwner(mod: User.ID, owner: User.ID, v: Boolean, nb: Int) =
+    add {
+      Modlog(
+        mod,
+        owner.some,
+        if (v) Modlog.studyFeature else Modlog.studyUnfeature,
+        details = s"all $nb studies".some
+      )
+    }
+
   def deleteTeam(mod: User.ID, id: String, name: String) =
     add {
       Modlog(mod, none, Modlog.deleteTeam, details = s"$id / $name".take(200).some)
@@ -280,6 +295,7 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
       case M.alt | M.engine | M.booster | M.troll | M.closeAccount          => "thorhammer"
       case M.unalt | M.unengine | M.unbooster | M.untroll | M.reopenAccount => "large_blue_circle"
       case M.deletePost | M.deleteTeam | M.terminateTournament              => "x"
+      case M.studyUnfeature                                                 => "x"
       case M.chatTimeout                                                    => "hourglass_flowing_sand"
       case M.closeTopic | M.disableTeam                                     => "lock"
       case M.openTopic | M.enableTeam                                       => "unlock"

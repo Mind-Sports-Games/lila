@@ -56,7 +56,8 @@ object bits {
     views.html.base.layout(
       title = title,
       moreCss = cssTag("relation"),
-      moreJs = infiniteScrollTag
+      moreJs = infiniteScrollTag,
+      robots = false
     ) {
       main(cls := "box page-small")(content)
     }
