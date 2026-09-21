@@ -5,13 +5,14 @@ import org.joda.time.DateTime
 import lila.api.Context
 import lila.app.templating.Environment.*
 import lila.app.ui.ScalatagsTemplate.*
-import lila.tournament.Tournament
 
 // A recurring series with one winner per edition — a game's shield, its yearly arena.
 // Everything here derives from the list of editions, newest first.
 object series {
 
-  case class Win(userId: String, date: DateTime, tourId: String)
+  case class Win(userId: String, date: DateTime, url: String)
+
+  case class Next(url: String, startsAt: DateTime)
 
   case class Wording(
       holderLabel: String, // "Current holder", "Reigning champion"
@@ -79,7 +80,7 @@ object series {
       stats.current.so(h => s" ${w.holderLabel}: ${usernameOrId(h.userId)} since ${showDate(h.date)}.")
   }
 
-  def holderCard(stats: Stats, next: Option[Tournament], trophy: Frag, w: Wording)(implicit
+  def holderCard(stats: Stats, next: Option[Next], trophy: Frag, w: Wording)(implicit
       ctx: Context
   ): Frag =
     div(cls := "categ-shield-holder")(
@@ -90,7 +91,7 @@ object series {
           userIdLink(holder.userId.some, cssClass = "reigning-shield-holder".some, withOnline = false),
           span(cls := "categ-shield-holder__since")(
             "since ",
-            a(href := routes.Tournament.show(holder.tourId))(showDate(holder.date)),
+            a(href := holder.url)(showDate(holder.date)),
             stats.currentReign.filter(r => w.contested && r.count > 1).map(r => frag(" · ", r.count, " in a row"))
           )
         )
@@ -122,7 +123,7 @@ object series {
         }
       },
       next.map { t =>
-        a(cls := "button categ-shield-holder__next", href := routes.Tournament.show(t.id))(
+        a(cls := "button categ-shield-holder__next", href := t.url)(
           s"${if (w.contested) w.takeLabel else s"Next ${w.arenaName}"} · ",
           absClientDateTime(t.startsAt)
         )
@@ -137,8 +138,26 @@ object series {
       case names                     => names.mkString
     }
 
-  def longestReign(stats: Stats, w: Wording)(implicit ctx: Context): Option[Frag] =
-    stats.longestReigns.headOption.map { first =>
+  def record(stats: Stats, w: Wording)(implicit ctx: Context): Option[Frag] =
+    longestReign(stats, w) orElse mostWins(stats, w)
+
+  private def mostWins(stats: Stats, w: Wording)(implicit ctx: Context): Option[Frag] =
+    stats.tally.headOption.map(_._2).filter(_ > 1).map { max =>
+      val holders = stats.tally.filter(_._2 == max).map(_._1)
+      div(cls := "shield-record")(
+        span(cls := "shield-record__label")(
+          if (holders.sizeIs > 1) s"Most ${w.units}, shared" else s"Most ${w.units}",
+          " — ",
+          max
+        ),
+        ul(cls := "shield-record__list")(
+          holders.map(userId => li(span(cls := "shield-record__value")(userIdLink(userId.some, withOnline = false))))
+        )
+      )
+    }
+
+  private def longestReign(stats: Stats, w: Wording)(implicit ctx: Context): Option[Frag] =
+    stats.longestReigns.headOption.filter(_.count >= 3).map { first =>
       div(cls := "shield-record")(
         span(cls := "shield-record__label")(
           if (stats.longestReigns.sizeIs > 1) "Longest reign, shared" else "Longest reign",

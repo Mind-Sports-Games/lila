@@ -608,21 +608,38 @@ final class Tournament(
       }
     }
 
-  def history(freq: String, page: Int, variant: Option[String]) =
+  def history(freq: String, page: Int) =
     Open { implicit ctx =>
-      lila.tournament.Schedule.Freq(freq) so { fr =>
-        val v = variant.flatMap(key => Variant.all.find(_.key == key))
-        for {
-          pager <- api.history(fr, page, v)
-          // a yearly series is small enough to summarise in full: champion, podium, reigns
-          summary <- v.filter(_ => fr == lila.tournament.Schedule.Freq.Yearly).so { variant =>
-            repo.finishedSeries(fr, variant) zip repo.nextScheduled(fr, variant) map { case (all, next) =>
-              html.tournament.history.Summary(all, next).some
-            }
-          }
-          _ <- env.user.lightUserApi preloadMany (pager.currentPageResults.toList ::: summary.so(_.all)).flatMap(_.winnerId)
-        } yield Ok(html.tournament.history(fr, v, pager, summary))
+      renderHistory(freq, page, none)
+    }
+
+  def historyVariant(freq: String, variant: String, page: Int) =
+    Open { implicit ctx =>
+      Variant.all.find(_.key.toLowerCase == variant.toLowerCase) match {
+        case None                        => notFound
+        case Some(v) if v.key != variant =>
+          MovedPermanently(routes.Tournament.historyVariant(freq, v.key, page).url).fuccess
+        case Some(_) if !lila.tournament.Schedule.Freq(freq).exists(html.tournament.history.hasSeries) =>
+          MovedPermanently(routes.Tournament.history(freq, page).url).fuccess
+        case Some(v)
+            if lila.tournament.Schedule.Freq(freq).contains(lila.tournament.Schedule.Freq.Shield) &&
+              lila.tournament.TournamentShield.Category.byKey(v.key).isDefined =>
+          MovedPermanently(routes.Tournament.categShields(v.key).url).fuccess
+        case Some(v) => renderHistory(freq, page, v.some)
       }
+    }
+
+  private def renderHistory(freq: String, page: Int, v: Option[Variant])(implicit ctx: Context) =
+    lila.tournament.Schedule.Freq(freq) so { fr =>
+      for {
+        pager <- api.history(fr, page, v)
+        summary <- v.filter(_ => fr == lila.tournament.Schedule.Freq.Yearly).so { variant =>
+          repo.finishedSeries(fr, variant) zip repo.nextScheduled(fr, variant) map { case (all, next) =>
+            html.tournament.history.Summary(all, next).some
+          }
+        }
+        _ <- env.user.lightUserApi preloadMany (pager.currentPageResults.toList ::: summary.so(_.all)).flatMap(_.winnerId)
+      } yield Ok(html.tournament.history(fr, v, pager, summary))
     }
 
   def edit(id: String) =

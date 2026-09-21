@@ -195,7 +195,7 @@ object show {
       ),
       p(
         (List(Freq.Yearly, Freq.Weekly).map { freq =>
-          a(href := routes.Tournament.history(freq.name, 1, variant.key.some))(
+          a(href := views.html.tournament.history.url(freq, variant.some))(
             s"${freq.display} ${VariantKeys.variantName(variant)}"
           )
         } ::: lila.tournament.TournamentShield.Category.byKey(variant.key).toList.map { categ =>

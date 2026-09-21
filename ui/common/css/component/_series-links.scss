@@ -1,0 +1,26 @@
+// one chip per game or per frequency, linking the series pages of a game
+.series-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 0.6em;
+  margin: 0 var(--box-padding) 1em;
+
+  a {
+    padding: 0.25em 0.7em;
+    border: 1px solid $c-border;
+    border-radius: 999px;
+    color: $c-font;
+    white-space: nowrap;
+
+    &:hover {
+      border-color: $c-font-dim;
+      color: $c-link;
+    }
+
+    &.active {
+      background: $c-accent;
+      border-color: $c-accent;
+      color: $c-accent-over;
+    }
+  }
+}
