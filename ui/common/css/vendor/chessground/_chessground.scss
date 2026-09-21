@@ -97,8 +97,7 @@ span.mini-game.variant-togyzkumalak.is2d {
   height: calc(100% / 10);
 }
 
-.variant-minixiangqi square,
-.variant-entropy square {
+.variant-minixiangqi square {
   width: calc(100% / 7);
   height: calc(100% / 7);
 }
@@ -626,8 +625,7 @@ square {
   height: calc(100% / 10);
 }
 
-.variant-minixiangqi piece,
-.variant-entropy piece {
+.variant-minixiangqi piece {
   width: calc(100% / 7);
   height: calc(100% / 7);
 }
@@ -825,8 +823,7 @@ piece {
   padding-bottom: calc(100% / 10);
 }
 
-.variant-minixiangqi cg-helper,
-.variant-entropy cg-helper {
+.variant-minixiangqi cg-helper {
   width: calc(100% / 7);
   padding-bottom: calc(100% / 7);
 }
@@ -916,8 +913,7 @@ cg-helper {
   height: calc(101% * 11);
 }
 
-.variant-minixiangqi cg-container,
-.variant-entropy cg-container {
+.variant-minixiangqi cg-container {
   width: calc(100% * 7);
   height: calc(100% * 7);
 }
@@ -1517,3 +1513,4 @@ cg-container .cg-custom-svgs svg {
 }
 
 @import 'abalone';
+@import 'entropy';

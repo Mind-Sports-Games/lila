@@ -1,0 +1,48 @@
+// A dest is drawn as the ring inside an entropy counter, so an empty square previews the outline of
+// the counter that will land on it. The counter svg draws that ring at r=30 with stroke-width=2 on a
+// 100-unit viewBox, reaching 31% of the square out from its centre, which is where insetting a
+// circle by 19% on every side puts its outer edge.
+$entropy-dest-ring-inset: 19%;
+// A bordered circle rather than radial-gradient stops: a gradient stop is a hard cut that the
+// browser does not antialias, and the ring is only a pixel or two across, so the stair-stepping is
+// the whole ring. cqw measures the board, not the square, and a square is a seventh of the board,
+// so the counter's own stroke-width=2 of a 100-unit viewBox is 2/7 cqw: the preview is drawn at
+// exactly the weight of the ring it previews.
+$entropy-dest-ring-width: 0.286cqw;
+// Neutral rather than the green of the other game families, so the ring reads as an outline of a
+// counter yet to be placed rather than as a highlight with a playerIndex of its own.
+$entropy-dest-ring: rgba(0, 0, 0, 0.45);
+
+.variant-entropy {
+  cg-container {
+    width: calc(100% * 7);
+    height: calc(100% * 7);
+  }
+
+  cg-helper {
+    width: calc(100% / 7);
+    padding-bottom: calc(100% / 7);
+  }
+
+  piece {
+    width: calc(100% / 7);
+    height: calc(100% / 7);
+  }
+
+  square {
+    width: calc(100% / 7);
+    height: calc(100% / 7);
+
+    &.move-dest {
+      background: none;
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: $entropy-dest-ring-inset;
+        border: $entropy-dest-ring-width solid $entropy-dest-ring;
+        border-radius: 50%;
+      }
+    }
+  }
+}

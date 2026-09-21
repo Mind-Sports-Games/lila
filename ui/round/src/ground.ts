@@ -202,6 +202,15 @@ export function makeConfig(ctrl: RoundController): Config {
   if (data.game.variant.key === 'dameo' && turnPlayerIndex === data.player.playerIndex) {
     return { ...config, selected: dameoStratUtils.activePiecePosition(step.fen) };
   }
+  if (variantKey === 'entropy' && playing && turnPlayerIndex === data.player.playerIndex) {
+    const role = stratUtils.entropy.isChaosTurn(step.fen) && stratUtils.entropy.counterInPocket(step.fen);
+    if (role)
+      return {
+        ...config,
+        onlyDropsVariant: true,
+        dropmode: { ...config.dropmode, active: true, piece: { playerIndex: turnPlayerIndex, role } },
+      };
+  }
   return config;
 }
 

@@ -1011,6 +1011,7 @@ export default class RoundController {
     } else if (this.clock) this.clock.setClock(d, d.clock!.p1, d.clock!.p2, d.clock!.p1Pending, d.clock!.p2Pending);
     if (this.corresClock) this.corresClock.update(d.correspondence.p1, d.correspondence.p2);
     if (!this.replaying()) ground.reload(this);
+    this.doForcedActions();
     this.setTitle();
     this.moveOn.next();
     this.setQuietMode();

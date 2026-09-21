@@ -13,7 +13,7 @@ importers:
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/e391b56a82b7c71e7663082a797f6fc21b18776d
       chessground:
         specifier: github:Mind-Sports-Games/chessground#pla-1709-add-entropy-lila-supporting-repos
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/ed48f91e01385d3caf4e06630f366e24715c6fb6
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/3674b007ca32747e87d995c5dc96d56a349d55fd
       stratops:
         specifier: github:Mind-Sports-Games/stratops#pla-1709-add-entropy-lila-supporting-repos
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/68d7a9b283eb7f1961a219f7f11654d5515ea896
@@ -862,8 +862,8 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/ed48f91e01385d3caf4e06630f366e24715c6fb6:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/ed48f91e01385d3caf4e06630f366e24715c6fb6}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/3674b007ca32747e87d995c5dc96d56a349d55fd:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/3674b007ca32747e87d995c5dc96d56a349d55fd}
     version: 7.11.1-pstrat3.39
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1806,7 +1806,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/ed48f91e01385d3caf4e06630f366e24715c6fb6: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/3674b007ca32747e87d995c5dc96d56a349d55fd: {}
 
   chokidar@3.6.0:
     dependencies:
