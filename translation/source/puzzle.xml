@@ -95,4 +95,6 @@ In rare cases, a puzzle might have been incorrectly added to our database where 
   <string name="futurePuzzlePlans">What are the future plans for puzzles?</string>
   <string name="futurePuzzlePlansANS">We plan to add more variants matching the mate-in-1 style. Then we aim to add additional themes for our variants, using Stockfish and engines to help us evaluate "good" puzzles.</string>
   <string name="side">Side</string>
+  <string name="noPuzzlesYet">No %s puzzles yet</string>
+  <string name="noPuzzlesYetDescription">We have not generated puzzles for this game and theme yet. Try another game, or come back later.</string>
 </resources>
