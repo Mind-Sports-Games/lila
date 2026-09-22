@@ -195,7 +195,18 @@ final class Study(
               chat      <- chatOf(sc.study)
               sVersion  <- env.study.version(sc.study.id)
               streamers <- streamersOf(sc.study)
-            } yield EnableSharedArrayBuffer(Ok(html.study.show(sc.study, data, chat, sVersion, streamers))),
+            } yield EnableSharedArrayBuffer(
+              Ok(
+                html.study.show(
+                  sc.study,
+                  data,
+                  chat,
+                  sVersion,
+                  streamers,
+                  sc.chapter.setup.variant.gameFamily.key.some
+                )
+              )
+            ),
             api = _ =>
               chatOf(sc.study).map { chatOpt =>
                 Ok(

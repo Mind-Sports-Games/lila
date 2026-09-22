@@ -24,6 +24,17 @@ export const hashedAssetUrl = (path: string, opts: AssetUrlOpts = {}) => {
   return baseUrl + '/assets' + '/' + path;
 };
 
+// zxcvbn is 387KB of word lists: load it when the field is focused, not when the page is
+export const lazyPasswordComplexity = (id: string) => {
+  const field = document.getElementById(id);
+  if (!field) return;
+  field.addEventListener(
+    'focus',
+    () => loadModule('passwordComplexity').then(() => window.PlayStrategyPassword.addPasswordChangeListener(id)),
+    { once: true },
+  );
+};
+
 const loadedCss = new Map<string, true>();
 
 // still used to load external libs css (hopscotch, shepherd)

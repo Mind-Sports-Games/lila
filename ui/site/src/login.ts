@@ -76,9 +76,7 @@ function signupStart() {
     if (form.reportValidity()) form.submit();
   };
 
-  playstrategy
-    .loadModule('passwordComplexity')
-    .then(() => window.PlayStrategyPassword.addPasswordChangeListener('form3-password'));
+  playstrategy.lazyPasswordComplexity('form3-password');
 }
 
 (window as any).PlayStrategyLogin = {

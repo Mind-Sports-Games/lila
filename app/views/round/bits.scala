@@ -24,6 +24,7 @@ object bits {
     views.html.base.layout(
       title = title,
       openGraph = openGraph,
+      boardFamily = variant.gameFamily.key.some,
       moreJs = moreJs,
       moreCss = frag(
         cssTag {

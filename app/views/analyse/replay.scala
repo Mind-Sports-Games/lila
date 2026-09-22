@@ -92,6 +92,7 @@ object replay {
 
     bits.layout(
       title = titleOf(pov),
+      boardFamily = pov.game.variant.gameFamily.key.some,
       moreCss = frag(
         cssTag("analyse.round"),
         pov.game.variant.hasDetachedPocket.option(

@@ -40,6 +40,7 @@ object userAnalysis {
       else routes.UserAnalysis.parseArg(variant.key).url
     views.html.base.layout(
       title = views.html.library.bits.analysisTitle(variant),
+      boardFamily = variant.gameFamily.key.some,
       moreCss = frag(
         cssTag("analyse.free"),
         pov.game.variant.hasDetachedPocket.option(
