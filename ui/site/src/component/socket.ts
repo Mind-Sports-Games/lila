@@ -98,7 +98,11 @@ export default class StrongSocket {
     };
     this.version = version;
     this.pubsub.on('socket.send', this.send);
-    window.addEventListener('unload', this.destroy);
+    // not 'unload': Chrome refuses it, and it would keep the page out of the back/forward cache.
+    // A pagehide with persisted=true is that cache, where the socket must survive.
+    window.addEventListener('pagehide', e => {
+      if (!e.persisted) this.destroy();
+    });
     this.connect();
   }
 
