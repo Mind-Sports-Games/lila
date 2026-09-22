@@ -29,30 +29,41 @@ object layout {
       raw {
         s"""<meta name="theme-color" content="${ctx.pref.themeColor}">"""
       }
-    def pieceSprite(implicit ctx: Context): Frag = {
-      ctx.currentPieceSet.map(ps => pieceSprite(ps))
-    }
-    def pieceSprite(ps: lila.pref.PieceSet): Frag =
+    // One stylesheet per game family, and only the family on the board is worth blocking the
+    // first paint for. The rest carry media="print": the browser fetches them without waiting,
+    // and lazyPieceScript below hands each one back to every medium once it has arrived.
+    def pieceSprite(boardFamily: Option[String])(implicit ctx: Context): Frag =
+      ctx.currentPieceSet.map(ps => pieceSprite(ps, boardFamily.contains(ps.gameFamilyName)))
+
+    def pieceSprite(ps: lila.pref.PieceSet, blocking: Boolean = true): Frag =
       link(
         id   := s"piece-sprite-${ps.gameFamilyName}",
         href := staticAssetUrl(s"piece-css/${ps.gameFamilyName}-${ps.name}.css"),
-        rel  := "stylesheet"
+        rel  := "stylesheet",
+        (!blocking).option(cls := "lazy-piece"),
+        (!blocking).option(attr("media") := "print")
+      )
+
+    // CSP has no unsafe-inline, so an onload attribute on the link would be blocked: the
+    // promotion runs from one nonced script placed straight after the links instead
+    def lazyPieceScript(nonce: Nonce) =
+      embedJsUnsafe(
+        """document.querySelectorAll('link.lazy-piece').forEach(function(l){""" +
+          """if(l.sheet)l.media='all';""" +
+          """else l.addEventListener('load',function(){l.media='all'},{once:true})});""",
+        nonce
       )
   }
   import bits.*
 
   private val noTranslate                        = raw("""<meta name="google" content="notranslate">""")
-  private def fontPreload(implicit ctx: Context) =
+  // one face, one preload: the @font-face below lists playstrategy.woff2 first and the browser
+  // never reaches the .chess entries, so preloading them only cost a high-priority request
+  private val fontPreload =
     raw {
       s"""<link rel="preload" href="${assetUrl(
           s"font/playstrategy.woff2"
-        )}" as="font" type="font/woff2" crossorigin>""" + (
-        if (!ctx.pref.pieceNotationIsLetter)
-          s"""<link rel="preload" href="${assetUrl(
-              s"font/playstrategy.chess.woff2"
-            )}" as="font" type="font/woff2" crossorigin>"""
-        else ""
-      )
+        )}" as="font" type="font/woff2" crossorigin>"""
     }
   private val manifests = raw(
     """<link rel="manifest" href="/manifest.json"><meta name="twitter:site" content="@playstrategy">"""
@@ -199,9 +210,7 @@ object layout {
         font-display: block;
         src:
           url('${assetUrl("font/playstrategy.woff2")}') format('woff2'),
-          url('${assetUrl("font/playstrategy.woff")}') format('woff'),
-          url('${assetUrl("font/playstrategy.chess.woff")}') format('woff'),
-          url('${assetUrl("font/playstrategy.chess.woff2")}') format('woff2');
+          url('${assetUrl("font/playstrategy.woff")}') format('woff');
       }</style>"""
   )
 
@@ -217,7 +226,9 @@ object layout {
       zoomable: Boolean = false,
       csp: Option[ContentSecurityPolicy] = None,
       wrapClass: String = "",
-      canonicalPath: Option[String] = None
+      canonicalPath: Option[String] = None,
+      // the game family this page draws a board for, if any: its pieces block the paint, the rest do not
+      boardFamily: Option[String] = None
   )(body: Frag)(implicit ctx: Context): Frag = {
     updateManifest()
 
@@ -241,7 +252,8 @@ object layout {
           ctx.userContext.impersonatedBy.isDefined.option(cssTagNoTheme("mod.impersonate")),
           ctx.blind.option(cssTagNoTheme("blind")),
           moreCss,
-          pieceSprite,
+          pieceSprite(boardFamily),
+          ctx.nonce map lazyPieceScript,
           meta(
             content := openGraph.fold(trans.playstrategySiteDescription.txt())(o => o.description),
             name    := "description"

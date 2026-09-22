@@ -20,6 +20,7 @@ object editor {
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = trans.boardEditorTitle.txt(),
+      boardFamily = variant.gameFamily.key.some,
       moreJs = frag(
         jsModule("editor"),
         embedJsUnsafeLoadThen(

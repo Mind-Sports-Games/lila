@@ -14,10 +14,12 @@ object show {
       data: lila.study.JsonView.JsData,
       chatOption: Option[lila.chat.UserChat.Mine],
       socketVersion: lila.socket.Socket.SocketVersion,
-      streamers: List[lila.user.User.ID]
+      streamers: List[lila.user.User.ID],
+      boardFamily: Option[String] = None
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s.name.value,
+      boardFamily = boardFamily,
       moreCss = cssTag("analyse.study"),
       moreJs = frag(
         analyseTag,

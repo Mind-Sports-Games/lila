@@ -1,17 +1,1 @@
-<svg width="321" height="2046" viewBox="0 0 321 2046" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- 5 checkers, all circles, evenly spaced with equal gap at bottom, shading arc fully inside on bottom right edge -->
-  <!-- Parameters: r=144.5, gap=16px, bottom gap=16px, centers: 1885.5, 1580.5, 1275.5, 970.5, 665.5 -->
-  <g>
-    <!-- Checker 1 (bottom) -->
-	<circle cx="160.5" cy="1885.5" r="144.5" fill="#241612" opacity="0.98"/>
-    <circle cx="164.5" cy="1889.5" r="140.5" fill="#6C362A" opacity="0.98"/>
-	<path
-      d="M301 1881.5
-         A144.5 144.5 0 0 1 160.5 2026"
-      stroke="#855040"
-      stroke-width="8"
-      fill="none"
-      opacity="0.6"
-    />
-  </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="321" height="2046" fill="none" viewBox="0 0 321 2046"><circle cx="160.5" cy="1885.5" r="144.5" fill="#241612" opacity=".98"/><circle cx="164.5" cy="1889.5" r="140.5" fill="#6C362A" opacity=".98"/><path stroke="#855040" stroke-width="8" d="M301 1881.5A144.5 144.5 0 0 1 160.5 2026" opacity=".6"/></svg>

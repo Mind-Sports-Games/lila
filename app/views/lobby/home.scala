@@ -20,7 +20,7 @@ object home {
 
     val chatJson = chatOption map { chat =>
       views.html.chat.json(
-        chat.chat.getlast(250),
+        chat.chat.getlast(40),
         name = trans.chatRoom.txt(),
         timeout = chat.timeout,
         public = true,
