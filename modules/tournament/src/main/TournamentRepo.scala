@@ -532,6 +532,22 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .cursor[Tournament]()
       .list(max)
 
+  // the editions a team ran: its own account created them, or they are listed for it
+  def finishedSeriesOfTeam(
+      teamId: TeamID,
+      freq: Schedule.Freq,
+      variant: Variant,
+      max: Int = 100
+  ): Fu[List[Tournament]] =
+    coll
+      .find(
+        finishedSelect ++ $doc("schedule.freq" -> freq.name) ++ libSelect(variant.gameLogic) ++
+          variantSelect(variant) ++ $or($doc("createdBy" -> teamId), forTeamSelect(teamId))
+      )
+      .sort($sort.desc("startsAt"))
+      .cursor[Tournament]()
+      .list(max)
+
   def nextByTrophy(trophy: String): Fu[Option[Tournament]] =
     coll
       .find($doc("trophy1st" -> trophy, "winner".$exists(false)))

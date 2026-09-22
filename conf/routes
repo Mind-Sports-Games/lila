@@ -179,6 +179,8 @@ POST  /study/by/:username/feature/:v   controllers.Study.featureByOwner(username
 GET   /study/topic                     controllers.Study.topics
 POST  /study/topic                     controllers.Study.setTopics
 GET   /study/topic/:topic/:order       controllers.Study.byTopic(topic: String, order: String, page: Int ?= 1)
+GET   /study/variant/:key              controllers.Study.byVariantDefault(key: String, page: Int ?= 1)
+GET   /study/variant/:key/:order       controllers.Study.byVariant(key: String, order: String, page: Int ?= 1)
 GET   /study/topic/autocomplete        controllers.Study.topicAutocomplete
 GET   /study/glyphs/:lang.json         controllers.Study.glyphs(lang)
 

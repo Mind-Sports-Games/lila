@@ -17,7 +17,6 @@ import play.api.i18n.Lang
 import strategygames.variant.Variant
 import strategygames.Speed
 
-import lila.tournament.Schedule.Freq
 
 object show {
 
@@ -28,7 +27,9 @@ object show {
       leaderboard: List[User.LightPerf],
       tours: List[Tournament],
       featuredGame: Option[Game] = None,
-      dailyPuzzle: Option[DailyPuzzle.WithHtml] = None
+      dailyPuzzle: Option[DailyPuzzle.WithHtml] = None,
+      studies: List[lila.study.Study.Notable] = Nil,
+      grandPrix: List[bits.GrandPrixEdition] = Nil
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = bits.pageTitle(variant),
@@ -110,12 +111,6 @@ object show {
             )
           )
         ),
-        p(cls := "library-intro")(
-          trans.playVariantOnlineFree(bits.nameWithAlias(variant)),
-          " ",
-          VariantKeys.variantTitle(variant),
-          "."
-        ),
         div(cls := "start")(
           a(
             href := s"/?variant=${variant.key}#game",
@@ -126,30 +121,38 @@ object show {
             trans.createAGame()
           )
         ),
-        dailyPuzzle map { p =>
-          div(cls := "library__puzzle")(
-            div(cls := "color-choice title")(
-              div(dataIcon := "-"),
-              h2(trans.dailyPuzzle()),
-              div(" ")
-            ),
-            views.html.puzzle.embed.dailyLink(p)(using ctx.lang)
+        // the live row keeps its two slots: puzzle left, featured game right (centred when alone)
+        (dailyPuzzle.isDefined || featuredGame.isDefined).option(
+          div(cls := "library__live")(
+            dailyPuzzle map { p =>
+              div(cls := "library__puzzle")(
+                div(cls := "color-choice title")(
+                  div(dataIcon := "-"),
+                  h2(trans.dailyPuzzle()),
+                  div(" ")
+                ),
+                views.html.puzzle.embed.dailyLink(p)(using ctx.lang)
+              )
+            },
+            featuredGame map { g =>
+              div(cls := List("library__tv" -> true, "library__tv--centered" -> dailyPuzzle.isEmpty))(
+                div(cls := "color-choice title")(
+                  div(dataIcon := "1"),
+                  h2(trans.featuredGame()),
+                  div(" ")
+                ),
+                views.html.game.mini(Pov.naturalOrientation(g), tv = false)
+              )
+            }
           )
-        },
-        featuredGame map { g =>
-          div(cls := List("library__tv" -> true, "library__tv--centered" -> dailyPuzzle.isEmpty))(
-            div(cls := "color-choice title")(
-              div(dataIcon := "1"),
-              h2(trans.featuredGame()),
-              div(" ")
-            ),
-            views.html.game.mini(Pov.naturalOrientation(g), tv = false)
-          )
-        },
-        tours.nonEmpty.option(tournamentList(tours)),
-        recurringSeries(variant),
-        bits.msoEvent(variant).map(msoEvent(variant, _)),
-        leaderboard.nonEmpty.option(userTopPerf(leaderboard, PerfType(variant, Speed.Blitz))),
+        ),
+        // whichever of these a game has, two per row, a lone last one full width
+        div(cls := "library__blocks")(
+          tours.nonEmpty.option(tournamentList(tours)),
+          leaderboard.nonEmpty.option(userTopPerf(leaderboard, PerfType(variant, Speed.Blitz))),
+          msoSection(variant, bits.msoEvent(variant), grandPrix),
+          studyList(variant, studies)
+        ),
         div(cls := "library-stats-table")(
           div(cls := "library-stats-title color-choice")(
             div(dataIcon := "^"),
@@ -169,6 +172,33 @@ object show {
         ),
         div(id := "library_chart_area")(
           div(id := "library_chart")(canvas)
+        ),
+        p(cls := "library-outro")(
+          trans.playVariantOnlineFree(bits.nameWithAlias(variant)),
+          " ",
+          VariantKeys.variantTitle(variant),
+          ".",
+          bits.parentVariant(variant).map { parent =>
+            frag(
+              " ",
+              trans.variantOf(
+                bits.searchName(variant),
+                a(href := routes.Library.variant(parent.key))(bits.searchName(parent))
+              )
+            )
+          },
+          bits.childVariants(variant) match {
+            case Nil      => emptyFrag
+            case children =>
+              frag(
+                " ",
+                trans.alsoOnPlayStrategy(
+                  children
+                    .map(v => a(href := routes.Library.variant(v.key))(bits.searchName(v)): Frag)
+                    .reduce[Frag]((a, b) => frag(a, ", ", b))
+                )
+              )
+          }
         )
       )
     )
@@ -185,47 +215,68 @@ object show {
       )
     )
 
-  // the stable, linkable page of each recurring series, since every edition has its own URL
-  private def recurringSeries(variant: Variant)(implicit ctx: Context) =
-    div(cls := "library__series")(
-      div(cls := "color-choice title")(
-        div(dataIcon := "g"),
-        h2(trans.recurringTournaments()),
-        div(" ")
-      ),
-      p(
-        (List(Freq.Yearly, Freq.Weekly).map { freq =>
-          a(href := views.html.tournament.history.url(freq, variant.some))(
-            s"${freq.display} ${VariantKeys.variantName(variant)}"
-          )
-        } ::: lila.tournament.TournamentShield.Category.byKey(variant.key).toList.map { categ =>
-          a(href := routes.Tournament.categShields(categ.key))(s"${categ.name} Shield")
-        }).reduce[Frag]((a, b) => frag(a, " · ", b))
-      )
-    )
-
-  private def msoEvent(variant: Variant, mso: bits.MsoEvent)(implicit ctx: Context) = {
-    val name = VariantKeys.variantName(variant)
-    div(cls := "library__wc")(
-      div(cls := "color-choice title")(
-        div(dataIcon := "g"),
-        h2(if (mso.worldChampionship) trans.msoWorldChampionship(name) else trans.msoEvent(name)),
-        div(" ")
-      ),
-      p(
-        if (mso.worldChampionship) trans.msoWorldChampionshipVenue(name)
-        else trans.msoEventVenue(name)
-      ),
-      p(
-        a(href := mso.resultsUrl)(trans.msoResultsAndMedallists()),
-        mso.studyId.map { id =>
-          frag(" · ", a(href := routes.Study.show(id))(trans.msoEventGames()))
-        },
-        " · ",
-        a(href := routes.Team.tournaments(bits.msoTeamId))(trans.msoGrandPrix())
+  // the game's notable studies, the site's own first, then by rank (NotableStudies),
+  // minus the tutorial and the MSO event games, which the page links on their own
+  private def studyList(variant: Variant, studies: List[lila.study.Study.Notable])(implicit ctx: Context) = {
+    val linked = bits.studyLink(variant).toSet ++ bits.msoEvent(variant).flatMap(_.studyId)
+    val others = studies.filterNot(s => linked(s.id.value))
+    others.nonEmpty.option(
+      div(cls := "library__studies")(
+        div(cls := "color-choice title")(
+          div(dataIcon := "4"),
+          h2(trans.variantStudies(bits.searchName(variant))),
+          a(href := routes.Study.byVariantDefault(variant.key), cls := "more")(trans.more(), " »")
+        ),
+        ul(others.map { s =>
+          li(a(href := routes.Study.show(s.id.value))(s.name.value))
+        })
       )
     )
   }
+
+  // the game at the Mind Sports Olympiad: its in-person event when it has one,
+  // and its online Grand Prix editions when there are any
+  private def msoSection(
+      variant: Variant,
+      mso: Option[bits.MsoEvent],
+      grandPrix: List[bits.GrandPrixEdition]
+  )(implicit ctx: Context) =
+    (mso.isDefined || grandPrix.nonEmpty).option {
+      val name = VariantKeys.variantName(variant)
+      div(cls := "library__wc")(
+        div(cls := "color-choice title")(
+          div(dataIcon := "g"),
+          h2(mso match {
+            case Some(m) if m.worldChampionship => trans.msoWorldChampionship(name)
+            case Some(_)                        => trans.msoEvent(name)
+            case None                           => trans.msoGrandPrixEvent(name)
+          }),
+          div(" ")
+        ),
+        p(mso match {
+          case Some(m) if m.worldChampionship => trans.msoWorldChampionshipVenue(name)
+          case Some(_)                        => trans.msoEventVenue(name)
+          case None                           => trans.msoGrandPrixVenue(name)
+        }),
+        mso.map { m =>
+          p(
+            a(href := m.resultsUrl)(trans.msoResultsAndMedallists()),
+            m.studyId.map { id =>
+              frag(" · ", a(href := routes.Study.show(id))(trans.msoEventGames()))
+            }
+          )
+        },
+        p(
+          // the game's own editions, latest first; the MSO team's tournaments only when it has none
+          if (grandPrix.isEmpty) a(href := routes.Team.tournaments(bits.msoTeamId))(trans.msoGrandPrix())
+          else
+            grandPrix
+              .take(5)
+              .map(e => a(href := e.url)(e.name): Frag)
+              .reduce[Frag]((a, b) => frag(a, " · ", b))
+        )
+      )
+    }
 
   @annotation.nowarn("msg=unused")
   private def userTopPerf(users: List[User.LightPerf], perfType: PerfType)(implicit lang: Lang) =

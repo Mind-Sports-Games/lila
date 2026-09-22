@@ -164,17 +164,16 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
             routes.Swiss.home.url,
             routes.Puzzle.base.url,
             routes.Study.allDefault().url,
-            routes.Learn.index.url,
             routes.Blog.index().url
           ) :::
             variants.map(v => routes.Library.variant(v.key).url) :::
             variants.map(v => routes.Page.variant(v.key).url) :::
             lila.puzzle.Puzzle.puzzleVariants.map(v => routes.Puzzle.home(v.key).url)
-        env.study.studyRepo.notableForSitemap(10000) map { studies =>
+        env.study.studyRepo.notable(10000) map { studies =>
           val urls =
             paths.map(p => s"  <url><loc>$base$p</loc></url>") :::
-              studies.map { case (id, updatedAt) =>
-                s"  <url><loc>$base${routes.Study.show(id.value).url}</loc><lastmod>${updatedAt.toString("yyyy-MM-dd")}</lastmod></url>"
+              studies.map { s =>
+                s"  <url><loc>$base${routes.Study.show(s.id.value).url}</loc><lastmod>${s.updatedAt.toString("yyyy-MM-dd")}</lastmod></url>"
               }
           s"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

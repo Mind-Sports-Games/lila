@@ -87,18 +87,20 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
       }
     }
 
-  // (id, updatedAt) of the studies the sitemap may list, best ranked first
-  def notableForSitemap(max: Int): Fu[List[(Study.Id, DateTime)]] =
+  // the studies a crawler may see, best ranked first
+  def notable(max: Int): Fu[List[Study.Notable]] =
     coll {
-      _.find(selectNotable, $doc("updatedAt" -> true).some)
+      _.find(selectNotable, $doc("name" -> true, "ownerId" -> true, "updatedAt" -> true).some)
         .sort($sort.desc(F.rank))
         .cursor[Bdoc](readPreference = readPref)
         .list(max) map { docs =>
         for {
           doc       <- docs
           id        <- doc.getAsOpt[Study.Id]("_id")
+          name      <- doc.getAsOpt[Study.Name]("name")
+          ownerId   <- doc.getAsOpt[User.ID]("ownerId")
           updatedAt <- doc.getAsOpt[DateTime]("updatedAt")
-        } yield (id, updatedAt)
+        } yield Study.Notable(id, name, ownerId, updatedAt)
       }
     }
 

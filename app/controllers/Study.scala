@@ -147,6 +147,21 @@ final class Study(
       }
     }
 
+  def byVariantDefault(key: String, page: Int) = byVariant(key, Order.default.key, page)
+
+  def byVariant(key: String, order: String, page: Int) =
+    Open { implicit ctx =>
+      Reasonable(page) {
+        strategygames.variant.Variant.all.find(_.key == key) match {
+          case None          => notFound
+          case Some(variant) =>
+            env.study.pager.byVariant(variant, ctx.me, Order(order), page) map { pag =>
+              Ok(html.study.variant.show(variant, pag, Order(order)))
+            }
+        }
+      }
+    }
+
   private def apiStudies(pager: Paginator[StudyModel.WithChaptersAndLiked]) = {
     implicit val pagerWriter = Writes[StudyModel.WithChaptersAndLiked] { s =>
       env.study.jsonView.pagerData(s)

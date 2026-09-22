@@ -19,7 +19,7 @@ case class Study(
     topics: Option[StudyTopics] = None,
     createdAt: DateTime,
     updatedAt: DateTime,
-    trash: Option[Boolean] = None // unfeatured by a mod: out of every listing but the owner's, and off the crawlers' map
+    trash: Option[Boolean] = None // unfeatured by a mod: out of every listing but the owner's, and unindexed
 ) {
 
   import Study.*
@@ -95,6 +95,11 @@ object Study {
 
   case class Name(value: String) extends AnyVal with StringValue
   implicit val nameIso: Iso.StringIso[Name] = lila.common.Iso.string[Name](Name.apply, _.value)
+
+  // what the sitemap and the game hubs need of a notable study
+  case class Notable(id: Id, name: Name, ownerId: User.ID, updatedAt: DateTime) {
+    def bySite = ownerId == User.playstrategyId || ownerId == User.msoId
+  }
 
   case class IdName(_id: Id, name: Name) {
     def id = _id

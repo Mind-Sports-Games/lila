@@ -894,7 +894,9 @@
   <string name="playVariantOnlineFree">Jouez à %s en ligne gratuitement : en direct ou par correspondance, classé ou amical, contre des joueurs du monde entier.</string>
   <string name="playVariantOnlineFreeTitle">Jouer à %s en ligne gratuitement</string>
   <string name="variantRulesTitle">Règles de %1$s — comment jouer à %2$s</string>
-  <string name="variantRulesDescription">Apprenez les règles de %s : mise en place, déplacements, prises et conditions de victoire, avec un tutoriel interactif. Puis jouez en ligne gratuitement sur PlayStrategy.</string>
+  <string name="variantRulesDescription">Apprenez les règles de %1$s : mise en place, coups et comment gagner. Puis jouez à %2$s en ligne gratuitement sur PlayStrategy : vrais adversaires, classement, tournois et plateau d'analyse gratuit.</string>
+  <string name="alsoOnPlayStrategy">Aussi sur PlayStrategy : %s.</string>
+  <string name="variantStudies">Études %s</string>
   <string name="playVariantOnlineFreeDescription">Jouez à %s en ligne gratuitement contre des joueurs du monde entier. Parties en direct et par correspondance, tournois, classements et analyse sur PlayStrategy.</string>
   <string name="variantPuzzles">Problèmes de %s</string>
   <string name="libraryTitle">Jeux de société à jouer en ligne gratuitement — la ludothèque PlayStrategy</string>
@@ -907,5 +909,7 @@
   <string name="msoResultsAndMedallists">Résultats et médaillés</string>
   <string name="msoEventGames">Parties du tournoi</string>
   <string name="msoGrandPrix">Grand Prix MSO</string>
+  <string name="msoGrandPrixEvent">%s au Grand Prix MSO</string>
+  <string name="msoGrandPrixVenue">Le Grand Prix en ligne de la Mind Sports Olympiad se joue sur PlayStrategy, et %s en fait partie.</string>
   <string name="gameLibrary">Ludothèque</string>
 </resources>

@@ -32,9 +32,14 @@ object userAnalysis {
     )
       .filterNot(noAnalysisVariants.contains(_))
 
-  def apply(data: JsObject, pov: lila.game.Pov, withForecast: Boolean = false)(implicit ctx: Context) =
+  def apply(data: JsObject, pov: lila.game.Pov, withForecast: Boolean = false)(implicit ctx: Context) = {
+    val variant = pov.game.variant
+    // one URL per game, whatever position the visitor pasted
+    val canonical =
+      if (variant == Variant.libStandard(GameLogic.Chess())) routes.UserAnalysis.index.url
+      else routes.UserAnalysis.parseArg(variant.key).url
     views.html.base.layout(
-      title = trans.analysis.txt(),
+      title = views.html.library.bits.analysisTitle(variant),
       moreCss = frag(
         cssTag("analyse.free"),
         pov.game.variant.hasDetachedPocket.option(
@@ -66,12 +71,13 @@ object userAnalysis {
       chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
-          title = "Strategy games analysis board",
-          url = s"$netBaseUrl${routes.UserAnalysis.index.url}",
-          description = "Analyse strategy game positions and variations on an interactive board"
+          title = views.html.library.bits.analysisTitle(variant),
+          url = s"$netBaseUrl$canonical",
+          description = views.html.library.bits.analysisDescription(variant)
         )
         .some,
-      zoomable = true
+      zoomable = true,
+      canonicalPath = canonical.some
     ) {
       main(cls := "analyse")(
         pov.game.synthetic.option(
@@ -96,4 +102,5 @@ object userAnalysis {
         div(cls := "analyse__controls")
       )
     }
+  }
 }

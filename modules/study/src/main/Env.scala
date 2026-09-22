@@ -70,6 +70,8 @@ final class Env(
 
   lazy val topicApi = wire[StudyTopicApi]
 
+  lazy val notable = wire[NotableStudies]
+
   lazy val api: StudyApi = wire[StudyApi]
 
   lazy val pager = wire[StudyPager]

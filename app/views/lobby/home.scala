@@ -53,7 +53,11 @@ object home {
             )})"""
         )
       ),
-      moreCss = cssTag("lobby"),
+      // the blog cards below the lobby come from prismic; the connection is worth ~300ms
+      moreCss = frag(
+        cssTag("lobby"),
+        raw("""<link rel="preconnect" href="https://images.prismic.io" crossorigin>""")
+      ),
       chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
@@ -259,18 +263,36 @@ object home {
     trans.anonymous
   ).map(_.key)
 
-  // structured data tying the site to the Mind Sports Olympiad
+  // structured data for the site and its publisher; sameAs means "the same entity elsewhere",
+  // so it holds our own profiles only
   private def organizationJsonLd(implicit ctx: Context) =
     raw(
       s"""<script type="application/ld+json">${safeJsonValue(
           Json.obj(
-            "@context"    -> "https://schema.org",
-            "@type"       -> "Organization",
-            "name"        -> "PlayStrategy",
-            "url"         -> netBaseUrl,
-            "logo"        -> staticAssetUrl("logo/playstrategy-tile.png"),
-            "sameAs"      -> Json.arr("https://mindsportsolympiad.com", "https://github.com/Mind-Sports-Games"),
-            "description" -> trans.playstrategySiteDescription.txt()
+            "@context" -> "https://schema.org",
+            "@graph"   -> Json.arr(
+              Json.obj(
+                "@type" -> "Organization",
+                "@id"   -> s"$netBaseUrl/#organization",
+                "name"  -> "PlayStrategy",
+                "url"   -> netBaseUrl,
+                "logo"  -> staticAssetUrl("logo/playstrategy-tile.png"),
+                "sameAs" -> Json.arr(
+                  "https://github.com/Mind-Sports-Games",
+                  "https://discord.gg/bVRQzgSbPq",
+                  "https://www.youtube.com/@PlayStrategyDotOrg"
+                ),
+                "description" -> trans.playstrategySiteDescription.txt()
+              ),
+              Json.obj(
+                "@type"         -> "WebSite",
+                "@id"           -> s"$netBaseUrl/#website",
+                "name"          -> "PlayStrategy",
+                "alternateName" -> netConfig.domain.value,
+                "url"           -> netBaseUrl,
+                "publisher"     -> Json.obj("@id" -> s"$netBaseUrl/#organization")
+              )
+            )
           )
         )}</script>"""
     )
