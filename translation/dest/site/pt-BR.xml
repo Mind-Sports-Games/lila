@@ -889,7 +889,9 @@
   <string name="playVariantOnlineFree">Jogue %s online grátis: ao vivo ou por correspondência, valendo rating ou amistoso, contra jogadores do mundo todo.</string>
   <string name="playVariantOnlineFreeTitle">Jogar %s online grátis</string>
   <string name="variantRulesTitle">Regras de %1$s — como jogar %2$s</string>
-  <string name="variantRulesDescription">Aprenda as regras de %s: posição inicial, movimentos, capturas e como vencer, com um tutorial interativo. Depois jogue online grátis no PlayStrategy.</string>
+  <string name="variantRulesDescription">Aprenda as regras de %1$s: posição inicial, movimentos e como vencer. Depois jogue %2$s online grátis no PlayStrategy: adversários reais, rating, torneios e um tabuleiro de análise gratuito.</string>
+  <string name="alsoOnPlayStrategy">Também no PlayStrategy: %s.</string>
+  <string name="variantStudies">Estudos de %s</string>
   <string name="playVariantOnlineFreeDescription">Jogue %s online grátis contra jogadores do mundo todo. Partidas ao vivo e por correspondência, torneios, ratings e análise no PlayStrategy.</string>
   <string name="variantPuzzles">Problemas de %s</string>
   <string name="libraryTitle">Jogos de tabuleiro para jogar online grátis — a biblioteca do PlayStrategy</string>
@@ -902,4 +904,6 @@
   <string name="msoResultsAndMedallists">Resultados e medalhistas</string>
   <string name="msoEventGames">Partidas do torneio</string>
   <string name="msoGrandPrix">Grand Prix MSO</string>
+  <string name="msoGrandPrixEvent">%s no Grande Prêmio MSO</string>
+  <string name="msoGrandPrixVenue">O Grande Prêmio online da Mind Sports Olympiad é jogado no PlayStrategy, e %s é um dos seus jogos.</string>
 </resources>

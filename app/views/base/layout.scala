@@ -114,15 +114,17 @@ object layout {
 
   private def anonDasher(playing: Boolean)(implicit ctx: Context) =
     spaceless(s"""<div class="dasher">
-  <a class="toggle link anon">
+  <button class="toggle link anon" aria-label="${trans.preferences.preferences.txt()}">
     <span title="${trans.preferences.preferences.txt()}" data-icon="%"></span>
-  </a>
+  </button>
   <div id="dasher_app" class="dropdown" data-playing="$playing"></div>
 </div>
 <a href="${routes.Auth.login}?referrer=${ctx.req.path}" class="signin button button-empty">${trans.signIn
         .txt()}</a>""")
 
-  private val clinputLink = a(cls := "link")(span(dataIcon := "y"))
+  // a control, not a destination: an <a> without href is not a link to a crawler
+  private def clinputLink(implicit ctx: Context) =
+    button(cls := "link", ariaTitle(trans.search.search.txt()))(span(dataIcon := "y"))
 
   private def clinput(implicit ctx: Context) =
     div(id := "clinput")(

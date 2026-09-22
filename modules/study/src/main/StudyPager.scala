@@ -1,5 +1,7 @@
 package lila.study
 
+import strategygames.variant.Variant
+
 import lila.common.paginator.Paginator
 import lila.db.dsl.*
 import lila.db.paginator.{ Adapter, CachedAdapter }
@@ -8,7 +10,8 @@ import lila.user.User
 
 final class StudyPager(
     studyRepo: StudyRepo,
-    chapterRepo: ChapterRepo
+    chapterRepo: ChapterRepo,
+    cacheApi: lila.memo.CacheApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   val maxPerPage                = lila.common.config.MaxPerPage(16)
@@ -91,6 +94,19 @@ final class StudyPager(
       page,
       hint = onlyMine.isDefined.option($doc("uids" -> 1, "rank" -> -1))
     )
+  }
+
+  def byVariant(variant: Variant, me: Option[User], order: Order, page: Int) =
+    variantStudyIds.get(variant.key) flatMap { ids =>
+      paginator($inIds(ids) ++ accessSelect(me), me, order, page)
+    }
+
+  // the distinct over chapters is the costly part; a few minutes of staleness is fine for a listing
+  private val variantStudyIds = cacheApi[String, List[Study.Id]](64, "study.pager.variantStudyIds") {
+    _.expireAfterWrite(5.minutes)
+      .buildAsyncFuture { key =>
+        Variant.all.find(_.key == key).fold(fuccess(List.empty[Study.Id]))(chapterRepo.studyIdsByVariant)
+      }
   }
 
   private def accessSelect(me: Option[User], trash: Boolean = false) = {

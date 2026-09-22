@@ -3,6 +3,7 @@ package views.html.library
 import lila.i18n.{ I18nKeys as trans, VariantKeys }
 import lila.app.ui.ScalatagsTemplate.*
 import play.api.i18n.Lang
+import play.api.mvc.Call
 import strategygames.variant.Variant
 import strategygames.GameLogic
 import org.joda.time.DateTime
@@ -81,6 +82,9 @@ object bits {
 
   val msoTeamId = "mind-sports-olympiad"
 
+  // how the MSO names its Grand Prix swisses: "Abalone - MSO GP 2026 PREMIER", "Chess Bullet - MSO Grand Prix 2024"
+  val msoGrandPrixName = "MSO (GP|Grand Prix)"
+
   // In-person Mind Sports Olympiad events whose games are published on PlayStrategy: msodb
   // event code, whether the MSO awards a world championship title for it, and the study
   // holding the latest edition's games (the MSO hub study CTu6f0Mp links every year's)
@@ -101,6 +105,36 @@ object bits {
       case "backgammon"         => Some(MsoEvent("BAOC", worldChampionship = false, None))
       case _                    => None
     }
+
+  // an edition of the MSO Grand Prix, arena or swiss, for the library page
+  case class GrandPrixEdition(name: String, url: Call, startsAt: DateTime)
+
+  def grandPrixEditions(arenas: List[lila.tournament.Tournament], swisses: List[lila.swiss.Swiss])(implicit
+      lang: Lang
+  ): List[GrandPrixEdition] =
+    (arenas.map(t => GrandPrixEdition(t.name(full = false), routes.Tournament.show(t.id), t.startsAt)) :::
+      swisses.map(s => GrandPrixEdition(s.name, routes.Swiss.show(s.id.value), s.startsAt)))
+      .sortBy(-_.startsAt.getMillis)
+
+  // derived variants name the game they come from, so search engines know which page is "Xiangqi"
+  def parentVariant(variant: Variant): Option[Variant] =
+    Variant.byKey.get(variant.key match {
+      case "minixiangqi"                                     => "xiangqi"
+      case "minishogi"                                       => "shogi"
+      case "go9x9" | "go13x13"                               => "go19x19"
+      case "flipello10" | "octagonflipello" | "antiflipello" => "flipello"
+      case "hyper" | "nackgammon"                            => "backgammon"
+      case "grandabalone"                                    => "abalone"
+      case "minibreakthroughtroyka"                          => "breakthroughtroyka"
+      case "bestemshe"                                       => "togyzkumalak"
+      case "frysk"                                           => "frisian"
+      case "scrambledEggs"                                   => "linesOfAction"
+      case _                                                 => ""
+    })
+
+  // the smaller-board or reduced variants of a game, so its hub links them and not only the other way round
+  def childVariants(variant: Variant): List[Variant] =
+    Variant.all.filter(v => parentVariant(v).exists(_.key == variant.key))
 
   // variants named by a bare adjective ("Russian", "Atomic") are searched with their family word
   private val adjectiveNames = Set(
@@ -150,7 +184,39 @@ object bits {
     trans.variantRulesTitle.txt(searchName(variant), nameWithAlias(variant))
 
   def rulesDescription(variant: Variant)(implicit lang: Lang) =
-    trans.variantRulesDescription.txt(nameWithAlias(variant))
+    trans.variantRulesDescription.txt(nameWithAlias(variant), searchName(variant))
+
+  // server engine but no browser one: keep in step with noClientEvalVariants in ui/ceval/src/util.ts
+  private val noBrowserEngine =
+    Set("amazons", "minibreakthroughtroyka", "antiflipello", "octagonflipello", "backgammon", "nackgammon")
+
+  // the engine behind the analysis board, when it has one (the same Fairy-Stockfish build serves both)
+  def analysisEngine(variant: Variant): Option[String] =
+    if (!variant.hasFishnet || noBrowserEngine(variant.key)) None
+    else if (variant.gameLogic == GameLogic.Chess()) Some("Stockfish")
+    else Some("Fairy-Stockfish")
+
+  // an engine that only analyses finished games, off the analysis board
+  def serverEngine(variant: Variant): Option[String] =
+    if (variant.hasFishnet && variant.gameLogic == GameLogic.Backgammon()) Some("GNU Backgammon (gnubg)")
+    else None
+
+  // "Atomic Chess analysis board — free engine & solver"; no engine claim for the games without one
+  def analysisTitle(variant: Variant)(implicit lang: Lang) =
+    (if (analysisEngine(variant).isDefined) trans.variantAnalysisTitle else trans.variantAnalysisTitleNoEngine)
+      .txt(searchName(variant))
+
+  def analysisDescription(variant: Variant)(implicit lang: Lang) =
+    analysisEngine(variant) match {
+      case Some(engine) =>
+        trans.variantAnalysisDescription.txt(nameWithAlias(variant), searchName(variant), engine)
+      case None =>
+        serverEngine(variant).fold(
+          trans.variantAnalysisDescriptionNoEngine.txt(nameWithAlias(variant), searchName(variant))
+        ) { engine =>
+          trans.variantAnalysisDescriptionServerEngine.txt(nameWithAlias(variant), searchName(variant), engine)
+        }
+    }
 
   def winRatePlayer1(variant: Variant, winRates: List[WinRatePercentages]): String =
     winRates

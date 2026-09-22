@@ -7,6 +7,15 @@
 .site-buttons {
   @extend %flex-center-nowrap;
 
+  // the search and preferences toggles are buttons, not links: they go nowhere
+  button.link,
+  button.toggle {
+    border: none;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+  }
+
   .link {
     @extend %top-icon;
 

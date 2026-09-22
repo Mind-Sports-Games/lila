@@ -431,7 +431,15 @@
   <string name="playVariantOnlineFree">Play %s online for free: live or by correspondence, rated or casual, against players from all over the world.</string>
   <string name="playVariantOnlineFreeTitle">Play %s online free</string>
   <string name="variantRulesTitle">%1$s rules — how to play %2$s</string>
-  <string name="variantRulesDescription">Learn the rules of %s: setup, moves, captures and how to win, with an interactive tutorial. Then play online for free on PlayStrategy.</string>
+  <string name="variantAnalysisTitle">%s analysis board — free engine &amp; solver</string>
+  <string name="variantAnalysisDescription">Analyse %1$s positions with a free engine and solver (%3$s): set up any position, explore the variations and see the best moves. Play %2$s online for free on PlayStrategy.</string>
+  <string name="variantAnalysisTitleNoEngine">%s analysis board — free online analysis</string>
+  <string name="variantAnalysisDescriptionNoEngine">Analyse %1$s positions on a free online board: set up any position, explore the variations and share them. Play %2$s online for free on PlayStrategy.</string>
+  <string name="variantAnalysisDescriptionServerEngine">Analyse %1$s positions on a free online board: set up any position, explore the variations and share them. Finished games get a free %3$s analysis. Play %2$s online for free on PlayStrategy.</string>
+  <string name="variantOf">%1$s is a variant of %2$s.</string>
+  <string name="variantRulesDescription">Learn the rules of %1$s: setup, moves and how to win. Then play %2$s online for free on PlayStrategy: live opponents, ratings, tournaments and a free analysis board.</string>
+  <string name="alsoOnPlayStrategy">Also on PlayStrategy: %s.</string>
+  <string name="variantStudies">%s studies</string>
   <string name="playVariantOnlineFreeDescription">Play %s online for free against players from all over the world. Live and correspondence games, tournaments, ratings and analysis on PlayStrategy.</string>
   <string name="msoWorldChampionship">%s World Championship</string>
   <string name="msoWorldChampionshipVenue">The Mind Sports Olympiad %s World Championship is played in person; its games are published on PlayStrategy, which also hosts the online MSO Grand Prix.</string>
@@ -440,6 +448,8 @@
   <string name="msoResultsAndMedallists">Results and medallists</string>
   <string name="msoEventGames">Tournament games</string>
   <string name="msoGrandPrix">MSO Grand Prix</string>
+  <string name="msoGrandPrixEvent">%s at the MSO Grand Prix</string>
+  <string name="msoGrandPrixVenue">The Mind Sports Olympiad's online Grand Prix is played on PlayStrategy, and %s is one of its games.</string>
   <string name="recurringTournaments">Recurring tournaments</string>
   <string name="variantPuzzles">%s puzzles</string>
   <string name="libraryTitle">Board games you can play online free — the PlayStrategy library</string>
@@ -554,6 +564,8 @@ computer analysis, game chat and shareable URL.</string>
   <string name="averageOpponent">Average opponent</string>
   <string name="membersOnly">Members only</string>
   <string name="boardEditor">Board editor</string>
+  <string name="boardEditorTitle">Chess board editor — set up any position, chess variants and fairy chess</string>
+  <string name="boardEditorDescription">Free online board editor for chess, chess variants and 40 other games: set up any position by hand or from a FEN, then analyse it, play it against the computer or share it.</string>
   <string name="setTheBoard">Set the board</string>
   <string name="popularOpenings">Popular openings</string>
   <string name="startPosition">Starting position</string>

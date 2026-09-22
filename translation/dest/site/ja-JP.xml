@@ -834,7 +834,9 @@
   <string name="playVariantOnlineFree">%s を無料でオンライン対戦：リアルタイムまたは通信対局、レーティング戦またはカジュアル戦で、世界中のプレイヤーと。</string>
   <string name="playVariantOnlineFreeTitle">%s を無料でオンライン対戦</string>
   <string name="variantRulesTitle">%1$s のルール — %2$s の遊び方</string>
-  <string name="variantRulesDescription">%s のルールを学ぶ：初期配置、駒の動き、取り方、勝利条件をインタラクティブなチュートリアルで。そのあとは PlayStrategy で無料オンライン対戦。</string>
+  <string name="variantRulesDescription">%1$s のルールを学ぶ：初期配置、動かし方、勝ち方。そして PlayStrategy で %2$s を無料オンライン対戦：実際の対戦相手、レーティング、トーナメント、無料の分析ボード。</string>
+  <string name="alsoOnPlayStrategy">PlayStrategy には %s もあります。</string>
+  <string name="variantStudies">%s のスタディ</string>
   <string name="playVariantOnlineFreeDescription">世界中のプレイヤーと %s を無料でオンライン対戦。リアルタイム対局と通信対局、トーナメント、レーティング、解析を PlayStrategy で。</string>
   <string name="variantPuzzles">%s の問題</string>
   <string name="libraryTitle">無料でオンライン対戦できるボードゲーム — PlayStrategy ライブラリ</string>

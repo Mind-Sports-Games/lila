@@ -836,7 +836,9 @@
   <string name="playVariantOnlineFree">%s을(를) 무료로 온라인에서 플레이하세요: 실시간 또는 통신 대국, 레이팅 또는 친선전, 전 세계 플레이어와 함께.</string>
   <string name="playVariantOnlineFreeTitle">%s 무료 온라인 플레이</string>
   <string name="variantRulesTitle">%1$s 규칙 — %2$s 하는 법</string>
-  <string name="variantRulesDescription">%s의 규칙을 배워보세요: 배치, 이동, 잡기, 승리 조건을 인터랙티브 튜토리얼과 함께. 그리고 PlayStrategy에서 무료로 온라인 플레이하세요.</string>
+  <string name="variantRulesDescription">%1$s 규칙 배우기: 배치, 이동, 승리 조건. 그리고 PlayStrategy에서 %2$s를 무료로 온라인 대국하세요: 실제 상대, 레이팅, 토너먼트, 무료 분석 보드.</string>
+  <string name="alsoOnPlayStrategy">PlayStrategy에는 %s도 있습니다.</string>
+  <string name="variantStudies">%s 연구</string>
   <string name="playVariantOnlineFreeDescription">전 세계 플레이어와 %s을(를) 무료로 온라인에서 플레이하세요. 실시간 및 통신 대국, 토너먼트, 레이팅, 분석을 PlayStrategy에서.</string>
   <string name="variantPuzzles">%s 퍼즐</string>
   <string name="libraryTitle">무료로 온라인 플레이할 수 있는 보드게임 — PlayStrategy 라이브러리</string>
