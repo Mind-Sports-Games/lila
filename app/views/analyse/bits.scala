@@ -21,7 +21,6 @@ object bits {
       moreJs = moreJs,
       openGraph = openGraph,
       boardFamily = boardFamily,
-      chessground = false,
       robots = false,
       zoomable = true,
       csp = defaultCsp.withWebAssembly.withPeer.some

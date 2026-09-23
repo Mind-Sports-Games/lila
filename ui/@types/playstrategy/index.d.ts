@@ -52,7 +52,8 @@ interface PlayStrategy {
   socket: any;
   sound: SoundI;
   miniBoard: {
-    init(node: HTMLElement): void;
+    // resolves with the board api once its library has been fetched
+    init(node: HTMLElement): Promise<any>;
     initAll(parent?: HTMLElement): void;
   };
   miniGame: {
@@ -246,7 +247,6 @@ interface Window {
 
   moment: any;
   Mousetrap: any;
-  Chessground: any;
   libraryChartData?: any;
   InfiniteScroll(selector: string): void;
   playstrategyReplayMusic: () => {

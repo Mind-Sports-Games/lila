@@ -49,8 +49,7 @@ object racer {
         )
       ),
       title = "Puzzle Racer",
-      zoomable = true,
-      chessground = false
+      zoomable = true
     ) {
       main(
         div(cls := "racer racer-app racer--play")(

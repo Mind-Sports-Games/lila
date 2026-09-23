@@ -126,7 +126,7 @@ object replay {
       openGraph = povOpenGraph(pov).some
     )(
       frag(
-        main(cls := "analyse")(
+        main(cls := s"analyse variant-${game.variant.key}")(
           st.aside(cls := "analyse__side")(
             views.html.game
               .side(
