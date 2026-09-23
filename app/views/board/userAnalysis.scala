@@ -69,7 +69,6 @@ object userAnalysis {
           )}""")
       ),
       csp = defaultCsp.withWebAssembly.some,
-      chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
           title = views.html.library.bits.analysisTitle(variant),
@@ -80,7 +79,7 @@ object userAnalysis {
       zoomable = true,
       canonicalPath = canonical.some
     ) {
-      main(cls := "analyse")(
+      main(cls := s"analyse variant-${variant.key}")(
         pov.game.synthetic.option(
           st.aside(cls := "analyse__side")(
             views.html.base.bits.mselect(

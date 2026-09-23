@@ -17,7 +17,6 @@ object bits {
       moreJs: Frag = emptyFrag,
       openGraph: Option[lila.app.ui.OpenGraph] = None,
       moreCss: Frag = emptyFrag,
-      chessground: Boolean = true,
       playing: Boolean = false,
       robots: Boolean = false
   )(body: Frag)(implicit ctx: Context) =
@@ -34,7 +33,6 @@ object bits {
         ctx.blind.option(cssTag("round.nvui")),
         moreCss
       ),
-      chessground = chessground,
       playing = playing,
       robots = robots,
       zoomable = true,
@@ -152,7 +150,7 @@ object bits {
 
   @annotation.nowarn("msg=unused")
   def roundAppPreload(pov: Pov, controls: Boolean)(implicit ctx: Context) =
-    div(cls := s"round__app")(
+    div(cls := s"round__app variant-${pov.game.variant.key}")(
       div(cls := "round__app__board main-board")(chessground(pov)),
       div(cls := "col1-rmoves-preload")
     )

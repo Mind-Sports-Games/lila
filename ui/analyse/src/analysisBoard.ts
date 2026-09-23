@@ -6,8 +6,6 @@ import makeCtrl from './ctrl';
 import menuHover from 'common/menuHover';
 import view from './view';
 import { AnalyseApi, AnalyseOpts } from './interfaces';
-import { Chessground } from 'chessground';
-import Draughtsground from 'draughtsground';
 
 export const patch = init([classModule, attributesModule]);
 
@@ -42,10 +40,6 @@ export function PlayStrategyAnalyse(opts: AnalyseOpts): AnalyseApi {
 
 export { boot };
 
-// that's for the rest of playstrategy to access chessground
-// without having to include it a second time
-window.Chessground = Chessground;
-window.Draughtsground = Draughtsground;
 window.PlayStrategyChat = PlayStrategyChat;
 
 (window as any).PlayStrategyAnalyse = PlayStrategyAnalyse; // esbuild

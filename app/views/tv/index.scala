@@ -33,7 +33,6 @@ object index {
         )
       ),
       moreCss = cssTag("tv.single"),
-      chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
           title = s"Watch the best ${channel.name.toLowerCase} games of playstrategy.org",

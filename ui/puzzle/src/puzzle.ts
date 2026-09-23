@@ -2,7 +2,6 @@ import { attributesModule, classModule, init } from 'snabbdom';
 import makeCtrl from './ctrl';
 import menuHover from 'common/menuHover';
 import view from './view/main';
-import { Chessground } from 'chessground';
 import { PuzzleOpts } from './interfaces';
 
 const patch = init([classModule, attributesModule]);
@@ -21,9 +20,5 @@ export default function PlayStrategyPuzzle(opts: PuzzleOpts): void {
 
   menuHover();
 }
-
-// that's for the rest of playstrategy to access chessground
-// without having to include it a second time
-window.Chessground = Chessground;
 
 (window as any).PlayStrategyPuzzle = PlayStrategyPuzzle; // esbuild

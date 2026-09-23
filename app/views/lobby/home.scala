@@ -58,7 +58,6 @@ object home {
         cssTag("lobby"),
         raw("""<link rel="preconnect" href="https://images.prismic.io" crossorigin>""")
       ),
-      chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
           image = staticAssetUrl("logo/playstrategy-tile-wide.png").some,

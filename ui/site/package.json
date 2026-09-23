@@ -63,8 +63,7 @@
       "src/memory.ts"
     ],
     "sync": {
-      "../../node_modules/chessground/dist/chessground.min.js": "public/npm",
-      "node_modules/hopscotch/dist/js/hopscotch.min.js": "public/vendor/hopscotch/dist/js",
+        "node_modules/hopscotch/dist/js/hopscotch.min.js": "public/vendor/hopscotch/dist/js",
       "node_modules/hopscotch/dist/css/hopscotch.min.css": "public/vendor/hopscotch/dist/css",
       "node_modules/hopscotch/dist/img": "public/vendor/hopscotch/dist",
       "node_modules/@yaireo/tagify/dist/tagify.js": "public/vendor/tagify",

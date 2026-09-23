@@ -1,7 +1,6 @@
 import { Chessground } from 'chessground';
 import { Coords as CgCoords } from 'chessground/types';
 
-window.Chessground = Chessground;
 //TODO fix this for puzzle embeds (/training/daily/puzzle)
 window.onload = () => {
   const el = document.querySelector('#daily-puzzle') as HTMLElement,

@@ -31,7 +31,6 @@ object editor {
         )
       ),
       moreCss = cssTag("editor"),
-      chessground = false,
       zoomable = true,
       openGraph = lila.app.ui
         .OpenGraph(
@@ -44,7 +43,7 @@ object editor {
       canonicalPath = routes.Editor.index.url.some
     )(
       main(id := "board-editor")(
-        div(cls := "board-editor")(
+        div(cls := s"board-editor variant-${variant.key}")(
           div(cls := "spare"),
           div(cls := "main-board")(chessgroundBoard),
           div(cls := "spare")

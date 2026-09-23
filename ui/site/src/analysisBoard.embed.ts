@@ -1,10 +1,6 @@
 import windowedPlaystrategy from './site.playstrategy.globals';
-import { Chessground } from 'chessground';
-import Draughtsground from 'draughtsground';
 
 windowedPlaystrategy();
-window.Chessground = Chessground;
-window.Draughtsground = Draughtsground;
 
 export default function PlayStrategyAnalyseEmbed(opts: any) {
   document.body.classList.toggle('supports-max-content', !!window.chrome);
