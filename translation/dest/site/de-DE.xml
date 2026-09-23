@@ -889,6 +889,11 @@
   <string name="playVariantOnlineFreeTitle">%s online spielen, kostenlos</string>
   <string name="variantRulesTitle">%1$s Regeln — so spielt man %2$s</string>
   <string name="variantRulesDescription">Lerne die Regeln von %1$s: Aufstellung, Züge und wie man gewinnt. Dann spiele %2$s kostenlos online auf PlayStrategy: echte Gegner, Wertungen, Turniere und ein kostenloses Analysebrett.</string>
+  <string name="variantAnalysisTitle">%s-Analysebrett — kostenlos mit Engine &amp; Solver</string>
+  <string name="variantAnalysisDescription">Analysiere Stellungen in %1$s mit einer kostenlosen Engine und einem Solver (%3$s): Stelle jede beliebige Stellung auf, erkunde die Varianten und sieh dir die besten Züge an. Spiele %2$s kostenlos online auf PlayStrategy.</string>
+  <string name="variantAnalysisTitleNoEngine">%s-Analysebrett — kostenlose Online-Analyse</string>
+  <string name="variantAnalysisDescriptionNoEngine">Analysiere Stellungen in %1$s auf einem kostenlosen Online-Brett: Stelle jede beliebige Stellung auf, erkunde die Varianten und teile sie. Spiele %2$s kostenlos online auf PlayStrategy.</string>
+  <string name="variantAnalysisDescriptionServerEngine">Analysiere Stellungen in %1$s auf einem kostenlosen Online-Brett: Stelle jede beliebige Stellung auf, erkunde die Varianten und teile sie. Für beendete Partien gibt es eine kostenlose Analyse mit %3$s. Spiele %2$s kostenlos online auf PlayStrategy.</string>
   <string name="alsoOnPlayStrategy">Auch auf PlayStrategy: %s.</string>
   <string name="variantStudies">%s-Studien</string>
   <string name="playVariantOnlineFreeDescription">Spiele %s kostenlos online gegen Spieler aus aller Welt. Live- und Fernpartien, Turniere, Wertungen und Analyse auf PlayStrategy.</string>

@@ -16,7 +16,8 @@ object variant {
     val title = trans.variantStudies.txt(views.html.library.bits.searchName(variant))
     views.html.base.layout(
       title = title,
-      robots = pag.currentPage == 1,
+      robots = netConfig.crawlable && pag.currentPage == 1,
+      canonicalPath = routes.Study.byVariantDefault(variant.key).url.some,
       moreCss = cssTag("study.index"),
       wrapClass = "full-screen-force",
       moreJs = infiniteScrollTag

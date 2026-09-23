@@ -8,6 +8,7 @@ import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 import lila.common.{ ContentSecurityPolicy, Nonce }
 import lila.common.base.StringUtils.escapeHtmlRaw
+import lila.i18n.SeoLang
 
 object layout {
 
@@ -70,6 +71,15 @@ object layout {
   )
 
   private val jsLicense = raw("""<link rel="jslicense" href="/source">""")
+
+  private val hreflang = attr("hreflang")
+
+  private def alternateLinks(barePath: String): Frag =
+    frag(
+      SeoLang.alternates(barePath).map { case (tag, path) =>
+        link(rel := "alternate", hreflang := tag, href := s"$netBaseUrl$path")
+      }
+    )
 
   private val favicons = raw {
     List(512, 256, 192, 128, 64)
@@ -224,10 +234,19 @@ object layout {
       csp: Option[ContentSecurityPolicy] = None,
       wrapClass: String = "",
       canonicalPath: Option[String] = None,
+      // this page type has one URL per maintained locale: link them all, both ways
+      alternates: Boolean = false,
       // the game family this page draws a board for, if any: its pieces block the paint, the rest do not
       boardFamily: Option[String] = None
   )(body: Frag)(implicit ctx: Context): Frag = {
     updateManifest()
+
+    // a localised URL is its own canonical: keep the prefix the visitor came in on, and hang
+    // both the canonical and the alternates off the same prefix-free path
+    val (urlLang, unprefixed) =
+      if (alternates) SeoLang.splitPath(ctx.req.path) else (none, ctx.req.path)
+    val barePath              = canonicalPath | unprefixed
+    val canonicalUrl          = s"$netBaseUrl${urlLang.fold("")(e => s"/${e.href}")}$barePath"
 
     frag(
       doctype,
@@ -258,10 +277,14 @@ object layout {
           link(rel := "mask-icon", href := staticAssetUrl("logo/playstrategy.svg"), color := "black"),
           favicons,
           (!robots).option(raw("""<meta content="noindex, nofollow" name="robots">""")),
-          // languages share URLs and query strings never change the page identity
-          robots.option(link(rel := "canonical", href := s"$netBaseUrl${canonicalPath | ctx.req.path}")),
+          // query strings never change the page identity
+          robots.option(link(rel := "canonical", href := canonicalUrl)),
+          (robots && alternates && canonicalUrl == s"$netBaseUrl${ctx.req.path}")
+            .option(alternateLinks(barePath)),
           noTranslate,
-          openGraph.map(_.frags),
+          // a localised page shares the English page's og:url otherwise, which reads as a
+          // second, conflicting canonical
+          openGraph.map(og => urlLang.fold(og)(_ => og.copy(url = canonicalUrl)).frags),
           link(
             href     := routes.Blog.atom,
             tpe      := "application/atom+xml",

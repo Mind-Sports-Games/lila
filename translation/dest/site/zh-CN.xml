@@ -832,6 +832,11 @@
   <string name="playVariantOnlineFree">免费在线玩 %s：实时或通信对局，积分或休闲，对手来自世界各地。</string>
   <string name="playVariantOnlineFreeTitle">免费在线玩 %s</string>
   <string name="variantRulesTitle">%1$s 规则 — %2$s 怎么玩</string>
+  <string name="variantAnalysisTitle">%s 分析棋盘 — 免费引擎与求解器</string>
+  <string name="variantAnalysisDescription">用免费的引擎与求解器（%3$s）分析 %1$s 的局面：摆出任意局面，研究各种变着，查看最佳走法。在 PlayStrategy 免费在线玩 %2$s。</string>
+  <string name="variantAnalysisTitleNoEngine">%s 分析棋盘 — 免费在线分析</string>
+  <string name="variantAnalysisDescriptionNoEngine">在免费的在线棋盘上分析 %1$s 的局面：摆出任意局面，研究各种变着并分享。在 PlayStrategy 免费在线玩 %2$s。</string>
+  <string name="variantAnalysisDescriptionServerEngine">在免费的在线棋盘上分析 %1$s 的局面：摆出任意局面，研究各种变着并分享。已结束的对局可获得免费的 %3$s 分析。在 PlayStrategy 免费在线玩 %2$s。</string>
   <string name="variantRulesDescription">学习 %1$s 规则：摆放、走法与胜负判定。然后在 PlayStrategy 免费在线对弈 %2$s：真人对手、等级分、锦标赛和免费分析棋盘。</string>
   <string name="alsoOnPlayStrategy">PlayStrategy 也有：%s。</string>
   <string name="variantStudies">%s 研究</string>

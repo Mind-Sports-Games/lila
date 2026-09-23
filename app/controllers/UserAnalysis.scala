@@ -43,17 +43,35 @@ final class UserAnalysis(
 
   def load(urlFen: String, variant: Variant) =
     Open { implicit ctx =>
-      val decodedFen: Option[FEN] = lila.common.String
-        .decodeUriPath(urlFen)
-        .filter(_.trim.nonEmpty)
-        .orElse(get("fen")) map (s => FEN.clean(variant.gameLogic, s))
-      val pov         = makePov(decodedFen, variant)
-      val orientation = get("orientation").flatMap(PlayerIndex.fromName) | pov.playerIndex
-      env.api.roundApi
-        .userAnalysisJson(pov, ctx.pref, decodedFen, orientation, owner = false, me = ctx.me) map { data =>
-        EnableSharedArrayBuffer(Ok(html.board.userAnalysis(data, pov)))
-      }
+      loadPage(urlFen, variant)
     }
+
+  def langIndex(lang: String) =
+    LangPage(routes.UserAnalysis.index.url)(ctx =>
+      loadPage("", Variant.libStandard(GameLogic.Chess()))(using ctx)
+    )(lang)
+
+  // only a variant key gets a localised URL, never a pasted position
+  def langLoad(lang: String, key: String) =
+    LangPage(routes.UserAnalysis.parseArg(key).url)(ctx =>
+      Variant.byKey get key match {
+        case Some(variant) => loadPage("", variant)(using ctx)
+        case None          => notFound(using ctx)
+      }
+    )(lang)
+
+  private def loadPage(urlFen: String, variant: Variant)(implicit ctx: Context): Fu[Result] = {
+    val decodedFen: Option[FEN] = lila.common.String
+      .decodeUriPath(urlFen)
+      .filter(_.trim.nonEmpty)
+      .orElse(get("fen")) map (s => FEN.clean(variant.gameLogic, s))
+    val pov         = makePov(decodedFen, variant)
+    val orientation = get("orientation").flatMap(PlayerIndex.fromName) | pov.playerIndex
+    env.api.roundApi
+      .userAnalysisJson(pov, ctx.pref, decodedFen, orientation, owner = false, me = ctx.me) map { data =>
+      EnableSharedArrayBuffer(Ok(html.board.userAnalysis(data, pov)))
+    }
+  }
 
   private[controllers] def makePov(fen: Option[FEN], variant: Variant): Pov =
     makePov {

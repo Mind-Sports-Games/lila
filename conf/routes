@@ -144,6 +144,8 @@ GET   /analysis/*something             controllers.UserAnalysis.parseArg(somethi
 GET   /analysis                        controllers.UserAnalysis.index
 POST  /analysis/pgn                    controllers.UserAnalysis.pgn
 
+# Localised URLs: one per hand-maintained locale, see modules/i18n/src/main/SeoLang.scala
+
 # Study
 GET   /study                           controllers.Study.allDefault(page: Int ?= 1)
 GET   /study/all/:order                controllers.Study.all(order: String, page: Int ?= 1)
@@ -797,6 +799,9 @@ GET   /variant/:key                    controllers.Page.variant(key)
 # Library
 GET   /library                        controllers.Library.home
 GET   /library/:key                   controllers.Library.variant(key)
+GET   /$lang<[a-z]{2}|pt-br|pt-pt|zh-cn>/library/:key  controllers.Library.langVariant(lang: String, key: String)
+GET   /$lang<[a-z]{2}|pt-br|pt-pt|zh-cn>/analysis       controllers.UserAnalysis.langIndex(lang: String)
+GET   /$lang<[a-z]{2}|pt-br|pt-pt|zh-cn>/analysis/:key  controllers.UserAnalysis.langLoad(lang: String, key: String)
 
 # Help
 GET   /help/contribute                 controllers.Page.help

@@ -59,7 +59,8 @@ object show {
         )
         .some,
       zoomable = true,
-      canonicalPath = routes.Library.variant(variant.key).url.some
+      canonicalPath = routes.Library.variant(variant.key).url.some,
+      alternates = true
     )(
       main(
         id  := "library-section",
