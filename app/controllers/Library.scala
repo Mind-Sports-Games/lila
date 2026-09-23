@@ -23,11 +23,19 @@ final class Library(env: Env) extends LilaController(env) {
 
   def variant(key: String) =
     Open { implicit ctx =>
-      showVariant(key)
+      views.html.library.bits.canonicalVariantKey(key) match {
+        case Some(canonical) => MovedPermanently(routes.Library.variant(canonical).url).fuccess
+        case None            => showVariant(key)
+      }
     }
 
   def langVariant(lang: String, key: String) =
-    LangPage(routes.Library.variant(key).url)(ctx => showVariant(key)(using ctx))(lang)
+    views.html.library.bits.canonicalVariantKey(key) match {
+      case Some(canonical) =>
+        Action(MovedPermanently(routes.Library.langVariant(lang, canonical).url))
+      case None =>
+        LangPage(routes.Library.variant(key).url)(ctx => showVariant(key)(using ctx))(lang)
+    }
 
   private def showVariant(key: String)(implicit ctx: Context): Fu[Result] =
     Variant.all.find(_.key == key) match {
