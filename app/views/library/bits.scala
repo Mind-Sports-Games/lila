@@ -137,6 +137,60 @@ object bits {
     Variant.all.filter(v => parentVariant(v).exists(_.key == variant.key))
 
   // variants named by a bare adjective ("Russian", "Atomic") are searched with their family word
+  // A game's URL carries its engine key - flipello, standard, go19x19 - so the name people
+  // actually type 404s. These redirect onto the one canonical URL instead.
+  private val urlAliases: Map[String, String] = Map(
+    "othello"               -> "flipello",
+    "reversi"               -> "flipello",
+    "grandothello"          -> "flipello10",
+    "grandreversi"          -> "flipello10",
+    "antiothello"           -> "antiflipello",
+    "antireversi"           -> "antiflipello",
+    "octagonothello"        -> "octagonflipello",
+    "octagonreversi"        -> "octagonflipello",
+    "chess"                 -> "standard",
+    "go"                    -> "go19x19",
+    "baduk"                 -> "go19x19",
+    "weiqi"                 -> "go19x19",
+    "chinesechess"          -> "xiangqi",
+    "japanesechess"         -> "shogi",
+    "loa"                   -> "linesOfAction",
+    "mancala"               -> "oware",
+    "awari"                 -> "oware",
+    "awale"                 -> "oware",
+    "ayo"                   -> "oware",
+    "toguzkumalak"          -> "togyzkumalak",
+    "togyzqumalaq"          -> "togyzkumalak",
+    // "checkers" and "draughts" both usually mean the 8x8 game, which is the english key
+    "checkers"              -> "english",
+    "draughts"              -> "english",
+    "americancheckers"      -> "english",
+    "americandraughts"      -> "english",
+    "englishcheckers"       -> "english",
+    "englishdraughts"       -> "english",
+    "internationaldraughts" -> "international",
+    "internationalcheckers" -> "international",
+    "polishdraughts"        -> "international",
+    "russiancheckers"       -> "russian",
+    "russiandraughts"       -> "russian",
+    "braziliancheckers"     -> "brazilian",
+    "braziliandraughts"     -> "brazilian",
+    "portuguesecheckers"    -> "portuguese",
+    "poolcheckers"          -> "pool",
+    "frisiandraughts"       -> "frisian"
+  )
+
+  private lazy val keysByLowerCase: Map[String, String] =
+    Variant.all.map(v => v.key.toLowerCase -> v.key).toMap
+
+  // The canonical key for something that is not one: a real key in the wrong case
+  // (linesofaction), or a name the game is better known by (othello). None when the key is
+  // already canonical, so a redirect can never loop.
+  def canonicalVariantKey(key: String): Option[String] = {
+    val lower = key.toLowerCase
+    keysByLowerCase.get(lower).filter(_ != key) orElse urlAliases.get(lower)
+  }
+
   private val adjectiveNames = Set(
     "crazyhouse",
     "kingOfTheHill",
