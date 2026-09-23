@@ -267,7 +267,7 @@ export default class Setup {
         });
       case '14_1': // entropy
         return Object.assign({}, defaultClockConfig, {
-          bullet: { timemode: '1', initial: '3', increment: '0' },
+          bullet: { timemode: '1', initial: '2', increment: '0' },
           blitz: { timemode: '1', initial: '5', increment: '0' },
           rapid: { timemode: '1', initial: '10', increment: '0' },
           classical: { timemode: '1', initial: '15', increment: '0' },

@@ -11,7 +11,7 @@ import scala.math
 
 import lila.common.ApiVersion
 import lila.game.JsonView.*
-import lila.game.{ DeadStoneOfferState, Event, Game, Player as GamePlayer, Pov }
+import lila.game.{ DeadStoneOfferState, Event, Game, Player as GamePlayer, PlayerName, Pov }
 import lila.pref.Pref
 import lila.user.{ User, UserRepo }
 
@@ -330,7 +330,7 @@ final class JsonView(
           )
           .add("division", division)
           .add("winner", game.winner.map(_.playerIndex.name))
-          .add("winnerPlayer", game.winner.map(w => game.variant.playerNames(w.playerIndex))),
+          .add("winnerPlayer", game.winner.map(w => PlayerName(game.variant, w.playerIndex))),
         "player" -> Json.obj(
           "id"          -> owner.option(pov.playerId),
           "playerName"  -> game.variant.playerNames(playerIndex),

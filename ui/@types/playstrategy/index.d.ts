@@ -396,7 +396,20 @@ declare type Perf =
   | 'entropy';
 
 //declare type Color = 'white' | 'black';
-declare type PlayerName = 'White' | 'Black' | 'Sente' | 'Gote' | 'Red' | 'South' | 'North' | 'Bastaushi' | 'Kostaushi';
+declare type PlayerName =
+  | 'White'
+  | 'Black'
+  | 'Sente'
+  | 'Gote'
+  | 'Red'
+  | 'South'
+  | 'North'
+  | 'Bastaushi'
+  | 'Kostaushi'
+  | 'Player 1'
+  | 'Player 2'
+  | 'First player as Order'
+  | 'Second player as Order';
 declare type PlayerIndex = 'p1' | 'p2';
 declare type PlayerColor = 'white' | 'black';
 declare type Orientation = 'p1' | 'p2' | 'left' | 'right' | 'p1vflip';

@@ -43,16 +43,18 @@ export function renderIndex(node: Tree.ParentedNode, withDots?: boolean): VNode 
 
 export function renderMove(ctx: Ctx, node: Tree.ParentedNode): VNode[] {
   const ev = cevalView.getBestEval({ client: node.ceval, server: node.eval });
+  const variantClass = variantClassFromKey(ctx.variant.key);
   const nodes = [
     h(
       'move',
-      // TODO: the || '' are probably not correct
-      variantClassFromKey(ctx.variant.key).computeMoveNotation({
-        san: fixCrazySan(node.san || ''),
-        uci: node.uci || '',
-        fen: node.fen,
-        prevFen: node.parent?.fen || '',
-      }),
+      ctx.variant.key === 'entropy'
+        ? notationOfTurn(ctx.variant, fullTurnNodesFromNode(node), variantClass.getNotationStyle())
+        : variantClass.computeMoveNotation({
+            san: fixCrazySan(node.san || ''),
+            uci: node.uci || '',
+            fen: node.fen,
+            prevFen: node.parent?.fen || '',
+          }),
     ),
   ];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => nodes.push(renderGlyph(g)));
@@ -62,6 +64,23 @@ export function renderMove(ctx: Ctx, node: Tree.ParentedNode): VNode[] {
     else if (defined(ev.mate)) nodes.push(renderEval('#' + ev.mate));
   }
   return nodes;
+}
+
+export function notationOfTurn(variant: Variant, turnNodes: Tree.ParentedNode[], notation: NotationStyle): string {
+  const variantClass = variantClassFromKey(variant.key);
+  return combinedNotationOfTurn(
+    turnNodes.map(n =>
+      variantClass.computeMoveNotation({
+        san: fixCrazySan(n.san || ''),
+        uci: n.uci || '',
+        fen: n.fen,
+        prevFen: n.parent?.fen || '',
+      }),
+    ),
+    notation,
+    variant.key,
+    turnNodes.map(n => n.uci || ''),
+  );
 }
 
 export function combinedNotationOfTurn(
@@ -81,27 +100,8 @@ export function combinedNotationOfTurn(
 
 export function renderFullMove(ctx: Ctx, node: Tree.ParentedNode, style: NotationStyle): VNode[] {
   const fullTurnNodes: Tree.ParentedNode[] = fullTurnNodesFromNode(node);
-  const variant = ctx.variant;
   const ev = cevalView.getBestEval({ client: node.ceval, server: node.eval });
-  const nodes = [
-    h(
-      'move',
-      // TODO: the || '' are probably not correct
-      combinedNotationOfTurn(
-        fullTurnNodes.map(n => {
-          return variantClassFromKey(variant.key).computeMoveNotation({
-            san: fixCrazySan(n.san || ''),
-            uci: n.uci || '',
-            fen: n.fen,
-            prevFen: n.parent?.fen || '',
-          });
-        }),
-        style,
-        variant.key,
-        fullTurnNodes.map(n => n.uci || ''),
-      ),
-    ),
-  ];
+  const nodes = [h('move', notationOfTurn(ctx.variant, fullTurnNodes, style))];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => nodes.push(renderGlyph(g)));
   if (fullTurnNodes.filter(n => n.shapes !== undefined).length > 0) nodes.push(h('shapes'));
   if (ev && ctx.showEval) {

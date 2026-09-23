@@ -42,7 +42,6 @@ import org.joda.time.DateTime
 import lila.db.ByteArray
 import lila.rating.PerfType
 import lila.user.User
-import lila.i18n.I18nKeys as trans
 import play.api.i18n.Lang
 
 case class Game(
@@ -1119,17 +1118,7 @@ case class Game(
   def playerPov(p: Player)                          = pov(p.playerIndex)
   def loserPov                                      = loser map playerPov
 
-  // When updating, also edit modules/challenge, modules/puzzle and ui/@types/playstrategy/index.d.ts:declare type PlayerName
-  def playerTrans(p: PlayerIndex)(implicit lang: Lang) =
-    stratGame.board.variant.playerNames(p) match {
-      case "White" => trans.white.txt()
-      case "Black" => trans.black.txt()
-      // Xiangqi add back in when adding red as a colour for Xiangqi
-      // case "Red"   => trans.red.txt()
-      case "Sente"   => trans.sente.txt()
-      case "Gote"    => trans.gote.txt()
-      case s: String => s
-    }
+  def playerTrans(p: PlayerIndex)(implicit lang: Lang) = PlayerName.translated(variant, p)
 
   def setAnalysed = copy(metadata = metadata.copy(analysed = true))
 
