@@ -77,7 +77,8 @@ object userAnalysis {
         )
         .some,
       zoomable = true,
-      canonicalPath = canonical.some
+      canonicalPath = canonical.some,
+      alternates = true
     ) {
       main(cls := s"analyse variant-${variant.key}")(
         pov.game.synthetic.option(

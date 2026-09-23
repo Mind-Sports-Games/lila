@@ -14,6 +14,7 @@ object theme {
   ) =
     views.html.base.layout(
       title = "Puzzle themes",
+      canonicalPath = routes.Puzzle.themes(variant.key).url.some,
       moreCss = cssTag("puzzle.page")
     )(
       main(cls := "page-menu")(

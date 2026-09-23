@@ -894,6 +894,11 @@
   <string name="playVariantOnlineFree">Jouez à %s en ligne gratuitement : en direct ou par correspondance, classé ou amical, contre des joueurs du monde entier.</string>
   <string name="playVariantOnlineFreeTitle">Jouer à %s en ligne gratuitement</string>
   <string name="variantRulesTitle">Règles de %1$s — comment jouer à %2$s</string>
+  <string name="variantAnalysisTitle">Plateau d'analyse de %s — moteur et solveur gratuits</string>
+  <string name="variantAnalysisDescription">Analysez les positions de %1$s avec un moteur et un solveur gratuits (%3$s) : composez n'importe quelle position, explorez les variantes et voyez les meilleurs coups. Jouez à %2$s en ligne gratuitement sur PlayStrategy.</string>
+  <string name="variantAnalysisTitleNoEngine">Plateau d'analyse de %s — analyse en ligne gratuite</string>
+  <string name="variantAnalysisDescriptionNoEngine">Analysez les positions de %1$s sur un plateau en ligne gratuit : composez n'importe quelle position, explorez les variantes et partagez-les. Jouez à %2$s en ligne gratuitement sur PlayStrategy.</string>
+  <string name="variantAnalysisDescriptionServerEngine">Analysez les positions de %1$s sur un plateau en ligne gratuit : composez n'importe quelle position, explorez les variantes et partagez-les. Les parties terminées bénéficient d'une analyse %3$s gratuite. Jouez à %2$s en ligne gratuitement sur PlayStrategy.</string>
   <string name="variantRulesDescription">Apprenez les règles de %1$s : mise en place, coups et comment gagner. Puis jouez à %2$s en ligne gratuitement sur PlayStrategy : vrais adversaires, classement, tournois et plateau d'analyse gratuit.</string>
   <string name="alsoOnPlayStrategy">Aussi sur PlayStrategy : %s.</string>
   <string name="variantStudies">Études %s</string>

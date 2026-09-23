@@ -888,6 +888,11 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="playVariantOnlineFree">Jogue %s online grátis: ao vivo ou por correspondência, valendo rating ou amistoso, contra jogadores do mundo todo.</string>
   <string name="playVariantOnlineFreeTitle">Jogar %s online grátis</string>
   <string name="variantRulesTitle">Regras de %1$s — como jogar %2$s</string>
+  <string name="variantAnalysisTitle">Tabuleiro de análise de %s — motor e solucionador gratuitos</string>
+  <string name="variantAnalysisDescription">Analise posições de %1$s com um motor e um solucionador gratuitos (%3$s): monte qualquer posição, explore as variantes e veja os melhores movimentos. Jogue %2$s online grátis no PlayStrategy.</string>
+  <string name="variantAnalysisTitleNoEngine">Tabuleiro de análise de %s — análise online gratuita</string>
+  <string name="variantAnalysisDescriptionNoEngine">Analise posições de %1$s num tabuleiro online gratuito: monte qualquer posição, explore as variantes e partilhe-as. Jogue %2$s online grátis no PlayStrategy.</string>
+  <string name="variantAnalysisDescriptionServerEngine">Analise posições de %1$s num tabuleiro online gratuito: monte qualquer posição, explore as variantes e partilhe-as. As partidas terminadas recebem uma análise gratuita do %3$s. Jogue %2$s online grátis no PlayStrategy.</string>
   <string name="variantRulesDescription">Aprenda as regras de %1$s: posição inicial, movimentos e como ganhar. Depois jogue %2$s online grátis no PlayStrategy: adversários reais, classificação, torneios e um tabuleiro de análise gratuito.</string>
   <string name="alsoOnPlayStrategy">Também no PlayStrategy: %s.</string>
   <string name="variantStudies">Estudos de %s</string>

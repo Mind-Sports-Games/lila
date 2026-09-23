@@ -124,7 +124,8 @@ object history {
 
   private def nameOf(f: Freq) = if (f == Freq.Weekend) "Elite" else f.display
 
-  private val allFreqs = List(
+  // the sitemap lists one page per frequency, and one per series (see Main.sitemap)
+  val allFreqs = List(
     Freq.Annual,
     Freq.Introductory,
     Freq.MSOGP,
