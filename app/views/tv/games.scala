@@ -18,6 +18,7 @@ object games {
           side.channels(channel, champions, "/games")
         ),
         div(cls := "page-menu__content now-playing")(
+          h1(cls := "offscreen")(channel.name),
           povs map { views.html.game.mini(_) }
         )
       )

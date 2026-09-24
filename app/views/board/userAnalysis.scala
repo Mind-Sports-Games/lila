@@ -80,7 +80,11 @@ object userAnalysis {
       canonicalPath = canonical.some,
       alternates = true
     ) {
-      main(cls := s"analyse variant-${variant.key}")(
+      frag(
+        // outside main: the analyse app empties main.analyse on mount, so a heading in there
+        // would be gone before a rendering crawler saw it
+        h1(cls := "offscreen")(views.html.library.bits.analysisTitle(variant)),
+        main(cls := s"analyse variant-${variant.key}")(
         pov.game.synthetic.option(
           st.aside(cls := "analyse__side")(
             views.html.base.bits.mselect(
@@ -98,9 +102,10 @@ object userAnalysis {
             )
           )
         ),
-        div(cls := "analyse__board main-board")(chessgroundBoard),
-        div(cls := "analyse__tools"),
-        div(cls := "analyse__controls")
+          div(cls := "analyse__board main-board")(chessgroundBoard),
+          div(cls := "analyse__tools"),
+          div(cls := "analyse__controls")
+        )
       )
     }
   }

@@ -284,7 +284,17 @@ object layout {
           noTranslate,
           // a localised page shares the English page's og:url otherwise, which reads as a
           // second, conflicting canonical
-          openGraph.map(og => urlLang.fold(og)(_ => og.copy(url = canonicalUrl)).frags),
+          // a page that names no image of its own still gets a branded card rather than none
+          openGraph.map { og =>
+            og.copy(
+              url = urlLang.fold(og.url)(_ => canonicalUrl),
+              image = og.image orElse staticAssetUrl("logo/playstrategy-tile-wide.png").some,
+              // a summary card is cropped square, so it gets the square tile - the same
+              // pairing lobby/home.scala and user/show/page.scala already use
+              twitterImage = og.twitterImage orElse og.image
+                .fold(staticAssetUrl("logo/playstrategy-tile.png").some)(_ => none)
+            ).frags
+          },
           link(
             href     := routes.Blog.atom,
             tpe      := "application/atom+xml",
@@ -418,7 +428,7 @@ object layout {
       header(id := "top")(
         div(cls := "site-title-nav")(
           (!ctx.isAppealUser).option(topnavToggle),
-          h1(cls := "site-title")(
+          div(cls := "site-title")(
             if (ctx.kid) span(title := trans.kidMode.txt(), cls := "kiddo")(":)")
             else ctx.isBot.option(botImage),
             a(href := "/")(

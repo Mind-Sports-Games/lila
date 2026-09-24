@@ -64,6 +64,8 @@ object show {
         .some
     )(
       frag(
+        // outside main.analyse, which the analyse app empties on mount
+        h1(cls := "offscreen")(s.name.value),
         main(cls := "analyse"),
         bits.streamers(streamers)
       )

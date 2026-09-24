@@ -57,6 +57,7 @@ object watcher {
       openGraph = povOpenGraph(pov).some
     )(
       main(cls := "round")(
+        h1(cls := "offscreen")(gameVsText(pov.game, withRatings = true)),
         st.aside(cls := "round__side")(
           bits.side(pov, data, tour, simul, userTv, bookmarked, swissPairingGames),
           chatOption.map(_ => chat.frag)
@@ -78,6 +79,7 @@ object watcher {
     )(
       frag(
         main(cls := "round")(
+          h1(cls := "offscreen")(gameVsText(pov.game, withRatings = true)),
           st.aside(cls := "round__side")(
             game.side(
               pov,

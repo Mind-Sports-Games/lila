@@ -174,6 +174,7 @@ object list {
         menu(active, order, topics.so(_.value)),
         main(cls := "page-menu__content study-index box")(
           div(cls := "box__top")(
+            h1(cls := "offscreen")(title),
             searchForm(title, s"$searchFilter${searchFilter.nonEmpty so " "}"),
             bits.orderSelect(order, active, url),
             bits.newForm(),
