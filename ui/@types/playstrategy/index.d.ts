@@ -25,6 +25,7 @@ interface PlayStrategy {
   loadScriptCJS(url: string, opts?: AssetUrlOpts): Promise<void>;
   loadModule(name: string): Promise<void>;
   lazyPasswordComplexity(fieldId: string): void;
+  lazyChart(selector: string, module: string, draw: () => void): void;
   hopscotch: any;
   userComplete: () => Promise<UserComplete>;
   slider(): Promise<void>;

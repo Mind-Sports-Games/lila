@@ -42,3 +42,26 @@ $forced-outer-coords-variants: (
   'go13x13',
   'go19x19'
 );
+
+// The board themes each family actually offers, mirroring boardThemes in strategygames
+// GameCollection.scala. Looping past these emits rules for art that was never drawn.
+$core-board-themes: (
+  'blue',
+  'blue2',
+  'blue3',
+  'canvas',
+  'wood',
+  'wood2',
+  'wood3',
+  'maple',
+  'brown',
+  'leather',
+  'green',
+  'marble',
+  'grey',
+  'metal',
+  'olive',
+  'purple'
+);
+
+$breakthroughtroyka-board-themes: ('maple', 'purple-diag');
