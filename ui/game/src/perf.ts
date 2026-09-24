@@ -51,5 +51,6 @@ export const perf = {
     nackgammon: '',
     abalone: '\ue927',
     grandabalone: '\ue92C',
+    entropy: '\ue935',
   },
 };

@@ -1,5 +1,5 @@
 import { h, VNode, Hooks, Attrs } from 'snabbdom';
-import { fixCrazySan, getScore } from 'stratutils';
+import { fixCrazySan, getScore, entropy } from 'stratutils';
 import * as cg from 'chessground/types';
 
 export { autolink, innerHTML, enrichText, richHTML, toYouTubeEmbed, toTwitchEmbed } from 'common/richText';
@@ -293,6 +293,7 @@ const noServerEvalVariants = [
   'nackgammon',
   'abalone',
   'grandabalone',
+  'entropy',
 ];
 
 export function allowServerEvalForVariant(variant: VariantKey) {
@@ -302,6 +303,7 @@ export function allowServerEvalForVariant(variant: VariantKey) {
 export const isOnlyDropsPly = (node: Tree.Node, variantKey: VariantKey, defaultValue: boolean) => {
   if (['amazons', 'backgammon', 'hyper', 'nackgammon'].includes(variantKey))
     return typeof node.dropsByRole === 'string' && node.dropsByRole.length > 0;
+  if (variantKey === 'entropy') return entropy.isChaosTurn(node.fen) && !!entropy.counterInPocket(node.fen);
   return defaultValue;
 };
 

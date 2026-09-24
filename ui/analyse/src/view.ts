@@ -271,6 +271,9 @@ function controls(ctrl: AnalyseCtrl) {
             else if (action === 'practice') ctrl.togglePractice();
             else if (action === 'menu') ctrl.actionMenu.toggle();
             else if (action === 'detail-mode') ctrl.analyseDetail(!ctrl.analyseDetail());
+            else if (action === 'pass') {
+              if (!(e.target as HTMLElement).closest('button')?.disabled) ctrl.sendPass();
+            } else if (action) ctrl.controlConfig.handleControlAction?.(action);
           },
           ctrl.redraw,
         );
@@ -326,6 +329,7 @@ function controls(ctrl: AnalyseCtrl) {
                         },
                       })
                     : null,
+                  ...(ctrl.controlConfig.renderControlActions?.() ?? []),
                   isCol1() && isBackgammonVariant(ctrl.data.game.variant.key)
                     ? h('button.fbt', {
                         attrs: {
@@ -535,6 +539,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
     gaugeOn = ctrl.showEvalGauge(),
     variantKey = ctrl.data.game.variant.key,
     needsUserNameWithScore = ['togyzkumalak', 'oware'].includes(variantKey),
+    // entropy shows its score on the pocket instead
+    showScoreBox = ctrl.data.hasGameScore && variantKey !== 'entropy',
     needsInnerCoords =
       isCol1() ||
       ((!!gaugeOn || !!playerBars) &&
@@ -636,6 +642,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'nackgammon',
     'abalone',
     'grandabalone',
+    'entropy',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';
@@ -705,9 +712,9 @@ export default function (ctrl: AnalyseCtrl): VNode {
             ],
           ),
         gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,
-        tour || !ctrl.data.hasGameScore ? null : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
+        tour || !showScoreBox ? null : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
         tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'top'),
-        tour || !ctrl.data.hasGameScore ? null : renderPlayerScoreNames(ctrl),
+        tour || !showScoreBox ? null : renderPlayerScoreNames(ctrl),
         tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
         gamebookPlayView ||
           (tour
@@ -727,9 +734,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
                       retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),
                     ]),
               ])),
-        tour || !ctrl.data.hasGameScore
-          ? null
-          : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey),
+        tour || !showScoreBox ? null : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey),
         tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'bottom'),
         tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
         gamebookPlayView || tour ? null : controls(ctrl),

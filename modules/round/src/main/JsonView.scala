@@ -11,7 +11,7 @@ import scala.math
 
 import lila.common.ApiVersion
 import lila.game.JsonView.*
-import lila.game.{ DeadStoneOfferState, Event, Game, Player as GamePlayer, Pov }
+import lila.game.{ DeadStoneOfferState, Event, Game, Player as GamePlayer, PlayerName, Pov }
 import lila.pref.Pref
 import lila.user.{ User, UserRepo }
 
@@ -47,7 +47,7 @@ final class JsonView(
   private def onlyDropsVariantForCurrentAction(pov: Pov): Boolean =
     pov.game.variant.onlyDropsVariant ||
       (pov.game.situation.canOnlyDrop &&
-        !List("crazyhouse", "minishogi", "shogi").contains(pov.game.variant.key))
+        !List("crazyhouse", "minishogi", "shogi", "entropy").contains(pov.game.variant.key))
 
   private def coordSystemForVariant(prefCoordSystem: Int, gameVariant: Variant): Int =
     gameVariant match {
@@ -155,6 +155,7 @@ final class JsonView(
               .add("destination" -> (pref.destination && !pref.isBlindfold))
               .add("playerTurnIndicator" -> pref.playerTurnIndicator)
               .add("actionReminder" -> pref.actionReminder)
+              .add("entropyPatterns" -> pref.isEntropyPatterns)
               .add("enablePremove" -> pref.premove)
               .add("showCaptured" -> pref.captured)
               .add("submitMove" -> {
@@ -283,6 +284,7 @@ final class JsonView(
               .add("destination" -> (pref.destination && !pref.isBlindfold))
               .add("playerTurnIndicator" -> false)
               .add("actionReminder" -> false)
+              .add("entropyPatterns" -> pref.isEntropyPatterns)
               .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
               .add("showCaptured" -> pref.captured),
             "evalPut" -> JsBoolean(me.so(evalCache.shouldPut))
@@ -330,7 +332,7 @@ final class JsonView(
           )
           .add("division", division)
           .add("winner", game.winner.map(_.playerIndex.name))
-          .add("winnerPlayer", game.winner.map(w => game.variant.playerNames(w.playerIndex))),
+          .add("winnerPlayer", game.winner.map(w => PlayerName(game.variant, w.playerIndex))),
         "player" -> Json.obj(
           "id"          -> owner.option(pov.playerId),
           "playerName"  -> game.variant.playerNames(playerIndex),
@@ -358,7 +360,8 @@ final class JsonView(
           .add("highlight" -> pref.highlight)
           .add("destination" -> (pref.destination && !pref.isBlindfold))
           .add("playerTurnIndicator" -> false)
-          .add("actionReminder" -> false),
+          .add("actionReminder" -> false)
+          .add("entropyPatterns" -> pref.isEntropyPatterns),
         "path"             -> pov.game.plies,
         "gameRecordFormat" -> pov.game.gameRecordFormat,
         "userAnalysis"     -> true
@@ -442,6 +445,10 @@ final class JsonView(
         pov.game
           .playableBy(pov.player)
           .option(Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion))
+      case (Situation.Entropy(_), Variant.Entropy(_)) =>
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion))
       case _ => sys.error("Mismatch of types for possibleMoves")
     }
 
@@ -468,6 +475,10 @@ final class JsonView(
       case (Situation.Abalone(_), Variant.Abalone(_))   => None
       case (Situation.Dameo(_), Variant.Dameo(_))       => None
       case (Situation.Draughts(_), Variant.Draughts(_)) => None
+      case (Situation.Entropy(_), Variant.Entropy(_))   =>
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty)))
       case _ => sys.error("Mismatch of types for possibleDropsByrole")
     }
 

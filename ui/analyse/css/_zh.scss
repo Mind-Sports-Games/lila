@@ -19,7 +19,7 @@
   }
 }
 
-@each $variant in ('crazyhouse', 'shogi', 'minishogi') {
+@each $variant in ('crazyhouse', 'shogi', 'minishogi', 'entropy') {
   .analyse.variant-#{$variant} {
     grid-template-rows: $pocket-col1-height auto $pocket-col1-height auto 50vh;
     grid-template-areas: 'pocket-top' 'board' 'pocket-bot' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
@@ -34,4 +34,24 @@
       grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
     }
   }
+}
+
+// eight slots leave entropy's counters shorter than the fixed pocket row, so the row fits them instead;
+// its fixed maximum keeps the board's extra height going to the middle rows, as a fixed row does
+$entropy-pocket-height: minmax(min-content, 0);
+
+.analyse.variant-entropy {
+  @include breakpoint($mq-col2) {
+    grid-template-rows: $entropy-pocket-height auto $entropy-pocket-height;
+  }
+
+  @include breakpoint($mq-col3) {
+    grid-template-rows: $entropy-pocket-height $meta-height $chat-height $entropy-pocket-height;
+  }
+}
+
+// the bag Chaos draws from, shown in its pocket until a counter is drawn
+.variant-entropy .pocket.bag {
+  outline: 2px dashed $c-primary;
+  outline-offset: -2px;
 }

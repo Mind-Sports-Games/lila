@@ -304,6 +304,15 @@ export interface AnaPass {
   ch?: string;
 }
 
+export interface AnaDrawCounter {
+  role: cg.Role;
+  variant: VariantKey;
+  lib: number;
+  fen: Fen;
+  path: string;
+  ch?: string;
+}
+
 export interface AnaRoll {
   variant: VariantKey;
   lib: number;

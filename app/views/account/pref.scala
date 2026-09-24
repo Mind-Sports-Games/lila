@@ -74,6 +74,10 @@ object pref {
               radios(form("display.boardIdentifier"), booleanChoices)
             ),
             setting(
+              entropyPatterns(),
+              radios(form("display.entropyPatterns"), booleanChoices)
+            ),
+            setting(
               boardCoordinates(),
               radios(form("display.coords"), translatedBoardCoordinateChoices)
             ),

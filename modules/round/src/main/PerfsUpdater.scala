@@ -121,6 +121,8 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.abalone, ratingsB.abalone, game)
               case Variant.Abalone(strategygames.abalone.variant.GrandAbalone) =>
                 updateRatings(ratingsW.grandabalone, ratingsB.grandabalone, game)
+              case Variant.Entropy(strategygames.entropy.variant.Entropy) =>
+                updateRatings(ratingsW.entropy, ratingsB.entropy, game)
               case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
@@ -203,6 +205,7 @@ final class PerfsUpdater(
       nackgammon: Rating,
       abalone: Rating,
       grandabalone: Rating,
+      entropy: Rating,
       ultraBullet: Rating,
       bullet: Rating,
       blitz: Rating,
@@ -259,6 +262,7 @@ final class PerfsUpdater(
       nackgammon = perfs.nackgammon.toRating,
       abalone = perfs.abalone.toRating,
       grandabalone = perfs.grandabalone.toRating,
+      entropy = perfs.entropy.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
       blitz = perfs.blitz.toRating,
@@ -533,6 +537,11 @@ final class PerfsUpdater(
             perfs.grandabalone,
             ratings.grandabalone
           ),
+          entropy = addRatingVariant(
+            Variant.Entropy(strategygames.entropy.variant.Entropy),
+            perfs.entropy,
+            ratings.entropy
+          ),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
           bullet = addRatingIf(isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),
@@ -594,6 +603,7 @@ final class PerfsUpdater(
           nackgammon = r(PT.orDefault("nackgammon"), perfs.nackgammon, perfs1.nackgammon),
           abalone = r(PT.orDefault("abalone"), perfs.abalone, perfs1.abalone),
           grandabalone = r(PT.orDefault("grandabalone"), perfs.grandabalone, perfs1.grandabalone),
+          entropy = r(PT.orDefault("entropy"), perfs.entropy, perfs1.entropy),
           bullet = r(PT.orDefault("bullet"), perfs.bullet, perfs1.bullet),
           blitz = r(PT.orDefault("blitz"), perfs.blitz, perfs1.blitz),
           rapid = r(PT.orDefault("rapid"), perfs.rapid, perfs1.rapid),

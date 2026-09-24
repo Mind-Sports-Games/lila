@@ -52,7 +52,7 @@ import { make as makeSocket, Socket } from './socket';
 
 import { Result } from '@badrap/result';
 import { storedProp, StoredBooleanProp } from 'common/storage';
-import { AnaMove, AnaDrop, AnaPass, StudyCtrl } from './study/interfaces';
+import { AnaMove, AnaDrop, AnaPass, AnaDrawCounter, StudyCtrl } from './study/interfaces';
 import { StudyPracticeCtrl } from './study/practice/interfaces';
 import { valid as crazyValid } from './crazy/crazyCtrl';
 import { isOnlyDropsPly } from './util';
@@ -318,7 +318,10 @@ export default class AnalyseCtrl {
     const dropDests = stratUtils.readDropsByRole(this.node.dropsByRole);
     const isDropPly = isOnlyDropsPly(this.node, variantKey, this.data.onlyDropsVariant);
     if (isDropPly) {
-      CgSetDropMode(cg.state, stratUtils.onlyDropsVariantPiece(variantKey, playerIndex));
+      CgSetDropMode(
+        cg.state,
+        this.controlConfig.dropModePiece?.(this.node) ?? stratUtils.onlyDropsVariantPiece(variantKey, playerIndex),
+      );
     }
     cg.set({
       // when bar pieces must be entered, treat as onlyDropsVariant so drop mode isn't cancelled on invalid clicks
@@ -589,7 +592,11 @@ export default class AnalyseCtrl {
     const piece = this.chessground.state.pieces.get(dest);
     const isCapture =
       capture ||
-      (this.data.game.gameFamily !== 'breakthroughtroyka' && piece && piece.role == 'p-piece' && orig[0] != dest[0]);
+      (this.data.game.gameFamily !== 'breakthroughtroyka' &&
+        this.data.game.variant.key !== 'entropy' &&
+        piece &&
+        piece.role == 'p-piece' &&
+        orig[0] != dest[0]);
     this.sound[isCapture ? 'capture' : 'move']();
     if (!promotion.start(this, orig, dest, capture, this.sendMove)) this.sendMove(orig, dest, capture);
     if (!this.data.onlyDropsVariant) CgCancelDropMode(this.chessground.state);
@@ -640,6 +647,20 @@ export default class AnalyseCtrl {
     this.controlConfig.onUserAction?.();
     this.socket.sendAnaPass(pass);
     this.preparePremoving();
+    this.redraw();
+  };
+
+  sendDrawCounter = (role: CgRole): void => {
+    const drawCounter: AnaDrawCounter = {
+      role,
+      variant: this.data.game.variant.key,
+      lib: this.data.game.variant.lib,
+      fen: this.node.fen,
+      path: this.path,
+    };
+    if (this.practice) this.practice.onUserMove();
+    this.controlConfig.onUserAction?.();
+    this.socket.sendAnaDrawCounter(drawCounter);
     this.redraw();
   };
 

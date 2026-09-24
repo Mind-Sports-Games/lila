@@ -83,4 +83,5 @@ export const perfIcons: any = {
   Nackgammon: '',
   Abalone: '\ue927',
   'Grand Abalone': '\ue92C',
+  Entropy: '\ue935',
 };

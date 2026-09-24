@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.Player as PlayerIndex
+import strategygames.{ GameLogic, Player as PlayerIndex }
 import lila.common.Bus
 import lila.game.{ Event, Game, GameRepo, Pov, Progress, Rewind, UciMemo }
 import lila.pref.{ Pref, PrefApi }
@@ -30,11 +30,13 @@ final private class Takebacker(
               takebackSwitchPlayer(game)
             else
               // go back one ply. if playerindex has not switched, continue going back
-              takebackRetainPlayer(game)
+              takebackRetainPlayer(game, !playerIndex)
           }.dmap(_ -> situation.reset)
         case Pov(game, _) if pov.game.playableByAi => takebackSwitchPlayer(game).dmap(_ -> situation)
-        case Pov(game, _) if pov.opponent.isAi     => takebackRetainPlayer(game).dmap(_ -> situation)
-        case Pov(game, _) if pov.opponent.isPSBot  => takebackRetainPlayer(game).dmap(_ -> situation)
+        case Pov(game, playerIndex) if pov.opponent.isAi =>
+          takebackRetainPlayer(game, playerIndex).dmap(_ -> situation)
+        case Pov(game, playerIndex) if pov.opponent.isPSBot =>
+          takebackRetainPlayer(game, playerIndex).dmap(_ -> situation)
         case Pov(game, playerIndex) if (game.playerCanProposeTakeback(playerIndex)) && situation.offerable =>
           {
             messenger.system(game, trans.takebackPropositionSent.txt())
@@ -109,11 +111,22 @@ final private class Takebacker(
   private def alwaysRewindSinglePly(game: Game): Boolean =
     game.variant.key == "grandabalone"
 
+  // Chaos's draw is forced and random, so undoing only the draw would deal them a new counter;
+  // instead take Chaos back to before their last drop, holding the counter they placed
+  private def chaosTakingBackToDrop(game: Game, requester: PlayerIndex): Boolean =
+    game.variant.gameLogic == GameLogic.Entropy() &&
+      requester == game.turnPlayerIndex &&
+      !currentPlayerTakingBack(game) &&
+      game.actionStrs.takeRight(3).map(_.size) == Vector(2, 1, 1)
+
   private def takebackSwitchPlayer(game: Game)(implicit proxy: GameProxy): Fu[Events] =
     if (alwaysRewindSinglePly(game) || currentPlayerTakingBack(game)) rewindPly(game)
     else rewindTurnAndPly(game)
-  private def takebackRetainPlayer(game: Game)(implicit proxy: GameProxy): Fu[Events] =
-    if (alwaysRewindSinglePly(game) || !currentPlayerTakingBack(game)) rewindPly(game)
+  private def takebackRetainPlayer(game: Game, requester: PlayerIndex)(implicit
+      proxy: GameProxy
+  ): Fu[Events] =
+    if (chaosTakingBackToDrop(game, requester)) rewindTwoTurnsAndPly(game)
+    else if (alwaysRewindSinglePly(game) || !currentPlayerTakingBack(game)) rewindPly(game)
     else rewindTurnAndPly(game)
 
   private def rewindPly(game: Game)(implicit proxy: GameProxy): Fu[Events] =
@@ -133,6 +146,18 @@ final private class Takebacker(
       }
       _      <- uciMemo.set(prog2.game, fen)
       events <- saveAndNotify(prog2)
+    } yield events
+
+  private def rewindTwoTurnsAndPly(game: Game)(implicit proxy: GameProxy): Fu[Events] =
+    for {
+      fen   <- gameRepo.initialFen(game)
+      prog1 <- Rewind(game, fen, false).toEither.toFuture
+      prog2 <- Rewind(prog1.game, fen, false).toEither.toFuture
+      prog3 <- Rewind(prog2.game, fen, true).toEither.toFuture dmap { progress =>
+        prog1.withGame(progress.game)
+      }
+      _      <- uciMemo.set(prog3.game, fen)
+      events <- saveAndNotify(prog3)
     } yield events
 
   // private def double(game: Game)(implicit proxy: GameProxy): Fu[Events] =

@@ -54,14 +54,16 @@ final class JsonView(rematches: Rematches) {
       .add("tournamentId" -> game.tournamentId)
       .add("swissId" -> game.swissId)
       .add("winner" -> game.winnerPlayerIndex)
-      .add("winnerPlayer" -> game.winnerPlayerIndex.map(game.variant.playerNames))
-      .add("loserPlayer" -> game.winnerPlayerIndex.map(w => game.variant.playerNames(!w)))
+      .add("winnerPlayer" -> game.winnerPlayerIndex.map(PlayerName(game.variant, _)))
+      .add("loserPlayer" -> game.winnerPlayerIndex.map(w => PlayerName(game.variant, !w)))
       .add("lastMove" -> game.lastActionKeys)
       .add("check" -> game.situation.checkSquare.map(_.key))
       .add("rematch" -> rematches.of(game.id))
       .add("canOfferDraw" -> game.variant.canOfferDraw)
       .add("drawOffers" -> (!game.drawOffers.isEmpty).option(game.drawOffers.normalizedTurns))
-      .add("canDoPassAction" -> (game.situation.passes.size > 0))
+      .add(
+        "canDoPassAction" -> (game.situation.passes.size > 0 || game.variant.gameLogic == GameLogic.Entropy())
+      )
       .add("multiMatch" -> game.metadata.multiMatchGameNr.map { index =>
         Json
           .obj("index" -> index)
@@ -250,6 +252,14 @@ object JsonView {
           "lib"       -> v.gameLogic.id,
           "boardSize" -> dameoVariant.boardSize
         )
+      case Variant.Entropy(entropyVariant) =>
+        Json.obj(
+          "key"       -> v.key,
+          "name"      -> VariantKeys.variantName(v),
+          "short"     -> VariantKeys.variantShortName(v),
+          "lib"       -> v.gameLogic.id,
+          "boardSize" -> entropyVariant.boardSize
+        )
       case _ =>
         Json.obj(
           "key"       -> v.key,
@@ -314,6 +324,14 @@ object JsonView {
 
   implicit val boardSizeDameoWriter: Writes[strategygames.dameo.Board.BoardSize] =
     Writes[strategygames.dameo.Board.BoardSize] { b =>
+      Json.obj(
+        "width"  -> b.width,
+        "height" -> b.height
+      )
+    }
+
+  implicit val boardSizeEntropyWriter: Writes[strategygames.entropy.Board.BoardSize] =
+    Writes[strategygames.entropy.Board.BoardSize] { b =>
       Json.obj(
         "width"  -> b.width,
         "height" -> b.height

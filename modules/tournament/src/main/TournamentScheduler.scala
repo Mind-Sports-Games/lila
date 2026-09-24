@@ -439,6 +439,9 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.Abalone(strategygames.abalone.variant.GrandAbalone), Delay66)(
         new DateTime(2026, 11, 27, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Entropy(strategygames.entropy.variant.Entropy), Blitz)(
+        new DateTime(2026, 12, 4, 0, 0)
       )
     ).flatten
 

@@ -43,6 +43,7 @@ export function makeConfig(ctrl: RoundController): Config {
     check: !!step.check,
     coordinates: data.pref.coords,
     boardScores: ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key),
+    showPatterns: variantKey === 'entropy' && data.pref.entropyPatterns ? 'full' : 'never',
     dice: dice,
     doublingCube: doublingCube,
     cubeActions: cubeActions,
@@ -173,17 +174,21 @@ export function makeConfig(ctrl: RoundController): Config {
                         ? 'https://playstrategy.org/assets/piece/backgammon/' +
                           data.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
                           '/'
-                        : variantKey === 'abalone' || variantKey === 'grandabalone'
-                          ? 'https://playstrategy.org/assets/piece/abalone/' +
-                            data.pref.pieceSet.filter(ps => ps.gameFamily === 'abalone')[0].name +
+                        : variantKey === 'entropy'
+                          ? 'https://playstrategy.org/assets/piece/entropy/' +
+                            data.pref.pieceSet.filter(ps => ps.gameFamily === 'entropy')[0].name +
                             '/'
-                          : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
-                            ? 'https://playstrategy.org/assets/piece/xiangqi/' +
-                              data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                          : variantKey === 'abalone' || variantKey === 'grandabalone'
+                            ? 'https://playstrategy.org/assets/piece/abalone/' +
+                              data.pref.pieceSet.filter(ps => ps.gameFamily === 'abalone')[0].name +
                               '/'
-                            : 'https://playstrategy.org/assets/piece/chess/' +
-                              data.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
-                              '/',
+                            : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
+                              ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+                                data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                                '/'
+                              : 'https://playstrategy.org/assets/piece/chess/' +
+                                data.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+                                '/',
       },
     },
     disableContextMenu: true,
@@ -197,6 +202,15 @@ export function makeConfig(ctrl: RoundController): Config {
   };
   if (data.game.variant.key === 'dameo' && turnPlayerIndex === data.player.playerIndex) {
     return { ...config, selected: dameoStratUtils.activePiecePosition(step.fen) };
+  }
+  if (variantKey === 'entropy' && playing && turnPlayerIndex === data.player.playerIndex) {
+    const role = stratUtils.entropy.isChaosTurn(step.fen) && stratUtils.entropy.counterInPocket(step.fen);
+    if (role)
+      return {
+        ...config,
+        onlyDropsVariant: true,
+        dropmode: { ...config.dropmode, active: true, piece: { playerIndex: turnPlayerIndex, role } },
+      };
   }
   return config;
 }

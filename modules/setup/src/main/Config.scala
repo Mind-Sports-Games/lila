@@ -130,6 +130,7 @@ trait Positional { self: Config =>
       true // randomly chooses start player and also sets multipoint in fen - but no from position
     case GameLogic.Abalone()      => true // no fromPosition yet
     case GameLogic.Dameo()        => true // no fromPosition yet
+    case GameLogic.Entropy()      => true // no fromPosition yet
   }
 
   lazy val validKingCount = variant.gameLogic match {

@@ -195,6 +195,8 @@ function renderFullMoveOf(
           });
         }),
         notation,
+        variant.key,
+        fullTurnNodes.map(n => n.uci || ''),
       ),
     ];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => content.push(moveView.renderGlyph(g)));
@@ -210,16 +212,16 @@ function renderFullMoveOf(
 
 function renderMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   const variant = ctx.ctrl.data.game.variant;
+  const notation = variantClassFromKey(variant.key).computeMoveNotation({
+    san: fixCrazySan(node.san || ''),
+    uci: node.uci || '',
+    fen: node.fen,
+    prevFen: node.parent?.fen || '',
+  });
   const path = opts.parentPath + node.id,
     content: MaybeVNodes = [
       opts.withIndex || node.ply & 1 ? moveView.renderIndex(node, true) : null,
-      // TODO: the || '' are probably not correct
-      variantClassFromKey(variant.key).computeMoveNotation({
-        san: fixCrazySan(node.san || ''),
-        uci: node.uci || '',
-        fen: node.fen,
-        prevFen: node.parent?.fen || '',
-      }),
+      variant.key === 'entropy' ? notation || node.uci || '' : notation,
     ];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => content.push(moveView.renderGlyph(g)));
   return h(

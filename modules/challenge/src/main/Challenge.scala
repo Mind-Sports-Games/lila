@@ -8,7 +8,7 @@ import strategygames.{ GameFamily, Mode, P1, P2, Player as PlayerIndex, Speed }
 import org.joda.time.DateTime
 import scala.util.Random
 
-import lila.game.Game
+import lila.game.{ Game, PlayerName }
 import lila.i18n.{ I18nKey, I18nKeys }
 import play.api.i18n.Lang
 import lila.rating.PerfType
@@ -109,17 +109,7 @@ case class Challenge(
     variant == Variant.Draughts(strategygames.draughts.variant.FromPosition) ||
       (draughtsFenVariants(variant) && customStartingPosition)
 
-  // When updating, also edit modules/game, modules/puzzle and ui/@types/playstrategy/index.d.ts:declare type PlayerName
-  def playerTrans(p: PlayerIndex)(implicit lang: Lang): String =
-    variant.playerNames(p) match {
-      case "White" => I18nKeys.white.txt()
-      case "Black" => I18nKeys.black.txt()
-      // Xiangqi add back in when adding red as a colour for Xiangqi
-      // case "Red"   => I18nKeys.red.txt()
-      case "Sente"   => I18nKeys.sente.txt()
-      case "Gote"    => I18nKeys.gote.txt()
-      case s: String => s
-    }
+  def playerTrans(p: PlayerIndex)(implicit lang: Lang): String = PlayerName.translated(variant, p)
 
   def playerChoiceTrans(p: PlayerIndexChoice)(implicit lang: Lang): String = p match {
     case PlayerIndexChoice.Random => "random"

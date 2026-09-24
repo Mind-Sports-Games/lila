@@ -13,7 +13,7 @@ import lila.common.Bus
 import lila.room.RoomSocket.{ Protocol as RP, * }
 import lila.socket.RemoteSocket.{ Protocol as P, * }
 import lila.socket.Socket.{ makeMessage, Sri }
-import lila.socket.{ AnaAny, AnaDests, AnaDrop, AnaEndTurn, AnaLift, AnaMove, AnaPass, AnaRoll }
+import lila.socket.{ AnaAny, AnaDests, AnaDrawCounter, AnaDrop, AnaEndTurn, AnaLift, AnaMove, AnaPass, AnaRoll }
 import lila.tree.Node.{ defaultNodeJsonWriter, Comment, Gamebook, Shape, Shapes }
 import lila.user.User
 
@@ -88,6 +88,10 @@ final private class StudySocket(
         case "anaPass" =>
           AnaPass.parse(o) foreach { pass =>
             who foreach gameAction(studyId, pass, MoveOpts.parse(o))
+          }
+        case "anaDrawCounter" =>
+          AnaDrawCounter.parse(o) foreach { drawCounter =>
+            who foreach gameAction(studyId, drawCounter, MoveOpts.parse(o))
           }
         case "anaRoll" =>
           AnaRoll.parse(o) foreach { roll =>

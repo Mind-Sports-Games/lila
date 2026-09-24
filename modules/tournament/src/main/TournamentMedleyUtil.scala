@@ -99,7 +99,8 @@ object TournamentMedleyUtil {
       "hyper"                  -> fastest,
       "nackgammon"             -> slow,
       "abalone"                -> slow,
-      "grandabalone"           -> slow
+      "grandabalone"           -> slow,
+      "entropy"                -> slow
     )
   }
 

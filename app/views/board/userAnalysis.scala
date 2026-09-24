@@ -28,7 +28,8 @@ object userAnalysis {
         Variant.all(GameLogic.Togyzkumalak()) ++
         Variant.all(GameLogic.Go()) ++
         Variant.all(GameLogic.Abalone()) ++
-        Variant.all(GameLogic.Backgammon())
+        Variant.all(GameLogic.Backgammon()) ++
+        Variant.all(GameLogic.Entropy())
     )
       .filterNot(noAnalysisVariants.contains(_))
 

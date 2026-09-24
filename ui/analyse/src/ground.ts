@@ -66,6 +66,8 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
       : ctrl.data.player.playerIndex,
     coordinates: !!ctrl.embed || !!renderPlayerBars(ctrl) ? cg.Coords.Hidden : pref.coords,
     boardScores: ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(variantKey),
+    // the variant control has already had its say over opts, and entropy's decides this one
+    showPatterns: opts.showPatterns ?? 'never',
     dice: stratUtils.backgammon.readDice(ctrl.node.fen, variantKey),
     doublingCube: stratUtils.backgammon.readDoublingCube(ctrl.node.fen, variantKey),
     multiPointState: stratUtils.backgammon.finalMultiPointState(d.game, ctrl.node.ply, ctrl.tree.lastPly()),
@@ -139,21 +141,25 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
                           ? 'https://playstrategy.org/assets/piece/backgammon/' +
                             d.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
                             '/'
-                          : cgVariantKey === 'abalone' || cgVariantKey === 'grandabalone'
-                            ? 'https://playstrategy.org/assets/piece/abalone/' +
-                              d.pref.pieceSet.filter(ps => ps.gameFamily === 'abalone')[0].name +
+                          : cgVariantKey === 'entropy'
+                            ? 'https://playstrategy.org/assets/piece/entropy/' +
+                              d.pref.pieceSet.filter(ps => ps.gameFamily === 'entropy')[0].name +
                               '/'
-                            : cgVariantKey === 'dameo'
-                              ? 'https://playstrategy.org/assets/piece/dameo/' +
-                                d.pref.pieceSet.filter(ps => ps.gameFamily === 'dameo')[0].name +
+                            : cgVariantKey === 'abalone' || cgVariantKey === 'grandabalone'
+                              ? 'https://playstrategy.org/assets/piece/abalone/' +
+                                d.pref.pieceSet.filter(ps => ps.gameFamily === 'abalone')[0].name +
                                 '/'
-                              : cgVariantKey === 'xiangqi' || cgVariantKey === 'minixiangqi'
-                                ? 'https://playstrategy.org/assets/piece/xiangqi/' +
-                                  d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                              : cgVariantKey === 'dameo'
+                                ? 'https://playstrategy.org/assets/piece/dameo/' +
+                                  d.pref.pieceSet.filter(ps => ps.gameFamily === 'dameo')[0].name +
                                   '/'
-                                : 'https://playstrategy.org/assets/piece/chess/' +
-                                  d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
-                                  '/',
+                                : cgVariantKey === 'xiangqi' || cgVariantKey === 'minixiangqi'
+                                  ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+                                    d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                                    '/'
+                                  : 'https://playstrategy.org/assets/piece/chess/' +
+                                    d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+                                    '/',
       },
     },
     highlight: {

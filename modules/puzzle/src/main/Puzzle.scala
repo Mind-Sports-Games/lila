@@ -7,7 +7,7 @@ import strategygames.variant.Variant
 
 import lila.rating.{ Glicko, PerfType }
 import lila.common.Iso
-import lila.i18n.I18nKeys
+import lila.game.PlayerName
 import play.api.i18n.Lang
 
 case class Puzzle(
@@ -26,17 +26,7 @@ case class Puzzle(
   def gameLogic: GameLogic = GameLogic(lib)
   def variant: Variant     = Variant.orDefault(gameLogic, variantId)
 
-  // When updating, also edit modules/game, modules/challenge, and ui/@types/playstrategy/index.d.ts:declare type PlayerName
-  def playerTrans(implicit lang: Lang): String =
-    variant.playerNames(playerIndex) match {
-      case "White" => I18nKeys.white.txt()
-      case "Black" => I18nKeys.black.txt()
-      // Xiangqi add back in when adding red as a colour for Xiangqi
-      // case "Red"   => I18nKeys.red.txt()
-      case "Sente"   => I18nKeys.sente.txt()
-      case "Gote"    => I18nKeys.gote.txt()
-      case s: String => s
-    }
+  def playerTrans(implicit lang: Lang): String = PlayerName.translated(variant, playerIndex)
 
   // ply after "initial move" when we start solving
   def initialPly: Int =

@@ -7,6 +7,7 @@ import { NotationStyle } from 'stratops/variants/types';
 import { variantClassFromKey } from 'stratops/variants/util';
 import { GameFamily as BackgammonFamily } from 'stratops/variants/backgammon/GameFamily';
 import { GameFamily as DameoFamily } from 'stratops/variants/dameo/GameFamily';
+import { GameFamily as EntropyFamily } from 'stratops/variants/entropy/GameFamily';
 
 export interface Ctx {
   withDots?: boolean;
@@ -42,16 +43,18 @@ export function renderIndex(node: Tree.ParentedNode, withDots?: boolean): VNode 
 
 export function renderMove(ctx: Ctx, node: Tree.ParentedNode): VNode[] {
   const ev = cevalView.getBestEval({ client: node.ceval, server: node.eval });
+  const variantClass = variantClassFromKey(ctx.variant.key);
   const nodes = [
     h(
       'move',
-      // TODO: the || '' are probably not correct
-      variantClassFromKey(ctx.variant.key).computeMoveNotation({
-        san: fixCrazySan(node.san || ''),
-        uci: node.uci || '',
-        fen: node.fen,
-        prevFen: node.parent?.fen || '',
-      }),
+      ctx.variant.key === 'entropy'
+        ? notationOfTurn(ctx.variant, fullTurnNodesFromNode(node), variantClass.getNotationStyle())
+        : variantClass.computeMoveNotation({
+            san: fixCrazySan(node.san || ''),
+            uci: node.uci || '',
+            fen: node.fen,
+            prevFen: node.parent?.fen || '',
+          }),
     ),
   ];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => nodes.push(renderGlyph(g)));
@@ -63,7 +66,31 @@ export function renderMove(ctx: Ctx, node: Tree.ParentedNode): VNode[] {
   return nodes;
 }
 
-export function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {
+export function notationOfTurn(variant: Variant, turnNodes: Tree.ParentedNode[], notation: NotationStyle): string {
+  const variantClass = variantClassFromKey(variant.key);
+  return combinedNotationOfTurn(
+    turnNodes.map(n =>
+      variantClass.computeMoveNotation({
+        san: fixCrazySan(n.san || ''),
+        uci: n.uci || '',
+        fen: n.fen,
+        prevFen: n.parent?.fen || '',
+      }),
+    ),
+    notation,
+    variant.key,
+    turnNodes.map(n => n.uci || ''),
+  );
+}
+
+export function combinedNotationOfTurn(
+  actionNotations: string[],
+  notation: NotationStyle,
+  variantKey?: VariantKey,
+  ucis: string[] = [],
+): string {
+  // an entropy draw is shown by the drop that follows it; a line stopped after the draw shows the draw
+  if (variantKey === 'entropy') return EntropyFamily.combinedNotation(actionNotations) || ucis.join(' ');
   return notation === NotationStyle.bkg
     ? BackgammonFamily.combinedNotation(actionNotations)
     : notation === NotationStyle.dmo
@@ -73,25 +100,8 @@ export function combinedNotationOfTurn(actionNotations: string[], notation: Nota
 
 export function renderFullMove(ctx: Ctx, node: Tree.ParentedNode, style: NotationStyle): VNode[] {
   const fullTurnNodes: Tree.ParentedNode[] = fullTurnNodesFromNode(node);
-  const variant = ctx.variant;
   const ev = cevalView.getBestEval({ client: node.ceval, server: node.eval });
-  const nodes = [
-    h(
-      'move',
-      // TODO: the || '' are probably not correct
-      combinedNotationOfTurn(
-        fullTurnNodes.map(n => {
-          return variantClassFromKey(variant.key).computeMoveNotation({
-            san: fixCrazySan(n.san || ''),
-            uci: n.uci || '',
-            fen: n.fen,
-            prevFen: n.parent?.fen || '',
-          });
-        }),
-        style,
-      ),
-    ),
-  ];
+  const nodes = [h('move', notationOfTurn(ctx.variant, fullTurnNodes, style))];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => nodes.push(renderGlyph(g)));
   if (fullTurnNodes.filter(n => n.shapes !== undefined).length > 0) nodes.push(h('shapes'));
   if (ev && ctx.showEval) {
