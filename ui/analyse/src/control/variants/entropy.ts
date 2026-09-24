@@ -35,10 +35,13 @@ export const configure = (ctrl: AnalyseCtrl): void => {
       attrs: { title: 'Show scoring patterns', 'data-act': 'patterns', 'data-icon': '^' },
       class: { active: showPatterns() },
     }),
-    entropy.isOrderTurn(ctrl.node.fen) && !ctrl.outcome()
-      ? h('button.fbt', {
-          attrs: { title: 'Pass', 'data-act': 'pass', 'data-icon': '\ue91b' },
-        })
-      : null,
+    h('button.fbt', {
+      attrs: {
+        title: 'Pass',
+        'data-act': 'pass',
+        'data-icon': '\ue91b',
+        disabled: !entropy.isOrderTurn(ctrl.node.fen) || !!ctrl.outcome(),
+      },
+    }),
   ];
 };

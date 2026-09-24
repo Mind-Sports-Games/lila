@@ -271,8 +271,9 @@ function controls(ctrl: AnalyseCtrl) {
             else if (action === 'practice') ctrl.togglePractice();
             else if (action === 'menu') ctrl.actionMenu.toggle();
             else if (action === 'detail-mode') ctrl.analyseDetail(!ctrl.analyseDetail());
-            else if (action === 'pass') ctrl.sendPass();
-            else if (action) ctrl.controlConfig.handleControlAction?.(action);
+            else if (action === 'pass') {
+              if (!(e.target as HTMLElement).closest('button')?.disabled) ctrl.sendPass();
+            } else if (action) ctrl.controlConfig.handleControlAction?.(action);
           },
           ctrl.redraw,
         );
