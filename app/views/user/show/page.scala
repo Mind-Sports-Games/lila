@@ -81,9 +81,8 @@ object page {
       infiniteScrollTag,
       jsModule("user"),
       info.ratingChart.map { ratingChart =>
-        frag(
-          jsModule("chart.ratingHistory"),
-          embedJsUnsafeLoadThen(s"playstrategy.ratingHistoryChart($ratingChart)")
+        embedJsUnsafeLoadThen(
+          s"playstrategy.lazyChart('.rating-history-container','chart.ratingHistory',()=>playstrategy.ratingHistoryChart($ratingChart))"
         )
       },
       withSearch.option(jsModule("gameSearch")),

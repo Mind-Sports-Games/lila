@@ -482,10 +482,11 @@ square {
     will-change: transform;
     background-color: rgba(155, 199, 0, 0.41);
 
+    // The horsey boards are drawn by hand and their squares do not sit on a true grid, so a
+    // square highlight lands visibly askew on them. These boards go without one.
     body.chess-horsey &:not(.move-dest),
     body.loa-horsey &:not(.move-dest) {
-      background: url(../images/board/horsey.last-move.png);
-      background-size: cover;
+      background: none;
     }
   }
 
@@ -502,10 +503,10 @@ square {
   &.selected {
     background-color: rgba(20, 85, 30, 0.5);
 
+    // no square highlight on the hand-drawn boards, as above
     body.chess-horsey &,
     body.loa-horsey & {
-      background: url(../images/board/horsey.selected.png);
-      background-size: cover;
+      background: none;
     }
 
     @each $board, $variant, $_lastMove, $selectedMove in $oware-board-highlights {
@@ -558,7 +559,7 @@ square {
       }
       body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.to,
       body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/marker-start#{marker-suffix}.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-start#{$marker-suffix}.svg);
         background-size: cover;
         height: $togyzkumalak-family-highlight-height;
         &.p2 {
@@ -574,20 +575,20 @@ square {
   &.current-premove {
     background-color: rgba(20, 30, 85, 0.5) !important;
 
+    // no square highlight on the hand-drawn boards, as above
     body.chess-horsey &,
     body.loa-horsey & {
-      background: url(../images/board/horsey.current-premove.png);
-      background-size: cover;
+      background: none;
     }
   }
 
   &.move-dest:hover {
     background: rgba(20, 85, 30, 0.3);
 
+    // no square highlight on the hand-drawn boards, as above
     body.chess-horsey &,
     body.loa-horsey & {
-      background: url(../images/board/horsey.move-dest.png);
-      background-size: cover;
+      background: none;
     }
 
     @each $color, $gameFamily in $alternate-board-highlights {

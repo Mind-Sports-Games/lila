@@ -195,9 +195,9 @@ $abalone-variants: ('abalone', 'grandabalone');
   }
 }
 
-@each $color, $file in $chess-board-files {
+@each $color in $core-board-themes {
   .dameo-#{$color} .variant-dameo.is2d cg-board {
-    background-image: url(../images/board/dameo/#{$file});
+    background-image: url(../images/board/dameo/#{map-get($chess-board-files, $color)});
   }
 }
 
@@ -339,9 +339,9 @@ $abalone-variants: ('abalone', 'grandabalone');
 }
 
 @each $variant in $dameo-variants {
-  @each $color, $file in $chess-board-files {
+  @each $color in $core-board-themes {
     .dameo-#{$color} .is2d .variant-#{$variant} cg-board {
-      background-image: url(../images/board/dameo/#{$file});
+      background-image: url(../images/board/dameo/#{map-get($chess-board-files, $color)});
     }
   }
 }

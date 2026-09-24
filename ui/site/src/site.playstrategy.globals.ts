@@ -19,6 +19,7 @@ import {
   userComplete,
   loadModule,
   lazyPasswordComplexity,
+  lazyChart,
 } from './component/assets';
 import widget from './component/widget';
 import idleTimer from './component/idle-timer';
@@ -55,6 +56,7 @@ export default function windowedPlaystrategy(): PlayStrategy {
   l.loadScriptCJS = loadScriptCJS;
   l.loadModule = loadModule;
   l.lazyPasswordComplexity = lazyPasswordComplexity;
+  l.lazyChart = lazyChart;
   l.hopscotch = hopscotch;
   l.userComplete = userComplete;
   l.makeChat = makeChat;

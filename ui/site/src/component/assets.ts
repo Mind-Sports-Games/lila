@@ -35,6 +35,25 @@ export const lazyPasswordComplexity = (id: string) => {
   );
 };
 
+// Chart.js and its plugins are 211KB, and a chart is never why someone opened the page:
+// fetch the module when its container is about to be seen.
+export const lazyChart = (selector: string, module: string, draw: () => void): void => {
+  const el = document.querySelector(selector);
+  if (!el) return;
+  const load = () => loadModule(module).then(draw);
+  if (!window.IntersectionObserver) return void load();
+  const observer = new IntersectionObserver(
+    entries => {
+      if (entries.some(e => e.isIntersecting)) {
+        observer.disconnect();
+        load();
+      }
+    },
+    { rootMargin: '300px' },
+  );
+  observer.observe(el);
+};
+
 const loadedCss = new Map<string, true>();
 
 // still used to load external libs css (hopscotch, shepherd)
