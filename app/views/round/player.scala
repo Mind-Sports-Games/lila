@@ -66,6 +66,7 @@ object player {
       playing = true
     )(
       main(cls := "round")(
+        h1(cls := "offscreen")(gameVsText(pov.game, withRatings = true)),
         st.aside(cls := "round__side")(
           bits.side(
             pov,

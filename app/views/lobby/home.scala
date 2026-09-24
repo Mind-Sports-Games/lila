@@ -75,6 +75,7 @@ object home {
           "lobby--no-simuls" -> simuls.isEmpty
         )
       )(
+        h1(cls := "offscreen")(trans.playstrategySiteTitle()),
         div(cls := "lobby__table")(
           div(cls := "bg-switch", title := "Dark mode")(
             div(cls := "bg-switch__track"),

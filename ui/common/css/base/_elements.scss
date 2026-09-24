@@ -182,3 +182,7 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
+
+.offscreen {
+  @extend %offscreen;
+}
