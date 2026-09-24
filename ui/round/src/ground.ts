@@ -43,6 +43,7 @@ export function makeConfig(ctrl: RoundController): Config {
     check: !!step.check,
     coordinates: data.pref.coords,
     boardScores: ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key),
+    showPatterns: variantKey === 'entropy' && data.pref.entropyPatterns ? 'full' : 'never',
     dice: dice,
     doublingCube: doublingCube,
     cubeActions: cubeActions,

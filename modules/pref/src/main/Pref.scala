@@ -51,6 +51,7 @@ case class Pref(
     pieceNotation: Int,
     resizeHandle: Int,
     boardIdentifier: Int,
+    entropyPatterns: Int,
     tags: Map[String, String] = Map.empty
 ) {
 
@@ -128,6 +129,8 @@ case class Pref(
   def isZen = zen == Zen.YES
 
   def isBoardIdentifier = boardIdentifier == BoardIdentifier.YES
+
+  def isEntropyPatterns = entropyPatterns == EntropyPatterns.YES
 
   def is2d = !is3d
 
@@ -283,6 +286,8 @@ object Pref {
   object KeyboardMove extends BooleanPref
 
   object BoardIdentifier extends BooleanPref
+
+  object EntropyPatterns extends BooleanPref
 
   object RookCastle {
     val NO  = 0
@@ -551,6 +556,7 @@ object Pref {
     pieceNotation = PieceNotation.SYMBOL,
     resizeHandle = ResizeHandle.INITIAL,
     boardIdentifier = BoardIdentifier.YES,
+    entropyPatterns = EntropyPatterns.YES,
     tags = Map.empty
   )
 

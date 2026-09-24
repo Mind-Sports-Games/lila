@@ -54,7 +54,9 @@ export interface ControlConfig {
   dropSoundOverride?(piece: CgPiece, pos: CgKey, captured?: CgPiece): string | undefined;
 
   // Variant action buttons beside the analysis controls (e.g. pass)
-  renderControlActions?(): VNode | null;
+  renderControlActions?(): (VNode | null)[];
+  // handle a click on one of them; false leaves the action to the shared controls
+  handleControlAction?(action: string): boolean;
 
   // Board overlay (e.g. dice picker)
   renderBoardOverlay?(): VNode | null;

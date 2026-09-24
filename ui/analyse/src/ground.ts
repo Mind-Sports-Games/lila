@@ -66,6 +66,8 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
       : ctrl.data.player.playerIndex,
     coordinates: !!ctrl.embed || !!renderPlayerBars(ctrl) ? cg.Coords.Hidden : pref.coords,
     boardScores: ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(variantKey),
+    // the variant control has already had its say over opts, and entropy's decides this one
+    showPatterns: opts.showPatterns ?? 'never',
     dice: stratUtils.backgammon.readDice(ctrl.node.fen, variantKey),
     doublingCube: stratUtils.backgammon.readDoublingCube(ctrl.node.fen, variantKey),
     multiPointState: stratUtils.backgammon.finalMultiPointState(d.game, ctrl.node.ply, ctrl.tree.lastPly()),

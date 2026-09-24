@@ -272,6 +272,7 @@ function controls(ctrl: AnalyseCtrl) {
             else if (action === 'menu') ctrl.actionMenu.toggle();
             else if (action === 'detail-mode') ctrl.analyseDetail(!ctrl.analyseDetail());
             else if (action === 'pass') ctrl.sendPass();
+            else if (action) ctrl.controlConfig.handleControlAction?.(action);
           },
           ctrl.redraw,
         );
@@ -327,7 +328,7 @@ function controls(ctrl: AnalyseCtrl) {
                         },
                       })
                     : null,
-                  ctrl.controlConfig.renderControlActions?.() ?? null,
+                  ...(ctrl.controlConfig.renderControlActions?.() ?? []),
                   isCol1() && isBackgammonVariant(ctrl.data.game.variant.key)
                     ? h('button.fbt', {
                         attrs: {
