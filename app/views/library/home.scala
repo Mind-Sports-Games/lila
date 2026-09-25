@@ -68,11 +68,11 @@ object home {
           div(cls := "variants-icons")(translatedVariantIconChoices.filter { case (id, _, _) =>
             id != "0_3" // from position
           } map { case (id, icon, name) =>
-            button(
-              cls      := "variant",
-              dataIcon := icon,
-              value    := id,
-              href     := routes.Library.variant(variantKey(id))
+            a(
+              cls                  := "variant",
+              dataIcon             := icon,
+              attr("data-value")   := id,
+              href                 := routes.Library.variant(variantKey(id))
             )(name)
           })
         ),

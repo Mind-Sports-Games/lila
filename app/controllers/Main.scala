@@ -165,8 +165,12 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
         // the pages with a URL per locale, so the ones carrying hreflang alternates
         val localisedPaths = routes.UserAnalysis.index.url ::
           variants.map(v => routes.Library.variant(v.key).url) :::
-          // the standard chess analysis board canonicalises to /analysis, already listed above
-          variants.filterNot(_ == chessStandard).map(v => routes.UserAnalysis.parseArg(v.key).url)
+          // only the variants that have an analysis board: draughts has none, so its pages
+          // render a board with no pieces. The standard chess board canonicalises to
+          // /analysis, already listed above.
+          views.html.board.userAnalysis.analysisVariants
+            .filterNot(_ == chessStandard)
+            .map(v => routes.UserAnalysis.parseArg(v.key).url)
         val paths =
           List(
             "/",

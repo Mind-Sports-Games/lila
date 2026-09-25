@@ -30,11 +30,16 @@ object layout {
       raw {
         s"""<meta name="theme-color" content="${ctx.pref.themeColor}">"""
       }
-    // One stylesheet per game family, and only the family on the board is worth blocking the
-    // first paint for. The rest carry media="print": the browser fetches them without waiting,
-    // and lazyPieceScript below hands each one back to every medium once it has arrived.
-    def pieceSprite(boardFamily: Option[String])(implicit ctx: Context): Frag =
-      ctx.currentPieceSet.map(ps => pieceSprite(ps, boardFamily.contains(ps.gameFamilyName)))
+    // One stylesheet per game family, 718KB of them, and a page that draws one family can never
+    // use the other thirteen: sole drops them. Where a page may also show a board of another
+    // family - the round player page lists the viewer's other games - they all ship, and only
+    // the family on the board is worth blocking the first paint for. The rest carry media="print":
+    // the browser fetches them without waiting, and lazyPieceScript below hands each one back to
+    // every medium once it has arrived.
+    def pieceSprite(boardFamily: Option[String], sole: Boolean)(implicit ctx: Context): Frag =
+      ctx.currentPieceSet
+        .filter(ps => !sole || boardFamily.contains(ps.gameFamilyName))
+        .map(ps => pieceSprite(ps, boardFamily.contains(ps.gameFamilyName)))
 
     def pieceSprite(ps: lila.pref.PieceSet, blocking: Boolean = true): Frag =
       link(
@@ -237,7 +242,9 @@ object layout {
       // this page type has one URL per maintained locale: link them all, both ways
       alternates: Boolean = false,
       // the game family this page draws a board for, if any: its pieces block the paint, the rest do not
-      boardFamily: Option[String] = None
+      boardFamily: Option[String] = None,
+      // and this page draws no board of any other family, so the other sprites can stay home
+      soleBoardFamily: Boolean = false
   )(body: Frag)(implicit ctx: Context): Frag = {
     updateManifest()
 
@@ -268,7 +275,7 @@ object layout {
           ctx.userContext.impersonatedBy.isDefined.option(cssTagNoTheme("mod.impersonate")),
           ctx.blind.option(cssTagNoTheme("blind")),
           moreCss,
-          pieceSprite(boardFamily),
+          pieceSprite(boardFamily, soleBoardFamily),
           ctx.nonce map lazyPieceScript,
           meta(
             content := openGraph.fold(trans.playstrategySiteDescription.txt())(o => o.description),

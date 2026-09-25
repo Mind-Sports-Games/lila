@@ -12,7 +12,8 @@ object embed {
   def apply(pov: lila.game.Pov, data: JsObject)(config: EmbedConfig) =
     views.html.base.embed(
       title = replay.titleOf(pov)(using config.lang),
-      cssModule = "analyse.embed"
+      cssModule = "analyse.embed",
+      boardFamily = pov.game.variant.gameFamily.key.some
     )(
       div(cls := "is2d")(
         main(cls := "analyse")

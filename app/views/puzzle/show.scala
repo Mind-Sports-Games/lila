@@ -19,6 +19,7 @@ object show {
     val variantPuzzles = trans.variantPuzzles.txt(lila.i18n.VariantKeys.variantName(puzzle.variant))
     views.html.base.layout(
       boardFamily = puzzle.variant.gameFamily.key.some,
+      soleBoardFamily = true,
       title = if (isStreak) "Puzzle Streak" else variantPuzzles,
       moreCss = cssTag("puzzle"),
       moreJs = frag(

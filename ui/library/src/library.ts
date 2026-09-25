@@ -1,11 +1,11 @@
 playstrategy.load.then(() => {
   $('#library-section').each(function (this: HTMLElement) {
     const $gamegroups = $('button.gamegroup');
-    const $variants = $('button.variant');
+    const $variants = $('a.variant');
     const $variantSection = $('.variants-choice');
 
     const data = window.libraryChartData;
-    const allVariants: string[] = $variants.get().map(el => (el as HTMLButtonElement).value);
+    const allVariants: string[] = $variants.get().map(el => el.getAttribute('data-value') ?? '');
 
     function updateLibraryChart(allowedVariants: string[], isOverallStats: boolean) {
       if (window.playstrategy && window.playstrategy.libraryChart && data) {
@@ -107,7 +107,7 @@ playstrategy.load.then(() => {
       const toShow: HTMLElement[] = [];
       const toHide: HTMLElement[] = [];
       $variants.each(function (this: HTMLElement) {
-        const gfOfVariant = ($(this).val() as string).split('_')[0];
+        const gfOfVariant = ($(this).attr('data-value') as string).split('_')[0];
         //add oware to mancala group or add dameo to draughts group
         const gameGroupCases =
           (gfOfVariant === '6' && gameFamily === '7') || (gfOfVariant === '13' && gameFamily === '1');
@@ -120,16 +120,11 @@ playstrategy.load.then(() => {
       $(toShow).show().removeAttr('style'); //remove unwated display: block added by show()
       $(toHide).hide();
 
-      const allowedVariants = toShow.map(el => $(el).val() as string);
+      const allowedVariants = toShow.map(el => $(el).attr('data-value') as string);
       updateLibraryChart(allowedVariants, false);
       updateStatsTable(allowedVariants, false, $(this).text().trim());
     });
 
-    $variants.on('click', function (this: HTMLElement, e) {
-      e.preventDefault();
-      const href = $(this).attr('href');
-      if (href) window.location.href = href;
-    });
     $variants.on('mouseenter', function (this: HTMLElement) {
       $(this).addClass('button button-color-choice');
     });

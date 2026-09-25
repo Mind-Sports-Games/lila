@@ -21,6 +21,7 @@ object editor {
     views.html.base.layout(
       title = trans.boardEditorTitle.txt(),
       boardFamily = variant.gameFamily.key.some,
+      soleBoardFamily = true,
       moreJs = frag(
         jsModule("editor"),
         embedJsUnsafeLoadThen(
