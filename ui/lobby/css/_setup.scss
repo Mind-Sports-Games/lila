@@ -219,10 +219,10 @@ $game-family-p2-pieces: (
     flex-flow: row nowrap;
     .opponent_bot.choice {
       text-wrap-mode: nowrap;
-      a {
+      .user-link {
         margin-left: -2em;
       }
-      a:has(i) {
+      .user-link:has(i) {
         margin-left: -4em;
       }
     }
