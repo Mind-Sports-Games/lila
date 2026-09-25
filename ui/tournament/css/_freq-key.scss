@@ -1,0 +1,49 @@
+$c-tour: #303e43;
+$c-tour-user: #888;
+$c-tour-hourly: #3d9333;
+$c-tour-daily: #0072b2;
+$c-tour-weekly: #d55e00;
+$c-tour-monthly: #c93d3d;
+$c-tour-yearly: $c-brag;
+$c-tour-weekend: $c-brag;
+$c-tour-marathon: #66558c;
+$c-tour-wildcard: #009e73;
+$c-tour-unique: $c-brag;
+$c-tour-max-rating: #8572ff;
+
+.tour-freq-key {
+  @extend %box-padding-horiz;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em 1.5em;
+  margin-bottom: 1em;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    cursor: help;
+  }
+
+  &__swatch {
+    @extend %box-radius;
+
+    width: 1.2em;
+    height: 1.2em;
+    background-color: $c-tour;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+
+    &.groupcycle {
+      background-color: $c-tour-weekly;
+    }
+
+    &.wildcard {
+      background-color: $c-tour-wildcard;
+    }
+
+    &.yearly {
+      background-color: $c-tour-yearly;
+    }
+  }
+}
