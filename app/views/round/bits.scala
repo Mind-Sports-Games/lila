@@ -18,12 +18,16 @@ object bits {
       openGraph: Option[lila.app.ui.OpenGraph] = None,
       moreCss: Frag = emptyFrag,
       playing: Boolean = false,
-      robots: Boolean = false
+      robots: Boolean = false,
+      // the player page lists the viewer's other games, which can be of any family; a spectator
+      // page shows this game and nothing else
+      soleBoardFamily: Boolean = false
   )(body: Frag)(implicit ctx: Context) =
     views.html.base.layout(
       title = title,
       openGraph = openGraph,
       boardFamily = variant.gameFamily.key.some,
+      soleBoardFamily = soleBoardFamily,
       moreJs = moreJs,
       moreCss = frag(
         cssTag {

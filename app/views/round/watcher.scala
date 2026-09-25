@@ -43,6 +43,7 @@ object watcher {
     bits.layout(
       variant = pov.game.variant,
       title = s"${gameVsText(pov.game, withRatings = true)} • spectator",
+      soleBoardFamily = true,
       moreJs = frag(
         roundNvuiTag,
         roundTag(gameLogic),
@@ -75,7 +76,8 @@ object watcher {
     bits.layout(
       variant = pov.game.variant,
       title = gameVsText(pov.game, withRatings = true),
-      openGraph = povOpenGraph(pov).some
+      openGraph = povOpenGraph(pov).some,
+      soleBoardFamily = true
     )(
       frag(
         main(cls := "round")(

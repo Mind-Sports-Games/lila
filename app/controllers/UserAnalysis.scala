@@ -22,11 +22,28 @@ final class UserAnalysis(
 
   def index = load("", Variant.libStandard(GameLogic.Chess()))
 
+  // the name a game is known by, or a real key in the wrong case, lands on the canonical
+  // URL rather than silently rendering standard chess
+  private def aliasRedirect(key: String, rest: String = "") =
+    views.html.library.bits.canonicalVariantKey(key) map { canonical =>
+      Open { implicit ctx =>
+        fuccess(MovedPermanently(routes.UserAnalysis.parseArg(s"$canonical$rest").url))
+      }
+    }
+
   def parseArg(arg: String) =
     arg.split("/", 2) match {
-      case Array(key)      => load("", Variant.orDefault(key))
+      case Array(key) =>
+        aliasRedirect(key) | {
+          // a real variant with no analysis board renders a board and no pieces; say so
+          // rather than serve a page that looks like it works
+          Variant.byKey.get(key).filterNot(views.html.board.userAnalysis.analysisVariants.contains) match {
+            case Some(_) => Open { implicit ctx => notFound }
+            case None    => load("", Variant.orDefault(key))
+          }
+        }
       case Array(key, fen) =>
-        Variant.byKey get key match {
+        aliasRedirect(key, s"/$fen") | (Variant.byKey get key match {
           case Some(variant) => load(fen, variant)
           case _ if FEN.clean(GameLogic.Chess(), fen) == Variant.libStandard(GameLogic.Chess()).initialFen =>
             load(arg, Variant.libStandard(GameLogic.Chess()))
@@ -37,7 +54,7 @@ final class UserAnalysis(
                 .apply(GameLogic.Chess(), "fromPosition")
                 .getOrElse(Variant.orDefault(GameLogic.Chess(), 3))
             )
-        }
+        })
       case _ => load("", Variant.libStandard(GameLogic.Chess()))
     }
 
@@ -53,12 +70,17 @@ final class UserAnalysis(
 
   // only a variant key gets a localised URL, never a pasted position
   def langLoad(lang: String, key: String) =
-    LangPage(routes.UserAnalysis.parseArg(key).url)(ctx =>
-      Variant.byKey get key match {
-        case Some(variant) => loadPage("", variant)(using ctx)
-        case None          => notFound(using ctx)
-      }
-    )(lang)
+    views.html.library.bits.canonicalVariantKey(key) match {
+      case Some(canonical) =>
+        Action(MovedPermanently(routes.UserAnalysis.langLoad(lang, canonical).url))
+      case None =>
+        LangPage(routes.UserAnalysis.parseArg(key).url)(ctx =>
+          Variant.byKey get key match {
+            case Some(variant) => loadPage("", variant)(using ctx)
+            case None          => notFound(using ctx)
+          }
+        )(lang)
+    }
 
   private def loadPage(urlFen: String, variant: Variant)(implicit ctx: Context): Fu[Result] = {
     val decodedFen: Option[FEN] = lila.common.String

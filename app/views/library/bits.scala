@@ -230,12 +230,20 @@ object bits {
       trans.playVariantOnlineFreeTitle.txt(searchName(variant))
     )(_ + " — " + _)
 
-  def pageDescription(variant: Variant)(implicit lang: Lang) = {
+  // the variant's own objective, punctuated: "Capture more discs than your opponent."
+  def objectiveSentence(variant: Variant)(implicit lang: Lang) = {
     val objective = VariantKeys.variantTitle(variant)
     // ja and zh end a sentence with their own stop; appending an ASCII one reads as a typo
     val stop = if (objective.lastOption.exists(".。．！？!?".contains)) "" else "."
-    s"${trans.playVariantOnlineFreeDescription.txt(nameWithAlias(variant))} $objective$stop"
+    s"$objective$stop"
   }
+
+  def pageDescription(variant: Variant)(implicit lang: Lang) =
+    s"${trans.playVariantOnlineFreeDescription.txt(nameWithAlias(variant))} ${objectiveSentence(variant)}"
+
+  // the two pseudo variants are playable but have neither a library hub nor a rules page
+  def hasLibraryPages(variant: Variant) =
+    !Set("fromPosition", "draughtsFromPosition")(variant.key)
 
   // "Othello rules — how to play Othello (Reversi)"
   def rulesTitle(variant: Variant)(implicit lang: Lang) =

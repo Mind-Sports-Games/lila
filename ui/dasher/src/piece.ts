@@ -148,7 +148,10 @@ function applyPiece(t: Piece, list: Piece[], is3d: boolean) {
   if (is3d) {
     $('body').removeClass(list.join(' ')).addClass(t.name);
   } else {
-    const sprite = document.getElementById('piece-sprite-' + t.gameFamily) as HTMLLinkElement;
-    sprite.href = sprite.href.replace(/\w+\-\w+\.css/, t.gameFamily + '-' + t.name + '.css');
+    // a page that draws one family ships that family's sheet alone, so picking a set for
+    // another family has nothing to rewrite here; the preference still saves and applies on
+    // the next page that draws it
+    const sprite = document.getElementById('piece-sprite-' + t.gameFamily) as HTMLLinkElement | null;
+    if (sprite) sprite.href = sprite.href.replace(/\w+\-\w+\.css/, t.gameFamily + '-' + t.name + '.css');
   }
 }

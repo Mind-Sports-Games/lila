@@ -13,7 +13,8 @@ object bits {
       moreCss: Frag = emptyFrag,
       moreJs: Frag = emptyFrag,
       openGraph: Option[lila.app.ui.OpenGraph] = None,
-      boardFamily: Option[String] = None
+      boardFamily: Option[String] = None,
+      soleBoardFamily: Boolean = false
   )(body: Frag)(implicit ctx: Context): Frag =
     views.html.base.layout(
       title = title,
@@ -21,6 +22,7 @@ object bits {
       moreJs = moreJs,
       openGraph = openGraph,
       boardFamily = boardFamily,
+      soleBoardFamily = soleBoardFamily,
       robots = false,
       zoomable = true,
       csp = defaultCsp.withWebAssembly.withPeer.some
