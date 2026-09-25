@@ -15,9 +15,10 @@ object show {
       pref: JsObject,
       difficulty: Option[lila.puzzle.PuzzleDifficulty] = None
   )(implicit ctx: Context) = {
-    val isStreak = data.value.contains("streak")
+    val isStreak       = data.value.contains("streak")
+    val variantPuzzles = trans.variantPuzzles.txt(lila.i18n.VariantKeys.variantName(puzzle.variant))
     views.html.base.layout(
-      title = if (isStreak) "Puzzle Streak" else trans.puzzles.txt(),
+      title = if (isStreak) "Puzzle Streak" else variantPuzzles,
       moreCss = cssTag("puzzle"),
       moreJs = frag(
         jsModule("puzzle"),
@@ -39,7 +40,7 @@ object show {
           image = cdnUrl(routes.Export.puzzleThumbnail(puzzle.id.value).url).some,
           title =
             if (isStreak) "Puzzle Streak"
-            else s"Chess tactic #${puzzle.id} - ${puzzle.playerIndex.name.capitalize} to play",
+            else s"$variantPuzzles #${puzzle.id} - ${puzzle.playerIndex.name.capitalize} to play",
           url = s"$netBaseUrl${routes.Puzzle.show(puzzle.variant.key, puzzle.id.value).url}",
           description =
             if (isStreak) trans.puzzle.streakDescription.txt()
