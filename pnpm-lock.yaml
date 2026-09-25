@@ -12,8 +12,8 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/e391b56a82b7c71e7663082a797f6fc21b18776d
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#pla-1720-go-long-games-slow-down-and-make-play-almost-impossible
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/f1e0140c636e4444bbc0e3f95d197986a983a1fc
+        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.39
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6465b2fad4091d31ad370562f785374af9bedf1d
       stratops:
         specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.31
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/951e538e6e013bbca5471877449dcee5a06398b0
@@ -47,7 +47,7 @@ importers:
         version: 7.1.0
       prettier:
         specifier: ^3.9.6
-        version: 3.9.6
+        version: 3.9.9
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -67,7 +67,7 @@ importers:
         version: 0.2.13
       '@yaireo/tagify':
         specifier: ^4.32.0
-        version: 4.38.0(prop-types@15.8.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 4.39.0(prop-types@15.8.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       ceval:
         specifier: workspace:*
         version: link:../ceval
@@ -449,7 +449,7 @@ importers:
         version: 0.3.10
       '@yaireo/tagify':
         specifier: ^4.32.0
-        version: 4.38.0(prop-types@15.8.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 4.39.0(prop-types@15.8.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       chat:
         specifier: workspace:*
         version: link:../chat
@@ -746,8 +746,8 @@ packages:
   '@ungap/structured-clone@1.4.0':
     resolution: {integrity: sha512-1mEZtMKPM09vDmQt5y7YvmN2+DFTP7Tg0EWXdic8/C6VRnpb33e4ghisCIE3WZjsE2N8mf+QV1Zqh7ZFYLWInQ==}
 
-  '@yaireo/tagify@4.38.0':
-    resolution: {integrity: sha512-/ZyG2NWQGNcTK4ay2aPE3ka/ZQmhTo+bUKb81SqjtQlt3VrGoxCNhmvKTV/mBJbY69BOXXeBEi+a5JLrvp6wLA==}
+  '@yaireo/tagify@4.39.0':
+    resolution: {integrity: sha512-7T/4PyjzrHj8QO5s06V1wV27AK6H6KtzTkFMPzm1lMKHs/rXioIbNBxxswKg2IkAfYrATRKLok5ZEJ6g3m262w==}
     engines: {node: '>=22', pnpm: '>=10'}
     peerDependencies:
       prop-types: '>15.5.7'
@@ -862,8 +862,8 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/f1e0140c636e4444bbc0e3f95d197986a983a1fc:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/f1e0140c636e4444bbc0e3f95d197986a983a1fc}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6465b2fad4091d31ad370562f785374af9bedf1d:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6465b2fad4091d31ad370562f785374af9bedf1d}
     version: 7.11.1-pstrat3.39
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1040,8 +1040,8 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  get-east-asian-width@1.6.0:
-    resolution: {integrity: sha512-QRbvDIbx6YklUe6RxeTeleMR0yv3cYH6PsPZHcnVn7xv7zO1BHN8r0XETu8n6Ye3Q+ahtSarc3WgtNWmehIBfA==}
+  get-east-asian-width@1.7.0:
+    resolution: {integrity: sha512-XjH1AECxf0giL2V1aU8vKyRR2ppRUb5c0EvT7zuJTokQ74bNo52zOtghqdWIqrhUD79fo3x0WfKZdOqxF6LG1Q==}
     engines: {node: '>=18'}
 
   get-stream@8.0.1:
@@ -1320,8 +1320,8 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier@3.9.6:
-    resolution: {integrity: sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g==}
+  prettier@3.9.9:
+    resolution: {integrity: sha512-Z/CJHIkdujO/OtN7nXUii0Rf3VT5SRuhjBA82Xvu2XhBUgX3nhP67T0LHceBdQLex7OOFGTox+Q5Yg8Jk2Qivg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -1711,7 +1711,7 @@ snapshots:
 
   '@ungap/structured-clone@1.4.0': {}
 
-  '@yaireo/tagify@4.38.0(prop-types@15.8.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@yaireo/tagify@4.39.0(prop-types@15.8.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       prop-types: 15.8.1
       react: 19.3.0
@@ -1806,7 +1806,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/f1e0140c636e4444bbc0e3f95d197986a983a1fc: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6465b2fad4091d31ad370562f785374af9bedf1d: {}
 
   chokidar@3.6.0:
     dependencies:
@@ -2011,7 +2011,7 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  get-east-asian-width@1.6.0: {}
+  get-east-asian-width@1.7.0: {}
 
   get-stream@8.0.1: {}
 
@@ -2085,7 +2085,7 @@ snapshots:
 
   is-fullwidth-code-point@5.1.0:
     dependencies:
-      get-east-asian-width: 1.6.0
+      get-east-asian-width: 1.7.0
 
   is-glob@4.0.3:
     dependencies:
@@ -2271,7 +2271,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier@3.9.6: {}
+  prettier@3.9.9: {}
 
   prop-types@15.8.1:
     dependencies:
@@ -2356,7 +2356,7 @@ snapshots:
   string-width@7.2.0:
     dependencies:
       emoji-regex: 10.6.0
-      get-east-asian-width: 1.6.0
+      get-east-asian-width: 1.7.0
       strip-ansi: 7.2.0
 
   strip-ansi@6.0.1:
