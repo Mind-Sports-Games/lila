@@ -12,8 +12,8 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/e391b56a82b7c71e7663082a797f6fc21b18776d
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.38
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/383a8bd99184d4ed06ff2d943502cc457f8efc93
+        specifier: github:Mind-Sports-Games/chessground#pla-1720-go-long-games-slow-down-and-make-play-almost-impossible
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/f1e0140c636e4444bbc0e3f95d197986a983a1fc
       stratops:
         specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.31
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/951e538e6e013bbca5471877449dcee5a06398b0
@@ -862,9 +862,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/383a8bd99184d4ed06ff2d943502cc457f8efc93:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/383a8bd99184d4ed06ff2d943502cc457f8efc93}
-    version: 7.11.1-pstrat3.38
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/f1e0140c636e4444bbc0e3f95d197986a983a1fc:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/f1e0140c636e4444bbc0e3f95d197986a983a1fc}
+    version: 7.11.1-pstrat3.39
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   chokidar@3.6.0:
@@ -1806,7 +1806,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/383a8bd99184d4ed06ff2d943502cc457f8efc93: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/f1e0140c636e4444bbc0e3f95d197986a983a1fc: {}
 
   chokidar@3.6.0:
     dependencies:
