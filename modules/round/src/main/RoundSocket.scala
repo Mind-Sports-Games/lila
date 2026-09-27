@@ -218,6 +218,17 @@ final class RoundSocket(
     val _ = lila.mon.round.ductCount.update(rounds.size)
   }
 
+  private def deepestRoundQueue(): Int = {
+    var deepest = 0
+    rounds.foreachValue { duct =>
+      val size = duct.queueSize
+      if (size > deepest) deepest = size
+    }
+    deepest
+  }
+
+  lila.common.DuctHealth.register("round.deepest", () => deepestRoundQueue())
+
   private val terminationDelay = new TerminationDelay(system.scheduler, 1 minute, finishRound)
 }
 
