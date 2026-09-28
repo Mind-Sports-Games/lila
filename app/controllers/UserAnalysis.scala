@@ -23,11 +23,14 @@ final class UserAnalysis(
   def index = load("", Variant.libStandard(GameLogic.Chess()))
 
   // the name a game is known by, or a real key in the wrong case, lands on the canonical
-  // URL rather than silently rendering standard chess
+  // URL rather than silently rendering standard chess. An alias for a variant with no
+  // analysis board stops here, rather than redirecting to a URL that only 404s.
   private def aliasRedirect(key: String, rest: String = "") =
     views.html.library.bits.canonicalVariantKey(key) map { canonical =>
       Open { implicit ctx =>
-        fuccess(MovedPermanently(routes.UserAnalysis.parseArg(s"$canonical$rest").url))
+        if (Variant.byKey.get(canonical).exists(views.html.board.userAnalysis.analysisVariants.contains))
+          fuccess(MovedPermanently(routes.UserAnalysis.parseArg(s"$canonical$rest").url))
+        else notFound
       }
     }
 

@@ -161,9 +161,9 @@ object bits {
     "ayo"                   -> "oware",
     "toguzkumalak"          -> "togyzkumalak",
     "togyzqumalaq"          -> "togyzkumalak",
-    // "checkers" and "draughts" both usually mean the 8x8 game, which is the english key
+    // "checkers" is the 8x8 game; "draughts" is what the lobby's own pool pairs you into
     "checkers"              -> "english",
-    "draughts"              -> "english",
+    "draughts"              -> "international",
     "americancheckers"      -> "english",
     "americandraughts"      -> "english",
     "englishcheckers"       -> "english",
@@ -175,6 +175,11 @@ object bits {
     "russiandraughts"       -> "russian",
     "braziliancheckers"     -> "brazilian",
     "braziliandraughts"     -> "brazilian",
+    // named Spanish, keyed portuguese: both names have to resolve
+    "spanish"               -> "portuguese",
+    "spanishdraughts"       -> "portuguese",
+    "spanishcheckers"       -> "portuguese",
+    "portuguesedraughts"    -> "portuguese",
     "portuguesecheckers"    -> "portuguese",
     "poolcheckers"          -> "pool",
     "frisiandraughts"       -> "frisian"
