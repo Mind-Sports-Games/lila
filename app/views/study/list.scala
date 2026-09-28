@@ -162,6 +162,8 @@ object list {
       topics: Option[StudyTopics] = None,
       modActions: Option[Frag] = None
   )(implicit ctx: Context) =
+    // no openGraph: every listing here is a page of a paginated, reordered set, and what
+    // gets shared is a study, which carries its own in show.scala
     views.html.base.layout(
       title = title,
       // only the first page of a listing is worth indexing; the rest is a crawl path into every study
