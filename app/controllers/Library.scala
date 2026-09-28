@@ -40,7 +40,7 @@ final class Library(env: Env) extends LilaController(env) {
   private def showVariant(key: String)(implicit ctx: Context): Fu[Result] =
     Variant.all.find(_.key == key) match {
       case Some(variant) => {
-        val tvChannel = lila.tv.Tv.Channel.byKey.get(variant.key)
+        val tvChannel = lila.tv.Tv.Channel.find(variant.key)
         for {
           monthlyGameData <- env.game.cached.monthlyGames
           winRates        <- env.game.cached.gameWinRates
