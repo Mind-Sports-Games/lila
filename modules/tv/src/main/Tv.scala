@@ -823,6 +823,12 @@ object Tv {
     val byKey = all.map { c =>
       c.key -> c
     }.toMap
+
+    // a channel key is its case object's name, so it is camelCase where the variant key it
+    // stands for is not: miniShogi against minishogi. Seven channels differ that way, and a
+    // lookup by variant key missed every one of them.
+    private val byFoldedKey = byKey.map { case (k, c) => k.toLowerCase -> c }
+    def find(key: String): Option[Channel] = byFoldedKey get key.toLowerCase
   }
 
   // private def rated(min: Int)                           = (c: Candidate) => c.game.rated && hasMinRating(c.game, min)
