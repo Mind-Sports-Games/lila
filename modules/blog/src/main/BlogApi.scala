@@ -37,11 +37,13 @@ final class BlogApi(
     recent(prismic.api, page, maxPerPage, prismic.ref.some)
 
   def one(api: Api, ref: Option[String], id: String): Fu[Option[Document]] =
-    api
-      .forms("everything")
-      .query(s"""[[:d = at(document.id, "$id")]]""")
-      .ref(ref | api.master.ref)
-      .submit() map (_.results.headOption)
+    id.some.filter(BlogApi.validDocumentId) so { validId =>
+      api
+        .forms("everything")
+        .query(s"""[[:d = at(document.id, "$validId")]]""")
+        .ref(ref | api.master.ref)
+        .submit() map (_.results.headOption)
+    }
 
   def one(prismic: BlogApi.Context, id: String): Fu[Option[Document]] = one(prismic.api, prismic.ref.some, id)
 
@@ -94,6 +96,10 @@ final class BlogApi(
 }
 
 object BlogApi {
+
+  private val documentIdRegex = """[A-Za-z0-9_-]{1,32}""".r
+
+  def validDocumentId(id: String): Boolean = documentIdRegex.matches(id)
 
   def extract(body: Fragment.StructuredText): String =
     body.blocks
