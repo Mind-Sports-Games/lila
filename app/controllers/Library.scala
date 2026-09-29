@@ -37,6 +37,29 @@ final class Library(env: Env) extends LilaController(env) {
         LangPage(routes.Library.variant(key).url)(ctx => showVariant(key)(using ctx))(lang)
     }
 
+  // Both halves are finished tournaments, so they change a few times a year, and the swiss one
+  // matches its name with a case-insensitive regex that no index can serve. Uncached they ran on
+  // every view of all 47 hubs, which is exactly the traffic these pages are built to attract.
+  private val grandPrixCache =
+    env.memo.cacheApi[String, (List[lila.tournament.Tournament], List[lila.swiss.Swiss])](
+      64,
+      "library.grandPrix"
+    ) {
+      _.refreshAfterWrite(1.hour)
+        .maximumSize(128)
+        .buildAsyncFuture { key =>
+          Variant.byKey.get(key).fold(fuccess(Nil -> Nil)) { variant =>
+            env.tournament.tournamentRepo
+              .finishedSeriesOfTeam(views.html.library.bits.msoTeamId, lila.common.Freq.MSOGP, variant) zip
+              env.swiss.api.finishedNamed(
+                views.html.library.bits.msoTeamId,
+                views.html.library.bits.msoGrandPrixName,
+                variant
+              )
+          }
+        }
+    }
+
   private def showVariant(key: String)(implicit ctx: Context): Fu[Result] =
     Variant.all.find(_.key == key) match {
       case Some(variant) => {
@@ -56,10 +79,7 @@ final class Library(env: Env) extends LilaController(env) {
             .exists(_.key == variant.key)
             .so(env.puzzle.daily.getForVariant(variant))
           studies  <- env.study.notable.byVariant(variant, 6)
-          gpArenas <- env.tournament.tournamentRepo
-            .finishedSeriesOfTeam(views.html.library.bits.msoTeamId, lila.common.Freq.MSOGP, variant)
-          gpSwisses <- env.swiss.api
-            .finishedNamed(views.html.library.bits.msoTeamId, views.html.library.bits.msoGrandPrixName, variant)
+          (gpArenas, gpSwisses) <- grandPrixCache get variant.key
         } yield Ok(
           views.html.library
             .show(
