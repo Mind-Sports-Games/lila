@@ -85,15 +85,23 @@ object bits {
     (Freq.Yearly, trans.arena.yearly, trans.arena.yearlyDescription)
   )
 
-  def freqKey(implicit ctx: Context) =
+  private val userTournamentKeyEntries = List(
+    ("team", trans.arena.team, trans.arena.teamDescription),
+    ("public", trans.arena.public, trans.arena.publicDescription)
+  )
+
+  def freqKey(withUserTournaments: Boolean = false)(implicit ctx: Context) = {
+    val entries = freqKeyEntries.map { case (freq, label, description) => (freq.name, label, description) } :::
+      (if (withUserTournaments) userTournamentKeyEntries else Nil)
     div(cls := "tour-freq-key")(
-      freqKeyEntries.map { case (freq, label, description) =>
+      entries.map { case (swatch, label, description) =>
         span(cls := "tour-freq-key__item", title := description.txt())(
-          span(cls := s"tour-freq-key__swatch ${freq.name}"),
+          span(cls := s"tour-freq-key__swatch $swatch"),
           label()
         )
       }
     )
+  }
 
   def freqDescriptions(implicit ctx: Context) =
     frag(

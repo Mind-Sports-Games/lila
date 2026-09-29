@@ -284,6 +284,20 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
         case (created, started) => created ::: started
       }
 
+  private val publicSelect = $doc(
+    "schedule".$exists(false),
+    "password".$exists(false),
+    "forTeams".$exists(false),
+    "teamBattle".$exists(false),
+    "nbPlayers".$gte(1)
+  )
+
+  def publicUserTournaments(aheadMinutes: Int): Fu[List[Tournament]] =
+    coll.list[Tournament](
+      $or(startingSoonSelect(aheadMinutes), startedSelect) ++ publicSelect,
+      ReadPreference.secondaryPreferred
+    )
+
   private[tournament] def shouldStartCursor =
     coll
       .find($doc("startsAt".$lt(DateTime.now)) ++ createdSelect)

@@ -13,6 +13,7 @@ import play.api.data.validation.Constraint
 
 import lila.common.Form.*
 import lila.common.Clock.*
+import lila.common.LameName
 import lila.hub.LeaderTeam
 import lila.hub.LightTeam.*
 import lila.user.User
@@ -133,8 +134,11 @@ final class TournamentForm {
 
   private def nameType(user: User) = eventName(2, 36).verifying(
     Constraint[String] { (t: String) =>
-      if (blockList.exists(t.toLowerCase.contains) && !user.isVerified && !user.isAdmin)
+      if (user.isVerified || user.isAdmin) validation.Valid
+      else if (blockList.exists(t.toLowerCase.contains))
         validation.Invalid(validation.ValidationError("Must not contain \"playstrategy\""))
+      else if (LameName.tournament(t))
+        validation.Invalid(validation.ValidationError("Must not contain inappropriate language"))
       else validation.Valid
     }
   )

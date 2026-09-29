@@ -116,6 +116,8 @@ function tournamentClass(tour: any) {
       'tsht-finished': finished,
       'tsht-joinable': !finished,
       'tsht-user-created': userCreated,
+      'tsht-team': userCreated && !!tour.team,
+      'tsht-public': userCreated && !tour.team,
       'tsht-thematic': !!tour.position,
       'tsht-short': tour.minutes <= 30,
       'tsht-max-rating': !userCreated && tour.hasMaxRating,
@@ -129,6 +131,34 @@ function iconOf(tour: any, perfIcon: any) {
 }
 
 let mousedownAt: number[] | undefined;
+
+function infoText(ctrl: any, tour: any) {
+  return [
+    displayClock(tour.clock) + ' ',
+    tour.variant.key === 'standard' ? null : tour.variant.name + ' ',
+    tour.position ? 'Thematic ' : null,
+    tour.rated ? ctrl.trans('ratedTournament') : ctrl.trans('casualTournament'),
+  ];
+}
+
+function renderNbPlayers(tour: any) {
+  return tour.nbPlayers ? h('span.nb-players', { attrs: { 'data-icon': 'r' } }, tour.nbPlayers) : null;
+}
+
+function renderPublicBody(tour: any) {
+  return h('span.body', [
+    h('span.name', i18nName(tour)),
+    h('span.text', [displayClock(tour.clock), tour.variant.key === 'standard' ? null : ' ' + tour.variant.name]),
+    renderNbPlayers(tour),
+  ]);
+}
+
+function renderBody(ctrl: any, tour: any) {
+  return h('span.body', [
+    h('span.name', i18nName(tour)),
+    h('span.infos', [h('span.text', infoText(ctrl, tour)), renderNbPlayers(tour)]),
+  ]);
+}
 
 function renderTournament(ctrl: any, tour: any) {
   let width = tour.minutes * scale;
@@ -154,6 +184,7 @@ function renderTournament(ctrl: any, tour: any) {
       attrs: {
         href: '/tournament/' + tour.id,
         style: 'width: ' + width + 'px; left: ' + left + 'px; padding-left: ' + paddingLeft + 'px',
+        ...(isPublic(tour) ? { title: [i18nName(tour) + ' ', ...infoText(ctrl, tour)].filter(Boolean).join('') } : {}),
       },
     },
     [
@@ -168,26 +199,7 @@ function renderTournament(ctrl: any, tour: any) {
             }
           : {},
       ),
-      h('span.body', [
-        h('span.name', i18nName(tour)),
-        h('span.infos', [
-          h('span.text', [
-            displayClock(tour.clock) + ' ',
-            tour.variant.key === 'standard' ? null : tour.variant.name + ' ',
-            tour.position ? 'Thematic ' : null,
-            tour.rated ? ctrl.trans('ratedTournament') : ctrl.trans('casualTournament'),
-          ]),
-          tour.nbPlayers
-            ? h(
-                'span.nb-players',
-                {
-                  attrs: { 'data-icon': 'r' },
-                },
-                tour.nbPlayers,
-              )
-            : null,
-        ]),
-      ]),
+      isPublic(tour) ? renderPublicBody(tour) : renderBody(ctrl, tour),
     ],
   );
 }
@@ -231,6 +243,14 @@ function isSystemTournament(t: any) {
   return !!t.schedule;
 }
 
+function isPublic(t: any) {
+  return !t.schedule && !t.team;
+}
+
+function byStartsAt(a: any, b: any) {
+  return a.startsAt - b.startsAt;
+}
+
 export default function (ctrl: any) {
   now = Date.now();
   startTime = now - 3 * 60 * 60 * 1000;
@@ -239,7 +259,8 @@ export default function (ctrl: any) {
   const data = ctrl.data();
 
   const systemTours: any[] = [],
-    userTours: any[] = [];
+    teamTours: any[] = [],
+    publicTours: any[] = [];
 
   data.finished
     .concat(data.started)
@@ -247,13 +268,14 @@ export default function (ctrl: any) {
     .filter((t: any) => t.finishesAt > startTime)
     .forEach((t: any) => {
       if (isSystemTournament(t)) systemTours.push(t);
-      else userTours.push(t);
+      else if (isPublic(t)) publicTours.push(t);
+      else teamTours.push(t);
     });
 
   // group system tournaments into dedicated lanes for PerfType
-  const tourLanes = splitOverlaping(group(systemTours, laneGrouper).concat([userTours])).filter(
-    lane => lane.length > 0,
-  );
+  const tourLanes = splitOverlaping(
+    group(systemTours, laneGrouper).concat([teamTours.sort(byStartsAt), publicTours.sort(byStartsAt)]),
+  ).filter(lane => lane.length > 0);
 
   return h('div.tour-chart', [
     h(
@@ -286,6 +308,7 @@ export default function (ctrl: any) {
         ...tourLanes.map(lane => {
           return h(
             'div.tournamentline',
+            { class: { 'tournamentline--public': isPublic(lane[0]) } },
             lane.map((tour: any) => renderTournament(ctrl, tour)),
           );
         }),
