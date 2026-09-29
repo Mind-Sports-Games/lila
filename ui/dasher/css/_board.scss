@@ -169,7 +169,7 @@
     'draughts': $core-board-themes,
     'dameo': $core-board-themes,
     'amazons': $core-board-themes,
-    'breakthroughtroyka': $breakthroughtroyka-board-themes
+    'breakthroughtroyka': $breakthroughtroyka-board-themes,
   );
 
   @each $gameFamily, $themes in $family-board-themes {
