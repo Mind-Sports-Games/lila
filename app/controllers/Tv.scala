@@ -67,21 +67,23 @@ final class Tv(
     Open { implicit ctx =>
       lila.tv.Tv.Channel.find(chanKey).so { channel =>
         if (channel.key != chanKey) fuccess(MovedPermanently(routes.Tv.gamesChannel(channel.key).url))
-        else
-          env.tv.tv.getChampions zip env.tv.tv.getGames(channel, 15) zip env.tv.tv.getCorrespondenceGames map {
-          case ((champs, lGames), cGames) =>
-            NoCache {
-              Ok(
-                html.tv.games(
-                  channel,
-                  (lGames ++ env.tv.tv.getNonLiveCorrespondenceGamesOfChannel(channel, cGames, 15, lGames))
-                    .take(15) map Pov.naturalOrientation,
-                  env.tv.tv.getCorrespondenceChampions(cGames).combineWithAndFavour(champs)
-                )
-              )
-            }
-        }
+        else gamesOfChannel(channel)
       }
+    }
+
+  private def gamesOfChannel(channel: lila.tv.Tv.Channel)(implicit ctx: Context) =
+    env.tv.tv.getChampions zip env.tv.tv.getGames(channel, 15) zip env.tv.tv.getCorrespondenceGames map {
+      case ((champs, lGames), cGames) =>
+        NoCache {
+          Ok(
+            html.tv.games(
+              channel,
+              (lGames ++ env.tv.tv.getNonLiveCorrespondenceGamesOfChannel(channel, cGames, 15, lGames))
+                .take(15) map Pov.naturalOrientation,
+              env.tv.tv.getCorrespondenceChampions(cGames).combineWithAndFavour(champs)
+            )
+          )
+        }
     }
 
   def feed =
