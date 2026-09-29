@@ -249,6 +249,10 @@
       flex-flow: column;
       padding: 2px;
       justify-content: center;
+      // the variants are <a> so a crawler can follow them to their hub; a button centres its own
+      // text and takes no link colour, an anchor has to be told both
+      align-items: center;
+      color: $c-font;
       flex: 0 0 25%;
       max-width: 25%;
       border-right: 1px solid $c-border;
