@@ -82,7 +82,8 @@ object bits {
 
   val msoTeamId = "mind-sports-olympiad"
 
-  // how the MSO names its Grand Prix swisses: "Abalone - MSO GP 2026 PREMIER", "Chess Bullet - MSO Grand Prix 2024"
+  // how the MSO names its Grand Prix swisses:
+  // "Abalone - MSO GP 2026 PREMIER", "Chess Bullet - MSO Grand Prix 2024"
   val msoGrandPrixName = "MSO (GP|Grand Prix)"
 
   // In-person Mind Sports Olympiad events whose games are published on PlayStrategy: msodb
@@ -274,7 +275,8 @@ object bits {
 
   // "Atomic Chess analysis board — free engine & solver"; no engine claim for the games without one
   def analysisTitle(variant: Variant)(implicit lang: Lang) =
-    (if (analysisEngine(variant).isDefined) trans.variantAnalysisTitle else trans.variantAnalysisTitleNoEngine)
+    (if (analysisEngine(variant).isDefined) trans.variantAnalysisTitle
+     else trans.variantAnalysisTitleNoEngine)
       .txt(searchName(variant))
 
   def analysisDescription(variant: Variant)(implicit lang: Lang) =
@@ -285,7 +287,8 @@ object bits {
         serverEngine(variant).fold(
           trans.variantAnalysisDescriptionNoEngine.txt(nameWithAlias(variant), searchName(variant))
         ) { engine =>
-          trans.variantAnalysisDescriptionServerEngine.txt(nameWithAlias(variant), searchName(variant), engine)
+          trans.variantAnalysisDescriptionServerEngine
+            .txt(nameWithAlias(variant), searchName(variant), engine)
         }
     }
 

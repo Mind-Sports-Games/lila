@@ -72,8 +72,6 @@
     "hashed": [
       "font/playstrategy.woff",
       "font/playstrategy.woff2",
-      "font/playstrategy.chess.woff",
-      "font/playstrategy.chess.woff2",
       "javascripts/vendor/cash.min.js",
       "javascripts/vendor/howler.min.js",
       "javascripts/vendor/mousetrap.min.js",
