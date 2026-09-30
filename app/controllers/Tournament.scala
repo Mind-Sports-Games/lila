@@ -629,17 +629,33 @@ final class Tournament(
       }
     }
 
-  private def renderHistory(freq: String, page: Int, v: Option[Variant])(implicit ctx: Context) =
+  // a whole game family: every Abalone tournament of this frequency, not one variant's
+  def historyGroup(freq: String, group: String, page: Int) =
+    Open { implicit ctx =>
+      views.html.tournament.history.groupByKey(group) match {
+        case None                                                                                => notFound
+        case Some(_) if !lila.tournament.Schedule.Freq(freq).exists(html.tournament.history.hasSeries) =>
+          MovedPermanently(routes.Tournament.history(freq, page).url).fuccess
+        case Some(g) => renderHistory(freq, page, none, g.some)
+      }
+    }
+
+  private def renderHistory(
+      freq: String,
+      page: Int,
+      v: Option[Variant],
+      group: Option[strategygames.GameGroup] = None
+  )(implicit ctx: Context) =
     lila.tournament.Schedule.Freq(freq) so { fr =>
       for {
-        pager <- api.history(fr, page, v)
+        pager <- api.history(fr, page, v.map(List(_)) orElse group.map(_.variants) getOrElse Nil)
         summary <- v.filter(_ => fr == lila.tournament.Schedule.Freq.Yearly).so { variant =>
           repo.finishedSeries(fr, variant) zip repo.nextScheduled(fr, variant) map { case (all, next) =>
             html.tournament.history.Summary(all, next).some
           }
         }
         _ <- env.user.lightUserApi preloadMany (pager.currentPageResults.toList ::: summary.so(_.all)).flatMap(_.winnerId)
-      } yield Ok(html.tournament.history(fr, v, pager, summary))
+      } yield Ok(html.tournament.history(fr, v, group, pager, summary))
     }
 
   def edit(id: String) =

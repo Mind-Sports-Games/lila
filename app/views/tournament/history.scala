@@ -20,12 +20,25 @@ object history {
 
   def hasSeries(freq: Freq) = perVariant(freq)
 
+  // Switching frequency keeps the game you were looking at, but the entry for the section you
+  // are already in drops it instead of pointing at this very page: from a shield category that
+  // is the only way back to /tournament/history/shield, since url() sends a shield variant to
+  // its category page.
   def freqNav(current: Freq, variant: Option[Variant]) =
     st.nav(cls := "page-menu__menu subnav")(
       allFreqs.map { f =>
-        a(cls := current.name.active(f.name), href := url(f, variant))(nameOf(f))
+        a(cls := current.name.active(f.name), href := url(f, variant.filter(_ => f != current)))(nameOf(f))
       }
     )
+
+  // the groups the picker offers, so the sitemap and the chips cannot disagree
+  def displayedGroups = displayedGameGroups
+
+  def groupByKey(key: String): Option[strategygames.GameGroup] =
+    displayedGameGroups.find(_.key == key)
+
+  def groupUrl(freq: Freq, group: strategygames.GameGroup, page: Int = 1) =
+    routes.Tournament.historyGroup(freq.name, group.key, page).url
 
   def url(freq: Freq, variant: Option[Variant], page: Int = 1) =
     variant.filter(_ => hasSeries(freq)).fold(routes.Tournament.history(freq.name, page).url) { v =>
@@ -38,11 +51,21 @@ object history {
     }
 
   // filtered by variant, this is the one stable page for a recurring series ("Yearly Abalone")
-  def apply(freq: Freq, variant: Option[Variant], pager: Paginator[Tournament], summary: Option[Summary] = None)(
+  def apply(
+      freq: Freq,
+      variant: Option[Variant],
+      group: Option[strategygames.GameGroup],
+      pager: Paginator[Tournament],
+      summary: Option[Summary] = None
+  )(
       implicit ctx: Context
   ) = {
-    val heading = variant.fold(s"${nameOf(freq)} tournaments") { v =>
-      s"${nameOf(freq)} ${VariantKeys.variantName(v)} tournaments"
+    // One variant, a whole family, or everything. A family is named after one of its games in
+    // eight cases out of twelve - Abalone holds Abalone and Grand Abalone - so the family page
+    // says so, or the two would carry the same title.
+    val subject = variant.map(VariantKeys.variantName) orElse group.map(VariantKeys.gameGroupName)
+    val heading = subject.fold(s"${nameOf(freq)} tournaments") { s =>
+      s"${nameOf(freq)} $s tournaments" + group.so(_ => ", all variants")
     }
     val stats = summary.map { s =>
       series.Stats(s.all.flatMap { t =>
@@ -60,16 +83,17 @@ object history {
       )
     }
     views.html.base.layout(
-      title = variant.fold("Tournament history")(_ => s"$heading — every edition and winner"),
+      title = subject.fold("Tournament history")(_ => s"$heading — every edition and winner"),
       moreJs = infiniteScrollTag,
       moreCss = frag(cssTag("tournament.history"), summary.isDefined.option(cssTag("tournament.leaderboard"))),
-      canonicalPath = url(freq, variant).some,
-      openGraph = variant.map { v =>
+      canonicalPath = group.fold(url(freq, variant))(groupUrl(freq, _)).some,
+      openGraph = subject.map { name =>
         lila.app.ui.OpenGraph(
           title = s"$heading — every edition and winner",
-          url = s"$netBaseUrl${url(freq, variant)}",
-          description = s"Every edition of the ${nameOf(freq)} ${VariantKeys.variantName(v)} arena on PlayStrategy, with its winner." +
-            (stats zip wording).map { case (st, w) => series.description(st, w) }.getOrElse("")
+          url = s"$netBaseUrl${group.fold(url(freq, variant))(groupUrl(freq, _))}",
+          description =
+            s"Every edition of the ${nameOf(freq)} $name arena on PlayStrategy, with its winner." +
+              (stats zip wording).map { case (st, w) => series.description(st, w) }.getOrElse("")
         )
       }
     ) {
@@ -77,19 +101,44 @@ object history {
         freqNav(freq, variant),
         div(cls := "page-menu__content box")(
           h1(heading),
-          // one link per game: the series page of that game for this frequency
-          hasSeries(freq).option(
-            div(cls := "series-links")(
-              a(cls := List("text" -> true, "active" -> variant.isEmpty), href := url(freq, none))("All games"),
-              Variant.all.filterNot(_.fromPositionVariant).map { v =>
+          // Two stages, game group then game, because 47 chips in one row is not a chooser.
+          // A group is a page of its own - every Abalone tournament of this frequency, across
+          // the family - so each chip is a link and none of this needs a line of script.
+          hasSeries(freq).option {
+            val open = group orElse variant.flatMap(v => displayedGameGroups.find(_.variants.contains(v)))
+            frag(
+              div(cls := "series-links series-links__groups")(
                 a(
-                  cls      := List("text" -> true, "active" -> variant.contains(v)),
-                  dataIcon := v.perfIcon,
-                  href     := url(freq, v.some)
-                )(VariantKeys.variantName(v))
+                  cls  := List("text" -> true, "active" -> (variant.isEmpty && group.isEmpty)),
+                  href := url(freq, none)
+                )("All games"),
+                displayedGameGroups.map { g =>
+                  a(
+                    cls := List(
+                      "text"   -> true,
+                      "group"  -> true,
+                      "active" -> open.contains(g)
+                    ),
+                    dataIcon := g.variants.headOption.map(_.perfIcon.toString).getOrElse(""),
+                    // an active chip steps back out: a family chip drops the filter entirely,
+                    // whether the page is showing that family or one of its games
+                    href := (if (open.contains(g)) url(freq, none) else groupUrl(freq, g))
+                  )(VariantKeys.gameGroupName(g))
+                }
+              ),
+              open.map { g =>
+                div(cls := "series-links series-links__variants")(
+                  g.variants.filterNot(_.fromPositionVariant).map { v =>
+                    a(
+                      cls      := List("text" -> true, "active" -> variant.contains(v)),
+                      dataIcon := v.perfIcon,
+                      href     := (if (variant.contains(v)) groupUrl(freq, g) else url(freq, v.some))
+                    )(VariantKeys.variantName(v))
+                  }
+                )
               }
             )
-          ),
+          },
           variant.map { v =>
             p(cls := "arena-history__intro")(
               a(href := routes.Library.variant(v.key))(trans.playVariantOnlineFreeTitle(VariantKeys.variantName(v))),

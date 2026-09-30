@@ -65,7 +65,12 @@ private object bits {
         trans.variant()
       ),
       div(id := "variant_icons")(
-        renderIconRadios(form("variant"), libs),
+        // the group this variant sits under, so the filter below does not re-derive it
+        renderIconRadios(
+          form("variant"),
+          libs,
+          key => gameGroupValueByFamilyId.get(key.takeWhile(_ != '_'))
+        ),
         renderSelectedChoice(form("variant"), libs)
       ),
       renderRatings()
@@ -161,7 +166,13 @@ private object bits {
       )
     }
 
-  def renderIconRadios(field: Field, options: Seq[SelectChoice]) =
+  // gameGroupOf lets the variant picker tag each radio with the group it belongs under; the
+  // other fields rendered here - opponent, mode, time mode - have no group and pass nothing
+  def renderIconRadios(
+      field: Field,
+      options: Seq[SelectChoice],
+      gameGroupOf: String => Option[String] = _ => None
+  ) =
     st.group(cls := "radio")(
       options.map { case (key, icon, hint) =>
         div(
@@ -170,6 +181,7 @@ private object bits {
             id      := s"$prefix${field.id}_$key",
             st.name := field.name,
             value   := key,
+            gameGroupOf(key).map(attr("data-gamegroup") := _),
             field.value.has(key).option(checked)
           ),
           label(

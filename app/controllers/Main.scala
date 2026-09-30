@@ -216,6 +216,12 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
               loc(html.tournament.history.url(freq, v.some), lastEdition.map(_.date))
             }
           }
+          // and one per game family, which lists every edition of its games together
+          val groupUrls = freqs.filter(html.tournament.history.hasSeries).flatMap { freq =>
+            views.html.tournament.history.displayedGroups.map { g =>
+              loc(html.tournament.history.groupUrl(freq, g), none)
+            }
+          }
           // a category with no award yet has no page
           val shieldUrls = lila.tournament.TournamentShield.Category.all.flatMap { categ =>
             shields.value.get(categ).flatMap(_.headOption) map { last =>
@@ -226,6 +232,7 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
             paths.map(p => loc(p)) :::
               localisedPaths.map(p => loc(p, children = alternates(p))) :::
               seriesUrls :::
+              groupUrls :::
               shieldUrls :::
               studies.map(s => loc(routes.Study.show(s.id.value).url, s.updatedAt.some))
           s"""<?xml version="1.0" encoding="UTF-8"?>
