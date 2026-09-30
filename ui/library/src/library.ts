@@ -11,7 +11,7 @@ playstrategy.load.then(() => {
       if (window.playstrategy && window.playstrategy.libraryChart && data) {
         if (isOverallStats) {
           //aggregate data by game group
-          const dataByGameGroup = data.freq.map(row => [row[0], gameFamilyToGameGroup(row[1].split('_')[0]), row[2]]);
+          const dataByGameGroup = data.freq.map(row => [row[0], gameGroupOfFamily(row[1].split('_')[0]), row[2]]);
           const aggregatedDataByGameGroup: Array<[string, string, number]> = [];
           const groupMap = new Map<string, number>();
           dataByGameGroup.forEach(([month, gameGroup, count]) => {
@@ -33,22 +33,10 @@ playstrategy.load.then(() => {
       }
     }
 
-    function gameFamilyToGameGroup(gf: string) {
-      switch (gf) {
-        case '3':
-          return '4'; //shogi
-        case '4':
-          return '5'; //xiangqi
-        case '5':
-          return '6'; //flipello
-        case '6':
-        case '7':
-          return '7'; //mancala
-        case '13':
-          return '1'; //draughts for dameo
-        default:
-          return gf;
-      }
+    // the server derives this from GameGroup.variants; the chart keys its series by group id,
+    // which is not the value the group buttons carry
+    function gameGroupOfFamily(familyId: string): string {
+      return data?.gameGroupOfFamily?.[familyId] ?? familyId;
     }
 
     function updateStatsTable(allowedVariants: string[], isOverallStats: boolean, groupName: string = '') {
@@ -102,16 +90,14 @@ playstrategy.load.then(() => {
       $(this).addClass('button button-color-choice selected');
       $variantSection.removeClass('hidden');
 
-      const gameFamily = $(this).val() as string;
+      const gameGroup = $(this).val() as string;
 
       const toShow: HTMLElement[] = [];
       const toHide: HTMLElement[] = [];
       $variants.each(function (this: HTMLElement) {
-        const gfOfVariant = ($(this).attr('data-value') as string).split('_')[0];
-        //add oware to mancala group or add dameo to draughts group
-        const gameGroupCases =
-          (gfOfVariant === '6' && gameFamily === '7') || (gfOfVariant === '13' && gameFamily === '1');
-        if (gfOfVariant === gameFamily || gameGroupCases) {
+        // the server writes the group on each variant, so the pairs that do not follow the
+        // family id - oware under mancala, dameo under draughts - need no rule here
+        if ($(this).attr('data-gamegroup') === gameGroup) {
           toShow.push($(this)[0]);
         } else {
           toHide.push($(this)[0]);

@@ -146,11 +146,17 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .map(_.flatMap(_.asOpt[Tournament]))
       .dmap { new lila.db.paginator.StaticAdapter(_) }
 
-  def finishedByFreqAdapter(freq: Schedule.Freq, variant: Option[Variant] = None) =
+  // Empty means every game. One variant selects it; several - a game group, whose variants can
+  // span game logics, draughts and dameo under Draughts - need an $or, since lib and variant are
+  // two fields of the same document.
+  def finishedByFreqAdapter(freq: Schedule.Freq, variants: List[Variant] = Nil) =
     new lila.db.paginator.Adapter[Tournament](
       collection = coll,
-      selector = $doc("schedule.freq" -> freq, "status" -> Status.Finished.id) ++
-        variant.so(v => libSelect(v.gameLogic) ++ variantSelect(v)),
+      selector = $doc("schedule.freq" -> freq, "status" -> Status.Finished.id) ++ (variants match {
+        case Nil      => $empty
+        case v :: Nil => libSelect(v.gameLogic) ++ variantSelect(v)
+        case many     => $or(many.map(v => libSelect(v.gameLogic) ++ variantSelect(v))*)
+      }),
       projection = none,
       sort = $sort.desc("startsAt"),
       readPreference = ReadPreference.secondaryPreferred
