@@ -35,7 +35,9 @@ object page {
         cssTag("user.show"),
         isGranted(_.UserModView).option(cssTag("mod.user"))
       ),
-      robots = u.crawlable
+      robots = u.crawlable,
+      // /@/dang and /@/DANG both serve this page: one canonical, in the stored casing, like og:url
+      canonicalPath = routes.User.show(u.username).url.some
     ) {
       main(cls := "page-menu", dataUsername := u.username)(
         st.aside(cls := "page-menu__menu")(side(u, info.ranks, none)),

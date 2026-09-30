@@ -184,10 +184,6 @@ $narrow-user-list-width: 30ch;
   height: 120px;
 }
 
-.page-medley-current {
-  text-align: center;
-}
-
 .one-medley-shield-trophy {
   width: 8em;
   margin: 0 auto 0.4em;
@@ -472,14 +468,5 @@ main.tournament-categ-shields .box > h1 {
   }
   ol {
     border-bottom: 2px solid $c-bg-zebra;
-  }
-}
-
-.next-tournament {
-  h2 {
-    text-align: center;
-    background: $c-bg-zebra;
-    line-height: 2em;
-    margin-top: 20px;
   }
 }

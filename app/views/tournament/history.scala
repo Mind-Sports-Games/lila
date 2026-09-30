@@ -7,7 +7,7 @@ import lila.common.paginator.Paginator
 import lila.i18n.VariantKeys
 import lila.tournament.Schedule.Freq
 import lila.tournament.Tournament
-
+import strategygames.GameGroup
 import strategygames.variant.Variant
 
 object history {
@@ -20,25 +20,41 @@ object history {
 
   def hasSeries(freq: Freq) = perVariant(freq)
 
-  // Switching frequency keeps the game you were looking at, but the entry for the section you
-  // are already in drops it instead of pointing at this very page: from a shield category that
-  // is the only way back to /tournament/history/shield, since url() sends a shield variant to
-  // its category page.
-  def freqNav(current: Freq, variant: Option[Variant]) =
+  // Switching frequency keeps the game or family you were looking at, but the entry for the
+  // section you are already in drops it instead of pointing at this very page: from a shield
+  // category that is the only way back to /tournament/history/shield, since url() sends a
+  // shield variant to its category page.
+  def freqNav(current: Freq, variant: Option[Variant], group: Option[GameGroup] = None) =
     st.nav(cls := "page-menu__menu subnav")(
       allFreqs.map { f =>
-        a(cls := current.name.active(f.name), href := url(f, variant.filter(_ => f != current)))(nameOf(f))
+        val target = if (f == current) url(f, none) else pageUrl(f, variant, group)
+        a(cls := current.name.active(f.name), href := target)(nameOf(f))
       }
     )
 
-  // the groups the picker offers, so the sitemap and the chips cannot disagree
-  def displayedGroups = displayedGameGroups
+  // a family of one game - Amazons - has no page of its own: the game's page is the family's
+  def soleVariant(group: GameGroup): Option[Variant] =
+    group.variants.filterNot(_.fromPositionVariant) match {
+      case v :: Nil => v.some
+      case _        => none
+    }
 
-  def groupByKey(key: String): Option[strategygames.GameGroup] =
+  // the families with a page of their own, so the sitemap and the chips cannot disagree
+  def displayedGroups = displayedGameGroups.filter(soleVariant(_).isEmpty)
+
+  def groupByKey(key: String): Option[GameGroup] =
     displayedGameGroups.find(_.key == key)
 
-  def groupUrl(freq: Freq, group: strategygames.GameGroup, page: Int = 1) =
-    routes.Tournament.historyGroup(freq.name, group.key, page).url
+  def groupUrl(freq: Freq, group: GameGroup, page: Int = 1) =
+    if (!hasSeries(freq)) routes.Tournament.history(freq.name, page).url
+    else
+      soleVariant(group).fold(routes.Tournament.historyGroup(freq.name, group.key, page).url) { v =>
+        url(freq, v.some, page)
+      }
+
+  // the page as filtered: one game, else a family, else everything of the frequency
+  def pageUrl(freq: Freq, variant: Option[Variant], group: Option[GameGroup], page: Int = 1) =
+    group.fold(url(freq, variant, page))(groupUrl(freq, _, page))
 
   def url(freq: Freq, variant: Option[Variant], page: Int = 1) =
     variant.filter(_ => hasSeries(freq)).fold(routes.Tournament.history(freq.name, page).url) { v =>
@@ -54,7 +70,7 @@ object history {
   def apply(
       freq: Freq,
       variant: Option[Variant],
-      group: Option[strategygames.GameGroup],
+      group: Option[GameGroup],
       pager: Paginator[Tournament],
       summary: Option[Summary] = None
   )(
@@ -83,14 +99,15 @@ object history {
       )
     }
     views.html.base.layout(
-      title = subject.fold("Tournament history")(_ => s"$heading — every edition and winner"),
+      // the heading already names the frequency, so nine frequency pages stop sharing one title
+      title = subject.fold(heading)(_ => s"$heading — every edition and winner"),
       moreJs = infiniteScrollTag,
       moreCss = frag(cssTag("tournament.history"), summary.isDefined.option(cssTag("tournament.leaderboard"))),
-      canonicalPath = group.fold(url(freq, variant))(groupUrl(freq, _)).some,
+      canonicalPath = pageUrl(freq, variant, group).some,
       openGraph = subject.map { name =>
         lila.app.ui.OpenGraph(
           title = s"$heading — every edition and winner",
-          url = s"$netBaseUrl${group.fold(url(freq, variant))(groupUrl(freq, _))}",
+          url = s"$netBaseUrl${pageUrl(freq, variant, group)}",
           description =
             s"Every edition of the ${nameOf(freq)} $name arena on PlayStrategy, with its winner." +
               (stats zip wording).map { case (st, w) => series.description(st, w) }.getOrElse("")
@@ -98,7 +115,7 @@ object history {
       }
     ) {
       main(cls := "page-menu arena-history")(
-        freqNav(freq, variant),
+        freqNav(freq, variant, group),
         div(cls := "page-menu__content box")(
           h1(heading),
           // Two stages, game group then game, because 47 chips in one row is not a chooser.
@@ -126,7 +143,8 @@ object history {
                   )(VariantKeys.gameGroupName(g))
                 }
               ),
-              open.map { g =>
+              // a family of one game has nothing to choose under its chip
+              open.filter(soleVariant(_).isEmpty).map { g =>
                 div(cls := "series-links series-links__variants")(
                   g.variants.filterNot(_.fromPositionVariant).map { v =>
                     a(
@@ -162,7 +180,8 @@ object history {
             table(cls := "slist slist-pad")(
               tbody(cls := "infinite-scroll")(
                 pager.currentPageResults map finishedList.apply,
-                pagerNextTable(pager, p => url(freq, variant, p))
+                // a family page pages within the family, not into the unfiltered list
+                pagerNextTable(pager, pageUrl(freq, variant, group, _))
               )
             )
           )

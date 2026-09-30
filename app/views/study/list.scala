@@ -96,7 +96,7 @@ object list {
   def search(pag: Paginator[WithChaptersAndLiked], text: String)(implicit ctx: Context) =
     views.html.base.layout(
       title = text,
-      robots = pag.currentPage == 1,
+      robots = netConfig.crawlable && pag.currentPage == 1,
       moreCss = cssTag("study.index"),
       wrapClass = "full-screen-force",
       moreJs = infiniteScrollTag
@@ -167,7 +167,7 @@ object list {
     views.html.base.layout(
       title = title,
       // only the first page of a listing is worth indexing; the rest is a crawl path into every study
-      robots = pag.currentPage == 1,
+      robots = netConfig.crawlable && pag.currentPage == 1,
       moreCss = cssTag("study.index"),
       wrapClass = "full-screen-force",
       moreJs = infiniteScrollTag

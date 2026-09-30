@@ -844,5 +844,4 @@
   <string name="variantPuzzles">%s 谜题</string>
   <string name="libraryTitle">可免费在线玩的桌游 — PlayStrategy 游戏库</string>
   <string name="libraryDescription">PlayStrategy 的所有游戏：国际象棋及其变体、跳棋、围棋、双陆棋、黑白棋、将棋、中国象棋、播棋、Abalone、Lines of Action 等——附规则、教程、锦标赛和统计。</string>
-  <string name="recurringTournaments">定期锦标赛</string>
 </resources>

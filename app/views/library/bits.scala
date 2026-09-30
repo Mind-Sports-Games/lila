@@ -137,7 +137,6 @@ object bits {
   def childVariants(variant: Variant): List[Variant] =
     Variant.all.filter(v => parentVariant(v).exists(_.key == variant.key))
 
-  // variants named by a bare adjective ("Russian", "Atomic") are searched with their family word
   // A game's URL carries its engine key - flipello, standard, go19x19 - so the name people
   // actually type 404s. These redirect onto the one canonical URL instead.
   private val urlAliases: Map[String, String] = Map(
@@ -197,6 +196,7 @@ object bits {
     keysByLowerCase.get(lower).filter(_ != key) orElse urlAliases.get(lower)
   }
 
+  // variants named by a bare adjective ("Russian", "Atomic") are searched with their family word
   private val adjectiveNames = Set(
     "crazyhouse",
     "kingOfTheHill",

@@ -848,5 +848,4 @@
   <string name="variantPuzzles">%s 퍼즐</string>
   <string name="libraryTitle">무료로 온라인 플레이할 수 있는 보드게임 — PlayStrategy 라이브러리</string>
   <string name="libraryDescription">PlayStrategy의 모든 게임: 체스와 그 변형, 체커, 바둑, 백개먼, 오델로, 쇼기, 샹치, 만칼라, 아발론, Lines of Action 등 — 규칙, 튜토리얼, 토너먼트, 통계와 함께.</string>
-  <string name="recurringTournaments">정기 토너먼트</string>
 </resources>

@@ -94,7 +94,6 @@
     font-size: 175%;
   }
 
-  .library__series,
   .library__studies,
   .library__wc {
     @each $c in ('black', 'green', 'red', 'blue', 'yellow') {

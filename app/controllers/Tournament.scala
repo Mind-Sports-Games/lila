@@ -632,11 +632,16 @@ final class Tournament(
   // a whole game family: every Abalone tournament of this frequency, not one variant's
   def historyGroup(freq: String, group: String, page: Int) =
     Open { implicit ctx =>
-      views.html.tournament.history.groupByKey(group) match {
-        case None                                                                                => notFound
-        case Some(_) if !lila.tournament.Schedule.Freq(freq).exists(html.tournament.history.hasSeries) =>
-          MovedPermanently(routes.Tournament.history(freq, page).url).fuccess
-        case Some(g) => renderHistory(freq, page, none, g.some)
+      val history = views.html.tournament.history
+      (history.groupByKey(group), lila.tournament.Schedule.Freq(freq).filter(history.hasSeries)) match {
+        case (None, _)       => notFound
+        case (Some(_), None) => MovedPermanently(routes.Tournament.history(freq, page).url).fuccess
+        case (Some(g), Some(f)) =>
+          // a family of one game has no page of its own: the game's page is the family's
+          history.soleVariant(g) match {
+            case Some(v) => MovedPermanently(history.url(f, v.some, page)).fuccess
+            case None    => renderHistory(freq, page, none, g.some)
+          }
       }
     }
 

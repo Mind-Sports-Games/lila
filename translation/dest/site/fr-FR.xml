@@ -906,7 +906,6 @@
   <string name="variantPuzzles">Problèmes de %s</string>
   <string name="libraryTitle">Jeux de société à jouer en ligne gratuitement — la ludothèque PlayStrategy</string>
   <string name="libraryDescription">Tous les jeux de PlayStrategy : les échecs et leurs variantes, les dames, le go, le backgammon, Othello, le shogi, le xiangqi, le mancala, Abalone, Lines of Action et plus — avec règles, tutoriels, tournois et statistiques.</string>
-  <string name="recurringTournaments">Tournois récurrents</string>
   <string name="msoWorldChampionship">Championnat du monde de %s</string>
   <string name="msoWorldChampionshipVenue">Le championnat du monde de %s des Mind Sports Olympiad se joue en présentiel ; ses parties sont publiées sur PlayStrategy, qui accueille aussi le Grand Prix MSO en ligne.</string>
   <string name="msoEvent">%s aux Mind Sports Olympiad</string>

@@ -47,7 +47,7 @@ object editor {
         // outside the element the editor empties on mount
         h1(cls := "offscreen")(trans.boardEditor()),
         main(id := "board-editor")(
-        div(cls := s"board-editor variant-${variant.key}")(
+          div(cls := s"board-editor variant-${variant.key}")(
             div(cls := "spare"),
             div(cls := "main-board")(chessgroundBoard),
             div(cls := "spare")

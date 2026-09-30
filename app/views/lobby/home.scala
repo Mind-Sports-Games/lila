@@ -63,7 +63,7 @@ object home {
           image = staticAssetUrl("logo/playstrategy-tile-wide.png").some,
           twitterImage = staticAssetUrl("logo/playstrategy-tile.png").some,
           title = trans.playstrategySiteTitle.txt(),
-          url = netBaseUrl,
+          url = s"$netBaseUrl/",
           description = trans.playstrategySiteDescription.txt()
         )
         .some

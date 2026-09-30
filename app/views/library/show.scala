@@ -1,6 +1,10 @@
 package views.html.library
 
+import play.api.i18n.Lang
 import play.api.libs.json.Json
+
+import strategygames.variant.Variant
+import strategygames.Speed
 
 import lila.api.Context
 import lila.app.templating.Environment.*
@@ -12,11 +16,6 @@ import lila.rating.PerfType
 import lila.user.User
 import lila.tournament.Tournament
 import lila.puzzle.{ DailyPuzzle, Puzzle }
-import play.api.i18n.Lang
-
-import strategygames.variant.Variant
-import strategygames.Speed
-
 
 object show {
 
@@ -193,10 +192,14 @@ object show {
             case children =>
               frag(
                 " ",
+                // a translated string renders a Tag argument but stringifies a bare SeqFrag, so
+                // the joined list has to sit inside one element
                 trans.alsoOnPlayStrategy(
-                  children
-                    .map(v => a(href := routes.Library.variant(v.key))(bits.searchName(v)): Frag)
-                    .reduce[Frag]((a, b) => frag(a, ", ", b))
+                  span(
+                    children
+                      .map(v => a(href := routes.Library.variant(v.key))(bits.searchName(v)): Frag)
+                      .reduce[Frag]((a, b) => frag(a, ", ", b))
+                  )
                 )
               )
           }
