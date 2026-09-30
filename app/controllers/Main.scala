@@ -179,7 +179,7 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
             routes.Tournament.home.url,
             routes.Tournament.shields.url,
             routes.Swiss.home.url,
-            routes.Puzzle.base.url,
+            // not /training: it renders the most-played variant's trainer, which is listed below
             routes.Study.allDefault().url,
             routes.Blog.index().url,
             routes.Editor.index.url

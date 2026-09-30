@@ -96,8 +96,8 @@ object shields {
     val bounties = history.sorted
       .flatMap { case (categ, awards) =>
         val stats = series.Stats(
-      awards.map(aw => series.Win(aw.owner.value, aw.date, routes.Tournament.show(aw.tourId).url))
-    )
+          awards.map(aw => series.Win(aw.owner.value, aw.date, routes.Tournament.show(aw.tourId).url))
+        )
         stats.currentReign.filter(_.count > 1).map { reign =>
           (categ, reign, upcoming.find(_.variant == categ.variant))
         }
@@ -159,7 +159,7 @@ object shields {
       next: Option[Tournament]
   )(implicit ctx: Context) = {
     val title = s"${categ.name} Shield — monthly tournament champions"
-    val stats = series.Stats(awards.map(aw => series.Win(aw.owner.value, aw.date, aw.tourId)))
+    val stats = series.Stats(awards.map(aw => series.Win(aw.owner.value, aw.date, routes.Tournament.show(aw.tourId).url)))
     val wording = series.Wording(
       holderLabel = "Current holder",
       unit = "shield",

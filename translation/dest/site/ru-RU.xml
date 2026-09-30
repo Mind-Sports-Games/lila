@@ -973,7 +973,6 @@
   <string name="variantPuzzles">Задачи: %s</string>
   <string name="libraryTitle">Настольные игры, в которые можно играть онлайн бесплатно — библиотека PlayStrategy</string>
   <string name="libraryDescription">Все игры PlayStrategy: шахматы и их варианты, шашки, го, нарды, реверси, сёги, сянци, манкала, Abalone, Lines of Action и другие — с правилами, обучением, турнирами и статистикой.</string>
-  <string name="recurringTournaments">Регулярные турниры</string>
   <string name="msoWorldChampionship">Чемпионат мира по %s</string>
   <string name="msoWorldChampionshipVenue">Чемпионат мира Mind Sports Olympiad по %s проходит очно; его партии публикуются на PlayStrategy, где также проводится онлайн Гран-при MSO.</string>
   <string name="msoEvent">%s на Mind Sports Olympiad</string>

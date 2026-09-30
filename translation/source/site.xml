@@ -450,7 +450,6 @@
   <string name="msoGrandPrix">MSO Grand Prix</string>
   <string name="msoGrandPrixEvent">%s at the MSO Grand Prix</string>
   <string name="msoGrandPrixVenue">The Mind Sports Olympiad's online Grand Prix is played on PlayStrategy, and %s is one of its games.</string>
-  <string name="recurringTournaments">Recurring tournaments</string>
   <string name="variantPuzzles">%s puzzles</string>
   <string name="libraryTitle">Board games you can play online free — the PlayStrategy library</string>
   <string name="libraryDescription">Every game on PlayStrategy: chess and its variants, checkers and draughts, Go, backgammon, Othello, shogi, xiangqi, mancala, abalone, Lines of Action and more — with rules, tutorials, tournaments and statistics.</string>

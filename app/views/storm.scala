@@ -29,6 +29,8 @@ object storm {
         )
       ),
       title = "Puzzle Storm",
+      boardFamily = "chess".some,
+      soleBoardFamily = true,
       zoomable = true
     ) {
       main(

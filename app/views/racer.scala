@@ -14,7 +14,9 @@ object racer {
   def home(implicit ctx: Context) =
     views.html.base.layout(
       moreCss = cssTag("racer-home"),
-      title = "Puzzle Racer"
+      title = "Puzzle Racer",
+      boardFamily = "chess".some,
+      soleBoardFamily = true
     ) {
       main(cls := "page page-small racer-home box box-pad")(
         h1("Puzzle Racer"),
@@ -49,6 +51,8 @@ object racer {
         )
       ),
       title = "Puzzle Racer",
+      boardFamily = "chess".some,
+      soleBoardFamily = true,
       zoomable = true
     ) {
       main(

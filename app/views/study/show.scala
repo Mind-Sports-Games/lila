@@ -53,6 +53,8 @@ object show {
           )}""")
       ),
       robots = s.isPublic && s.notable,
+      // every chapter URL is the same study: one canonical, the study root, which og:url already names
+      canonicalPath = routes.Study.show(s.id.value).url.some,
       zoomable = true,
       csp = defaultCsp.withWebAssembly.withPeer.some,
       openGraph = lila.app.ui

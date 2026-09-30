@@ -25,10 +25,13 @@ final class UserAnalysis(
   // the name a game is known by, or a real key in the wrong case, lands on the canonical
   // URL rather than silently rendering standard chess. An alias for a variant with no
   // analysis board stops here, rather than redirecting to a URL that only 404s.
+  private def hasAnalysisBoard(key: String) =
+    Variant.byKey.get(key).exists(views.html.board.userAnalysis.analysisVariants.contains)
+
   private def aliasRedirect(key: String, rest: String = "") =
     views.html.library.bits.canonicalVariantKey(key) map { canonical =>
       Open { implicit ctx =>
-        if (Variant.byKey.get(canonical).exists(views.html.board.userAnalysis.analysisVariants.contains))
+        if (hasAnalysisBoard(canonical))
           fuccess(MovedPermanently(routes.UserAnalysis.parseArg(s"$canonical$rest").url))
         else notFound
       }
@@ -71,14 +74,16 @@ final class UserAnalysis(
       loadPage("", Variant.libStandard(GameLogic.Chess()))(using ctx)
     )(lang)
 
-  // only a variant key gets a localised URL, never a pasted position
+  // only a variant key gets a localised URL, never a pasted position; the same gate as the
+  // bare URL, so /fr/analysis/<key> never serves a board the English page refuses
   def langLoad(lang: String, key: String) =
     views.html.library.bits.canonicalVariantKey(key) match {
-      case Some(canonical) =>
+      case Some(canonical) if hasAnalysisBoard(canonical) =>
         Action(MovedPermanently(routes.UserAnalysis.langLoad(lang, canonical).url))
+      case Some(_) => Open { implicit ctx => notFound }
       case None =>
         LangPage(routes.UserAnalysis.parseArg(key).url)(ctx =>
-          Variant.byKey get key match {
+          Variant.byKey.get(key).filter(views.html.board.userAnalysis.analysisVariants.contains) match {
             case Some(variant) => loadPage("", variant)(using ctx)
             case None          => notFound(using ctx)
           }

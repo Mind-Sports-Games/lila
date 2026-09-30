@@ -846,5 +846,4 @@
   <string name="variantPuzzles">%s の問題</string>
   <string name="libraryTitle">無料でオンライン対戦できるボードゲーム — PlayStrategy ライブラリ</string>
   <string name="libraryDescription">PlayStrategy のすべてのゲーム：チェスとその変則ルール、チェッカー、囲碁、バックギャモン、オセロ、将棋、シャンチー、マンカラ、アバロン、Lines of Action など。ルール、チュートリアル、トーナメント、統計付き。</string>
-  <string name="recurringTournaments">定期トーナメント</string>
 </resources>
