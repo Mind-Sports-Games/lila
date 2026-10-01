@@ -1,6 +1,7 @@
 import { h, VNode } from 'snabbdom';
 
 import * as xhr from 'common/xhr';
+import { remember as rememberPieceSet } from 'common/piece-sprite';
 import { Redraw, Open, bind, header, displayGameFamily, convertVariantKeyToGameFamily } from './util';
 import { gameFamily } from './common';
 
@@ -148,10 +149,10 @@ function applyPiece(t: Piece, list: Piece[], is3d: boolean) {
   if (is3d) {
     $('body').removeClass(list.join(' ')).addClass(t.name);
   } else {
-    // a page that draws one family ships that family's sheet alone, so picking a set for
-    // another family has nothing to rewrite here; the preference still saves and applies on
-    // the next page that draws it
+    // a page that draws one family ships that family's sheet alone: a set picked for another
+    // family is only noted, for the day its sheet is fetched
     const sprite = document.getElementById('piece-sprite-' + t.gameFamily) as HTMLLinkElement | null;
     if (sprite) sprite.href = sprite.href.replace(/\w+\-\w+\.css/, t.gameFamily + '-' + t.name + '.css');
+    else rememberPieceSet(t.gameFamily, t.name);
   }
 }

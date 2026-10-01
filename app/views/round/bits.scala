@@ -20,7 +20,7 @@ object bits {
       playing: Boolean = false,
       robots: Boolean = false,
       // the player page lists the viewer's other games, which can be of any family; a spectator
-      // page shows this game and nothing else
+      // page draws this game, and a preview of another family fetches its own sheet
       soleBoardFamily: Boolean = false
   )(body: Frag)(implicit ctx: Context) =
     views.html.base.layout(

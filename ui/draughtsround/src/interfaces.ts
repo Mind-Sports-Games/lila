@@ -183,6 +183,7 @@ export interface Pref {
   is3d: boolean;
   keyboardMove: boolean;
   moveEvent: Prefs.MoveEvent;
+  pieceSet?: { name: string; gameFamily: string }[];
   replay: Prefs.Replay;
   draughtsResult: boolean;
   rookCastle: boolean;

@@ -41,6 +41,13 @@ object layout {
         .filter(ps => !sole || boardFamily.contains(ps.gameFamilyName))
         .map(ps => pieceSprite(ps, boardFamily.contains(ps.gameFamilyName)))
 
+    // the sets a sole page left out, for piece-sprite.ts to fetch when another family shows up
+    def leftOutPieceSets(boardFamily: Option[String])(implicit ctx: Context): String =
+      ctx.currentPieceSet
+        .filterNot(ps => boardFamily.contains(ps.gameFamilyName))
+        .map(ps => s"${ps.gameFamilyName}:${ps.name}")
+        .mkString(",")
+
     def pieceSprite(ps: lila.pref.PieceSet, blocking: Boolean = true): Frag =
       link(
         id   := s"piece-sprite-${ps.gameFamilyName}",
@@ -210,6 +217,7 @@ object layout {
   private val dataAnnounce      = attr("data-announce")
   private val dataSelectedColor = attr("data-selected-color")
   private val dataDev           = attr("data-dev")
+  private val dataPieceSets     = attr("data-piece-sets")
   val dataSoundSet              = attr("data-sound-set")
   val dataTheme                 = attr("data-theme")
   val dataAssetUrl              = attr("data-asset-url") // netConfig.assetBaseUrl.value
@@ -244,7 +252,9 @@ object layout {
       // the game family this page draws a board for, if any: its pieces block the paint, the rest do not
       boardFamily: Option[String] = None,
       // and this page draws no board of any other family, so the other sprites can stay home
-      soleBoardFamily: Boolean = false
+      soleBoardFamily: Boolean = false,
+      // its script is not handed the piece sets as round and analysis are, so <body> names them
+      namePieceSets: Boolean = false
   )(body: Frag)(implicit ctx: Context): Frag = {
     updateManifest()
 
@@ -342,6 +352,7 @@ object layout {
           dataNonce         := ctx.nonce.ifTrue(sameAssetDomain).map(_.value),
           dataTheme         := ctx.currentBg,
           dataSelectedColor := ctx.currentSelectedColorCls,
+          dataPieceSets     := namePieceSets.option(leftOutPieceSets(boardFamily)),
           dataAnnounce      := AnnounceStore.get.map(a => safeJsonValue(a.json)),
           style             := zoomable.option(s"--zoom:${ctx.zoom}")
         )(

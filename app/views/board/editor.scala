@@ -22,6 +22,7 @@ object editor {
       title = trans.boardEditorTitle.txt(),
       boardFamily = variant.gameFamily.key.some,
       soleBoardFamily = true,
+      namePieceSets = true,
       moreJs = frag(
         jsModule("editor"),
         embedJsUnsafeLoadThen(
