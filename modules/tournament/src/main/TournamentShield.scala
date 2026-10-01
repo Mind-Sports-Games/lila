@@ -34,10 +34,9 @@ final class TournamentShieldApi(
 
   def byCategKey(k: String): Fu[Option[(Category, List[Award])]] =
     Category.byKey(k) so { categ =>
-      cache.getUnit dmap {
-        _.value get categ map {
-          categ -> _
-        }
+      // a category nobody has won yet is still a page: its first edition is coming
+      cache.getUnit dmap { h =>
+        (categ -> h.value.getOrElse(categ, Nil)).some
       }
     }
 
