@@ -8,6 +8,7 @@ import { parseCastlingFen } from 'stratops/fen';
 import * as fp from 'stratops/fp';
 import { defined, prop, Prop } from 'common';
 import { replacePocketsInFen } from 'common/editor';
+import { ensureFamily as ensurePieceSprite } from 'common/piece-sprite';
 import throttle from 'common/throttle';
 import { variantClass, variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
 import { Key, Variant as CGVariant } from 'chessground/types';
@@ -336,6 +337,7 @@ export default class EditorCtrl {
   changeVariant(variantKey: VariantKey): void {
     this.variantKey = variantKey;
     const variant = variantClassFromKey(variantKey);
+    ensurePieceSprite(variant.family);
     this.turn = 'p1';
     this.initialFen = variant.getInitialFen(this.turn);
     const posKey = variant.family === 'chess' ? 'chess' : variantKey;

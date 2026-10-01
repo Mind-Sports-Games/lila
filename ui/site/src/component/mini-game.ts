@@ -2,6 +2,7 @@ import { Coords as CgCoords } from 'chessground/types';
 import * as domData from 'common/data';
 import { boardDimensions, variantFromElement } from 'common/mini-board';
 import { loadChessground, loadDraughtsground } from 'common/board-lib';
+import { ensureFor as ensurePieceSprite } from 'common/piece-sprite';
 import { displayScore, fenPlayerIndex, parseLastMove, backgammon as bgUtils } from 'stratutils';
 import clockWidget from './clock-widget';
 
@@ -24,6 +25,7 @@ export const init = (node: HTMLElement): string | null => {
   const live = node.getAttribute('data-live'),
     $el = $(node);
   $el.removeClass('mini-game--init');
+  ensurePieceSprite(node);
   const wrap = $el.find('.cg-wrap')[0] as HTMLElement | undefined;
   if (!wrap || domData.get(wrap, 'board-pending')) return live;
   domData.set(

@@ -20,6 +20,7 @@ object show {
     views.html.base.layout(
       boardFamily = puzzle.variant.gameFamily.key.some,
       soleBoardFamily = true,
+      namePieceSets = true,
       title = if (isStreak) "Puzzle Streak" else variantPuzzles,
       moreCss = cssTag("puzzle"),
       moreJs = frag(
