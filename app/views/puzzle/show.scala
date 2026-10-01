@@ -57,13 +57,17 @@ object show {
       zoomable = true,
       playing = true
     ) {
-      main(cls := "puzzle")(
-        st.aside(cls := "puzzle__side")(
-          div(cls := "puzzle__side__metas")
-        ),
-        div(cls := s"puzzle__board main-board variant-${puzzle.variant.key}")(chessgroundBoard),
-        div(cls := "puzzle__tools"),
-        div(cls := "puzzle__controls")
+      frag(
+        // a streak draws its own h1 in the side panel
+        (!isStreak).option(h1(cls := "offscreen")(variantPuzzles)),
+        main(cls := "puzzle")(
+          st.aside(cls := "puzzle__side")(
+            div(cls := "puzzle__side__metas")
+          ),
+          div(cls := s"puzzle__board main-board variant-${puzzle.variant.key}")(chessgroundBoard),
+          div(cls := "puzzle__tools"),
+          div(cls := "puzzle__controls")
+        )
       )
     }
   }
