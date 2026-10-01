@@ -106,18 +106,18 @@ $minibreakthrough-board-files: (
 );
 
 $oware-board-files: (
-  'light-wood': 'oware_light_wood_board.png',
-  'dark-wood': 'oware_dark_wood_board.png',
+  'light-wood': 'oware_light_wood_board.webp',
+  'dark-wood': 'oware_dark_wood_board.webp',
 );
 
 $togyzkumalak-board-files: (
-  'blue': 'togyzkumalak_blue_board.png',
-  'wood': 'togyzkumalak_wood_board.png',
+  'blue': 'togyzkumalak_blue_board.webp',
+  'wood': 'togyzkumalak_wood_board.webp',
 );
 
 $bestemshe-board-files: (
-  'blue': 'togyzkumalak_blue_board_mini.png',
-  'wood': 'togyzkumalak_wood_board_mini.png',
+  'blue': 'togyzkumalak_blue_board_mini.webp',
+  'wood': 'togyzkumalak_wood_board_mini.webp',
 );
 
 $go9x9-board-files: (
@@ -195,9 +195,9 @@ $abalone-variants: ('abalone', 'grandabalone');
   }
 }
 
-@each $color, $file in $chess-board-files {
+@each $color in $core-board-themes {
   .dameo-#{$color} .variant-dameo.is2d cg-board {
-    background-image: url(../images/board/dameo/#{$file});
+    background-image: url(../images/board/dameo/#{map-get($chess-board-files, $color)});
   }
 }
 
@@ -339,9 +339,9 @@ $abalone-variants: ('abalone', 'grandabalone');
 }
 
 @each $variant in $dameo-variants {
-  @each $color, $file in $chess-board-files {
+  @each $color in $core-board-themes {
     .dameo-#{$color} .is2d .variant-#{$variant} cg-board {
-      background-image: url(../images/board/dameo/#{$file});
+      background-image: url(../images/board/dameo/#{map-get($chess-board-files, $color)});
     }
   }
 }

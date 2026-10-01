@@ -82,9 +82,59 @@
     }
   }
 
+  .library-outro {
+    max-width: 60ch;
+    margin: 1em auto 0;
+    text-align: center;
+    line-height: 1.5;
+  }
+
   .start {
     margin: 2em 0em;
     font-size: 175%;
+  }
+
+  .library__studies,
+  .library__wc {
+    @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
+      .selected-color-#{$c} & .color-choice {
+        background: map-get($c-color-choice-map, $c);
+        color: $c-color-choice-font-default;
+        text-shadow: 0 1px 0 map-get($c-color-choice-map, $c);
+      }
+    }
+
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 1em;
+
+    .title {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5em 1em;
+      align-items: center;
+
+      ::before {
+        font-size: 2.2em;
+      }
+
+      h2 {
+        font-size: 1.3em;
+        font-weight: bold;
+      }
+    }
+
+    p {
+      margin: 0.6em 1em;
+    }
+
+    ul {
+      margin: 0.6em 1em;
+    }
+
+    li {
+      margin: 0.3em 0;
+    }
   }
 
   .library__tv,
@@ -198,6 +248,10 @@
       flex-flow: column;
       padding: 2px;
       justify-content: center;
+      // the variants are <a> so a crawler can follow them to their hub; a button centres its own
+      // text and takes no link colour, an anchor has to be told both
+      align-items: center;
+      color: $c-font;
       flex: 0 0 25%;
       max-width: 25%;
       border-right: 1px solid $c-border;
@@ -348,7 +402,10 @@
       font-size: 1.6em;
     }
 
+    // the table inside shares the class, so it would inherit the block's cap
     table {
+      width: 100%;
+      max-width: none;
       overflow-x: hidden;
       background: $c-bg-zebra;
       border-bottom: 1px solid $c-border;
@@ -389,62 +446,70 @@
       padding-right: 1em;
     }
 
+    .library__live,
+    .library__blocks {
+      display: flex;
+      flex-flow: column;
+      align-items: center;
+      width: 100%;
+    }
+
     @include breakpoint($mq-small) {
       max-width: 950px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      column-gap: 1em;
-      align-items: start;
-      grid-template-areas:
-        'header header'
-        'start  start'
-        'puzzle tv'
-        'tours  leader'
-        'stats  stats'
-        'chart  chart';
 
-      .library-header {
-        grid-area: header;
-      }
       .start {
-        grid-area: start;
         text-align: center;
       }
-      .library__puzzle {
-        grid-area: puzzle;
-        max-width: 100%;
-      }
-      .library__tv {
-        grid-area: tv;
-        max-width: 100%;
-      }
-      .library__tv--centered {
-        grid-column: 1 / -1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
 
-        .title,
-        .mini-game {
-          width: calc(50% - 0.5em);
-          margin-left: 0em;
+      .library__live {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 1em;
+        align-items: start;
+
+        .library__puzzle {
+          grid-column: 1;
+          max-width: 100%;
+        }
+        .library__tv {
+          grid-column: 2;
+          max-width: 100%;
+        }
+        .library__tv--centered {
+          grid-column: 1 / -1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+
+          .title,
+          .mini-game {
+            width: calc(50% - 0.5em);
+            margin-left: 0em;
+          }
         }
       }
-      .tournaments {
-        grid-area: tours;
-        max-width: 100%;
+
+      .library__blocks {
+        flex-flow: row wrap;
+        align-items: stretch;
+        gap: 1em;
+        margin-bottom: 1em;
+
+        > div {
+          flex: 1 1 calc(50% - 0.5em);
+          max-width: 100%;
+          margin-bottom: 0;
+        }
       }
-      .leaderboards {
-        grid-area: leader;
-        max-width: 100%;
-      }
-      .library-stats-table {
-        grid-area: stats;
-        max-width: 100%;
-      }
+
+      .library-stats-table,
       #library_chart_area {
-        grid-area: chart;
         max-width: 100%;
+      }
+
+      .library-outro {
+        max-width: 100%;
+        margin: 1em 0 2em;
       }
     }
   }

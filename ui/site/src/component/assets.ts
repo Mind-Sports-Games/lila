@@ -24,6 +24,36 @@ export const hashedAssetUrl = (path: string, opts: AssetUrlOpts = {}) => {
   return baseUrl + '/assets' + '/' + path;
 };
 
+// zxcvbn is 387KB of word lists: load it when the field is focused, not when the page is
+export const lazyPasswordComplexity = (id: string) => {
+  const field = document.getElementById(id);
+  if (!field) return;
+  field.addEventListener(
+    'focus',
+    () => loadModule('passwordComplexity').then(() => window.PlayStrategyPassword.addPasswordChangeListener(id)),
+    { once: true },
+  );
+};
+
+// Chart.js and its plugins are 211KB, and a chart is never why someone opened the page:
+// fetch the module when its container is about to be seen.
+export const lazyChart = (selector: string, module: string, draw: () => void): void => {
+  const el = document.querySelector(selector);
+  if (!el) return;
+  const load = () => loadModule(module).then(draw);
+  if (!window.IntersectionObserver) return void load();
+  const observer = new IntersectionObserver(
+    entries => {
+      if (entries.some(e => e.isIntersecting)) {
+        observer.disconnect();
+        load();
+      }
+    },
+    { rootMargin: '300px' },
+  );
+  observer.observe(el);
+};
+
 const loadedCss = new Map<string, true>();
 
 // still used to load external libs css (hopscotch, shepherd)

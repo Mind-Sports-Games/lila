@@ -17,11 +17,32 @@ object variant {
   )(implicit ctx: Context) =
     layout(
       active = variant.some,
-      title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
-      klass = "box-pad page variant"
+      title = views.html.library.bits.rulesTitle(variant),
+      klass = "box-pad page variant",
+      openGraph = lila.app.ui
+        .OpenGraph(
+          title = views.html.library.bits.rulesTitle(variant),
+          url = s"$netBaseUrl${routes.Page.variant(variant.key).url}",
+          description = views.html.library.bits.rulesDescription(variant)
+        )
+        .some
     )(
       h1(cls := "text", dataIcon := variant.perfIcon)(VariantKeys.variantName(variant)),
       h2(cls := "headline")(VariantKeys.variantTitle(variant)),
+      div(cls := "play")(
+        a(cls := "button", href := routes.Library.variant(variant.key))(
+          trans.playVariantOnlineFreeTitle(views.html.library.bits.searchName(variant))
+        ),
+        a(cls := "button button-empty", href := routes.UserAnalysis.parseArg(variant.key))(trans.analysis()),
+        views.html.library.bits.parentVariant(variant).map { parent =>
+          p(
+            trans.variantOf(
+              views.html.library.bits.searchName(variant),
+              a(href := routes.Page.variant(parent.key))(views.html.library.bits.searchName(parent))
+            )
+          )
+        }
+      ),
       div(cls := "body")(raw(~doc.getHtml("pages.content", resolver)))
     )
 
@@ -30,7 +51,7 @@ object variant {
       resolver: io.prismic.DocumentLinkResolver
   )(implicit ctx: Context) =
     layout(
-      title = "PlayStrategy Games",
+      title = "Board game rules — how to play every game on PlayStrategy",
       klass = "variants"
     )(
       h1("PlayStrategy Games"),

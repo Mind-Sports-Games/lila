@@ -1,7 +1,9 @@
 package controllers
 
+import play.api.mvc.Result
 import strategygames.variant.Variant
 
+import lila.api.Context
 import lila.app.{ *, given }
 import lila.memo.CacheApi.*
 import lila.puzzle.Puzzle
@@ -21,30 +23,79 @@ final class Library(env: Env) extends LilaController(env) {
 
   def variant(key: String) =
     Open { implicit ctx =>
-      Variant.all.find(_.key == key) match {
-        case Some(variant) => {
-          val tvChannel = lila.tv.Tv.Channel.byKey.get(variant.key)
-          for {
-            monthlyGameData <- env.game.cached.monthlyGames
-            winRates        <- env.game.cached.gameWinRates
-            leaderboards    <- env.user.cached.top10.get {}
-            leaderboard = leaderboards.forVariant(variant)
-            tours <- env.tournament.cached.onLibraryPage.getUnit.recoverDefault
-            filteredTours = tours.filter(_.variant.key == variant.key)
-            featuredGame <- tvChannel
-              .map(env.tv.tv.getGame)
-              .getOrElse(fuccess(none))
-              .orElse(env.game.gameRepo.randomByVariant(variant))
-            dailyPuzzle <- Puzzle.puzzleVariants
-              .exists(_.key == variant.key)
-              .so(env.puzzle.daily.getForVariant(variant))
-          } yield Ok(
-            views.html.library
-              .show(variant, monthlyGameData, winRates, leaderboard, filteredTours, featuredGame, dailyPuzzle)
-          )
-        }
-        case None => NotFound("Variant not found").fuccess
+      views.html.library.bits.canonicalVariantKey(key) match {
+        case Some(canonical) => MovedPermanently(routes.Library.variant(canonical).url).fuccess
+        case None            => showVariant(key)
       }
+    }
+
+  def langVariant(lang: String, key: String) =
+    views.html.library.bits.canonicalVariantKey(key) match {
+      case Some(canonical) =>
+        Action(MovedPermanently(routes.Library.langVariant(lang, canonical).url))
+      case None =>
+        LangPage(routes.Library.variant(key).url)(ctx => showVariant(key)(using ctx))(lang)
+    }
+
+  // Both halves are finished tournaments, so they change a few times a year, and the swiss one
+  // matches its name with a case-insensitive regex that no index can serve. Uncached they ran on
+  // every view of all 47 hubs, which is exactly the traffic these pages are built to attract.
+  private val grandPrixCache =
+    env.memo.cacheApi[String, (List[lila.tournament.Tournament], List[lila.swiss.Swiss])](
+      64,
+      "library.grandPrix"
+    ) {
+      _.refreshAfterWrite(1.hour)
+        .maximumSize(128)
+        .buildAsyncFuture { key =>
+          Variant.byKey.get(key).fold(fuccess(Nil -> Nil)) { variant =>
+            env.tournament.tournamentRepo
+              .finishedSeriesOfTeam(views.html.library.bits.msoTeamId, lila.common.Freq.MSOGP, variant) zip
+              env.swiss.api.finishedNamed(
+                views.html.library.bits.msoTeamId,
+                views.html.library.bits.msoGrandPrixName,
+                variant
+              )
+          }
+        }
+    }
+
+  private def showVariant(key: String)(implicit ctx: Context): Fu[Result] =
+    Variant.all.find(_.key == key) match {
+      case Some(variant) => {
+        val tvChannel = lila.tv.Tv.Channel.find(variant.key)
+        for {
+          monthlyGameData <- env.game.cached.monthlyGames
+          winRates        <- env.game.cached.gameWinRates
+          leaderboards    <- env.user.cached.top10.get {}
+          leaderboard = leaderboards.forVariant(variant)
+          tours <- env.tournament.cached.onLibraryPage.getUnit.recoverDefault
+          filteredTours = tours.filter(_.variant.key == variant.key)
+          featuredGame <- tvChannel
+            .map(env.tv.tv.getGame)
+            .getOrElse(fuccess(none))
+            .orElse(env.game.gameRepo.randomByVariant(variant))
+          dailyPuzzle <- Puzzle.puzzleVariants
+            .exists(_.key == variant.key)
+            .so(env.puzzle.daily.getForVariant(variant))
+          studies  <- env.study.notable.byVariant(variant, 6)
+          (gpArenas, gpSwisses) <- grandPrixCache get variant.key
+        } yield Ok(
+          views.html.library
+            .show(
+              variant,
+              monthlyGameData,
+              winRates,
+              leaderboard,
+              filteredTours,
+              featuredGame,
+              dailyPuzzle,
+              studies,
+              views.html.library.bits.grandPrixEditions(gpArenas, gpSwisses)
+            )
+        )
+      }
+      case None => NotFound("Variant not found").fuccess
     }
 
 }

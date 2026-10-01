@@ -84,6 +84,25 @@ $c-study: $c-primary;
       .private {
         color: $c-brag;
       }
+
+      .study-feature {
+        display: inline-block;
+        position: relative;
+        z-index: 3;
+
+        button {
+          @extend %button-none;
+          color: $c-bad;
+          font-size: 0.8em;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
     }
 
     &:hover {

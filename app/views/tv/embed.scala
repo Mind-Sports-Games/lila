@@ -11,7 +11,8 @@ object embed {
   def apply(pov: lila.game.Pov)(implicit config: EmbedConfig) =
     views.html.base.embed(
       title = "playstrategy.org chess TV",
-      cssModule = "tv.embed"
+      cssModule = "tv.embed",
+      boardFamily = pov.game.variant.gameFamily.key.some
     )(
       dataStreamUrl,
       div(id := "featured-game", cls := "embedded", title := "playstrategy.org TV")(

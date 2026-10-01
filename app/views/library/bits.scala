@@ -1,7 +1,9 @@
 package views.html.library
 
-import lila.i18n.I18nKeys as trans
+import lila.i18n.{ I18nKeys as trans, VariantKeys }
 import lila.app.ui.ScalatagsTemplate.*
+import play.api.i18n.Lang
+import play.api.mvc.Call
 import strategygames.variant.Variant
 import strategygames.GameLogic
 import org.joda.time.DateTime
@@ -77,6 +79,218 @@ object bits {
       case _               => None
     }
   }
+
+  val msoTeamId = "mind-sports-olympiad"
+
+  // how the MSO names its Grand Prix swisses:
+  // "Abalone - MSO GP 2026 PREMIER", "Chess Bullet - MSO Grand Prix 2024"
+  val msoGrandPrixName = "MSO (GP|Grand Prix)"
+
+  // In-person Mind Sports Olympiad events whose games are published on PlayStrategy: msodb
+  // event code, whether the MSO awards a world championship title for it, and the study
+  // holding the latest edition's games (the MSO hub study CTu6f0Mp links every year's)
+  case class MsoEvent(eventCode: String, worldChampionship: Boolean, studyId: Option[String]) {
+    def resultsUrl = s"https://msodb.playstrategy.org/Report/EventResults?eventCode=$eventCode"
+  }
+
+  def msoEvent(variant: Variant): Option[MsoEvent] =
+    variant.key match {
+      case "abalone"            => Some(MsoEvent("ABOC", worldChampionship = true, Some("JG7Zf7mE")))
+      case "linesOfAction"      => Some(MsoEvent("LOWC", worldChampionship = true, Some("IyudHHhm")))
+      case "amazons"            => Some(MsoEvent("AMZOC", worldChampionship = false, Some("m8N1ERm6")))
+      case "breakthroughtroyka" => Some(MsoEvent("BTOC", worldChampionship = false, Some("EkVLAnIi")))
+      case "international"      => Some(MsoEvent("DRDA", worldChampionship = false, Some("CTu6f0Mp")))
+      case "oware"              => Some(MsoEvent("OWOC", worldChampionship = false, Some("C7hHSwaw")))
+      case "flipello"           => Some(MsoEvent("OTOC", worldChampionship = false, Some("PuMKTeH2")))
+      case "togyzkumalak"       => Some(MsoEvent("TOOC", worldChampionship = false, None))
+      case "backgammon"         => Some(MsoEvent("BAOC", worldChampionship = false, None))
+      case _                    => None
+    }
+
+  // an edition of the MSO Grand Prix, arena or swiss, for the library page
+  case class GrandPrixEdition(name: String, url: Call, startsAt: DateTime)
+
+  def grandPrixEditions(arenas: List[lila.tournament.Tournament], swisses: List[lila.swiss.Swiss])(implicit
+      lang: Lang
+  ): List[GrandPrixEdition] =
+    (arenas.map(t => GrandPrixEdition(t.name(full = false), routes.Tournament.show(t.id), t.startsAt)) :::
+      swisses.map(s => GrandPrixEdition(s.name, routes.Swiss.show(s.id.value), s.startsAt)))
+      .sortBy(-_.startsAt.getMillis)
+
+  // derived variants name the game they come from, so search engines know which page is "Xiangqi"
+  def parentVariant(variant: Variant): Option[Variant] =
+    Variant.byKey.get(variant.key match {
+      case "minixiangqi"                                     => "xiangqi"
+      case "minishogi"                                       => "shogi"
+      case "go9x9" | "go13x13"                               => "go19x19"
+      case "flipello10" | "octagonflipello" | "antiflipello" => "flipello"
+      case "hyper" | "nackgammon"                            => "backgammon"
+      case "grandabalone"                                    => "abalone"
+      case "minibreakthroughtroyka"                          => "breakthroughtroyka"
+      case "bestemshe"                                       => "togyzkumalak"
+      case "frysk"                                           => "frisian"
+      case "scrambledEggs"                                   => "linesOfAction"
+      case _                                                 => ""
+    })
+
+  // the smaller-board or reduced variants of a game, so its hub links them and not only the other way round
+  def childVariants(variant: Variant): List[Variant] =
+    Variant.all.filter(v => parentVariant(v).exists(_.key == variant.key))
+
+  // A game's URL carries its engine key - flipello, standard, go19x19 - so the name people
+  // actually type 404s. These redirect onto the one canonical URL instead.
+  private val urlAliases: Map[String, String] = Map(
+    "othello"               -> "flipello",
+    "reversi"               -> "flipello",
+    "grandothello"          -> "flipello10",
+    "grandreversi"          -> "flipello10",
+    "antiothello"           -> "antiflipello",
+    "antireversi"           -> "antiflipello",
+    "octagonothello"        -> "octagonflipello",
+    "octagonreversi"        -> "octagonflipello",
+    "chess"                 -> "standard",
+    "go"                    -> "go19x19",
+    "baduk"                 -> "go19x19",
+    "weiqi"                 -> "go19x19",
+    "chinesechess"          -> "xiangqi",
+    "japanesechess"         -> "shogi",
+    "loa"                   -> "linesOfAction",
+    "mancala"               -> "oware",
+    "awari"                 -> "oware",
+    "awale"                 -> "oware",
+    "ayo"                   -> "oware",
+    "toguzkumalak"          -> "togyzkumalak",
+    "togyzqumalaq"          -> "togyzkumalak",
+    // "checkers" is the 8x8 game; "draughts" is what the lobby's own pool pairs you into
+    "checkers"              -> "english",
+    "draughts"              -> "international",
+    "americancheckers"      -> "english",
+    "americandraughts"      -> "english",
+    "englishcheckers"       -> "english",
+    "englishdraughts"       -> "english",
+    "internationaldraughts" -> "international",
+    "internationalcheckers" -> "international",
+    "polishdraughts"        -> "international",
+    "russiancheckers"       -> "russian",
+    "russiandraughts"       -> "russian",
+    "braziliancheckers"     -> "brazilian",
+    "braziliandraughts"     -> "brazilian",
+    // named Spanish, keyed portuguese: both names have to resolve
+    "spanish"               -> "portuguese",
+    "spanishdraughts"       -> "portuguese",
+    "spanishcheckers"       -> "portuguese",
+    "portuguesedraughts"    -> "portuguese",
+    "portuguesecheckers"    -> "portuguese",
+    "poolcheckers"          -> "pool",
+    "frisiandraughts"       -> "frisian"
+  )
+
+  private lazy val keysByLowerCase: Map[String, String] =
+    Variant.all.map(v => v.key.toLowerCase -> v.key).toMap
+
+  // The canonical key for something that is not one: a real key in the wrong case
+  // (linesofaction), or a name the game is better known by (othello). None when the key is
+  // already canonical, so a redirect can never loop.
+  def canonicalVariantKey(key: String): Option[String] = {
+    val lower = key.toLowerCase
+    keysByLowerCase.get(lower).filter(_ != key) orElse urlAliases.get(lower)
+  }
+
+  // variants named by a bare adjective ("Russian", "Atomic") are searched with their family word
+  private val adjectiveNames = Set(
+    "crazyhouse",
+    "kingOfTheHill",
+    "threeCheck",
+    "fiveCheck",
+    "atomic",
+    "horde",
+    "racingKings",
+    "noCastling",
+    "monster",
+    "international",
+    "frisian",
+    "frysk",
+    "breakthrough",
+    "russian",
+    "brazilian",
+    "pool",
+    "portuguese",
+    "english"
+  )
+
+  // "Russian Draughts", "Atomic Chess", "Othello"
+  def searchName(variant: Variant)(implicit lang: Lang) =
+    if (adjectiveNames(variant.key))
+      s"${VariantKeys.variantName(variant)} ${VariantKeys.gameFamilyName(variant.gameFamily)}"
+    else VariantKeys.variantName(variant)
+
+  // "Othello (Reversi)", "Abalone (board game)", "Backgammon"
+  def nameWithAlias(variant: Variant)(implicit lang: Lang) =
+    VariantKeys.variantAlias(variant).fold(searchName(variant)) { alias =>
+      s"${searchName(variant)} ($alias)"
+    }
+
+  // "Play Othello online free — Reversi"
+  def pageTitle(variant: Variant)(implicit lang: Lang) =
+    VariantKeys.variantAlias(variant).foldLeft(
+      trans.playVariantOnlineFreeTitle.txt(searchName(variant))
+    )(_ + " — " + _)
+
+  // the variant's own objective, punctuated: "Capture more discs than your opponent."
+  def objectiveSentence(variant: Variant)(implicit lang: Lang) = {
+    val objective = VariantKeys.variantTitle(variant)
+    // ja and zh end a sentence with their own stop; appending an ASCII one reads as a typo
+    val stop = if (objective.lastOption.exists(".。．！？!?".contains)) "" else "."
+    s"$objective$stop"
+  }
+
+  def pageDescription(variant: Variant)(implicit lang: Lang) =
+    s"${trans.playVariantOnlineFreeDescription.txt(nameWithAlias(variant))} ${objectiveSentence(variant)}"
+
+  // the two pseudo variants are playable but have neither a library hub nor a rules page
+  def hasLibraryPages(variant: Variant) =
+    !Set("fromPosition", "draughtsFromPosition")(variant.key)
+
+  // "Othello rules — how to play Othello (Reversi)"
+  def rulesTitle(variant: Variant)(implicit lang: Lang) =
+    trans.variantRulesTitle.txt(searchName(variant), nameWithAlias(variant))
+
+  def rulesDescription(variant: Variant)(implicit lang: Lang) =
+    trans.variantRulesDescription.txt(nameWithAlias(variant), searchName(variant))
+
+  // server engine but no browser one: keep in step with noClientEvalVariants in ui/ceval/src/util.ts
+  private val noBrowserEngine =
+    Set("amazons", "minibreakthroughtroyka", "antiflipello", "octagonflipello", "backgammon", "nackgammon")
+
+  // the engine behind the analysis board, when it has one (the same Fairy-Stockfish build serves both)
+  def analysisEngine(variant: Variant): Option[String] =
+    if (!variant.hasFishnet || noBrowserEngine(variant.key)) None
+    else if (variant.gameLogic == GameLogic.Chess()) Some("Stockfish")
+    else Some("Fairy-Stockfish")
+
+  // an engine that only analyses finished games, off the analysis board
+  def serverEngine(variant: Variant): Option[String] =
+    if (variant.hasFishnet && variant.gameLogic == GameLogic.Backgammon()) Some("GNU Backgammon (gnubg)")
+    else None
+
+  // "Atomic Chess analysis board — free engine & solver"; no engine claim for the games without one
+  def analysisTitle(variant: Variant)(implicit lang: Lang) =
+    (if (analysisEngine(variant).isDefined) trans.variantAnalysisTitle
+     else trans.variantAnalysisTitleNoEngine)
+      .txt(searchName(variant))
+
+  def analysisDescription(variant: Variant)(implicit lang: Lang) =
+    analysisEngine(variant) match {
+      case Some(engine) =>
+        trans.variantAnalysisDescription.txt(nameWithAlias(variant), searchName(variant), engine)
+      case None =>
+        serverEngine(variant).fold(
+          trans.variantAnalysisDescriptionNoEngine.txt(nameWithAlias(variant), searchName(variant))
+        ) { engine =>
+          trans.variantAnalysisDescriptionServerEngine
+            .txt(nameWithAlias(variant), searchName(variant), engine)
+        }
+    }
 
   def winRatePlayer1(variant: Variant, winRates: List[WinRatePercentages]): String =
     winRates

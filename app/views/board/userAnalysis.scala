@@ -32,9 +32,16 @@ object userAnalysis {
     )
       .filterNot(noAnalysisVariants.contains(_))
 
-  def apply(data: JsObject, pov: lila.game.Pov, withForecast: Boolean = false)(implicit ctx: Context) =
+  def apply(data: JsObject, pov: lila.game.Pov, withForecast: Boolean = false)(implicit ctx: Context) = {
+    val variant = pov.game.variant
+    // one URL per game, whatever position the visitor pasted
+    val canonical =
+      if (variant == Variant.libStandard(GameLogic.Chess())) routes.UserAnalysis.index.url
+      else routes.UserAnalysis.parseArg(variant.key).url
     views.html.base.layout(
-      title = trans.analysis.txt(),
+      title = views.html.library.bits.analysisTitle(variant),
+      boardFamily = variant.gameFamily.key.some,
+      soleBoardFamily = true,
       moreCss = frag(
         cssTag("analyse.free"),
         pov.game.variant.hasDetachedPocket.option(
@@ -63,17 +70,22 @@ object userAnalysis {
           )}""")
       ),
       csp = defaultCsp.withWebAssembly.some,
-      chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
-          title = "Strategy games analysis board",
-          url = s"$netBaseUrl${routes.UserAnalysis.index.url}",
-          description = "Analyse strategy game positions and variations on an interactive board"
+          title = views.html.library.bits.analysisTitle(variant),
+          url = s"$netBaseUrl$canonical",
+          description = views.html.library.bits.analysisDescription(variant)
         )
         .some,
-      zoomable = true
+      zoomable = true,
+      canonicalPath = canonical.some,
+      alternates = true
     ) {
-      main(cls := "analyse")(
+      frag(
+        // outside main: the analyse app empties main.analyse on mount, so a heading in there
+        // would be gone before a rendering crawler saw it
+        h1(cls := "offscreen")(views.html.library.bits.analysisTitle(variant)),
+        main(cls := s"analyse variant-${variant.key}")(
         pov.game.synthetic.option(
           st.aside(cls := "analyse__side")(
             views.html.base.bits.mselect(
@@ -91,9 +103,28 @@ object userAnalysis {
             )
           )
         ),
-        div(cls := "analyse__board main-board")(chessgroundBoard),
-        div(cls := "analyse__tools"),
-        div(cls := "analyse__controls")
+          div(cls := "analyse__board main-board")(chessgroundBoard),
+          div(cls := "analyse__tools"),
+          div(cls := "analyse__controls")
+        ),
+        // the 400-odd analysis pages are otherwise a bare board, near identical to one another.
+        // Sibling of main for the same reason as the h1 above.
+        st.section(cls := "analyse__about")(
+          h2(trans.aboutX(views.html.library.bits.searchName(variant))),
+          p(views.html.library.bits.objectiveSentence(variant)),
+          p(views.html.library.bits.analysisDescription(variant)),
+          views.html.library.bits.hasLibraryPages(variant).option(
+            p(cls := "analyse__about__links")(
+              a(href := routes.Library.variant(variant.key))(
+                trans.playVariantOnlineFreeTitle(views.html.library.bits.searchName(variant))
+              ),
+              a(href := routes.Page.variant(variant.key))(
+                views.html.library.bits.rulesTitle(variant)
+              )
+            )
+          )
+        )
       )
     }
+  }
 }

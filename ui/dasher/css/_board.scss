@@ -162,8 +162,19 @@
     'horsey': 'horsey.thumbnail.jpg',
   );
 
-  @each $gameFamily in ('chess', 'draughts', 'dameo', 'loa', 'amazons', 'breakthroughtroyka') {
-    @each $color, $file in $chess-board-files {
+  // only the themes each family offers: the rest pointed at art that does not exist
+  $family-board-themes: (
+    'chess': map-keys($chess-board-files),
+    'loa': map-keys($chess-board-files),
+    'draughts': $core-board-themes,
+    'dameo': $core-board-themes,
+    'amazons': $core-board-themes,
+    'breakthroughtroyka': $breakthroughtroyka-board-themes,
+  );
+
+  @each $gameFamily, $themes in $family-board-themes {
+    @each $color in $themes {
+      $file: map-get($chess-board-files, $color);
       &.d2 .#{$gameFamily}-#{$color} {
         background-image: url(../images/board/#{$gameFamily}/#{$file});
         @if (str-index(#{$file}, '.svg')) {
@@ -219,22 +230,22 @@
     }
 
     .oware-light-wood {
-      background-image: url(../images/board/oware/oware_light_wood_board.png);
+      background-image: url(../images/board/oware/oware_light_wood_board.webp);
       background-size: 100px;
     }
 
     .oware-dark-wood {
-      background-image: url(../images/board/oware/oware_dark_wood_board.png);
+      background-image: url(../images/board/oware/oware_dark_wood_board.webp);
       background-size: 100px;
     }
 
     .togyzkumalak-blue {
-      background-image: url(../images/board/togyzkumalak/togyzkumalak_blue_board.png);
+      background-image: url(../images/board/togyzkumalak/togyzkumalak_blue_board.webp);
       background-size: 100px;
     }
 
     .togyzkumalak-wood {
-      background-image: url(../images/board/togyzkumalak/togyzkumalak_wood_board.png);
+      background-image: url(../images/board/togyzkumalak/togyzkumalak_wood_board.webp);
       background-size: 100px;
     }
 
@@ -275,21 +286,6 @@
 
     .abalone-yellow {
       background-image: url(../images/board/abalone/abalone/svg/yellow.svg);
-      background-size: 100px;
-    }
-
-    .grandabalone-classic {
-      background-image: url(../images/board/abalone/abalone/grandabalone/classic.svg);
-      background-size: 100px;
-    }
-
-    .grandabalone-dark {
-      background-image: url(../images/board/abalone/abalone/grandabalone/dark.svg);
-      background-size: 100px;
-    }
-
-    .grandabalone-yellow {
-      background-image: url(../images/board/abalone/abalone/grandabalone/yellow.svg);
       background-size: 100px;
     }
   }

@@ -15,8 +15,8 @@ importers:
         specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.39
         version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6465b2fad4091d31ad370562f785374af9bedf1d
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.31
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/951e538e6e013bbca5471877449dcee5a06398b0
+        specifier: github:Mind-Sports-Games/stratops#pla-1225-investigate-first-pass-of-seo-improvements
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/6c34afece850621ef4484df9d17611ca3df8e131
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -180,6 +180,9 @@ importers:
 
   ui/common:
     dependencies:
+      draughtsground:
+        specifier: workspace:*
+        version: link:../draughtsground
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
@@ -779,8 +782,8 @@ packages:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
 
-  ansi-regex@6.3.0:
-    resolution: {integrity: sha512-WpDfL7NO6j7tH88IDBNVdUJxDh9nmCteAVW9dsep846XdwF4naCBK+/tGLX3KJgcpgMRXCFlTM2hKGoK9FsdrQ==}
+  ansi-regex@6.4.0:
+    resolution: {integrity: sha512-KzTVk2tCWAHtYrvvvaP8bJKJq2pVinhLcGEQdtLIYPbmNGNyYe8QwNaTUYQp2J7/vIsUKt5QCqAfUkYyG9DkOw==}
     engines: {node: '>=12'}
 
   ansi-styles@4.3.0:
@@ -1420,8 +1423,8 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/951e538e6e013bbca5471877449dcee5a06398b0:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/951e538e6e013bbca5471877449dcee5a06398b0}
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/6c34afece850621ef4484df9d17611ca3df8e131:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/6c34afece850621ef4484df9d17611ca3df8e131}
     version: 0.8.1-pstrat5.31
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1738,7 +1741,7 @@ snapshots:
 
   ansi-regex@5.0.1: {}
 
-  ansi-regex@6.3.0: {}
+  ansi-regex@6.4.0: {}
 
   ansi-styles@4.3.0:
     dependencies:
@@ -2347,7 +2350,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/951e538e6e013bbca5471877449dcee5a06398b0:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/6c34afece850621ef4484df9d17611ca3df8e131:
     dependencies:
       '@badrap/result': 0.2.13
 
@@ -2365,7 +2368,7 @@ snapshots:
 
   strip-ansi@7.2.0:
     dependencies:
-      ansi-regex: 6.3.0
+      ansi-regex: 6.4.0
 
   strip-final-newline@3.0.0: {}
 

@@ -124,7 +124,8 @@ final class Tournament(
                 }
                 streamers   <- streamerCache get tour.id
                 shieldOwner <- env.tournament.shieldApi.currentOwner(tour)
-              } yield Ok(html.tournament.show(tour, verdicts, json, chat, streamers, shieldOwner))
+                previous    <- repo.previousEdition(tour)
+              } yield Ok(html.tournament.show(tour, verdicts, json, chat, streamers, shieldOwner, previous))
             }
             .monSuccess(_.tournament.apiShowPartial(partial = false, HTTPRequest.clientName(ctx.req))),
           api = _ =>
@@ -531,11 +532,22 @@ final class Tournament(
       } yield html.tournament.shields(history)
     }
 
+  def shieldStreaks =
+    Open { implicit ctx =>
+      for {
+        history  <- env.tournament.shieldApi.history(none) // full: streaks need every edition
+        upcoming <- repo.upcomingShields
+        _        <- env.user.lightUserApi preloadMany history.userIds
+      } yield html.tournament.shields.streaks(history, upcoming)
+    }
+
   def categShields(k: String) =
     Open { implicit ctx =>
       OptionFuOk(env.tournament.shieldApi.byCategKey(k)) { case (categ, awards) =>
-        env.user.lightUserApi preloadMany awards.map(_.owner.value) inject
-          html.tournament.shields.byCateg(categ, awards)
+        repo.nextShield(categ.variant) zip
+          (env.user.lightUserApi preloadMany awards.map(_.owner.value)) map { case (next, _) =>
+            html.tournament.shields.byCateg(categ, awards, next)
+          }
       }
     }
 
@@ -599,12 +611,57 @@ final class Tournament(
 
   def history(freq: String, page: Int) =
     Open { implicit ctx =>
-      lila.tournament.Schedule.Freq(freq) so { fr =>
-        api.history(fr, page) flatMap { pager =>
-          env.user.lightUserApi preloadMany pager.currentPageResults.flatMap(_.winnerId) inject
-            Ok(html.tournament.history(fr, pager))
-        }
+      renderHistory(freq, page, none)
+    }
+
+  def historyVariant(freq: String, variant: String, page: Int) =
+    Open { implicit ctx =>
+      Variant.all.find(_.key.toLowerCase == variant.toLowerCase) match {
+        case None                        => notFound
+        case Some(v) if v.key != variant =>
+          MovedPermanently(routes.Tournament.historyVariant(freq, v.key, page).url).fuccess
+        case Some(_) if !lila.tournament.Schedule.Freq(freq).exists(html.tournament.history.hasSeries) =>
+          MovedPermanently(routes.Tournament.history(freq, page).url).fuccess
+        case Some(v)
+            if lila.tournament.Schedule.Freq(freq).contains(lila.tournament.Schedule.Freq.Shield) &&
+              lila.tournament.TournamentShield.Category.byKey(v.key).isDefined =>
+          MovedPermanently(routes.Tournament.categShields(v.key).url).fuccess
+        case Some(v) => renderHistory(freq, page, v.some)
       }
+    }
+
+  // a whole game family: every Abalone tournament of this frequency, not one variant's
+  def historyGroup(freq: String, group: String, page: Int) =
+    Open { implicit ctx =>
+      val history = views.html.tournament.history
+      (history.groupByKey(group), lila.tournament.Schedule.Freq(freq).filter(history.hasSeries)) match {
+        case (None, _)       => notFound
+        case (Some(_), None) => MovedPermanently(routes.Tournament.history(freq, page).url).fuccess
+        case (Some(g), Some(f)) =>
+          // a family of one game has no page of its own: the game's page is the family's
+          history.soleVariant(g) match {
+            case Some(v) => MovedPermanently(history.url(f, v.some, page)).fuccess
+            case None    => renderHistory(freq, page, none, g.some)
+          }
+      }
+    }
+
+  private def renderHistory(
+      freq: String,
+      page: Int,
+      v: Option[Variant],
+      group: Option[strategygames.GameGroup] = None
+  )(implicit ctx: Context) =
+    lila.tournament.Schedule.Freq(freq) so { fr =>
+      for {
+        pager <- api.history(fr, page, v.map(List(_)) orElse group.map(_.variants) getOrElse Nil)
+        summary <- v.filter(_ => fr == lila.tournament.Schedule.Freq.Yearly).so { variant =>
+          repo.finishedSeries(fr, variant) zip repo.nextScheduled(fr, variant) map { case (all, next) =>
+            html.tournament.history.Summary(all, next).some
+          }
+        }
+        _ <- env.user.lightUserApi preloadMany (pager.currentPageResults.toList ::: summary.so(_.all)).flatMap(_.winnerId)
+      } yield Ok(html.tournament.history(fr, v, group, pager, summary))
     }
 
   def edit(id: String) =

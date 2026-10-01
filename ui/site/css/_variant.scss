@@ -5,6 +5,14 @@
     margin-bottom: 30px;
   }
 
+  .play {
+    margin-bottom: 30px;
+
+    p {
+      margin-top: 1em;
+    }
+  }
+
   [data-oembed] {
     @extend %video;
   }

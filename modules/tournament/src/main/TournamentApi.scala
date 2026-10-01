@@ -931,9 +931,9 @@ final class TournamentApi(
     tournamentRepo.calendar(from = from, to = from.plusYears(1))
   }
 
-  def history(freq: Schedule.Freq, page: Int): Fu[Paginator[Tournament]] =
+  def history(freq: Schedule.Freq, page: Int, variants: List[Variant] = Nil): Fu[Paginator[Tournament]] =
     Paginator(
-      adapter = tournamentRepo.finishedByFreqAdapter(freq),
+      adapter = tournamentRepo.finishedByFreqAdapter(freq, variants),
       currentPage = page,
       maxPerPage = MaxPerPage(20)
     )

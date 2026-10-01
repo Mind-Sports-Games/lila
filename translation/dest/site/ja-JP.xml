@@ -827,4 +827,23 @@
   <string name="refundXpointsTimeControlY">レーティングの復活：%1$s %2$s 点。</string>
   <string name="timeAlmostUp">残り時間わずか！</string>
   <string name="clickToRevealEmailAddress">[ クリックでメールアドレスを表示 ]</string>
+  <string name="playstrategySiteTitle">ボードゲームを無料でオンライン対戦 — チェス、チェッカー、囲碁、バックギャモン、オセロなど</string>
+  <string name="playstrategySiteTitleShort">ボードゲームを無料でオンライン対戦 — チェス、チェッカー、囲碁、バックギャモン</string>
+  <string name="playstrategySiteDescription">ボードゲームを無料でオンライン対戦：チェスとその変則ルール、チェッカー、囲碁、バックギャモン、オセロ、将棋、シャンチー、マンカラ、アバロンなど。Mind Sports Olympiad 公式オンラインプラットフォーム。無料・オープンソース、リアルタイム対局と通信対局に対応。</string>
+  <string name="playstrategyAboutSummary">%1$s は2人用ボードゲームのリアルタイム対戦プラットフォームであり、Mind Sports Olympiad の公式オンラインプラットフォームです。チェス、囲碁、オセロ、マンカラ、チェッカー、バックギャモン、アバロンなど40種類以上のゲームを、この無料・オープンソースのサイトで。</string>
+  <string name="playVariantOnlineFree">%s を無料でオンライン対戦：リアルタイムまたは通信対局、レーティング戦またはカジュアル戦で、世界中のプレイヤーと。</string>
+  <string name="playVariantOnlineFreeTitle">%s を無料でオンライン対戦</string>
+  <string name="variantRulesTitle">%1$s のルール — %2$s の遊び方</string>
+  <string name="variantAnalysisTitle">%s の分析ボード — 無料のエンジンとソルバー</string>
+  <string name="variantAnalysisDescription">無料のエンジンとソルバー（%3$s）で %1$s の局面を分析：任意の局面を設定し、変化を調べて最善手を確認。PlayStrategy で %2$s を無料でオンライン対戦。</string>
+  <string name="variantAnalysisTitleNoEngine">%s の分析ボード — 無料のオンライン分析</string>
+  <string name="variantAnalysisDescriptionNoEngine">無料のオンライン盤で %1$s の局面を分析：任意の局面を設定し、変化を調べて共有。PlayStrategy で %2$s を無料でオンライン対戦。</string>
+  <string name="variantAnalysisDescriptionServerEngine">無料のオンライン盤で %1$s の局面を分析：任意の局面を設定し、変化を調べて共有。終了した対局は %3$s による解析を無料で受けられます。PlayStrategy で %2$s を無料でオンライン対戦。</string>
+  <string name="variantRulesDescription">%1$s のルールを学ぶ：初期配置、動かし方、勝ち方。そして PlayStrategy で %2$s を無料オンライン対戦：実際の対戦相手、レーティング、トーナメント、無料の分析ボード。</string>
+  <string name="alsoOnPlayStrategy">PlayStrategy には %s もあります。</string>
+  <string name="variantStudies">%s のスタディ</string>
+  <string name="playVariantOnlineFreeDescription">世界中のプレイヤーと %s を無料でオンライン対戦。リアルタイム対局と通信対局、トーナメント、レーティング、解析を PlayStrategy で。</string>
+  <string name="variantPuzzles">%s の問題</string>
+  <string name="libraryTitle">無料でオンライン対戦できるボードゲーム — PlayStrategy ライブラリ</string>
+  <string name="libraryDescription">PlayStrategy のすべてのゲーム：チェスとその変則ルール、チェッカー、囲碁、バックギャモン、オセロ、将棋、シャンチー、マンカラ、アバロン、Lines of Action など。ルール、チュートリアル、トーナメント、統計付き。</string>
 </resources>

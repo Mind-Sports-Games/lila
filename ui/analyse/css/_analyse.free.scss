@@ -58,45 +58,60 @@
   }
 }
 
-/* Below 3-col, the side column would fall under the tools, so the select
-   takes a full-width row above the board instead. div.analyse outranks the shared layout and the
-   pocket layout of analyse.zh, which is loaded after this sheet. */
-div.analyse {
-  grid-template-rows: auto auto auto minmax(20em, 30vh);
-  grid-template-areas: 'side' 'board' 'controls' 'tools' 'acpl' 'under' 'chat' 'uchat';
-
-  @include breakpoint($mq-col2) {
-    grid-template-rows: auto fit-content(0);
-    grid-template-areas: 'side side side' 'board gauge tools' 'under . controls' 'under . acpl' 'chat . .' 'uchat . .';
-  }
+/* Below 3-col, the side column would fall under the tools, so the select takes a full-width row
+   above the board instead. Restating every grid-template-areas here would lose to the per-variant
+   templates in _score.scss, which carry two classes; placing the select itself in an implicit row
+   above the explicit grid needs no template at all, so it works for every variant. The named side
+   area is then simply left empty below 3-col. */
+div.analyse .analyse__side {
+  grid-row: span 1 / 1;
+  grid-column: 1 / -1;
+  margin: 0 0 $block-gap 0;
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $meta-height $chat-height 2.5em auto;
-    grid-template-areas: 'side . board gauge tools' 'chat . board gauge tools' 'uchat . under . controls' 'uchat . under . acpl';
-  }
-
-  .analyse__side {
-    margin: 0 0 $block-gap 0;
-
-    @include breakpoint($mq-col3) {
-      margin: 0;
-    }
+    grid-area: side;
+    margin: 0;
   }
 }
 
-@each $variant in ('crazyhouse', 'shogi', 'minishogi') {
-  div.analyse.variant-#{$variant} {
-    grid-template-rows: auto $pocket-col1-height auto $pocket-col1-height auto 50vh;
-    grid-template-areas: 'side' 'pocket-top' 'board' 'pocket-bot' 'controls' 'tools' 'acpl' 'under' 'chat' 'uchat';
+/* Body copy under the board. A sibling of main.analyse, because the analyse app empties main on
+   mount, so it claims the main column of the #main-wrap grid itself and tucks into the free space
+   on the right, under the tools panel, the way the lobby footer does. */
+.analyse__about {
+  grid-column: main;
+  margin: $block-gap 1em;
+  font-size: 0.85em;
+  color: $c-font-dim;
 
-    @include breakpoint($mq-col2) {
-      grid-template-rows: auto $pocket-height auto $pocket-height;
-      grid-template-areas: 'side side side' 'board gauge pocket-top' 'board gauge tools' 'board gauge pocket-bot' 'under . controls' 'under . acpl' 'chat . .' 'uchat . .';
-    }
+  /* only from 3 columns up is the column under the tools panel free to tuck into */
+  @include breakpoint($mq-col3) {
+    margin-left: auto;
+    max-width: 46ch;
+  }
 
-    @include breakpoint($mq-col3) {
-      grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
-      grid-template-areas: 'side . board gauge pocket-top' 'side . board gauge tools' 'chat . board gauge tools' 'chat . board gauge pocket-bot' 'uchat . under . controls' 'uchat . under . acpl';
+  h2 {
+    font-size: 1.15em;
+    font-weight: bold;
+    margin-bottom: 0.3em;
+    color: $c-font;
+  }
+
+  p {
+    margin-bottom: 0.6em;
+  }
+
+  &__links {
+    display: flex;
+    flex-flow: column;
+    gap: 0.2em;
+    font-weight: bold;
+
+    a {
+      @include transition(color);
+
+      &:hover {
+        color: $c-link;
+      }
     }
   }
 }

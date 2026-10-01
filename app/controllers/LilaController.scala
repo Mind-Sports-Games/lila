@@ -12,7 +12,7 @@ import scalatags.Text.Frag
 import lila.api.{ BodyContext, Context, HeaderContext, PageData }
 import lila.app.{ *, given }
 import lila.common.{ ApiVersion, HTTPRequest, Nonce }
-import lila.i18n.I18nLangPicker
+import lila.i18n.{ I18nLangPicker, SeoLang }
 import lila.notify.Notification.Notifies
 import lila.oauth.{ OAuthScope, OAuthServer }
 import lila.security.{ AppealUser, FingerPrintedUser, Granter, Permission }
@@ -85,6 +85,28 @@ abstract private[controllers] class LilaController(val env: Env)
 
   protected def Open[A](parser: BodyParser[A])(f: Context => Fu[Result]): Action[A] =
     Action.async(parser)(handleOpen(f, _))
+
+  // One localised URL per maintained locale, for the page types worth ranking in another language.
+  // path is the same page without the prefix: everyone who has a language of their own goes there.
+  protected def LangPage(path: String)(f: Context => Fu[Result])(segment: String): Action[Unit] =
+    Action.async(parse.empty) { req =>
+      CSRF(req) {
+        val result = SeoLang.byHref(segment, req) match {
+          case SeoLang.ByHref.NotFound   => notFoundReq(req)
+          case SeoLang.ByHref.Refused(_) => fuccess(redirectWithQueryString(path, req))
+          case SeoLang.ByHref.Found(lang) =>
+            reqToCtx(req, lang.some) flatMap { ctx =>
+              if (ctx.isAuth) fuccess(redirectWithQueryString(path, req))
+              else f(ctx)
+            }
+        }
+        // the same URL answers 200 or 303 by Accept-Language, so no shared cache may reuse it
+        result.dmap(_.withHeaders(VARY -> "Accept-Language"))
+      }
+    }
+
+  private def redirectWithQueryString(path: String, req: RequestHeader): Result =
+    Redirect(if (req.rawQueryString.isEmpty) path else s"$path?${req.rawQueryString}")
 
   protected def OpenBody(f: BodyContext[?] => Fu[Result]): Action[AnyContent] =
     OpenBody(parse.anyContent)(f)
@@ -517,9 +539,10 @@ abstract private[controllers] class LilaController(val env: Env)
       }
       .dmap(_.withHeaders("Vary" -> "Accept"))
 
-  protected def reqToCtx(req: RequestHeader): Fu[HeaderContext] =
+  protected def reqToCtx(req: RequestHeader, langOverride: Option[Lang] = None): Fu[HeaderContext] =
     restoreUser(req) flatMap { case (d, impersonatedBy) =>
-      val lang = getAndSaveLang(req, d.map(_.user))
+      // a language the URL asked for is not a preference: it must not be saved
+      val lang = langOverride getOrElse getAndSaveLang(req, d.map(_.user))
       val ctx  = UserContext(req, d.map(_.user), impersonatedBy, lang)
       pageDataBuilder(ctx, d.exists(_.hasFingerPrint)) dmap { Context(ctx, _) }
     }

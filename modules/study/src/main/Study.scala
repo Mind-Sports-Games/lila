@@ -18,7 +18,8 @@ case class Study(
     description: Option[String] = None,
     topics: Option[StudyTopics] = None,
     createdAt: DateTime,
-    updatedAt: DateTime
+    updatedAt: DateTime,
+    trash: Option[Boolean] = None // unfeatured by a mod: out of every listing but the owner's, and unindexed
 ) {
 
   import Study.*
@@ -46,6 +47,12 @@ case class Study(
   def isPublic   = visibility == Study.Visibility.Public
   def isUnlisted = visibility == Study.Visibility.Unlisted
   def isPrivate  = visibility == Study.Visibility.Private
+
+  def isTrash = trash.has(true)
+
+  // what a crawler may see, and what the sitemap lists (StudyRepo.selectNotable is the query form):
+  // a like from anyone but the owner, or one of the site's own accounts, unless a mod unfeatured it
+  def notable = !isTrash && (likes.value > 1 || ownerId == User.playstrategyId || ownerId == User.msoId)
 
   def isNew = (nowSeconds - createdAt.getSeconds) < 4
 
@@ -88,6 +95,11 @@ object Study {
 
   case class Name(value: String) extends AnyVal with StringValue
   implicit val nameIso: Iso.StringIso[Name] = lila.common.Iso.string[Name](Name.apply, _.value)
+
+  // what the sitemap and the game hubs need of a notable study
+  case class Notable(id: Id, name: Name, ownerId: User.ID, updatedAt: DateTime) {
+    def bySite = ownerId == User.playstrategyId || ownerId == User.msoId
+  }
 
   case class IdName(_id: Id, name: Name) {
     def id = _id

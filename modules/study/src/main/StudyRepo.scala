@@ -60,6 +60,12 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
   private[study] val selectPublic                      = $doc(
     "visibility" -> VisibilityHandler.writeTry(Study.Visibility.Public).get
   )
+  private[study] val selectPublicFeaturable = selectPublic ++ "trash".$ne(true)
+  // Study.notable as a query
+  private[study] val selectNotable = selectPublicFeaturable ++ $or(
+    F.likes.$gt(1),
+    $doc("ownerId".$in(List(User.playstrategyId, User.msoId)))
+  )
   private[study] val selectPrivateOrUnlisted =
     "visibility".$ne(VisibilityHandler.writeTry(Study.Visibility.Public).get)
   private[study] def selectLiker(userId: User.ID)         = $doc(F.likers -> userId)
@@ -78,6 +84,23 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
           .sort($sort.desc("updatedAt"))
           .cursor[Study](readPreference = readPref)
           .documentSource()
+      }
+    }
+
+  // the studies a crawler may see, best ranked first
+  def notable(max: Int): Fu[List[Study.Notable]] =
+    coll {
+      _.find(selectNotable, $doc("name" -> true, "ownerId" -> true, "updatedAt" -> true).some)
+        .sort($sort.desc(F.rank))
+        .cursor[Bdoc](readPreference = readPref)
+        .list(max) map { docs =>
+        for {
+          doc       <- docs
+          id        <- doc.getAsOpt[Study.Id]("_id")
+          name      <- doc.getAsOpt[Study.Name]("name")
+          ownerId   <- doc.getAsOpt[User.ID]("ownerId")
+          updatedAt <- doc.getAsOpt[DateTime]("updatedAt")
+        } yield Study.Notable(id, name, ownerId, updatedAt)
       }
     }
 
@@ -198,6 +221,15 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
 
   def isMember(studyId: Study.Id, userId: User.ID) =
     coll(_.exists($id(studyId) ++ (s"members.$userId".$exists(true))))
+
+  def feature(id: Study.Id): Funit = coll(_.unsetField($id(id), "trash")).void
+
+  def setTrashByOwner(ownerId: User.ID, v: Boolean): Fu[Int] =
+    coll {
+      _.update
+        .one(selectOwnerId(ownerId), $setBoolOrUnset("trash", v), multi = true)
+        .map(_.nModified)
+    }
 
   def like(studyId: Study.Id, userId: User.ID, v: Boolean): Fu[Study.Likes] =
     countLikes(studyId).flatMap {

@@ -175,11 +175,13 @@ function makeCg(preview: ChapterPreview): VNode {
       },
       postpatch(old, vnode) {
         if (old.data!.fen !== preview.fen) {
-          const lm = preview.lastMove!;
-          domData.get(vnode.elm as HTMLElement, 'chessground').set({
-            fen: preview.fen,
-            lastMove: parseLastMove(lm),
-          });
+          const el = vnode.elm as HTMLElement,
+            config = { fen: preview.fen, lastMove: parseLastMove(preview.lastMove!) },
+            cg = domData.get(el, 'chessground');
+          // no instance yet means the board library is still in flight - init is
+          // memoised per node, so this waits on the one insert() already started
+          if (cg) cg.set(config);
+          else playstrategy.miniBoard.init(el).then(cg => cg.set(config));
         }
         vnode.data!.fen = preview.fen;
       },

@@ -1,6 +1,6 @@
 package views.html.study
 
-import play.api.libs.json.Json
+import play.api.libs.json.{ JsObject, Json }
 
 import lila.api.Context
 import lila.app.templating.Environment.*
@@ -14,10 +14,12 @@ object show {
       data: lila.study.JsonView.JsData,
       chatOption: Option[lila.chat.UserChat.Mine],
       socketVersion: lila.socket.Socket.SocketVersion,
-      streamers: List[lila.user.User.ID]
+      streamers: List[lila.user.User.ID],
+      boardFamily: Option[String] = None
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s.name.value,
+      boardFamily = boardFamily,
       moreCss = cssTag("analyse.study"),
       moreJs = frag(
         analyseTag,
@@ -50,23 +52,41 @@ object show {
             )
           )}""")
       ),
-      robots = s.isPublic,
-      chessground = false,
+      robots = s.isPublic && s.notable,
+      // every chapter URL is the same study: one canonical, the study root, which og:url already names
+      canonicalPath = routes.Study.show(s.id.value).url.some,
       zoomable = true,
       csp = defaultCsp.withWebAssembly.withPeer.some,
       openGraph = lila.app.ui
         .OpenGraph(
           title = s.name.value,
           url = s"$netBaseUrl${routes.Study.show(s.id.value).url}",
-          description = s"A chess study by ${usernameOrId(s.ownerId)}"
+          description = description(s, data)
         )
         .some
     )(
       frag(
+        // outside main.analyse, which the analyse app empties on mount
+        h1(cls := "offscreen")(s.name.value),
         main(cls := "analyse"),
         bits.streamers(streamers)
       )
     )
 
   def socketUrl(id: String) = s"/study/$id/socket/v$apiVersion"
+
+  // chapters are client-rendered, so the description is the only place their names reach crawlers
+  private def description(s: lila.study.Study, data: lila.study.JsonView.JsData) = {
+    val chapters = (data.study \ "chapters")
+      .asOpt[List[JsObject]]
+      .so(_.flatMap(c => (c \ "name").asOpt[String]))
+    val intro = s.description
+      .map(_.replaceAll("\\s+", " ").trim)
+      .filter(_.nonEmpty)
+      .getOrElse(s"A study by ${usernameOrId(s.ownerId)} on PlayStrategy")
+    val withChapters =
+      if (chapters.sizeIs > 1) s"$intro. ${chapters.size} chapters: ${chapters.take(6).mkString(", ")}"
+      else intro
+    lila.common.String.shorten(withChapters, 250, "…")
+  }
 }

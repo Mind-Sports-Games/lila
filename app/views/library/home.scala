@@ -20,7 +20,7 @@ object home {
       // botOrHumanGames: (Int, Int)
   )(implicit ctx: Context) =
     views.html.base.layout(
-      title = "Library of Games",
+      title = trans.libraryTitle.txt(),
       moreCss = cssTag("library"),
       moreJs = frag(
         jsModule("library"),
@@ -34,6 +34,12 @@ object home {
                   s"${v.gameFamily.id}_${v.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.variantName(v))
                 )*
               ),
+              // family id -> the id of the group it buckets into, so the chart need not re-derive it
+              "gameGroupOfFamily" -> Json.obj(
+                gameGroupIdByFamilyId.map { case (fam, group) =>
+                  fam -> Json.toJsFieldJsValueWrapper(group)
+                }.toSeq*
+              ),
               "gameGroupNames" -> Json.obj(
                 GameGroup.all
                   .map(gg => s"${gg.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.gameGroupName(gg)))*
@@ -44,12 +50,13 @@ object home {
       ),
       openGraph = lila.app.ui
         .OpenGraph(
-          title = "Library of Games",
+          title = trans.libraryTitle.txt(),
           url = s"$netBaseUrl${routes.Library.home.url}",
-          description = "Games you can play on PlayStrategy."
+          description = trans.libraryDescription.txt()
         )
         .some,
-      zoomable = true
+      zoomable = true,
+      canonicalPath = routes.Library.home.url.some
     )(
       main(
         id  := "library-section",
@@ -67,11 +74,13 @@ object home {
           div(cls := "variants-icons")(translatedVariantIconChoices.filter { case (id, _, _) =>
             id != "0_3" // from position
           } map { case (id, icon, name) =>
-            button(
-              cls      := "variant",
-              dataIcon := icon,
-              value    := id,
-              href     := routes.Library.variant(variantKey(id))
+            a(
+              cls                := "variant",
+              dataIcon           := icon,
+              attr("data-value") := id,
+              // the group this variant sits under, so the filter does not have to re-derive it
+              attr("data-gamegroup") := gameGroupValueByFamilyId.getOrElse(id.takeWhile(_ != '_'), ""),
+              href                   := routes.Library.variant(variantKey(id))
             )(name)
           })
         ),

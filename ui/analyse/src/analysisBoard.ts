@@ -4,16 +4,16 @@ import PlayStrategyChat from 'chat';
 // eslint-disable-next-line no-duplicate-imports
 import makeCtrl from './ctrl';
 import menuHover from 'common/menuHover';
+import { register as registerPieceSets } from 'common/piece-sprite';
 import view from './view';
 import { AnalyseApi, AnalyseOpts } from './interfaces';
-import { Chessground } from 'chessground';
-import Draughtsground from 'draughtsground';
 
 export const patch = init([classModule, attributesModule]);
 
 export function PlayStrategyAnalyse(opts: AnalyseOpts): AnalyseApi {
   opts.element = document.querySelector('main.analyse') as HTMLElement;
   opts.trans = playstrategy.trans(opts.i18n);
+  registerPieceSets(opts.data.pref.pieceSet);
 
   let vnode: VNode | undefined;
 
@@ -42,10 +42,6 @@ export function PlayStrategyAnalyse(opts: AnalyseOpts): AnalyseApi {
 
 export { boot };
 
-// that's for the rest of playstrategy to access chessground
-// without having to include it a second time
-window.Chessground = Chessground;
-window.Draughtsground = Draughtsground;
 window.PlayStrategyChat = PlayStrategyChat;
 
 (window as any).PlayStrategyAnalyse = PlayStrategyAnalyse; // esbuild

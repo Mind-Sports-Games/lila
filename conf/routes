@@ -144,6 +144,8 @@ GET   /analysis/*something             controllers.UserAnalysis.parseArg(somethi
 GET   /analysis                        controllers.UserAnalysis.index
 POST  /analysis/pgn                    controllers.UserAnalysis.pgn
 
+# Localised URLs: one per hand-maintained locale, see modules/i18n/src/main/SeoLang.scala
+
 # Study
 GET   /study                           controllers.Study.allDefault(page: Int ?= 1)
 GET   /study/all/:order                controllers.Study.all(order: String, page: Int ?= 1)
@@ -174,9 +176,13 @@ POST  /study/$id<\w{8}>/clear-chat     controllers.Study.clearChat(id: String)
 POST  /study/$id<\w{8}>/import-pgn     controllers.Study.importPgn(id: String)
 GET   /study/$id<\w{8}>/multi-board    controllers.Study.multiBoard(id: String, page: Int ?= 1)
 POST  /study/$id<\w{8}>/admin          controllers.Study.admin(id: String)
+POST  /study/$id<\w{8}>/feature        controllers.Study.feature(id: String)
+POST  /study/by/:username/feature/:v   controllers.Study.featureByOwner(username: String, v: Boolean)
 GET   /study/topic                     controllers.Study.topics
 POST  /study/topic                     controllers.Study.setTopics
 GET   /study/topic/:topic/:order       controllers.Study.byTopic(topic: String, order: String, page: Int ?= 1)
+GET   /study/variant/:key              controllers.Study.byVariantDefault(key: String, page: Int ?= 1)
+GET   /study/variant/:key/:order       controllers.Study.byVariant(key: String, order: String, page: Int ?= 1)
 GET   /study/topic/autocomplete        controllers.Study.topicAutocomplete
 GET   /study/glyphs/:lang.json         controllers.Study.glyphs(lang)
 
@@ -279,6 +285,8 @@ POST  /tournament/team-battle/edit/:id        controllers.Tournament.teamBattleU
 GET   /tournament/calendar                    controllers.Tournament.calendar
 GET   /tournament/history                     controllers.Tournament.history(freq: String = "introductory", page: Int ?= 1)
 GET   /tournament/history/:freq               controllers.Tournament.history(freq: String, page: Int ?= 1)
+GET   /tournament/history/:freq/group/:group  controllers.Tournament.historyGroup(freq: String, group: String, page: Int ?= 1)
+GET   /tournament/history/:freq/:variant      controllers.Tournament.historyVariant(freq: String, variant: String, page: Int ?= 1)
 GET   /tournament/$id<\w{8}>                  controllers.Tournament.show(id: String)
 GET   /tournament/$id<\w{8}>/standing/:page   controllers.Tournament.standing(id: String, page: Int)
 GET   /tournament/$id<\w{8}>/page-of/:userId  controllers.Tournament.pageOf(id: String, userId: String)
@@ -296,6 +304,7 @@ GET   /tournament/shields                     controllers.Tournament.shields
 GET   /tournament/shields/:categ              controllers.Tournament.categShields(categ: String)
 GET   /tournament/medley-shield/:categ        controllers.Tournament.medleyShield(categ: String)
 GET   /tournament/shield-leaderboard/:id      controllers.Tournament.shieldLeaderboard(id: Int)
+GET   /tournament/shield-streaks              controllers.Tournament.shieldStreaks
 
 # Tournament CRUD
 GET   /tournament/manager                     controllers.TournamentCrud.index(page: Int ?= 1)
@@ -791,6 +800,9 @@ GET   /variant/:key                    controllers.Page.variant(key)
 # Library
 GET   /library                        controllers.Library.home
 GET   /library/:key                   controllers.Library.variant(key)
+GET   /$lang<[a-z]{2}|pt-br|pt-pt|zh-cn>/library/:key  controllers.Library.langVariant(lang: String, key: String)
+GET   /$lang<[a-z]{2}|pt-br|pt-pt|zh-cn>/analysis       controllers.UserAnalysis.langIndex(lang: String)
+GET   /$lang<[a-z]{2}|pt-br|pt-pt|zh-cn>/analysis/:key  controllers.UserAnalysis.langLoad(lang: String, key: String)
 
 # Help
 GET   /help/contribute                 controllers.Page.help
@@ -817,5 +829,6 @@ GET   /assets/*file                    controllers.ExternalAssets.at(path="publi
 
 GET   /manifest.json                   controllers.Main.manifest
 GET   /robots.txt                      controllers.Main.robots
+GET   /sitemap.xml                     controllers.Main.sitemap
 
 GET   /$username<\w{2,30}>             controllers.User.redirect(username: String)

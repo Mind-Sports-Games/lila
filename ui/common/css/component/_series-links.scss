@@ -1,0 +1,84 @@
+// Two rows of chips on the tournament series pages: the game groups, then the games of whichever
+// group is open. Every chip is a link to a page of its own, so none of this needs script.
+.series-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em 0.5em;
+  margin: 0 var(--box-padding) 1em;
+
+  a {
+    @extend %flex-center-nowrap;
+
+    padding: 0.3em 0.85em;
+    border: 1px solid $c-border;
+    border-radius: 999px;
+    color: $c-font;
+    line-height: 1.4;
+    white-space: nowrap;
+
+    @include transition(0.13s);
+
+    &::before {
+      opacity: 0.75;
+    }
+
+    &:hover {
+      border-color: $c-font-dim;
+      color: $c-link;
+
+      &::before {
+        opacity: 1;
+      }
+    }
+
+    // a filled chip is the narrowest thing the page lists: All games, or one game
+    &.active {
+      background: $c-accent;
+      border-color: $c-accent;
+      color: $c-accent-over;
+
+      &::before {
+        opacity: 1;
+      }
+
+      &:hover {
+        color: $c-accent-over;
+      }
+    }
+
+    // A group is wider than the game chosen inside it, and both chips can carry the same word -
+    // Abalone above Abalone - so an open group is outlined where a game is filled.
+    &.group.active {
+      background: none;
+      border-color: $c-accent;
+      color: $c-accent;
+      font-weight: bold;
+
+      &:hover {
+        color: $c-accent;
+      }
+    }
+  }
+}
+
+.series-links__groups {
+  margin-bottom: 0.5em;
+}
+
+// The games of the open group, tucked under it and set apart by a short rule rather than by
+// spacing, so the two rows never read as one bag of chips.
+.series-links__variants {
+  position: relative;
+  padding-top: 0.9em;
+  font-size: 0.95em;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2.5em;
+    border-top: 2px solid $c-accent;
+  }
+}

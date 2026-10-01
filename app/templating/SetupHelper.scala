@@ -177,23 +177,43 @@ trait SetupHelper { self: I18nHelper =>
   )(variant: Variant) =
     (encode(variant), variantName(variant), VariantKeys.variantTitle(variant).some)
 
-  def translatedGameGroupIconChoices(implicit lang: Lang): List[SelectChoice] = {
-    val displayOrder = List(
-      GameGroup.Chess(),
-      GameGroup.Draughts(),
-      GameGroup.Go(),
-      GameGroup.Backgammon(),
-      GameGroup.Shogi(),
-      GameGroup.BreakthroughTroyka(),
-      GameGroup.Flipello(),
-      GameGroup.Mancala(),
-      GameGroup.Xiangqi(),
-      GameGroup.LinesOfAction(),
-      GameGroup.Abalone(),
-      GameGroup.Amazons()
-    )
-    displayOrder.map(translatedGameGroupIconChoice)
-  }
+  // The groups the two-stage picker offers, in the order it shows them. GameGroup.all also holds
+  // FairySF, a catch-all that claims every FairySF variant and is shown nowhere, so a lookup over
+  // all of them would put shogi, xiangqi and flipello under it.
+  val displayedGameGroups: List[GameGroup] = List(
+    GameGroup.Chess(),
+    GameGroup.Draughts(),
+    GameGroup.Go(),
+    GameGroup.Backgammon(),
+    GameGroup.Shogi(),
+    GameGroup.BreakthroughTroyka(),
+    GameGroup.Flipello(),
+    GameGroup.Mancala(),
+    GameGroup.Xiangqi(),
+    GameGroup.LinesOfAction(),
+    GameGroup.Abalone(),
+    GameGroup.Amazons()
+  )
+
+  // Which group button a variant belongs under, keyed by its game family. Note the value is not
+  // the group's own id: encodeGameGroupId emits the game family id of the group's first variant,
+  // so Mancala reads 7 (togyzkumalak) and Draughts reads 1. Two families can share a group -
+  // oware and togyzkumalak both sit under Mancala - which is why this is derived here rather than
+  // rewritten by hand wherever the picker is drawn.
+  val gameGroupValueByFamilyId: Map[String, String] =
+    displayedGameGroups.flatMap { group =>
+      group.variants.map(v => encodeGameFamilyId(v.gameFamily) -> encodeGameGroupId(group))
+    }.toMap
+
+  // The group's own id, for callers that bucket by group rather than match the picker's buttons -
+  // the library chart keys its series this way.
+  val gameGroupIdByFamilyId: Map[String, String] =
+    displayedGameGroups.flatMap { group =>
+      group.variants.map(v => encodeGameFamilyId(v.gameFamily) -> group.id.toString)
+    }.toMap
+
+  def translatedGameGroupIconChoices(implicit lang: Lang): List[SelectChoice] =
+    displayedGameGroups.map(translatedGameGroupIconChoice)
 
   private def translatedGameGroupIconChoice(
       gameGroup: GameGroup

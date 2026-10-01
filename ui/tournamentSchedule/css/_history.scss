@@ -1,9 +1,14 @@
 @import 'layout';
 @import 'finished';
+@import '../../common/css/component/series-links';
 
 .arena-history {
   h1,
   .subnav {
     text-transform: capitalize;
   }
+}
+
+.arena-history__intro {
+  margin: 0 var(--box-padding) 1em;
 }

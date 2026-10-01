@@ -8,6 +8,7 @@ import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 import lila.common.{ ContentSecurityPolicy, Nonce }
 import lila.common.base.StringUtils.escapeHtmlRaw
+import lila.i18n.SeoLang
 
 object layout {
 
@@ -29,36 +30,68 @@ object layout {
       raw {
         s"""<meta name="theme-color" content="${ctx.pref.themeColor}">"""
       }
-    def pieceSprite(implicit ctx: Context): Frag = {
-      ctx.currentPieceSet.map(ps => pieceSprite(ps))
-    }
-    def pieceSprite(ps: lila.pref.PieceSet): Frag =
+    // One stylesheet per game family, 718KB of them, and a page that draws one family can never
+    // use the other thirteen: sole drops them. Where a page may also show a board of another
+    // family - the round player page lists the viewer's other games - they all ship, and only
+    // the family on the board is worth blocking the first paint for. The rest carry media="print":
+    // the browser fetches them without waiting, and lazyPieceScript below hands each one back to
+    // every medium once it has arrived.
+    def pieceSprite(boardFamily: Option[String], sole: Boolean)(implicit ctx: Context): Frag =
+      ctx.currentPieceSet
+        .filter(ps => !sole || boardFamily.contains(ps.gameFamilyName))
+        .map(ps => pieceSprite(ps, boardFamily.contains(ps.gameFamilyName)))
+
+    // the sets a sole page left out, for piece-sprite.ts to fetch when another family shows up
+    def leftOutPieceSets(boardFamily: Option[String])(implicit ctx: Context): String =
+      ctx.currentPieceSet
+        .filterNot(ps => boardFamily.contains(ps.gameFamilyName))
+        .map(ps => s"${ps.gameFamilyName}:${ps.name}")
+        .mkString(",")
+
+    def pieceSprite(ps: lila.pref.PieceSet, blocking: Boolean = true): Frag =
       link(
         id   := s"piece-sprite-${ps.gameFamilyName}",
         href := staticAssetUrl(s"piece-css/${ps.gameFamilyName}-${ps.name}.css"),
-        rel  := "stylesheet"
+        rel  := "stylesheet",
+        (!blocking).option(cls := "lazy-piece"),
+        (!blocking).option(attr("media") := "print")
+      )
+
+    // CSP has no unsafe-inline, so an onload attribute on the link would be blocked: the
+    // promotion runs from one nonced script placed straight after the links instead
+    def lazyPieceScript(nonce: Nonce) =
+      embedJsUnsafe(
+        """document.querySelectorAll('link.lazy-piece').forEach(function(l){""" +
+          """if(l.sheet)l.media='all';""" +
+          """else l.addEventListener('load',function(){l.media='all'},{once:true})});""",
+        nonce
       )
   }
   import bits.*
 
   private val noTranslate                        = raw("""<meta name="google" content="notranslate">""")
-  private def fontPreload(implicit ctx: Context) =
+  // one face, one preload: the @font-face below lists playstrategy.woff2 first and the browser
+  // never reaches the .chess entries, so preloading them only cost a high-priority request
+  private val fontPreload =
     raw {
       s"""<link rel="preload" href="${assetUrl(
           s"font/playstrategy.woff2"
-        )}" as="font" type="font/woff2" crossorigin>""" + (
-        if (!ctx.pref.pieceNotationIsLetter)
-          s"""<link rel="preload" href="${assetUrl(
-              s"font/playstrategy.chess.woff2"
-            )}" as="font" type="font/woff2" crossorigin>"""
-        else ""
-      )
+        )}" as="font" type="font/woff2" crossorigin>"""
     }
   private val manifests = raw(
     """<link rel="manifest" href="/manifest.json"><meta name="twitter:site" content="@playstrategy">"""
   )
 
   private val jsLicense = raw("""<link rel="jslicense" href="/source">""")
+
+  private val hreflang = attr("hreflang")
+
+  private def alternateLinks(barePath: String): Frag =
+    frag(
+      SeoLang.alternates(barePath).map { case (tag, path) =>
+        link(rel := "alternate", hreflang := tag, href := s"$netBaseUrl$path")
+      }
+    )
 
   private val favicons = raw {
     List(512, 256, 192, 128, 64)
@@ -114,15 +147,17 @@ object layout {
 
   private def anonDasher(playing: Boolean)(implicit ctx: Context) =
     spaceless(s"""<div class="dasher">
-  <a class="toggle link anon">
+  <button class="toggle link anon" aria-label="${trans.preferences.preferences.txt()}">
     <span title="${trans.preferences.preferences.txt()}" data-icon="%"></span>
-  </a>
+  </button>
   <div id="dasher_app" class="dropdown" data-playing="$playing"></div>
 </div>
 <a href="${routes.Auth.login}?referrer=${ctx.req.path}" class="signin button button-empty">${trans.signIn
         .txt()}</a>""")
 
-  private val clinputLink = a(cls := "link")(span(dataIcon := "y"))
+  // a control, not a destination: an <a> without href is not a link to a crawler
+  private def clinputLink(implicit ctx: Context) =
+    button(cls := "link", ariaTitle(trans.search.search.txt()))(span(dataIcon := "y"))
 
   private def clinput(implicit ctx: Context) =
     div(id := "clinput")(
@@ -154,10 +189,8 @@ object layout {
       nonce
     )
 
-  private def loadScripts(moreJs: Frag, ground: Boolean)(implicit ctx: Context) =
+  private def loadScripts(moreJs: Frag)(implicit ctx: Context) =
     frag(
-      ground.option(chessgroundTag),
-      ground.option(draughtsgroundTag),
       ctx.requiresFingerprint.option(fingerprintTag),
       ctx.nonce map playstrategyJsObject,
       frag(
@@ -184,6 +217,7 @@ object layout {
   private val dataAnnounce      = attr("data-announce")
   private val dataSelectedColor = attr("data-selected-color")
   private val dataDev           = attr("data-dev")
+  private val dataPieceSets     = attr("data-piece-sets")
   val dataSoundSet              = attr("data-sound-set")
   val dataTheme                 = attr("data-theme")
   val dataAssetUrl              = attr("data-asset-url") // netConfig.assetBaseUrl.value
@@ -197,9 +231,7 @@ object layout {
         font-display: block;
         src:
           url('${assetUrl("font/playstrategy.woff2")}') format('woff2'),
-          url('${assetUrl("font/playstrategy.woff")}') format('woff'),
-          url('${assetUrl("font/playstrategy.chess.woff")}') format('woff'),
-          url('${assetUrl("font/playstrategy.chess.woff2")}') format('woff2');
+          url('${assetUrl("font/playstrategy.woff")}') format('woff');
       }</style>"""
   )
 
@@ -211,12 +243,27 @@ object layout {
       moreJs: Frag = emptyFrag,
       playing: Boolean = false,
       openGraph: Option[lila.app.ui.OpenGraph] = None,
-      chessground: Boolean = true,
       zoomable: Boolean = false,
       csp: Option[ContentSecurityPolicy] = None,
-      wrapClass: String = ""
+      wrapClass: String = "",
+      canonicalPath: Option[String] = None,
+      // this page type has one URL per maintained locale: link them all, both ways
+      alternates: Boolean = false,
+      // the game family this page draws a board for, if any: its pieces block the paint, the rest do not
+      boardFamily: Option[String] = None,
+      // and this page draws no board of any other family, so the other sprites can stay home
+      soleBoardFamily: Boolean = false,
+      // its script is not handed the piece sets as round and analysis are, so <body> names them
+      namePieceSets: Boolean = false
   )(body: Frag)(implicit ctx: Context): Frag = {
     updateManifest()
+
+    // a localised URL is its own canonical: keep the prefix the visitor came in on, and hang
+    // both the canonical and the alternates off the same prefix-free path
+    val (urlLang, unprefixed) =
+      if (alternates) SeoLang.splitPath(ctx.req.path) else (none, ctx.req.path)
+    val barePath              = canonicalPath | unprefixed
+    val canonicalUrl          = s"$netBaseUrl${urlLang.fold("")(e => s"/${e.href}")}$barePath"
 
     frag(
       doctype,
@@ -238,7 +285,8 @@ object layout {
           ctx.userContext.impersonatedBy.isDefined.option(cssTagNoTheme("mod.impersonate")),
           ctx.blind.option(cssTagNoTheme("blind")),
           moreCss,
-          pieceSprite,
+          pieceSprite(boardFamily, soleBoardFamily),
+          ctx.nonce map lazyPieceScript,
           meta(
             content := openGraph.fold(trans.playstrategySiteDescription.txt())(o => o.description),
             name    := "description"
@@ -246,8 +294,24 @@ object layout {
           link(rel := "mask-icon", href := staticAssetUrl("logo/playstrategy.svg"), color := "black"),
           favicons,
           (!robots).option(raw("""<meta content="noindex, nofollow" name="robots">""")),
+          // query strings never change the page identity
+          robots.option(link(rel := "canonical", href := canonicalUrl)),
+          (robots && alternates && canonicalUrl == s"$netBaseUrl${ctx.req.path}")
+            .option(alternateLinks(barePath)),
           noTranslate,
-          openGraph.map(_.frags),
+          // a localised page shares the English page's og:url otherwise, which reads as a
+          // second, conflicting canonical
+          // a page that names no image of its own still gets a branded card rather than none
+          openGraph.map { og =>
+            og.copy(
+              url = urlLang.fold(og.url)(_ => canonicalUrl),
+              image = og.image orElse staticAssetUrl("logo/playstrategy-tile-wide.png").some,
+              // a summary card is cropped square, so it gets the square tile - the same
+              // pairing lobby/home.scala and user/show/page.scala already use
+              twitterImage = og.twitterImage orElse og.image
+                .fold(staticAssetUrl("logo/playstrategy-tile.png").some)(_ => none)
+            ).frags
+          },
           link(
             href     := routes.Blog.atom,
             tpe      := "application/atom+xml",
@@ -288,6 +352,7 @@ object layout {
           dataNonce         := ctx.nonce.ifTrue(sameAssetDomain).map(_.value),
           dataTheme         := ctx.currentBg,
           dataSelectedColor := ctx.currentSelectedColorCls,
+          dataPieceSets     := namePieceSets.option(leftOutPieceSets(boardFamily)),
           dataAnnounce      := AnnounceStore.get.map(a => safeJsonValue(a.json)),
           style             := zoomable.option(s"--zoom:${ctx.zoom}")
         )(
@@ -323,7 +388,7 @@ object layout {
               )
             ),
           a(id := "reconnecting", cls := "link text", dataIcon := "B")(trans.reconnecting()),
-          loadScripts(moreJs, chessground) // chessground / draughtsground
+          loadScripts(moreJs)
         )
       )
     )
@@ -381,7 +446,7 @@ object layout {
       header(id := "top")(
         div(cls := "site-title-nav")(
           (!ctx.isAppealUser).option(topnavToggle),
-          h1(cls := "site-title")(
+          div(cls := "site-title")(
             if (ctx.kid) span(title := trans.kidMode.txt(), cls := "kiddo")(":)")
             else ctx.isBot.option(botImage),
             a(href := "/")(
