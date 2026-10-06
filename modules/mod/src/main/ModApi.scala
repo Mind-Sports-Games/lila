@@ -144,10 +144,14 @@ final class ModApi(
       val prev = user.perfs(pt)
       if (prev.nb == 0) fufail(s"${user.username} has not played ${pt.key}")
       else {
+        // refund first so the progress arrow updates, then store exactly what the mod entered
         val refunded = prev.refund(data.rating - prev.intRating)
-        val perf     = data.deviation.fold(refunded) { d =>
-          refunded.copy(glicko = refunded.glicko.copy(deviation = d.toDouble))
-        }
+        val perf     = refunded.copy(glicko =
+          refunded.glicko.copy(
+            rating = data.rating.toDouble,
+            deviation = data.deviation.fold(refunded.glicko.deviation)(_.toDouble)
+          )
+        )
         val deviationChange =
           data.deviation.filter(_ != prev.intDeviation) so { d => s" (±${prev.intDeviation} → ±$d)" }
         ratingWriter(user, pt, perf) >>
