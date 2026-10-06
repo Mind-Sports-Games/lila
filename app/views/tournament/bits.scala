@@ -4,6 +4,7 @@ import lila.api.Context
 import lila.app.templating.Environment.*
 import lila.app.ui.ScalatagsTemplate.*
 import lila.i18n.{ I18nKeys as trans, VariantKeys }
+import lila.tournament.Schedule.Freq
 import lila.tournament.Tournament
 import strategygames.variant.Variant
 
@@ -75,6 +76,39 @@ object bits {
             }
         )
       )
+    )
+
+  private val freqKeyEntries = List(
+    (Freq.GroupCycle, trans.arena.cycle, trans.arena.cycleDescription),
+    (Freq.Wildcard, trans.arena.wildcard, trans.arena.wildcardDescription),
+    (Freq.Shield, trans.arena.shield, trans.arena.shieldDescription),
+    (Freq.Yearly, trans.arena.yearly, trans.arena.yearlyDescription)
+  )
+
+  private val userTournamentKeyEntries = List(
+    ("team", trans.arena.team, trans.arena.teamDescription),
+    ("public", trans.arena.public, trans.arena.publicDescription)
+  )
+
+  def freqKey(withUserTournaments: Boolean = false)(implicit ctx: Context) = {
+    val entries = freqKeyEntries.map { case (freq, label, description) => (freq.name, label, description) } :::
+      (if (withUserTournaments) userTournamentKeyEntries else Nil)
+    div(cls := "tour-freq-key")(
+      entries.map { case (swatch, label, description) =>
+        span(cls := "tour-freq-key__item", title := description.txt())(
+          span(cls := s"tour-freq-key__swatch $swatch"),
+          label()
+        )
+      }
+    )
+  }
+
+  def freqDescriptions(implicit ctx: Context) =
+    frag(
+      h2(trans.arena.whatTypesOfScheduledTournament()),
+      freqKeyEntries.map { case (_, label, description) =>
+        p(strong(label()), ": ", description())
+      }
     )
 
   def jsI18n(implicit ctx: Context) = i18nJsObject(i18nKeys)

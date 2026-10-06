@@ -18,7 +18,9 @@ object BotVsBotConfig {
   private val rapidClock = Clock.Config(3 * 60, 2) // 3+2
 
   private val stockfishVariants: List[Variant] =
-    Variant.all.filter(v => v.hasFishnet && !v.fromPositionVariant).toList
+    Variant.all
+      .filter(v => v.hasFishnet && !v.fromPositionVariant && v.gameLogic != GameLogic.Backgammon())
+      .toList
 
   private val nonStockfishOrBackgammonVariants: List[Variant] =
     Variant.all

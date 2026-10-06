@@ -817,8 +817,12 @@ case class Game(
 
   private def accountable = playedTurns >= 2 || isTournament
 
+  def psBotFlagged =
+    List(Status.Outoftime, Status.OutoftimeGammon, Status.OutoftimeBackgammon).contains(status) &&
+      player.isPSBot
+
   def updateRatingsOnFinish =
-    rated && accountable && !MultiPointState.requireMoreGamesInMultipoint(this)
+    rated && accountable && !psBotFlagged && !MultiPointState.requireMoreGamesInMultipoint(this)
 
   def replayable = isPgnImport || finished || (aborted && bothPlayersHaveMoved)
 
