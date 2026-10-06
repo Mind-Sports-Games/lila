@@ -1026,7 +1026,7 @@ object TournamentShield {
         extends Category(
           Variant.Entropy(strategygames.entropy.variant.Entropy),
           Blitz,
-          3,
+          15,
           1
         )
 
