@@ -211,6 +211,20 @@ final class Mod(
       }
     }
 
+  def setRating(username: String) =
+    SecureBody(_.SetRating) { implicit ctx => me =>
+      implicit def req: play.api.mvc.Request[?] = ctx.body
+      lila.mod.SetRatingForm.form
+        .bindFromRequest()
+        .fold(
+          err => BadRequest(err.errors.map(e => s"${e.key}: ${e.message}").mkString(", ")).fuccess,
+          data =>
+            modApi.setRating(me.id, username, data) inject redirect(username, mod = true) recover {
+              case e: Exception => BadRequest(e.getMessage)
+            }
+        )
+    }
+
   def notifySlack(username: String) =
     OAuthMod(_.NotifySlack) { _ => me =>
       withSuspect(username) { sus =>

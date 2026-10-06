@@ -16,8 +16,7 @@ final private class RatingRefund(
     userRepo: UserRepo,
     scheduler: akka.actor.Scheduler,
     notifier: ModNotifier,
-    historyApi: lila.history.HistoryApi,
-    rankingApi: lila.user.RankingApi,
+    ratingWriter: RatingWriter,
     logApi: ModlogApi,
     perfStat: lila.perfStat.Env
 )(implicit ec: scala.concurrent.ExecutionContext) {
@@ -60,9 +59,7 @@ final private class RatingRefund(
 
         def refundPoints(victim: Victim, pt: PerfType, points: Int): Funit = {
           val newPerf = victim.user.perfs(pt).refund(points)
-          userRepo.setPerf(victim.user.id, pt, newPerf) >>
-            historyApi.setPerfRating(victim.user, pt, newPerf.intRating) >>
-            rankingApi.save(victim.user, pt, newPerf) >>
+          ratingWriter(victim.user, pt, newPerf) >>
             notifier.refund(victim, pt, points)
         }
 

@@ -139,6 +139,7 @@ object mod {
           )
         }
       ),
+      setRatingButton(u),
       div(cls := "btn-rack")(
         if (u.enabled) {
           isGranted(_.CloseAccount) option {
@@ -212,8 +213,56 @@ object mod {
         emails.previous.map { email =>
           s"Previously $email"
         }
+      ),
+      isGranted(_.SetRating).option(setRatingForm(u))
+    )
+
+  private def playedPerfs(u: User) =
+    lila.rating.PerfType.nonPuzzle.map(pt => pt -> u.perfs(pt)).filter(_._2.nb > 0)
+
+  private def setRatingButton(u: User)(implicit ctx: Context): Option[Frag] =
+    (isGranted(_.SetRating) && playedPerfs(u).nonEmpty).option(
+      div(cls := "btn-rack")(
+        button(tpe := "button", cls := "btn-rack__btn set-rating-toggle")("Set Rating")
       )
     )
+
+  private def setRatingForm(u: User)(implicit ctx: Context): Frag = {
+    val played = playedPerfs(u)
+    if (played.isEmpty) emptyFrag
+    else
+      postForm(cls := "set-rating none", action := routes.Mod.setRating(u.username))(
+        st.select(name := "perf")(
+          played.map { case (pt, perf) =>
+            st.option(value := pt.key)(s"${pt.trans} — ${perf.intRating} ±${perf.intDeviation}")
+          }
+        ),
+        st.input(
+          tpe  := "number",
+          name := "rating",
+          required,
+          st.min      := lila.rating.Glicko.minRating,
+          st.max      := lila.mod.SetRatingForm.maxRating,
+          placeholder := "New rating"
+        ),
+        st.input(
+          tpe         := "number",
+          name        := "deviation",
+          st.min      := lila.rating.Glicko.minDeviation,
+          st.max      := lila.rating.Glicko.maxDeviation.toInt,
+          placeholder := "Deviation (optional)",
+          title       := "Optional. Leave blank to keep the current deviation"
+        ),
+        st.input(
+          tpe  := "text",
+          name := "reason",
+          required,
+          maxlength   := 200,
+          placeholder := "Reason"
+        ),
+        submitButton(cls := "button")("Set Rating")
+      )
+  }
 
   def prefs(u: User)(pref: lila.pref.Pref)(implicit ctx: Context) =
     frag(
