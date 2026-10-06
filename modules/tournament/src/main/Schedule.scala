@@ -413,6 +413,7 @@ object Schedule {
       // case (Hourly, strategygames.variant.Variant.Chess(Crazyhouse), Blitz) if zhInc(s)      => TC(4 * 60, 2)
       // case (Hourly, strategygames.variant.Variant.Chess(Standard), Blitz) if standardInc(s)  => TC(3 * 60, 2)
 
+      case (Shield, Variant.Entropy(_), Blitz)        => TC(5 * 60, 0)
       case (Shield, variant, Blitz) if variant.exotic => TC(3 * 60, 2)
 
       case (_, _, UltraBullet)  => TC(15, 0)
