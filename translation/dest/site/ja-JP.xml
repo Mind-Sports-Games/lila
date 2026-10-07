@@ -841,6 +841,7 @@
   <string name="variantAnalysisDescriptionServerEngine">無料のオンライン盤で %1$s の局面を分析：任意の局面を設定し、変化を調べて共有。終了した対局は %3$s による解析を無料で受けられます。PlayStrategy で %2$s を無料でオンライン対戦。</string>
   <string name="variantRulesDescription">%1$s のルールを学ぶ：初期配置、動かし方、勝ち方。そして PlayStrategy で %2$s を無料オンライン対戦：実際の対戦相手、レーティング、トーナメント、無料の分析ボード。</string>
   <string name="relatedGames">関連ゲーム</string>
+  <string name="allAboutX">PlayStrategyの%sのすべて</string>
   <string name="variantStudies">%s のスタディ</string>
   <string name="playVariantOnlineFreeDescription">世界中のプレイヤーと %s を無料でオンライン対戦。リアルタイム対局と通信対局、トーナメント、レーティング、解析を PlayStrategy で。</string>
   <string name="variantPuzzles">%s の問題</string>

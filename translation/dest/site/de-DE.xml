@@ -895,6 +895,7 @@
   <string name="variantAnalysisDescriptionNoEngine">Analysiere Stellungen in %1$s auf einem kostenlosen Online-Brett: Stelle jede beliebige Stellung auf, erkunde die Varianten und teile sie. Spiele %2$s kostenlos online auf PlayStrategy.</string>
   <string name="variantAnalysisDescriptionServerEngine">Analysiere Stellungen in %1$s auf einem kostenlosen Online-Brett: Stelle jede beliebige Stellung auf, erkunde die Varianten und teile sie. Für beendete Partien gibt es eine kostenlose Analyse mit %3$s. Spiele %2$s kostenlos online auf PlayStrategy.</string>
   <string name="relatedGames">Verwandte Spiele</string>
+  <string name="allAboutX">Alles über %s auf PlayStrategy</string>
   <string name="variantStudies">%s-Studien</string>
   <string name="playVariantOnlineFreeDescription">Spiele %s kostenlos online gegen Spieler aus aller Welt. Live- und Fernpartien, Turniere, Wertungen und Analyse auf PlayStrategy.</string>
   <string name="variantPuzzles">%s-Aufgaben</string>

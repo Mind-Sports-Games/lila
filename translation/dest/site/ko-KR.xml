@@ -843,6 +843,7 @@
   <string name="variantAnalysisDescriptionServerEngine">무료 온라인 보드에서 %1$s 포지션을 분석하세요: 원하는 포지션을 설정하고 변화를 탐색하며 공유할 수 있습니다. 종료된 대국은 %3$s 분석을 무료로 받을 수 있습니다. PlayStrategy에서 %2$s을(를) 무료로 온라인에서 플레이하세요.</string>
   <string name="variantRulesDescription">%1$s 규칙 배우기: 배치, 이동, 승리 조건. 그리고 PlayStrategy에서 %2$s를 무료로 온라인 대국하세요: 실제 상대, 레이팅, 토너먼트, 무료 분석 보드.</string>
   <string name="relatedGames">관련 게임</string>
+  <string name="allAboutX">PlayStrategy의 %s 모든 것</string>
   <string name="variantStudies">%s 연구</string>
   <string name="playVariantOnlineFreeDescription">전 세계 플레이어와 %s을(를) 무료로 온라인에서 플레이하세요. 실시간 및 통신 대국, 토너먼트, 레이팅, 분석을 PlayStrategy에서.</string>
   <string name="variantPuzzles">%s 퍼즐</string>

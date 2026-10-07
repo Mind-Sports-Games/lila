@@ -335,6 +335,7 @@ val `variantAnalysisDescriptionServerEngine` = new I18nKey("variantAnalysisDescr
 val `variantRulesDescription` = new I18nKey("variantRulesDescription")
 val `variantOf` = new I18nKey("variantOf")
 val `relatedGames` = new I18nKey("relatedGames")
+val `allAboutX` = new I18nKey("allAboutX")
 val `variantStudies` = new I18nKey("variantStudies")
 val `playVariantOnlineFreeDescription` = new I18nKey("playVariantOnlineFreeDescription")
 val `msoWorldChampionship` = new I18nKey("msoWorldChampionship")

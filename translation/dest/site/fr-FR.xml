@@ -901,6 +901,7 @@
   <string name="variantAnalysisDescriptionServerEngine">Analysez les positions de %1$s sur un plateau en ligne gratuit : composez n'importe quelle position, explorez les variantes et partagez-les. Les parties terminées bénéficient d'une analyse %3$s gratuite. Jouez à %2$s en ligne gratuitement sur PlayStrategy.</string>
   <string name="variantRulesDescription">Apprenez les règles de %1$s : mise en place, coups et comment gagner. Puis jouez à %2$s en ligne gratuitement sur PlayStrategy : vrais adversaires, classement, tournois et plateau d'analyse gratuit.</string>
   <string name="relatedGames">Jeux liés</string>
+  <string name="allAboutX">Tout sur %s sur PlayStrategy</string>
   <string name="variantStudies">Études %s</string>
   <string name="playVariantOnlineFreeDescription">Jouez à %s en ligne gratuitement contre des joueurs du monde entier. Parties en direct et par correspondance, tournois, classements et analyse sur PlayStrategy.</string>
   <string name="variantPuzzles">Problèmes de %s</string>

@@ -968,6 +968,7 @@
   <string name="variantAnalysisDescriptionServerEngine">Анализируйте позиции %1$s на бесплатной онлайн-доске: расставьте любую позицию, изучайте варианты и делитесь ими. Для завершённых партий доступен бесплатный анализ от %3$s. Играйте в %2$s онлайн бесплатно на PlayStrategy.</string>
   <string name="variantRulesDescription">Изучите правила %1$s: расстановка, ходы и как выиграть. Затем играйте в %2$s онлайн бесплатно на PlayStrategy: реальные соперники, рейтинг, турниры и бесплатная доска для анализа.</string>
   <string name="relatedGames">Похожие игры</string>
+  <string name="allAboutX">Всё о %s на PlayStrategy</string>
   <string name="variantStudies">Студии: %s</string>
   <string name="playVariantOnlineFreeDescription">Играйте в %s онлайн бесплатно с игроками со всего мира. Партии в реальном времени и по переписке, турниры, рейтинги и анализ на PlayStrategy.</string>
   <string name="variantPuzzles">Задачи: %s</string>

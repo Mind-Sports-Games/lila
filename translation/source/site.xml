@@ -439,6 +439,7 @@
   <string name="variantRulesDescription">Learn the rules of %1$s: setup, moves and how to win. Then play %2$s online for free on PlayStrategy: live opponents, ratings, tournaments and a free analysis board.</string>
   <string name="variantOf">%1$s is a variant of %2$s.</string>
   <string name="relatedGames">Related games</string>
+  <string name="allAboutX">All about %s on PlayStrategy</string>
   <string name="variantStudies">%s studies</string>
   <string name="playVariantOnlineFreeDescription">Play %s online for free against players from all over the world. Live and correspondence games, tournaments, ratings and analysis on PlayStrategy.</string>
   <string name="msoWorldChampionship">%s World Championship</string>

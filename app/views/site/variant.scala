@@ -27,13 +27,13 @@ object variant {
         )
         .some
     )(
-      h1(cls := "text", dataIcon := variant.perfIcon)(VariantKeys.variantName(variant)),
-      h2(cls := "headline")(VariantKeys.variantTitle(variant)),
-      div(cls := "play")(
-        a(cls := "button", href := routes.Library.variant(variant.key))(
-          trans.playVariantOnlineFreeTitle(views.html.library.bits.searchName(variant))
-        ),
-        a(cls := "button button-empty", href := routes.UserAnalysis.parseArg(variant.key))(trans.analysis()),
+      div(cls := "variant__head")(
+        h1(cls := "text", dataIcon := variant.perfIcon)(VariantKeys.variantName(variant)),
+        // the same link as the library's button: the lobby's game form, on this game
+        a(cls := "button", href := s"/?variant=${variant.key}#game")(trans.createAGame())
+      ),
+      div(cls := "variant__intro")(
+        h2(cls := "headline")(VariantKeys.variantTitle(variant)),
         views.html.library.bits.parentVariant(variant).map { parent =>
           p(
             trans.variantOf(
@@ -43,7 +43,20 @@ object variant {
           )
         }
       ),
-      div(cls := "body")(raw(~doc.getHtml("pages.content", resolver)))
+      div(cls := "body")(raw(~doc.getHtml("pages.content", resolver))),
+      // the page's description for search engines and for anyone who scrolls this far, apart from the rules
+      views.html.library.bits.hasLibraryPages(variant).option(
+        p(cls := "variant__about")(
+          trans.playVariantOnlineFree(views.html.library.bits.nameWithAlias(variant)),
+          " ",
+          VariantKeys.variantTitle(variant),
+          ". ",
+          a(href := routes.Library.variant(variant.key))(
+            trans.allAboutX(views.html.library.bits.searchName(variant)),
+            " »"
+          )
+        )
+      )
     )
 
   def home(
