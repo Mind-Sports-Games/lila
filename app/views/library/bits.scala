@@ -288,6 +288,9 @@ object bits {
     "backgammon", "hyper", "nackgammon", "abalone", "grandabalone"
   )
 
+  def editorDescription(variant: Variant)(implicit lang: Lang) =
+    trans.variantEditorDescription.txt(nameWithAlias(variant), searchName(variant))
+
   // the engine behind the analysis board, when it has one (the same Fairy-Stockfish build serves both)
   def analysisEngine(variant: Variant): Option[String] =
     if (!variant.hasFishnet || noBrowserEngine(variant.key)) None

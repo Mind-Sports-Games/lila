@@ -7,6 +7,7 @@ import { Board, Castles, makeSquare } from 'stratops';
 import { parseCastlingFen } from 'stratops/fen';
 import * as fp from 'stratops/fp';
 import { defined, prop, Prop } from 'common';
+import * as xhr from 'common/xhr';
 import { replacePocketsInFen } from 'common/editor';
 import { ensureFamily as ensurePieceSprite } from 'common/piece-sprite';
 import throttle from 'common/throttle';
@@ -21,6 +22,8 @@ export default class EditorCtrl {
   positions: Editor.OpeningPosition[];
   chessground: CgApi | undefined;
   redraw: Redraw;
+  // the text about the variant, from the page; the view places it in the grid
+  aboutHtml?: string;
 
   selected: Prop<Selected>;
 
@@ -352,6 +355,20 @@ export default class EditorCtrl {
     this.extraPositions = [startPos, { fen: 'prompt', name: this.trans('loadPosition') }, ...extraFromPositions];
     this.positions = newPositions.filter(p => !p.eco?.startsWith('X'));
     this.setRules(variantKeyToRules(variantKey));
+    this.refreshAbout(variantKey);
+  }
+
+  // the text under the board follows the variant, for the one the visitor has settled on
+  private refreshAbout(variantKey: VariantKey): void {
+    if (this.aboutHtml === undefined) return;
+    xhr.text(`/editor/about/${variantKey}`).then(
+      html => {
+        if (variantKey !== this.variantKey) return;
+        this.aboutHtml = html;
+        this.redraw();
+      },
+      () => {},
+    );
   }
 
   private setRules(rules: Rules): void {

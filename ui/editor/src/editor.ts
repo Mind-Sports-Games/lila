@@ -7,6 +7,7 @@ const patch = init([classModule, attributesModule, propsModule, eventListenersMo
 
 export default function PlayStrategyEditor(element: HTMLElement, config: Editor.Config): PlayStrategyEditor {
   const ctrl = new EditorCtrl(config, redraw);
+  ctrl.aboutHtml = element.querySelector('.editor__about')?.innerHTML;
   element.innerHTML = '';
   const inner = document.createElement('div');
   element.appendChild(inner);

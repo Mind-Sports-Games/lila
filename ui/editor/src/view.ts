@@ -589,6 +589,7 @@ export default function (ctrl: EditorCtrl): VNode {
       sparePieces(ctrl, playerIndex, playerIndex, 'bottom'),
       controls(ctrl, state),
       inputs(ctrl, state.fen),
+      ctrl.aboutHtml ? h('section.editor__about', { props: { innerHTML: ctrl.aboutHtml } }) : null,
     ],
   );
 }

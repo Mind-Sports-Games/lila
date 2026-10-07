@@ -52,7 +52,22 @@ object editor {
             div(cls := "spare"),
             div(cls := "main-board")(chessgroundBoard),
             div(cls := "spare")
-          )
+          ),
+          // the editor lifts this into its grid, and fetches the text again when the variant changes
+          st.section(cls := "editor__about")(about(variant))
+        )
+      )
+    )
+
+  def about(variant: strategygames.variant.Variant)(implicit ctx: Context): Frag =
+    frag(
+      h2(trans.aboutX(views.html.library.bits.searchName(variant))),
+      p(views.html.library.bits.objectiveSentence(variant)),
+      p(views.html.library.bits.editorDescription(variant)),
+      views.html.library.bits.hasLibraryPages(variant).option(
+        p(cls := "editor__about__links")(
+          a(cls := "button", href := s"/?variant=${variant.key}#game")(trans.createAGame()),
+          a(cls := "editor__about__rules", href := routes.Page.variant(variant.key))("Rules")
         )
       )
     )

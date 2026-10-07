@@ -897,6 +897,7 @@
   <string name="variantRulesDescription">Aprenda as regras de %1$s: posição inicial, movimentos e como vencer. Depois jogue %2$s online grátis no PlayStrategy: adversários reais, rating, torneios e um tabuleiro de análise gratuito.</string>
   <string name="relatedGames">Jogos relacionados</string>
   <string name="allAboutX">Tudo sobre %s no PlayStrategy</string>
+  <string name="variantEditorDescription">Monte qualquer posição de %1$s em um editor de tabuleiro online gratuito, depois analise ou jogue. Jogue %2$s online de graça no PlayStrategy.</string>
   <string name="variantStudies">Estudos de %s</string>
   <string name="playVariantOnlineFreeDescription">Jogue %s online grátis contra jogadores do mundo todo. Partidas ao vivo e por correspondência, torneios, ratings e análise no PlayStrategy.</string>
   <string name="variantPuzzles">Problemas de %s</string>
