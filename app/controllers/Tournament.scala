@@ -31,6 +31,38 @@ final class Tournament(
   private def jsonView = env.tournament.jsonView
   private def forms    = env.tournament.forms
 
+  // every online MSO tournament, arena or swiss, which the team's own list scrolls away; the queries
+  // match swisses by a regex no index serves, and the list only changes during the weeks of the MSO,
+  // so the page is built once a day, or on demand by msoHistoryRefresh
+  private val msoHistoryCache =
+    env.memo.cacheApi.unit[List[html.tournament.msoHistory.Edition]] {
+      _.refreshAfterWrite(1.day).buildAsyncFuture { _ =>
+        val team = views.html.library.bits.msoTeamId
+        repo.finishedOfTeam(team, List(lila.common.Freq.MSOGP), List(lila.common.Freq.MSO21)) zip
+          env.swiss.api.finishedNamedAll(team, views.html.library.bits.msoGrandPrixName) map {
+            case (arenas, swisses) =>
+              (arenas.map(Left(_)) ::: swisses.map(Right(_))).sortBy {
+                case Left(t)  => -t.startsAt.getMillis
+                case Right(s) => -s.startsAt.getMillis
+              }
+          }
+      }
+    }
+
+  def msoHistory =
+    Open { implicit ctx =>
+      msoHistoryCache.getUnit map { editions => Ok(html.tournament.msoHistory(editions)) }
+    }
+
+  // for the admins and the MSO's own account, once a tournament of the MSO has finished
+  def msoHistoryRefresh =
+    Auth { _ => me =>
+      if (html.tournament.msoHistory.canRefresh(me)) {
+        msoHistoryCache.invalidateUnit()
+        Redirect(routes.Tournament.msoHistory).fuccess
+      } else Forbidden("Not allowed").fuccess
+    }
+
   private def tournamentNotFound(implicit ctx: Context) = NotFound(html.tournament.bits.notFound())
 
   private[controllers] val upcomingCache = env.memo.cacheApi.unit[(VisibleTournaments, List[Tour])] {

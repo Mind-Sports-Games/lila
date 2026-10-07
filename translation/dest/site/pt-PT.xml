@@ -898,6 +898,7 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="msoEventResultsOnly">O torneio de %s da Mind Sports Olympiad é disputado presencialmente; os resultados são publicados na base de resultados do MSO.</string>
   <string name="msoWorldChampionshipResultsOnly">O Campeonato do Mundo de %s da Mind Sports Olympiad é disputado presencialmente; os resultados são publicados na base de resultados do MSO.</string>
   <string name="msoGrandPrixOnline">Grand Prix online da MSO:</string>
+  <string name="msoAllTournaments">Todos os torneios online da MSO</string>
   <string name="aboutMso">Sobre a Mind Sports Olympiad</string>
   <string name="allAboutX">Tudo sobre %s no PlayStrategy</string>
   <string name="variantEditorDescription">Monte qualquer posição de %1$s num editor de tabuleiro online gratuito, depois analise-a ou jogue-a. Jogue %2$s online de graça no PlayStrategy.</string>

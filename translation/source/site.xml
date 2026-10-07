@@ -452,6 +452,7 @@
   <string name="msoEventResultsOnly">The Mind Sports Olympiad %s tournament is played in person; its results are published on the MSO results database.</string>
   <string name="msoWorldChampionshipResultsOnly">The Mind Sports Olympiad %s World Championship is played in person; its results are published on the MSO results database.</string>
   <string name="msoGrandPrixOnline">Online MSO Grand Prix:</string>
+  <string name="msoAllTournaments">All MSO online tournaments</string>
   <string name="aboutMso">About the Mind Sports Olympiad</string>
   <string name="msoGrandPrix">MSO Grand Prix</string>
   <string name="msoGrandPrixEvent">%s at the MSO Grand Prix</string>

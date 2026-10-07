@@ -572,6 +572,24 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .cursor[Tournament]()
       .list(max)
 
+  // every finished edition of those series, whatever the game, latest first
+  def finishedOfTeam(
+      teamId: TeamID,
+      freqs: List[Schedule.Freq],
+      anyCreatorFreqs: List[Schedule.Freq],
+      max: Int = 1000
+  ): Fu[List[Tournament]] =
+    coll
+      .find(
+        finishedSelect ++ $or(
+          $doc("schedule.freq".$in(freqs.map(_.name))) ++ $or($doc("createdBy" -> teamId), forTeamSelect(teamId)),
+          $doc("schedule.freq".$in(anyCreatorFreqs.map(_.name)))
+        )
+      )
+      .sort($sort.desc("startsAt"))
+      .cursor[Tournament]()
+      .list(max)
+
   def nextByTrophy(trophy: String): Fu[Option[Tournament]] =
     coll
       .find($doc("trophy1st" -> trophy, "winner".$exists(false)))

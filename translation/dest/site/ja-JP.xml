@@ -844,6 +844,7 @@
   <string name="msoEventResultsOnly">Mind Sports Olympiadの%sトーナメントは現地で開催され、結果はMSO結果データベースで公開されています。</string>
   <string name="msoWorldChampionshipResultsOnly">Mind Sports Olympiadの%s世界選手権は現地で開催され、結果はMSO結果データベースで公開されています。</string>
   <string name="msoGrandPrixOnline">オンラインMSOグランプリ：</string>
+  <string name="msoAllTournaments">MSOのオンライントーナメント一覧</string>
   <string name="aboutMso">Mind Sports Olympiadについて</string>
   <string name="allAboutX">PlayStrategyの%sのすべて</string>
   <string name="variantEditorDescription">無料のオンライン盤面エディタで%1$sの局面を自由に作成し、分析したり対局したりできます。PlayStrategyで%2$sを無料でオンラインプレイ。</string>

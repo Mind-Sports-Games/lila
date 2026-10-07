@@ -284,6 +284,8 @@ GET   /tournament/team-battle/edit/:id        controllers.Tournament.teamBattleE
 POST  /tournament/team-battle/edit/:id        controllers.Tournament.teamBattleUpdate(id: String)
 GET   /tournament/calendar                    controllers.Tournament.calendar
 GET   /tournament/history                     controllers.Tournament.history(freq: String = "introductory", page: Int ?= 1)
+GET   /tournament/history/mso-grand-prix      controllers.Tournament.msoHistory
+POST  /tournament/history/mso-grand-prix/refresh controllers.Tournament.msoHistoryRefresh
 GET   /tournament/history/:freq               controllers.Tournament.history(freq: String, page: Int ?= 1)
 GET   /tournament/history/:freq/group/:group  controllers.Tournament.historyGroup(freq: String, group: String, page: Int ?= 1)
 GET   /tournament/history/:freq/:variant      controllers.Tournament.historyVariant(freq: String, variant: String, page: Int ?= 1)

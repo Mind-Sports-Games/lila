@@ -904,6 +904,20 @@ final class SwissApi(
       .cursor[Swiss]()
       .list(max)
 
+  // the same, whatever the game
+  def finishedNamedAll(teamId: TeamID, namePattern: String, max: Int = 1000): Fu[List[Swiss]] =
+    colls.swiss
+      .find(
+        $doc(
+          "teamId"     -> teamId,
+          "finishedAt" -> $doc("$exists" -> true),
+          "name"       -> $doc("$regex" -> namePattern, "$options" -> "i")
+        )
+      )
+      .sort($sort.desc("startsAt"))
+      .cursor[Swiss]()
+      .list(max)
+
   def byTeamCursor(teamId: TeamID) =
     colls.swiss
       .find($doc("teamId" -> teamId))

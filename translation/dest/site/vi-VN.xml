@@ -827,6 +827,7 @@
   <string name="msoEventResultsOnly">Giải %s của Mind Sports Olympiad được tổ chức trực tiếp; kết quả được đăng trên cơ sở dữ liệu kết quả của MSO.</string>
   <string name="msoWorldChampionshipResultsOnly">Giải vô địch thế giới %s của Mind Sports Olympiad được tổ chức trực tiếp; kết quả được đăng trên cơ sở dữ liệu kết quả của MSO.</string>
   <string name="msoGrandPrixOnline">MSO Grand Prix trực tuyến:</string>
+  <string name="msoAllTournaments">Tất cả giải đấu trực tuyến của MSO</string>
   <string name="aboutMso">Về Mind Sports Olympiad</string>
   <string name="allAboutX">Tất cả về %s trên PlayStrategy</string>
   <string name="variantEditorDescription">Dựng bất kỳ thế cờ %1$s nào trên trình chỉnh sửa bàn cờ trực tuyến miễn phí, rồi phân tích hoặc chơi tiếp. Chơi %2$s trực tuyến miễn phí trên PlayStrategy.</string>

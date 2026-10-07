@@ -971,6 +971,7 @@
   <string name="msoEventResultsOnly">Турнир Mind Sports Olympiad по %s проходит очно; его результаты опубликованы в базе результатов MSO.</string>
   <string name="msoWorldChampionshipResultsOnly">Чемпионат мира Mind Sports Olympiad по %s проходит очно; его результаты опубликованы в базе результатов MSO.</string>
   <string name="msoGrandPrixOnline">Онлайн Гран-при MSO:</string>
+  <string name="msoAllTournaments">Все онлайн-турниры MSO</string>
   <string name="aboutMso">О Mind Sports Olympiad</string>
   <string name="allAboutX">Всё о %s на PlayStrategy</string>
   <string name="variantEditorDescription">Расставьте любую позицию %1$s в бесплатном онлайн-редакторе доски, затем проанализируйте её или сыграйте. Играйте в %2$s онлайн бесплатно на PlayStrategy.</string>

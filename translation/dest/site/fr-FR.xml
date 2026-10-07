@@ -911,6 +911,7 @@
   <string name="msoEventResultsOnly">Le tournoi de %s de la Mind Sports Olympiad se joue sur place ; ses résultats sont publiés dans la base de résultats du MSO.</string>
   <string name="msoWorldChampionshipResultsOnly">Le championnat du monde de %s de la Mind Sports Olympiad se joue sur place ; ses résultats sont publiés dans la base de résultats du MSO.</string>
   <string name="msoGrandPrixOnline">Grand Prix MSO en ligne :</string>
+  <string name="msoAllTournaments">Tous les tournois en ligne du MSO</string>
   <string name="aboutMso">À propos de la Mind Sports Olympiad</string>
   <string name="gameLibrary">Ludothèque</string>
 </resources>

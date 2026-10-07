@@ -179,6 +179,7 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
             routes.Tournament.home.url,
             routes.Tournament.shields.url,
             routes.Page.lonePage("mind-sports-olympiad").url,
+            routes.Tournament.msoHistory.url,
             routes.Swiss.home.url,
             // not /training: it renders the most-played variant's trainer, which is listed below
             routes.Study.allDefault().url,

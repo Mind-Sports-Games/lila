@@ -842,6 +842,7 @@
   <string name="msoEventResultsOnly">Mind Sports Olympiad 的%s比赛在线下举行，成绩发布在 MSO 成绩数据库中。</string>
   <string name="msoWorldChampionshipResultsOnly">Mind Sports Olympiad 的%s世界锦标赛在线下举行，成绩发布在 MSO 成绩数据库中。</string>
   <string name="msoGrandPrixOnline">MSO 在线大奖赛：</string>
+  <string name="msoAllTournaments">MSO 全部在线赛事</string>
   <string name="aboutMso">关于 Mind Sports Olympiad</string>
   <string name="allAboutX">PlayStrategy上关于%s的一切</string>
   <string name="variantEditorDescription">在免费的在线棋盘编辑器中摆出任意%1$s局面，然后分析或对弈。在 PlayStrategy 免费在线玩%2$s。</string>

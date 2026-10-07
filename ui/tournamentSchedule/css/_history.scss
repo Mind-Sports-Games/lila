@@ -12,3 +12,10 @@
 .arena-history__intro {
   margin: 0 var(--box-padding) 1em;
 }
+
+// the button that rebuilds the MSO list sits at the right, where the eye ends the introduction
+.mso-history__refresh {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 1em;
+}

@@ -287,7 +287,11 @@ object show {
               .map(e => a(href := e.url)(e.name): Frag)
               .reduce[Frag]((a, b) => frag(a, " · ", b))
         ),
-        p(a(href := routes.Page.lonePage("mind-sports-olympiad"))(trans.aboutMso()))
+        p(
+          a(href := routes.Page.lonePage("mind-sports-olympiad"))(trans.aboutMso()),
+          " · ",
+          a(href := routes.Tournament.msoHistory)(trans.msoAllTournaments())
+        )
       )
     }
 
