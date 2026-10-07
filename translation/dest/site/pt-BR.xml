@@ -901,6 +901,9 @@
   <string name="msoGrandPrixOnline">Grand Prix online da MSO:</string>
   <string name="msoAllTournaments">Todos os torneios online da MSO</string>
   <string name="aboutMso">Sobre a Mind Sports Olympiad</string>
+  <string name="variantOf">%1$s é uma variante de %2$s.</string>
+  <string name="boardEditorTitle">Editor de tabuleiro de xadrez — monte qualquer posição, variantes de xadrez e xadrez fantasia</string>
+  <string name="boardEditorDescription">Editor de tabuleiro online gratuito para xadrez, variantes de xadrez e outros 40 jogos: monte qualquer posição à mão ou a partir de um FEN, depois analise, jogue contra o computador ou compartilhe.</string>
   <string name="allAboutX">Tudo sobre %s no PlayStrategy</string>
   <string name="variantEditorDescription">Monte qualquer posição de %1$s em um editor de tabuleiro online gratuito, depois analise ou jogue. Jogue %2$s online de graça no PlayStrategy.</string>
   <string name="variantStudies">Estudos de %s</string>
@@ -908,4 +911,13 @@
   <string name="variantPuzzles">Problemas de %s</string>
   <string name="libraryTitle">Jogos de tabuleiro para jogar online grátis — a biblioteca do PlayStrategy</string>
   <string name="libraryDescription">Todos os jogos do PlayStrategy: xadrez e suas variantes, damas, go, gamão, Othello, shogi, xiangqi, mancala, Abalone, Lines of Action e mais — com regras, tutoriais, torneios e estatísticas.</string>
+  <string name="msoWorldChampionship">Campeonato Mundial de %s</string>
+  <string name="msoWorldChampionshipVenue">O Campeonato Mundial de %s da Mind Sports Olympiad é disputado presencialmente; suas partidas são publicadas no PlayStrategy, que também recebe o Grand Prix MSO online.</string>
+  <string name="msoEvent">%s na Mind Sports Olympiad</string>
+  <string name="msoEventVenue">O torneio de %s da Mind Sports Olympiad é disputado presencialmente; suas partidas são publicadas no PlayStrategy, que também recebe o Grand Prix MSO online.</string>
+  <string name="msoResultsAndMedallists">Resultados e medalhistas</string>
+  <string name="msoEventGames">Partidas do torneio</string>
+  <string name="msoGrandPrix">Grand Prix MSO</string>
+  <string name="msoGrandPrixEvent">%s no Grande Prêmio MSO</string>
+  <string name="msoGrandPrixVenue">O Grande Prêmio online da Mind Sports Olympiad é jogado no PlayStrategy, e %s é um dos seus jogos.</string>
 </resources>

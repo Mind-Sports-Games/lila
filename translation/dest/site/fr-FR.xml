@@ -908,10 +908,22 @@
   <string name="variantPuzzles">Problèmes de %s</string>
   <string name="libraryTitle">Jeux de société à jouer en ligne gratuitement — la ludothèque PlayStrategy</string>
   <string name="libraryDescription">Tous les jeux de PlayStrategy : les échecs et leurs variantes, les dames, le go, le backgammon, Othello, le shogi, le xiangqi, le mancala, Abalone, Lines of Action et plus — avec règles, tutoriels, tournois et statistiques.</string>
+  <string name="msoWorldChampionship">Championnat du monde de %s</string>
+  <string name="msoWorldChampionshipVenue">Le championnat du monde de %s des Mind Sports Olympiad se joue en présentiel ; ses parties sont publiées sur PlayStrategy, qui accueille aussi le Grand Prix MSO en ligne.</string>
+  <string name="msoEvent">%s aux Mind Sports Olympiad</string>
+  <string name="msoEventVenue">Le tournoi de %s des Mind Sports Olympiad se joue en présentiel ; ses parties sont publiées sur PlayStrategy, qui accueille aussi le Grand Prix MSO en ligne.</string>
+  <string name="msoResultsAndMedallists">Résultats et médaillés</string>
+  <string name="msoEventGames">Parties du tournoi</string>
   <string name="msoEventResultsOnly">Le tournoi de %s de la Mind Sports Olympiad se joue sur place ; ses résultats sont publiés dans la base de résultats du MSO.</string>
   <string name="msoWorldChampionshipResultsOnly">Le championnat du monde de %s de la Mind Sports Olympiad se joue sur place ; ses résultats sont publiés dans la base de résultats du MSO.</string>
   <string name="msoGrandPrixOnline">Grand Prix MSO en ligne :</string>
   <string name="msoAllTournaments">Tous les tournois en ligne du MSO</string>
   <string name="aboutMso">À propos de la Mind Sports Olympiad</string>
+  <string name="variantOf">%1$s est une variante de %2$s.</string>
+  <string name="boardEditorTitle">Éditeur de position d’échecs — composez n’importe quelle position, variantes d’échecs et échecs féeriques</string>
+  <string name="boardEditorDescription">Éditeur de position en ligne gratuit pour les échecs, leurs variantes et 40 autres jeux : composez n’importe quelle position à la main ou depuis un FEN, puis analysez-la, jouez-la contre l’ordinateur ou partagez-la.</string>
+  <string name="msoGrandPrix">Grand Prix MSO</string>
+  <string name="msoGrandPrixEvent">%s au Grand Prix MSO</string>
+  <string name="msoGrandPrixVenue">Le Grand Prix en ligne de la Mind Sports Olympiad se joue sur PlayStrategy, et %s en fait partie.</string>
   <string name="gameLibrary">Ludothèque</string>
 </resources>

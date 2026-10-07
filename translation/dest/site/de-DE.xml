@@ -902,9 +902,21 @@
   <string name="variantPuzzles">%s-Aufgaben</string>
   <string name="libraryTitle">Brettspiele, die du kostenlos online spielen kannst — die PlayStrategy-Bibliothek</string>
   <string name="libraryDescription">Jedes Spiel auf PlayStrategy: Schach und seine Varianten, Dame, Go, Backgammon, Othello, Shogi, Xiangqi, Mancala, Abalone, Lines of Action und mehr — mit Regeln, Tutorials, Turnieren und Statistiken.</string>
+  <string name="msoWorldChampionship">%s-Weltmeisterschaft</string>
+  <string name="msoWorldChampionshipVenue">Die %s-Weltmeisterschaft der Mind Sports Olympiad wird vor Ort gespielt; ihre Partien werden auf PlayStrategy veröffentlicht, wo auch der Online-Grand-Prix der MSO ausgetragen wird.</string>
+  <string name="msoEvent">%s bei der Mind Sports Olympiad</string>
+  <string name="msoEventVenue">Das %s-Turnier der Mind Sports Olympiad wird vor Ort gespielt; seine Partien werden auf PlayStrategy veröffentlicht, wo auch der Online-Grand-Prix der MSO ausgetragen wird.</string>
+  <string name="msoResultsAndMedallists">Ergebnisse und Medaillengewinner</string>
+  <string name="msoEventGames">Turnierpartien</string>
   <string name="msoEventResultsOnly">Das %s-Turnier der Mind Sports Olympiad wird vor Ort gespielt; die Ergebnisse stehen in der MSO-Ergebnisdatenbank.</string>
   <string name="msoWorldChampionshipResultsOnly">Die %s-Weltmeisterschaft der Mind Sports Olympiad wird vor Ort gespielt; die Ergebnisse stehen in der MSO-Ergebnisdatenbank.</string>
   <string name="msoGrandPrixOnline">Online-Grand-Prix der MSO:</string>
   <string name="msoAllTournaments">Alle Online-Turniere der MSO</string>
   <string name="aboutMso">Über die Mind Sports Olympiad</string>
+  <string name="variantOf">%1$s ist eine Variante von %2$s.</string>
+  <string name="boardEditorTitle">Schachbrett-Editor — jede Stellung aufbauen, Schachvarianten und Märchenschach</string>
+  <string name="boardEditorDescription">Kostenloser Online-Brett-Editor für Schach, Schachvarianten und 40 weitere Spiele: Stelle jede beliebige Stellung von Hand oder aus einer FEN auf, analysiere sie, spiele sie gegen den Computer oder teile sie.</string>
+  <string name="msoGrandPrix">MSO Grand Prix</string>
+  <string name="msoGrandPrixEvent">%s beim MSO Grand Prix</string>
+  <string name="msoGrandPrixVenue">Der Online-Grand-Prix der Mind Sports Olympiad wird auf PlayStrategy gespielt, und %s ist eines seiner Spiele.</string>
 </resources>
