@@ -13,11 +13,13 @@ export const patch = init([classModule, attributesModule]);
 export function PlayStrategyAnalyse(opts: AnalyseOpts): AnalyseApi {
   opts.element = document.querySelector('main.analyse') as HTMLElement;
   opts.trans = playstrategy.trans(opts.i18n);
+  const aboutHtml = opts.element.querySelector('.analyse__about')?.innerHTML;
   registerPieceSets(opts.data.pref.pieceSet);
 
   let vnode: VNode | undefined;
 
   const ctrl = (playstrategy.analysis = new makeCtrl(opts, redraw));
+  ctrl.aboutHtml = aboutHtml;
 
   const blueprint = view(ctrl);
   opts.element.innerHTML = '';

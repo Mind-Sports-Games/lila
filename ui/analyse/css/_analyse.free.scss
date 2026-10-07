@@ -74,19 +74,19 @@ div.analyse .analyse__side {
   }
 }
 
-/* Body copy under the board. A sibling of main.analyse, because the analyse app empties main on
-   mount, so it claims the main column of the #main-wrap grid itself and tucks into the free space
-   on the right, under the tools panel, the way the lobby footer does. */
+/* Body copy under the board. It starts in main.analyse, which the analyse app empties on mount, so
+   the app lifts it into its grid. The per-variant layouts each restate grid-template-areas, so no
+   area name is shared by all of them: from two columns up the block asks for the last column and
+   lets the grid put it on the first free row, which is under the tools panel (and under the
+   advice list of a game that has one). On one column it simply comes last. */
 .analyse__about {
-  grid-column: main;
   margin: $block-gap 1em;
   font-size: 0.85em;
   color: $c-font-dim;
 
-  /* only from 3 columns up is the column under the tools panel free to tuck into */
-  @include breakpoint($mq-col3) {
-    margin-left: auto;
-    max-width: 46ch;
+  @include breakpoint($mq-col2) {
+    grid-column: -2 / -1;
+    margin: $block-gap 0 0;
   }
 
   h2 {
@@ -102,16 +102,18 @@ div.analyse .analyse__side {
 
   &__links {
     display: flex;
-    flex-flow: column;
-    gap: 0.2em;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 0.5em 1em;
+  }
+
+  &__rules {
     font-weight: bold;
 
-    a {
-      @include transition(color);
+    @include transition(color);
 
-      &:hover {
-        color: $c-link;
-      }
+    &:hover {
+      color: $c-link;
     }
   }
 }

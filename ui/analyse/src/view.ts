@@ -822,6 +822,9 @@ export default function (ctrl: AnalyseCtrl): VNode {
           : h('div.chat__members.none', {
               hook: onInsert(playstrategy.watchers),
             }),
+        ctrl.aboutHtml
+          ? h('section.analyse__about', { hook: onInsert(elm => (elm.innerHTML = ctrl.aboutHtml!)) })
+          : null,
       ],
     ),
   ]);

@@ -105,21 +105,18 @@ object userAnalysis {
         ),
           div(cls := "analyse__board main-board")(chessgroundBoard),
           div(cls := "analyse__tools"),
-          div(cls := "analyse__controls")
-        ),
-        // the 400-odd analysis pages are otherwise a bare board, near identical to one another.
-        // Sibling of main for the same reason as the h1 above.
-        st.section(cls := "analyse__about")(
-          h2(trans.aboutX(views.html.library.bits.searchName(variant))),
-          p(views.html.library.bits.objectiveSentence(variant)),
-          p(views.html.library.bits.analysisDescription(variant)),
-          views.html.library.bits.hasLibraryPages(variant).option(
-            p(cls := "analyse__about__links")(
-              a(href := routes.Library.variant(variant.key))(
-                trans.playVariantOnlineFreeTitle(views.html.library.bits.searchName(variant))
-              ),
-              a(href := routes.Page.variant(variant.key))(
-                views.html.library.bits.rulesTitle(variant)
+          div(cls := "analyse__controls"),
+          // the 400-odd analysis pages are otherwise a bare board, near identical to one another.
+          // The analyse app empties this element on mount: it lifts the section into its grid first.
+          st.section(cls := "analyse__about")(
+            h2(trans.aboutX(views.html.library.bits.searchName(variant))),
+            p(views.html.library.bits.objectiveSentence(variant)),
+            p(views.html.library.bits.analysisDescription(variant)),
+            views.html.library.bits.hasLibraryPages(variant).option(
+              p(cls := "analyse__about__links")(
+                // the same link as the library's and the rules page's button: the lobby's game form
+                a(cls := "button", href := s"/?variant=${variant.key}#game")(trans.createAGame()),
+                a(cls := "analyse__about__rules", href := routes.Page.variant(variant.key))("Rules")
               )
             )
           )
