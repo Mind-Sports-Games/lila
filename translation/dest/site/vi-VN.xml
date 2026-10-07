@@ -837,6 +837,7 @@
   <string name="msoEvent">%s tại Mind Sports Olympiad</string>
   <string name="msoEventVenue">Giải %s của Mind Sports Olympiad được tổ chức trực tiếp; các ván đấu được đăng trên PlayStrategy, nơi cũng tổ chức MSO Grand Prix trực tuyến.</string>
   <string name="msoResultsAndMedallists">Kết quả và huy chương</string>
+  <string name="msoAllEditions">Tất cả các kỳ</string>
   <string name="msoEventGames">Các ván đấu của giải</string>
   <string name="msoGrandPrix">MSO Grand Prix</string>
   <string name="msoGrandPrixEvent">%s tại MSO Grand Prix</string>

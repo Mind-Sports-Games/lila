@@ -854,6 +854,7 @@
   <string name="msoEvent">Mind Sports Olympiadの%s</string>
   <string name="msoEventVenue">Mind Sports Olympiadの%sトーナメントは現地で開催され、その対局はPlayStrategyで公開されています。PlayStrategyはオンラインのMSOグランプリも開催しています。</string>
   <string name="msoResultsAndMedallists">結果とメダリスト</string>
+  <string name="msoAllEditions">全大会の記録</string>
   <string name="msoEventGames">トーナメントの対局</string>
   <string name="msoGrandPrix">MSOグランプリ</string>
   <string name="msoGrandPrixEvent">MSOグランプリの%s</string>

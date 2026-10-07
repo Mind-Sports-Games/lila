@@ -344,6 +344,7 @@ val `msoWorldChampionshipVenue` = new I18nKey("msoWorldChampionshipVenue")
 val `msoEvent` = new I18nKey("msoEvent")
 val `msoEventVenue` = new I18nKey("msoEventVenue")
 val `msoResultsAndMedallists` = new I18nKey("msoResultsAndMedallists")
+val `msoAllEditions` = new I18nKey("msoAllEditions")
 val `msoEventGames` = new I18nKey("msoEventGames")
 val `msoEventResultsOnly` = new I18nKey("msoEventResultsOnly")
 val `msoWorldChampionshipResultsOnly` = new I18nKey("msoWorldChampionshipResultsOnly")
@@ -2587,6 +2588,7 @@ val `hyper` = new I18nKey("variantAlias:hyper")
 val `nackgammon` = new I18nKey("variantAlias:nackgammon")
 val `abalone` = new I18nKey("variantAlias:abalone")
 val `grandabalone` = new I18nKey("variantAlias:grandabalone")
+val `entropy` = new I18nKey("variantAlias:entropy")
 }
 
 object onboarding {

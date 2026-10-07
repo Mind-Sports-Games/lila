@@ -49,4 +49,5 @@
   <string name="nackgammon">backgammon variant</string>
   <string name="abalone">board game</string>
   <string name="grandabalone">Abalone on a larger board</string>
+  <string name="entropy"></string>
 </resources>

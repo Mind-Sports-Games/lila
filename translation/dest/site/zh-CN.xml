@@ -852,6 +852,7 @@
   <string name="msoEvent">Mind Sports Olympiad 的%s</string>
   <string name="msoEventVenue">Mind Sports Olympiad 的%s比赛在线下举行，对局会发布在 PlayStrategy 上，PlayStrategy 同时也承办在线的 MSO 大奖赛。</string>
   <string name="msoResultsAndMedallists">成绩与奖牌得主</string>
+  <string name="msoAllEditions">历届赛事</string>
   <string name="msoEventGames">比赛对局</string>
   <string name="msoGrandPrix">MSO 大奖赛</string>
   <string name="msoGrandPrixEvent">MSO 大奖赛的%s</string>

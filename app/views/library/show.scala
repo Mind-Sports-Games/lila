@@ -265,7 +265,9 @@ object show {
               m.resultsUrl.map(url => a(href := url)(trans.msoResultsAndMedallists())),
               m.studyId.map { id =>
                 frag(" · ", a(href := routes.Study.show(id))(trans.msoEventGames()))
-              }
+              },
+              " · ",
+              a(href := m.allEditionsUrl)(trans.msoAllEditions())
             ),
             m.others.nonEmpty.option(
               p(
@@ -276,21 +278,24 @@ object show {
             )
           )
         },
-        p(
-          // the game's own editions, latest first; the MSO team's tournaments only when it has none.
-          // After a sentence about the in-person event they are labelled as the online ones.
-          (mso.isDefined && grandPrix.nonEmpty).option(frag(strong(trans.msoGrandPrixOnline()), " ")),
-          if (grandPrix.isEmpty) a(href := routes.Team.tournaments(bits.msoTeamId))(trans.msoGrandPrix())
-          else
-            grandPrix
-              .take(5)
-              .map(e => a(href := e.url)(e.name): Frag)
-              .reduce[Frag]((a, b) => frag(a, " · ", b))
+        bits.hasMsoOnline(variant).option(
+          p(
+            // the game's own editions, latest first; the MSO team's tournaments only when it has none.
+            // After a sentence about the in-person event they are labelled as the online ones.
+            (mso.isDefined && grandPrix.nonEmpty).option(frag(strong(trans.msoGrandPrixOnline()), " ")),
+            if (grandPrix.isEmpty) a(href := routes.Team.tournaments(bits.msoTeamId))(trans.msoGrandPrix())
+            else
+              grandPrix
+                .take(5)
+                .map(e => a(href := e.url)(e.name): Frag)
+                .reduce[Frag]((a, b) => frag(a, " · ", b))
+          )
         ),
         p(
           a(href := routes.Page.lonePage("mind-sports-olympiad"))(trans.aboutMso()),
-          " · ",
-          a(href := routes.Tournament.msoHistory)(trans.msoAllTournaments())
+          bits.hasMsoOnline(variant).option(
+            frag(" · ", a(href := routes.Tournament.msoHistory)(trans.msoAllTournaments()))
+          )
         )
       )
     }

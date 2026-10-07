@@ -84,6 +84,8 @@ object bits {
 
   val msoGrandPrixName = "MSO (GP|Grand Prix|2021)"
   case class MsoEvent(
+      // the game's page in the results database, which lists every edition
+      gameCode: String,
       eventCode: Option[String],
       worldChampionship: Boolean,
       studyId: Option[String],
@@ -91,32 +93,46 @@ object bits {
       others: List[(String, String)] = Nil
   ) {
     def resultsUrl = eventCode.map(resultsUrlOf)
+    def allEditionsUrl = s"https://msodb.playstrategy.org/Report/GameMedals?gameCode=$gameCode"
   }
 
-  def resultsUrlOf(code: String) = s"https://msodb.playstrategy.org/Report/EventResults?eventCode=$code"
+  // the edition the results links point at: msodb is only advisory while an MSO is running, and a link
+  // with its year is stable once that MSO is over. Bump it when the next MSO has finished.
+  val msoResultsYear = 2026
+
+  def resultsUrlOf(code: String) =
+    s"https://msodb.playstrategy.org/Report/EventResults?year=$msoResultsYear&eventCode=$code"
 
   private def mso(
+      gameCode: String,
       code: String,
       worldChampionship: Boolean = false,
       study: Option[String] = None,
       others: List[(String, String)] = Nil
-  ) = Some(MsoEvent(Some(code), worldChampionship, study, others))
+  ) = Some(MsoEvent(gameCode, Some(code), worldChampionship, study, others))
+
+  // games the MSO has not run an online tournament for yet: their page links no online tournaments
+  private val noMsoOnline = Set("entropy")
+
+  def hasMsoOnline(variant: Variant): Boolean = !noMsoOnline(variant.key)
 
   def msoEvent(variant: Variant): Option[MsoEvent] =
     variant.key match {
-      case "abalone"            => mso("ABOC", worldChampionship = true, Some("JG7Zf7mE"))
-      case "linesOfAction"      => mso("LOWC", worldChampionship = true, Some("IyudHHhm"))
-      case "amazons"            => mso("AMZOC", study = Some("m8N1ERm6"))
-      case "breakthroughtroyka" => mso("BTOC", study = Some("EkVLAnIi"))
-      case "international"      => mso("DRDA", study = Some("CTu6f0Mp"))
-      case "oware"              => mso("OWOC", study = Some("C7hHSwaw"))
-      case "flipello"           => mso("OTOC", study = Some("PuMKTeH2"))
+      case "abalone"            => mso("AB", "ABOC", worldChampionship = true, Some("JG7Zf7mE"))
+      case "linesOfAction"      => mso("LO", "LOWC", worldChampionship = true, Some("IyudHHhm"))
+      case "amazons"            => mso("AMZ", "AMZOC", study = Some("m8N1ERm6"))
+      case "entropy"            => mso("EN", "ENWC", worldChampionship = true)
+      case "breakthroughtroyka" => mso("BT", "BTOC", study = Some("EkVLAnIi"))
+      case "international"      => mso("DR", "DRDA", study = Some("CTu6f0Mp"))
+      case "oware"              => mso("OW", "OWOC", study = Some("C7hHSwaw"))
+      case "flipello"           => mso("OT", "OTOC", study = Some("PuMKTeH2"))
       // played at the MSO but not recorded yet; their games are not in a study yet
-      case "togyzkumalak" => mso("TOOC")
-      case "shogi"        => mso("SHOC")
-      case "xiangqi"      => mso("CCOC")
+      case "togyzkumalak" => mso("TO", "TOOC")
+      case "shogi"        => mso("SH", "SHOC")
+      case "xiangqi"      => mso("CC", "CCOC")
       case "backgammon"   =>
         mso(
+          "BA",
           "BAWIC",
           worldChampionship = true,
           others = List(
@@ -126,8 +142,8 @@ object bits {
             "BAWO"  -> "7x1pt"
           )
         )
-      case "hyper"      => mso("BAHY")
-      case "nackgammon" => mso("BANG")
+      case "hyper"      => mso("BA", "BAHY")
+      case "nackgammon" => mso("BA", "BANG")
       case _            => None
     }
 
@@ -309,7 +325,7 @@ object bits {
   private val noBrowserEngine = Set(
     "monster", "linesOfAction", "scrambledEggs", "dameo", "amazons", "minibreakthroughtroyka",
     "antiflipello", "octagonflipello", "oware", "togyzkumalak", "bestemshe", "go9x9", "go13x13", "go19x19",
-    "backgammon", "hyper", "nackgammon", "abalone", "grandabalone"
+    "backgammon", "hyper", "nackgammon", "abalone", "grandabalone", "entropy"
   )
 
   def editorDescription(variant: Variant)(implicit lang: Lang) =
