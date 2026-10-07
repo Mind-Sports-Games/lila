@@ -348,6 +348,39 @@ object GameDiff {
           (o: Score) => o.nonEmpty so { BSONHandlers.scoreWriter writeOpt o }
         )
       }
+      case GameLogic.Entropy() => {
+        dTry(oldPgn, _.actionStrs, writeBytes compose newLibStorageWriter)
+        dTry(
+          binaryPieces,
+          _.board match {
+            case Board.Entropy(b) => b.pieces
+            case _                => sys.error("Wrong board type")
+          },
+          writeBytes compose BinaryFormat.piece.writeEntropy
+        )
+        dOpt(halfMoveClock, _.history.halfMoveClock, w.intO)
+        d(positionHashes, _.history.positionHashes, w.bytes)
+        d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
+        d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
+        dOpt(
+          pocketData,
+          _.board.pocketData,
+          (o: Option[PocketData]) => o map BSONHandlers.pocketDataBSONHandler.write
+        )
+        dOpt(
+          score,
+          _.history.score,
+          (o: Score) => o.nonEmpty so { BSONHandlers.scoreWriter writeOpt o }
+        )
+        dOpt(
+          round,
+          _.board match {
+            case Board.Entropy(b) => b.round
+            case _                => 1
+          },
+          (r: Int) => (r != 1).option(BSONInteger(r))
+        )
+      }
       case GameLogic.Dameo() => {
         dTry(oldPgn, _.actionStrs, writeBytes compose newLibStorageWriter)
         dTry(

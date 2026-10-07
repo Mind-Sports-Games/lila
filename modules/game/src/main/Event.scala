@@ -10,6 +10,7 @@ import strategygames.{
   CubeAction as StratCubeAction,
   CubeInteraction,
   DiceRoll as StratDiceRoll,
+  DrawCounter as StratDrawCounter,
   Drop as StratDrop,
   EndTurn as StratEndTurn,
   GameFamily,
@@ -348,6 +349,7 @@ object Event {
           case StratDrop.FairySF(drop)    => strategygames.fairysf.format.pgn.Dumper(drop)
           case StratDrop.Go(drop)         => strategygames.go.format.pgn.Dumper(drop)
           case StratDrop.Backgammon(drop) => strategygames.backgammon.format.pgn.Dumper(drop)
+          case StratDrop.Entropy(drop)    => strategygames.entropy.format.pgn.Dumper(drop)
         },
         fen = Forsyth.>>(situation.board.variant.gameLogic, situation).value,
         check = situation.check,
@@ -468,6 +470,8 @@ object Event {
             situation.dropsByRole
           case (Situation.Backgammon(_)) =>
             situation.dropsByRole
+          case (Situation.Entropy(_)) =>
+            situation.dropsByRole
           case _ => None
         },
         possibleLifts = situation match {
@@ -572,6 +576,8 @@ object Event {
           case (Situation.Go(_)) =>
             situation.dropsByRole
           case (Situation.Backgammon(_)) =>
+            situation.dropsByRole
+          case (Situation.Entropy(_)) =>
             situation.dropsByRole
           case _ => None
         },
@@ -888,6 +894,8 @@ object Event {
             situation.dropsByRole
           case (Situation.Backgammon(_)) =>
             situation.dropsByRole
+          case (Situation.Entropy(_)) =>
+            situation.dropsByRole
           case _ => None
         },
         possibleLifts = situation match {
@@ -898,6 +906,92 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.cubeActions.map(_.interaction))
           case _                         => None
         },
+        forcedAction = situation.forcedAction.map(_.toUci.uci),
+        forcedTurnAction = situation.forcedTurnAction.map(_.toUci.uci),
+        pocketData = pocketData
+      )
+  }
+
+  case class DrawCounter(
+      gf: GameFamily,
+      role: Role,
+      fen: String,
+      check: Boolean,
+      currentPointValueP1: Option[Int],
+      currentPointValueP2: Option[Int],
+      threefold: Boolean,
+      gameMessage: Option[GameMessage],
+      takebackable: Boolean,
+      canOnlyRollDice: Boolean,
+      canEndTurn: Boolean,
+      canUndo: Boolean,
+      state: State,
+      clock: Option[ClockEvent],
+      possibleMoves: Map[Pos, List[Pos]],
+      pocketData: Option[PocketData],
+      possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]],
+      forcedAction: Option[String],
+      forcedTurnAction: Option[String]
+  ) extends Event {
+    def typ  = "drawcounter"
+    def data =
+      Action.data(
+        gf,
+        fen,
+        check,
+        currentPointValueP1,
+        currentPointValueP2,
+        threefold,
+        gameMessage,
+        takebackable,
+        canOnlyRollDice,
+        canEndTurn,
+        canUndo,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        possibleDropsByRole,
+        None,
+        None,
+        forcedAction,
+        forcedTurnAction,
+        pocketData
+      ) {
+        Json.obj(
+          "uci" -> s"draw-${role.forsyth}",
+          "san" -> ""
+        )
+      }
+    override def moveBy = Some(!state.playerIndex)
+  }
+  object DrawCounter {
+    def apply(
+        dc: StratDrawCounter,
+        situation: Situation,
+        state: State,
+        clock: Option[ClockEvent],
+        pocketData: Option[PocketData]
+    ): DrawCounter =
+      DrawCounter(
+        gf = situation.board.variant.gameFamily,
+        role = dc.role,
+        fen = Forsyth.>>(situation.board.variant.gameLogic, situation).value,
+        check = situation.check,
+        currentPointValueP1 = situation.pointValue(Some(P1)),
+        currentPointValueP2 = situation.pointValue(Some(P2)),
+        threefold = situation.threefoldRepetition,
+        gameMessage = situation.gameMessage,
+        takebackable = situation.takebackable,
+        canOnlyRollDice = situation.canOnlyRollDice,
+        canEndTurn = situation.canEndTurn,
+        canUndo = situation.canUndo,
+        state = state,
+        clock = clock,
+        possibleMoves = situation.destinations,
+        possibleDrops = situation.drops,
+        possibleDropsByRole = situation.dropsByRole,
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         forcedTurnAction = situation.forcedTurnAction.map(_.toUci.uci),
         pocketData = pocketData
@@ -993,6 +1087,8 @@ object Event {
           case (Situation.Go(_)) =>
             situation.dropsByRole
           case (Situation.Backgammon(_)) =>
+            situation.dropsByRole
+          case (Situation.Entropy(_)) =>
             situation.dropsByRole
           case _ => None
         },
@@ -1098,6 +1194,8 @@ object Event {
           case (Situation.Go(_)) =>
             situation.dropsByRole
           case (Situation.Backgammon(_)) =>
+            situation.dropsByRole
+          case (Situation.Entropy(_)) =>
             situation.dropsByRole
           case _ => None
         },
@@ -1232,8 +1330,8 @@ object Event {
       Json
         .obj(
           "winner"       -> game.winnerPlayerIndex,
-          "winnerPlayer" -> game.winnerPlayerIndex.map(game.variant.playerNames),
-          "loserPlayer"  -> game.winnerPlayerIndex.map(w => game.variant.playerNames(!w)),
+          "winnerPlayer" -> game.winnerPlayerIndex.map(PlayerName(game.variant, _)),
+          "loserPlayer"  -> game.winnerPlayerIndex.map(w => PlayerName(game.variant, !w)),
           "status"       -> game.status,
           "pointValue"   -> game.pointValue
         )

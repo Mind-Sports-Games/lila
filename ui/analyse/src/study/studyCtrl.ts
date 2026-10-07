@@ -38,6 +38,7 @@ import {
 } from './interfaces';
 import GamebookPlayCtrl from './gamebook/gamebookPlayCtrl';
 import { configureVariantControl } from '../control/configure';
+import { allowedForVariant as allowClientEvalForVariant } from 'ceval/src/util';
 import { DescriptionCtrl } from './description';
 import RelayCtrl from './relay/relayCtrl';
 import { RelayData } from './relay/interfaces';
@@ -228,7 +229,7 @@ export default function (
     playstrategy.pubsub.emit('palantir.toggle', data.features.chat && !!members.myMember());
     const computer: boolean = !isGamebookPlay() && !!(data.chapter.features.computer || data.chapter.practice);
     if (!computer) ctrl.getCeval().enabled(false);
-    ctrl.getCeval().allowed(computer);
+    ctrl.getCeval().allowed(computer && allowClientEvalForVariant(ctrl.data.game.variant.key));
     if (!data.chapter.features.explorer) ctrl.explorer.disable();
     ctrl.explorer.allowed(data.chapter.features.explorer);
   }

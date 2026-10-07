@@ -49,7 +49,8 @@ object JsonView {
       "moveEvent"           -> p.moveEvent,
       "mancalaMove"         -> p.mancalaMove,
       "rookCastle"          -> p.rookCastle,
-      "boardIdentifier"     -> p.boardIdentifier
+      "boardIdentifier"     -> p.boardIdentifier,
+      "entropyPatterns"     -> p.entropyPatterns
     )
   }
 

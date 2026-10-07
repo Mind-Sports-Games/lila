@@ -45,6 +45,10 @@
       height: 125px;
     }
 
+    &.entropy {
+      height: 125px;
+    }
+
     @extend %flex-center;
 
     justify-content: center;
@@ -290,6 +294,11 @@
 
     .grandabalone-yellow {
       background-image: url(../images/board/abalone/abalone/grandabalone/yellow.svg);
+      background-size: 100px;
+    }
+
+    .entropy-wood {
+      background-image: url(../images/board/entropy/wood.svg);
       background-size: 100px;
     }
   }

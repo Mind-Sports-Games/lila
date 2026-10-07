@@ -14,4 +14,5 @@ export const gameFamily: GameFamilyKey[] = [
   'go',
   'backgammon',
   'abalone',
+  'entropy',
 ];

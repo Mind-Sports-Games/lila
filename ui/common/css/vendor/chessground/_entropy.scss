@@ -1,0 +1,89 @@
+// a pattern is drawn over the counters it scores, so it carries its own outline rather than a
+// colour chosen to beat any one counter: seven counter colours and the board are all underneath it
+$entropy-pattern-core: #fff;
+$entropy-pattern-halo: #16161a;
+$entropy-pattern-halo-opacity: 0.8;
+$entropy-line-score-fill: #d2d2d2;
+$entropy-line-score-outline: #16161a;
+$entropy-line-score-outline-width: 0.03;
+
+$entropy-dest-ring-inset: 19%;
+$entropy-premove-dest-ring-inset: 36.6%;
+$entropy-dest-ring-width: 0.286cqw;
+$entropy-dest-ring: rgba(0, 0, 0, 0.45);
+$entropy-premove-dest-ring: rgba(20, 30, 85, 0.5);
+
+.variant-entropy {
+  cg-container {
+    width: calc(100% * 7);
+    height: calc(100% * 7);
+  }
+
+  cg-helper {
+    width: calc(100% / 7);
+    padding-bottom: calc(100% / 7);
+  }
+
+  piece {
+    width: calc(100% / 7);
+    height: calc(100% / 7);
+  }
+
+  .cg-patterns {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: z('cg__svg.cg-patterns');
+
+    line {
+      stroke-linecap: round;
+    }
+
+    .halo {
+      stroke: $entropy-pattern-halo;
+      opacity: $entropy-pattern-halo-opacity;
+    }
+
+    .core {
+      stroke: $entropy-pattern-core;
+    }
+
+    // outline behind the fill, so the stroke thickens the figure outwards and never eats into it
+    .line-score {
+      fill: $entropy-line-score-fill;
+      stroke: $entropy-line-score-outline;
+      stroke-width: $entropy-line-score-outline-width;
+      paint-order: stroke fill;
+      stroke-linejoin: round;
+      font-weight: bold;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  square {
+    width: calc(100% / 7);
+    height: calc(100% / 7);
+
+    &.move-dest,
+    &.premove-dest {
+      background: none;
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: $entropy-dest-ring-inset;
+        border: $entropy-dest-ring-width solid $entropy-dest-ring;
+        border-radius: 50%;
+      }
+    }
+
+    &.premove-dest::before {
+      inset: $entropy-premove-dest-ring-inset;
+      border-color: $entropy-premove-dest-ring;
+    }
+  }
+}

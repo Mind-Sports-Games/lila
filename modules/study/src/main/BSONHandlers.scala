@@ -376,6 +376,21 @@ object BSONHandlers {
                   }
                 )
               )
+            case GameLogic.Entropy() =>
+              PocketData.Entropy(
+                strategygames.entropy.PocketData(
+                  pockets = {
+                    val (p1, p2) = (
+                      r.strD("w").view.flatMap(c => strategygames.entropy.Piece.fromChar(c)).to(List),
+                      r.strD("b").view.flatMap(c => strategygames.entropy.Piece.fromChar(c)).to(List)
+                    )
+                    Pockets(
+                      p1 = Pocket(p1.map(_.role).map(Role.EntropyRole.apply)),
+                      p2 = Pocket(p2.map(_.role).map(Role.EntropyRole.apply))
+                    )
+                  }
+                )
+              )
             case _ =>
               sys.error(s"Pocket Data BSON reader not implemented for GameLogic: ${variant.gameLogic}")
           }

@@ -1,5 +1,5 @@
 import { dragNewPiece } from 'chessground/drag';
-import { readDrops, readDropsByRole } from 'stratutils';
+import { readDrops, readDropsByRole, entropy } from 'stratutils';
 import AnalyseCtrl from '../ctrl';
 import * as cg from 'chessground/types';
 import { Api as ChessgroundApi } from 'chessground/api';
@@ -8,8 +8,23 @@ import { AnalyseData } from '../interfaces';
 
 let dragDropMode = false;
 
+function drawFromBag(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, e: cg.MouchEvent): void {
+  if (ctrl.embed || playerIndex !== ctrl.turnPlayerIndex()) return;
+  const el = e.target as HTMLElement,
+    role = el.getAttribute('data-role') as cg.Role,
+    number = el.getAttribute('data-nb');
+  e.stopPropagation();
+  e.preventDefault();
+  if (role && number !== '0') ctrl.sendDrawCounter(role);
+}
+
+// an entropy pocket shows the bag while Chaos has still to draw, and nothing in it can be dropped
+export const isDrawingFromBag = (ctrl: AnalyseCtrl): boolean =>
+  ctrl.data.game.variant.key === 'entropy' && entropy.mustDraw(ctrl.node.fen);
+
 export function drag(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, e: cg.MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
+  if (isDrawingFromBag(ctrl)) return;
   if (ctrl.chessground.state.movable.playerIndex !== playerIndex) return;
   const el = e.target as HTMLElement;
   const role = el.getAttribute('data-role') as cg.Role,
@@ -40,6 +55,11 @@ export function drag(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, e: cg.MouchEve
 
 export function selectToDrop(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, e: cg.MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
+  if (isDrawingFromBag(ctrl)) {
+    // the pocket is showing the bag, so picking a colour draws it; touch also fires a click, draw once
+    if (e.type === 'click') drawFromBag(ctrl, playerIndex, e);
+    return;
+  }
   if (ctrl.chessground.state.movable.playerIndex !== playerIndex) return;
   const el = e.target as HTMLElement,
     role = el.getAttribute('data-role') as cg.Role,

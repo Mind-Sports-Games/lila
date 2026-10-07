@@ -9,6 +9,7 @@ import { configure as configureTogyzkumalak } from './variants/togyzkumalak';
 import { configure as configureAbalone } from './variants/abalone';
 import { configure as configureFlipello } from './variants/flipello';
 import { configure as configureCrazy } from './variants/crazy';
+import { configure as configureEntropy } from './variants/entropy';
 
 type Configure = (ctrl: AnalyseCtrl) => void;
 
@@ -20,6 +21,7 @@ const byFamily: Partial<Record<GameFamilyKey, Configure>> = {
   abalone: configureAbalone,
   flipello: configureFlipello,
   shogi: configureCrazy,
+  entropy: configureEntropy,
 };
 
 const byKey: Partial<Record<VariantKey, Configure>> = {

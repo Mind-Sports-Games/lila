@@ -68,6 +68,7 @@ final class DiscordApi(
     case ("go", _)                 => DiscordRole.Go.id
     case ("backgammon", _)         => DiscordRole.Backgammon.id
     case ("abalone", _)            => DiscordRole.Abalone.id
+    case ("entropy", _)            => DiscordRole.Entropy.id
     case _                         => DiscordRole.Default.id
   }
 
@@ -96,6 +97,7 @@ final class DiscordApi(
     case object Go                 extends DiscordRole("<@&1344679175453409323>")
     case object Backgammon         extends DiscordRole("<@&1344679208735215616>")
     case object Abalone            extends DiscordRole("<@&1344679243082108988>")
+    case object Entropy            extends DiscordRole("<@&1549712324938563625>")
 
     case object Default extends DiscordRole("<@&1344676517237755925>")
   }

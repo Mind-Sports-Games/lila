@@ -58,6 +58,7 @@ export const possiblePromotion = (
     case 'nackgammon':
     case 'abalone':
     case 'grandabalone':
+    case 'entropy':
       return false;
     case 'shogi':
       return (

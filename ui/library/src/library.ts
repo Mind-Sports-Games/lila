@@ -46,6 +46,8 @@ playstrategy.load.then(() => {
           return '7'; //mancala
         case '13':
           return '1'; //draughts for dameo
+        case '14':
+          return '13'; //entropy
         default:
           return gf;
       }

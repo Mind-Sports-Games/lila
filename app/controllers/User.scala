@@ -332,7 +332,8 @@ final class User(
                   "hyper"                  -> leaderboards.hyper,
                   "nackgammon"             -> leaderboards.nackgammon,
                   "abalone"                -> leaderboards.abalone,
-                  "grandabalone"           -> leaderboards.grandabalone
+                  "grandabalone"           -> leaderboards.grandabalone,
+                  "entropy"                -> leaderboards.entropy
                 )
               )
             }

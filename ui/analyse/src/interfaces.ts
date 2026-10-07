@@ -63,6 +63,7 @@ export interface AnalysePref {
   showDests?: boolean;
   rookCastle?: boolean;
   destination?: boolean;
+  entropyPatterns?: boolean;
   highlight?: boolean;
   moveEvent: Prefs.MoveEvent;
   animationDuration?: number;

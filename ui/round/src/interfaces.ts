@@ -250,6 +250,7 @@ export interface Pref {
   playForcedAction: Prefs.PlayForcedActions;
   coords: cg.Coords;
   destination: boolean;
+  entropyPatterns: boolean;
   playerTurnIndicator: boolean;
   actionReminder: boolean;
   enablePremove: boolean;

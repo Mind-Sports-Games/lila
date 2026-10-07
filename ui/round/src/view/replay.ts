@@ -13,6 +13,7 @@ import { Step, MaybeVNodes } from '../interfaces';
 import { variantClassFromKey } from 'stratops/variants/util';
 import { GameFamily as BackgammonFamily } from 'stratops/variants/backgammon/GameFamily';
 import { GameFamily as DameoFamily } from 'stratops/variants/dameo/GameFamily';
+import { GameFamily as EntropyFamily } from 'stratops/variants/entropy/GameFamily';
 import { NotationStyle } from 'stratops/variants/types';
 import { backgammon as bgUtils } from 'stratutils';
 
@@ -88,13 +89,15 @@ function renderMultiActionMove(
             : '',
         ),
         notation,
+        variant.key,
       ),
       actions.some(s => drawOffers.has(s.turnCount)) ? renderDrawOffer() : undefined,
     ],
   );
 }
 
-function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {
+function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle, variantKey: VariantKey): string {
+  if (variantKey === 'entropy') return EntropyFamily.combinedNotation(actionNotations);
   switch (notation) {
     case NotationStyle.bkg:
       return BackgammonFamily.combinedNotation(actionNotations);

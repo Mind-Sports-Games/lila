@@ -22,7 +22,8 @@ case class SwissPairing(
     isPlayX: Boolean,
     nbGamesPerRound: Int,
     openingFEN: Option[FEN],
-    variant: Option[Variant] = None
+    variant: Option[Variant] = None,
+    p1VictoryPoints: Option[Int] = None
 ) {
   def apply(c: PlayerIndex)                    = c.fold(p1, p2)
   def gameId                                   = id
@@ -37,6 +38,9 @@ case class SwissPairing(
   def p1Wins                                   = status == Right(Some(PlayerIndex.P1))
   def p2Wins                                   = status == Right(Some(PlayerIndex.P2))
   def isDraw                                   = status == Right(None)
+
+  def victoryPointsFor(userId: User.ID): Option[Int] =
+    p1VictoryPoints.map(SwissVictoryPoints.forPlayer(_, playerIndexOf(userId)))
 
   def numFirstPlayerWins =
     startPlayerWinners.fold(matchStatus.fold(_ => 0, l => l.count(Some(PlayerIndex.P1).==)))(spw =>
@@ -330,6 +334,7 @@ object SwissPairing {
     val nbGamesPerRound    = "gpr"
     val openingFEN         = "of"
     val variant            = "v"
+    val p1VictoryPoints    = "vp"
   }
   def fields[A](f: Fields.type => A): A = f(Fields)
 

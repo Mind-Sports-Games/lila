@@ -247,6 +247,8 @@ function renderVariationFullMoveOf(
           });
         }),
         notation,
+        variant.key,
+        fullTurnNodes.map(n => n.uci || ''),
       ),
     ],
     classes = nodeClasses(ctx, node, path, fullTurnPath);

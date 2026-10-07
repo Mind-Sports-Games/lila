@@ -29,9 +29,9 @@ object PoolList {
     ),
     PoolConfig(3 ++ 5, Wave(40 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Amazons)),
     PoolConfig(
-      3 ++ 2,
+      5 ++ 0,
       Wave(43 seconds, 30 players),
-      Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka)
+      Variant.Entropy(strategygames.entropy.variant.Entropy)
     ),
     PoolConfig(
       3 ++ 2,

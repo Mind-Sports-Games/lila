@@ -64,7 +64,7 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
               ? { width: 9, height: 10 }
               : $el.hasClass('variant-minishogi') || $el.hasClass('variant-minibreakthroughtroyka')
                 ? { width: 5, height: 5 }
-                : $el.hasClass('variant-minixiangqi')
+                : $el.hasClass('variant-minixiangqi') || $el.hasClass('variant-entropy')
                   ? { width: 7, height: 7 }
                   : $el.hasClass('variant-flipello10') || $el.hasClass('variant-octagonflipello')
                     ? { width: 10, height: 10 }

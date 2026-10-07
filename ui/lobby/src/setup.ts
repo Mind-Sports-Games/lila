@@ -265,6 +265,13 @@ export default class Setup {
           rapid: { timemode: '5', initial: '10', increment: '5' },
           classical: { timemode: '5', initial: '20', increment: '10' },
         });
+      case '14_1': // entropy
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '1', initial: '2', increment: '0' },
+          blitz: { timemode: '1', initial: '5', increment: '0' },
+          rapid: { timemode: '1', initial: '10', increment: '0' },
+          classical: { timemode: '1', initial: '15', increment: '0' },
+        });
       case '12_2': // grand abalone
         return Object.assign({}, defaultClockConfig, {
           bullet: { timemode: '5', initial: '2', increment: '2' },
@@ -847,6 +854,9 @@ export default class Setup {
         case '13':
           key = 'dameo';
           break;
+        case '14':
+          key = 'entropy';
+          break;
       }
       const $selected = $ratings
         .hide()
@@ -858,7 +868,7 @@ export default class Setup {
     const showStartingImages = () => {
       const variantId = ($variantInput.filter(':checked').val() as string).split('_');
       const class_list =
-        'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon breakthroughtroyka abalone dameo';
+        'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon breakthroughtroyka abalone dameo entropy';
       let key = 'chess';
       switch (variantId[0]) {
         case '0':
@@ -902,6 +912,9 @@ export default class Setup {
           break;
         case '13':
           key = 'dameo';
+          break;
+        case '14':
+          key = 'entropy';
           break;
       }
       $playerIndex.removeClass(class_list);
@@ -1376,6 +1389,8 @@ export default class Setup {
           return '7'; //oware
         case '13':
           return '1'; //dameo
+        case '14':
+          return '13'; //entropy
         default:
           return gameLogicId;
       }
@@ -1505,6 +1520,8 @@ export default class Setup {
                 return '9_4'; // Go 19x19
               case '11':
                 return '11_9'; // Breakthrough Troyka
+              case '13':
+                return '14_1'; // Entropy
               default:
                 return `${gameGroup}_1`;
             }

@@ -99,7 +99,8 @@ object TournamentDaySchedule {
             Variant.wrap(strategygames.go.variant.Go13x13)                     -> Byoyomi310x5,
             Variant.wrap(strategygames.go.variant.Go19x19)                     -> Byoyomi510x5,
             Variant.wrap(strategygames.abalone.variant.Abalone)                -> Delay62,
-            Variant.wrap(strategygames.abalone.variant.GrandAbalone)           -> Delay66
+            Variant.wrap(strategygames.abalone.variant.GrandAbalone)           -> Delay66,
+            Variant.Entropy(strategygames.entropy.variant.Entropy)                -> Blitz
           )
         )
 

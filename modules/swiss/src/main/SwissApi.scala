@@ -102,6 +102,7 @@ final class SwissApi(
         inputPlayerRatings = ~data.inputPlayerRatings,
         backgammonPoints = data.backgammonPoints,
         isMatchScore = data.isMatchScore,
+        isVictoryPoints = data.isVictoryPoints,
         isBestOfX = data.isBestOfX,
         isPlayX = data.isPlayX,
         nbGamesPerRound = data.nbGamesPerRound,
@@ -152,6 +153,7 @@ final class SwissApi(
               else old.settings.inputPlayerRatings,
             backgammonPoints = data.backgammonPoints,
             isMatchScore = data.isMatchScore,
+            isVictoryPoints = if (old.isCreated) data.isVictoryPoints else old.settings.isVictoryPoints,
             isBestOfX = data.isBestOfX,
             isPlayX = data.isPlayX,
             nbGamesPerRound = data.nbGamesPerRound,
@@ -709,7 +711,10 @@ final class SwissApi(
                 .get,
               SwissPairing.Fields.status -> pairingStatusHandler
                 .writeTry(Right(game.winnerPlayerIndex))
-                .get
+                .get,
+              SwissPairing.Fields.p1VictoryPoints -> swiss.settings.isVictoryPoints.option(
+                SwissVictoryPoints.forP1(game.lastGame)
+              )
             )
           )
           .flatMap { result =>

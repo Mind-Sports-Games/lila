@@ -33,7 +33,8 @@ object PrefForm {
         "zen"             -> optional(booleanNumber),
         "resizeHandle"    -> optional(checkedNumber(Pref.ResizeHandle.choices)),
         "blindfold"       -> checkedNumber(Pref.Blindfold.choices),
-        "boardIdentifier" -> optional(booleanNumber)
+        "boardIdentifier" -> optional(booleanNumber),
+        "entropyPatterns" -> optional(booleanNumber)
       )(DisplayData.apply)(unapply),
       "behavior" -> mapping(
         "moveEvent"          -> optional(numberIn(Set(0, 1, 2))),
@@ -79,7 +80,8 @@ object PrefForm {
       zen: Option[Int],
       resizeHandle: Option[Int],
       blindfold: Int,
-      boardIdentifier: Option[Int]
+      boardIdentifier: Option[Int],
+      entropyPatterns: Option[Int]
   )
 
   case class BehaviorData(
@@ -154,7 +156,8 @@ object PrefForm {
         pieceNotation = display.pieceNotation | pref.pieceNotation,
         moveEvent = behavior.moveEvent | pref.moveEvent,
         mancalaMove = behavior.mancalaMove | pref.mancalaMove,
-        boardIdentifier = display.boardIdentifier | pref.boardIdentifier
+        boardIdentifier = display.boardIdentifier | pref.boardIdentifier,
+        entropyPatterns = display.entropyPatterns | pref.entropyPatterns
       )
   }
 
@@ -176,7 +179,8 @@ object PrefForm {
           zen = pref.zen.some,
           resizeHandle = pref.resizeHandle.some,
           pieceNotation = pref.pieceNotation.some,
-          boardIdentifier = pref.boardIdentifier.some
+          boardIdentifier = pref.boardIdentifier.some,
+          entropyPatterns = pref.entropyPatterns.some
         ),
         behavior = BehaviorData(
           moveEvent = pref.moveEvent.some,
