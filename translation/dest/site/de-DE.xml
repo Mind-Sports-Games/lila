@@ -902,4 +902,8 @@
   <string name="variantPuzzles">%s-Aufgaben</string>
   <string name="libraryTitle">Brettspiele, die du kostenlos online spielen kannst — die PlayStrategy-Bibliothek</string>
   <string name="libraryDescription">Jedes Spiel auf PlayStrategy: Schach und seine Varianten, Dame, Go, Backgammon, Othello, Shogi, Xiangqi, Mancala, Abalone, Lines of Action und mehr — mit Regeln, Tutorials, Turnieren und Statistiken.</string>
+  <string name="msoEventResultsOnly">Das %s-Turnier der Mind Sports Olympiad wird vor Ort gespielt; die Ergebnisse stehen in der MSO-Ergebnisdatenbank.</string>
+  <string name="msoWorldChampionshipResultsOnly">Die %s-Weltmeisterschaft der Mind Sports Olympiad wird vor Ort gespielt; die Ergebnisse stehen in der MSO-Ergebnisdatenbank.</string>
+  <string name="msoGrandPrixOnline">Online-Grand-Prix der MSO:</string>
+  <string name="aboutMso">Über die Mind Sports Olympiad</string>
 </resources>

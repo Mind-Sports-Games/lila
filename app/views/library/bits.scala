@@ -82,29 +82,53 @@ object bits {
 
   val msoTeamId = "mind-sports-olympiad"
 
-  // how the MSO names its Grand Prix swisses:
-  // "Abalone - MSO GP 2026 PREMIER", "Chess Bullet - MSO Grand Prix 2024"
-  val msoGrandPrixName = "MSO (GP|Grand Prix)"
-
-  // In-person Mind Sports Olympiad events whose games are published on PlayStrategy: msodb
-  // event code, whether the MSO awards a world championship title for it, and the study
-  // holding the latest edition's games (the MSO hub study CTu6f0Mp links every year's)
-  case class MsoEvent(eventCode: String, worldChampionship: Boolean, studyId: Option[String]) {
-    def resultsUrl = s"https://msodb.playstrategy.org/Report/EventResults?eventCode=$eventCode"
+  val msoGrandPrixName = "MSO (GP|Grand Prix|2021)"
+  case class MsoEvent(
+      eventCode: Option[String],
+      worldChampionship: Boolean,
+      studyId: Option[String],
+      // the same game's other events at the MSO: (code, name as the results database titles it)
+      others: List[(String, String)] = Nil
+  ) {
+    def resultsUrl = eventCode.map(resultsUrlOf)
   }
+
+  def resultsUrlOf(code: String) = s"https://msodb.playstrategy.org/Report/EventResults?eventCode=$code"
+
+  private def mso(
+      code: String,
+      worldChampionship: Boolean = false,
+      study: Option[String] = None,
+      others: List[(String, String)] = Nil
+  ) = Some(MsoEvent(Some(code), worldChampionship, study, others))
 
   def msoEvent(variant: Variant): Option[MsoEvent] =
     variant.key match {
-      case "abalone"            => Some(MsoEvent("ABOC", worldChampionship = true, Some("JG7Zf7mE")))
-      case "linesOfAction"      => Some(MsoEvent("LOWC", worldChampionship = true, Some("IyudHHhm")))
-      case "amazons"            => Some(MsoEvent("AMZOC", worldChampionship = false, Some("m8N1ERm6")))
-      case "breakthroughtroyka" => Some(MsoEvent("BTOC", worldChampionship = false, Some("EkVLAnIi")))
-      case "international"      => Some(MsoEvent("DRDA", worldChampionship = false, Some("CTu6f0Mp")))
-      case "oware"              => Some(MsoEvent("OWOC", worldChampionship = false, Some("C7hHSwaw")))
-      case "flipello"           => Some(MsoEvent("OTOC", worldChampionship = false, Some("PuMKTeH2")))
-      case "togyzkumalak"       => Some(MsoEvent("TOOC", worldChampionship = false, None))
-      case "backgammon"         => Some(MsoEvent("BAOC", worldChampionship = false, None))
-      case _                    => None
+      case "abalone"            => mso("ABOC", worldChampionship = true, Some("JG7Zf7mE"))
+      case "linesOfAction"      => mso("LOWC", worldChampionship = true, Some("IyudHHhm"))
+      case "amazons"            => mso("AMZOC", study = Some("m8N1ERm6"))
+      case "breakthroughtroyka" => mso("BTOC", study = Some("EkVLAnIi"))
+      case "international"      => mso("DRDA", study = Some("CTu6f0Mp"))
+      case "oware"              => mso("OWOC", study = Some("C7hHSwaw"))
+      case "flipello"           => mso("OTOC", study = Some("PuMKTeH2"))
+      // played at the MSO but not recorded yet; their games are not in a study yet
+      case "togyzkumalak" => mso("TOOC")
+      case "shogi"        => mso("SHOC")
+      case "xiangqi"      => mso("CCOC")
+      case "backgammon"   =>
+        mso(
+          "BAWIC",
+          worldChampionship = true,
+          others = List(
+            "BAWCI" -> "World Individual Championship (Intermediates)",
+            "BAOC"  -> "6x7pt",
+            "BAMB"  -> "6x3pt",
+            "BAWO"  -> "7x1pt"
+          )
+        )
+      case "hyper"      => mso("BAHY")
+      case "nackgammon" => mso("BANG")
+      case _            => None
     }
 
   // an edition of the MSO Grand Prix, arena or swiss, for the library page

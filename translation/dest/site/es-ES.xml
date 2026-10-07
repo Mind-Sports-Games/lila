@@ -901,4 +901,8 @@
   <string name="variantPuzzles">Problemas de %s</string>
   <string name="libraryTitle">Juegos de mesa a los que puedes jugar online gratis — la biblioteca de PlayStrategy</string>
   <string name="libraryDescription">Todos los juegos de PlayStrategy: ajedrez y sus variantes, damas, go, backgammon, Othello, shogi, xiangqi, mancala, Abalone, Lines of Action y más, con reglas, tutoriales, torneos y estadísticas.</string>
+  <string name="msoEventResultsOnly">El torneo de %s de la Mind Sports Olympiad se juega en persona; sus resultados se publican en la base de resultados del MSO.</string>
+  <string name="msoWorldChampionshipResultsOnly">El Campeonato del Mundo de %s de la Mind Sports Olympiad se juega en persona; sus resultados se publican en la base de resultados del MSO.</string>
+  <string name="msoGrandPrixOnline">Grand Prix online de la MSO:</string>
+  <string name="aboutMso">Sobre la Mind Sports Olympiad</string>
 </resources>

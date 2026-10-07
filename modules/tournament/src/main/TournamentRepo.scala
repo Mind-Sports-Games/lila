@@ -538,17 +538,35 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .cursor[Tournament]()
       .list(max)
 
-  // the editions a team ran: its own account created them, or they are listed for it
+  // International draughts counts as the standard variant, but is stored with its id (only standard
+  // chess is stored without one), so the plain variant selector never finds it
+  private def ownVariantSelect(variant: Variant) =
+    if (variant.standardVariant) $or($doc("variant".$exists(false)), $doc("variant" -> variant.id))
+    else variantSelect(variant)
+
+  // the editions a team ran: its own account created them, or they are listed for it.
+  // `anyCreatorFreqs` are series nobody but the team ran, though PlayStrategy's own account created
+  // them with no team behind them (the 2021 online MSO)
   def finishedSeriesOfTeam(
       teamId: TeamID,
-      freq: Schedule.Freq,
+      freqs: List[Schedule.Freq],
+      anyCreatorFreqs: List[Schedule.Freq],
       variant: Variant,
       max: Int = 100
   ): Fu[List[Tournament]] =
     coll
       .find(
-        finishedSelect ++ $doc("schedule.freq" -> freq.name) ++ libSelect(variant.gameLogic) ++
-          variantSelect(variant) ++ $or($doc("createdBy" -> teamId), forTeamSelect(teamId))
+        finishedSelect ++ $and(
+          // its own variant, or one of the variants of a medley (stored as "<lib id>:<key>", older ones bare)
+          $or(
+            libSelect(variant.gameLogic) ++ ownVariantSelect(variant),
+            $doc("mVariants".$in(List(s"${variant.gameLogic.id}:${variant.key}", variant.key)))
+          ),
+          $or(
+            $doc("schedule.freq".$in(freqs.map(_.name))) ++ $or($doc("createdBy" -> teamId), forTeamSelect(teamId)),
+            $doc("schedule.freq".$in(anyCreatorFreqs.map(_.name)))
+          )
+        )
       )
       .sort($sort.desc("startsAt"))
       .cursor[Tournament]()

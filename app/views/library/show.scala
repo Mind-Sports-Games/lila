@@ -252,27 +252,42 @@ object show {
           div(" ")
         ),
         p(mso match {
-          case Some(m) if m.worldChampionship => trans.msoWorldChampionshipVenue(name)
-          case Some(_)                        => trans.msoEventVenue(name)
-          case None                           => trans.msoGrandPrixVenue(name)
+          // the games of an event are in a study only once somebody has recorded them
+          case Some(m) if m.worldChampionship && m.studyId.isEmpty => trans.msoWorldChampionshipResultsOnly(name)
+          case Some(m) if m.worldChampionship                      => trans.msoWorldChampionshipVenue(name)
+          case Some(m) if m.studyId.isEmpty                        => trans.msoEventResultsOnly(name)
+          case Some(_)                                             => trans.msoEventVenue(name)
+          case None                                                => trans.msoGrandPrixVenue(name)
         }),
         mso.map { m =>
-          p(
-            a(href := m.resultsUrl)(trans.msoResultsAndMedallists()),
-            m.studyId.map { id =>
-              frag(" · ", a(href := routes.Study.show(id))(trans.msoEventGames()))
-            }
+          frag(
+            p(
+              m.resultsUrl.map(url => a(href := url)(trans.msoResultsAndMedallists())),
+              m.studyId.map { id =>
+                frag(" · ", a(href := routes.Study.show(id))(trans.msoEventGames()))
+              }
+            ),
+            m.others.nonEmpty.option(
+              p(
+                m.others
+                  .map { case (code, name) => a(href := bits.resultsUrlOf(code))(name): Frag }
+                  .reduce[Frag]((a, b) => frag(a, " · ", b))
+              )
+            )
           )
         },
         p(
-          // the game's own editions, latest first; the MSO team's tournaments only when it has none
+          // the game's own editions, latest first; the MSO team's tournaments only when it has none.
+          // After a sentence about the in-person event they are labelled as the online ones.
+          (mso.isDefined && grandPrix.nonEmpty).option(frag(strong(trans.msoGrandPrixOnline()), " ")),
           if (grandPrix.isEmpty) a(href := routes.Team.tournaments(bits.msoTeamId))(trans.msoGrandPrix())
           else
             grandPrix
               .take(5)
               .map(e => a(href := e.url)(e.name): Frag)
               .reduce[Frag]((a, b) => frag(a, " · ", b))
-        )
+        ),
+        p(a(href := routes.Page.lonePage("mind-sports-olympiad"))(trans.aboutMso()))
       )
     }
 

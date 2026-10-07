@@ -50,7 +50,14 @@ final class Library(env: Env) extends LilaController(env) {
         .buildAsyncFuture { key =>
           Variant.byKey.get(key).fold(fuccess(Nil -> Nil)) { variant =>
             env.tournament.tournamentRepo
-              .finishedSeriesOfTeam(views.html.library.bits.msoTeamId, lila.common.Freq.MSOGP, variant) zip
+              .finishedSeriesOfTeam(
+                views.html.library.bits.msoTeamId,
+                List(lila.common.Freq.MSOGP),
+                // the 2021 online edition, before the Grand Prix series began: created by PlayStrategy
+                // itself, for no team
+                List(lila.common.Freq.MSO21),
+                variant
+              ) zip
               env.swiss.api.finishedNamed(
                 views.html.library.bits.msoTeamId,
                 views.html.library.bits.msoGrandPrixName,
