@@ -838,7 +838,7 @@
   <string name="variantAnalysisDescriptionNoEngine">在免费的在线棋盘上分析 %1$s 的局面：摆出任意局面，研究各种变着并分享。在 PlayStrategy 免费在线玩 %2$s。</string>
   <string name="variantAnalysisDescriptionServerEngine">在免费的在线棋盘上分析 %1$s 的局面：摆出任意局面，研究各种变着并分享。已结束的对局可获得免费的 %3$s 分析。在 PlayStrategy 免费在线玩 %2$s。</string>
   <string name="variantRulesDescription">学习 %1$s 规则：摆放、走法与胜负判定。然后在 PlayStrategy 免费在线对弈 %2$s：真人对手、等级分、锦标赛和免费分析棋盘。</string>
-  <string name="alsoOnPlayStrategy">PlayStrategy 也有：%s。</string>
+  <string name="relatedGames">相关游戏</string>
   <string name="variantStudies">%s 研究</string>
   <string name="playVariantOnlineFreeDescription">与世界各地的玩家免费在线玩 %s。实时与通信对局、锦标赛、积分和分析，尽在 PlayStrategy。</string>
   <string name="variantPuzzles">%s 谜题</string>

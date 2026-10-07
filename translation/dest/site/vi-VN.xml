@@ -823,7 +823,7 @@
   <string name="variantAnalysisDescriptionNoEngine">Phân tích các thế trận %1$s trên bàn trực tuyến miễn phí: bày quân ở bất kỳ thế nào, khám phá các biến và chia sẻ chúng. Chơi %2$s trực tuyến miễn phí trên PlayStrategy.</string>
   <string name="variantAnalysisDescriptionServerEngine">Phân tích các thế trận %1$s trên bàn trực tuyến miễn phí: bày quân ở bất kỳ thế nào, khám phá các biến và chia sẻ chúng. Các ván đã kết thúc được %3$s phân tích miễn phí. Chơi %2$s trực tuyến miễn phí trên PlayStrategy.</string>
   <string name="variantRulesDescription">Học luật chơi %1$s: bày quân, nước đi và cách thắng. Rồi chơi %2$s trực tuyến miễn phí trên PlayStrategy: đối thủ thật, xếp hạng, giải đấu và bàn phân tích miễn phí.</string>
-  <string name="alsoOnPlayStrategy">Trên PlayStrategy còn có: %s.</string>
+  <string name="relatedGames">Trò chơi liên quan</string>
   <string name="variantStudies">Nghiên cứu %s</string>
   <string name="playVariantOnlineFreeDescription">Chơi %s trực tuyến miễn phí với người chơi trên toàn thế giới. Ván đấu trực tiếp và theo lượt, giải đấu, xếp hạng và phân tích trên PlayStrategy.</string>
   <string name="variantPuzzles">Câu đố %s</string>

@@ -82,11 +82,41 @@
     }
   }
 
-  .library-outro {
-    max-width: 60ch;
-    margin: 1em auto 0;
-    text-align: center;
-    line-height: 1.5;
+  // a few links, not a block: a muted label over a row of pills
+  .library-related {
+    // the sections above sit in a centred 500px column; this one runs the width of the page
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 1em;
+    margin-bottom: 2em;
+
+    h2 {
+      margin-bottom: 0.6em;
+      font-size: 0.8em;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: $c-font-dim;
+    }
+
+    div {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4em 0.5em;
+    }
+
+    a {
+      padding: 0.3em 0.85em;
+      border: 1px solid $c-border;
+      border-radius: 999px;
+      color: $c-font;
+      line-height: 1.4;
+      white-space: nowrap;
+
+      &:hover {
+        border-color: $c-font-dim;
+        color: $c-link;
+      }
+    }
   }
 
   .start {
@@ -340,6 +370,14 @@
       align-items: center;
     }
 
+    .library-info__about {
+      margin: 0;
+      padding: 0.8em 1em;
+      font-size: 0.9em;
+      line-height: 1.5;
+      color: $c-font-dim;
+    }
+
     .library-stats-row {
       display: flex;
       justify-content: space-between;
@@ -505,11 +543,6 @@
       .library-stats-table,
       #library_chart_area {
         max-width: 100%;
-      }
-
-      .library-outro {
-        max-width: 100%;
-        margin: 1em 0 2em;
       }
     }
   }

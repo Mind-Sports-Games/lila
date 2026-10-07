@@ -436,9 +436,9 @@
   <string name="variantAnalysisTitleNoEngine">%s analysis board — free online analysis</string>
   <string name="variantAnalysisDescriptionNoEngine">Analyse %1$s positions on a free online board: set up any position, explore the variations and share them. Play %2$s online for free on PlayStrategy.</string>
   <string name="variantAnalysisDescriptionServerEngine">Analyse %1$s positions on a free online board: set up any position, explore the variations and share them. Finished games get a free %3$s analysis. Play %2$s online for free on PlayStrategy.</string>
-  <string name="variantOf">%1$s is a variant of %2$s.</string>
   <string name="variantRulesDescription">Learn the rules of %1$s: setup, moves and how to win. Then play %2$s online for free on PlayStrategy: live opponents, ratings, tournaments and a free analysis board.</string>
-  <string name="alsoOnPlayStrategy">Also on PlayStrategy: %s.</string>
+  <string name="variantOf">%1$s is a variant of %2$s.</string>
+  <string name="relatedGames">Related games</string>
   <string name="variantStudies">%s studies</string>
   <string name="playVariantOnlineFreeDescription">Play %s online for free against players from all over the world. Live and correspondence games, tournaments, ratings and analysis on PlayStrategy.</string>
   <string name="msoWorldChampionship">%s World Championship</string>

@@ -159,6 +159,12 @@ object show {
             h2(trans.gameInfo()),
             div(" ") // place holder to keep title centered
           ),
+          p(cls := "library-info__about")(
+            trans.playVariantOnlineFree(bits.nameWithAlias(variant)),
+            " ",
+            VariantKeys.variantTitle(variant),
+            "."
+          ),
           bits.statsRow("Date Released", bits.releaseDateDisplay(monthlyGameData, variant)),
           bits.statsRow("Total Games Played", bits.totalGamesForVariant(monthlyGameData, variant).toString()),
           bits.statsRow(
@@ -173,37 +179,7 @@ object show {
         div(id := "library_chart_area")(
           div(id := "library_chart")(canvas)
         ),
-        p(cls := "library-outro")(
-          trans.playVariantOnlineFree(bits.nameWithAlias(variant)),
-          " ",
-          VariantKeys.variantTitle(variant),
-          ".",
-          bits.parentVariant(variant).map { parent =>
-            frag(
-              " ",
-              trans.variantOf(
-                bits.searchName(variant),
-                a(href := routes.Library.variant(parent.key))(bits.searchName(parent))
-              )
-            )
-          },
-          bits.childVariants(variant) match {
-            case Nil      => emptyFrag
-            case children =>
-              frag(
-                " ",
-                // a translated string renders a Tag argument but stringifies a bare SeqFrag, so
-                // the joined list has to sit inside one element
-                trans.alsoOnPlayStrategy(
-                  span(
-                    children
-                      .map(v => a(href := routes.Library.variant(v.key))(bits.searchName(v)): Frag)
-                      .reduce[Frag]((a, b) => frag(a, ", ", b))
-                  )
-                )
-              )
-          }
-        )
+        relatedSection(variant)
       )
     )
 
@@ -236,6 +212,24 @@ object show {
         })
       )
     )
+  }
+
+  // the game it derives from, the games derived from it, then the ones merely alike
+  private def relatedSection(variant: Variant)(implicit ctx: Context) = {
+    val related =
+      (bits.parentVariant(variant).toList ::: bits.childVariants(variant) ::: bits.relatedVariants(variant)).distinct
+    related.nonEmpty.option {
+      div(cls := "library-related")(
+        h2(trans.relatedGames()),
+        div(related.map { v =>
+          // the plain name: searchName adds the family word ("Three-check Chess"), which a chip on a
+          // page of that family does not need
+          a(href := routes.Library.variant(v.key), dataIcon := v.perfIcon, cls := "text")(
+            VariantKeys.variantName(v)
+          )
+        })
+      )
+    }
   }
 
   // the game at the Mind Sports Olympiad: its in-person event when it has one,

@@ -130,12 +130,35 @@ object bits {
       case "bestemshe"                                       => "togyzkumalak"
       case "frysk"                                           => "frisian"
       case "scrambledEggs"                                   => "linesOfAction"
+      case "antichess" | "atomic" | "chess960" | "crazyhouse" | "fiveCheck" | "horde" | "kingOfTheHill" |
+          "monster" | "noCastling" | "racingKings" | "threeCheck" =>
+        "standard"
+      case "antidraughts" | "breakthrough" | "frisian" => "international"
       case _                                                 => ""
     })
 
   // the smaller-board or reduced variants of a game, so its hub links them and not only the other way round
   def childVariants(variant: Variant): List[Variant] =
     Variant.all.filter(v => parentVariant(v).exists(_.key == variant.key))
+
+  // Games a player of one is likely to like, as sets: each page lists the others of its sets. Unlike a
+  // parent, nothing derives from anything here, so the rules pages do not call these "variants of".
+  private val relatedSets: List[List[String]] = List(
+    List("international", "english", "brazilian", "portuguese"),
+    List("russian", "pool"),
+    List("dameo", "frisian"),
+    List("antidraughts", "breakthrough"),
+    List("fiveCheck", "threeCheck"),
+    List("oware", "bestemshe")
+  )
+
+  def relatedVariants(variant: Variant): List[Variant] =
+    relatedSets
+      .filter(_.contains(variant.key))
+      .flatten
+      .distinct
+      .filterNot(_ == variant.key)
+      .flatMap(Variant.byKey.get)
 
   // A game's URL carries its engine key - flipello, standard, go19x19 - so the name people
   // actually type 404s. These redirect onto the one canonical URL instead.

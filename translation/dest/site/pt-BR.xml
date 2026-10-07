@@ -895,19 +895,10 @@
   <string name="variantAnalysisDescriptionNoEngine">Analise posições de %1$s em um tabuleiro online gratuito: monte qualquer posição, explore as variantes e compartilhe-as. Jogue %2$s online grátis no PlayStrategy.</string>
   <string name="variantAnalysisDescriptionServerEngine">Analise posições de %1$s em um tabuleiro online gratuito: monte qualquer posição, explore as variantes e compartilhe-as. As partidas terminadas recebem uma análise gratuita do %3$s. Jogue %2$s online grátis no PlayStrategy.</string>
   <string name="variantRulesDescription">Aprenda as regras de %1$s: posição inicial, movimentos e como vencer. Depois jogue %2$s online grátis no PlayStrategy: adversários reais, rating, torneios e um tabuleiro de análise gratuito.</string>
-  <string name="alsoOnPlayStrategy">Também no PlayStrategy: %s.</string>
+  <string name="relatedGames">Jogos relacionados</string>
   <string name="variantStudies">Estudos de %s</string>
   <string name="playVariantOnlineFreeDescription">Jogue %s online grátis contra jogadores do mundo todo. Partidas ao vivo e por correspondência, torneios, ratings e análise no PlayStrategy.</string>
   <string name="variantPuzzles">Problemas de %s</string>
   <string name="libraryTitle">Jogos de tabuleiro para jogar online grátis — a biblioteca do PlayStrategy</string>
   <string name="libraryDescription">Todos os jogos do PlayStrategy: xadrez e suas variantes, damas, go, gamão, Othello, shogi, xiangqi, mancala, Abalone, Lines of Action e mais — com regras, tutoriais, torneios e estatísticas.</string>
-  <string name="msoWorldChampionship">Campeonato Mundial de %s</string>
-  <string name="msoWorldChampionshipVenue">O Campeonato Mundial de %s da Mind Sports Olympiad é disputado presencialmente; suas partidas são publicadas no PlayStrategy, que também recebe o Grand Prix MSO online.</string>
-  <string name="msoEvent">%s na Mind Sports Olympiad</string>
-  <string name="msoEventVenue">O torneio de %s da Mind Sports Olympiad é disputado presencialmente; suas partidas são publicadas no PlayStrategy, que também recebe o Grand Prix MSO online.</string>
-  <string name="msoResultsAndMedallists">Resultados e medalhistas</string>
-  <string name="msoEventGames">Partidas do torneio</string>
-  <string name="msoGrandPrix">Grand Prix MSO</string>
-  <string name="msoGrandPrixEvent">%s no Grande Prêmio MSO</string>
-  <string name="msoGrandPrixVenue">O Grande Prêmio online da Mind Sports Olympiad é jogado no PlayStrategy, e %s é um dos seus jogos.</string>
 </resources>
