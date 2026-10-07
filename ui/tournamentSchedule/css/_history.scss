@@ -10,6 +10,9 @@
 }
 
 .arena-history__intro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em 1em;
   margin: 0 var(--box-padding) 1em;
 }
 

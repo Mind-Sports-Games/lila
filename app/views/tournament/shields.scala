@@ -68,7 +68,7 @@ object shields {
             }
           ),
           h2("Variant Shields:"),
-          p(cls := "tournament-shields__hint")("The current holder and the last editions of every game's shield."),
+          p(cls := "tournament-shields__hint")("The current holder and the recent editions of every game's shield."),
           div(cls := "tournament-shields")(
             history.sorted.map { case (categ, awards) =>
               section(
@@ -189,8 +189,7 @@ object shields {
           ),
           p(cls := "tournament-categ-shields__intro")(
             s"The ${categ.name} Shield is a monthly arena; its winner holds the shield until the next edition. ",
-            a(href := routes.Library.variant(categ.variant.key))(s"Play ${categ.name} online"),
-            "."
+            a(href := routes.Library.variant(categ.variant.key))(trans.aboutX(categ.name))
           ),
           series.holderCard(
             stats,
@@ -310,10 +309,12 @@ object shields {
           series.record(stats, wording),
           series.podium(stats, wording),
           h2(cls := "shield-section")("Format"),
-          p(medleyShield.arenaFormatFull),
+          p(cls := "shield-format")(medleyShield.arenaFormatFull),
           h2(cls := "shield-section")("Variants in this medley"),
           if (medleyShield.hasAllVariants)
-            p(a(cls := "all-variants", href := routes.Page.variantHome)("All variants on PlayStrategy!"))
+            p(cls := "shield-format")(
+              a(cls := "all-variants", href := routes.Page.variantHome)("All variants on PlayStrategy!")
+            )
           else
             div(cls := "medley-variants")(
               medleyShield.eligibleVariants.map { variant =>

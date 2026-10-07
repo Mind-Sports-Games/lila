@@ -158,10 +158,12 @@ object history {
             )
           },
           variant.map { v =>
-            p(cls := "arena-history__intro")(
-              a(href := routes.Library.variant(v.key))(trans.playVariantOnlineFreeTitle(VariantKeys.variantName(v))),
-              " · ",
-              a(href := url(freq, none))(s"${nameOf(freq)} tournaments of every game")
+            div(cls := "arena-history__intro")(
+              // the same link as the library's button: the lobby's game form, on this game
+              a(cls := "button", href := s"/?variant=${v.key}#game")(trans.createAGame()),
+              a(cls := "button button-empty", href := routes.Library.variant(v.key))(
+                trans.aboutX(VariantKeys.variantName(v))
+              )
             )
           },
           (stats zip wording zip summary).map { case ((st, w), sm) =>

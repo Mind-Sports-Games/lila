@@ -111,16 +111,10 @@ object series {
           case (Some(n), Some(r)) => s"$name has held the ${w.unit} for $n editions in a row and $r.".some
           case (Some(n), None)    => s"$name has held the ${w.unit} for $n editions in a row.".some
           case (None, Some(r))    => s"$name $r.".some
-          case (None, None)       => w.contested.option(s"$name took the ${w.unit} on ${showDate(holder.date)}.")
+          case (None, None)       => none
         }
-        val dare = w.contested.option(
-          next.fold(s"The next ${w.arenaName} will be scheduled soon.")(_ =>
-            s"Take it from them in the next ${w.arenaName}."
-          )
-        )
-        (feat.toList ::: dare.toList).some.filter(_.nonEmpty).map { parts =>
-          p(cls := "categ-shield-holder__challenge")(parts.mkString(" "))
-        }
+        // what the holder has built up; the date is on the line above and the next arena on the button
+        feat.map(f => p(cls := "categ-shield-holder__challenge")(f))
       },
       next.map { t =>
         a(cls := "button categ-shield-holder__next", href := t.url)(
@@ -185,9 +179,11 @@ object series {
       frag(
         h2(cls := "shield-section")(s"Most ${w.units}"),
         ol(cls := "shield-podium")(
-          stats.tally.take(10).zipWithIndex.map { case ((userId, n), i) =>
-            li(cls := (i < 3).option(s"podium podium--${i + 1}"))(
-              span(cls := "rank")(i + 1),
+          stats.tally.take(10).map { case (userId, n) =>
+            // players on the same count share a place, and so a medal: 1, 1, 3
+            val place = 1 + stats.tally.count(_._2 > n)
+            li(cls := (place <= 3).option(s"podium podium--$place"))(
+              span(cls := "rank")(place),
               userIdLink(userId.some, withOnline = false),
               span(cls := "count")(n, " ", if (n == 1) w.unit else w.units)
             )
