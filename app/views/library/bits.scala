@@ -258,9 +258,12 @@ object bits {
   def rulesDescription(variant: Variant)(implicit lang: Lang) =
     trans.variantRulesDescription.txt(nameWithAlias(variant), searchName(variant))
 
-  // server engine but no browser one: keep in step with noClientEvalVariants in ui/ceval/src/util.ts
-  private val noBrowserEngine =
-    Set("amazons", "minibreakthroughtroyka", "antiflipello", "octagonflipello", "backgammon", "nackgammon")
+  // no browser engine: this is noClientEvalVariants in ui/ceval/src/util.ts, to keep in step with it
+  private val noBrowserEngine = Set(
+    "monster", "linesOfAction", "scrambledEggs", "dameo", "amazons", "minibreakthroughtroyka",
+    "antiflipello", "octagonflipello", "oware", "togyzkumalak", "bestemshe", "go9x9", "go13x13", "go19x19",
+    "backgammon", "hyper", "nackgammon", "abalone", "grandabalone"
+  )
 
   // the engine behind the analysis board, when it has one (the same Fairy-Stockfish build serves both)
   def analysisEngine(variant: Variant): Option[String] =
