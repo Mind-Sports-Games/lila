@@ -773,7 +773,7 @@ POST  /push/subscribe                  controllers.Push.webSubscribe
 
 # Pages
 GET   /terms-of-service                controllers.Page.tos
-GET   /$uid<privacy|thanks|about|changelog> controllers.Page.menuPage(uid: String)
+GET   /$uid<privacy|thanks|about|partners|changelog> controllers.Page.menuPage(uid: String)
 GET   /contact                         controllers.Main.contact
 GET   /faq                             controllers.Main.faq
 GET   /source                          controllers.Page.source

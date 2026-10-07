@@ -211,6 +211,7 @@ object home {
           div(cls := "lobby__about")(
             ctx.blind.option(h2("About")),
             a(href := "/about")(trans.aboutX("PlayStrategy")),
+            a(href := "/partners")("Partners"),
             a(href := "/faq")(trans.faq.faqAbbreviation()),
             a(href := "/contact")(trans.contact.contact()),
             // a(href := "/mobile")(trans.mobileApp()),
