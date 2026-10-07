@@ -6,6 +6,7 @@ import { MaybeVNodes, PairingBase, Player, Pager, Board } from '../interfaces';
 function playerTr(ctrl: SwissCtrl, player: Player) {
   const userId = player.user.id;
   const isMatchScore = ctrl.data.isMatchScore;
+  const byeScore = ctrl.data.isVictoryPoints ? '100' : isMatchScore ? matchScoreDisplay(multiMatchByeScore(ctrl)) : '1';
   return h(
     'tr',
     {
@@ -39,7 +40,7 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
               p == 'absent'
                 ? h(p, title('Absent'), '-')
                 : p == 'bye'
-                  ? h(p, title('Bye'), isMatchScore ? matchScoreDisplay(multiMatchByeScore(ctrl)) : '1')
+                  ? h(p, title('Bye'), byeScore)
                   : p == 'late'
                     ? h(p, title('Late'), '½')
                     : h(
@@ -71,6 +72,7 @@ const findLastGameId = (boards: Board[], gameId: string) => {
 };
 
 const result = (p: PairingBase): string => {
+  if (p.vp !== undefined) return '' + p.vp;
   if (p.ms) {
     if (!p.mp) return '?';
     const score = parseInt(p.mp, 10);

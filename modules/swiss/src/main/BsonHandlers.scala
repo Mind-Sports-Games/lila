@@ -140,7 +140,8 @@ object BsonHandlers {
             openingFEN = r
               .getO[String](openingFEN)
               .map(fen => FEN(variant.map(_.gameLogic).getOrElse(GameLogic.Draughts()), fen)),
-            variant = variant
+            variant = variant,
+            p1VictoryPoints = r.intO(p1VictoryPoints)
           )
         }
         case _ => sys error "Invalid swiss pairing users"
@@ -164,7 +165,8 @@ object BsonHandlers {
         isPlayX           -> o.isPlayX,
         nbGamesPerRound -> (o.nbGamesPerRound != SwissBounds.defaultGamesPerRound).option(o.nbGamesPerRound),
         openingFEN      -> o.openingFEN.map(_.value),
-        variant         -> o.variant
+        variant         -> o.variant,
+        p1VictoryPoints -> o.p1VictoryPoints
       )
   }
   implicit val pairingGamesHandler: BSON[SwissPairingGameIds] = new BSON[SwissPairingGameIds] {
@@ -205,6 +207,7 @@ object BsonHandlers {
         backgammonPoints = r.intO("bp"),
         inputPlayerRatings = r.getD[String]("ipr"),
         isMatchScore = r.boolO("ms") | false,
+        isVictoryPoints = r.boolO("vp") | false,
         isBestOfX = r.boolO("x") | false,
         isPlayX = r.boolO("px") | false,
         nbGamesPerRound = r.intO("gpr") getOrElse SwissBounds.defaultGamesPerRound,
@@ -231,6 +234,7 @@ object BsonHandlers {
         "h"   -> s.handicapped.option(true),
         "ipr" -> s.inputPlayerRatings.some.filter(_.nonEmpty),
         "ms"  -> s.isMatchScore,
+        "vp"  -> s.isVictoryPoints.option(true),
         "x"   -> s.isBestOfX,
         "px"  -> s.isPlayX,
         "gpr" -> (s.nbGamesPerRound != SwissBounds.defaultGamesPerRound).option(s.nbGamesPerRound),

@@ -67,6 +67,10 @@ Play fast and return to the lobby to play more games and win more points.</strin
   <string name="shieldDescription">Held monthly for each variant, and monthly or weekly for some medleys. The winner holds the shield until the next one.</string>
   <string name="yearlyDescription">A 24-hour arena for one variant, held once a year.</string>
   <string name="whatTypesOfScheduledTournament">What types of scheduled tournament are there?</string>
+  <string name="team">Team</string>
+  <string name="public">Public</string>
+  <string name="teamDescription">Created by a player for their team. Only members of the team can join.</string>
+  <string name="publicDescription">Created by a player and open to everyone. The most popular are shown, up to six at a time.</string>
   <plurals name="viewAllXTeams">
     <item quantity="one">View the team</item>
     <item quantity="other">View all %s teams</item>

@@ -94,7 +94,7 @@ object home {
               )
             )
           ),
-          bits.freqKey,
+          bits.freqKey(withUserTournaments = true),
           div(cls := "tour-chart")
         ),
         div(cls := "arena-list box")(

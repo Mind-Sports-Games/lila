@@ -65,6 +65,7 @@ const readSheetMin = (str: string) =>
                     : s.length > 12 && s[11] == 'x' && s[12] == 's'
                       ? s.slice(13, 15)
                       : undefined,
+              vp: s[10] == 'v' ? parseInt(s.slice(11, 14), 10) : undefined,
             },
       )
     : [];

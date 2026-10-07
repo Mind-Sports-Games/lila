@@ -97,6 +97,7 @@ object Tv {
   import strategygames.backgammon.variant as BV
   import strategygames.abalone.variant as AV
   import strategygames.dameo.variant as D2V
+  import strategygames.entropy.variant as EV
   import strategygames.{ GameFamily, Speed as S }
 
   case class Champion(user: LightUser, rating: Int, gameId: Game.ID)
@@ -734,6 +735,15 @@ object Tv {
           familyChannel = false,
           gameFamily = "abalone"
         )
+    case object Entropy
+        extends Channel(
+          name = VariantKeys.variantName(Variant.Entropy(EV.Entropy)),
+          icon = EV.Entropy.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.Entropy(EV.Entropy)), noBot),
+          familyChannel = true,
+          gameFamily = "entropy"
+        )
     case object Bot
         extends Channel(
           name = "Bot",
@@ -817,6 +827,7 @@ object Tv {
       AbaloneFamily,
       Abalone,
       GrandAbalone,
+      Entropy,
       Bot,
       Computer
     )

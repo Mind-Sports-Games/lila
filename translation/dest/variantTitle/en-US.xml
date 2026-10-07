@@ -48,4 +48,5 @@
   <string name="minibreakthroughtroyka">Breakthrough on a 5x5 board: race one piece to your opponent's home rank to win</string>
   <string name="abalone">Push six of your opponent's marbles off the board to win</string>
   <string name="grandabalone">Push ten of your opponent's marbles off the board to win</string>
+  <string name="entropy">Build symmetric colour patterns as Order, and break them up as Chaos</string>
 </resources>

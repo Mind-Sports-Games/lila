@@ -21,6 +21,9 @@
 
   --cg-coord-color-flipello-p1: #ffedd1;
   --cg-coord-shadow-flipello: 0 1px 2px #000;
+
+  --cg-coord-color-entropy: #fff;
+  --cg-coord-shadow-entropy: 0 1px 2px #000;
 }
 
 coords {
@@ -204,6 +207,17 @@ coords {
       coord {
         text-shadow: var(--cg-coord-shadow-flipello);
         color: var(--cg-coord-color-flipello-p1);
+      }
+    }
+  }
+}
+.variant-entropy {
+  cg-coords-container.inner-coords {
+    coords.ranks,
+    coords.files {
+      coord {
+        text-shadow: var(--cg-coord-shadow-entropy);
+        color: var(--cg-coord-color-entropy);
       }
     }
   }

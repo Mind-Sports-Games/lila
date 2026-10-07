@@ -216,6 +216,7 @@ object SwissJson {
         "trophy2nd"             -> swiss.trophy2nd,
         "trophy3rd"             -> swiss.trophy3rd,
         "isMatchScore"          -> swiss.settings.isMatchScore,
+        "isVictoryPoints"       -> swiss.settings.isVictoryPoints,
         "isBestOfX"             -> swiss.settings.isBestOfX,
         "isPlayX"               -> swiss.settings.isPlayX,
         "nbGamesPerRound"       -> swiss.settings.nbGamesPerRound,
@@ -356,7 +357,7 @@ object SwissJson {
       .add("disqualified" -> p.disqualified)
 
   private def outcomeJson(outcome: List[SwissSheet.Outcome]): String =
-    outcome.head match {
+    outcome.head.result match {
       case SwissSheet.Absent => "absent"
       case SwissSheet.Bye    => "bye"
       case _                 => ""
@@ -372,8 +373,9 @@ object SwissJson {
       pairing.matchScoreFor(player.userId) // "" if isMatchScore is false, otherwise 2 digit string number
     val bestOfX    = if (pairing.isBestOfX) "x" else ""
     val playX      = if (pairing.isPlayX) "px" else ""
-    val openingFEN = pairing.openingFEN.map(_.value).fold("")(f => s"=${f}")
-    s"${pairing.gameId}$status${pairing.nbGamesPerRound}$bestOfX$playX$useMatchScore$matchScore$multiMatchIds$openingFEN"
+    val victoryPoints = pairing.victoryPointsFor(player.userId).fold("")(vp => f"v$vp%03d")
+    val openingFEN    = pairing.openingFEN.map(_.value).fold("")(f => s"=${f}")
+    s"${pairing.gameId}$status${pairing.nbGamesPerRound}$bestOfX$playX$useMatchScore$matchScore$victoryPoints$multiMatchIds$openingFEN"
   }
 
   private def pairingJson(player: SwissPlayer, pairing: SwissPairing) =
@@ -392,6 +394,7 @@ object SwissJson {
       .add("w" -> pairing.resultFor(player.userId))
       .add("mr" -> pairing.multiMatchResultsFor(player.userId))
       .add("c" -> (pairing.p1 == player.userId))
+      .add("vp" -> pairing.victoryPointsFor(player.userId))
       .add("vi" -> pairing.variant.map(_.perfIcon.toString))
 
   private def pairingJsonOrOutcome(

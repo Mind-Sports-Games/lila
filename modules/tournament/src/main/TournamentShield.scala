@@ -1021,6 +1021,13 @@ object TournamentShield {
           14,
           1
         )
+    case object Entropy
+        extends Category(
+          Variant.Entropy(strategygames.entropy.variant.Entropy),
+          Blitz,
+          15,
+          1
+        )
 
     val all: List[Category] = List(
       Chess,
@@ -1069,7 +1076,8 @@ object TournamentShield {
       Hyper,
       Nackgammon,
       Abalone,
-      GrandAbalone
+      GrandAbalone,
+      Entropy
     )
 
     def of(t: Tournament): Option[Category] = all.find(_.matches(t))

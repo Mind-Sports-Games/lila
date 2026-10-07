@@ -13,6 +13,7 @@ import play.api.data.validation.Constraint
 
 import lila.common.Form.*
 import lila.common.Clock.*
+import lila.common.LameName
 import lila.hub.LeaderTeam
 import lila.hub.LightTeam.*
 import lila.user.User
@@ -53,7 +54,8 @@ final class TournamentForm {
           breakthroughtroyka = true.some,
           go = true.some,
           backgammon = true.some,
-          abalone = true.some
+          abalone = true.some,
+          entropy = true.some
         ),
         variantSettings = VariantSettings(
           handicaps = Handicaps(
@@ -107,7 +109,8 @@ final class TournamentForm {
           breakthroughtroyka = gameGroupInMedley(tour.medleyVariants, GameGroup.BreakthroughTroyka()).some,
           go = gameGroupInMedley(tour.medleyVariants, GameGroup.Go()).some,
           backgammon = gameGroupInMedley(tour.medleyVariants, GameGroup.Backgammon()).some,
-          abalone = gameGroupInMedley(tour.medleyVariants, GameGroup.Abalone()).some
+          abalone = gameGroupInMedley(tour.medleyVariants, GameGroup.Abalone()).some,
+          entropy = gameGroupInMedley(tour.medleyVariants, GameGroup.Entropy()).some
         ),
         variantSettings = VariantSettings(handicaps =
           Handicaps(
@@ -133,8 +136,11 @@ final class TournamentForm {
 
   private def nameType(user: User) = eventName(2, 36).verifying(
     Constraint[String] { (t: String) =>
-      if (blockList.exists(t.toLowerCase.contains) && !user.isVerified && !user.isAdmin)
+      if (user.isVerified || user.isAdmin) validation.Valid
+      else if (blockList.exists(t.toLowerCase.contains))
         validation.Invalid(validation.ValidationError("Must not contain \"playstrategy\""))
+      else if (LameName.tournament(t))
+        validation.Invalid(validation.ValidationError("Must not contain inappropriate language"))
       else validation.Valid
     }
   )
@@ -199,7 +205,8 @@ final class TournamentForm {
           "breakthroughtroyka" -> optional(boolean),
           "go"                 -> optional(boolean),
           "backgammon"         -> optional(boolean),
-          "abalone"            -> optional(boolean)
+          "abalone"            -> optional(boolean),
+          "entropy"            -> optional(boolean)
         )(MedleyGameFamilies.apply)(unapply),
         "variantSettings" -> mapping(
           "handicaps" -> mapping(
@@ -530,7 +537,8 @@ case class MedleyGameFamilies(
     breakthroughtroyka: Option[Boolean],
     go: Option[Boolean],
     backgammon: Option[Boolean],
-    abalone: Option[Boolean]
+    abalone: Option[Boolean],
+    entropy: Option[Boolean]
 ) {
 
   lazy val ggList: List[GameGroup] = GameGroup.medley
@@ -548,4 +556,5 @@ case class MedleyGameFamilies(
     .filterNot(gg => if (!go.getOrElse(false)) gg == GameGroup.Go() else false)
     .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
     .filterNot(gg => if (!abalone.getOrElse(false)) gg == GameGroup.Abalone() else false)
+    .filterNot(gg => if (!entropy.getOrElse(false)) gg == GameGroup.Entropy() else false)
 }

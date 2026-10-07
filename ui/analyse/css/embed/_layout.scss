@@ -46,9 +46,15 @@
     grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
   }
 }
-.analyse.variant-shogi {
-  grid-template-rows: 7vw auto 3rem 7vw;
-  grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
+@each $variant in ('shogi', 'entropy') {
+  .analyse.variant-#{$variant} {
+    grid-template-rows: 7vw auto 3rem 7vw;
+    grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
+  }
+}
+// entropy's rows fit its eight-slot pocket; the fixed maximum keeps the board's height going to tools
+.analyse.variant-entropy {
+  grid-template-rows: minmax(min-content, 0) auto 3rem minmax(min-content, 0);
 }
 
 //score for games (togyzkumalak and Oware has own layout below)

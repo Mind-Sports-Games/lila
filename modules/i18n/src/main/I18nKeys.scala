@@ -953,6 +953,10 @@ val `wildcardDescription` = new I18nKey("arena:wildcardDescription")
 val `shieldDescription` = new I18nKey("arena:shieldDescription")
 val `yearlyDescription` = new I18nKey("arena:yearlyDescription")
 val `whatTypesOfScheduledTournament` = new I18nKey("arena:whatTypesOfScheduledTournament")
+val `team` = new I18nKey("arena:team")
+val `public` = new I18nKey("arena:public")
+val `teamDescription` = new I18nKey("arena:teamDescription")
+val `publicDescription` = new I18nKey("arena:publicDescription")
 val `drawingWithinNbMoves` = new I18nKey("arena:drawingWithinNbMoves")
 val `viewAllXTeams` = new I18nKey("arena:viewAllXTeams")
 }
@@ -1719,6 +1723,7 @@ val `pieceDestinations` = new I18nKey("preferences:pieceDestinations")
 val `playerTurnIndicator` = new I18nKey("preferences:playerTurnIndicator")
 val `actionReminder` = new I18nKey("preferences:actionReminder")
 val `boardIdentifier` = new I18nKey("preferences:boardIdentifier")
+val `entropyPatterns` = new I18nKey("preferences:entropyPatterns")
 val `boardCoordinates` = new I18nKey("preferences:boardCoordinates")
 val `coordinateSystemDraughts8x8` = new I18nKey("preferences:coordinateSystemDraughts8x8")
 val `moveListWhilePlaying` = new I18nKey("preferences:moveListWhilePlaying")
@@ -2423,6 +2428,7 @@ val `hyper` = new I18nKey("variantName:hyper")
 val `nackgammon` = new I18nKey("variantName:nackgammon")
 val `abalone` = new I18nKey("variantName:abalone")
 val `grandabalone` = new I18nKey("variantName:grandabalone")
+val `entropy` = new I18nKey("variantName:entropy")
 }
 
 object variantShortName {
@@ -2475,6 +2481,7 @@ val `hyper` = new I18nKey("variantShortName:hyper")
 val `nackgammon` = new I18nKey("variantShortName:nackgammon")
 val `abalone` = new I18nKey("variantShortName:abalone")
 val `grandabalone` = new I18nKey("variantShortName:grandabalone")
+val `entropy` = new I18nKey("variantShortName:entropy")
 }
 
 object variantTitle {
@@ -2527,6 +2534,7 @@ val `hyper` = new I18nKey("variantTitle:hyper")
 val `nackgammon` = new I18nKey("variantTitle:nackgammon")
 val `abalone` = new I18nKey("variantTitle:abalone")
 val `grandabalone` = new I18nKey("variantTitle:grandabalone")
+val `entropy` = new I18nKey("variantTitle:entropy")
 }
 
 object variantAlias {

@@ -33,6 +33,7 @@ import strategygames.togyzkumalak
 import strategygames.go
 import strategygames.backgammon
 import strategygames.abalone
+import strategygames.entropy
 import strategygames.format.FEN
 import strategygames.chess.variant.{ Standard as ChessStandard, Variant as ChessVariant }
 import strategygames.draughts.variant.{ Standard as DraughtsStandard, Variant as DraughtsVariant }
@@ -46,6 +47,7 @@ import strategygames.go.variant.{ Go19x19 as GoStandard, Variant as GoVariant }
 import strategygames.backgammon.variant.{ Backgammon as BackgammonStandard, Variant as BackgammonVariant }
 import strategygames.abalone.variant.{ Abalone as AbaloneStandard, Variant as AbaloneVariant }
 import strategygames.dameo.variant.{ Dameo as DameoStandard, Variant as DameoVariant }
+import strategygames.entropy.variant.{ Entropy as EntropyStandard, Variant as EntropyVariant }
 import org.joda.time.DateTime
 import reactivemongo.api.bson.*
 import scala.util.{ Success, Try }
@@ -142,6 +144,20 @@ object BSONHandlers {
               }
             )
           )
+        case GameLogic.Entropy() =>
+          PocketData.Entropy(
+            entropy.PocketData(
+              pockets = {
+                val (p1, p2) = {
+                  r.str("p").view.flatMap(c => entropy.Piece.fromChar(c)).to(List)
+                }.partition(_.is(P1))
+                Pockets(
+                  p1 = Pocket(p1.map(_.role).map(Role.EntropyRole.apply)),
+                  p2 = Pocket(p2.map(_.role).map(Role.EntropyRole.apply))
+                )
+              }
+            )
+          )
         case _ => sys.error(s"Pocket Data BSON reader not implemented for GameLogic: ${r.intD("l")}")
       }
 
@@ -154,6 +170,7 @@ object BSONHandlers {
           case PocketData.FairySF(pd)   => pd.gameFamily.getOrElse(GameFamily.Shogi()).id
           case PocketData.Go(_)         => 9
           case PocketData.Backgammon(_) => 10
+          case PocketData.Entropy(_)    => GameFamily.Entropy().id
         }),
         "p" -> {
           o.pockets.p1.roles.map(_.forsyth.toUpper).mkString +
@@ -759,6 +776,52 @@ object BSONHandlers {
         (dameoGame, defaultMetaData)
       }
 
+      def readEntropyGame(r: BSON.Reader): (StratGame, Metadata) = {
+
+        val gameVariant = EntropyVariant(r.intD(F.variant)) | EntropyStandard
+
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Entropy(), r.bytesD(F.oldPgn), playedPlies)
+
+        def turnUcis(turnStr: Option[String]) =
+          turnStr.map(_.split(",").toList.flatMap(entropy.format.Uci.apply)).getOrElse(List.empty)
+
+        val entropyGame = StratGame.Entropy(
+          entropy.Game(
+            situation = entropy.Situation(
+              entropy.Board(
+                pieces = BinaryFormat.piece.readEntropy(r.bytes(F.binaryPieces)),
+                history = entropy.History(
+                  lastTurn = turnUcis(r.strO(F.historyLastTurn)),
+                  currentTurn = turnUcis(r.strO(F.historyCurrentTurn)),
+                  positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
+                  score = {
+                    val counts = r.intsD(F.score)
+                    Score(~counts.headOption, ~counts.lastOption)
+                  },
+                  round = r.intO(F.round) | 1,
+                  halfMoveClock = r.intD(F.halfMoveClock)
+                ),
+                variant = gameVariant,
+                pocketData = r.getO[PocketData](F.pocketData) match {
+                  case Some(PocketData.Entropy(pd)) => Some(pd)
+                  case None                         => Some(entropy.PocketData.init)
+                  case _                            => sys.error("non entropy pocket data")
+                }
+              ),
+              player = turnPlayerIndex
+            ),
+            actionStrs = actionStrs,
+            clock = clock,
+            plies = plies,
+            turnCount = turns,
+            startedAtPly = startedAtPly,
+            startedAtTurn = startedAtTurn
+          )
+        )
+
+        (entropyGame, defaultMetaData)
+      }
+
       val libId                 = r.intD(F.lib)
       val (stratGame, metadata) = libId match {
         case 0 => readChessGame(r)
@@ -770,6 +833,7 @@ object BSONHandlers {
         case 6 => readBackgammonGame(r)
         case 7 => readAbaloneGame(r)
         case 8 => readDameoGame(r)
+        case 9 => readEntropyGame(r)
         case _ => sys.error(s"Invalid game in the database, libId: ${libId}")
       }
 
@@ -949,6 +1013,23 @@ object BSONHandlers {
               F.positionHashes     -> o.history.positionHashes,
               F.historyLastTurn    -> o.history.lastTurnUciString,
               F.historyCurrentTurn -> o.history.currentTurnUciString
+            )
+          case GameLogic.Entropy() =>
+            val board = o.board match {
+              case Board.Entropy(board) => board
+              case _                    => sys.error("invalid entropy board")
+            }
+            $doc(
+              F.oldPgn -> NewLibStorage.OldBin
+                .encodeActionStrs(o.variant.gameFamily, o.actionStrs take Game.maxTurns),
+              F.binaryPieces       -> BinaryFormat.piece.writeEntropy(board.pieces),
+              F.halfMoveClock      -> (o.history.halfMoveClock != 0).option(o.history.halfMoveClock),
+              F.positionHashes     -> o.history.positionHashes,
+              F.historyLastTurn    -> o.history.lastTurnUciString,
+              F.historyCurrentTurn -> o.history.currentTurnUciString,
+              F.pocketData         -> o.board.pocketData,
+              F.score              -> o.history.score.nonEmpty.option(o.history.score),
+              F.round              -> (board.round != 1).option(board.round)
             )
           case _ => // chess or fail
             if (o.variant.key == "standard")

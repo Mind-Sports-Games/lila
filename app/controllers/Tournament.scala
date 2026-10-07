@@ -69,9 +69,10 @@ final class Tournament(
     _.refreshAfterWrite(3.seconds)
       .buildAsyncFuture { _ =>
         for {
-          visible   <- api.fetchVisibleTournaments
-          scheduled <- repo.allScheduledDedup
-        } yield (visible, scheduled)
+          visible     <- api.fetchVisibleTournaments
+          publicTours <- api.fetchPublicTournaments
+          scheduled   <- repo.allScheduledDedup
+        } yield (visible.add(publicTours), scheduled)
       }
   }
 

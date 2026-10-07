@@ -192,7 +192,8 @@ trait SetupHelper { self: I18nHelper =>
     GameGroup.Xiangqi(),
     GameGroup.LinesOfAction(),
     GameGroup.Abalone(),
-    GameGroup.Amazons()
+    GameGroup.Amazons(),
+    GameGroup.Entropy()
   )
 
   // Which group button a variant belongs under, keyed by its game family. Note the value is not

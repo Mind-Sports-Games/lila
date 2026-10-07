@@ -47,6 +47,7 @@ export interface SwissData {
   trophy3rd: string;
   multiMatchGameIds?: string[];
   isMatchScore: boolean;
+  isVictoryPoints: boolean;
   isBestOfX: boolean;
   isPlayX: boolean;
   nbGamesPerRound: number;
@@ -99,6 +100,7 @@ export interface PairingBase {
   px: boolean; // isPlayX
   gpr: string; //nbGamesPerRound
   mp?: string; //match points for player if using matchScore
+  vp?: number; //victory points for player if using victory points
   vi?: string; //variant icon
   of?: string; //opening fen
 }

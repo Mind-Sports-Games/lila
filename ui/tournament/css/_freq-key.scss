@@ -1,5 +1,6 @@
 $c-tour: #303e43;
 $c-tour-user: #888;
+$c-tour-team: #7e57c2;
 $c-tour-hourly: #3d9333;
 $c-tour-daily: #0072b2;
 $c-tour-weekly: #d55e00;
@@ -44,6 +45,15 @@ $c-tour-max-rating: #8572ff;
 
     &.yearly {
       background-color: $c-tour-yearly;
+    }
+
+    &.team {
+      background-color: $c-tour-team;
+    }
+
+    &.public {
+      height: 0.6em;
+      background-color: $c-tour-user;
     }
   }
 }

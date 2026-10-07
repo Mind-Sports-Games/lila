@@ -14,6 +14,7 @@ playstrategy.load.then(() => {
     $bestOfX = $('#form3-xGamesChoice_bestOfX'),
     $playX = $('#form3-xGamesChoice_playX'),
     $useMatchScore = $('#form3-xGamesChoice_matchScore'),
+    $victoryPoints = $('#form3-variantSettings_victoryPoints'),
     $useByoyomi = $('#form3-clock_useByoyomi'),
     $useBronsteinDelay = $('#form3-clock_useBronsteinDelay'),
     $useSimpleDelay = $('#form3-clock_useSimpleDelay'),
@@ -33,6 +34,12 @@ playstrategy.load.then(() => {
       $('.form3 .variant').toggle(!$medley.is(':checked'));
       showPosition();
       showDrawTables();
+      showVictoryPoints();
+    },
+    showVictoryPoints = () => {
+      const isEntropy = (($variant.val() as string) || '').startsWith('14_') && !$medley.is(':checked');
+      $('.form3 .victoryPoints').toggle(isEntropy);
+      if (!isEntropy) $victoryPoints.prop('checked', false);
     },
     showInputRatings = () => {
       $('.form3 .inputPlayerRatings').toggle($handicapped.is(':checked') || $mcmahon.is(':checked'));
@@ -44,6 +51,7 @@ playstrategy.load.then(() => {
       $('.form3 .mcmahon').toggle(isGo);
       $('.form3 .handicapped').toggle(isGo);
       $('.form3 .mcmahonCutoff').toggle(isGo);
+      showVictoryPoints();
       if (!isGo) {
         $mcmahon.prop('checked', false);
         $handicapped.prop('checked', false);
@@ -141,9 +149,18 @@ playstrategy.load.then(() => {
   $bestOfX.on('change', () => {
     toggleOff($playX);
     toggleOff($useMatchScore);
+    toggleOff($victoryPoints);
   });
   $playX.on('change', () => toggleOff($bestOfX));
   $playX.on('change', () => matchSelectors($playX, $useMatchScore));
+  $playX.on('change', () => toggleOff($victoryPoints));
+  $useMatchScore.on('change', () => toggleOff($victoryPoints));
+  $victoryPoints.on('change', () => {
+    toggleOff($bestOfX);
+    toggleOff($playX);
+    toggleOff($useMatchScore);
+    $('#form3-xGamesChoice_nbGamesPerRound').val('1');
+  });
 
   $useByoyomi.on('change', toggleByoyomiSettings);
   $useBronsteinDelay.on('change', toggleBronstein);

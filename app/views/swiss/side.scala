@@ -74,6 +74,9 @@ object side {
                 s.settings.isMatchScore.option(
                   a(href := s"${routes.Swiss.home}#faqMatchScore")(" using match score")
                 ),
+                s.settings.isVictoryPoints.option(
+                  a(href := s"${routes.Swiss.home}#faqVictoryPoints")(" using victory points")
+                ),
                 if (s.settings.isBestOfX || s.settings.isPlayX) ")"
                 else ""
               ),

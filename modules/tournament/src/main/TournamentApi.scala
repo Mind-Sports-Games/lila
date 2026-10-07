@@ -15,7 +15,7 @@ import scala.util.control.NonFatal
 import lila.common.config.{ MaxPerPage, MaxPerSecond }
 import lila.common.extensions.*
 import lila.common.paginator.Paginator
-import lila.common.{ Bus, Debouncer, LightUser }
+import lila.common.{ Bus, Debouncer, LameName, LightUser }
 import lila.game.{ Game, GameRepo, Handicaps, LightPov, Pov }
 import lila.hub.LeaderTeam
 import lila.hub.LightTeam.*
@@ -870,6 +870,34 @@ final class TournamentApi(
       VisibleTournaments(created, started, finished)
     }
 
+  def fetchPublicTournaments: Fu[List[Tournament]] =
+    tournamentRepo.publicUserTournaments(6 * 60) flatMap { tours =>
+      userRepo.enabledByIds(tours.map(_.createdBy).distinct) map { creators =>
+        val goodCreators = creators.filterNot(_.lameOrTroll).map(u => u.id -> u).toMap
+        val ranked = tours
+          .filter { t =>
+            goodCreators.get(t.createdBy) exists { creator =>
+              creator.isVerified || creator.isAdmin || !LameName.tournament(t.name)
+            }
+          }
+          .sortBy(t => (-t.nbPlayers, t.minutes, t.startsAt.getMillis))
+        ranked.foldLeft(List.empty[Tournament]) { (accepted, tour) =>
+          if (maxOverlap(tour :: accepted) <= TournamentApi.maxOverlappingPublic) tour :: accepted
+          else accepted
+        }
+      }
+    }
+
+  private def maxOverlap(tours: List[Tournament]): Int =
+    tours
+      .flatMap(t => List(t.startsAt.getMillis -> 1, t.finishesAt.getMillis -> -1))
+      .sortBy { case (at, delta) => (at, delta) }
+      .foldLeft((0, 0)) { case ((current, max), (_, delta)) =>
+        val next = current + delta
+        (next, next.atLeast(max))
+      }
+      ._2
+
   // when updating /tournament
   def fetchUpdateTournaments: Fu[VisibleTournaments] =
     scheduledCreatedAndStarted dmap { case (created, started) =>
@@ -1074,6 +1102,8 @@ final class TournamentApi(
 }
 
 private object TournamentApi {
+
+  val maxOverlappingPublic = 6
 
   case class Callbacks(
       clearJsonViewCache: Tournament => Unit,

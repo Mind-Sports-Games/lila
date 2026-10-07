@@ -82,6 +82,7 @@ private object PrefHandlers {
         moveEvent = r.getD("moveEvent", Pref.default.moveEvent),
         mancalaMove = r.getD("mancalaMove", Pref.default.mancalaMove),
         boardIdentifier = r.getD("boardIdentifier", Pref.default.boardIdentifier),
+        entropyPatterns = r.getD("entropyPatterns", Pref.default.entropyPatterns),
         tags = r.getD("tags", Pref.default.tags)
       )
 
@@ -135,6 +136,7 @@ private object PrefHandlers {
         "pieceNotation"       -> o.pieceNotation,
         "resizeHandle"        -> o.resizeHandle,
         "boardIdentifier"     -> o.boardIdentifier,
+        "entropyPatterns"     -> o.entropyPatterns,
         "tags"                -> o.tags
       )
   }
