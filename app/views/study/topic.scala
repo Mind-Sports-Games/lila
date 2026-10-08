@@ -50,7 +50,9 @@ object topic {
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = topic.value,
-      robots = pag.currentPage == 1,
+      // every ordering lists the same studies: the default one is the page to index, as on the variant listing
+      robots = netConfig.crawlable && pag.currentPage == 1,
+      canonicalPath = routes.Study.byTopic(topic.value, Order.default.key).url.some,
       moreCss = cssTag("study.index"),
       wrapClass = "full-screen-force",
       moreJs = infiniteScrollTag

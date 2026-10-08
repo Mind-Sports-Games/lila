@@ -25,14 +25,14 @@ export const hashedAssetUrl = (path: string, opts: AssetUrlOpts = {}) => {
 };
 
 // zxcvbn is 387KB of word lists: load it when the field is focused, not when the page is
+// A field the page autofocused is focused before this runs, so it loads at once.
 export const lazyPasswordComplexity = (id: string) => {
   const field = document.getElementById(id);
   if (!field) return;
-  field.addEventListener(
-    'focus',
-    () => loadModule('passwordComplexity').then(() => window.PlayStrategyPassword.addPasswordChangeListener(id)),
-    { once: true },
-  );
+  const load = () =>
+    loadModule('passwordComplexity').then(() => window.PlayStrategyPassword.addPasswordChangeListener(id));
+  if (document.activeElement === field) load();
+  else field.addEventListener('focus', load, { once: true });
 };
 
 // Chart.js and its plugins are 211KB, and a chart is never why someone opened the page:
