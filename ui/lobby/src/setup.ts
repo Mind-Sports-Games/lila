@@ -1634,6 +1634,16 @@ export default class Setup {
       }
     });
 
+    // the clock section was opened without a click: show the custom clock settings the way a click
+    // would. After the loop, as each section it runs through hides them again.
+    if (
+      (forceVariant || forceFromPosition) &&
+      $timeModeDefaults.hasClass('active') &&
+      ($timeModeDefaults.find('input').filter(':checked').val() as string) === 'custom'
+    ) {
+      $timeModeDefaults.trigger('change');
+    }
+
     $collapsibleSections.find('input, label').on('click', function (e) {
       e.stopPropagation();
     });
