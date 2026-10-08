@@ -39,6 +39,10 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
 
   def byId(id: Study.Id) = coll(_.find($id(id), projection.some).one[Study])
 
+  // these studies, minus the ones a mod took out of the listings
+  def featured(ids: List[Study.Id]): Fu[List[Study.Id]] =
+    coll(_.distinctEasy[Study.Id, List]("_id", $inIds(ids) ++ "trash".$ne(true), readPref))
+
   def byOrderedIds(ids: Seq[Study.Id]) = coll(_.byOrderedIds[Study, Study.Id](ids)(_.id))
 
   def lightById(id: Study.Id): Fu[Option[Study.LightStudy]] =

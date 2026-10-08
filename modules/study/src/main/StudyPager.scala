@@ -108,11 +108,14 @@ final class StudyPager(
       ids.flatMap(byId.get)
     }
 
-  // the distinct over chapters is the costly part; a few minutes of staleness is fine for a listing
+  // the distinct over chapters is the costly part; a few minutes of staleness is fine for a listing.
+  // The studies a mod took out of the listings leave the list here, so each page does not carry them.
   private val variantStudyIds = cacheApi[String, List[Study.Id]](64, "study.pager.variantStudyIds") {
     _.expireAfterWrite(5.minutes)
       .buildAsyncFuture { key =>
-        Variant.all.find(_.key == key).fold(fuccess(List.empty[Study.Id]))(chapterRepo.studyIdsByVariant)
+        Variant.all
+          .find(_.key == key)
+          .fold(fuccess(List.empty[Study.Id]))(chapterRepo.studyIdsByVariant(_) flatMap studyRepo.featured)
       }
   }
 
