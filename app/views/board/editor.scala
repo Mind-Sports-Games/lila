@@ -67,7 +67,9 @@ object editor {
       views.html.library.bits.hasLibraryPages(variant).option(
         p(cls := "editor__about__links")(
           a(cls := "button", href := s"/?variant=${variant.key}#game")(trans.createAGame()),
-          a(cls := "editor__about__rules", href := routes.Page.variant(variant.key))("Rules")
+          a(cls := "editor__about__library", href := routes.Library.variant(variant.key))(
+            trans.aboutX(views.html.library.bits.searchName(variant))
+          )
         )
       )
     )

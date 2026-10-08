@@ -117,7 +117,9 @@ object userAnalysis {
               p(cls := "analyse__about__links")(
                 // the same link as the library's and the rules page's button: the lobby's game form
                 a(cls := "button", href := s"/?variant=${variant.key}#game")(trans.createAGame()),
-                a(cls := "analyse__about__rules", href := routes.Page.variant(variant.key))("Rules")
+                a(cls := "analyse__about__library", href := routes.Library.variant(variant.key))(
+                  trans.aboutX(views.html.library.bits.searchName(variant))
+                )
               )
             )
           )
