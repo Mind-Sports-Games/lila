@@ -61,6 +61,8 @@ final class Env(
 
   private lazy val notifier = wire[ModNotifier]
 
+  private lazy val ratingWriter = wire[RatingWriter]
+
   private lazy val ratingRefund = wire[RatingRefund]
 
   lazy val publicChat = wire[PublicChat]

@@ -100,6 +100,11 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
       Modlog(mod, user.some, Modlog.removeTitle)
     }
 
+  def setRating(mod: User.ID, user: User.ID, details: String) =
+    add {
+      Modlog(mod, user.some, Modlog.setRating, details.some)
+    }
+
   def setEmail(mod: User.ID, user: User.ID) =
     add {
       Modlog(mod, user.some, Modlog.setEmail)

@@ -30,7 +30,7 @@ case class Glicko(
 
   def sanityCheck =
     rating > 0 &&
-      rating < 4000 &&
+      intRating <= Glicko.maxRating &&
       deviation > 0 &&
       deviation < 1000 &&
       volatility > 0 &&
@@ -61,6 +61,7 @@ case class Glicko(
 case object Glicko {
 
   val minRating = 600
+  val maxRating = 3999
 
   val minDeviation              = 45
   val standardRankableDeviation = 75

@@ -102,6 +102,14 @@ playstrategy.load.then(() => {
       $(el).on('change', () => ($(el).parent('form')[0] as HTMLFormElement).submit()),
     );
 
+    makeReady('button.set-rating-toggle', el =>
+      $(el).on('click', () => {
+        const form = $inZone.find('form.set-rating').toggleClass('none');
+        el.classList.toggle('active', !form.hasClass('none'));
+        if (!form.hasClass('none')) form.find('select').trigger('focus');
+      }),
+    );
+
     makeReady('form.pm-preset select', (el: HTMLSelectElement) =>
       $(el).on('change', () => {
         const form = $(el).parent('form')[0] as HTMLFormElement;

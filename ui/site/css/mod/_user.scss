@@ -112,6 +112,23 @@
   select {
     max-width: 8em;
   }
+  form.set-rating:not(.none) {
+    display: flex;
+    flex: 0 0 100%;
+    justify-content: flex-start;
+    gap: 0.5em;
+
+    select {
+      max-width: none;
+      width: 18em;
+    }
+    input[type='number'] {
+      width: 13em;
+    }
+    input[name='reason'] {
+      width: 22em;
+    }
+  }
 }
 
 #mz_actions .inquiry {
