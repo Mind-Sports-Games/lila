@@ -117,7 +117,16 @@ object history {
       main(cls := "page-menu arena-history")(
         freqNav(freq, variant, group),
         div(cls := "page-menu__content box")(
-          h1(heading),
+          // the game's own page, on the title's line: kept out of the h1 so the heading stays the page's name
+          div(cls := "arena-history__head")(
+            h1(heading),
+            variant.map { v =>
+              a(cls := "arena-history__about", href := routes.Library.variant(v.key))(
+                trans.aboutX(VariantKeys.variantName(v)),
+                " ›"
+              )
+            }
+          ),
           // Two stages, game group then game, because 47 chips in one row is not a chooser.
           // A group is a page of its own - every Abalone tournament of this frequency, across
           // the family - so each chip is a link and none of this needs a line of script.
@@ -157,15 +166,6 @@ object history {
               }
             )
           },
-          variant.map { v =>
-            div(cls := "arena-history__intro")(
-              // the same link as the library's button: the lobby's game form, on this game
-              a(cls := "button", href := s"/?variant=${v.key}#game")(trans.createAGame()),
-              a(cls := "button button-empty", href := routes.Library.variant(v.key))(
-                trans.aboutX(VariantKeys.variantName(v))
-              )
-            )
-          },
           (stats zip wording zip summary).map { case ((st, w), sm) =>
             frag(
               series.holderCard(
@@ -178,15 +178,20 @@ object history {
               h2(cls := "shield-section")("Every edition")
             )
           },
-          div(cls := "arena-list")(
-            table(cls := "slist slist-pad")(
-              tbody(cls := "infinite-scroll")(
-                pager.currentPageResults map finishedList.apply,
-                // a family page pages within the family, not into the unfiltered list
-                pagerNextTable(pager, pageUrl(freq, variant, group, _))
+          // a series with no finished edition says so, rather than show an empty table. Not "yet": a
+          // legacy series may never have another one
+          if (pager.currentPage == 1 && pager.currentPageResults.isEmpty)
+            p(cls := "arena-history__empty")(trans.noFinishedTournament())
+          else
+            div(cls := "arena-list")(
+              table(cls := "slist slist-pad")(
+                tbody(cls := "infinite-scroll")(
+                  pager.currentPageResults map finishedList.apply,
+                  // a family page pages within the family, not into the unfiltered list
+                  pagerNextTable(pager, pageUrl(freq, variant, group, _))
+                )
               )
             )
-          )
         )
       )
     }

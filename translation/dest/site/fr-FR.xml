@@ -915,6 +915,7 @@
   <string name="msoEventVenue">Le tournoi de %s des Mind Sports Olympiad se joue en présentiel ; ses parties sont publiées sur PlayStrategy, qui accueille aussi le Grand Prix MSO en ligne.</string>
   <string name="msoResultsAndMedallists">Résultats et médaillés</string>
   <string name="msoAllEditions">Toutes les éditions</string>
+  <string name="noFinishedTournament">Aucun tournoi de cette série n\'est terminé.</string>
   <string name="msoEventGames">Parties du tournoi</string>
   <string name="msoEventResultsOnly">Le tournoi de %s de la Mind Sports Olympiad se joue sur place ; ses résultats sont publiés dans la base de résultats du MSO.</string>
   <string name="msoWorldChampionshipResultsOnly">Le championnat du monde de %s de la Mind Sports Olympiad se joue sur place ; ses résultats sont publiés dans la base de résultats du MSO.</string>

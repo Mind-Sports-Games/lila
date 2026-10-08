@@ -990,6 +990,7 @@
   <string name="msoEventVenue">Турнир Mind Sports Olympiad по %s проходит очно; его партии публикуются на PlayStrategy, где также проводится онлайн Гран-при MSO.</string>
   <string name="msoResultsAndMedallists">Результаты и призёры</string>
   <string name="msoAllEditions">Все розыгрыши</string>
+  <string name="noFinishedTournament">Ни один турнир этой серии не завершён.</string>
   <string name="msoEventGames">Партии турнира</string>
   <string name="msoGrandPrix">Гран-при MSO</string>
   <string name="msoGrandPrixEvent">%s на Гран-при MSO</string>

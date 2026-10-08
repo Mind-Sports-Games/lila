@@ -83,46 +83,53 @@ object series {
   def holderCard(stats: Stats, next: Option[Next], trophy: Frag, w: Wording)(implicit
       ctx: Context
   ): Frag =
-    div(cls := "categ-shield-holder")(
-      trophy,
-      stats.current.map { holder =>
-        frag(
-          span(cls := "categ-shield-holder__label")(w.holderLabel),
-          userIdLink(holder.userId.some, cssClass = "reigning-shield-holder".some, withOnline = false),
-          span(cls := "categ-shield-holder__since")(
-            "since ",
-            a(href := holder.url)(showDate(holder.date)),
-            stats.currentReign.filter(r => w.contested && r.count > 1).map(r => frag(" · ", r.count, " in a row"))
+    // with no holder and no edition coming there is nothing to show, not even the box
+    if (stats.current.isEmpty && next.isEmpty) emptyFrag
+    else
+      div(cls := "categ-shield-holder")(
+        trophy,
+        // nobody has won it yet: say so, under the trophy and above the next arena
+        stats.current.isEmpty.option(
+          p(cls := "categ-shield-holder__challenge")(s"No one holds the ${w.unit} yet.")
+        ),
+        stats.current.map { holder =>
+          frag(
+            span(cls := "categ-shield-holder__label")(w.holderLabel),
+            userIdLink(holder.userId.some, cssClass = "reigning-shield-holder".some, withOnline = false),
+            span(cls := "categ-shield-holder__since")(
+              "since ",
+              a(href := holder.url)(showDate(holder.date)),
+              stats.currentReign.filter(r => w.contested && r.count > 1).map(r => frag(" · ", r.count, " in a row"))
+            )
           )
-        )
-      },
-      // contested: dare the reader by naming what the holder has built up, then point at the next arena;
-      // otherwise just state the record, if any
-      stats.current.map { holder =>
-        val name   = usernameOrId(holder.userId)
-        val streak = stats.currentReign.map(_.count).filter(_ > 1).filter(_ => w.contested)
-        // "has the most X of anyone" / "shares the most X with lukas and vincent" / "has the second most X"
-        val rank = stats.rankOf(holder.userId).map {
-          case (ord, Nil) if ord == "the most" => s"has $ord ${w.unitsName} of anyone"
-          case (ord, Nil)                      => s"has $ord ${w.unitsName}"
-          case (ord, tied)                     => s"shares $ord ${w.unitsName} with ${listPeople(tied)}"
+        },
+        // contested: dare the reader by naming what the holder has built up, then point at the next arena;
+        // otherwise just state the record, if any
+        stats.current.map { holder =>
+          val name   = usernameOrId(holder.userId)
+          val streak = stats.currentReign.map(_.count).filter(_ > 1).filter(_ => w.contested)
+          // "has the most X of anyone" / "shares the most X with lukas and vincent" / "has the second most X"
+          val rank = stats.rankOf(holder.userId).map {
+            case (ord, Nil) if ord == "the most" => s"has $ord ${w.unitsName} of anyone"
+            case (ord, Nil)                      => s"has $ord ${w.unitsName}"
+            case (ord, tied)                     => s"shares $ord ${w.unitsName} with ${listPeople(tied)}"
+          }
+          val feat = (streak, rank) match {
+            case (Some(n), Some(r)) => s"$name has held the ${w.unit} for $n editions in a row and $r.".some
+            case (Some(n), None)    => s"$name has held the ${w.unit} for $n editions in a row.".some
+            case (None, Some(r))    => s"$name $r.".some
+            case (None, None)       => none
+          }
+          // what the holder has built up; the date is on the line above and the next arena on the button
+          feat.map(f => p(cls := "categ-shield-holder__challenge")(f))
+        },
+        next.map { t =>
+          a(cls := "button categ-shield-holder__next", href := t.url)(
+            s"${if (w.contested) w.takeLabel else s"Next ${w.arenaName}"} · ",
+            absClientDateTime(t.startsAt)
+          )
         }
-        val feat = (streak, rank) match {
-          case (Some(n), Some(r)) => s"$name has held the ${w.unit} for $n editions in a row and $r.".some
-          case (Some(n), None)    => s"$name has held the ${w.unit} for $n editions in a row.".some
-          case (None, Some(r))    => s"$name $r.".some
-          case (None, None)       => none
-        }
-        // what the holder has built up; the date is on the line above and the next arena on the button
-        feat.map(f => p(cls := "categ-shield-holder__challenge")(f))
-      },
-      next.map { t =>
-        a(cls := "button categ-shield-holder__next", href := t.url)(
-          s"${if (w.contested) w.takeLabel else s"Next ${w.arenaName}"} · ",
-          absClientDateTime(t.startsAt)
-        )
-      }
-    )
+      )
 
   // "lukas", "lukas and vincent", "lukas, vincent and primodragon", "5 other players"
   private def listPeople(userIds: List[String]): String =

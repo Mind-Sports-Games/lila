@@ -917,6 +917,7 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="msoEventVenue">O torneio de %s da Mind Sports Olympiad é disputado presencialmente; suas partidas são publicadas no PlayStrategy, que também recebe o Grand Prix MSO online.</string>
   <string name="msoResultsAndMedallists">Resultados e medalhistas</string>
   <string name="msoAllEditions">Todas as edições</string>
+  <string name="noFinishedTournament">Nenhum torneio desta série terminou.</string>
   <string name="msoEventGames">Partidas do torneio</string>
   <string name="msoGrandPrix">Grand Prix MSO</string>
   <string name="msoGrandPrixEvent">%s no Grande Prémio MSO</string>
