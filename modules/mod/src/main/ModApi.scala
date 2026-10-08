@@ -1,5 +1,7 @@
 package lila.mod
 
+import org.joda.time.DateTime
+
 import lila.common.{ Bus, EmailAddress }
 import lila.report.{ Mod, ModId, Room, Suspect, SuspectId }
 import lila.security.{ Granter, Permission }
@@ -144,13 +146,15 @@ final class ModApi(
       val prev = user.perfs(pt)
       if (prev.nb == 0) fufail(s"${user.username} has not played ${pt.key}")
       else {
-        // refund first so the progress arrow updates, then store exactly what the mod entered
+        // refund first so the progress arrow updates, then store exactly what the mod entered.
+        // latest moves to now because the stored deviation is wound back to latest.
         val refunded = prev.refund(data.rating - prev.intRating)
-        val perf     = refunded.copy(glicko =
-          refunded.glicko.copy(
+        val perf     = refunded.copy(
+          glicko = refunded.glicko.copy(
             rating = data.rating.toDouble,
             deviation = data.deviation.fold(refunded.glicko.deviation)(_.toDouble)
-          )
+          ),
+          latest = DateTime.now.some
         )
         val deviationChange =
           data.deviation.filter(_ != prev.intDeviation) so { d => s" (±${prev.intDeviation} → ±$d)" }
