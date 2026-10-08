@@ -27,9 +27,13 @@ object show {
       tours: List[Tournament],
       featuredGame: Option[Game] = None,
       dailyPuzzle: Option[DailyPuzzle.WithHtml] = None,
-      studies: List[lila.study.Study.Notable] = Nil,
+      studies: List[lila.study.Study.WithChaptersAndLiked] = Nil,
       grandPrix: List[bits.GrandPrixEdition] = Nil
-  )(implicit ctx: Context) =
+  )(implicit ctx: Context) = {
+    val mso = msoSection(variant, bits.msoEvent(variant), grandPrix)
+    // the blocks go two to a row: the studies share theirs with the leaderboard when an even number of
+    // blocks come before it
+    val besideLeaderboard = leaderboard.nonEmpty && ((if (tours.nonEmpty) 1 else 0) + mso.size) % 2 == 0
     views.html.base.layout(
       title = bits.pageTitle(variant),
       moreCss = cssTag("library"),
@@ -146,12 +150,13 @@ object show {
             }
           )
         ),
-        // whichever of these a game has, two per row, a lone last one full width
+        // whichever of these a game has, two per row, a lone last one full width. The short blocks come
+        // first and the tall ones (leaderboard, studies) after, so the two of a row are about as high
         div(cls := "library__blocks")(
           tours.nonEmpty.option(tournamentList(tours)),
+          mso,
           leaderboard.nonEmpty.option(userTopPerf(leaderboard, PerfType(variant, Speed.Blitz))),
-          msoSection(variant, bits.msoEvent(variant), grandPrix),
-          studyList(variant, studies)
+          studyList(variant, studies, besideLeaderboard)
         ),
         div(cls := "library-stats-table")(
           div(cls := "library-stats-title color-choice")(
@@ -182,6 +187,7 @@ object show {
         relatedSection(variant)
       )
     )
+  }
 
   private def tournamentList(tours: List[Tournament])(implicit ctx: Context) =
     div(cls := "tournaments")(
@@ -195,21 +201,26 @@ object show {
       )
     )
 
-  // the game's notable studies, the site's own first, then by rank (NotableStudies),
-  // minus the tutorial and the MSO event games, which the page links on their own
-  private def studyList(variant: Variant, studies: List[lila.study.Study.Notable])(implicit ctx: Context) = {
+  // the game's notable studies, the site's own first, then by rank (NotableStudies), as on the studies
+  // page, minus the tutorial and the MSO event games, which the page links on their own
+  private def studyList(
+      variant: Variant,
+      studies: List[lila.study.Study.WithChaptersAndLiked],
+      besideLeaderboard: Boolean
+  )(implicit ctx: Context) = {
     val linked = bits.studyLink(variant).toSet ++ bits.msoEvent(variant).flatMap(_.studyId)
-    val others = studies.filterNot(s => linked(s.id.value))
+    val others = studies.filterNot(s => linked(s.study.id.value))
     others.nonEmpty.option(
-      div(cls := "library__studies")(
+      // beside the leaderboard the block is no higher than it, and its tiles scroll
+      div(cls := List("library__studies" -> true, "library__studies--beside-leaderboard" -> besideLeaderboard))(
         div(cls := "color-choice title")(
           div(dataIcon := "4"),
-          h2(trans.variantStudies(bits.searchName(variant))),
+          h2(trans.libraryStudies()),
           a(href := routes.Study.byVariantDefault(variant.key), cls := "more")(trans.more(), " »")
         ),
-        ul(others.map { s =>
-          li(a(href := routes.Study.show(s.id.value))(s.name.value))
-        })
+        div(cls := "studies")(
+          others.map(s => div(cls := "study")(views.html.study.bits.widget(s, h3)))
+        )
       )
     )
   }

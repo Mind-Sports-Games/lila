@@ -979,6 +979,7 @@
   <string name="allAboutX">Всё о %s на PlayStrategy</string>
   <string name="variantEditorDescription">Расставьте любую позицию %1$s в бесплатном онлайн-редакторе доски, затем проанализируйте её или сыграйте. Играйте в %2$s онлайн бесплатно на PlayStrategy.</string>
   <string name="variantStudies">Студии: %s</string>
+  <string name="libraryStudies">Студии</string>
   <string name="playVariantOnlineFreeDescription">Играйте в %s онлайн бесплатно с игроками со всего мира. Партии в реальном времени и по переписке, турниры, рейтинги и анализ на PlayStrategy.</string>
   <string name="variantPuzzles">Задачи: %s</string>
   <string name="libraryTitle">Настольные игры, в которые можно играть онлайн бесплатно — библиотека PlayStrategy</string>

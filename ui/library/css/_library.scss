@@ -1,3 +1,5 @@
+@import '../../analyse/css/study/list-widget';
+
 .library-all {
   display: flex;
   flex-flow: column;
@@ -164,6 +166,26 @@
 
     li {
       margin: 0.3em 0;
+    }
+
+    // the same white as the "more" link of the tournaments block
+    .title a {
+      color: $c-color-choice-font-default;
+
+      &:hover {
+        color: $c-link;
+      }
+    }
+  }
+
+  // the studies as on the studies page: the tiles of its list
+  .library__studies {
+    .studies {
+      border-top: $border;
+
+      .study li {
+        margin: 0;
+      }
     }
   }
 
@@ -537,6 +559,21 @@
           flex: 1 1 calc(50% - 0.5em);
           max-width: 100%;
           margin-bottom: 0;
+        }
+      }
+
+      // the studies are as high as the leaderboard they share a row with, and their tiles scroll
+      .library__studies--beside-leaderboard {
+        display: flex;
+        flex-flow: column;
+
+        .studies {
+          flex: 1 1 0;
+          min-height: 0;
+          overflow-y: auto;
+          // the tiles hide their overflow, so without this the rows shrink to fit instead of scrolling
+          grid-auto-rows: max-content;
+          align-content: start;
         }
       }
 

@@ -898,6 +898,7 @@
   <string name="allAboutX">Alles über %s auf PlayStrategy</string>
   <string name="variantEditorDescription">Stelle jede beliebige Stellung in %1$s auf einem kostenlosen Online-Brett-Editor auf, analysiere sie oder spiele sie aus. Spiele %2$s kostenlos online auf PlayStrategy.</string>
   <string name="variantStudies">%s-Studien</string>
+  <string name="libraryStudies">Studien</string>
   <string name="playVariantOnlineFreeDescription">Spiele %s kostenlos online gegen Spieler aus aller Welt. Live- und Fernpartien, Turniere, Wertungen und Analyse auf PlayStrategy.</string>
   <string name="variantPuzzles">%s-Aufgaben</string>
   <string name="libraryTitle">Brettspiele, die du kostenlos online spielen kannst — die PlayStrategy-Bibliothek</string>
