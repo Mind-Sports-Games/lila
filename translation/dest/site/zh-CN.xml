@@ -595,7 +595,7 @@
   <string name="aboutSimulSettings">车轮战总是非排位赛。重赛、悔棋和\"加时\"功能被禁用。</string>
   <string name="create">创建</string>
   <string name="whenCreateSimul">当你创建一个车轮战时，你要一次同时跟几个棋手一起下棋。</string>
-  <string name="simulVariantsHint">如果您选择几种变体，每个棋手都能选择其中之一。</string>
+  <string name="simulVariantsHint">如果您选择几种变体，每个棋手都能选择其中之一。如果一个都不选，棋手可以用任何变体加入。</string>
   <string name="simulClockHint">菲舍尔时钟设置。挑战者越多，您所需时间就可能相应越多。</string>
   <string name="simulAddExtraTime">您可以为自己附加时间应对车轮战。</string>
   <string name="simulHostExtraTime">主持的额外时间</string>

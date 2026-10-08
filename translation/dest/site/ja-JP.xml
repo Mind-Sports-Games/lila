@@ -597,7 +597,7 @@
   <string name="aboutSimulSettings">同時対局は非レート戦です。再対局、待った、持時間追加はできません。</string>
   <string name="create">作成する</string>
   <string name="whenCreateSimul">同時対局を作成すると、同時に複数の相手と対戦できます。</string>
-  <string name="simulVariantsHint">複数のバリアントを選ぶと、どのバリアントにするか相手が選べます。</string>
+  <string name="simulVariantsHint">複数のバリアントを選ぶと、どのバリアントにするか相手が選べます。何も選ばない場合は、どのバリアントでも参加できます。</string>
   <string name="simulClockHint">フィッシャーモードの設定。相手が多いほど追加時間は長めに。</string>
   <string name="simulAddExtraTime">同時対局の手間を考え、自分に持時間をさらに追加できます。</string>
   <string name="simulHostExtraTime">ホスト延長時間</string>

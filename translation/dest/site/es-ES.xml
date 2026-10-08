@@ -641,7 +641,7 @@
   <string name="aboutSimulSettings">Las simultáneas son siempre partidas amistosas. Las opciones de petición de revancha, deshacer jugada y agregar tiempo están deshabilitadas.</string>
   <string name="create">Crear</string>
   <string name="whenCreateSimul">Cuando creas una simultánea, juegas contra varios jugadores a la vez.</string>
-  <string name="simulVariantsHint">Si seleccionas diferentes variantes, cada jugador escoge cuál jugar.</string>
+  <string name="simulVariantsHint">Si seleccionas varias variantes, cada jugador escoge cuál jugar. Si no seleccionas ninguna, los jugadores pueden unirse con cualquier variante.</string>
   <string name="simulClockHint">Configuración de reloj Fischer. Cuantos más oponentes, más tiempo se necesita.</string>
   <string name="simulAddExtraTime">Puedes añadir tiempo adicional a tu reloj para ayudarte en la simultánea.</string>
   <string name="simulHostExtraTime">Tiempo extra del anfitrión</string>

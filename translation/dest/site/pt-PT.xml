@@ -641,7 +641,7 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="aboutSimulSettings">As simultâneas são sempre partidas amigáveis. Desforras, voltar jogadas atrás e dar mais tempo estão desativados.</string>
   <string name="create">Criar</string>
   <string name="whenCreateSimul">Quando crias uma simultânea, podes jogar com vários adversários ao mesmo tempo.</string>
-  <string name="simulVariantsHint">Se selecionares diversas variantes, cada jogador poderá escolher qual delas jogar.</string>
+  <string name="simulVariantsHint">Se selecionares diversas variantes, cada jogador poderá escolher qual delas jogar. Se não selecionares nenhuma, os jogadores podem entrar com qualquer variante.</string>
   <string name="simulClockHint">Configuração de incrementos no relógio. Quanto mais jogadores admitires, mais tempo poderás necessitar.</string>
   <string name="simulAddExtraTime">Podes acrescentar tempo adicional ao teu relógio, para te ajudar a lidar com a simultânea.</string>
   <string name="simulHostExtraTime">Tempo adicional do anfitrião</string>

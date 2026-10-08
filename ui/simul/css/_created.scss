@@ -44,3 +44,46 @@
     text-align: center;
   }
 }
+
+// the games to join with, family by family as in the simul form
+.simul-join {
+  &__row {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 0.4em 0.5em;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  // only the next line of the families, not a section of its own like the dialog's other blocks
+  .continue-with &__singles {
+    margin-top: 0.4em;
+  }
+
+  &__games {
+    padding-top: 0.7em;
+    border-top: 1px solid $c-border;
+  }
+
+  &__chip {
+    padding: 0.3em 0.85em;
+    border: 1px solid $c-border;
+    border-radius: 999px;
+    color: $c-font;
+    line-height: 1.4;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover {
+      border-color: $c-primary;
+      color: $c-primary;
+    }
+  }
+
+  &__family.active {
+    border-color: $c-primary;
+    color: $c-primary;
+  }
+}

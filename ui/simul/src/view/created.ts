@@ -1,6 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import SimulCtrl from '../ctrl';
-import { Applicant } from '../interfaces';
+import { Applicant, Variant } from '../interfaces';
 import xhr from '../xhr';
 import * as util from './util';
 import modal from 'common/modal';
@@ -49,10 +49,21 @@ export default function (showText: (ctrl: SimulCtrl) => VNode) {
                         : util.bind('click', () => {
                             if (ctrl.data.variants.length === 1) xhr.join(ctrl.data.id, ctrl.data.variants[0].key);
                             else {
-                              modal($('.simul .continue-with'));
-                              $('#modal-wrap .continue-with a').on('click', function (this: HTMLElement) {
+                              const $wrap = modal($('.simul .continue-with'));
+                              $wrap.find('a[data-variant]').on('click', function (this: HTMLElement) {
                                 modal.close();
                                 xhr.join(ctrl.data.id, $(this).data('variant'));
+                              });
+                              // a family chip shows its games, and a second click hides them again
+                              $wrap.find('.simul-join__family').on('click', function (this: HTMLElement) {
+                                const group = this.dataset.group,
+                                  wasOpen = this.classList.contains('active');
+                                $wrap.find('.simul-join__family').removeClass('active');
+                                $wrap.find('.simul-join__games').addClass('none');
+                                if (!wasOpen) {
+                                  this.classList.add('active');
+                                  $wrap.find(`.simul-join__games[data-group="${group}"]`).removeClass('none');
+                                }
                               });
                             }
                           }),
@@ -199,23 +210,43 @@ export default function (showText: (ctrl: SimulCtrl) => VNode) {
       ctrl.data.quote
         ? h('blockquote.pull-quote', [h('p', ctrl.data.quote.text), h('footer', ctrl.data.quote.author)])
         : null,
-      h(
-        'div.continue-with.none',
-        ctrl.data.variants.map(function (variant) {
-          return h(
-            'a.button',
-            {
-              attrs: {
-                'data-variant': variant.key,
-              },
-            },
-            variant.name,
-          );
-        }),
-      ),
+      h('div.continue-with.none', joinChoices(ctrl)),
     ];
   };
 }
+
+// The games a player can join with, family by family as in the simul form: a family of several games
+// is a chip that shows them, a family of one game is a chip that joins with it.
+const joinChoices = (ctrl: SimulCtrl): VNode[] => {
+  const groups = new Map<string, Variant[]>();
+  ctrl.data.variants.forEach(v => {
+    const key = v.group?.key ?? v.key;
+    groups.set(key, [...(groups.get(key) ?? []), v]);
+  });
+  const several = [...groups.entries()].filter(([, vs]) => vs.length > 1);
+  const gameChip = (v: Variant) =>
+    h('a.simul-join__chip.text', { attrs: { 'data-variant': v.key, 'data-icon': v.icon } }, v.name);
+  // all in one family: its games straight away
+  if (several.length === 1 && groups.size === 1) return [h('div.simul-join__row', several[0][1].map(gameChip))];
+  return [
+    h('div.simul-join__row', [
+      ...several.map(([key, vs]) =>
+        h(
+          'span.simul-join__chip.simul-join__family.text',
+          { attrs: { 'data-group': key, 'data-icon': vs[0].icon } },
+          vs[0].group?.name ?? key,
+        ),
+      ),
+    ]),
+    h(
+      'div.simul-join__row.simul-join__singles',
+      [...groups.values()].filter(vs => vs.length === 1).map(vs => gameChip(vs[0])),
+    ),
+    ...several.map(([key, vs]) =>
+      h('div.simul-join__row.simul-join__games.none', { attrs: { 'data-group': key } }, vs.map(gameChip)),
+    ),
+  ];
+};
 
 const byName = (a: Applicant, b: Applicant) => (a.player.name > b.player.name ? 1 : -1);
 
