@@ -4,7 +4,7 @@
   <string name="amazons">jogo das amazonas</string>
   <string name="antichess">xadrez perde-ganha</string>
   <string name="antidraughts">damas perde-ganha</string>
-  <string name="antiflipello">Reversi invertido</string>
+  <string name="antiflipello">Othello invertido</string>
   <string name="atomic">variante de xadrez</string>
   <string name="backgammon">gamão</string>
   <string name="bestemshe">Togyzkumalak de 5 casas</string>
@@ -17,8 +17,8 @@
   <string name="draughtsFromPosition">posição inicial personalizada</string>
   <string name="english">damas inglesas, checkers</string>
   <string name="fiveCheck">variante de xadrez de 5 xeques</string>
-  <string name="flipello">Reversi</string>
-  <string name="flipello10">Reversi 10x10</string>
+  <string name="flipello"></string>
+  <string name="flipello10">tabuleiro 10x10</string>
   <string name="frisian">damas frísias</string>
   <string name="fromPosition">posição inicial personalizada</string>
   <string name="frysk">damas frísias com 5 peças</string>
@@ -37,7 +37,7 @@
   <string name="monster">variante de xadrez</string>
   <string name="nackgammon">variante de gamão</string>
   <string name="noCastling">variante de xadrez sem roque</string>
-  <string name="octagonflipello">Reversi em tabuleiro octogonal</string>
+  <string name="octagonflipello">Othello em tabuleiro octogonal</string>
   <string name="oware">mancala</string>
   <string name="pool">pool checkers, damas americanas</string>
   <string name="portuguese">damas espanholas e portuguesas</string>

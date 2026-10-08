@@ -31,10 +31,10 @@
   <string name="xiangqi">Chinese chess</string>
   <string name="minishogi">5x5 Japanese chess</string>
   <string name="minixiangqi">7x7 Chinese chess</string>
-  <string name="flipello">Reversi</string>
-  <string name="flipello10">10x10 Reversi</string>
-  <string name="antiflipello">reverse Reversi</string>
-  <string name="octagonflipello">Reversi on an octagonal board</string>
+  <string name="flipello"></string>
+  <string name="flipello10">10x10 board</string>
+  <string name="antiflipello">reverse Othello</string>
+  <string name="octagonflipello">Othello on an octagonal board</string>
   <string name="amazons">Game of the Amazons board game</string>
   <string name="breakthroughtroyka">Dan Troyka's board game</string>
   <string name="minibreakthroughtroyka">5x5 Breakthrough</string>

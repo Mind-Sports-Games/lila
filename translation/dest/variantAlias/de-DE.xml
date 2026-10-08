@@ -4,7 +4,7 @@
   <string name="amazons">Amazonen-Spiel, Brettspiel</string>
   <string name="antichess">Räuberschach</string>
   <string name="antidraughts">Verlierdame</string>
-  <string name="antiflipello">umgekehrtes Reversi</string>
+  <string name="antiflipello">umgekehrtes Othello</string>
   <string name="atomic">Schachvariante</string>
   <string name="bestemshe">Togyzkumalak mit 5 Mulden</string>
   <string name="brazilian">Brasilianische Dame</string>
@@ -16,8 +16,8 @@
   <string name="draughtsFromPosition">eigene Startstellung</string>
   <string name="english">Englische Dame, Checkers</string>
   <string name="fiveCheck">5-Schach-Variante</string>
-  <string name="flipello">Reversi</string>
-  <string name="flipello10">Reversi 10x10</string>
+  <string name="flipello"></string>
+  <string name="flipello10">Brett 10x10</string>
   <string name="frisian">Friesische Dame</string>
   <string name="fromPosition">eigene Startstellung</string>
   <string name="frysk">Friesische Dame mit 5 Steinen</string>
@@ -36,7 +36,7 @@
   <string name="monster">Schachvariante</string>
   <string name="nackgammon">Backgammon-Variante</string>
   <string name="noCastling">Schachvariante ohne Rochade</string>
-  <string name="octagonflipello">Reversi auf achteckigem Brett</string>
+  <string name="octagonflipello">Othello auf achteckigem Brett</string>
   <string name="oware">Mancala</string>
   <string name="pool">Pool Checkers, amerikanische Dame</string>
   <string name="portuguese">Spanische und portugiesische Dame</string>

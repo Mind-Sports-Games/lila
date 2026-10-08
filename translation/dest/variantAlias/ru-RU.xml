@@ -4,7 +4,7 @@
   <string name="amazons">игра «Амазонки», настольная игра</string>
   <string name="antichess">поддавки</string>
   <string name="antidraughts">поддавки в шашки</string>
-  <string name="antiflipello">обратное реверси</string>
+  <string name="antiflipello">обратное отелло</string>
   <string name="atomic">шахматный вариант</string>
   <string name="backgammon">нарды</string>
   <string name="bestemshe">тогызкумалак на 5 лунок</string>
@@ -17,8 +17,8 @@
   <string name="draughtsFromPosition">своя начальная позиция</string>
   <string name="english">английские шашки, чекерс</string>
   <string name="fiveCheck">вариант шахмат, 5 шахов</string>
-  <string name="flipello">реверси</string>
-  <string name="flipello10">реверси 10x10</string>
+  <string name="flipello"></string>
+  <string name="flipello10">доска 10x10</string>
   <string name="frisian">фризские шашки</string>
   <string name="fromPosition">своя начальная позиция</string>
   <string name="frysk">фризские шашки на 5 шашек</string>
@@ -37,7 +37,7 @@
   <string name="monster">шахматный вариант</string>
   <string name="nackgammon">вариант нард</string>
   <string name="noCastling">шахматы без рокировки</string>
-  <string name="octagonflipello">реверси на восьмиугольной доске</string>
+  <string name="octagonflipello">отелло на восьмиугольной доске</string>
   <string name="oware">манкала, овари</string>
   <string name="pool">пул чекерс, американские шашки</string>
   <string name="portuguese">испанские и португальские шашки</string>

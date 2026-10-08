@@ -4,7 +4,7 @@
   <string name="amazons">jeu des Amazones</string>
   <string name="antichess">échecs qui perd gagne</string>
   <string name="antidraughts">dames qui perd gagne</string>
-  <string name="antiflipello">Reversi inversé</string>
+  <string name="antiflipello">Othello inversé</string>
   <string name="atomic">variante d\'échecs</string>
   <string name="bestemshe">Togyzkumalak à 5 trous</string>
   <string name="brazilian">dames brésiliennes</string>
@@ -16,8 +16,8 @@
   <string name="draughtsFromPosition">position de départ personnalisée</string>
   <string name="english">dames anglaises, checkers</string>
   <string name="fiveCheck">variante d\'échecs à 5 échecs</string>
-  <string name="flipello">Reversi</string>
-  <string name="flipello10">Reversi 10x10</string>
+  <string name="flipello"></string>
+  <string name="flipello10">plateau 10x10</string>
   <string name="frisian">dames frisonnes</string>
   <string name="fromPosition">position de départ personnalisée</string>
   <string name="frysk">dames frisonnes à 5 pions</string>
@@ -36,7 +36,7 @@
   <string name="monster">variante d\'échecs</string>
   <string name="nackgammon">variante de backgammon</string>
   <string name="noCastling">variante d\'échecs sans roque</string>
-  <string name="octagonflipello">Reversi sur plateau octogonal</string>
+  <string name="octagonflipello">Othello sur plateau octogonal</string>
   <string name="oware">awalé, mancala</string>
   <string name="pool">pool checkers, dames américaines</string>
   <string name="portuguese">dames espagnoles et portugaises</string>

@@ -189,7 +189,7 @@ object bits {
     List("dameo", "frisian"),
     List("antidraughts", "breakthrough"),
     List("fiveCheck", "threeCheck"),
-    List("oware", "bestemshe")
+    List("oware", "togyzkumalak")
   )
 
   def relatedVariants(variant: Variant): List[Variant] =
@@ -287,13 +287,13 @@ object bits {
       s"${VariantKeys.variantName(variant)} ${VariantKeys.gameFamilyName(variant.gameFamily)}"
     else VariantKeys.variantName(variant)
 
-  // "Othello (Reversi)", "Abalone (board game)", "Backgammon"
+  // "Shogi (Japanese chess)", "Abalone (board game)", "Backgammon"
   def nameWithAlias(variant: Variant)(implicit lang: Lang) =
     VariantKeys.variantAlias(variant).fold(searchName(variant)) { alias =>
       s"${searchName(variant)} ($alias)"
     }
 
-  // "Play Othello online free — Reversi"
+  // "Play Shogi online free — Japanese chess"
   def pageTitle(variant: Variant)(implicit lang: Lang) =
     VariantKeys.variantAlias(variant).foldLeft(
       trans.playVariantOnlineFreeTitle.txt(searchName(variant))
@@ -314,7 +314,7 @@ object bits {
   def hasLibraryPages(variant: Variant) =
     !Set("fromPosition", "draughtsFromPosition")(variant.key)
 
-  // "Othello rules — how to play Othello (Reversi)"
+  // "Shogi rules — how to play Shogi (Japanese chess)"
   def rulesTitle(variant: Variant)(implicit lang: Lang) =
     trans.variantRulesTitle.txt(searchName(variant), nameWithAlias(variant))
 
