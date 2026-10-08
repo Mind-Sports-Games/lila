@@ -242,7 +242,7 @@ object mod {
           name := "rating",
           required,
           st.min      := lila.rating.Glicko.minRating,
-          st.max      := lila.mod.SetRatingForm.maxRating,
+          st.max      := lila.rating.Glicko.maxRating,
           placeholder := "New rating"
         ),
         st.input(
