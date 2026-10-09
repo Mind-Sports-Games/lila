@@ -1,0 +1,8 @@
+.fiveinarow.is2d .b-piece.p1 {background-image:url('/assets/piece/fiveinarow/classic_stone/B.svg')}
+.fiveinarow.is2d .w-piece.p1 {background-image:url('/assets/piece/fiveinarow/classic_stone/W.svg')}
+.fiveinarow.is2d .b-piece.p2 {background-image:url('/assets/piece/fiveinarow/classic_stone/B.svg')}
+.fiveinarow.is2d .w-piece.p2 {background-image:url('/assets/piece/fiveinarow/classic_stone/W.svg')}
+.is2d .variant-gomoku .b-piece.p1 {background-image:url('/assets/piece/fiveinarow/classic_stone/B.svg')}
+.is2d .variant-gomoku .w-piece.p1 {background-image:url('/assets/piece/fiveinarow/classic_stone/W.svg')}
+.is2d .variant-gomoku .b-piece.p2 {background-image:url('/assets/piece/fiveinarow/classic_stone/B.svg')}
+.is2d .variant-gomoku .w-piece.p2 {background-image:url('/assets/piece/fiveinarow/classic_stone/W.svg')}

@@ -53,4 +53,6 @@
   <string name="abalone">Abalone</string>
   <string name="grandabalone">Grand Abalone</string>
   <string name="entropy">Entropy</string>
+  <string name="fiveinarow">Five in a Row</string>
+  <string name="gomoku">Gomoku</string>
 </resources>

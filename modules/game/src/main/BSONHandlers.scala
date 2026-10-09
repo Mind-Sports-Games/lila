@@ -34,6 +34,7 @@ import strategygames.go
 import strategygames.backgammon
 import strategygames.abalone
 import strategygames.entropy
+import strategygames.fiveinarow
 import strategygames.format.FEN
 import strategygames.chess.variant.{ Standard as ChessStandard, Variant as ChessVariant }
 import strategygames.draughts.variant.{ Standard as DraughtsStandard, Variant as DraughtsVariant }
@@ -48,6 +49,7 @@ import strategygames.backgammon.variant.{ Backgammon as BackgammonStandard, Vari
 import strategygames.abalone.variant.{ Abalone as AbaloneStandard, Variant as AbaloneVariant }
 import strategygames.dameo.variant.{ Dameo as DameoStandard, Variant as DameoVariant }
 import strategygames.entropy.variant.{ Entropy as EntropyStandard, Variant as EntropyVariant }
+import strategygames.fiveinarow.variant.{ Gomoku as FiveInARowStandard, Variant as FiveInARowVariant }
 import org.joda.time.DateTime
 import reactivemongo.api.bson.*
 import scala.util.{ Success, Try }
@@ -822,19 +824,63 @@ object BSONHandlers {
         (entropyGame, defaultMetaData)
       }
 
+      def readFiveInARowGame(r: BSON.Reader): (StratGame, Metadata) = {
+
+        val gameVariant = FiveInARowVariant(r.intD(F.variant)) | FiveInARowStandard
+
+        val actionStrs =
+          NewLibStorage.OldBin.decode(GameLogic.FiveInARow(), r.bytesD(F.oldPgn), playedPlies)
+
+        def turnUcis(turnStr: Option[String]) =
+          turnStr.map(_.split(",").toList.flatMap(fiveinarow.format.Uci.apply)).getOrElse(List.empty)
+
+        val blackSeat = if (r.intD(F.blackSeat) == 2) PlayerIndex.P2 else PlayerIndex.P1
+
+        val fiveInARowGame = StratGame.FiveInARow(
+          fiveinarow.Game(
+            situation = fiveinarow.Situation(
+              fiveinarow.Board(
+                pieces = BinaryFormat.piece.readFiveInARow(r.bytes(F.binaryPieces), blackSeat),
+                history = fiveinarow.History(
+                  lastTurn = turnUcis(r.strO(F.historyLastTurn)),
+                  currentTurn = turnUcis(r.strO(F.historyCurrentTurn)),
+                  positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
+                  blackSeat = blackSeat,
+                  openingStep = r
+                    .strO(F.openingStep)
+                    .flatMap(_.headOption)
+                    .flatMap(fiveinarow.OpeningStep.fromFen) | fiveinarow.OpeningStep.Play
+                ),
+                variant = gameVariant
+              ),
+              player = turnPlayerIndex
+            ),
+            actionStrs = actionStrs,
+            clock = clock,
+            plies = plies,
+            turnCount = turns,
+            startedAtPly = startedAtPly,
+            startedAtTurn = startedAtTurn
+          )
+        )
+
+        (fiveInARowGame, defaultMetaData)
+      }
+
       val libId                 = r.intD(F.lib)
       val (stratGame, metadata) = libId match {
-        case 0 => readChessGame(r)
-        case 1 => readDraughtsGame(r)
-        case 2 => readFairySFGame(r)
-        case 3 => readSamuraiGame(r)
-        case 4 => readTogyzkumalakGame(r)
-        case 5 => readGoGame(r)
-        case 6 => readBackgammonGame(r)
-        case 7 => readAbaloneGame(r)
-        case 8 => readDameoGame(r)
-        case 9 => readEntropyGame(r)
-        case _ => sys.error(s"Invalid game in the database, libId: ${libId}")
+        case 0  => readChessGame(r)
+        case 1  => readDraughtsGame(r)
+        case 2  => readFairySFGame(r)
+        case 3  => readSamuraiGame(r)
+        case 4  => readTogyzkumalakGame(r)
+        case 5  => readGoGame(r)
+        case 6  => readBackgammonGame(r)
+        case 7  => readAbaloneGame(r)
+        case 8  => readDameoGame(r)
+        case 9  => readEntropyGame(r)
+        case 10 => readFiveInARowGame(r)
+        case _  => sys.error(s"Invalid game in the database, libId: ${libId}")
       }
 
       Game(
@@ -1030,6 +1076,22 @@ object BSONHandlers {
               F.pocketData         -> o.board.pocketData,
               F.score              -> o.history.score.nonEmpty.option(o.history.score),
               F.round              -> (board.round != 1).option(board.round)
+            )
+          case GameLogic.FiveInARow() =>
+            val board = o.board match {
+              case Board.FiveInARow(board) => board
+              case _                       => sys.error("invalid fiveinarow board")
+            }
+            $doc(
+              F.oldPgn -> NewLibStorage.OldBin
+                .encodeActionStrs(o.variant.gameFamily, o.actionStrs take Game.maxTurns),
+              F.binaryPieces       -> BinaryFormat.piece.writeFiveInARow(board.pieces),
+              F.positionHashes     -> o.history.positionHashes,
+              F.historyLastTurn    -> o.history.lastTurnUciString,
+              F.historyCurrentTurn -> o.history.currentTurnUciString,
+              F.blackSeat          -> (board.blackSeat == PlayerIndex.P2).option(2),
+              F.openingStep        -> (board.openingStep != fiveinarow.OpeningStep.Play)
+                .option(board.openingStep.fen.toString)
             )
           case _ => // chess or fail
             if (o.variant.key == "standard")

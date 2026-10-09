@@ -49,6 +49,10 @@
       height: 125px;
     }
 
+    &.fiveinarow {
+      height: 125px;
+    }
+
     @extend %flex-center;
 
     justify-content: center;
@@ -299,6 +303,11 @@
 
     .entropy-wood {
       background-image: url(../images/board/entropy/wood.svg);
+      background-size: 100px;
+    }
+
+    .fiveinarow-wood {
+      background-image: url(../images/board/fiveinarow/wood.svg);
       background-size: 100px;
     }
   }

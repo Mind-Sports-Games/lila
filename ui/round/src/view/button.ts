@@ -362,6 +362,26 @@ export function cancelDrawOffer(ctrl: RoundController) {
   return ctrl.data.player.offeringDraw ? h('div.pending', [h('p', ctrl.noarg('drawOfferSent'))]) : null;
 }
 
+// five in a row's opening choice: play on with a stone, or take one of the swaps offered
+export function swapOptions(ctrl: RoundController) {
+  const canSwap = ctrl.canSwap('swap'),
+    canSwap2 = ctrl.canSwap('swap2');
+  if (!canSwap && !canSwap2) return null;
+  const colour = stratUtils.gomoku.nextStone(round.lastStep(ctrl.data).fen) === 'b-piece' ? 'Black' : 'White';
+  const choice = (action: 'swap' | 'swap2', label: string) =>
+    h('button.button', { hook: util.bind('click', () => ctrl.sendSwap(action)) }, label);
+  return h('div.suggestion.swap-options', [
+    h(
+      'p',
+      canSwap2
+        ? `Place a stone to play on as ${colour}, swap colours, or swap colours and place 2 stones.`
+        : `Place a stone to play on as ${colour}, or swap colours.`,
+    ),
+    canSwap ? choice('swap', 'Swap') : null,
+    canSwap2 ? choice('swap2', 'Swap 2') : null,
+  ]);
+}
+
 export function answerOpponentDrawOffer(ctrl: RoundController) {
   return ctrl.data.opponent.offeringDraw
     ? h('div.negotiation.draw', [

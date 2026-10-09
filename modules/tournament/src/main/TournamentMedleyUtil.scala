@@ -100,7 +100,8 @@ object TournamentMedleyUtil {
       "nackgammon"             -> slow,
       "abalone"                -> slow,
       "grandabalone"           -> slow,
-      "entropy"                -> slow
+      "entropy"                -> slow,
+      "gomoku"                 -> medium
     )
   }
 

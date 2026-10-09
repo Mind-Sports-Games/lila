@@ -52,7 +52,7 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
             Mate,
             GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() |
             GameLogic.Go() | GameLogic.Backgammon() | GameLogic.Abalone() | GameLogic.Dameo() |
-            GameLogic.Entropy()
+            GameLogic.Entropy() | GameLogic.FiveInARow()
           ) =>
         // TODO set this properly for non chess variants
         s"${playerText(w)} won by checkmate"
@@ -186,7 +186,7 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
         game.variant.gameLogic match {
           case GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() |
               GameLogic.Go() | GameLogic.Backgammon() | GameLogic.Abalone() | GameLogic.Dameo() |
-              GameLogic.Entropy() =>
+              GameLogic.Entropy() | GameLogic.FiveInARow() =>
             // TODO set this properly for non chess variants
             trans.checkmate.txt()
           case _ => ""
@@ -308,6 +308,8 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
           case Variant.Abalone(strategygames.abalone.variant.GrandAbalone) =>
             trans.gameFinished.txt()
           case Variant.Entropy(strategygames.entropy.variant.Entropy) =>
+            trans.gameFinished.txt()
+          case Variant.FiveInARow(strategygames.fiveinarow.variant.Gomoku) =>
             trans.gameFinished.txt()
           case _ => trans.variantEnding.txt()
         }

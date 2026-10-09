@@ -116,14 +116,14 @@ export function makeConfig(ctrl: RoundController): Config {
       },
     },
     dropmode: {
-      showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'hyper', 'nackgammon'].includes(
+      showDropDests: !['go9x9', 'go13x13', 'go19x19', 'gomoku', 'backgammon', 'hyper', 'nackgammon'].includes(
         data.game.variant.key,
       ),
       dropDests: playing ? stratUtils.readDropsByRole(data.possibleDropsByRole) : new Map(),
       active: data.onlyDropsVariant && playing ? true : false,
       piece:
         data.onlyDropsVariant && playing
-          ? stratUtils.onlyDropsVariantPiece(data.game.variant.key, turnPlayerIndex)
+          ? stratUtils.onlyDropsVariantPiece(data.game.variant.key, turnPlayerIndex, step.fen)
           : undefined,
       events: {
         cancel: hooks.onCancelDropMode,
@@ -178,17 +178,21 @@ export function makeConfig(ctrl: RoundController): Config {
                           ? 'https://playstrategy.org/assets/piece/entropy/' +
                             data.pref.pieceSet.filter(ps => ps.gameFamily === 'entropy')[0].name +
                             '/'
-                          : variantKey === 'abalone' || variantKey === 'grandabalone'
-                            ? 'https://playstrategy.org/assets/piece/abalone/' +
-                              data.pref.pieceSet.filter(ps => ps.gameFamily === 'abalone')[0].name +
+                          : variantKey === 'gomoku'
+                            ? 'https://playstrategy.org/assets/piece/fiveinarow/' +
+                              data.pref.pieceSet.filter(ps => ps.gameFamily === 'fiveinarow')[0].name +
                               '/'
-                            : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
-                              ? 'https://playstrategy.org/assets/piece/xiangqi/' +
-                                data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                            : variantKey === 'abalone' || variantKey === 'grandabalone'
+                              ? 'https://playstrategy.org/assets/piece/abalone/' +
+                                data.pref.pieceSet.filter(ps => ps.gameFamily === 'abalone')[0].name +
                                 '/'
-                              : 'https://playstrategy.org/assets/piece/chess/' +
-                                data.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
-                                '/',
+                              : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
+                                ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+                                  data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                                  '/'
+                                : 'https://playstrategy.org/assets/piece/chess/' +
+                                  data.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+                                  '/',
       },
     },
     disableContextMenu: true,

@@ -29,6 +29,8 @@ import strategygames.{
   SelectSquares as StratSelectSquares,
   Situation,
   Status,
+  Swap as StratSwap,
+  Swap2 as StratSwap2,
   Undo as StratUndo
 }
 import strategygames.chess
@@ -350,6 +352,7 @@ object Event {
           case StratDrop.Go(drop)         => strategygames.go.format.pgn.Dumper(drop)
           case StratDrop.Backgammon(drop) => strategygames.backgammon.format.pgn.Dumper(drop)
           case StratDrop.Entropy(drop)    => strategygames.entropy.format.pgn.Dumper(drop)
+          case StratDrop.FiveInARow(drop) => strategygames.fiveinarow.format.pgn.Dumper(drop)
         },
         fen = Forsyth.>>(situation.board.variant.gameLogic, situation).value,
         check = situation.check,
@@ -996,6 +999,77 @@ object Event {
         forcedTurnAction = situation.forcedTurnAction.map(_.toUci.uci),
         pocketData = pocketData
       )
+  }
+
+  // five in a row's swap and swap2: the board is unchanged, the typ names the action
+  case class Swap(
+      gf: GameFamily,
+      uci: String,
+      actor: PlayerIndex,
+      fen: String,
+      takebackable: Boolean,
+      state: State,
+      clock: Option[ClockEvent],
+      possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]]
+  ) extends Event {
+    def typ  = uci
+    def data =
+      Action.data(
+        gf,
+        fen,
+        false,
+        None,
+        None,
+        false,
+        None,
+        takebackable,
+        false,
+        false,
+        false,
+        state,
+        clock,
+        Map.empty,
+        possibleDrops,
+        possibleDropsByRole,
+        None,
+        None,
+        None,
+        None,
+        None
+      ) {
+        Json.obj(
+          "uci" -> uci,
+          "san" -> uci
+        )
+      }
+    override def moveBy = Some(actor)
+  }
+  object Swap {
+    private def apply(
+        uci: String,
+        actor: PlayerIndex,
+        situation: Situation,
+        state: State,
+        clock: Option[ClockEvent]
+    ): Swap =
+      Swap(
+        gf = situation.board.variant.gameFamily,
+        uci = uci,
+        actor = actor,
+        fen = Forsyth.>>(situation.board.variant.gameLogic, situation).value,
+        takebackable = situation.takebackable,
+        state = state,
+        clock = clock,
+        possibleDrops = situation.drops,
+        possibleDropsByRole = situation.dropsByRole
+      )
+
+    def apply(swap: StratSwap, situation: Situation, state: State, clock: Option[ClockEvent]): Swap =
+      apply(swap.toUci.uci, swap.player, situation, state, clock)
+
+    def apply(swap2: StratSwap2, situation: Situation, state: State, clock: Option[ClockEvent]): Swap =
+      apply(swap2.toUci.uci, swap2.player, situation, state, clock)
   }
 
   case class CubeAction(

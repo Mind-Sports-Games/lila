@@ -559,11 +559,12 @@ export default function (ctrl: AnalyseCtrl): VNode {
         'go9x9',
         'go13x13',
         'go19x19',
+        'gomoku',
       ].includes(variantKey) &&
-      !((gaugeOn || !!playerBars) && ['octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey)),
+      !((gaugeOn || !!playerBars) && ['octagonflipello', 'go9x9', 'go13x13', 'go19x19', 'gomoku'].includes(variantKey)),
     needsNoCoords =
       ctrl.embed ||
-      (['shogi', 'minishogi', 'octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey) &&
+      (['shogi', 'minishogi', 'octagonflipello', 'go9x9', 'go13x13', 'go19x19', 'gomoku'].includes(variantKey) &&
         (gaugeOn || !!playerBars)) ||
       (['xiangqi', 'minixiangqi'].includes(variantKey) && !!playerBars), // coordinates for xiangqi game family only label columns // Oware has a short height, which means we can display coords, even with player bars
     tour = relayTour(ctrl),
@@ -643,6 +644,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'abalone',
     'grandabalone',
     'entropy',
+    'gomoku',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

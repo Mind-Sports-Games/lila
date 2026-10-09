@@ -67,6 +67,8 @@ export function displayGameFamily(gameFamilyKey: GameFamilyKey): string {
       return 'Breakthrough';
     case 'togyzkumalak':
       return 'Togyzqumalaq';
+    case 'fiveinarow':
+      return 'Five in a Row';
     default:
       return gameFamilyKey.charAt(0).toUpperCase() + gameFamilyKey.slice(1);
   }
@@ -125,6 +127,8 @@ export function convertVariantKeyToGameFamily(variantKey: VariantKey | DraughtsV
       return 'dameo';
     case 'entropy':
       return 'entropy';
+    case 'gomoku':
+      return 'fiveinarow';
     default:
       return 'chess';
   }

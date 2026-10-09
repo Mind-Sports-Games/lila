@@ -323,7 +323,8 @@ declare type VariantKey =
   | 'nackgammon'
   | 'abalone'
   | 'grandabalone'
-  | 'entropy';
+  | 'entropy'
+  | 'gomoku';
 
 declare type DraughtsVariantKey =
   | 'international'
@@ -393,7 +394,8 @@ declare type Perf =
   | 'nackgammon'
   | 'abalone'
   | 'grandabalone'
-  | 'entropy';
+  | 'entropy'
+  | 'gomoku';
 
 //declare type Color = 'white' | 'black';
 declare type PlayerName =
@@ -430,7 +432,8 @@ declare type GameFamilyKey =
   | 'backgammon'
   | 'abalone'
   | 'dameo'
-  | 'entropy';
+  | 'entropy'
+  | 'fiveinarow';
 
 declare type Files =
   'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's';

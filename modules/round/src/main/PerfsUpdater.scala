@@ -123,6 +123,8 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.grandabalone, ratingsB.grandabalone, game)
               case Variant.Entropy(strategygames.entropy.variant.Entropy) =>
                 updateRatings(ratingsW.entropy, ratingsB.entropy, game)
+              case Variant.FiveInARow(strategygames.fiveinarow.variant.Gomoku) =>
+                updateRatings(ratingsW.gomoku, ratingsB.gomoku, game)
               case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
@@ -206,6 +208,7 @@ final class PerfsUpdater(
       abalone: Rating,
       grandabalone: Rating,
       entropy: Rating,
+      gomoku: Rating,
       ultraBullet: Rating,
       bullet: Rating,
       blitz: Rating,
@@ -263,6 +266,7 @@ final class PerfsUpdater(
       abalone = perfs.abalone.toRating,
       grandabalone = perfs.grandabalone.toRating,
       entropy = perfs.entropy.toRating,
+      gomoku = perfs.gomoku.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
       blitz = perfs.blitz.toRating,
@@ -542,6 +546,11 @@ final class PerfsUpdater(
             perfs.entropy,
             ratings.entropy
           ),
+          gomoku = addRatingVariant(
+            Variant.FiveInARow(strategygames.fiveinarow.variant.Gomoku),
+            perfs.gomoku,
+            ratings.gomoku
+          ),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
           bullet = addRatingIf(isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),
@@ -604,6 +613,7 @@ final class PerfsUpdater(
           abalone = r(PT.orDefault("abalone"), perfs.abalone, perfs1.abalone),
           grandabalone = r(PT.orDefault("grandabalone"), perfs.grandabalone, perfs1.grandabalone),
           entropy = r(PT.orDefault("entropy"), perfs.entropy, perfs1.entropy),
+          gomoku = r(PT.orDefault("gomoku"), perfs.gomoku, perfs1.gomoku),
           bullet = r(PT.orDefault("bullet"), perfs.bullet, perfs1.bullet),
           blitz = r(PT.orDefault("blitz"), perfs.blitz, perfs1.blitz),
           rapid = r(PT.orDefault("rapid"), perfs.rapid, perfs1.rapid),

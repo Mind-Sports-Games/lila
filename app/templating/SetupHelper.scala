@@ -191,7 +191,8 @@ trait SetupHelper { self: I18nHelper =>
       GameGroup.LinesOfAction(),
       GameGroup.Abalone(),
       GameGroup.Amazons(),
-      GameGroup.Entropy()
+      GameGroup.Entropy(),
+      GameGroup.FiveInARow()
     )
     displayOrder.map(translatedGameGroupIconChoice)
   }

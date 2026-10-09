@@ -442,6 +442,9 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.Entropy(strategygames.entropy.variant.Entropy), Blitz)(
         new DateTime(2026, 12, 4, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.FiveInARow(strategygames.fiveinarow.variant.Gomoku), Blitz32)(
+        new DateTime(2026, 12, 11, 0, 0)
       )
     ).flatten
 

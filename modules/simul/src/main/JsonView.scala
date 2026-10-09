@@ -174,8 +174,8 @@ final class JsonView(
             "variant"         -> p.player.variant.key,
             "hostPlayerIndex" -> p.hostPlayerIndex,
             "game"            -> gameJson(hostId, game),
-            "p1Color"         -> p.player.variant.playerColors(P1),
-            "p2Color"         -> p.player.variant.playerColors(P2)
+            "p1Color"         -> game.playerColor(P1),
+            "p2Color"         -> game.playerColor(P2)
           )
           .some
       }

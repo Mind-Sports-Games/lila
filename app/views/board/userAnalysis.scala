@@ -29,7 +29,8 @@ object userAnalysis {
         Variant.all(GameLogic.Go()) ++
         Variant.all(GameLogic.Abalone()) ++
         Variant.all(GameLogic.Backgammon()) ++
-        Variant.all(GameLogic.Entropy())
+        Variant.all(GameLogic.Entropy()) ++
+        Variant.all(GameLogic.FiveInARow())
     )
       .filterNot(noAnalysisVariants.contains(_))
 

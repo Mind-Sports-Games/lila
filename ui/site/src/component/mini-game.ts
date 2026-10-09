@@ -1,7 +1,7 @@
 import { Coords as CgCoords } from 'chessground/types';
 import * as domData from 'common/data';
 import { variantFromElement } from 'common/mini-board';
-import { displayScore, fenPlayerIndex, parseLastMove, backgammon as bgUtils } from 'stratutils';
+import { displayScore, fenPlayerIndex, parseLastMove, backgammon as bgUtils, gomoku } from 'stratutils';
 import clockWidget from './clock-widget';
 
 interface UpdateData {
@@ -96,17 +96,19 @@ export const init = (node: HTMLElement) => {
                               ? { width: 9, height: 9 }
                               : $el.hasClass('variant-go13x13')
                                 ? { width: 13, height: 13 }
-                                : $el.hasClass('variant-go19x19')
-                                  ? { width: 19, height: 19 }
-                                  : $el.hasClass('variant-backgammon') ||
-                                      $el.hasClass('variant-hyper') ||
-                                      $el.hasClass('variant-nackgammon')
-                                    ? { width: 12, height: 2 }
-                                    : $el.hasClass('variant-grandabalone')
-                                      ? { width: 11, height: 11 }
-                                      : $el.hasClass('variant-abalone')
-                                        ? { width: 9, height: 9 }
-                                        : { width: 8, height: 8 },
+                                : $el.hasClass('variant-gomoku')
+                                  ? { width: 15, height: 15 }
+                                  : $el.hasClass('variant-go19x19')
+                                    ? { width: 19, height: 19 }
+                                    : $el.hasClass('variant-backgammon') ||
+                                        $el.hasClass('variant-hyper') ||
+                                        $el.hasClass('variant-nackgammon')
+                                      ? { width: 12, height: 2 }
+                                      : $el.hasClass('variant-grandabalone')
+                                        ? { width: 11, height: 11 }
+                                        : $el.hasClass('variant-abalone')
+                                          ? { width: 9, height: 9 }
+                                          : { width: 8, height: 8 },
           variant: variantFromElement($el),
           ...(multiPointState?.length === 6 && {
             multiPointState: {
@@ -186,6 +188,15 @@ export const update = (node: HTMLElement, data: UpdateData) => {
   };
   renderClock(data.p1, data.p1Delay, data.p1Pending, 'p1');
   renderClock(data.p2, data.p2Delay, data.p2Pending, 'p2');
+
+  if (gomoku.isGomoku(variantFromElement($el)))
+    (['p1', 'p2'] as const).forEach(playerIndex =>
+      gomoku.setSeatColorIcon(
+        node.querySelector(`.mini-game__score--${playerIndex}`)?.parentElement?.querySelector('.mini-game__user'),
+        data.fen,
+        playerIndex,
+      ),
+    );
 
   if (!isMultiPoint(multiPointState)) {
     ['p1', 'p2'].forEach(playerIndex => {

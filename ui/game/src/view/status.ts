@@ -113,6 +113,8 @@ export default function status(ctrl: Ctrl): string {
         case 'abalone':
         case 'grandabalone':
           return noarg('gameFinished');
+        case 'gomoku':
+          return noarg('gameFinished');
         case 'entropy':
           return noarg('gameFinished');
       }

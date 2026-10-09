@@ -30,6 +30,7 @@ const noClientEvalVariants = [
   'abalone',
   'grandabalone',
   'entropy',
+  'gomoku',
 ];
 
 const noPathVizualizationVariants: VariantKey[] = [
@@ -96,6 +97,7 @@ const noPracticeWithComputerVariants: VariantKey[] = [
   'abalone',
   'grandabalone',
   'entropy',
+  'gomoku',
 ];
 
 export function isEvalBetter(a: Tree.ClientEval, b?: Tree.ClientEval): boolean {

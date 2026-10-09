@@ -54,7 +54,7 @@ object bits {
             div(
               playerLink(
                 p,
-                cssClass = s"is playerIndex-icon ${game.variant.playerColors(p.playerIndex)}".some,
+                cssClass = s"is playerIndex-icon ${game.playerColor(p.playerIndex)}".some,
                 withOnline = false,
                 mod = true
               ),
@@ -64,7 +64,7 @@ object bits {
           }
           // game.players flatMap { p => p.holdAlert.map(p ->) } map {
           //   case (p, h) => div(
-          //     playerLink(p, cssClass = s"is playerIndex-icon ${game.variant.playerColors(p.playerIndex)}".some, mod = true, withOnline = false),
+          //     playerLink(p, cssClass = s"is playerIndex-icon ${game.playerColor(p.playerIndex)}".some, mod = true, withOnline = false),
           //     "hold alert",
           //     br,
           //     s"(ply: ${h.ply}, mean: ${h.mean} ms, SD: ${h.sd})"

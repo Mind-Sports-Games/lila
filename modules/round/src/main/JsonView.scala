@@ -66,7 +66,7 @@ final class JsonView(
         // "color" -> p.playerIndex.classicName,
         "playerName"  -> g.variant.playerNames(p.playerIndex),
         "playerIndex" -> p.playerIndex.name,
-        "playerColor" -> g.variant.playerColors(p.playerIndex)
+        "playerColor" -> g.playerColor(p.playerIndex)
       )
       .add("user" -> user.map { userJsonView.minimal(_, g.perfType) })
       .add("rating" -> p.rating)
@@ -113,7 +113,7 @@ final class JsonView(
                   // "color" -> opponent.playerIndex.classicName,
                   "playerName"  -> pov.game.variant.playerNames(opponent.playerIndex),
                   "playerIndex" -> opponent.playerIndex.name,
-                  "playerColor" -> pov.game.variant.playerColors(opponent.playerIndex),
+                  "playerColor" -> pov.game.playerColor(opponent.playerIndex),
                   "ai"          -> opponent.aiLevel
                 )
                 .add("isGone" -> (!opponent.isAi && socket.isGone(opponent.playerIndex)))
@@ -212,7 +212,7 @@ final class JsonView(
         // "color" -> p.playerIndex.classicName,
         "playerName"  -> g.variant.playerNames(p.playerIndex),
         "playerIndex" -> p.playerIndex.name,
-        "playerColor" -> g.variant.playerColors(p.playerIndex),
+        "playerColor" -> g.playerColor(p.playerIndex),
         "name"        -> p.name
       )
       .add("user" -> user.map { userJsonView.minimal(_, g.perfType) })
@@ -337,12 +337,12 @@ final class JsonView(
           "id"          -> owner.option(pov.playerId),
           "playerName"  -> game.variant.playerNames(playerIndex),
           "playerIndex" -> playerIndex.name,
-          "playerColor" -> game.variant.playerColors(playerIndex)
+          "playerColor" -> game.playerColor(playerIndex)
         ),
         "opponent" -> Json.obj(
           "playerName"  -> game.variant.playerNames(opponent.playerIndex),
           "playerIndex" -> opponent.playerIndex.name,
-          "playerColor" -> game.variant.playerColors(opponent.playerIndex),
+          "playerColor" -> game.playerColor(opponent.playerIndex),
           "ai"          -> opponent.aiLevel
         ),
         "orientation" -> orientation.name,
@@ -449,6 +449,7 @@ final class JsonView(
         pov.game
           .playableBy(pov.player)
           .option(Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion))
+      case (Situation.FiveInARow(_), Variant.FiveInARow(_)) => None
       case _ => sys.error("Mismatch of types for possibleMoves")
     }
 
@@ -476,6 +477,10 @@ final class JsonView(
       case (Situation.Dameo(_), Variant.Dameo(_))       => None
       case (Situation.Draughts(_), Variant.Draughts(_)) => None
       case (Situation.Entropy(_), Variant.Entropy(_))   =>
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty)))
+      case (Situation.FiveInARow(_), Variant.FiveInARow(_)) =>
         pov.game
           .playableBy(pov.player)
           .option(Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty)))

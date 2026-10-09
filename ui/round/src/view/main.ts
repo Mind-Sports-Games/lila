@@ -286,6 +286,7 @@ export function main(ctrl: RoundController): VNode {
     'abalone',
     'grandabalone',
     'entropy',
+    'gomoku',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

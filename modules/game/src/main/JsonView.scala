@@ -260,6 +260,14 @@ object JsonView {
           "lib"       -> v.gameLogic.id,
           "boardSize" -> entropyVariant.boardSize
         )
+      case Variant.FiveInARow(fiveInARowVariant) =>
+        Json.obj(
+          "key"       -> v.key,
+          "name"      -> VariantKeys.variantName(v),
+          "short"     -> VariantKeys.variantShortName(v),
+          "lib"       -> v.gameLogic.id,
+          "boardSize" -> fiveInARowVariant.boardSize
+        )
       case _ =>
         Json.obj(
           "key"       -> v.key,
@@ -332,6 +340,14 @@ object JsonView {
 
   implicit val boardSizeEntropyWriter: Writes[strategygames.entropy.Board.BoardSize] =
     Writes[strategygames.entropy.Board.BoardSize] { b =>
+      Json.obj(
+        "width"  -> b.width,
+        "height" -> b.height
+      )
+    }
+
+  implicit val boardSizeFiveInARowWriter: Writes[strategygames.fiveinarow.Board.BoardSize] =
+    Writes[strategygames.fiveinarow.Board.BoardSize] { b =>
       Json.obj(
         "width"  -> b.width,
         "height" -> b.height

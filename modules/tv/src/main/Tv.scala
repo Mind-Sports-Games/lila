@@ -98,6 +98,7 @@ object Tv {
   import strategygames.abalone.variant as AV
   import strategygames.dameo.variant as D2V
   import strategygames.entropy.variant as EV
+  import strategygames.fiveinarow.variant as FIRV
   import strategygames.{ GameFamily, Speed as S }
 
   case class Champion(user: LightUser, rating: Int, gameId: Game.ID)
@@ -744,6 +745,15 @@ object Tv {
           familyChannel = true,
           gameFamily = "entropy"
         )
+    case object Gomoku
+        extends Channel(
+          name = VariantKeys.variantName(Variant.FiveInARow(FIRV.Gomoku)),
+          icon = FIRV.Gomoku.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.FiveInARow(FIRV.Gomoku)), noBot),
+          familyChannel = true,
+          gameFamily = "fiveinarow"
+        )
     case object Bot
         extends Channel(
           name = "Bot",
@@ -828,6 +838,7 @@ object Tv {
       Abalone,
       GrandAbalone,
       Entropy,
+      Gomoku,
       Bot,
       Computer
     )

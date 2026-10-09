@@ -333,7 +333,8 @@ final class User(
                   "nackgammon"             -> leaderboards.nackgammon,
                   "abalone"                -> leaderboards.abalone,
                   "grandabalone"           -> leaderboards.grandabalone,
-                  "entropy"                -> leaderboards.entropy
+                  "entropy"                -> leaderboards.entropy,
+                  "gomoku"                 -> leaderboards.gomoku
                 )
               )
             }

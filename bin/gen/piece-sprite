@@ -69,6 +69,9 @@ flipello_themes = [
 entropy_themes = [
   ['classic_entropy', 'svg']
 ]
+fiveinarow_themes = [
+  ['classic_stone', 'svg']
+]
 amazons_themes = [
   ['queen', 'svg'],
   ['arrow', 'svg'],
@@ -157,6 +160,9 @@ amazons_variants = ['amazons']
 entropy_variants = ['entropy']
 # a counter's owner changes as it lands, so both players share the one image per colour
 entropy_roles = ['w-piece', 'k-piece', 'y-piece', 'g-piece', 'r-piece', 'b-piece', 'p-piece']
+fiveinarow_variants = ['gomoku']
+# a stone's colour is its role, whichever seat currently owns it
+fiveinarow_roles = ['b-piece', 'w-piece']
 oware_roles=['s1-piece','s2-piece','s3-piece','s4-piece','s5-piece','s6-piece','s7-piece','s8-piece','s9-piece','s10-piece',
 's11-piece','s12-piece','s13-piece','s14-piece','s15-piece','s16-piece','s17-piece','s18-piece','s19-piece','s20-piece',
 's21-piece','s22-piece','s23-piece','s24-piece','s25-piece','s26-piece','s27-piece','s28-piece','s29-piece','s30-piece',
@@ -632,6 +638,41 @@ entropy_themes.map { |theme|
     }
   }.flatten
   File.open(dest_dir + 'entropy-' + name + '.external.css', 'w') { |f| f.puts classes_entropy.join("\n") }
+}
+
+# inline SVG fiveinarow
+fiveinarow_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_fiveinarow = (['.fiveinarow.is2d'] + fiveinarow_variants.map { |variant| '.is2d .variant-' + variant }).map { |scope|
+    colors.map { |color|
+      fiveinarow_roles.map { |role|
+        file = source_dir + 'fiveinarow/' + name + '/' + role.upcase[0] + '.' + ext
+        File.open(file, 'r') do|image_file|
+          image = image_file.read
+          base64 = Base64.strict_encode64(image)
+          scope + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+            "background-image:url('data:image/" + types[ext] + base64 + "')}"
+        end
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'fiveinarow-' + name + '.css', 'w') { |f| f.puts classes_fiveinarow.join("\n") }
+}
+
+# external SVG fiveinarow
+fiveinarow_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_fiveinarow = (['.fiveinarow.is2d'] + fiveinarow_variants.map { |variant| '.is2d .variant-' + variant }).map { |scope|
+    colors.map { |color|
+      fiveinarow_roles.map { |role|
+        scope + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+          "background-image:url('/assets/piece/" + 'fiveinarow/' + name + "/" + role.upcase[0] + "." + ext + "')}"
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'fiveinarow-' + name + '.external.css', 'w') { |f| f.puts classes_fiveinarow.join("\n") }
 }
 
 # inline SVG oware

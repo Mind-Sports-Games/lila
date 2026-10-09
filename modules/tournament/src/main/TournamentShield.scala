@@ -1029,6 +1029,13 @@ object TournamentShield {
           15,
           1
         )
+    case object Gomoku
+        extends Category(
+          Variant.FiveInARow(strategygames.fiveinarow.variant.Gomoku),
+          Blitz32,
+          3,
+          1
+        )
 
     val all: List[Category] = List(
       Chess,
@@ -1078,7 +1085,8 @@ object TournamentShield {
       Nackgammon,
       Abalone,
       GrandAbalone,
-      Entropy
+      Entropy,
+      Gomoku
     )
 
     def of(t: Tournament): Option[Category] = all.find(_.matches(t))

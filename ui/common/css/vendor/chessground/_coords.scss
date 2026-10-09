@@ -1,14 +1,11 @@
 $go-variants: ('go9x9', 'go13x13', 'go19x19');
-$forced-outer-coords-variants: (
-  'shogi',
-  'minishogi',
-  'xiangqi',
-  'minixiangqi',
-  'octagonflipello',
-  'oware',
-  'go9x9',
-  'go13x13',
-  'go19x19'
+$fiveinarow-variants: ('gomoku');
+// both play stones on the line intersections, so their coords line up with the lines
+$intersection-variants: join($go-variants, $fiveinarow-variants, comma);
+$forced-outer-coords-variants: join(
+  ('shogi', 'minishogi', 'xiangqi', 'minixiangqi', 'octagonflipello', 'oware'),
+  $intersection-variants,
+  comma
 );
 
 /* hidden coords */
@@ -486,7 +483,7 @@ coords {
     }
   }
 
-  @each $variant in $go-variants {
+  @each $variant in $intersection-variants {
     .variant-#{$variant} &.files {
       &.p1,
       &.p2 {
@@ -696,8 +693,8 @@ coords {
     }
   }
 
-  // Go specific outer coords adjustments
-  @each $variant in $go-variants {
+  // Go and five in a row outer coords adjustments
+  @each $variant in $intersection-variants {
     .variant-#{$variant} cg-coords-container.outer-coords .ranks {
       &.p1,
       &.p2 {

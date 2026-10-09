@@ -34,6 +34,8 @@ import strategygames.{
   Situation,
   Speed,
   Status,
+  Swap,
+  Swap2,
   Undo
 }
 import strategygames.variant.Variant
@@ -67,6 +69,12 @@ case class Game(
   def board        = stratGame.situation.board
   def history      = stratGame.situation.board.history
   def variant      = stratGame.situation.board.variant
+
+  // five in a row: a swap moves black to the other seat, so a seat's colour follows the board
+  def playerColor(playerIndex: PlayerIndex): String = board match {
+    case strategygames.Board.FiveInARow(b) if b.blackSeat == P2 => variant.playerColors(!playerIndex)
+    case _                                                      => variant.playerColors(playerIndex)
+  }
   def turnCount    = stratGame.turnCount
   def plies        = stratGame.plies
   def clock        = stratGame.clock
@@ -389,6 +397,8 @@ case class Game(
           Event.Undo(u, game.situation, state, clockEvent, updated.board.pocketData)
         case ss: SelectSquares =>
           Event.SelectSquares(ss, game.situation, state, clockEvent, updated.board.pocketData)
+        case sw: Swap   => Event.Swap(sw, game.situation, state, clockEvent)
+        case sw2: Swap2 => Event.Swap(sw2, game.situation, state, clockEvent)
       }
     } :: {
       // abstraction leak, I know.
@@ -485,6 +495,8 @@ case class Game(
       case _: Uci.DrawCounter   => "draw"
       case _: Uci.CubeAction    => "cube"
       case _: Uci.SelectSquares => "ss:"
+      case _: Uci.Swap          => "swap"
+      case _: Uci.Swap2         => "swap2"
       case _                    => sys.error("Type Error")
     }
 
@@ -1355,6 +1367,9 @@ object Game {
     val multiPointState = "mps"
     // entropy
     val round = "rd"
+    // five in a row
+    val blackSeat   = "bs" // stored only once P2 plays black
+    val openingStep = "op" // stored only during the opening
     // go
     val selectedSquares     = "ss" // the dead stones selected in go
     val deadStoneOfferState = "os" // state of the dead stone offer

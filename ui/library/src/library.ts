@@ -48,6 +48,8 @@ playstrategy.load.then(() => {
           return '1'; //draughts for dameo
         case '14':
           return '13'; //entropy
+        case '15':
+          return '14'; //fiveinarow
         default:
           return gf;
       }

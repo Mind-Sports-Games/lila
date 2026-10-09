@@ -40,6 +40,7 @@ type variantConfirmsType = {
   abalone: string;
   grandabalone: string;
   entropy: string;
+  gomoku: string;
 };
 
 const variantConfirms: variantConfirmsType = {
@@ -104,6 +105,8 @@ const variantConfirms: variantConfirmsType = {
     "This is a Grand Abalone game!\n\nThe aim of the game is to be the first to push ten of your opponent's marbles off the board.",
   entropy:
     'This is an Entropy game!\n\nThe game is played over two rounds with roles swapped. Chaos draws and places counters; Order slides them to build symmetric colour patterns, scoring as it goes. The higher score wins.',
+  gomoku:
+    'This is a Gomoku game!\n\nThe first to make an unbroken line of five or more stones wins. It opens with swap2: Player 1 places three stones, then Player 2 may play on, swap colours, or place two more and let Player 1 choose a colour.',
 };
 
 function storageKey(key: string) {

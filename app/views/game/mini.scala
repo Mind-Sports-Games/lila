@@ -88,7 +88,8 @@ object mini {
             pov
           )}|${~pov.game.lastActionKeys}|${pov.game.multiPointResult.fold(MultiPointState.noDataChar)(_.toString)}"
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
-          Variant.Go(_) | Variant.Abalone(_) | Variant.Dameo(_) | Variant.Entropy(_) =>
+          Variant.Go(_) | Variant.Abalone(_) | Variant.Dameo(_) | Variant.Entropy(_) |
+          Variant.FiveInARow(_) =>
         dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(
@@ -100,7 +101,7 @@ object mini {
   private def renderPlayer(pov: Pov)(implicit lang: Lang) =
     span(cls := "mini-game__player")(
       span(
-        cls := s"mini-game__user playerIndex-icon is ${pov.game.variant.playerColors(pov.player.playerIndex)} text"
+        cls := s"mini-game__user playerIndex-icon is ${pov.game.playerColor(pov.player.playerIndex)} text"
       )(
         playerUsername(pov.player, withRating = false),
         span(cls := "rating")(lila.game.Namer.ratingString(pov.player)),

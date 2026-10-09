@@ -147,6 +147,27 @@ span.mini-game.variant-togyzkumalak.is2d {
   height: calc(100% / 19);
 }
 
+.variant-gomoku square {
+  width: calc(100% / 15);
+  height: calc(100% / 15);
+}
+
+// as go marks its last stone: a white ring on a black stone, a black ring on a white one. The class names
+// the stone's colour because a swap means the seat cannot say which colour it is.
+.variant-gomoku square.last-move {
+  background-color: transparent;
+  background-size: cover;
+  z-index: 3;
+
+  &.black-stone {
+    background-image: url(../images/board/go/highlights/p1.svg);
+  }
+
+  &.white-stone {
+    background-image: url(../images/board/go/highlights/p2.svg);
+  }
+}
+
 .variant-nackgammon square,
 .variant-hyper square,
 .variant-backgammon square {
@@ -719,6 +740,11 @@ square {
   height: calc(100% / 19);
 }
 
+.variant-gomoku piece {
+  width: calc(100% / 15);
+  height: calc(100% / 15);
+}
+
 .variant-nackgammon piece,
 .variant-hyper piece,
 .variant-backgammon piece {
@@ -873,6 +899,11 @@ piece {
   padding-bottom: calc(100% / 19);
 }
 
+.variant-gomoku cg-helper {
+  width: calc(100% / 15);
+  padding-bottom: calc(100% / 15);
+}
+
 .variant-nackgammon cg-helper,
 .variant-hyper cg-helper,
 .variant-backgammon cg-helper {
@@ -961,6 +992,11 @@ cg-helper {
 .variant-go19x19 cg-container {
   width: calc(100% * 19);
   height: calc(100% * 19);
+}
+
+.variant-gomoku cg-container {
+  width: calc(100% * 15);
+  height: calc(100% * 15);
 }
 
 .variant-nackgammon cg-container,

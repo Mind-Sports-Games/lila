@@ -304,7 +304,7 @@ export default class AnalyseCtrl {
   }
 
   private uciToLastMove(uci?: Uci): Key[] | undefined {
-    if (!uci || uci == 'pass' || uci.substring(0, 3) == 'ss:') return;
+    if (!uci || uci == 'pass' || uci == 'swap' || uci == 'swap2' || uci.substring(0, 3) == 'ss:') return;
     const pos = uci.match(/[a-z][1-9][0-9]?/g) as Key[];
     if (!pos) return; // roll, endturn, cube*, undo, dice roll
     if (uci[1] === '@') return [pos[0], pos[0]] as Key[];
@@ -647,6 +647,19 @@ export default class AnalyseCtrl {
     this.controlConfig.onUserAction?.();
     this.socket.sendAnaPass(pass);
     this.preparePremoving();
+    this.redraw();
+  };
+
+  sendSwap = (action: 'swap' | 'swap2'): void => {
+    const swap: AnaPass = {
+      variant: this.data.game.variant.key,
+      lib: this.data.game.variant.lib,
+      fen: this.node.fen,
+      path: this.path,
+    };
+    if (this.practice) this.practice.onUserMove();
+    this.controlConfig.onUserAction?.();
+    this.socket.sendAnaSwap(action, swap);
     this.redraw();
   };
 
