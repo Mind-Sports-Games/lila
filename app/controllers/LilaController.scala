@@ -86,8 +86,7 @@ abstract private[controllers] class LilaController(val env: Env)
   protected def Open[A](parser: BodyParser[A])(f: Context => Fu[Result]): Action[A] =
     Action.async(parser)(handleOpen(f, _))
 
-  // One localised URL per maintained locale, for the page types worth ranking in another language.
-  // path is the same page without the prefix: everyone who has a language of their own goes there.
+  // a localised URL per maintained locale; path is the same page without the prefix
   protected def LangPage(path: String)(f: Context => Fu[Result])(segment: String): Action[Unit] =
     Action.async(parse.empty) { req =>
       CSRF(req) {

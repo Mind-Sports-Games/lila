@@ -31,9 +31,8 @@ final class Tournament(
   private def jsonView = env.tournament.jsonView
   private def forms    = env.tournament.forms
 
-  // every online MSO tournament, arena or swiss, which the team's own list scrolls away; the queries
-  // match swisses by a regex no index serves, and the list only changes during the weeks of the MSO,
-  // so the page is built once a day, or on demand by msoHistoryRefresh
+  // every online MSO tournament: swisses are matched by a regex no index serves, and the list only
+  // changes during an MSO, so it is built once a day, or on demand
   private val msoHistoryCache =
     env.memo.cacheApi.unit[List[html.tournament.msoHistory.Edition]] {
       _.refreshAfterWrite(1.day).buildAsyncFuture { _ =>
@@ -54,7 +53,6 @@ final class Tournament(
       msoHistoryCache.getUnit map { editions => Ok(html.tournament.msoHistory(editions)) }
     }
 
-  // for the admins and the MSO's own account, once a tournament of the MSO has finished
   def msoHistoryRefresh =
     Auth { _ => me =>
       if (html.tournament.msoHistory.canRefresh(me)) {
@@ -662,7 +660,6 @@ final class Tournament(
       }
     }
 
-  // a whole game family: every Abalone tournament of this frequency, not one variant's
   def historyGroup(freq: String, group: String, page: Int) =
     Open { implicit ctx =>
       val history = views.html.tournament.history

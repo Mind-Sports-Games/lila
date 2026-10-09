@@ -13,7 +13,7 @@ object finishedList {
 
   def apply(t: Tournament)(implicit ctx: Context): Tag = withType(t, emptyFrag)
 
-  // `kind` ends the line under the name ("3h Arena"), where a list of mixed kinds says which this one is
+  // `kind` ends the line under the name ("3h Arena")
   def withType(t: Tournament, kind: Frag)(implicit ctx: Context): Tag =
     tr(cls := "paginated")(
       td(cls := "icon")(iconTag(tournamentIconChar(t))),

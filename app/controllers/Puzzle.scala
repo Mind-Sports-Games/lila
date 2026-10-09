@@ -121,8 +121,6 @@ final class Puzzle(
           .orFailWith(lila.puzzle.NoPuzzleAvailable(variant.key, theme.value))
     }
 
-  // a variant whose puzzles have not been generated yet, or a theme with none in the player's
-  // rating band, is a page to show — not a 500
   private def nextPuzzleForMeOrNone(variant: Variant, theme: PuzzleTheme.Key)(implicit
       ctx: Context
   ): Fu[Option[Puz]] =

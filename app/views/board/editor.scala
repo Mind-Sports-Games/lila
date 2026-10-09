@@ -41,7 +41,6 @@ object editor {
           description = trans.boardEditorDescription.txt()
         )
         .some,
-      // one URL, whatever position or ?variant= the visitor arrived with
       canonicalPath = routes.Editor.index.url.some
     )(
       frag(
@@ -61,7 +60,6 @@ object editor {
 
   def about(variant: strategygames.variant.Variant)(implicit ctx: Context): Frag =
     frag(
-      // the heading is the link to the game's own page
       h2(
         a(href := routes.Library.variant(variant.key))(
           trans.aboutX(views.html.library.bits.searchName(variant))

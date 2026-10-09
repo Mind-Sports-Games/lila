@@ -88,8 +88,7 @@ object form {
               .getOrElse(simul.filterNot(s => SimulForm.isAnyVariant(s.variants)).so(_.variants.map(encode)))
               .toSet
             val variantOf = Variant.all.map(v => encode(v) -> v).toMap
-            // a chip that toggles the game: the index stays the option's own, so the form is posted
-            // as it always was
+            // the index stays the option's own, so the form posts as before
             def chip(option: ((String, String, Option[String]), Int)) = {
               val ((value, text, hint), index) = option
               label(
@@ -106,8 +105,7 @@ object form {
                 raw(text)
               )
             }
-            // family by family, as on the tournament pages: a family chip shows its games, a family of
-            // one game is its own chip. Shown first: the first family with a pick, else none.
+            // open first: the first family with a pick, else none
             val indexed = options.zipWithIndex
             val byGroup = displayedGameGroups.map { g =>
               g -> indexed.filter { case ((value, _, _), _) => variantOf.get(value).exists(g.variants.contains) }
@@ -138,8 +136,6 @@ object form {
                   )
                 case _ => emptyFrag
               },
-              // the games of a family of one game are toggled where they stand, so on a line of their own under the
-              // families
               div(cls := "variants__singles")(
                 byGroup.collect { case (_, items) if items.size == 1 => items.map(chip) },
                 indexed.filterNot(i => placed(i._2)).map(chip)

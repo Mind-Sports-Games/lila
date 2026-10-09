@@ -1,5 +1,4 @@
-// Two rows of chips on the tournament series pages: the game groups, then the games of whichever
-// group is open. Every chip is a link to a page of its own, so none of this needs script.
+// the tournament series chips: the game groups, then the games of the open one
 .series-links {
   display: flex;
   flex-wrap: wrap;
@@ -32,7 +31,6 @@
       }
     }
 
-    // a filled chip is the narrowest thing the page lists: All games, or one game
     &.active {
       background: $c-accent;
       border-color: $c-accent;
@@ -47,8 +45,7 @@
       }
     }
 
-    // A group is wider than the game chosen inside it, and both chips can carry the same word -
-    // Abalone above Abalone - so an open group is outlined where a game is filled.
+    // an open group is outlined, a chosen game filled: both can read Abalone
     &.group.active {
       background: none;
       border-color: $c-accent;
@@ -66,8 +63,7 @@
   margin-bottom: 0.5em;
 }
 
-// The games of the open group, tucked under it and set apart by a short rule rather than by
-// spacing, so the two rows never read as one bag of chips.
+// the open group's games, set apart by a short rule
 .series-links__variants {
   position: relative;
   padding-top: 0.9em;

@@ -50,7 +50,7 @@ object topic {
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = topic.value,
-      // every ordering lists the same studies: the default one is the page to index, as on the variant listing
+      // every ordering lists the same studies: the default one is canonical
       robots = netConfig.crawlable && pag.currentPage == 1,
       canonicalPath = routes.Study.byTopic(topic.value, Order.default.key).url.some,
       moreCss = cssTag("study.index"),

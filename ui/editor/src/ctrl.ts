@@ -22,7 +22,6 @@ export default class EditorCtrl {
   positions: Editor.OpeningPosition[];
   chessground: CgApi | undefined;
   redraw: Redraw;
-  // the text about the variant, from the page; the view places it in the grid
   aboutHtml?: string;
 
   selected: Prop<Selected>;
@@ -358,7 +357,6 @@ export default class EditorCtrl {
     this.refreshAbout(variantKey);
   }
 
-  // the text under the board follows the variant, for the one the visitor has settled on
   private refreshAbout(variantKey: VariantKey): void {
     if (this.aboutHtml === undefined) return;
     xhr.text(`/editor/about/${variantKey}`).then(

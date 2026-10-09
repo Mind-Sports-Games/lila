@@ -54,7 +54,6 @@ export default function (showText: (ctrl: SimulCtrl) => VNode) {
                                 modal.close();
                                 xhr.join(ctrl.data.id, $(this).data('variant'));
                               });
-                              // a family chip shows its games, and a second click hides them again
                               $wrap.find('.simul-join__family').on('click', function (this: HTMLElement) {
                                 const group = this.dataset.group,
                                   wasOpen = this.classList.contains('active');
@@ -215,8 +214,7 @@ export default function (showText: (ctrl: SimulCtrl) => VNode) {
   };
 }
 
-// The games a player can join with, family by family as in the simul form: a family of several games
-// is a chip that shows them, a family of one game is a chip that joins with it.
+// a family of several games is a chip that shows them; a family of one game joins with it
 const joinChoices = (ctrl: SimulCtrl): VNode[] => {
   const groups = new Map<string, Variant[]>();
   ctrl.data.variants.forEach(v => {

@@ -91,7 +91,6 @@ object shields {
       )
     }
 
-  // every shield whose defender is on a streak, longest first: the ones worth taking away
   def streaks(history: TournamentShield.History, upcoming: List[Tournament])(implicit ctx: Context) = {
     val bounties = history.sorted
       .flatMap { case (categ, awards) =>

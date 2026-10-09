@@ -391,8 +391,7 @@ final class Study(
       env.study.api.adminInvite(id, me) inject Redirect(routes.Study.show(id))
     }
 
-  // featured = shown in the all/hot/popular/topic listings, served to crawlers and listed in the sitemap;
-  // an unfeatured study is still reachable by its URL
+  // featured: in the listings, served to crawlers and in the sitemap; unfeatured still opens by its URL
   def feature(id: String) =
     SecureF(canUnfeature) { implicit ctx => me =>
       OptionFuResult(env.study.api.byId(id)) { study =>

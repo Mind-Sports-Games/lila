@@ -150,7 +150,6 @@ export default class AnalyseCtrl {
   cgConfig: any; // latest chessground config (useful for revert)
   music?: any;
   nvui?: NvuiPlugin;
-  // the text about the variant, from the page of a free analysis board; the view places it in the grid
   aboutHtml?: string;
 
   constructor(

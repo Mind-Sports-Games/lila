@@ -24,8 +24,7 @@ export const hashedAssetUrl = (path: string, opts: AssetUrlOpts = {}) => {
   return baseUrl + '/assets' + '/' + path;
 };
 
-// zxcvbn is 387KB of word lists: load it when the field is focused, not when the page is
-// A field the page autofocused is focused before this runs, so it loads at once.
+// zxcvbn is large: load it on focus, or at once for a field already focused
 export const lazyPasswordComplexity = (id: string) => {
   const field = document.getElementById(id);
   if (!field) return;
@@ -35,8 +34,7 @@ export const lazyPasswordComplexity = (id: string) => {
   else field.addEventListener('focus', load, { once: true });
 };
 
-// Chart.js and its plugins are 211KB, and a chart is never why someone opened the page:
-// fetch the module when its container is about to be seen.
+// Chart.js loads when its container is about to be seen
 export const lazyChart = (selector: string, module: string, draw: () => void): void => {
   const el = document.querySelector(selector);
   if (!el) return;

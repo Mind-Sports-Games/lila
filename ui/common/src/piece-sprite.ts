@@ -22,19 +22,16 @@ export const ensureFamily = (family: string): void => {
   document.head.appendChild(link);
 };
 
-// a mini game carries its family among its classes
 export const ensureFor = (el: Element): void => {
   for (const family of named().keys()) if (el.classList.contains(family)) ensureFamily(family);
 };
 
-// from a page whose data already lists the sets (round, analysis)
 export const register = (sets?: { name: string; gameFamily: string }[]): void => {
   if (!sets?.length) return;
   document.body.setAttribute(attr, sets.map(s => `${s.gameFamily}:${s.name}`).join(','));
   document.querySelectorAll('.mini-game').forEach(ensureFor); // any drawn before this call
 };
 
-// a set picked for a family whose sheet is not here yet
 export const remember = (family: string, set: string): void => {
   const sets = named();
   if (!sets.has(family)) return;

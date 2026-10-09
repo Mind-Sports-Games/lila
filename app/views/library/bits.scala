@@ -126,7 +126,7 @@ object bits {
       case "international"      => mso("DR", "DRDA", study = Some("CTu6f0Mp"))
       case "oware"              => mso("OW", "OWOC", study = Some("C7hHSwaw"))
       case "flipello"           => mso("OT", "OTOC", study = Some("PuMKTeH2"))
-      // played at the MSO but not recorded yet; their games are not in a study yet
+      // played at the MSO, their games not in a study yet
       case "togyzkumalak" => mso("TO", "TOOC")
       case "shogi"        => mso("SH", "SHOC")
       case "xiangqi"      => mso("CC", "CCOC")
@@ -147,7 +147,6 @@ object bits {
       case _            => None
     }
 
-  // an edition of the MSO Grand Prix, arena or swiss, for the library page
   case class GrandPrixEdition(name: String, url: Call, startsAt: DateTime)
 
   def grandPrixEditions(arenas: List[lila.tournament.Tournament], swisses: List[lila.swiss.Swiss])(implicit
@@ -177,12 +176,11 @@ object bits {
       case _                                                 => ""
     })
 
-  // the smaller-board or reduced variants of a game, so its hub links them and not only the other way round
+  // the variants derived from a game, so its page links them too
   def childVariants(variant: Variant): List[Variant] =
     Variant.all.filter(v => parentVariant(v).exists(_.key == variant.key))
 
-  // Games a player of one is likely to like, as sets: each page lists the others of its sets. Unlike a
-  // parent, nothing derives from anything here, so the rules pages do not call these "variants of".
+  // games alike without one deriving from the other: each page lists the others of its sets
   private val relatedSets: List[List[String]] = List(
     List("international", "english", "brazilian", "portuguese"),
     List("russian", "pool"),
@@ -200,8 +198,7 @@ object bits {
       .filterNot(_ == variant.key)
       .flatMap(Variant.byKey.get)
 
-  // A game's URL carries its engine key - flipello, standard, go19x19 - so the name people
-  // actually type 404s. These redirect onto the one canonical URL instead.
+  // the names people type for a game, when they differ from its key
   private val urlAliases: Map[String, String] = Map(
     "othello"               -> "flipello",
     "reversi"               -> "flipello",

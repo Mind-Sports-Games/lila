@@ -92,16 +92,13 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
       }
     }
 
-  // the studies a crawler may see, most liked first, the oldest first among equals: an order anyone
-  // can foresee, and which a study cannot climb by being new
+  // most liked first, the oldest first among equals, so a study cannot climb by being new
   def notable(max: Int): Fu[List[Study.Notable]] = notableOf(selectNotable, max)
 
-  // the studies pinned to the library pages of their games
   def libraryPinned: Fu[List[Study.Notable]] =
     notableOf(selectPublicFeaturable ++ $doc("library" -> true), 1000)
 
-  // the others the library pages may show: liked by someone other than the owner, whoever the owner
-  // is (Study.onLibraryPages); the site's own accounts get there by a pin
+  // liked by someone other than the owner, whoever the owner (Study.onLibraryPages)
   def libraryPopular(max: Int): Fu[List[Study.Notable]] =
     notableOf(selectPublicFeaturable ++ F.likes.$gt(1) ++ "library".$ne(false), max)
 

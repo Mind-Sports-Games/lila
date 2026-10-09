@@ -250,7 +250,6 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
         }
       }
 
-  // every study with a chapter in this variant
   def studyIdsByVariant(variant: Variant): Fu[List[Study.Id]] =
     coll {
       _.distinctEasy[String, List](
@@ -260,7 +259,6 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
       ).map(_.map(Study.Id.apply))
     }
 
-  // the variant keys played in each of these studies
   def variantKeysByStudyIds(studyIds: List[Study.Id]): Fu[Map[Study.Id, Set[String]]] =
     coll {
       _.find($doc("studyId".$in(studyIds)), $doc("studyId" -> true, "setup.variant" -> true).some)

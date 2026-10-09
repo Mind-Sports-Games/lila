@@ -166,7 +166,6 @@
     'horsey': 'horsey.thumbnail.jpg',
   );
 
-  // only the themes each family offers: the rest pointed at art that does not exist
   $family-board-themes: (
     'chess': map-keys($chess-board-files),
     'loa': map-keys($chess-board-files),

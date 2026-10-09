@@ -12,7 +12,6 @@ import strategygames.variant.Variant
 
 object history {
 
-  // every finished edition of a series plus the next scheduled one
   case class Summary(all: List[Tournament], next: Option[Tournament])
 
   private val perVariant: Set[Freq] =
@@ -20,10 +19,8 @@ object history {
 
   def hasSeries(freq: Freq) = perVariant(freq)
 
-  // Switching frequency keeps the game or family you were looking at, but the entry for the
-  // section you are already in drops it instead of pointing at this very page: from a shield
-  // category that is the only way back to /tournament/history/shield, since url() sends a
-  // shield variant to its category page.
+  // switching frequency keeps the game or family; the current section's entry drops it instead,
+  // the only way back from a shield category to /tournament/history/shield
   def freqNav(current: Freq, variant: Option[Variant], group: Option[GameGroup] = None) =
     st.nav(cls := "page-menu__menu subnav")(
       allFreqs.map { f =>
@@ -52,7 +49,6 @@ object history {
         url(freq, v.some, page)
       }
 
-  // the page as filtered: one game, else a family, else everything of the frequency
   def pageUrl(freq: Freq, variant: Option[Variant], group: Option[GameGroup], page: Int = 1) =
     group.fold(url(freq, variant, page))(groupUrl(freq, _, page))
 
@@ -66,7 +62,6 @@ object history {
         )
     }
 
-  // filtered by variant, this is the one stable page for a recurring series ("Yearly Abalone")
   def apply(
       freq: Freq,
       variant: Option[Variant],
@@ -76,9 +71,7 @@ object history {
   )(
       implicit ctx: Context
   ) = {
-    // One variant, a whole family, or everything. A family is named after one of its games in
-    // eight cases out of twelve - Abalone holds Abalone and Grand Abalone - so the family page
-    // says so, or the two would carry the same title.
+    // a family named after one of its games says so, or the two pages would share a title
     val subject = variant.map(VariantKeys.variantName) orElse group.map(VariantKeys.gameGroupName)
     val heading = subject.fold(s"${nameOf(freq)} tournaments") { s =>
       s"${nameOf(freq)} $s tournaments" + group.so(_ => ", all variants")
@@ -99,7 +92,6 @@ object history {
       )
     }
     views.html.base.layout(
-      // the heading already names the frequency, so nine frequency pages stop sharing one title
       title = subject.fold(heading)(_ => s"$heading — every edition and winner"),
       moreJs = infiniteScrollTag,
       moreCss = frag(cssTag("tournament.history"), summary.isDefined.option(cssTag("tournament.leaderboard"))),
@@ -117,7 +109,7 @@ object history {
       main(cls := "page-menu arena-history")(
         freqNav(freq, variant, group),
         div(cls := "page-menu__content box")(
-          // the game's own page, on the title's line: kept out of the h1 so the heading stays the page's name
+          // kept out of the h1, which stays the page's name
           div(cls := "arena-history__head")(
             h1(heading),
             variant.map { v =>
@@ -127,9 +119,7 @@ object history {
               )
             }
           ),
-          // Two stages, game group then game, because 47 chips in one row is not a chooser.
-          // A group is a page of its own - every Abalone tournament of this frequency, across
-          // the family - so each chip is a link and none of this needs a line of script.
+          // game group, then game: each chip is a link to a page of its own
           hasSeries(freq).option {
             val open = group orElse variant.flatMap(v => displayedGameGroups.find(_.variants.contains(v)))
             frag(
@@ -152,7 +142,6 @@ object history {
                   )(VariantKeys.gameGroupName(g))
                 }
               ),
-              // a family of one game has nothing to choose under its chip
               open.filter(soleVariant(_).isEmpty).map { g =>
                 div(cls := "series-links series-links__variants")(
                   g.variants.filterNot(_.fromPositionVariant).map { v =>
@@ -178,8 +167,7 @@ object history {
               h2(cls := "shield-section")("Every edition")
             )
           },
-          // a series with no finished edition says so, rather than show an empty table. Not "yet": a
-          // legacy series may never have another one
+          // not "yet": a legacy series may never have another edition
           if (pager.currentPage == 1 && pager.currentPageResults.isEmpty)
             p(cls := "arena-history__empty")(trans.noFinishedTournament())
           else

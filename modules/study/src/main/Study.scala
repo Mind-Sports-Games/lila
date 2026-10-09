@@ -20,7 +20,7 @@ case class Study(
     createdAt: DateTime,
     updatedAt: DateTime,
     trash: Option[Boolean] = None, // unfeatured by a mod: out of every listing but the owner's, and unindexed
-    // on the library pages of its games: true always shown, before the rest; false never; unset, by rank
+    // on its games' library pages: true pinned first; false never; unset, by its likes
     library: Option[Boolean] = None
 ) {
 
@@ -106,7 +106,6 @@ object Study {
   case class Name(value: String) extends AnyVal with StringValue
   implicit val nameIso: Iso.StringIso[Name] = lila.common.Iso.string[Name](Name.apply, _.value)
 
-  // what the sitemap and the game hubs need of a notable study
   case class Notable(id: Id, name: Name, ownerId: User.ID, updatedAt: DateTime)
 
   case class IdName(_id: Id, name: Name) {

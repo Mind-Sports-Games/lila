@@ -88,7 +88,6 @@ object series {
     else
       div(cls := "categ-shield-holder")(
         trophy,
-        // nobody has won it yet: say so, under the trophy and above the next arena
         stats.current.isEmpty.option(
           p(cls := "categ-shield-holder__challenge")(s"No one holds the ${w.unit} yet.")
         ),
@@ -103,8 +102,7 @@ object series {
             )
           )
         },
-        // contested: dare the reader by naming what the holder has built up, then point at the next arena;
-        // otherwise just state the record, if any
+        // contested: name what the holder has built up; otherwise the record, if any
         stats.current.map { holder =>
           val name   = usernameOrId(holder.userId)
           val streak = stats.currentReign.map(_.count).filter(_ > 1).filter(_ => w.contested)
@@ -120,7 +118,6 @@ object series {
             case (None, Some(r))    => s"$name $r.".some
             case (None, None)       => none
           }
-          // what the holder has built up; the date is on the line above and the next arena on the button
           feat.map(f => p(cls := "categ-shield-holder__challenge")(f))
         },
         next.map { t =>

@@ -11,7 +11,6 @@ import lila.study.Study.WithChaptersAndLiked
 
 object variant {
 
-  // the studies with a chapter in the variant, linked from the game's library page
   def show(variant: Variant, pag: Paginator[WithChaptersAndLiked], order: Order)(implicit ctx: Context) = {
     val title = trans.variantStudies.txt(views.html.library.bits.searchName(variant))
     views.html.base.layout(

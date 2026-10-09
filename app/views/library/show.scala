@@ -125,7 +125,6 @@ object show {
             trans.createAGame()
           )
         ),
-        // the live row keeps its two slots: puzzle left, featured game right (centred when alone)
         (dailyPuzzle.isDefined || featuredGame.isDefined).option(
           div(cls := "library__live")(
             dailyPuzzle map { p =>
@@ -150,8 +149,7 @@ object show {
             }
           )
         ),
-        // whichever of these a game has, two per row, a lone last one full width. The short blocks come
-        // first and the tall ones (leaderboard, studies) after, so the two of a row are about as high
+        // two per row, a lone last one full width; short blocks first, tall ones after
         div(cls := "library__blocks")(
           tours.nonEmpty.option(tournamentList(tours)),
           mso,
@@ -201,8 +199,7 @@ object show {
       )
     )
 
-  // the game's studies, pinned first, then by likes (NotableStudies), as on the studies page, minus the
-  // tutorial, which the Tutorial link above already offers; six at most
+  // the game's studies (NotableStudies), minus the tutorial linked above; six at most
   private def studyList(
       variant: Variant,
       studies: List[lila.study.Study.WithChaptersAndLiked],
@@ -211,7 +208,6 @@ object show {
     val tutorial = bits.studyLink(variant)
     val others   = studies.filterNot(s => tutorial.has(s.study.id.value)).take(6)
     others.nonEmpty.option(
-      // beside the leaderboard the block is no higher than it, and its tiles scroll
       div(cls := List("library__studies" -> true, "library__studies--beside-leaderboard" -> besideLeaderboard))(
         div(cls := "color-choice title")(
           div(dataIcon := "4"),
@@ -222,7 +218,6 @@ object show {
           others.map { s =>
             div(cls := "study")(
               views.html.study.bits.widget(s, h3),
-              // a study an admin pinned here says so with a pin, in the tile's corner
               s.study.library.has(true).option(
                 span(cls := "library__pin", dataIcon := "\ue93a", title := trans.libraryStudyPinned.txt())
               )
@@ -251,8 +246,6 @@ object show {
     }
   }
 
-  // the game at the Mind Sports Olympiad: its in-person event when it has one,
-  // and its online Grand Prix editions when there are any
   private def msoSection(
       variant: Variant,
       mso: Option[bits.MsoEvent],
@@ -271,8 +264,7 @@ object show {
           div(" ")
         ),
         p {
-          // the sentence carries the links: the Mind Sports Olympiad's page, the event's games and the
-          // online Grand Prix, each where the sentence names it. Raw HTML, as a string argument is escaped.
+          // raw HTML: a string argument would be escaped
           val msoLink =
             raw(a(href := routes.Page.lonePage("mind-sports-olympiad"))("Mind Sports Olympiad").render)
           def gamesLink(id: String) = raw(a(href := routes.Study.show(id))(trans.msoGamesLink()).render)
@@ -309,7 +301,6 @@ object show {
             )
           )
         },
-        // the online editions are all on the MSO history page, which a list here would only repeat
         bits.hasMsoOnline(variant).option(
           p(a(href := routes.Tournament.msoHistory)(trans.msoAllTournaments()))
         )

@@ -34,7 +34,6 @@ object home {
                   s"${v.gameFamily.id}_${v.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.variantName(v))
                 )*
               ),
-              // family id -> the id of the group it buckets into, so the chart need not re-derive it
               "gameGroupOfFamily" -> Json.obj(
                 gameGroupIdByFamilyId.map { case (fam, group) =>
                   fam -> Json.toJsFieldJsValueWrapper(group)
@@ -78,7 +77,6 @@ object home {
               cls                := "variant",
               dataIcon           := icon,
               attr("data-value") := id,
-              // the group this variant sits under, so the filter does not have to re-derive it
               attr("data-gamegroup") := gameGroupValueByFamilyId.getOrElse(id.takeWhile(_ != '_'), ""),
               href                   := routes.Library.variant(variantKey(id))
             )(name)

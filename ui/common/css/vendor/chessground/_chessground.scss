@@ -503,7 +503,6 @@ square {
   &.selected {
     background-color: rgba(20, 85, 30, 0.5);
 
-    // no square highlight on the hand-drawn boards, as above
     body.chess-horsey &,
     body.loa-horsey & {
       background: none;
@@ -575,7 +574,6 @@ square {
   &.current-premove {
     background-color: rgba(20, 30, 85, 0.5) !important;
 
-    // no square highlight on the hand-drawn boards, as above
     body.chess-horsey &,
     body.loa-horsey & {
       background: none;
@@ -585,7 +583,6 @@ square {
   &.move-dest:hover {
     background: rgba(20, 85, 30, 0.3);
 
-    // no square highlight on the hand-drawn boards, as above
     body.chess-horsey &,
     body.loa-horsey & {
       background: none;

@@ -196,18 +196,14 @@ trait SetupHelper { self: I18nHelper =>
     GameGroup.Entropy()
   )
 
-  // Which group button a variant belongs under, keyed by its game family. Note the value is not
-  // the group's own id: encodeGameGroupId emits the game family id of the group's first variant,
-  // so Mancala reads 7 (togyzkumalak) and Draughts reads 1. Two families can share a group -
-  // oware and togyzkumalak both sit under Mancala - which is why this is derived here rather than
-  // rewritten by hand wherever the picker is drawn.
+  // the group button a game family sits under. Not the group's id: the family id of the group's
+  // first variant (Mancala reads 7, Draughts 1)
   val gameGroupValueByFamilyId: Map[String, String] =
     displayedGameGroups.flatMap { group =>
       group.variants.map(v => encodeGameFamilyId(v.gameFamily) -> encodeGameGroupId(group))
     }.toMap
 
-  // The group's own id, for callers that bucket by group rather than match the picker's buttons -
-  // the library chart keys its series this way.
+  // the group's own id, which the library chart keys its series by
   val gameGroupIdByFamilyId: Map[String, String] =
     displayedGameGroups.flatMap { group =>
       group.variants.map(v => encodeGameFamilyId(v.gameFamily) -> group.id.toString)

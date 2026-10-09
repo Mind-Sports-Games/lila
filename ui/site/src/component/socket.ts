@@ -98,9 +98,8 @@ export default class StrongSocket {
     };
     this.version = version;
     this.pubsub.on('socket.send', this.send);
-    // not 'unload': Chrome refuses it, and it would keep the page out of the back/forward cache.
-    // An open socket can keep a page out of that cache too, and one kept through it is not sure to
-    // work: it closes on the way in and opens again when the page comes back.
+    // not 'unload', which blocks the back/forward cache; an open socket can too, so it closes on the
+    // way in and opens again on the way back
     window.addEventListener('pagehide', () => this.destroy());
     window.addEventListener('pageshow', e => {
       if (e.persisted) this.connect();

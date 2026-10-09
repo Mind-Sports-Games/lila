@@ -143,10 +143,8 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
 
   import scala.concurrent.duration.*
   import lila.memo.CacheApi.*
-  // every game's library page, rules page, study listing and analysis board, its puzzle trainer and
-  // theme index where it has one, every tournament series, the static hubs, and the studies a
-  // crawler is allowed to see (Study.notable). Excluded on purpose: the puzzle theme hubs
-  // (/training/<variant>/<theme>), which 404 for a visitor with no puzzle in that theme.
+  // every page a crawler should find; not the puzzle theme pages, which 404 for a visitor with
+  // no puzzle in that theme
   def sitemap = Action.async {
     if (!env.net.crawlable) fuccess(NotFound)
     else sitemapCache.getUnit map { Ok(_).as(XML).withHeaders(CACHE_CONTROL -> "max-age=86400") }
@@ -162,12 +160,9 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
         val freqs         = html.tournament.history.allFreqs
         // a shield's per-variant series page IS the shield page, which gets its own date below
         val shieldKeys = lila.tournament.TournamentShield.Category.all.map(_.key).toSet
-        // the pages with a URL per locale, so the ones carrying hreflang alternates
         val localisedPaths = routes.UserAnalysis.index.url ::
           variants.map(v => routes.Library.variant(v.key).url) :::
-          // only the variants that have an analysis board: draughts has none, so its pages
-          // render a board with no pieces. The standard chess board canonicalises to
-          // /analysis, already listed above.
+          // only variants with an analysis board; the standard chess board is /analysis, listed above
           views.html.board.userAnalysis.analysisVariants
             .filterNot(_ == chessStandard)
             .map(v => routes.UserAnalysis.parseArg(v.key).url)
@@ -200,13 +195,11 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
             val mod = lastmod.fold("")(d => s"<lastmod>${d.toString("yyyy-MM-dd")}</lastmod>")
             s"  <url><loc>$base$path</loc>$mod$children</url>"
           }
-          // the set the page itself links (views.html.base.layout): a crawler that has only seen the
-          // sitemap still finds every localised URL
+          // the same set as the page's own links (views.html.base.layout)
           def alternates(path: String) = lila.i18n.SeoLang
             .alternates(path)
             .map { case (tag, p) => s"""<xhtml:link rel="alternate" hreflang="$tag" href="$base$p"/>""" }
             .mkString
-          // one page per series, dated by its last edition where a cache knows it
           val seriesUrls = freqs.filter(html.tournament.history.hasSeries).flatMap { freq =>
             variants.filterNot(v => freq == Freq.Shield && shieldKeys(v.key)).map { v =>
               val lastEdition = winners.variants.get(v.key).flatMap { w =>
@@ -218,7 +211,6 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
               loc(html.tournament.history.url(freq, v.some), lastEdition.map(_.date))
             }
           }
-          // and one per game family, which lists every edition of its games together
           val groupUrls = freqs.filter(html.tournament.history.hasSeries).flatMap { freq =>
             views.html.tournament.history.displayedGroups.map { g =>
               loc(html.tournament.history.groupUrl(freq, g), none)

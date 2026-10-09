@@ -237,7 +237,6 @@ main.tournament-categ-shields .box > h1 {
   color: $c-font-dim;
 }
 
-// the reigning holder, laid out like the medley shield page
 .categ-shield-holder {
   display: flex;
   flex-flow: column;
@@ -331,7 +330,6 @@ main.tournament-categ-shields .box > h1 {
   }
 }
 
-// the headhunter page: defenders on a streak, longest first
 .shield-headhunter {
   &__intro {
     margin: 0 var(--box-padding) 1em;
@@ -376,7 +374,6 @@ main.tournament-categ-shields .box > h1 {
   }
 }
 
-// most shields held: medal badges for the top three, plain numbers after
 .shield-podium {
   list-style: none;
   margin: 0 var(--box-padding) 1em;

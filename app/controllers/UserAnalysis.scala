@@ -22,9 +22,8 @@ final class UserAnalysis(
 
   def index = load("", Variant.libStandard(GameLogic.Chess()))
 
-  // the name a game is known by, or a real key in the wrong case, lands on the canonical
-  // URL rather than silently rendering standard chess. An alias for a variant with no
-  // analysis board stops here, rather than redirecting to a URL that only 404s.
+  // a name or a key in the wrong case redirects to the canonical URL; an alias for a variant with
+  // no analysis board stops here
   private def hasAnalysisBoard(key: String) =
     Variant.byKey.get(key).exists(views.html.board.userAnalysis.analysisVariants.contains)
 
@@ -41,8 +40,7 @@ final class UserAnalysis(
     arg.split("/", 2) match {
       case Array(key) =>
         aliasRedirect(key) | {
-          // a real variant with no analysis board renders a board and no pieces; say so
-          // rather than serve a page that looks like it works
+          // a variant with no analysis board would render a board without pieces
           Variant.byKey.get(key).filterNot(views.html.board.userAnalysis.analysisVariants.contains) match {
             case Some(_) => Open { implicit ctx => notFound }
             case None    => load("", Variant.orDefault(key))

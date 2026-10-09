@@ -5,9 +5,8 @@ import strategygames.variant.Variant
 import lila.memo.CacheApi
 import lila.memo.CacheApi.*
 
-// the studies of the library pages (Study.onLibraryPages), by the variants their chapters play: the
-// pinned ones first, then the most liked. A study whose chapters play several variants, which no
-// single game's page describes, is left out unless it is pinned.
+// the studies of the library pages (Study.onLibraryPages) by variant: pinned first, then by
+// likes; one playing several variants only when pinned
 final class NotableStudies(
     studyRepo: StudyRepo,
     chapterRepo: ChapterRepo,

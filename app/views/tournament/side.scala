@@ -68,9 +68,7 @@ object side {
         tour.spotlight map { s =>
           st.section(cls := "spotlight")(
             markdownLinksOrRichText(s.description),
-            // the defender is whoever won the previous edition: the label leads there (date in the
-            // tooltip), the name stays a normal user link. Without a previous edition on record,
-            // fall back to the shield holder from the cache
+            // the defender won the previous edition; without one on record, the shield holder from the cache
             previous.filter(_ => isSeries(tour)).flatMap(prev => prev.winnerId.map(prev -> _)) match {
               case Some((prev, winner)) =>
                 p(cls := "defender", dataIcon := "5")(
@@ -225,7 +223,6 @@ object side {
     else if (tour.schedule.exists(_.freq == Schedule.Freq.Yearly)) "Reigning champion:"
     else "Last winner:"
 
-  // the series page, styled like the defender line above it
   private def seriesNav(tour: Tournament)(implicit ctx: Context): Option[Frag] =
     tour.schedule.filter(_ => isSeries(tour)).map { sched =>
       val variantName = VariantKeys.variantName(tour.variant)

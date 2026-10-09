@@ -65,7 +65,6 @@ private object bits {
         trans.variant()
       ),
       div(id := "variant_icons")(
-        // the group this variant sits under, so the filter below does not re-derive it
         renderIconRadios(
           form("variant"),
           libs,
@@ -166,8 +165,7 @@ private object bits {
       )
     }
 
-  // gameGroupOf lets the variant picker tag each radio with the group it belongs under; the
-  // other fields rendered here - opponent, mode, time mode - have no group and pass nothing
+  // gameGroupOf tags each variant radio with its group
   def renderIconRadios(
       field: Field,
       options: Seq[SelectChoice],

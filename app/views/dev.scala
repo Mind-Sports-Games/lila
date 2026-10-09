@@ -64,7 +64,6 @@ object dev {
             form3.input(form("command"))(autofocus)
           ),
           h2("Command examples:"),
-          // one line per command, or per group of commands sharing their words
           p(
             "( ): one choice, of words (a/b) or of whole forms (a | b). ",
             "{x}: a value to fill in. [ ]: may be left out."

@@ -1,6 +1,4 @@
-/* Board libraries are loaded on demand, so a page that shows no mini board of a
- * given family never downloads that family's code. Memoised per family: initAll
- * runs again on every 'content-loaded' and on every snabbdom postpatch. */
+// board libraries load with the first board of their family, memoised per family
 
 type BoardCtor = (element: HTMLElement, config: any) => any;
 

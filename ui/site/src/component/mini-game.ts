@@ -17,10 +17,8 @@ interface UpdateData {
   p2Delay?: number;
 }
 
-// Returns data-live synchronously - initAll feeds those ids to startWatching - while
-// the board library itself is fetched in the background. The marker class is dropped
-// and the promise memoised before that await, so the redraws that call initAll on
-// every websocket tick cannot build a second board on the same element.
+// returns data-live synchronously; memoised before the library is awaited, so the websocket
+// redraws cannot build a second board
 export const init = (node: HTMLElement): string | null => {
   const live = node.getAttribute('data-live'),
     $el = $(node);

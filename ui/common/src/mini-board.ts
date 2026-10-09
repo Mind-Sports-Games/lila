@@ -7,9 +7,8 @@ export const init = (node: HTMLElement): Promise<any> => {
   return initWith(node, fen, orientation as Orientation);
 };
 
-// Resolves with the board api instance. Idempotent per node: the marker class is
-// dropped and the promise memoised synchronously, before the library is awaited,
-// so a redraw or a second initAll in that window cannot build a second board.
+// idempotent per node: memoised before the library is awaited, so a redraw cannot build a
+// second board
 export const initWith = (node: HTMLElement, fen: string, orientation: Orientation): Promise<any> => {
   const pending = domData.get(node, 'board-pending');
   if (pending) return pending;

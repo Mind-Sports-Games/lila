@@ -9,8 +9,7 @@ object embed {
 
   import EmbedConfig.implicits.*
 
-  // boardFamily: the family this embed draws, whose sprite blocks the paint. The other
-  // thirteen are 89% of an embed's render-blocking CSS and match nothing on it.
+  // boardFamily: the family this embed draws; only its sprite blocks the paint
   def apply(title: String, cssModule: String, boardFamily: Option[String] = None)(
       body: Modifier*
   )(implicit config: EmbedConfig) =

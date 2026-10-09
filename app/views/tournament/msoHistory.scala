@@ -11,7 +11,6 @@ object msoHistory {
 
   type Edition = Either[Tournament, Swiss]
 
-  // the admins, and the account the MSO runs its tournaments from
   def canRefresh(me: lila.user.User) =
     lila.security.Granter(_.Admin)(me) || me.id == views.html.library.bits.msoTeamId
 
@@ -65,7 +64,6 @@ object msoHistory {
     }
   }
 
-  // arenas and swisses are listed together, and the end of the line under the name says which is which
   private def swissRow(s: Swiss)(implicit ctx: Context) =
     tr(cls := "paginated")(
       td(cls := "icon")(iconTag(s.variant.perfIcon)),

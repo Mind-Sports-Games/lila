@@ -15,7 +15,6 @@
 }
 
 // the title, and the game's own page at the end of its line
-// the box pads its own h1, which this row now holds
 .arena-history__head {
   @extend %box-padding;
 
@@ -35,7 +34,6 @@
   white-space: nowrap;
 }
 
-// the button that rebuilds the MSO list sits at the right, where the eye ends the introduction
 .mso-history__refresh {
   display: flex;
   justify-content: flex-end;

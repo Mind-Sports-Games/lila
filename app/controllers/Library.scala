@@ -37,9 +37,7 @@ final class Library(env: Env) extends LilaController(env) {
         LangPage(routes.Library.variant(key).url)(ctx => showVariant(key)(using ctx))(lang)
     }
 
-  // Both halves are finished tournaments, so they change a few times a year, and the swiss one
-  // matches its name with a case-insensitive regex that no index can serve. Uncached they ran on
-  // every view of all 47 hubs, which is exactly the traffic these pages are built to attract.
+  // finished tournaments rarely change, and the swiss query is a regex no index serves
   private val grandPrixCache =
     env.memo.cacheApi[String, (List[lila.tournament.Tournament], List[lila.swiss.Swiss])](
       64,

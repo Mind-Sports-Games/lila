@@ -101,15 +101,14 @@ final class StudyPager(
       paginator($inIds(ids) ++ accessSelect(me), me, order, page)
     }
 
-  // these studies as listing tiles, in the order of the ids (the library page lists a game's notable ones)
+  // these studies as listing tiles, in the order of the ids
   def byIds(ids: List[Study.Id], me: Option[User]): Fu[List[Study.WithChaptersAndLiked]] =
     paginator($inIds(ids) ++ accessSelect(me), me, Order.Hot, 1) map { pag =>
       val byId = pag.currentPageResults.map(s => s.study.id -> s).toMap
       ids.flatMap(byId.get)
     }
 
-  // the distinct over chapters is the costly part; a few minutes of staleness is fine for a listing.
-  // The studies a mod took out of the listings leave the list here, so each page does not carry them.
+  // the distinct over chapters is the costly part; unfeatured studies leave the list here
   private val variantStudyIds = cacheApi[String, List[Study.Id]](64, "study.pager.variantStudyIds") {
     _.expireAfterWrite(5.minutes)
       .buildAsyncFuture { key =>

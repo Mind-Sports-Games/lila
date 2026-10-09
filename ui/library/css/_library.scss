@@ -84,7 +84,6 @@
     }
   }
 
-  // a few links, not a block: a muted label over a row of pills
   .library-related {
     // the sections above sit in a centred 500px column; this one runs the width of the page
     box-sizing: border-box;
@@ -168,7 +167,6 @@
       margin: 0.3em 0;
     }
 
-    // the same white as the "more" link of the tournaments block
     .title a {
       color: $c-color-choice-font-default;
 
@@ -178,7 +176,6 @@
     }
   }
 
-  // the studies as on the studies page: the tiles of its list
   .library__studies {
     .studies {
       border-top: $border;
@@ -188,7 +185,6 @@
       }
     }
 
-    // a pinned study: a pin in the tile's top right corner, above the tile's link overlay
     .library__pin {
       position: absolute;
       top: 0.8em;
@@ -198,7 +194,6 @@
       font-size: 0.65em;
     }
 
-    // and a long name stops short of it
     .study:has(.library__pin) .top {
       padding-right: 1.2em;
     }
@@ -577,7 +572,6 @@
         }
       }
 
-      // the studies are as high as the leaderboard they share a row with, and their tiles scroll
       .library__studies--beside-leaderboard {
         display: flex;
         flex-flow: column;

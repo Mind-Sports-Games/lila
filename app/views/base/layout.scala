@@ -30,12 +30,8 @@ object layout {
       raw {
         s"""<meta name="theme-color" content="${ctx.pref.themeColor}">"""
       }
-    // One stylesheet per game family, 718KB of them, and a page that draws one family can never
-    // use the other thirteen: sole drops them. Where a page may also show a board of another
-    // family - the round player page lists the viewer's other games - they all ship, and only
-    // the family on the board is worth blocking the first paint for. The rest carry media="print":
-    // the browser fetches them without waiting, and lazyPieceScript below hands each one back to
-    // every medium once it has arrived.
+    // the family on the board blocks the first paint; the other families' sheets load as print and
+    // lazyPieceScript switches them on when they arrive. sole drops them altogether.
     def pieceSprite(boardFamily: Option[String], sole: Boolean)(implicit ctx: Context): Frag =
       ctx.currentPieceSet
         .filter(ps => !sole || boardFamily.contains(ps.gameFamilyName))
@@ -70,8 +66,7 @@ object layout {
   import bits.*
 
   private val noTranslate                        = raw("""<meta name="google" content="notranslate">""")
-  // one face, one preload: the @font-face below lists playstrategy.woff2 first and the browser
-  // never reaches the .chess entries, so preloading them only cost a high-priority request
+  // one preload: the browser never reaches the .chess faces listed after playstrategy.woff2
   private val fontPreload =
     raw {
       s"""<link rel="preload" href="${assetUrl(
@@ -247,7 +242,6 @@ object layout {
       csp: Option[ContentSecurityPolicy] = None,
       wrapClass: String = "",
       canonicalPath: Option[String] = None,
-      // this page type has one URL per maintained locale: link them all, both ways
       alternates: Boolean = false,
       // the game family this page draws a board for, if any: its pieces block the paint, the rest do not
       boardFamily: Option[String] = None,
@@ -294,20 +288,17 @@ object layout {
           link(rel := "mask-icon", href := staticAssetUrl("logo/playstrategy.svg"), color := "black"),
           favicons,
           (!robots).option(raw("""<meta content="noindex, nofollow" name="robots">""")),
-          // query strings never change the page identity
           robots.option(link(rel := "canonical", href := canonicalUrl)),
           (robots && alternates && canonicalUrl == s"$netBaseUrl${ctx.req.path}")
             .option(alternateLinks(barePath)),
           noTranslate,
-          // a localised page shares the English page's og:url otherwise, which reads as a
-          // second, conflicting canonical
-          // a page that names no image of its own still gets a branded card rather than none
+          // a localised page's own og:url, or it reads as a second canonical
+          // a page with no image of its own gets the branded card
           openGraph.map { og =>
             og.copy(
               url = urlLang.fold(og.url)(_ => canonicalUrl),
               image = og.image orElse staticAssetUrl("logo/playstrategy-tile-wide.png").some,
-              // a summary card is cropped square, so it gets the square tile - the same
-              // pairing lobby/home.scala and user/show/page.scala already use
+              // a summary card is cropped square, so it gets the square tile
               twitterImage = og.twitterImage orElse og.image
                 .fold(staticAssetUrl("logo/playstrategy-tile.png").some)(_ => none)
             ).frags

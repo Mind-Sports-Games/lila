@@ -146,9 +146,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .map(_.flatMap(_.asOpt[Tournament]))
       .dmap { new lila.db.paginator.StaticAdapter(_) }
 
-  // Empty means every game. One variant selects it; several - a game group, whose variants can
-  // span game logics, draughts and dameo under Draughts - need an $or, since lib and variant are
-  // two fields of the same document.
+  // empty means every game; several variants need an $or, as a group can span game logics
   def finishedByFreqAdapter(freq: Schedule.Freq, variants: List[Variant] = Nil) =
     new lila.db.paginator.Adapter[Tournament](
       collection = coll,
@@ -523,7 +521,6 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
 
   def nextShield(variant: Variant): Fu[Option[Tournament]] = nextScheduled(Schedule.Freq.Shield, variant)
 
-  // every scheduled shield arena not yet finished, soonest first
   def upcomingShields: Fu[List[Tournament]] =
     coll
       .find(unfinishedSelect ++ $doc("schedule.freq" -> Schedule.Freq.Shield.name))
@@ -531,7 +528,6 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .cursor[Tournament]()
       .list()
 
-  // the last finished edition of a scheduled series before this one
   def previousEdition(tour: Tournament): Fu[Option[Tournament]] =
     tour.schedule.so { sched =>
       coll
@@ -544,7 +540,6 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
         .headOption
     }
 
-  // every finished edition of a series, newest first (a yearly series stays small)
   def finishedSeries(freq: Schedule.Freq, variant: Variant, max: Int = 100): Fu[List[Tournament]] =
     coll
       .find(finishedSelect ++ $doc("schedule.freq" -> freq.name) ++ libSelect(variant.gameLogic) ++ variantSelect(variant))
@@ -558,9 +553,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
     if (variant.standardVariant) $or($doc("variant".$exists(false)), $doc("variant" -> variant.id))
     else variantSelect(variant)
 
-  // the editions a team ran: its own account created them, or they are listed for it.
-  // `anyCreatorFreqs` are series nobody but the team ran, though PlayStrategy's own account created
-  // them with no team behind them (the 2021 online MSO)
+  // `anyCreatorFreqs`: series PlayStrategy's own account created for no team (the 2021 online MSO)
   def finishedSeriesOfTeam(
       teamId: TeamID,
       freqs: List[Schedule.Freq],
@@ -586,7 +579,6 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .cursor[Tournament]()
       .list(max)
 
-  // every finished edition of those series, whatever the game, latest first
   def finishedOfTeam(
       teamId: TeamID,
       freqs: List[Schedule.Freq],

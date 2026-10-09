@@ -909,7 +909,6 @@ final class SwissApi(
       .cursor[Swiss]()
       .list(max)
 
-  // the same, whatever the game
   def finishedNamedAll(teamId: TeamID, namePattern: String, max: Int = 1000): Fu[List[Swiss]] =
     colls.swiss
       .find(

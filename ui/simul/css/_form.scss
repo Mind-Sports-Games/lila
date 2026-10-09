@@ -4,10 +4,8 @@
     display: inline-block;
   }
 
-  // The games to play, picked family by family as on the tournament pages. The family chips are
-  // radios, each showing its family's game chips: those are the checkboxes the form posts. A family
-  // of one game is its own chip. The count on a family chip is a CSS counter over its checked games,
-  // so none of this needs a line of script.
+  // family chips are radios showing their games; the game chips are the posted checkboxes, and a
+  // family's count is a CSS counter over them
   .variants {
     display: flex;
     flex-flow: row wrap;
@@ -37,7 +35,6 @@
       }
     }
 
-    // a picked game fills its chip; an open family is only outlined
     .variants__chip:has(input:checked) {
       background: mix($c-primary, $c-bg-box, 15%);
     }
@@ -77,7 +74,6 @@
       }
     }
 
-    // on a line of their own under the families, above the open family's games
     &__singles {
       flex: 1 1 100%;
       display: flex;
