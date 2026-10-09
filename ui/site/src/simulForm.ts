@@ -43,6 +43,17 @@ playstrategy.load.then(() => {
     $('form .conditions').addClass('visible');
   });
 
+  // a family chip is a radio, which a second click would not close: this one does
+  document.querySelectorAll<HTMLLabelElement>('.simul-form .variants__family-name').forEach(label =>
+    label.addEventListener('click', e => {
+      const radio = document.getElementById(label.htmlFor) as HTMLInputElement | null;
+      if (radio?.checked) {
+        e.preventDefault();
+        radio.checked = false;
+      }
+    }),
+  );
+
   $('.flatpickr').each(function (this: HTMLInputElement) {
     flatpickr(this, {
       minDate: 'today',

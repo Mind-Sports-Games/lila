@@ -1,3 +1,5 @@
+@import '../../analyse/css/study/list-widget';
+
 .library-all {
   display: flex;
   flex-flow: column;
@@ -82,9 +84,124 @@
     }
   }
 
+  // a few links, not a block: a muted label over a row of pills
+  .library-related {
+    // the sections above sit in a centred 500px column; this one runs the width of the page
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 1em;
+    margin-bottom: 2em;
+
+    h2 {
+      margin-bottom: 0.6em;
+      font-size: 0.8em;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: $c-font-dim;
+    }
+
+    div {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4em 0.5em;
+    }
+
+    a {
+      padding: 0.3em 0.85em;
+      border: 1px solid $c-border;
+      border-radius: 999px;
+      color: $c-font;
+      line-height: 1.4;
+      white-space: nowrap;
+
+      &:hover {
+        border-color: $c-font-dim;
+        color: $c-link;
+      }
+    }
+  }
+
   .start {
     margin: 2em 0em;
     font-size: 175%;
+  }
+
+  .library__studies,
+  .library__wc {
+    @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
+      .selected-color-#{$c} & .color-choice {
+        background: map-get($c-color-choice-map, $c);
+        color: $c-color-choice-font-default;
+        text-shadow: 0 1px 0 map-get($c-color-choice-map, $c);
+      }
+    }
+
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 1em;
+
+    .title {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5em 1em;
+      align-items: center;
+
+      ::before {
+        font-size: 2.2em;
+      }
+
+      h2 {
+        font-size: 1.3em;
+        font-weight: bold;
+      }
+    }
+
+    p {
+      margin: 0.6em 1em;
+    }
+
+    ul {
+      margin: 0.6em 1em;
+    }
+
+    li {
+      margin: 0.3em 0;
+    }
+
+    // the same white as the "more" link of the tournaments block
+    .title a {
+      color: $c-color-choice-font-default;
+
+      &:hover {
+        color: $c-link;
+      }
+    }
+  }
+
+  // the studies as on the studies page: the tiles of its list
+  .library__studies {
+    .studies {
+      border-top: $border;
+
+      .study li {
+        margin: 0;
+      }
+    }
+
+    // a pinned study: a pin in the tile's top right corner, above the tile's link overlay
+    .library__pin {
+      position: absolute;
+      top: 0.8em;
+      right: 0.8em;
+      z-index: 2;
+      color: $c-primary;
+      font-size: 0.65em;
+    }
+
+    // and a long name stops short of it
+    .study:has(.library__pin) .top {
+      padding-right: 1.2em;
+    }
   }
 
   .library__tv,
@@ -198,6 +315,10 @@
       flex-flow: column;
       padding: 2px;
       justify-content: center;
+      // the variants are <a> so a crawler can follow them to their hub; a button centres its own
+      // text and takes no link colour, an anchor has to be told both
+      align-items: center;
+      color: $c-font;
       flex: 0 0 25%;
       max-width: 25%;
       border-right: 1px solid $c-border;
@@ -286,6 +407,14 @@
       align-items: center;
     }
 
+    .library-info__about {
+      margin: 0;
+      padding: 0.8em 1em;
+      font-size: 0.9em;
+      line-height: 1.5;
+      color: $c-font-dim;
+    }
+
     .library-stats-row {
       display: flex;
       justify-content: space-between;
@@ -348,7 +477,10 @@
       font-size: 1.6em;
     }
 
+    // the table inside shares the class, so it would inherit the block's cap
     table {
+      width: 100%;
+      max-width: none;
       overflow-x: hidden;
       background: $c-bg-zebra;
       border-bottom: 1px solid $c-border;
@@ -389,61 +521,79 @@
       padding-right: 1em;
     }
 
+    .library__live,
+    .library__blocks {
+      display: flex;
+      flex-flow: column;
+      align-items: center;
+      width: 100%;
+    }
+
     @include breakpoint($mq-small) {
       max-width: 950px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      column-gap: 1em;
-      align-items: start;
-      grid-template-areas:
-        'header header'
-        'start  start'
-        'puzzle tv'
-        'tours  leader'
-        'stats  stats'
-        'chart  chart';
 
-      .library-header {
-        grid-area: header;
-      }
       .start {
-        grid-area: start;
         text-align: center;
       }
-      .library__puzzle {
-        grid-area: puzzle;
-        max-width: 100%;
-      }
-      .library__tv {
-        grid-area: tv;
-        max-width: 100%;
-      }
-      .library__tv--centered {
-        grid-column: 1 / -1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
 
-        .title,
-        .mini-game {
-          width: calc(50% - 0.5em);
-          margin-left: 0em;
+      .library__live {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 1em;
+        align-items: start;
+
+        .library__puzzle {
+          grid-column: 1;
+          max-width: 100%;
+        }
+        .library__tv {
+          grid-column: 2;
+          max-width: 100%;
+        }
+        .library__tv--centered {
+          grid-column: 1 / -1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+
+          .title,
+          .mini-game {
+            width: calc(50% - 0.5em);
+            margin-left: 0em;
+          }
         }
       }
-      .tournaments {
-        grid-area: tours;
-        max-width: 100%;
+
+      .library__blocks {
+        flex-flow: row wrap;
+        align-items: stretch;
+        gap: 1em;
+        margin-bottom: 1em;
+
+        > div {
+          flex: 1 1 calc(50% - 0.5em);
+          max-width: 100%;
+          margin-bottom: 0;
+        }
       }
-      .leaderboards {
-        grid-area: leader;
-        max-width: 100%;
+
+      // the studies are as high as the leaderboard they share a row with, and their tiles scroll
+      .library__studies--beside-leaderboard {
+        display: flex;
+        flex-flow: column;
+
+        .studies {
+          flex: 1 1 0;
+          min-height: 0;
+          overflow-y: auto;
+          // the tiles hide their overflow, so without this the rows shrink to fit instead of scrolling
+          grid-auto-rows: max-content;
+          align-content: start;
+        }
       }
-      .library-stats-table {
-        grid-area: stats;
-        max-width: 100%;
-      }
+
+      .library-stats-table,
       #library_chart_area {
-        grid-area: chart;
         max-width: 100%;
       }
     }

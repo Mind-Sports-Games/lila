@@ -1,4 +1,10 @@
 .team-events {
+  .team-tournaments__year {
+    margin: 1.5em 1rem 0.5em;
+    font-size: 1.3em;
+    color: $c-font-dim;
+  }
+
   .slist {
     td {
       padding: 0.5rem 1rem;

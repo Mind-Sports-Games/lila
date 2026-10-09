@@ -29,8 +29,10 @@ object storm {
         )
       ),
       title = "Puzzle Storm",
-      zoomable = true,
-      chessground = false
+      boardFamily = "chess".some,
+      soleBoardFamily = true,
+      namePieceSets = true,
+      zoomable = true
     ) {
       main(
         div(cls := "storm storm-app storm--play")(

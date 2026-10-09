@@ -647,10 +647,16 @@ export default function (ctrl: AnalyseCtrl): VNode {
     ? '.piece-letter'
     : '';
 
+  // draughts keys its board off the board size, not the variant, so without this the board
+  // background never matches and the board renders blank. Chess variants carry boardSize
+  // instead of board and correctly yield nothing here.
+  const boardKey = (ctrl.data.game.variant as { board?: { key: string } }).board?.key;
+  const boardSizeClass = boardKey ? `.is${boardKey}` : '';
+
   return h('main', [
     study ? studyView.overboard(study) : null,
     h(
-      `div.analyse.variant-${variantKey}${notationBasic}.${ctrl.data.game.gameFamily}`,
+      `div.analyse.variant-${variantKey}${notationBasic}${boardSizeClass}.${ctrl.data.game.gameFamily}`,
       {
         hook: {
           insert: vn => {
@@ -821,6 +827,9 @@ export default function (ctrl: AnalyseCtrl): VNode {
           : h('div.chat__members.none', {
               hook: onInsert(playstrategy.watchers),
             }),
+        ctrl.aboutHtml
+          ? h('section.analyse__about', { hook: onInsert(elm => (elm.innerHTML = ctrl.aboutHtml!)) })
+          : null,
       ],
     ),
   ]);

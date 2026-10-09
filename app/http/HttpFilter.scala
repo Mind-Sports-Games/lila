@@ -16,15 +16,17 @@ final class HttpFilter(env: Env)(implicit val mat: Materializer) extends Filter 
   def apply(nextFilter: RequestHeader => Fu[Result])(req: RequestHeader): Fu[Result] =
     if (HTTPRequest.isAssets(req))
       nextFilter(req) dmap { result =>
-        result.withHeaders(
-          "Service-Worker-Allowed"       -> "/",
-          "Cross-Origin-Embedder-Policy" -> "require-corp"
+        addNoIndexHeader(
+          result.withHeaders(
+            "Service-Worker-Allowed"       -> "/",
+            "Cross-Origin-Embedder-Policy" -> "require-corp"
+          )
         )
       }
     else {
       val startTime = nowMillis
       redirectWrongDomain(req) map fuccess getOrElse {
-        nextFilter(req).dmap(addApiResponseHeaders(req)) dmap { result =>
+        nextFilter(req).dmap(addApiResponseHeaders(req)).dmap(addNoIndexHeader) dmap { result =>
           monitoring(req, startTime, result)
           result
         }
@@ -52,4 +54,9 @@ final class HttpFilter(env: Env)(implicit val mat: Materializer) extends Filter 
   private def addApiResponseHeaders(req: RequestHeader)(result: Result) =
     if (HTTPRequest.isApiOrApp(req)) result.withHeaders(ResponseHeaders.headersForApiOrApp(req)*)
     else result
+
+  // dev and staging must stay out of search indexes whatever the response type;
+  // the HTML meta tag only covers pages
+  private def addNoIndexHeader(result: Result) =
+    if (net.crawlable) result else result.withHeaders("X-Robots-Tag" -> "noindex, nofollow")
 }

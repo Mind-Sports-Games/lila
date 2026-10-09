@@ -160,8 +160,17 @@ function metadata(ctrl: StudyCtrl): VNode {
         '' + d.likes,
       ),
     ]),
+    hubLink(ctrl),
     topicsView(ctrl),
     tagsView(ctrl),
+  ]);
+}
+
+// the game's hub page, for the players who land on a study from a search
+function hubLink(ctrl: StudyCtrl): VNode {
+  const variant = ctrl.data.chapter.setup.variant;
+  return h('div.study__hub', [
+    h('a', { attrs: { href: '/library/' + variant.key } }, ctrl.trans('playVariantOnlineFreeTitle', variant.name)),
   ]);
 }
 

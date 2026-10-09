@@ -125,7 +125,7 @@ final class Main(
 
   val robots = Action { (req: play.api.mvc.RequestHeader) =>
     Ok {
-      if (env.net.crawlable && req.domain == env.net.domain.value) """User-agent: *
+      if (env.net.crawlable && req.domain == env.net.domain.value) s"""User-agent: *
 Allow: /
 Disallow: /game/export/
 Disallow: /games/export/
@@ -133,9 +133,117 @@ Allow: /game/export/gif/thumbnail/
 
 User-agent: Twitterbot
 Allow: /
+
+Sitemap: ${env.net.baseUrl.value}${routes.Main.sitemap.url}
+Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
 """
       else "User-agent: *\nDisallow: /"
     }
+  }
+
+  import scala.concurrent.duration.*
+  import lila.memo.CacheApi.*
+  // every game's library page, rules page, study listing and analysis board, its puzzle trainer and
+  // theme index where it has one, every tournament series, the static hubs, and the studies a
+  // crawler is allowed to see (Study.notable). Excluded on purpose: the puzzle theme hubs
+  // (/training/<variant>/<theme>), which 404 for a visitor with no puzzle in that theme.
+  def sitemap = Action.async {
+    if (!env.net.crawlable) fuccess(NotFound)
+    else sitemapCache.getUnit map { Ok(_).as(XML).withHeaders(CACHE_CONTROL -> "max-age=86400") }
+  }
+
+  private val sitemapCache = env.memo.cacheApi.unit[String] {
+    _.refreshAfterWrite(1.day)
+      .buildAsyncFuture { _ =>
+        val Freq          = lila.tournament.Schedule.Freq
+        val base          = env.net.baseUrl.value
+        val variants      = strategygames.variant.Variant.all.filterNot(_.fromPositionVariant)
+        val chessStandard = strategygames.variant.Variant.libStandard(strategygames.GameLogic.Chess())
+        val freqs         = html.tournament.history.allFreqs
+        // a shield's per-variant series page IS the shield page, which gets its own date below
+        val shieldKeys = lila.tournament.TournamentShield.Category.all.map(_.key).toSet
+        // the pages with a URL per locale, so the ones carrying hreflang alternates
+        val localisedPaths = routes.UserAnalysis.index.url ::
+          variants.map(v => routes.Library.variant(v.key).url) :::
+          // only the variants that have an analysis board: draughts has none, so its pages
+          // render a board with no pieces. The standard chess board canonicalises to
+          // /analysis, already listed above.
+          views.html.board.userAnalysis.analysisVariants
+            .filterNot(_ == chessStandard)
+            .map(v => routes.UserAnalysis.parseArg(v.key).url)
+        val paths =
+          List(
+            "/",
+            routes.Library.home.url,
+            routes.Page.variantHome.url,
+            routes.Tournament.home.url,
+            routes.Tournament.shields.url,
+            routes.Page.lonePage("mind-sports-olympiad").url,
+            routes.Tournament.msoHistory.url,
+            routes.Swiss.home.url,
+            // not /training: it renders the most-played variant's trainer, which is listed below
+            routes.Study.allDefault().url,
+            routes.Blog.index().url,
+            routes.Editor.index.url
+          ) :::
+            variants.map(v => routes.Page.variant(v.key).url) :::
+            variants.map(v => routes.Study.byVariantDefault(v.key).url) :::
+            lila.puzzle.Puzzle.puzzleVariants.map(v => routes.Puzzle.home(v.key).url) :::
+            lila.puzzle.Puzzle.puzzleVariants.map(v => routes.Puzzle.themes(v.key).url) :::
+            freqs.map(f => html.tournament.history.url(f, none))
+        for {
+          studies <- env.study.studyRepo.notable(10000)
+          shields <- env.tournament.shieldApi.history(none) // in memory, filled by /tournament/shields
+          winners <- env.tournament.winners.all             // in memory, filled by the homepage
+        } yield {
+          def loc(path: String, lastmod: Option[org.joda.time.DateTime] = none, children: String = "") = {
+            val mod = lastmod.fold("")(d => s"<lastmod>${d.toString("yyyy-MM-dd")}</lastmod>")
+            s"  <url><loc>$base$path</loc>$mod$children</url>"
+          }
+          // the set the page itself links (views.html.base.layout): a crawler that has only seen the
+          // sitemap still finds every localised URL
+          def alternates(path: String) = lila.i18n.SeoLang
+            .alternates(path)
+            .map { case (tag, p) => s"""<xhtml:link rel="alternate" hreflang="$tag" href="$base$p"/>""" }
+            .mkString
+          // one page per series, dated by its last edition where a cache knows it
+          val seriesUrls = freqs.filter(html.tournament.history.hasSeries).flatMap { freq =>
+            variants.filterNot(v => freq == Freq.Shield && shieldKeys(v.key)).map { v =>
+              val lastEdition = winners.variants.get(v.key).flatMap { w =>
+                if (freq == Freq.Yearly) w.yearly
+                else if (freq == Freq.GroupCycle) w.groupCycle
+                else if (freq == Freq.Wildcard) w.wildcard
+                else none
+              }
+              loc(html.tournament.history.url(freq, v.some), lastEdition.map(_.date))
+            }
+          }
+          // and one per game family, which lists every edition of its games together
+          val groupUrls = freqs.filter(html.tournament.history.hasSeries).flatMap { freq =>
+            views.html.tournament.history.displayedGroups.map { g =>
+              loc(html.tournament.history.groupUrl(freq, g), none)
+            }
+          }
+          // a category with no award yet has no page
+          val shieldUrls = lila.tournament.TournamentShield.Category.all.flatMap { categ =>
+            shields.value.get(categ).flatMap(_.headOption) map { last =>
+              loc(routes.Tournament.categShields(categ.key).url, last.date.some)
+            }
+          }
+          val urls =
+            paths.map(p => loc(p)) :::
+              localisedPaths.map(p => loc(p, children = alternates(p))) :::
+              seriesUrls :::
+              groupUrls :::
+              shieldUrls :::
+              studies.map(s => loc(routes.Study.show(s.id.value).url, s.updatedAt.some))
+          s"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${urls.mkString("\n")}
+</urlset>
+"""
+        }
+      }
   }
 
   def manifest =

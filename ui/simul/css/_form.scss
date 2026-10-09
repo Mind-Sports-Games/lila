@@ -4,23 +4,116 @@
     display: inline-block;
   }
 
+  // The games to play, picked family by family as on the tournament pages. The family chips are
+  // radios, each showing its family's game chips: those are the checkboxes the form posts. A family
+  // of one game is its own chip. The count on a family chip is a CSS counter over its checked games,
+  // so none of this needs a line of script.
   .variants {
     display: flex;
     flex-flow: row wrap;
+    gap: 0.4em 0.5em;
 
-    .checkable {
-      flex: 1 1 33%;
+    label {
+      padding: 0.3em 0.85em;
+      border: 1px solid $c-border;
+      border-radius: 999px;
+      color: $c-font;
+      line-height: 1.4;
       white-space: nowrap;
+      cursor: pointer;
 
-      input {
-        margin-right: 0.3em;
+      &:hover {
+        border-color: $c-font-dim;
       }
 
-      label,
-      input {
-        vertical-align: middle;
-        cursor: pointer;
+      &:has(input:checked) {
+        border-color: $c-primary;
+        color: $c-primary;
       }
+
+      &:has(input:focus-visible) {
+        outline: 2px solid $c-primary;
+        outline-offset: 2px;
+      }
+    }
+
+    // a picked game fills its chip; an open family is only outlined
+    .variants__chip:has(input:checked) {
+      background: mix($c-primary, $c-bg-box, 15%);
+    }
+
+    input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    &__family {
+      display: contents;
+
+      > input {
+        counter-reset: picked;
+      }
+    }
+
+    &__group {
+      order: 1;
+      flex: 1 1 100%;
+      display: flex;
+      flex-flow: row wrap;
+      gap: 0.4em 0.5em;
+      margin-top: 0.3em;
+      padding-top: 0.7em;
+      border-top: 1px solid $c-border;
+      // the other families' games stay rendered for their counters, out of the flow and out of sight
+      position: absolute;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+      visibility: hidden;
+
+      label:has(input:checked) {
+        counter-increment: picked;
+      }
+    }
+
+    // on a line of their own under the families, above the open family's games
+    &__singles {
+      flex: 1 1 100%;
+      display: flex;
+      flex-flow: row wrap;
+      gap: 0.4em 0.5em;
+
+      &:empty {
+        display: none;
+      }
+    }
+
+    &__family:has(> input:checked) > .variants__group {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      visibility: visible;
+    }
+
+    &__count {
+      display: none;
+      margin-left: 0.5em;
+      padding: 0 0.5em;
+      border-radius: 999px;
+      background: $c-primary;
+      color: $c-bg-box;
+      font-size: 0.8em;
+      font-weight: bold;
+
+      &::before {
+        content: counter(picked);
+      }
+    }
+
+    &__family:has(.variants__group input:checked) .variants__count {
+      display: inline-block;
     }
   }
 }

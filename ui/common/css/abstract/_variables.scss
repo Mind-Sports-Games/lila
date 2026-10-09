@@ -27,3 +27,41 @@ $site-header-height: var(--site-header-height);
 $site-header-margin: var(--site-header-margin);
 
 $site-header-outer-height: calc(#{$site-header-height} + #{$site-header-margin});
+
+// which variants draw their coordinates outside the board, and which are Go boards; here rather
+// than in vendor/chessground/coords so a bundle can use them without importing the whole partial
+$go-variants: ('go9x9', 'go13x13', 'go19x19');
+$forced-outer-coords-variants: (
+  'shogi',
+  'minishogi',
+  'xiangqi',
+  'minixiangqi',
+  'octagonflipello',
+  'oware',
+  'go9x9',
+  'go13x13',
+  'go19x19'
+);
+
+// The board themes each family actually offers, mirroring boardThemes in strategygames
+// GameCollection.scala. Looping past these emits rules for art that was never drawn.
+$core-board-themes: (
+  'blue',
+  'blue2',
+  'blue3',
+  'canvas',
+  'wood',
+  'wood2',
+  'wood3',
+  'maple',
+  'brown',
+  'leather',
+  'green',
+  'marble',
+  'grey',
+  'metal',
+  'olive',
+  'purple'
+);
+
+$breakthroughtroyka-board-themes: ('maple', 'purple-diag');

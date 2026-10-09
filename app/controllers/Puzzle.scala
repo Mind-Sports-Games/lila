@@ -87,10 +87,7 @@ final class Puzzle(
   def base =
     Open { implicit ctx =>
       NoBot {
-        val theme = PuzzleTheme.mix
-        nextPuzzleForMe(mostPlayedPuzzleVariant, theme.key) flatMap {
-          renderShow(_, theme)
-        }
+        renderShowOrNoPuzzle(mostPlayedPuzzleVariant, PuzzleTheme.mix)
       }
     }
 
@@ -111,18 +108,49 @@ final class Puzzle(
   def home(variant: String) =
     Open { implicit ctx =>
       NoBot {
-        val theme = PuzzleTheme.mix
-        nextPuzzleForMe(puzzleVariantFromKey(variant), theme.key) flatMap {
-          renderShow(_, theme)
-        }
+        renderShowOrNoPuzzle(puzzleVariantFromKey(variant), PuzzleTheme.mix)
       }
     }
 
   private def nextPuzzleForMe(variant: Variant, theme: PuzzleTheme.Key)(implicit ctx: Context): Fu[Puz] =
     ctx.me match {
       case Some(me) => env.puzzle.session.nextPuzzleFor(me, variant, theme)
-      case None     => env.puzzle.anon.getOneFor(variant, theme).orFail("Couldn't find a puzzle for anon!")
+      case None =>
+        env.puzzle.anon
+          .getOneFor(variant, theme)
+          .orFailWith(lila.puzzle.NoPuzzleAvailable(variant.key, theme.value))
     }
+
+  // a variant whose puzzles have not been generated yet, or a theme with none in the player's
+  // rating band, is a page to show — not a 500
+  private def nextPuzzleForMeOrNone(variant: Variant, theme: PuzzleTheme.Key)(implicit
+      ctx: Context
+  ): Fu[Option[Puz]] =
+    nextPuzzleForMe(variant, theme).dmap(some).recover { case _: lila.puzzle.NoPuzzleAvailable =>
+      none
+    }
+
+  private def renderShowOrNoPuzzle(variant: Variant, theme: PuzzleTheme)(implicit
+      ctx: Context
+  ): Fu[play.api.mvc.Result] =
+    nextPuzzleForMeOrNone(variant, theme.key) flatMap {
+      case Some(puzzle) => renderShow(puzzle, theme)
+      case None         => noPuzzlePage(variant)
+    }
+
+  private def noPuzzlePage(variant: Variant)(implicit ctx: Context): Fu[play.api.mvc.Result] =
+    negotiate(
+      html = fuccess {
+        import scalatags.Text.all.stringFrag
+        NotFound(
+          html.site.message(
+            lila.i18n.I18nKeys.puzzle.noPuzzlesYet.txt(lila.i18n.VariantKeys.variantName(variant)),
+            back = routes.Puzzle.home(Puz.puzzleVariants.head.key).url.some
+          )(stringFrag(lila.i18n.I18nKeys.puzzle.noPuzzlesYetDescription.txt()))
+        )
+      },
+      api = _ => notFoundJson("No puzzle available for this variant and theme")
+    )
 
   def complete(variant: String, themeStr: String, id: String) =
     OpenBody { implicit ctx =>
@@ -363,9 +391,7 @@ final class Puzzle(
     NoBot {
       PuzzleTheme.find(themeOrId) match {
         case Some(theme) =>
-          nextPuzzleForMe(puzzleVariantFromKey(variant), theme.key) flatMap {
-            renderShow(_, theme)
-          }
+          renderShowOrNoPuzzle(puzzleVariantFromKey(variant), theme)
         case None if themeOrId.size == Puz.idSize =>
           OptionFuResult(env.puzzle.api.puzzle.find(Puz.Id(themeOrId))) { puzzle =>
             ctx.me.so { env.puzzle.api.casual.setCasualIfNotYetPlayed(_, puzzle) } >>
@@ -500,11 +526,10 @@ final class Puzzle(
           api = v => {
             val theme         = PuzzleTheme.mix
             val puzzleVariant = Puz.puzzleVariants.head
-            nextPuzzleForMe(puzzleVariant, theme.key)
-              .flatMap { puzzle =>
-                renderJson(puzzle, theme, apiVersion = v.some)
-              }
-              .dmap(JsonOk)
+            nextPuzzleForMeOrNone(puzzleVariant, theme.key).flatMap {
+              case Some(puzzle) => renderJson(puzzle, theme, apiVersion = v.some).dmap(JsonOk)
+              case None         => notFoundJson("No puzzle available for this variant and theme")
+            }
           }
         )
       }

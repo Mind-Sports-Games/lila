@@ -1,5 +1,7 @@
 package lila.study
 
+import strategygames.variant.Variant
+
 import lila.common.paginator.Paginator
 import lila.db.dsl.*
 import lila.db.paginator.{ Adapter, CachedAdapter }
@@ -8,7 +10,8 @@ import lila.user.User
 
 final class StudyPager(
     studyRepo: StudyRepo,
-    chapterRepo: ChapterRepo
+    chapterRepo: ChapterRepo,
+    cacheApi: lila.memo.CacheApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   val maxPerPage                = lila.common.config.MaxPerPage(16)
@@ -21,6 +24,7 @@ final class StudyPager(
     selectOwnerId,
     selectPrivateOrUnlisted,
     selectPublic,
+    selectPublicFeaturable,
     selectTopic
   }
 
@@ -35,7 +39,7 @@ final class StudyPager(
 
   def byOwner(owner: User, me: Option[User], order: Order, page: Int) =
     paginator(
-      selectOwnerId(owner.id) ++ accessSelect(me),
+      selectOwnerId(owner.id) ++ accessSelect(me, trash = true),
       me,
       order,
       page
@@ -75,7 +79,7 @@ final class StudyPager(
 
   def mineLikes(me: User, order: Order, page: Int) =
     paginator(
-      selectLiker(me.id) ++ accessSelect(me.some) ++ $doc("ownerId".$ne(me.id)),
+      selectLiker(me.id) ++ accessSelect(me.some, trash = true) ++ $doc("ownerId".$ne(me.id)),
       me.some,
       order,
       page
@@ -92,10 +96,35 @@ final class StudyPager(
     )
   }
 
-  private def accessSelect(me: Option[User]) =
-    me.fold(selectPublic) { u =>
-      $or(selectPublic, selectMemberId(u.id))
+  def byVariant(variant: Variant, me: Option[User], order: Order, page: Int) =
+    variantStudyIds.get(variant.key) flatMap { ids =>
+      paginator($inIds(ids) ++ accessSelect(me), me, order, page)
     }
+
+  // these studies as listing tiles, in the order of the ids (the library page lists a game's notable ones)
+  def byIds(ids: List[Study.Id], me: Option[User]): Fu[List[Study.WithChaptersAndLiked]] =
+    paginator($inIds(ids) ++ accessSelect(me), me, Order.Hot, 1) map { pag =>
+      val byId = pag.currentPageResults.map(s => s.study.id -> s).toMap
+      ids.flatMap(byId.get)
+    }
+
+  // the distinct over chapters is the costly part; a few minutes of staleness is fine for a listing.
+  // The studies a mod took out of the listings leave the list here, so each page does not carry them.
+  private val variantStudyIds = cacheApi[String, List[Study.Id]](64, "study.pager.variantStudyIds") {
+    _.expireAfterWrite(5.minutes)
+      .buildAsyncFuture { key =>
+        Variant.all
+          .find(_.key == key)
+          .fold(fuccess(List.empty[Study.Id]))(chapterRepo.studyIdsByVariant(_) flatMap studyRepo.featured)
+      }
+  }
+
+  private def accessSelect(me: Option[User], trash: Boolean = false) = {
+    val public = if (trash) selectPublic else selectPublicFeaturable
+    me.fold(public) { u =>
+      $or(public, selectMemberId(u.id))
+    }
+  }
 
   private def paginator(
       selector: Bdoc,

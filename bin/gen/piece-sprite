@@ -8,6 +8,26 @@ lila_dir = pwd()
 source_dir = lila_dir + '/public/piece/'
 dest_dir = lila_dir + '/public/piece-css/'
 
+# The same piece is referenced by its game selector and again by every variant selector, so a
+# 100KB data URI was repeated up to 14 times per file. One rule per image, selectors joined.
+def merge_rules(classes)
+  order = []
+  selectors = {}
+  literals = {}
+  classes.compact.each_with_index do |rule, index|
+    selector, declaration = rule.split(' {', 2)
+    if declaration.nil? # not a rule of ours (the backgammon score blocks): leave it where it is
+      key = 'literal:' + index.to_s
+      order << key
+      literals[key] = rule
+    else
+      order << declaration unless selectors.key?(declaration)
+      (selectors[declaration] ||= []) << selector
+    end
+  end
+  order.map { |key| literals.key?(key) ? literals[key] : selectors[key].join(',') + ' {' + key }
+end
+
 chess_themes = [
   ['alpha', 'svg'],
   ['cburnett', 'svg'],
@@ -207,7 +227,7 @@ chess_themes.map { |theme|
       }
     }
   }.flatten
-  File.open(dest_dir + 'chess-' + name + '.css', 'w') { |f| f.puts (classes_chess_game + classes_chess_variant).join("\n") }
+  File.open(dest_dir + 'chess-' + name + '.css', 'w') { |f| f.puts merge_rules(classes_chess_game + classes_chess_variant).join("\n") }
 }
 
 # external SVG Chess
@@ -232,7 +252,7 @@ chess_themes.map { |theme|
       }
     }
   }.flatten
-  File.open(dest_dir + 'chess-' + name + '.external.css', 'w') { |f| f.puts (classes_chess_game + classes_chess_variant).join("\n") }
+  File.open(dest_dir + 'chess-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_chess_game + classes_chess_variant).join("\n") }
 }
 
 # inline SVG Draughts
@@ -267,7 +287,7 @@ draughts_themes.map { |theme|
       }
     }
   }.flatten
-  File.open(dest_dir + 'draughts-' + name + '.css', 'w') { |f| f.puts (classes_draughts_game + classes_draughts_variant).join("\n") }
+  File.open(dest_dir + 'draughts-' + name + '.css', 'w') { |f| f.puts merge_rules(classes_draughts_game + classes_draughts_variant).join("\n") }
 }
 # external SVG Draughts
 draughts_themes.map { |theme|
@@ -291,7 +311,7 @@ draughts_themes.map { |theme|
       }
     }
   }.flatten
-  File.open(dest_dir + 'draughts-' + name + '.external.css', 'w') { |f| f.puts (classes_draughts_game + classes_draughts_variant).join("\n") }
+  File.open(dest_dir + 'draughts-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_draughts_game + classes_draughts_variant).join("\n") }
 }
 
 # inline SVG Dameo
@@ -326,7 +346,7 @@ dameo_themes.map { |theme|
       }
     }
   }.flatten
-  File.open(dest_dir + 'dameo-' + name + '.css', 'w') { |f| f.puts (classes_dameo_game + classes_dameo_variant).join("\n") }
+  File.open(dest_dir + 'dameo-' + name + '.css', 'w') { |f| f.puts merge_rules(classes_dameo_game + classes_dameo_variant).join("\n") }
 }
 # external SVG Dameo
 dameo_themes.map { |theme|
@@ -350,7 +370,7 @@ dameo_themes.map { |theme|
       }
     }
   }.flatten
-  File.open(dest_dir + 'dameo-' + name + '.external.css', 'w') { |f| f.puts (classes_dameo_game + classes_dameo_variant).join("\n") }
+  File.open(dest_dir + 'dameo-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_dameo_game + classes_dameo_variant).join("\n") }
 }
 
 # inline SVG loa
@@ -383,7 +403,7 @@ loa_themes.map { |theme|
         }
       }
     }.flatten
-    File.open(dest_dir + 'loa-' + name + '.css', 'w') { |f| f.puts (classes_loa_game + classes_loa_variant).join("\n") }
+    File.open(dest_dir + 'loa-' + name + '.css', 'w') { |f| f.puts merge_rules(classes_loa_game + classes_loa_variant).join("\n") }
   }
 # external SVG loa
 loa_themes.map { |theme|
@@ -405,7 +425,7 @@ loa_themes.map { |theme|
         }
       }
     }.flatten
-    File.open(dest_dir + 'loa-' + name + '.external.css', 'w') { |f| f.puts (classes_loa_game + classes_loa_variant).join("\n") }
+    File.open(dest_dir + 'loa-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_loa_game + classes_loa_variant).join("\n") }
 }
 # inline SVG shogi
 shogi_themes.map { |theme|
@@ -428,7 +448,7 @@ shogi_themes.map { |theme|
       end
     }
   }.flatten
-  File.open(dest_dir + 'shogi-' + name + '.css', 'w') { |f| f.puts (classes_shogi_game_and_variant).join("\n") }
+  File.open(dest_dir + 'shogi-' + name + '.css', 'w') { |f| f.puts merge_rules(classes_shogi_game_and_variant).join("\n") }
 }
 # external SVG shogi
 shogi_themes.map { |theme|
@@ -446,7 +466,7 @@ shogi_themes.map { |theme|
         "background-image:url('/assets/piece/" + 'shogi/' + name + "/" + piece + "." + ext + "')}"
     }
   }.flatten
-  File.open(dest_dir + 'shogi-' + name + '.external.css', 'w') { |f| f.puts (classes_shogi_game_and_variant).join("\n") }
+  File.open(dest_dir + 'shogi-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_shogi_game_and_variant).join("\n") }
 }
 
 # inline SVG xiangqi
@@ -479,7 +499,7 @@ xiangqi_themes.map { |theme|
       }
     }
   }.flatten
-  File.open(dest_dir + 'xiangqi-' + name + '.css', 'w') { |f| f.puts (classes_xiangqi_game + classes_xiangqi_variant).join("\n") }
+  File.open(dest_dir + 'xiangqi-' + name + '.css', 'w') { |f| f.puts merge_rules(classes_xiangqi_game + classes_xiangqi_variant).join("\n") }
 }
 # external SVG xiangqi
 xiangqi_themes.map { |theme|
@@ -501,7 +521,7 @@ xiangqi_themes.map { |theme|
       }
     }
   }.flatten
-  File.open(dest_dir + 'xiangqi-' + name + '.external.css', 'w') { |f| f.puts (classes_xiangqi_game + classes_xiangqi_variant).join("\n") }
+  File.open(dest_dir + 'xiangqi-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_xiangqi_game + classes_xiangqi_variant).join("\n") }
 }
 
 # inline SVG flipello (reversi)
@@ -524,7 +544,7 @@ flipello_themes.map { |theme|
       end
     }
   }.flatten
-  File.open(dest_dir + 'flipello-' + name + '.css', 'w') { |f| f.puts (classes_flipello).join("\n") }
+  File.open(dest_dir + 'flipello-' + name + '.css', 'w') { |f| f.puts merge_rules(classes_flipello).join("\n") }
 }
 # external SVG flipello
 flipello_themes.map { |theme|
@@ -541,7 +561,7 @@ flipello_themes.map { |theme|
       ' {' + "background-image:url('/assets/piece/" + 'flipello/' + name + "/" + piece + "." + ext + "')}"
     }
   }.flatten
-  File.open(dest_dir + 'flipello-' + name + '.external.css', 'w') { |f| f.puts (classes_flipello).join("\n") }
+  File.open(dest_dir + 'flipello-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_flipello).join("\n") }
 }
 
 # inline SVG amazons
@@ -574,7 +594,7 @@ amazons_themes.map { |theme|
       }
     }
   }.flatten
-  File.open(dest_dir + 'amazons-' + name + '.css', 'w') { |f| f.puts (classes_amazons_game + classes_amazons_variant).join("\n") }
+  File.open(dest_dir + 'amazons-' + name + '.css', 'w') { |f| f.puts merge_rules(classes_amazons_game + classes_amazons_variant).join("\n") }
 }
 # external SVG amazons
 amazons_themes.map { |theme|
@@ -596,7 +616,7 @@ amazons_themes.map { |theme|
       }
     }
   }.flatten
-  File.open(dest_dir + 'amazons-' + name + '.external.css', 'w') { |f| f.puts (classes_amazons_game + classes_amazons_variant).join("\n") }
+  File.open(dest_dir + 'amazons-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_amazons_game + classes_amazons_variant).join("\n") }
 }
 
 # inline SVG entropy
@@ -648,7 +668,7 @@ oware_themes.map { |theme|
           "background-image:url('data:image/" + types[ext] + base64 + "')}"
       end
   }.flatten
-  File.open(dest_dir + 'oware-' + name + '.css', 'w') { |f| f.puts (classes_oware).join("\n") }
+  File.open(dest_dir + 'oware-' + name + '.css', 'w') { |f| f.puts merge_rules(classes_oware).join("\n") }
 }
 # external SVG oware
 oware_themes.map { |theme|
@@ -659,7 +679,7 @@ oware_themes.map { |theme|
       '.oware.is2d .' + role + ', ' + '.is2d .variant-oware' + ' .' + role + ' {' +
         "background-image:url('/assets/piece/" + 'oware/' + name + "/" + count + "." + ext + "')}"
   }.flatten
-  File.open(dest_dir + 'oware-' + name + '.external.css', 'w') { |f| f.puts (classes_oware).join("\n") }
+  File.open(dest_dir + 'oware-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_oware).join("\n") }
 }
 
 # inline SVG togyzkumalak
@@ -690,7 +710,7 @@ togyzkumalak_themes.map { |theme|
         initial_css + ' {' + "background-image:url('data:image/" + types[ext] + base64 + "')}"
       end
   }.flatten
-  File.open(dest_dir + 'togyzkumalak-' + name + '.css', 'w') { |f| f.puts (classes_togyzkumalak_game_and_variant).join("\n") }
+  File.open(dest_dir + 'togyzkumalak-' + name + '.css', 'w') { |f| f.puts merge_rules(classes_togyzkumalak_game_and_variant).join("\n") }
 }
 # external SVG togyzkumalak
 togyzkumalak_themes.map { |theme|
@@ -716,7 +736,7 @@ togyzkumalak_themes.map { |theme|
       initial_css + ' {' +
         "background-image:url('/assets/piece/" + 'togyzkumalak/' + name + "/" + image_name + "." + ext + "')}"
   }.flatten
-  File.open(dest_dir + 'togyzkumalak-' + name + '.external.css', 'w') { |f| f.puts (classes_togyzkumalak_game_and_variant).join("\n") }
+  File.open(dest_dir + 'togyzkumalak-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_togyzkumalak_game_and_variant).join("\n") }
 }
 
 # inline SVG go
@@ -760,7 +780,7 @@ go_themes.map { |theme|
           "z-index: 3;}"
       }
     }.flatten
-    File.open(dest_dir + 'go-' + name + '.css', 'w') { |f| f.puts (classes_go_game + classes_go_variant + classes_go_highlights).join("\n") }
+    File.open(dest_dir + 'go-' + name + '.css', 'w') { |f| f.puts merge_rules(classes_go_game + classes_go_variant + classes_go_highlights).join("\n") }
   }
 # external SVG go
 go_themes.map { |theme|
@@ -793,7 +813,7 @@ go_themes.map { |theme|
           "z-index: 3;}"
       }
     }.flatten
-    File.open(dest_dir + 'go-' + name + '.external.css', 'w') { |f| f.puts (classes_go_game + classes_go_variant + classes_go_highlights).join("\n") }
+    File.open(dest_dir + 'go-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_go_game + classes_go_variant + classes_go_highlights).join("\n") }
 }
 
 # inline SVG backgammon
@@ -857,7 +877,7 @@ backgammon_themes.map { |theme|
         " border: " + border_colour + ";" + 
         " border-width: medium; border-style: solid; " + "}"
   }.flatten
-  File.open(dest_dir + 'backgammon-' + name + '.css', 'w') { |f| f.puts (classes_backgammon_game_and_variant + classes_backgammon_buttons_and_score).join("\n") }
+  File.open(dest_dir + 'backgammon-' + name + '.css', 'w') { |f| f.puts merge_rules(classes_backgammon_game_and_variant + classes_backgammon_buttons_and_score).join("\n") }
 }
 # external SVG backgammon
 backgammon_themes.map { |theme|
@@ -916,7 +936,7 @@ backgammon_themes.map { |theme|
         " border: " + border_colour + ";" + 
         " border-width: medium; border-style: solid; " + "}"
   }.flatten
-  File.open(dest_dir + 'backgammon-' + name + '.external.css', 'w') { |f| f.puts (classes_backgammon_game_and_variant + classes_backgammon_buttons_and_score).join("\n") }
+  File.open(dest_dir + 'backgammon-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_backgammon_game_and_variant + classes_backgammon_buttons_and_score).join("\n") }
 }
 
 
@@ -938,7 +958,7 @@ breakthroughtroyka_themes.map { |theme|
       end
     }
   }.flatten
-  File.open(dest_dir + 'breakthroughtroyka-' + name + '.css', 'w') { |f| f.puts (classes_breakthroughtroyka).join("\n") }
+  File.open(dest_dir + 'breakthroughtroyka-' + name + '.css', 'w') { |f| f.puts merge_rules(classes_breakthroughtroyka).join("\n") }
 }
 # external SVG breakthroughtroyka
 breakthroughtroyka_themes.map { |theme|
@@ -953,7 +973,7 @@ breakthroughtroyka_themes.map { |theme|
         "background-image:url('/assets/piece/" + 'breakthroughtroyka/' + name + "/" + piece + "." + ext + "')}"
     }
   }.flatten
-  File.open(dest_dir + 'breakthroughtroyka-' + name + '.external.css', 'w') { |f| f.puts (classes_breakthroughtroyka).join("\n") }
+  File.open(dest_dir + 'breakthroughtroyka-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_breakthroughtroyka).join("\n") }
 }
 
 # inline SVG abalone
@@ -986,7 +1006,7 @@ abalone_themes.map { |theme|
       }
     }
   }.flatten
-  File.open(dest_dir + 'abalone-' + name + '.css', 'w') { |f| f.puts (classes_abalone_game + classes_abalone_variant).join("\n") }
+  File.open(dest_dir + 'abalone-' + name + '.css', 'w') { |f| f.puts merge_rules(classes_abalone_game + classes_abalone_variant).join("\n") }
 }
 # external SVG abalone
 abalone_themes.map { |theme|
@@ -1008,5 +1028,5 @@ abalone_themes.map { |theme|
       }
     }
   }.flatten
-  File.open(dest_dir + 'abalone-' + name + '.external.css', 'w') { |f| f.puts (classes_abalone_game + classes_abalone_variant).join("\n") }
+  File.open(dest_dir + 'abalone-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_abalone_game + classes_abalone_variant).join("\n") }
 }

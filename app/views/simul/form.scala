@@ -1,11 +1,13 @@
 package views.html.simul
 
 import play.api.data.Form
+import strategygames.variant.Variant
 
 import lila.api.Context
 import lila.app.templating.Environment.*
 import lila.app.ui.ScalatagsTemplate.*
 import lila.hub.LeaderTeam
+import lila.i18n.VariantKeys
 import lila.simul.Simul
 import lila.simul.SimulForm
 
@@ -79,28 +81,69 @@ object form {
       form3.group(form("variant"), trans.simulVariantsHint()) { f =>
         frag(
           {
-            val options = translatedAllVariantChoicesWithVariants(v => s"${v.gameFamily.id}_${v.id}")
+            val encode  = (v: Variant) => s"${v.gameFamily.id}_${v.id}"
+            val options = translatedAllVariantChoicesWithVariants(encode)
             val checks  = form.value
               .map(_.variants.map(_.toString))
-              .getOrElse(simul.so(_.variants.map(v => s"${v.gameFamily.id}_${v.id}")))
+              .getOrElse(simul.filterNot(s => SimulForm.isAnyVariant(s.variants)).so(_.variants.map(encode)))
               .toSet
-            val checkboxes = options.zipWithIndex.map { case ((value, text, hint), index) =>
-              div(cls := "checkable")(
-                views.html.setup.filter.renderCheckbox(
-                  form,
-                  "variants",
-                  index,
-                  value,
-                  raw(text),
-                  hint,
-                  checks
-                )
+            val variantOf = Variant.all.map(v => encode(v) -> v).toMap
+            // a chip that toggles the game: the index stays the option's own, so the form is posted
+            // as it always was
+            def chip(option: ((String, String, Option[String]), Int)) = {
+              val ((value, text, hint), index) = option
+              label(
+                cls      := "text variants__chip",
+                dataIcon := variantOf.get(value).fold("")(_.perfIcon.toString),
+                title    := hint
+              )(
+                input(
+                  tpe      := "checkbox",
+                  name     := s"${form("variants").name}[$index]",
+                  st.value := value,
+                  checks(value).option(checked)
+                ),
+                raw(text)
               )
             }
-            val n        = options.size
-            val fakeDivs = if (n % 3 == 2) 1 else 0
+            // family by family, as on the tournament pages: a family chip shows its games, a family of
+            // one game is its own chip. Shown first: the first family with a pick, else none.
+            val indexed = options.zipWithIndex
+            val byGroup = displayedGameGroups.map { g =>
+              g -> indexed.filter { case ((value, _, _), _) => variantOf.get(value).exists(g.variants.contains) }
+            }
+            val placed = byGroup.flatMap(_._2).map(_._2).toSet
+            val open = byGroup.collectFirst {
+              case (g, items) if items.size > 1 && items.exists(i => checks(i._1._1)) => g
+            }
             div(cls := "variants")(
-              checkboxes ++ Seq.fill(fakeDivs)(div(cls := "checkable fake", style := "visibility:hidden")())
+              byGroup.map[Frag] {
+                case (g, items) if items.size > 1 =>
+                  val inputId = s"variantGroup-${g.key}"
+                  // the games and their count come after the radio: the count is a CSS counter over them
+                  div(cls := "variants__family")(
+                    input(
+                      tpe      := "radio",
+                      id       := inputId,
+                      name     := "variantGroup",
+                      st.value := g.key,
+                      open.contains(g).option(checked)
+                    ),
+                    div(cls := "variants__group")(items.map(chip)),
+                    label(
+                      cls      := "text variants__family-name",
+                      `for`    := inputId,
+                      dataIcon := g.variants.headOption.fold("")(_.perfIcon.toString)
+                    )(VariantKeys.gameGroupName(g), span(cls := "variants__count"))
+                  )
+                case _ => emptyFrag
+              },
+              // the games of a family of one game are toggled where they stand, so on a line of their own under the
+              // families
+              div(cls := "variants__singles")(
+                byGroup.collect { case (_, items) if items.size == 1 => items.map(chip) },
+                indexed.filterNot(i => placed(i._2)).map(chip)
+              )
             )
           },
           errMsg(f)

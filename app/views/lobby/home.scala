@@ -20,7 +20,7 @@ object home {
 
     val chatJson = chatOption map { chat =>
       views.html.chat.json(
-        chat.chat.getlast(250),
+        chat.chat.getlast(40),
         name = trans.chatRoom.txt(),
         timeout = chat.timeout,
         public = true,
@@ -31,10 +31,11 @@ object home {
     views.html.base.layout(
       title = "",
       fullTitle = Some {
-        s"playstrategy.${if (netConfig.isProd) "org" else "dev"} • ${trans.playstrategySiteTitleShort.txt()}"
+        s"${trans.playstrategySiteTitleShort.txt()} • playstrategy.${if (netConfig.isProd) "org" else "dev"}"
       },
       moreJs = frag(
         jsModule("lobby"),
+        organizationJsonLd,
         embedJsUnsafeLoadThen(
           s"""PlayStrategyLobby(${safeJsonValue(
               Json.obj(
@@ -52,14 +53,17 @@ object home {
             )})"""
         )
       ),
-      moreCss = cssTag("lobby"),
-      chessground = false,
+      // the blog cards below the lobby come from prismic; the connection is worth ~300ms
+      moreCss = frag(
+        cssTag("lobby"),
+        raw("""<link rel="preconnect" href="https://images.prismic.io" crossorigin>""")
+      ),
       openGraph = lila.app.ui
         .OpenGraph(
           image = staticAssetUrl("logo/playstrategy-tile-wide.png").some,
           twitterImage = staticAssetUrl("logo/playstrategy-tile.png").some,
           title = trans.playstrategySiteTitle.txt(),
-          url = netBaseUrl,
+          url = s"$netBaseUrl/",
           description = trans.playstrategySiteDescription.txt()
         )
         .some
@@ -71,6 +75,7 @@ object home {
           "lobby--no-simuls" -> simuls.isEmpty
         )
       )(
+        h1(cls := "offscreen")(trans.playstrategySiteTitle()),
         div(cls := "lobby__table")(
           div(cls := "bg-switch", title := "Dark mode")(
             div(cls := "bg-switch__track"),
@@ -257,4 +262,38 @@ object home {
     trans.unlimited,
     trans.anonymous
   ).map(_.key)
+
+  // structured data for the site and its publisher; sameAs means "the same entity elsewhere",
+  // so it holds our own profiles only
+  private def organizationJsonLd(implicit ctx: Context) =
+    raw(
+      s"""<script type="application/ld+json">${safeJsonValue(
+          Json.obj(
+            "@context" -> "https://schema.org",
+            "@graph"   -> Json.arr(
+              Json.obj(
+                "@type" -> "Organization",
+                "@id"   -> s"$netBaseUrl/#organization",
+                "name"  -> "PlayStrategy",
+                "url"   -> netBaseUrl,
+                "logo"  -> staticAssetUrl("logo/playstrategy-tile.png"),
+                "sameAs" -> Json.arr(
+                  "https://github.com/Mind-Sports-Games",
+                  "https://discord.gg/bVRQzgSbPq",
+                  "https://www.youtube.com/@PlayStrategyDotOrg"
+                ),
+                "description" -> trans.playstrategySiteDescription.txt()
+              ),
+              Json.obj(
+                "@type"         -> "WebSite",
+                "@id"           -> s"$netBaseUrl/#website",
+                "name"          -> "PlayStrategy",
+                "alternateName" -> netConfig.domain.value,
+                "url"           -> netBaseUrl,
+                "publisher"     -> Json.obj("@id" -> s"$netBaseUrl/#organization")
+              )
+            )
+          )
+        )}</script>"""
+    )
 }

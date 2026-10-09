@@ -146,10 +146,17 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .map(_.flatMap(_.asOpt[Tournament]))
       .dmap { new lila.db.paginator.StaticAdapter(_) }
 
-  def finishedByFreqAdapter(freq: Schedule.Freq) =
+  // Empty means every game. One variant selects it; several - a game group, whose variants can
+  // span game logics, draughts and dameo under Draughts - need an $or, since lib and variant are
+  // two fields of the same document.
+  def finishedByFreqAdapter(freq: Schedule.Freq, variants: List[Variant] = Nil) =
     new lila.db.paginator.Adapter[Tournament](
       collection = coll,
-      selector = $doc("schedule.freq" -> freq, "status" -> Status.Finished.id),
+      selector = $doc("schedule.freq" -> freq, "status" -> Status.Finished.id) ++ (variants match {
+        case Nil      => $empty
+        case v :: Nil => libSelect(v.gameLogic) ++ variantSelect(v)
+        case many     => $or(many.map(v => libSelect(v.gameLogic) ++ variantSelect(v))*)
+      }),
       projection = none,
       sort = $sort.desc("startsAt"),
       readPreference = ReadPreference.secondaryPreferred
@@ -506,6 +513,96 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .sort($sort.desc("startsAt"))
       .cursor[Tournament]()
       .list()
+
+  def nextScheduled(freq: Schedule.Freq, variant: Variant): Fu[Option[Tournament]] =
+    coll
+      .find(createdSelect ++ $doc("schedule.freq" -> freq.name) ++ libSelect(variant.gameLogic) ++ variantSelect(variant))
+      .sort($sort.asc("startsAt"))
+      .cursor[Tournament]()
+      .headOption
+
+  def nextShield(variant: Variant): Fu[Option[Tournament]] = nextScheduled(Schedule.Freq.Shield, variant)
+
+  // every scheduled shield arena not yet finished, soonest first
+  def upcomingShields: Fu[List[Tournament]] =
+    coll
+      .find(unfinishedSelect ++ $doc("schedule.freq" -> Schedule.Freq.Shield.name))
+      .sort($sort.asc("startsAt"))
+      .cursor[Tournament]()
+      .list()
+
+  // the last finished edition of a scheduled series before this one
+  def previousEdition(tour: Tournament): Fu[Option[Tournament]] =
+    tour.schedule.so { sched =>
+      coll
+        .find(
+          finishedSelect ++ $doc("schedule.freq" -> sched.freq.name, "startsAt".$lt(tour.startsAt)) ++
+            libSelect(tour.variant.gameLogic) ++ variantSelect(tour.variant)
+        )
+        .sort($sort.desc("startsAt"))
+        .cursor[Tournament]()
+        .headOption
+    }
+
+  // every finished edition of a series, newest first (a yearly series stays small)
+  def finishedSeries(freq: Schedule.Freq, variant: Variant, max: Int = 100): Fu[List[Tournament]] =
+    coll
+      .find(finishedSelect ++ $doc("schedule.freq" -> freq.name) ++ libSelect(variant.gameLogic) ++ variantSelect(variant))
+      .sort($sort.desc("startsAt"))
+      .cursor[Tournament]()
+      .list(max)
+
+  // International draughts counts as the standard variant, but is stored with its id (only standard
+  // chess is stored without one), so the plain variant selector never finds it
+  private def ownVariantSelect(variant: Variant) =
+    if (variant.standardVariant) $or($doc("variant".$exists(false)), $doc("variant" -> variant.id))
+    else variantSelect(variant)
+
+  // the editions a team ran: its own account created them, or they are listed for it.
+  // `anyCreatorFreqs` are series nobody but the team ran, though PlayStrategy's own account created
+  // them with no team behind them (the 2021 online MSO)
+  def finishedSeriesOfTeam(
+      teamId: TeamID,
+      freqs: List[Schedule.Freq],
+      anyCreatorFreqs: List[Schedule.Freq],
+      variant: Variant,
+      max: Int = 100
+  ): Fu[List[Tournament]] =
+    coll
+      .find(
+        finishedSelect ++ $and(
+          // its own variant, or one of the variants of a medley (stored as "<lib id>:<key>", older ones bare)
+          $or(
+            libSelect(variant.gameLogic) ++ ownVariantSelect(variant),
+            $doc("mVariants".$in(List(s"${variant.gameLogic.id}:${variant.key}", variant.key)))
+          ),
+          $or(
+            $doc("schedule.freq".$in(freqs.map(_.name))) ++ $or($doc("createdBy" -> teamId), forTeamSelect(teamId)),
+            $doc("schedule.freq".$in(anyCreatorFreqs.map(_.name)))
+          )
+        )
+      )
+      .sort($sort.desc("startsAt"))
+      .cursor[Tournament]()
+      .list(max)
+
+  // every finished edition of those series, whatever the game, latest first
+  def finishedOfTeam(
+      teamId: TeamID,
+      freqs: List[Schedule.Freq],
+      anyCreatorFreqs: List[Schedule.Freq],
+      max: Int = 1000
+  ): Fu[List[Tournament]] =
+    coll
+      .find(
+        finishedSelect ++ $or(
+          $doc("schedule.freq".$in(freqs.map(_.name))) ++ $or($doc("createdBy" -> teamId), forTeamSelect(teamId)),
+          $doc("schedule.freq".$in(anyCreatorFreqs.map(_.name)))
+        )
+      )
+      .sort($sort.desc("startsAt"))
+      .cursor[Tournament]()
+      .list(max)
 
   def nextByTrophy(trophy: String): Fu[Option[Tournament]] =
     coll

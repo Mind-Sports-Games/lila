@@ -1,12 +1,42 @@
 .variant {
+  // the name and the way to play it on one line; the button drops under the name when narrow
+  .variant__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5em 1em;
+    margin-bottom: 0.4em;
+
+    h1 {
+      margin: 0;
+    }
+  }
+
+  .variant__intro {
+    margin-bottom: 30px;
+
+    p {
+      margin-top: 0.5em;
+    }
+  }
+
   .headline {
     font-size: 1.2em;
     font-style: italic;
-    margin-bottom: 30px;
   }
 
   [data-oembed] {
     @extend %video;
+  }
+
+  .variant__about {
+    margin-top: 3em;
+    padding-top: 1em;
+    border-top: 1px solid $c-border;
+    font-size: 0.85em;
+    line-height: 1.5;
+    color: $c-font-dim;
   }
 }
 

@@ -91,11 +91,9 @@ export async function hashedManifest() {
     else newHashLinks.set(name, stat.mtimeMs);
   }
 
-  await Promise.allSettled(
-    [...alreadyHashed].map(([name, hash]) =>
-      fs.promises.symlink(path.join(env.outDir, name), path.join(env.hashDir, hash)),
-    ),
-  );
+  // link() and not a bare symlink: the name has to be the one the manifest serves,
+  // or a rebuild that finds every asset unchanged relinks them all under the wrong names.
+  for (const [name, hash] of alreadyHashed) link(name, hash);
 
   for (const { name, hash } of await Promise.all([...newHashLinks.keys()].map(hashLink))) {
     current.hashed[name] = Object.defineProperty({ hash }, 'mtime', { value: newHashLinks.get(name) });

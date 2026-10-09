@@ -39,6 +39,10 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
 
   def byId(id: Study.Id) = coll(_.find($id(id), projection.some).one[Study])
 
+  // these studies, minus the ones a mod took out of the listings
+  def featured(ids: List[Study.Id]): Fu[List[Study.Id]] =
+    coll(_.distinctEasy[Study.Id, List]("_id", $inIds(ids) ++ "trash".$ne(true), readPref))
+
   def byOrderedIds(ids: Seq[Study.Id]) = coll(_.byOrderedIds[Study, Study.Id](ids)(_.id))
 
   def lightById(id: Study.Id): Fu[Option[Study.LightStudy]] =
@@ -60,6 +64,13 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
   private[study] val selectPublic                      = $doc(
     "visibility" -> VisibilityHandler.writeTry(Study.Visibility.Public).get
   )
+  private[study] val selectPublicFeaturable = selectPublic ++ "trash".$ne(true)
+  // Study.notable as a query
+  private[study] val selectNotable = selectPublicFeaturable ++ $or(
+    F.likes.$gt(1),
+    $doc("ownerId".$in(List(User.playstrategyId, User.msoId))),
+    $doc("library" -> true)
+  )
   private[study] val selectPrivateOrUnlisted =
     "visibility".$ne(VisibilityHandler.writeTry(Study.Visibility.Public).get)
   private[study] def selectLiker(userId: User.ID)         = $doc(F.likers -> userId)
@@ -78,6 +89,35 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
           .sort($sort.desc("updatedAt"))
           .cursor[Study](readPreference = readPref)
           .documentSource()
+      }
+    }
+
+  // the studies a crawler may see, most liked first, the oldest first among equals: an order anyone
+  // can foresee, and which a study cannot climb by being new
+  def notable(max: Int): Fu[List[Study.Notable]] = notableOf(selectNotable, max)
+
+  // the studies pinned to the library pages of their games
+  def libraryPinned: Fu[List[Study.Notable]] =
+    notableOf(selectPublicFeaturable ++ $doc("library" -> true), 1000)
+
+  // the others the library pages may show: liked by someone other than the owner, whoever the owner
+  // is (Study.onLibraryPages); the site's own accounts get there by a pin
+  def libraryPopular(max: Int): Fu[List[Study.Notable]] =
+    notableOf(selectPublicFeaturable ++ F.likes.$gt(1) ++ "library".$ne(false), max)
+
+  private def notableOf(selector: Bdoc, max: Int): Fu[List[Study.Notable]] =
+    coll {
+      _.find(selector, $doc("name" -> true, "ownerId" -> true, "updatedAt" -> true).some)
+        .sort($doc(F.likes -> -1, F.createdAt -> 1))
+        .cursor[Bdoc](readPreference = readPref)
+        .list(max) map { docs =>
+        for {
+          doc       <- docs
+          id        <- doc.getAsOpt[Study.Id]("_id")
+          name      <- doc.getAsOpt[Study.Name]("name")
+          ownerId   <- doc.getAsOpt[User.ID]("ownerId")
+          updatedAt <- doc.getAsOpt[DateTime]("updatedAt")
+        } yield Study.Notable(id, name, ownerId, updatedAt)
       }
     }
 
@@ -198,6 +238,19 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
 
   def isMember(studyId: Study.Id, userId: User.ID) =
     coll(_.exists($id(studyId) ++ (s"members.$userId".$exists(true))))
+
+  def feature(id: Study.Id): Funit = coll(_.unsetField($id(id), "trash")).void
+
+  // the number of studies found: 0 when the id is wrong
+  def setLibrary(id: Study.Id, v: Option[Boolean]): Fu[Int] =
+    coll(_.update.one($id(id), v.fold($unset("library"))(b => $set("library" -> b))).map(_.n))
+
+  def setTrashByOwner(ownerId: User.ID, v: Boolean): Fu[Int] =
+    coll {
+      _.update
+        .one(selectOwnerId(ownerId), $setBoolOrUnset("trash", v), multi = true)
+        .map(_.nModified)
+    }
 
   def like(studyId: Study.Id, userId: User.ID, v: Boolean): Fu[Study.Likes] =
     countLikes(studyId).flatMap {

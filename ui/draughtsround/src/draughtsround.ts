@@ -4,8 +4,6 @@ import PlayStrategyChat from 'chat';
 import menuHover from 'common/menuHover';
 import MoveOn from './moveOn';
 import RoundController from './ctrl';
-import Draughtsground from 'draughtsground';
-import { Chessground } from 'chessground';
 import { main as view } from './view/main';
 import { RoundData, RoundOpts, Redraw, Step } from './interfaces';
 
@@ -55,7 +53,3 @@ export function app(opts: RoundOpts): RoundApi {
 export { boot };
 
 window.PlayStrategyChat = PlayStrategyChat;
-// that's for the rest of playstrategy to access chessground
-// without having to include it a second time
-window.Draughtsground = Draughtsground;
-window.Chessground = Chessground; // We need both for the "ongoing games" underneath the curren one.

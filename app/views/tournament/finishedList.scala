@@ -11,10 +11,13 @@ object finishedList {
   def apply(finished: List[Tournament])(implicit ctx: Context): Tag =
     tbody(finished map apply)
 
-  def apply(t: Tournament)(implicit ctx: Context): Tag =
+  def apply(t: Tournament)(implicit ctx: Context): Tag = withType(t, emptyFrag)
+
+  // `kind` ends the line under the name ("3h Arena"), where a list of mixed kinds says which this one is
+  def withType(t: Tournament, kind: Frag)(implicit ctx: Context): Tag =
     tr(cls := "paginated")(
       td(cls := "icon")(iconTag(tournamentIconChar(t))),
-      header(t),
+      header(t, kind),
       td(cls := "date")(momentFromNow(t.startsAt)),
       td(cls := "players")(
         span(
@@ -25,7 +28,7 @@ object finishedList {
       )
     )
 
-  def header(t: Tournament)(implicit ctx: Context) =
+  def header(t: Tournament, kind: Frag = emptyFrag)(implicit ctx: Context) =
     td(cls := "header")(
       a(href := routes.Tournament.show(t.id))(
         span(cls := "name")(t.name()),
@@ -38,7 +41,8 @@ object finishedList {
           if (t.handicapped) trans.handicappedTournament()
           else t.mode.fold(trans.casualTournament, trans.ratedTournament)(),
           " • ",
-          t.durationString
+          t.durationString,
+          kind
         )
       )
     )

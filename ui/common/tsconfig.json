@@ -8,5 +8,5 @@
     "composite": true,
     "incremental": true
   },
-  "references": [{ "path": "../stratutils/tsconfig.json" }]
+  "references": [{ "path": "../draughtsground/tsconfig.json" }, { "path": "../stratutils/tsconfig.json" }]
 }

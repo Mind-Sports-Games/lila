@@ -19,7 +19,10 @@ object editor {
       orientation: Option[String] = None
   )(implicit ctx: Context) =
     views.html.base.layout(
-      title = trans.boardEditor.txt(),
+      title = trans.boardEditorTitle.txt(),
+      boardFamily = variant.gameFamily.key.some,
+      soleBoardFamily = true,
+      namePieceSets = true,
       moreJs = frag(
         jsModule("editor"),
         embedJsUnsafeLoadThen(
@@ -30,21 +33,45 @@ object editor {
         )
       ),
       moreCss = cssTag("editor"),
-      chessground = false,
       zoomable = true,
       openGraph = lila.app.ui
         .OpenGraph(
-          title = "Chess board editor",
+          title = trans.boardEditorTitle.txt(),
           url = s"$netBaseUrl${routes.Editor.index.url}",
-          description = "Load opening positions or create your own chess position on a chess board editor"
+          description = trans.boardEditorDescription.txt()
         )
-        .some
+        .some,
+      // one URL, whatever position or ?variant= the visitor arrived with
+      canonicalPath = routes.Editor.index.url.some
     )(
-      main(id := "board-editor")(
-        div(cls := "board-editor")(
-          div(cls := "spare"),
-          div(cls := "main-board")(chessgroundBoard),
-          div(cls := "spare")
+      frag(
+        // outside the element the editor empties on mount
+        h1(cls := "offscreen")(trans.boardEditor()),
+        main(id := "board-editor")(
+          div(cls := s"board-editor variant-${variant.key}")(
+            div(cls := "spare"),
+            div(cls := "main-board")(chessgroundBoard),
+            div(cls := "spare")
+          ),
+          // the editor lifts this into its grid, and fetches the text again when the variant changes
+          st.section(cls := "editor__about")(about(variant))
+        )
+      )
+    )
+
+  def about(variant: strategygames.variant.Variant)(implicit ctx: Context): Frag =
+    frag(
+      // the heading is the link to the game's own page
+      h2(
+        a(href := routes.Library.variant(variant.key))(
+          trans.aboutX(views.html.library.bits.searchName(variant))
+        )
+      ),
+      p(views.html.library.bits.objectiveSentence(variant)),
+      p(views.html.library.bits.editorDescription(variant)),
+      views.html.library.bits.hasLibraryPages(variant).option(
+        p(cls := "editor__about__links")(
+          a(cls := "button", href := s"/?variant=${variant.key}#game")(trans.createAGame())
         )
       )
     )

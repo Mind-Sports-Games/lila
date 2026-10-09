@@ -400,9 +400,9 @@
   <string name="youAreNotInTeam">You are not in the team %s</string>
   <string name="backToGame">Back to game</string>
   <string name="siteDescription">Free online chess server. Play chess in a clean interface. No registration, no ads, no plugin required. Play chess with the computer, friends or random opponents.</string>
-  <string name="playstrategySiteDescription">2 player strategy games platform. Chess, Draughts, Backgammon, Go, Shogi, Xiangqi, and more abstract games. Play in a clean interface against the computer, friends or random opponents.</string>
-  <string name="playstrategySiteTitle">The two player strategy games platform. Chess, Draughts, Backgammon, Go, Shogi, Xiangqi and more!</string>
-  <string name="playstrategySiteTitleShort">2 player strategy games</string>
+  <string name="playstrategySiteDescription">Play board games online for free: chess and chess variants, checkers (draughts), Go, backgammon, Othello, shogi, xiangqi, mancala, abalone and more. The official online platform of the Mind Sports Olympiad. Free, open source, live or correspondence.</string>
+  <string name="playstrategySiteTitle">Play board games online free — Chess, Draughts, Go, Backgammon, Othello and more</string>
+  <string name="playstrategySiteTitleShort">Play board games online free — Chess, Draughts, Go, Backgammon</string>
   <string name="xJoinedTeamY">%1$s joined team %2$s</string>
   <string name="xCreatedTeamY">%1$s created team %2$s</string>
   <string name="xStartedStreaming">%s started streaming</string>
@@ -694,7 +694,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="webmasters">Webmasters</string>
   <string name="about">About</string>
   <string name="aboutX">About %s</string>
-  <string name="playstrategyAboutSummary">%1$s is a real-time platform to play two-player Mind Sports board games. Over 30 different games available including Chess, Go, Othello, Mancala, Draughts... on this free and open-source site.</string>
+  <string name="playstrategyAboutSummary">%1$s is a real-time platform to play two-player Mind Sports board games, and the official online platform of the Mind Sports Olympiad. Over 40 different games available including Chess, Go, Othello, Mancala, Draughts, Backgammon, Abalone... on this free and open-source site.</string>
   <string name="really">really</string>
   <string name="contribute">Contribute</string>
   <string name="termsOfService">Terms of Service</string>
@@ -718,7 +718,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="aboutSimulSettings">Simuls are always casual. Rematches, takebacks and adding time are disabled.</string>
   <string name="create">Create</string>
   <string name="whenCreateSimul">When you create a Simul, you get to play several players at once.</string>
-  <string name="simulVariantsHint">If you select several variants, each player gets to choose which one to play.</string>
+  <string name="simulVariantsHint">If you select several variants, each player gets to choose which one to play. If you select none, players can join with any variant.</string>
   <string name="simulClockHint">Fischer Clock setup. The more players you take on, the more time you may need.</string>
   <string name="simulAddExtraTime">You may add extra time to your clock to help cope with the simul.</string>
   <string name="simulHostExtraTime">Host extra clock time</string>
@@ -968,4 +968,5 @@ computer analysis, game chat and shareable URL.</string>
   <string name="playAgainstX">Play against %1$s</string>
   <string name="weeklyChallenge">Weekly Challenge</string>
   <string name="learnHowToPlay">Learn how to play</string>
+  <string name="noFinishedTournament">No tournament in this series has finished.</string>
 </resources>

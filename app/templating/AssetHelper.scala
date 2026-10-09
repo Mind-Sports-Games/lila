@@ -98,11 +98,8 @@ trait AssetHelper { self: I18nHelper & SecurityHelper =>
   def captchaTag        = jsModule("captcha")
   def infiniteScrollTag = jsModule("infiniteScroll")
 
-  def chessgroundTag = staticJsAtESM("chessground.min.js", "npm/")
-
-  def draughtsgroundTag = jsAtCJS("javascripts/vendor/draughtsground.min.js")
-  def fingerprintTag    = staticJsAtESM("fipr.js", "javascripts/")
-  def tagifyTag         = staticJsAtESM("tagify.js", "vendor/tagify/")
+  def fingerprintTag = staticJsAtESM("fipr.js", "javascripts/")
+  def tagifyTag      = staticJsAtESM("tagify.js", "vendor/tagify/")
 
   def prismicJs(implicit ctx: Context): Frag =
     raw {

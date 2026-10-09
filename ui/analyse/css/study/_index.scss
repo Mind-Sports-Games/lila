@@ -14,6 +14,11 @@ $top-height: 3.2rem;
       margin: 0 0 1em 1em;
     }
 
+    .study-feature-owner {
+      display: flex;
+      gap: 0.5em;
+    }
+
     /* end of flex gutter hack */
 
     h1 {

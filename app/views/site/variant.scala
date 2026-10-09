@@ -17,12 +17,46 @@ object variant {
   )(implicit ctx: Context) =
     layout(
       active = variant.some,
-      title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
-      klass = "box-pad page variant"
+      title = views.html.library.bits.rulesTitle(variant),
+      klass = "box-pad page variant",
+      openGraph = lila.app.ui
+        .OpenGraph(
+          title = views.html.library.bits.rulesTitle(variant),
+          url = s"$netBaseUrl${routes.Page.variant(variant.key).url}",
+          description = views.html.library.bits.rulesDescription(variant)
+        )
+        .some
     )(
-      h1(cls := "text", dataIcon := variant.perfIcon)(VariantKeys.variantName(variant)),
-      h2(cls := "headline")(VariantKeys.variantTitle(variant)),
-      div(cls := "body")(raw(~doc.getHtml("pages.content", resolver)))
+      div(cls := "variant__head")(
+        h1(cls := "text", dataIcon := variant.perfIcon)(VariantKeys.variantName(variant)),
+        // the same link as the library's button: the lobby's game form, on this game
+        a(cls := "button", href := s"/?variant=${variant.key}#game")(trans.createAGame())
+      ),
+      div(cls := "variant__intro")(
+        h2(cls := "headline")(VariantKeys.variantTitle(variant)),
+        views.html.library.bits.parentVariant(variant).map { parent =>
+          p(
+            trans.variantOf(
+              views.html.library.bits.searchName(variant),
+              a(href := routes.Page.variant(parent.key))(views.html.library.bits.searchName(parent))
+            )
+          )
+        }
+      ),
+      div(cls := "body")(raw(~doc.getHtml("pages.content", resolver))),
+      // the page's description for search engines and for anyone who scrolls this far, apart from the rules
+      views.html.library.bits.hasLibraryPages(variant).option(
+        p(cls := "variant__about")(
+          trans.playVariantOnlineFree(views.html.library.bits.nameWithAlias(variant)),
+          " ",
+          VariantKeys.variantTitle(variant),
+          ". ",
+          a(href := routes.Library.variant(variant.key))(
+            trans.allAboutX(views.html.library.bits.searchName(variant)),
+            " »"
+          )
+        )
+      )
     )
 
   def home(
@@ -30,7 +64,7 @@ object variant {
       resolver: io.prismic.DocumentLinkResolver
   )(implicit ctx: Context) =
     layout(
-      title = "PlayStrategy Games",
+      title = "Board game rules — how to play every game on PlayStrategy",
       klass = "variants"
     )(
       h1("PlayStrategy Games"),

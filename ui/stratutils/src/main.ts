@@ -1,6 +1,6 @@
 import { abalonePiotrToKey, piotr } from './piotr';
 import type * as cg from 'chessground/types';
-import { variantClassFromKey } from 'stratops/variants/util';
+import { getScoreFromFen } from 'stratops/variants/score';
 
 // TODO: For some reason we can't import this like:
 // import * from 'stratutils/promotion'
@@ -107,7 +107,7 @@ export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | und
 
 // 3 check and 5 check dont have consistent fen formats, its calculated from running through game plys.
 export function getScore(variant: VariantKey, fen: string, playerIndex: string): number | undefined {
-  return variantClassFromKey(variant).getScoreFromFen(fen, playerIndex);
+  return getScoreFromFen(variant, fen, playerIndex);
 }
 
 export function displayScore(variant: VariantKey, fen: string, playerIndex: string): string {

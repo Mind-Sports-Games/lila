@@ -18,6 +18,7 @@ import lila.hub.actorApi.round.NextGameLinked
 import lila.round.actorApi.round.QuietFlag
 import lila.user.{ User, UserRepo }
 import lila.i18n.VariantKeys
+import strategygames.variant.Variant
 
 final class SwissApi(
     colls: SwissColls,
@@ -891,6 +892,36 @@ final class SwissApi(
       .headOption
 
   def roundInfo = cache.roundInfo.get
+
+  // a team's finished tournaments for a variant whose name matches, latest first;
+  // swisses carry no schedule.freq, so a series is known by its naming
+  def finishedNamed(teamId: TeamID, namePattern: String, variant: Variant, max: Int = 100): Fu[List[Swiss]] =
+    colls.swiss
+      .find(
+        $doc(
+          "teamId"     -> teamId,
+          "variant"    -> variant,
+          "finishedAt" -> $doc("$exists" -> true),
+          "name"       -> $doc("$regex" -> namePattern, "$options" -> "i")
+        )
+      )
+      .sort($sort.desc("startsAt"))
+      .cursor[Swiss]()
+      .list(max)
+
+  // the same, whatever the game
+  def finishedNamedAll(teamId: TeamID, namePattern: String, max: Int = 1000): Fu[List[Swiss]] =
+    colls.swiss
+      .find(
+        $doc(
+          "teamId"     -> teamId,
+          "finishedAt" -> $doc("$exists" -> true),
+          "name"       -> $doc("$regex" -> namePattern, "$options" -> "i")
+        )
+      )
+      .sort($sort.desc("startsAt"))
+      .cursor[Swiss]()
+      .list(max)
 
   def byTeamCursor(teamId: TeamID) =
     colls.swiss

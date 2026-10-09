@@ -1,9 +1,43 @@
 @import 'layout';
 @import 'finished';
+@import '../../common/css/component/series-links';
 
 .arena-history {
   h1,
   .subnav {
     text-transform: capitalize;
   }
+}
+
+.arena-history__empty {
+  margin: 1em var(--box-padding) 2em;
+  color: $c-font-dim;
+}
+
+// the title, and the game's own page at the end of its line
+// the box pads its own h1, which this row now holds
+.arena-history__head {
+  @extend %box-padding;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 1em;
+
+  h1 {
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.arena-history__about {
+  white-space: nowrap;
+}
+
+// the button that rebuilds the MSO list sits at the right, where the eye ends the introduction
+.mso-history__refresh {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 1em;
 }

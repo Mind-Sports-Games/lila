@@ -90,6 +90,15 @@ final class Editor(env: Env) extends LilaController(env) {
       }
     }
 
+  // the text under the board, for the variant the editor has just switched to
+  def about(key: String) =
+    Open { implicit ctx =>
+      Variant.byKey.get(key) match {
+        case Some(variant) => fuccess(Ok(html.board.editor.about(variant)))
+        case None          => notFound
+      }
+    }
+
   // Study => Add a new chapter, "Editor" tab
   def data =
     Open { implicit ctx =>

@@ -72,10 +72,9 @@ object bits {
       title = s"${u.username} - ${trans.changePassword.txt()}",
       moreCss = cssTag("form3"),
       moreJs = frag(
-        embedJsUnsafeLoadThen("""
-          playstrategy.loadModule('passwordComplexity').then(() =>
-            PlayStrategyPassword.addPasswordChangeListener('form3-newPasswd1')
-          )""")
+        embedJsUnsafeLoadThen(
+          """playstrategy.lazyPasswordComplexity('form3-newPasswd1')"""
+        )
       )
     ) {
       main(cls := "page-small box box-pad")(

@@ -1,7 +1,9 @@
 package controllers
 
+import play.api.mvc.Result
 import strategygames.variant.Variant
 
+import lila.api.Context
 import lila.app.*
 import lila.i18n.VariantKeys
 
@@ -56,14 +58,20 @@ final class Page(
 
   def variant(key: String) =
     Open { implicit ctx =>
-      (for {
-        variant <- Variant.all.map { v =>
-          (v.key, v)
-        }.toMap get key
-      } yield OptionOk(prismicC.getPage(prismicUid(key))) { case (doc, resolver) =>
-        views.html.site.variant.show(doc, resolver, variant)
-      }) | notFound
+      views.html.library.bits.canonicalVariantKey(key) match {
+        case Some(canonical) => MovedPermanently(routes.Page.variant(canonical).url).fuccess
+        case None            => showVariantPage(key)
+      }
     }
+
+  private def showVariantPage(key: String)(implicit ctx: Context): Fu[Result] =
+    (for {
+      variant <- Variant.all.map { v =>
+        (v.key, v)
+      }.toMap get key
+    } yield OptionOk(prismicC.getPage(prismicUid(key))) { case (doc, resolver) =>
+      views.html.site.variant.show(doc, resolver, variant)
+    }) | notFound
 
   // The UID field in prismic has to be unique, lowercase, and some are taken by other pages
   def prismicUid(key: String) =

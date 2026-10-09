@@ -64,25 +64,25 @@ object dev {
             form3.input(form("command"))(autofocus)
           ),
           h2("Command examples:"),
-          pre("""uptime
-announce 10 minutes PlayStrategy will restart!
+          // one line per command, or per group of commands sharing their words
+          p(
+            "( ): one choice, of words (a/b) or of whole forms (a | b). ",
+            "{x}: a value to fill in. [ ]: may be left out."
+          ),
+          pre("""announce 10 minutes PlayStrategy will restart!
 announce cancel
+bot-vs-bot (status | (start/stop/restart) [{stream}])
 change asset version
-puzzle disable 70000
-team disable foobar
-team enable foobar
-fishnet client create {username}
+eval-cache drop {chess-variant} {fen}
+fishnet client (create {username} | (delete/enable/disable) {key})
 gdpr erase {username} forever
-patron lifetime {username}
-patron month {username}
-patron remove {username}
-tournament feature {id}
-tournament unfeature {id}
-eval-cache drop standard 8/8/1k6/8/2K5/1P6/8/8 w - - 0 1
-swiss update score {id}
+patron (lifetime/month/remove) {username}
 shield-leaderboards recalc
-{tournament/swiss} dq {username} {id}
-bot-vs-bot start/stop/status
+study library (pin/hide/reset) {id}
+swiss update score {id}
+(swiss/tournament) dq {username} {id}
+tournament (feature/unfeature) {id}
+uptime
 """)
         )
       )

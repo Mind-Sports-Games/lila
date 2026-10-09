@@ -20,7 +20,8 @@ object embed {
   )(implicit config: EmbedConfig) =
     views.html.base.embed(
       title = s"${s.name} ${chapter.name}",
-      cssModule = "analyse.embed"
+      cssModule = "analyse.embed",
+      boardFamily = chapter.setup.variant.gameFamily.key.some
     )(
       div(cls := "is2d")(
         main(cls := "analyse")

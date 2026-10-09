@@ -38,6 +38,7 @@ export interface Variant {
   key: VariantKey;
   name: string;
   icon: string;
+  group?: { key: string; name: string };
 }
 
 export interface Team {

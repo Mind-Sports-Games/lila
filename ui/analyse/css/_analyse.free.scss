@@ -58,45 +58,62 @@
   }
 }
 
-/* Below 3-col, the side column would fall under the tools, so the select
-   takes a full-width row above the board instead. div.analyse outranks the shared layout and the
-   pocket layout of analyse.zh, which is loaded after this sheet. */
-div.analyse {
-  grid-template-rows: auto auto auto minmax(20em, 30vh);
-  grid-template-areas: 'side' 'board' 'controls' 'tools' 'acpl' 'under' 'chat' 'uchat';
-
-  @include breakpoint($mq-col2) {
-    grid-template-rows: auto fit-content(0);
-    grid-template-areas: 'side side side' 'board gauge tools' 'under . controls' 'under . acpl' 'chat . .' 'uchat . .';
-  }
+/* Below 3-col, the side column would fall under the tools, so the select takes a full-width row
+   above the board instead. Restating every grid-template-areas here would lose to the per-variant
+   templates in _score.scss, which carry two classes; placing the select itself in an implicit row
+   above the explicit grid needs no template at all, so it works for every variant. The named side
+   area is then simply left empty below 3-col. */
+div.analyse .analyse__side {
+  grid-row: span 1 / 1;
+  grid-column: 1 / -1;
+  margin: 0 0 $block-gap 0;
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $meta-height $chat-height 2.5em auto;
-    grid-template-areas: 'side . board gauge tools' 'chat . board gauge tools' 'uchat . under . controls' 'uchat . under . acpl';
-  }
-
-  .analyse__side {
-    margin: 0 0 $block-gap 0;
-
-    @include breakpoint($mq-col3) {
-      margin: 0;
-    }
+    grid-area: side;
+    margin: 0;
   }
 }
 
-@each $variant in ('crazyhouse', 'shogi', 'minishogi') {
-  div.analyse.variant-#{$variant} {
-    grid-template-rows: auto $pocket-col1-height auto $pocket-col1-height auto 50vh;
-    grid-template-areas: 'side' 'pocket-top' 'board' 'pocket-bot' 'controls' 'tools' 'acpl' 'under' 'chat' 'uchat';
+/* Body copy under the board. It starts in main.analyse, which the analyse app empties on mount, so
+   the app lifts it into its grid. The per-variant layouts each restate grid-template-areas, so no
+   area name is shared by all of them: from two columns up the block asks for the last column and
+   lets the grid put it on the first free row, which is under the tools panel (and under the
+   advice list of a game that has one). On one column it simply comes last. */
+.analyse__about {
+  margin: $block-gap 1em;
+  font-size: 0.85em;
+  color: $c-font-dim;
 
-    @include breakpoint($mq-col2) {
-      grid-template-rows: auto $pocket-height auto $pocket-height;
-      grid-template-areas: 'side side side' 'board gauge pocket-top' 'board gauge tools' 'board gauge pocket-bot' 'under . controls' 'under . acpl' 'chat . .' 'uchat . .';
-    }
+  @include breakpoint($mq-col2) {
+    grid-column: -2 / -1;
+    margin: $block-gap 0 0;
+  }
 
-    @include breakpoint($mq-col3) {
-      grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
-      grid-template-areas: 'side . board gauge pocket-top' 'side . board gauge tools' 'chat . board gauge tools' 'chat . board gauge pocket-bot' 'uchat . under . controls' 'uchat . under . acpl';
+  h2 {
+    font-size: 1.15em;
+    font-weight: bold;
+    margin-bottom: 0.3em;
+    color: $c-font;
+  }
+
+  p {
+    margin-bottom: 0.6em;
+  }
+
+  &__links {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 0.5em 1em;
+  }
+
+  &__rules {
+    font-weight: bold;
+
+    @include transition(color);
+
+    &:hover {
+      color: $c-link;
     }
   }
 }

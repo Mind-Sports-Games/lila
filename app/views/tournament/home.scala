@@ -52,7 +52,9 @@ object home {
             br,
             a(href := routes.Tournament.history(Freq.Annual.name))(trans.arena.history()),
             br,
-            a(href := routes.Tournament.help("arena".some))(trans.tournamentFAQ())
+            a(href := routes.Tournament.help("arena".some))(trans.tournamentFAQ()),
+            br,
+            a(href := routes.Page.lonePage("mind-sports-olympiad"))(trans.aboutMso())
           ),
           h2(
             a(href := routes.Tournament.leaderboard)(trans.tournamentWinners())

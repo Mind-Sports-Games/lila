@@ -85,6 +85,9 @@ case class User(
 
   def everLoggedIn = seenAt.so(createdAt !=)
 
+  // whether crawlers may index the profile and its sub-pages
+  def crawlable = count.game >= 10 && !lameOrTroll && timeNoSee < 365.days
+
   def lame = marks.boost || marks.engine
 
   def lameOrTroll      = lame || marks.troll
@@ -181,6 +184,7 @@ object User {
   val anonymous                    = "Anonymous"
   val playstrategyId               = "playstrategy"
   val broadcasterId                = "broadcaster"
+  val msoId                        = "mind-sports-olympiad"
   val ghostId                      = "ghost"
   def isOfficial(username: String) =
     normalize(username) == playstrategyId || normalize(username) == broadcasterId

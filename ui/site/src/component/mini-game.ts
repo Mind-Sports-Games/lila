@@ -1,6 +1,8 @@
 import { Coords as CgCoords } from 'chessground/types';
 import * as domData from 'common/data';
-import { variantFromElement } from 'common/mini-board';
+import { boardDimensions, variantFromElement } from 'common/mini-board';
+import { loadChessground, loadDraughtsground } from 'common/board-lib';
+import { ensureFor as ensurePieceSprite } from 'common/piece-sprite';
 import { displayScore, fenPlayerIndex, parseLastMove, backgammon as bgUtils } from 'stratutils';
 import clockWidget from './clock-widget';
 
@@ -15,145 +17,76 @@ interface UpdateData {
   p2Delay?: number;
 }
 
-export const init = (node: HTMLElement) => {
-  if (!window.Chessground || !window.Draughtsground) setTimeout(() => init(node), 200);
-  else {
-    const $el = $(node);
-    $el.removeClass('mini-game--init');
-    if ($el.hasClass('draughts')) {
-      const [fen, board, orientation, lm] = $el.data('state').split('|'),
-        config = {
-          coordinates: CgCoords.Hidden,
-          boardSize: board ? board.split('x').map((s: string) => parseInt(s)) : [10, 10],
-          viewOnly: !node.getAttribute('data-playable'),
-          resizable: false,
-          fen,
-          orientation,
-          lastMove: lm && [lm.slice(-4, -2), lm.slice(-2)],
-          drawable: {
-            enabled: false,
-            visible: false,
-          },
-        },
-        $cg = $el.find('.cg-wrap'),
-        turnPlayerIndex = fen[0].toLowerCase() === 'w' ? 'p1' : 'p2';
-      domData.set($cg[0] as HTMLElement, 'draughtsground', window.Draughtsground($cg[0], config));
-      ['p1', 'p2'].forEach(playerIndex =>
-        $el.find('.mini-game__clock--' + playerIndex).each(function (this: HTMLElement) {
-          clockWidget(this, {
-            time: parseInt(this.getAttribute('data-time')!),
-            delay: parseInt(this.getAttribute('data-time-delay')!),
-            pending: parseInt(this.getAttribute('data-time-pending')!),
-            pause: playerIndex != turnPlayerIndex,
-          });
-        }),
-      );
-    } else {
-      const [fen, orientation, lm, multiPointState] = node.getAttribute('data-state')!.split('|');
-      const config = {
-          coordinates: CgCoords.Hidden,
-          viewOnly: true,
-          myPlayerIndex: orientation === 'p1vflip' ? 'p2' : orientation,
-          turnPlayerIndex: fenPlayerIndex(variantFromElement($el) as VariantKey, fen),
-          resizable: false,
-          fen,
-          dice: bgUtils.readDice(fen, variantFromElement($el) as VariantKey),
-          doublingCube: bgUtils.readDoublingCube(fen, variantFromElement($el) as VariantKey),
-          showUndoButton: false,
-          orientation,
-          lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : parseLastMove(lm)),
-          highlight: {
-            lastMove:
-              lm != undefined &&
-              lm !== 'pass' &&
-              variantFromElement($el) != 'backgammon' &&
-              variantFromElement($el) != 'hyper' &&
-              variantFromElement($el) != 'nackgammon',
-          },
-          drawable: {
-            enabled: false,
-            visible: false,
-          },
-          dimensions: $el.hasClass('variant-shogi')
-            ? { width: 9, height: 9 }
-            : $el.hasClass('variant-xiangqi')
-              ? { width: 9, height: 10 }
-              : $el.hasClass('variant-minishogi') || $el.hasClass('variant-minibreakthroughtroyka')
-                ? { width: 5, height: 5 }
-                : $el.hasClass('variant-minixiangqi') || $el.hasClass('variant-entropy')
-                  ? { width: 7, height: 7 }
-                  : $el.hasClass('variant-flipello10') || $el.hasClass('variant-octagonflipello')
-                    ? { width: 10, height: 10 }
-                    : $el.hasClass('variant-amazons')
-                      ? { width: 10, height: 10 }
-                      : $el.hasClass('variant-oware')
-                        ? { width: 6, height: 2 }
-                        : $el.hasClass('variant-togyzkumalak')
-                          ? { width: 9, height: 2 }
-                          : $el.hasClass('variant-bestemshe')
-                            ? { width: 5, height: 2 }
-                            : $el.hasClass('variant-go9x9')
-                              ? { width: 9, height: 9 }
-                              : $el.hasClass('variant-go13x13')
-                                ? { width: 13, height: 13 }
-                                : $el.hasClass('variant-go19x19')
-                                  ? { width: 19, height: 19 }
-                                  : $el.hasClass('variant-backgammon') ||
-                                      $el.hasClass('variant-hyper') ||
-                                      $el.hasClass('variant-nackgammon')
-                                    ? { width: 12, height: 2 }
-                                    : $el.hasClass('variant-grandabalone')
-                                      ? { width: 11, height: 11 }
-                                      : $el.hasClass('variant-abalone')
-                                        ? { width: 9, height: 9 }
-                                        : { width: 8, height: 8 },
-          variant: variantFromElement($el),
-          ...(multiPointState?.length === 6 && {
-            multiPointState: {
-              target: parseInt(multiPointState.substring(0, 2)),
-              p1: parseInt(multiPointState.substring(2, 4)),
-              p2: parseInt(multiPointState.substring(4, 6)),
-            },
-          }),
-        },
-        $cg = $el.find('.cg-wrap'),
-        turnPlayerIndex = fenPlayerIndex(variantFromElement($el) as VariantKey, fen);
-      domData.set($cg[0] as HTMLElement, 'chessground', window.Chessground($cg[0], config));
-      ['p1', 'p2'].forEach(playerIndex =>
-        $el.find('.mini-game__clock--' + playerIndex).each(function (this: HTMLElement) {
-          clockWidget(this, {
-            time: parseInt(this.getAttribute('data-time')!),
-            delay: parseInt(this.getAttribute('data-time-delay')!),
-            pending: parseInt(this.getAttribute('data-time-pending')!),
-            pause: playerIndex != turnPlayerIndex,
-          });
-        }),
-      );
-    }
-  }
-  return node.getAttribute('data-live');
+// Returns data-live synchronously - initAll feeds those ids to startWatching - while
+// the board library itself is fetched in the background. The marker class is dropped
+// and the promise memoised before that await, so the redraws that call initAll on
+// every websocket tick cannot build a second board on the same element.
+export const init = (node: HTMLElement): string | null => {
+  const live = node.getAttribute('data-live'),
+    $el = $(node);
+  $el.removeClass('mini-game--init');
+  ensurePieceSprite(node);
+  const wrap = $el.find('.cg-wrap')[0] as HTMLElement | undefined;
+  if (!wrap || domData.get(wrap, 'board-pending')) return live;
+  domData.set(
+    wrap,
+    'board-pending',
+    ($el.hasClass('draughts') ? initDraughts($el, node, wrap) : initChess($el, node, wrap)).catch(e => {
+      domData.set(wrap, 'board-pending', undefined); // the next initAll may retry this node
+      throw e;
+    }),
+  );
+  return live;
 };
 
-export const initAll = (parent?: HTMLElement) => {
-  const nodes = Array.from((parent || document).getElementsByClassName('mini-game--init')),
-    ids = nodes.map(init).filter(id => id);
-  if (ids.length) playstrategy.StrongSocket.firstConnect.then(send => send('startWatching', ids.join(' ')));
+const initDraughts = ($el: Cash, node: HTMLElement, wrap: HTMLElement): Promise<any> => {
+  const [fen, board, orientation, lm] = $el.data('state').split('|'),
+    config = {
+      coordinates: CgCoords.Hidden,
+      boardSize: board ? board.split('x').map((s: string) => parseInt(s)) : [10, 10],
+      viewOnly: !node.getAttribute('data-playable'),
+      resizable: false,
+      fen,
+      orientation,
+      lastMove: lm && [lm.slice(-4, -2), lm.slice(-2)],
+      drawable: {
+        enabled: false,
+        visible: false,
+      },
+    };
+  renderClocks($el, fen[0].toLowerCase() === 'w' ? 'p1' : 'p2');
+  return loadDraughtsground().then(Draughtsground => {
+    const dg = Draughtsground(wrap, config);
+    domData.set(wrap, 'draughtsground', dg);
+    return dg;
+  });
 };
 
-export const update = (node: HTMLElement, data: UpdateData) => {
-  const $el = $(node),
-    lm = data.lm,
-    lastMove = lm && (lm[1] === '@' ? [lm.slice(2)] : parseLastMove(lm)),
-    cg = domData.get(node.querySelector('.cg-wrap')!, 'chessground'),
-    dg = domData.get(node.querySelector('.cg-wrap')!, 'draughtsground'),
-    [, , , multiPointState] = node.getAttribute('data-state')!.split('|');
-  if (cg) {
-    cg.set({
-      fen: data.fen,
-      turnPlayerIndex: fenPlayerIndex(variantFromElement($el) as VariantKey, data.fen),
-      dice: bgUtils.readDice(data.fen, variantFromElement($el) as VariantKey),
-      doublingCube: bgUtils.readDoublingCube(data.fen, variantFromElement($el) as VariantKey),
-      lastMove,
+const initChess = ($el: Cash, node: HTMLElement, wrap: HTMLElement): Promise<any> => {
+  const [fen, orientation, lm, multiPointState] = node.getAttribute('data-state')!.split('|'),
+    variant = variantFromElement($el) as VariantKey,
+    config = {
+      coordinates: CgCoords.Hidden,
+      viewOnly: true,
+      myPlayerIndex: orientation === 'p1vflip' ? 'p2' : orientation,
+      turnPlayerIndex: fenPlayerIndex(variant, fen),
+      resizable: false,
+      fen,
+      dice: bgUtils.readDice(fen, variant),
+      doublingCube: bgUtils.readDoublingCube(fen, variant),
+      showUndoButton: false,
+      orientation,
+      lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : parseLastMove(lm)),
+      highlight: {
+        lastMove:
+          lm != undefined && lm !== 'pass' && variant != 'backgammon' && variant != 'hyper' && variant != 'nackgammon',
+      },
+      drawable: {
+        enabled: false,
+        visible: false,
+      },
+      dimensions: boardDimensions($el),
+      variant,
       ...(multiPointState?.length === 6 && {
         multiPointState: {
           target: parseInt(multiPointState.substring(0, 2)),
@@ -161,23 +94,54 @@ export const update = (node: HTMLElement, data: UpdateData) => {
           p2: parseInt(multiPointState.substring(4, 6)),
         },
       }),
-    });
-  }
-  if (['backgammon', 'nackgammon', 'hyper'].includes(variantFromElement($el))) cg.redrawAll(); //update dice as they are in wrap of cg
-  if (dg)
-    dg.set({
-      fen: data.fen,
-      lastMove,
-    });
-  const turnPlayerIndex = fenPlayerIndex(variantFromElement($el) as VariantKey, data.fen);
+    };
+  renderClocks($el, fenPlayerIndex(variant, fen));
+  return loadChessground().then(Chessground => {
+    const cg = Chessground(wrap, config);
+    domData.set(wrap, 'chessground', cg);
+    return cg;
+  });
+};
+
+const renderClocks = ($el: Cash, turnPlayerIndex: string): void =>
+  ['p1', 'p2'].forEach(playerIndex =>
+    $el.find('.mini-game__clock--' + playerIndex).each(function (this: HTMLElement) {
+      clockWidget(this, {
+        time: parseInt(this.getAttribute('data-time')!),
+        delay: parseInt(this.getAttribute('data-time-delay')!),
+        pending: parseInt(this.getAttribute('data-time-pending')!),
+        pause: playerIndex != turnPlayerIndex,
+      });
+    }),
+  );
+
+export const initAll = (parent?: HTMLElement) => {
+  const nodes = Array.from((parent || document).getElementsByClassName('mini-game--init')),
+    ids = nodes.map(node => init(node as HTMLElement)).filter(id => id);
+  if (ids.length) playstrategy.StrongSocket.firstConnect.then(send => send('startWatching', ids.join(' ')));
+};
+
+export const update = (node: HTMLElement, data: UpdateData) => {
+  const wrap = node.querySelector('.cg-wrap') as HTMLElement | null;
+  if (!wrap) return;
+  const $el = $(node),
+    variant = variantFromElement($el) as VariantKey,
+    lm = data.lm,
+    lastMove = lm && (lm[1] === '@' ? [lm.slice(2)] : parseLastMove(lm)),
+    [, , , multiPointState] = node.getAttribute('data-state')!.split('|'),
+    turnPlayerIndex = fenPlayerIndex(variant, data.fen);
+
+  // Clocks and scores stay synchronous. They share a socket with finish(), which replaces
+  // the clock nodes, so deferring them past it would write to a DOM that is no longer there.
   const renderClock = (
     time: number | undefined,
     delay: number | undefined,
     pending: number | undefined,
     playerIndex: string,
   ) => {
-    if (!isNaN(time!))
-      clockWidget($el[0]?.querySelector('.mini-game__clock--' + playerIndex) as HTMLElement, {
+    const clock = $el[0]?.querySelector('.mini-game__clock--' + playerIndex) as HTMLElement | null;
+    if (clock && !isNaN(time!))
+      clockWidget(clock, {
         time: time || 0,
         delay: delay || 0,
         pending: pending || 0,
@@ -189,9 +153,42 @@ export const update = (node: HTMLElement, data: UpdateData) => {
 
   if (!isMultiPoint(multiPointState)) {
     ['p1', 'p2'].forEach(playerIndex => {
-      const $score = $(node).find('.mini-game__score--' + playerIndex);
-      $score.html(displayScore(variantFromElement($el) as VariantKey, data.fen, playerIndex));
+      const $score = $el.find('.mini-game__score--' + playerIndex);
+      $score.html(displayScore(variant, data.fen, playerIndex));
     });
+  }
+
+  // Only the position waits for the board library, where the last fen to land wins anyway.
+  const setPosition = (board: any, draughts: boolean) => {
+    if (draughts) {
+      board.set({ fen: data.fen, lastMove });
+      return;
+    }
+    board.set({
+      fen: data.fen,
+      turnPlayerIndex,
+      dice: bgUtils.readDice(data.fen, variant),
+      doublingCube: bgUtils.readDoublingCube(data.fen, variant),
+      lastMove,
+      ...(multiPointState?.length === 6 && {
+        multiPointState: {
+          target: parseInt(multiPointState.substring(0, 2)),
+          p1: parseInt(multiPointState.substring(2, 4)),
+          p2: parseInt(multiPointState.substring(4, 6)),
+        },
+      }),
+    });
+    //update dice as they are in wrap of cg
+    if (['backgammon', 'nackgammon', 'hyper'].includes(variant)) board.redrawAll();
+  };
+  const cg = domData.get(wrap, 'chessground'),
+    dg = domData.get(wrap, 'draughtsground');
+  if (cg) setPosition(cg, false);
+  else if (dg) setPosition(dg, true);
+  else {
+    const pending = domData.get(wrap, 'board-pending');
+    // a failed fetch already reports itself once, rather than once per socket tick
+    if (pending) pending.then((board: any) => board && setPosition(board, $el.hasClass('draughts'))).catch(() => {});
   }
 };
 
