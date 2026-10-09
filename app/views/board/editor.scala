@@ -61,15 +61,17 @@ object editor {
 
   def about(variant: strategygames.variant.Variant)(implicit ctx: Context): Frag =
     frag(
-      h2(trans.aboutX(views.html.library.bits.searchName(variant))),
+      // the heading is the link to the game's own page
+      h2(
+        a(href := routes.Library.variant(variant.key))(
+          trans.aboutX(views.html.library.bits.searchName(variant))
+        )
+      ),
       p(views.html.library.bits.objectiveSentence(variant)),
       p(views.html.library.bits.editorDescription(variant)),
       views.html.library.bits.hasLibraryPages(variant).option(
         p(cls := "editor__about__links")(
-          a(cls := "button", href := s"/?variant=${variant.key}#game")(trans.createAGame()),
-          a(cls := "editor__about__library", href := routes.Library.variant(variant.key))(
-            trans.aboutX(views.html.library.bits.searchName(variant))
-          )
+          a(cls := "button", href := s"/?variant=${variant.key}#game")(trans.createAGame())
         )
       )
     )
