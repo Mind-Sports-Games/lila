@@ -73,7 +73,7 @@ object dev {
 announce cancel
 bot-vs-bot (status | (start/stop/restart) [{stream}])
 change asset version
-eval-cache drop standard 8/8/1k6/8/2K5/1P6/8/8 w - - 0 1
+eval-cache drop {chess-variant} {fen}
 fishnet client (create {username} | (delete/enable/disable) {key})
 gdpr erase {username} forever
 patron (lifetime/month/remove) {username}
