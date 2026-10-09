@@ -85,11 +85,14 @@ final class Library(env: Env) extends LilaController(env) {
           dailyPuzzle <- Puzzle.puzzleVariants
             .exists(_.key == variant.key)
             .so(env.puzzle.daily.getForVariant(variant))
-          notable <- env.study.notable.byVariant(variant, 6)
-          // the cached list is up to a day old: a study made private since is dropped here
+          // one more than the page shows: it leaves out the tutorial, linked above
+          notable <- env.study.notable.byVariant(variant, 7)
           studies <- env.study.pager
             .byIds(notable.map(_.id), ctx.me)
-            .map(_.filter(s => s.study.isPublic && s.study.notable))
+            // the cache is up to a day old: a study made private, unfeatured or kept off since is dropped
+            .map(_.filter { s =>
+              s.study.isPublic && s.study.onLibraryPages
+            })
             .recoverDefault
           (gpArenas, gpSwisses) <- grandPrixCache get variant.key
         } yield Ok(

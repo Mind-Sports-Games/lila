@@ -863,6 +863,7 @@
   <string name="variantEditorDescription">在免费的在线棋盘编辑器中摆出任意%1$s局面，然后分析或对弈。在 PlayStrategy 免费在线玩%2$s。</string>
   <string name="variantStudies">%s 研究</string>
   <string name="libraryStudies">研究</string>
+  <string name="libraryStudyPinned">已置顶</string>
   <string name="playVariantOnlineFreeDescription">与世界各地的玩家免费在线玩 %s。实时与通信对局、锦标赛、积分和分析，尽在 PlayStrategy。</string>
   <string name="variantPuzzles">%s 谜题</string>
   <string name="libraryTitle">可免费在线玩的桌游 — PlayStrategy 游戏库</string>

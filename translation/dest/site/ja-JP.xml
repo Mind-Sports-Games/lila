@@ -865,6 +865,7 @@
   <string name="variantEditorDescription">無料のオンライン盤面エディタで%1$sの局面を自由に作成し、分析したり対局したりできます。PlayStrategyで%2$sを無料でオンラインプレイ。</string>
   <string name="variantStudies">%s のスタディ</string>
   <string name="libraryStudies">スタディ</string>
+  <string name="libraryStudyPinned">ピン留め</string>
   <string name="playVariantOnlineFreeDescription">世界中のプレイヤーと %s を無料でオンライン対戦。リアルタイム対局と通信対局、トーナメント、レーティング、解析を PlayStrategy で。</string>
   <string name="variantPuzzles">%s の問題</string>
   <string name="libraryTitle">無料でオンライン対戦できるボードゲーム — PlayStrategy ライブラリ</string>

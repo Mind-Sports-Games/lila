@@ -907,6 +907,7 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="variantEditorDescription">Monte qualquer posição de %1$s num editor de tabuleiro online gratuito, depois analise-a ou jogue-a. Jogue %2$s online de graça no PlayStrategy.</string>
   <string name="variantStudies">Estudos de %s</string>
   <string name="libraryStudies">Estudos</string>
+  <string name="libraryStudyPinned">Fixado</string>
   <string name="playVariantOnlineFreeDescription">Jogue %s online grátis contra jogadores do mundo todo. Partidas ao vivo e por correspondência, torneios, ratings e análise no PlayStrategy.</string>
   <string name="variantPuzzles">Problemas de %s</string>
   <string name="libraryTitle">Jogos de tabuleiro para jogar online grátis — a biblioteca do PlayStrategy</string>

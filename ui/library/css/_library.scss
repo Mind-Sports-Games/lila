@@ -187,6 +187,21 @@
         margin: 0;
       }
     }
+
+    // a pinned study: a pin in the tile's top right corner, above the tile's link overlay
+    .library__pin {
+      position: absolute;
+      top: 0.8em;
+      right: 0.8em;
+      z-index: 2;
+      color: $c-primary;
+      font-size: 0.65em;
+    }
+
+    // and a long name stops short of it
+    .study:has(.library__pin) .top {
+      padding-right: 1.2em;
+    }
   }
 
   .library__tv,

@@ -201,15 +201,15 @@ object show {
       )
     )
 
-  // the game's notable studies, the site's own first, then by rank (NotableStudies), as on the studies
-  // page, minus the tutorial and the MSO event games, which the page links on their own
+  // the game's studies, pinned first, then by likes (NotableStudies), as on the studies page, minus the
+  // tutorial, which the Tutorial link above already offers; six at most
   private def studyList(
       variant: Variant,
       studies: List[lila.study.Study.WithChaptersAndLiked],
       besideLeaderboard: Boolean
   )(implicit ctx: Context) = {
-    val linked = bits.studyLink(variant).toSet ++ bits.msoEvent(variant).flatMap(_.studyId)
-    val others = studies.filterNot(s => linked(s.study.id.value))
+    val tutorial = bits.studyLink(variant)
+    val others   = studies.filterNot(s => tutorial.has(s.study.id.value)).take(6)
     others.nonEmpty.option(
       // beside the leaderboard the block is no higher than it, and its tiles scroll
       div(cls := List("library__studies" -> true, "library__studies--beside-leaderboard" -> besideLeaderboard))(
@@ -219,7 +219,15 @@ object show {
           a(href := routes.Study.byVariantDefault(variant.key), cls := "more")(trans.more(), " »")
         ),
         div(cls := "studies")(
-          others.map(s => div(cls := "study")(views.html.study.bits.widget(s, h3)))
+          others.map { s =>
+            div(cls := "study")(
+              views.html.study.bits.widget(s, h3),
+              // a study an admin pinned here says so with a pin, in the tile's corner
+              s.study.library.has(true).option(
+                span(cls := "library__pin", dataIcon := "\ue93a", title := trans.libraryStudyPinned.txt())
+              )
+            )
+          }
         )
       )
     )

@@ -848,6 +848,7 @@
   <string name="variantEditorDescription">Dựng bất kỳ thế cờ %1$s nào trên trình chỉnh sửa bàn cờ trực tuyến miễn phí, rồi phân tích hoặc chơi tiếp. Chơi %2$s trực tuyến miễn phí trên PlayStrategy.</string>
   <string name="variantStudies">Nghiên cứu %s</string>
   <string name="libraryStudies">Nghiên cứu</string>
+  <string name="libraryStudyPinned">Đã ghim</string>
   <string name="playVariantOnlineFreeDescription">Chơi %s trực tuyến miễn phí với người chơi trên toàn thế giới. Ván đấu trực tiếp và theo lượt, giải đấu, xếp hạng và phân tích trên PlayStrategy.</string>
   <string name="variantPuzzles">Câu đố %s</string>
   <string name="libraryTitle">Các board game có thể chơi trực tuyến miễn phí — thư viện PlayStrategy</string>

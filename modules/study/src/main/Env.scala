@@ -86,11 +86,30 @@ final class Env(
 
   def cli =
     new lila.common.Cli {
-      def process = { case "study" :: "rank" :: "reset" :: Nil =>
-        api.resetAllRanks.map { count =>
-          s"$count done"
-        }
+      def process = {
+        case "study" :: "rank" :: "reset" :: Nil =>
+          api.resetAllRanks.map { count =>
+            s"$count done"
+          }
+        // on the library pages of its games: pinned first, hidden, or back to the likes
+        case "study" :: "library" :: (cmd @ ("pin" | "hide" | "reset")) :: id :: Nil =>
+          val v = cmd match {
+            case "pin"  => true.some
+            case "hide" => false.some
+            case _      => none
+          }
+          val what = v.fold("back to its likes on the library pages") { b =>
+            if (b) "pinned to the library pages" else "hidden from the library pages"
+          }
+          studyRepo.setLibrary(Study.Id(id), v) map done(id, what)
       }
+
+      private def done(id: String, what: String)(found: Int) =
+        if (found == 0) s"No study $id"
+        else {
+          notable.refresh()
+          s"Study $id $what"
+        }
     }
 
   lila.common.Bus.subscribeFun("studyAnalysisProgress") {
