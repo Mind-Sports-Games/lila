@@ -1,5 +1,7 @@
 package lila.mod
 
+import org.joda.time.DateTime
+
 import lila.common.{ Bus, EmailAddress }
 import lila.report.{ Mod, ModId, Room, Suspect, SuspectId }
 import lila.security.{ Granter, Permission }
@@ -12,7 +14,8 @@ final class ModApi(
     noteApi: lila.user.NoteApi,
     notifier: ModNotifier,
     lightUserApi: LightUserApi,
-    refunder: RatingRefund
+    refunder: RatingRefund,
+    ratingWriter: RatingWriter
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def setAlt(mod: Mod, prev: Suspect, v: Boolean): Funit =
@@ -135,6 +138,33 @@ final class ModApi(
       userRepo.setEmail(user.id, email) >>
         userRepo.setEmailConfirmed(user.id) >>
         logApi.setEmail(mod, user.id)
+    }
+
+  def setRating(mod: User.ID, username: String, data: SetRatingForm.Data): Funit =
+    withUser(username) { user =>
+      val pt   = data.perfType
+      val prev = user.perfs(pt)
+      if (prev.nb == 0) fufail(s"${user.username} has not played ${pt.key}")
+      else {
+        // refund first so the progress arrow updates, then store exactly what the mod entered.
+        // latest moves to now because the stored deviation is wound back to latest.
+        val refunded = prev.refund(data.rating - prev.intRating)
+        val perf     = refunded.copy(
+          glicko = refunded.glicko.copy(
+            rating = data.rating.toDouble,
+            deviation = data.deviation.fold(refunded.glicko.deviation)(_.toDouble)
+          ),
+          latest = DateTime.now.some
+        )
+        val deviationChange =
+          data.deviation.filter(_ != prev.intDeviation) so { d => s" (±${prev.intDeviation} → ±$d)" }
+        ratingWriter(user, pt, perf) >>
+          logApi.setRating(
+            mod,
+            user.id,
+            s"${pt.trans(using lila.i18n.defaultLang)}: ${prev.intRating} → ${perf.intRating}$deviationChange — \"${data.reason}\""
+          )
+      }
     }
 
   def setPermissions(mod: Holder, username: String, permissions: Set[Permission]): Funit =

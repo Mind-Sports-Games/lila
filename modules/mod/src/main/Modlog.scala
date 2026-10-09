@@ -72,6 +72,7 @@ case class Modlog(
       case Modlog.teamEdit            => "edited team"
       case Modlog.appealPost          => "posted in appeal"
       case Modlog.setKidMode          => "set kid mode"
+      case Modlog.setRating           => "adjust rating"
       case a                          => a
     }
 
@@ -139,4 +140,5 @@ object Modlog {
   val teamEdit            = "teamEdit"
   val appealPost          = "appealPost"
   val setKidMode          = "setKidMode"
+  val setRating           = "setRating"
 }

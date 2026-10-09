@@ -36,6 +36,7 @@ object Permission {
   case object CloseAccount     extends Permission("CLOSE_ACCOUNT", List(UserModView), "Close/reopen account")
   case object SetTitle         extends Permission("SET_TITLE", List(UserModView), "Set/unset title")
   case object SetEmail         extends Permission("SET_EMAIL", List(UserModView), "Set email address")
+  case object SetRating        extends Permission("SET_RATING", List(UserModView), "Set rating")
   case object SeeReport        extends Permission("SEE_REPORT", "See reports")
   case object Appeals          extends Permission("APPEAL", "Handle appeals")
   case object Presets          extends Permission("PRESET", "Edit mod presets")
@@ -149,6 +150,7 @@ object Permission {
           CloseAccount,
           SetTitle,
           SetEmail,
+          SetRating,
           ManageTeam,
           ManageTournament,
           ManageSimul,
@@ -209,7 +211,8 @@ object Permission {
       DisableTwoFactor,
       CloseAccount,
       SetTitle,
-      SetEmail
+      SetEmail,
+      SetRating
     ),
     "Misc mod" -> List(
       SeeReport,
