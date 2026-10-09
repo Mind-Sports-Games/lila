@@ -262,21 +262,33 @@ object show {
           }),
           div(" ")
         ),
-        p(mso match {
-          // the games of an event are in a study only once somebody has recorded them
-          case Some(m) if m.worldChampionship && m.studyId.isEmpty => trans.msoWorldChampionshipResultsOnly(name)
-          case Some(m) if m.worldChampionship                      => trans.msoWorldChampionshipVenue(name)
-          case Some(m) if m.studyId.isEmpty                        => trans.msoEventResultsOnly(name)
-          case Some(_)                                             => trans.msoEventVenue(name)
-          case None                                                => trans.msoGrandPrixVenue(name)
-        }),
+        p {
+          // the sentence carries the links: the Mind Sports Olympiad's page, the event's games and the
+          // online Grand Prix, each where the sentence names it. Raw HTML, as a string argument is escaped.
+          val msoLink =
+            raw(a(href := routes.Page.lonePage("mind-sports-olympiad"))("Mind Sports Olympiad").render)
+          def gamesLink(id: String) = raw(a(href := routes.Study.show(id))(trans.msoGamesLink()).render)
+          val grandPrixLink =
+            if (bits.hasMsoOnline(variant))
+              raw(a(href := routes.Tournament.msoHistory)(trans.msoGrandPrix()).render)
+            else trans.msoGrandPrix()
+          mso match {
+            // the games of an event are in a study only once somebody has recorded them
+            case Some(m) =>
+              m.studyId match {
+                case None if m.worldChampionship => trans.msoWorldChampionshipResultsOnly(name, msoLink)
+                case None                        => trans.msoEventResultsOnly(name, msoLink)
+                case Some(id) if m.worldChampionship =>
+                  trans.msoWorldChampionshipVenue(name, msoLink, gamesLink(id), grandPrixLink)
+                case Some(id) => trans.msoEventVenue(name, msoLink, gamesLink(id), grandPrixLink)
+              }
+            case None => trans.msoGrandPrixVenue(name, msoLink)
+          }
+        },
         mso.map { m =>
           frag(
             p(
               m.resultsUrl.map(url => a(href := url)(trans.msoResultsAndMedallists())),
-              m.studyId.map { id =>
-                frag(" · ", a(href := routes.Study.show(id))(trans.msoEventGames()))
-              },
               " · ",
               a(href := m.allEditionsUrl)(trans.msoAllEditions())
             ),
@@ -289,24 +301,9 @@ object show {
             )
           )
         },
+        // the online editions are all on the MSO history page, which a list here would only repeat
         bits.hasMsoOnline(variant).option(
-          p(
-            // the game's own editions, latest first; the MSO team's tournaments only when it has none.
-            // After a sentence about the in-person event they are labelled as the online ones.
-            (mso.isDefined && grandPrix.nonEmpty).option(frag(strong(trans.msoGrandPrixOnline()), " ")),
-            if (grandPrix.isEmpty) a(href := routes.Team.tournaments(bits.msoTeamId))(trans.msoGrandPrix())
-            else
-              grandPrix
-                .take(5)
-                .map(e => a(href := e.url)(e.name): Frag)
-                .reduce[Frag]((a, b) => frag(a, " · ", b))
-          )
-        ),
-        p(
-          a(href := routes.Page.lonePage("mind-sports-olympiad"))(trans.aboutMso()),
-          bits.hasMsoOnline(variant).option(
-            frag(" · ", a(href := routes.Tournament.msoHistory)(trans.msoAllTournaments()))
-          )
+          p(a(href := routes.Tournament.msoHistory)(trans.msoAllTournaments()))
         )
       )
     }

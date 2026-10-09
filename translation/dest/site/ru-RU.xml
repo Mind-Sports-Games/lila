@@ -968,8 +968,8 @@
   <string name="variantAnalysisDescriptionServerEngine">Анализируйте позиции %1$s на бесплатной онлайн-доске: расставьте любую позицию, изучайте варианты и делитесь ими. Для завершённых партий доступен бесплатный анализ от %3$s. Играйте в %2$s онлайн бесплатно на PlayStrategy.</string>
   <string name="variantRulesDescription">Изучите правила %1$s: расстановка, ходы и как выиграть. Затем играйте в %2$s онлайн бесплатно на PlayStrategy: реальные соперники, рейтинг, турниры и бесплатная доска для анализа.</string>
   <string name="relatedGames">Похожие игры</string>
-  <string name="msoEventResultsOnly">Турнир Mind Sports Olympiad по %s проходит очно; его результаты опубликованы в базе результатов MSO.</string>
-  <string name="msoWorldChampionshipResultsOnly">Чемпионат мира Mind Sports Olympiad по %s проходит очно; его результаты опубликованы в базе результатов MSO.</string>
+  <string name="msoEventResultsOnly">Турнир %2$s по %1$s проходит очно; его результаты опубликованы в базе результатов MSO.</string>
+  <string name="msoWorldChampionshipResultsOnly">Чемпионат мира %2$s по %1$s проходит очно; его результаты опубликованы в базе результатов MSO.</string>
   <string name="msoGrandPrixOnline">Онлайн Гран-при MSO:</string>
   <string name="msoAllTournaments">Все онлайн-турниры MSO</string>
   <string name="aboutMso">О Mind Sports Olympiad</string>
@@ -985,14 +985,15 @@
   <string name="libraryTitle">Настольные игры, в которые можно играть онлайн бесплатно — библиотека PlayStrategy</string>
   <string name="libraryDescription">Все игры PlayStrategy: шахматы и их варианты, шашки, го, нарды, отелло, сёги, сянци, манкала, Abalone, Lines of Action и другие — с правилами, обучением, турнирами и статистикой.</string>
   <string name="msoWorldChampionship">Чемпионат мира по %s</string>
-  <string name="msoWorldChampionshipVenue">Чемпионат мира Mind Sports Olympiad по %s проходит очно; его партии публикуются на PlayStrategy, где также проводится онлайн Гран-при MSO.</string>
+  <string name="msoWorldChampionshipVenue">Чемпионат мира %2$s по %1$s проходит очно; его %3$s публикуются на PlayStrategy, где также проводится онлайн %4$s.</string>
   <string name="msoEvent">%s на Mind Sports Olympiad</string>
-  <string name="msoEventVenue">Турнир Mind Sports Olympiad по %s проходит очно; его партии публикуются на PlayStrategy, где также проводится онлайн Гран-при MSO.</string>
+  <string name="msoEventVenue">Турнир %2$s по %1$s проходит очно; его %3$s публикуются на PlayStrategy, где также проводится онлайн %4$s.</string>
   <string name="msoResultsAndMedallists">Результаты и призёры</string>
   <string name="msoAllEditions">Все розыгрыши</string>
   <string name="noFinishedTournament">Ни один турнир этой серии не завершён.</string>
   <string name="msoEventGames">Партии турнира</string>
+  <string name="msoGamesLink">партии</string>
   <string name="msoGrandPrix">Гран-при MSO</string>
   <string name="msoGrandPrixEvent">%s на Гран-при MSO</string>
-  <string name="msoGrandPrixVenue">Онлайн Гран-при Mind Sports Olympiad проходит на PlayStrategy, и %s — одна из его игр.</string>
+  <string name="msoGrandPrixVenue">Онлайн Гран-при %2$s проходит на PlayStrategy, и %1$s — одна из его игр.</string>
 </resources>

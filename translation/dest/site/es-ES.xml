@@ -903,15 +903,16 @@
   <string name="libraryTitle">Juegos de mesa a los que puedes jugar online gratis — la biblioteca de PlayStrategy</string>
   <string name="libraryDescription">Todos los juegos de PlayStrategy: ajedrez y sus variantes, damas, go, backgammon, Othello, shogi, xiangqi, mancala, Abalone, Lines of Action y más, con reglas, tutoriales, torneos y estadísticas.</string>
   <string name="msoWorldChampionship">Campeonato del mundo de %s</string>
-  <string name="msoWorldChampionshipVenue">El campeonato del mundo de %s de las Mind Sports Olympiad se juega de forma presencial; sus partidas se publican en PlayStrategy, que también acoge el Gran Premio MSO online.</string>
+  <string name="msoWorldChampionshipVenue">El campeonato del mundo de %1$s de las %2$s se juega de forma presencial; sus %3$s se publican en PlayStrategy, que también acoge el %4$s online.</string>
   <string name="msoEvent">%s en las Mind Sports Olympiad</string>
-  <string name="msoEventVenue">El torneo de %s de las Mind Sports Olympiad se juega de forma presencial; sus partidas se publican en PlayStrategy, que también acoge el Gran Premio MSO online.</string>
+  <string name="msoEventVenue">El torneo de %1$s de las %2$s se juega de forma presencial; sus %3$s se publican en PlayStrategy, que también acoge el %4$s online.</string>
   <string name="msoResultsAndMedallists">Resultados y medallistas</string>
   <string name="msoAllEditions">Todas las ediciones</string>
   <string name="noFinishedTournament">Ningún torneo de esta serie ha terminado.</string>
   <string name="msoEventGames">Partidas del torneo</string>
-  <string name="msoEventResultsOnly">El torneo de %s de la Mind Sports Olympiad se juega en persona; sus resultados se publican en la base de resultados del MSO.</string>
-  <string name="msoWorldChampionshipResultsOnly">El Campeonato del Mundo de %s de la Mind Sports Olympiad se juega en persona; sus resultados se publican en la base de resultados del MSO.</string>
+  <string name="msoGamesLink">partidas</string>
+  <string name="msoEventResultsOnly">El torneo de %1$s de la %2$s se juega en persona; sus resultados se publican en la base de resultados del MSO.</string>
+  <string name="msoWorldChampionshipResultsOnly">El Campeonato del Mundo de %1$s de la %2$s se juega en persona; sus resultados se publican en la base de resultados del MSO.</string>
   <string name="msoGrandPrixOnline">Grand Prix online de la MSO:</string>
   <string name="msoAllTournaments">Todos los torneos online de la MSO</string>
   <string name="aboutMso">Sobre la Mind Sports Olympiad</string>
@@ -920,5 +921,5 @@
   <string name="boardEditorDescription">Editor de tablero online gratuito para ajedrez, variantes de ajedrez y 40 juegos más: crea cualquier posición a mano o desde un FEN, luego analízala, juégala contra el ordenador o compártela.</string>
   <string name="msoGrandPrix">Gran Premio MSO</string>
   <string name="msoGrandPrixEvent">%s en el Gran Premio MSO</string>
-  <string name="msoGrandPrixVenue">El Gran Premio online de la Mind Sports Olympiad se juega en PlayStrategy, y %s es uno de sus juegos.</string>
+  <string name="msoGrandPrixVenue">El Gran Premio online de la %2$s se juega en PlayStrategy, y %1$s es uno de sus juegos.</string>
 </resources>

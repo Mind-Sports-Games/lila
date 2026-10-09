@@ -121,7 +121,7 @@ object bits {
       case "abalone"            => mso("AB", "ABOC", worldChampionship = true, Some("JG7Zf7mE"))
       case "linesOfAction"      => mso("LO", "LOWC", worldChampionship = true, Some("IyudHHhm"))
       case "amazons"            => mso("AMZ", "AMZOC", study = Some("m8N1ERm6"))
-      case "entropy"            => mso("EN", "ENWC", worldChampionship = true)
+      case "entropy"            => mso("EN", "ENWC", worldChampionship = true, Some("GqB7F4xh"))
       case "breakthroughtroyka" => mso("BT", "BTOC", study = Some("EkVLAnIi"))
       case "international"      => mso("DR", "DRDA", study = Some("CTu6f0Mp"))
       case "oware"              => mso("OW", "OWOC", study = Some("C7hHSwaw"))
