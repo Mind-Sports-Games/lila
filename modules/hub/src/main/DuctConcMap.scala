@@ -38,6 +38,9 @@ final class DuctConcMap[D <: Duct](
   def foreachKey(f: String => Unit): Unit =
     ducts.forEachKey(16, k => f(k))
 
+  def foreachValue(f: D => Unit): Unit =
+    ducts.forEachValue(Long.MaxValue, d => f(d))
+
   def tellAllWithAck(makeMsg: Promise[Unit] => Any)(implicit ec: ExecutionContext): Fu[Int] =
     Future
       .sequence(ducts.values.asScala.map(_.ask(makeMsg)))
