@@ -52,6 +52,6 @@ export const perf = {
     abalone: '\ue927',
     grandabalone: '\ue92C',
     entropy: '\ue938',
-    gomoku: '\ue939',
+    gomoku: '\ue93A',
   },
 };
