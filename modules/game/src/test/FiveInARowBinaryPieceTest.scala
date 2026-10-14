@@ -8,8 +8,9 @@ class FiveInARowBinaryPieceTest extends munit.FunSuite {
   private def roundTrip(pieces: Map[Pos, Piece], blackSeat: Player) =
     BinaryFormat.piece.readFiveInARow(BinaryFormat.piece.writeFiveInARow(pieces), blackSeat)
 
-  private val first = Pos.at(0, 0).get
-  private val last  = Pos.at(14, 14).get
+  private val first  = Pos.at(0, 0).get
+  private val last   = Pos.at(14, 14).get
+  private val corner = Pos.at(18, 18).get
 
   test("an empty board stays empty") {
     assertEquals(roundTrip(Map.empty, Player.P1), Map.empty[Pos, Piece])
@@ -17,6 +18,11 @@ class FiveInARowBinaryPieceTest extends munit.FunSuite {
 
   test("each stone keeps its colour, including on the last point") {
     val pieces = Map(first -> Piece(Player.P1, BlackStone), last -> Piece(Player.P2, WhiteStone))
+    assertEquals(roundTrip(pieces, Player.P1), pieces)
+  }
+
+  test("a stone on the far corner of pente's 19x19 board keeps its point") {
+    val pieces = Map(corner -> Piece(Player.P1, BlackStone))
     assertEquals(roundTrip(pieces, Player.P1), pieces)
   }
 

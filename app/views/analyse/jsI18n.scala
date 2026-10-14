@@ -99,6 +99,7 @@ private object jsI18n {
     trans.blunder,
     trans.perpetualWarning,
     trans.subsequentPassWarning,
+    trans.forbiddenMoveWarning,
     trans.threefoldRepetition,
     trans.anotherWasX,
     trans.bestWasX,

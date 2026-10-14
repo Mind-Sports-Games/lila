@@ -345,6 +345,8 @@ export function gameMessage(ctrl: RoundController) {
       return null; //other messages only for current player in xiangqi/minixiangqi
     }
   }
+  // renju's forbidden move warning is for black, about to drop
+  if (stratUtils.fiveInARow.isFiveInARow(ctrl.data.game.variant.key) && !game.isPlayerTurn(ctrl.data)) return null;
   return ctrl.data.game.gameMessage
     ? h('div.suggestion', [
         h(
@@ -364,21 +366,43 @@ export function cancelDrawOffer(ctrl: RoundController) {
 
 // five in a row's opening choice: play on with a stone, or take one of the swaps offered
 export function swapOptions(ctrl: RoundController) {
+  const fen = round.lastStep(ctrl.data).fen;
+  if (ctrl.canPick()) return pickOptions(ctrl);
+  if (ctrl.isPlaying() && game.isPlayerTurn(ctrl.data) && stratUtils.fiveInARow.offering(fen))
+    return h('div.suggestion.swap-options', [
+      h('p', `Place ${stratUtils.fiveInARow.stonesStillToOffer(fen)} more stones for White to pick a fifth from.`),
+    ]);
   const canSwap = ctrl.canSwap('swap'),
-    canSwap2 = ctrl.canSwap('swap2');
-  if (!canSwap && !canSwap2) return null;
-  const colour = stratUtils.gomoku.nextStone(round.lastStep(ctrl.data).fen) === 'b-piece' ? 'Black' : 'White';
-  const choice = (action: 'swap' | 'swap2', label: string) =>
+    canSwap2 = ctrl.canSwap('swap2'),
+    canOffer10 = ctrl.canSwap('offer10');
+  if (!canSwap && !canSwap2 && !canOffer10) return null;
+  const colour = stratUtils.fiveInARow.nextStone(fen) === 'b-piece' ? 'Black' : 'White';
+  const choice = (action: stratUtils.fiveInARow.OpeningAction, label: string) =>
     h('button.button', { hook: util.bind('click', () => ctrl.sendSwap(action)) }, label);
+  const others = [
+    canSwap ? 'swap colours' : null,
+    canSwap2 ? 'swap colours and place 2 stones' : null,
+    canOffer10 ? 'offer 10 fifth stones for White to pick from' : null,
+  ].filter(o => o !== null);
+  const choices = others.length > 1 ? `${others.slice(0, -1).join(', ')}, or ${others[others.length - 1]}` : others[0];
   return h('div.suggestion.swap-options', [
-    h(
-      'p',
-      canSwap2
-        ? `Place a stone to play on as ${colour}, swap colours, or swap colours and place 2 stones.`
-        : `Place a stone to play on as ${colour}, or swap colours.`,
-    ),
+    h('p', `Place a stone to play on as ${colour}, or ${choices}.`),
     canSwap ? choice('swap', 'Swap') : null,
     canSwap2 ? choice('swap2', 'Swap 2') : null,
+    canOffer10 ? choice('offer10', 'Offer 10') : null,
+  ]);
+}
+
+// renju: white keeps one of black's offered stones as the fifth, then places the sixth
+function pickOptions(ctrl: RoundController) {
+  const picked = ctrl.pickedStone();
+  return h('div.suggestion.swap-options', [
+    h('p', "Select one of the offered stones to keep as Black's fifth, then place the sixth stone."),
+    h(
+      'button.button',
+      { attrs: { disabled: !picked }, hook: util.bind('click', () => ctrl.sendPick()) },
+      picked ? `Keep ${picked}` : 'Keep',
+    ),
   ]);
 }
 

@@ -66,6 +66,7 @@ $score-variants: (
   'go9x9',
   'go13x13',
   'go19x19',
+  'pente',
   'abalone',
   'grandabalone'
 );
@@ -395,6 +396,17 @@ $pocket-col1-size: 9.5vw;
   }
 }
 
+// pente's stones fill their point, so they sit smaller in the box, as in the round, on a lighter grey
+.variant-pente .game-score {
+  background-color: #d6d6d6;
+
+  piece {
+    width: 70% !important;
+    height: 70% !important;
+    margin: 15%;
+  }
+}
+
 $pocket-height-oware: 14vh;
 .analyse.variant-oware {
   grid-template-rows: $pocket-height-oware auto calc(#{$pocket-height-oware} - 3rem) 3rem;
@@ -440,7 +452,8 @@ $pocket-height-oware: 14vh;
 .variant-octagonflipello .game-score,
 .variant-go9x9 .game-score,
 .variant-go13x13 .game-score,
-.variant-go19x19 .game-score {
+.variant-go19x19 .game-score,
+.variant-pente .game-score {
   piece::after {
     @extend %active, %box-radius;
 

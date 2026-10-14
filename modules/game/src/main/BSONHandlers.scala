@@ -849,7 +849,12 @@ object BSONHandlers {
                   openingStep = r
                     .strO(F.openingStep)
                     .flatMap(_.headOption)
-                    .flatMap(fiveinarow.OpeningStep.fromFen) | fiveinarow.OpeningStep.Play
+                    .flatMap(fiveinarow.OpeningStep.fromFen) | fiveinarow.OpeningStep.Play,
+                  score = {
+                    val counts = r.intsD(F.score)
+                    Score(~counts.headOption, ~counts.lastOption)
+                  },
+                  offered = r.strO(F.offered) so { _.split(",").toList.flatMap(fiveinarow.Pos.fromKey) }
                 ),
                 variant = gameVariant
               ),
@@ -1091,7 +1096,9 @@ object BSONHandlers {
               F.historyCurrentTurn -> o.history.currentTurnUciString,
               F.blackSeat          -> (board.blackSeat == PlayerIndex.P2).option(2),
               F.openingStep        -> (board.openingStep != fiveinarow.OpeningStep.Play)
-                .option(board.openingStep.fen.toString)
+                .option(board.openingStep.fen.toString),
+              F.score              -> o.history.score.nonEmpty.option(o.history.score),
+              F.offered            -> board.offered.nonEmpty.option(board.offered.map(_.key).mkString(","))
             )
           case _ => // chess or fail
             if (o.variant.key == "standard")

@@ -83,6 +83,7 @@ object jsI18n {
     trans.perpetualWarning,
     trans.perpetualWarningOpponent,
     trans.subsequentPassWarning,
+    trans.forbiddenMoveWarning,
     trans.threefoldRepetition,
     trans.claimADraw,
     trans.drawOfferSent,

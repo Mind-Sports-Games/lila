@@ -54,6 +54,8 @@ case class History(
     grandabalone: RatingsMap,
     entropy: RatingsMap,
     gomoku: RatingsMap,
+    pente: RatingsMap,
+    renju: RatingsMap,
     ultraBullet: RatingsMap,
     bullet: RatingsMap,
     blitz: RatingsMap,
@@ -124,6 +126,8 @@ case class History(
       case "grandabalone"           => grandabalone
       case "entropy"                => entropy
       case "gomoku"                 => gomoku
+      case "pente"                  => pente
+      case "renju"                  => renju
       case "puzzle_standard"        => puzzle_standard
       case "puzzle_kingOfTheHill"   => puzzle_kingOfTheHill
       case "puzzle_atomic"          => puzzle_atomic
@@ -208,6 +212,8 @@ object History {
             grandabalone = ratingsMap("grandabalone"),
             entropy = ratingsMap("entropy"),
             gomoku = ratingsMap("gomoku"),
+            pente = ratingsMap("pente"),
+            renju = ratingsMap("renju"),
             ultraBullet = ratingsMap("ultraBullet"),
             bullet = ratingsMap("bullet"),
             blitz = ratingsMap("blitz"),

@@ -256,6 +256,15 @@ object Tv {
           familyChannel = true,
           gameFamily = "abalone"
         )
+    case object FiveInARowFamily
+        extends Channel(
+          name = s"All ${GameGroup(14).name}",
+          icon = FIRV.Gomoku.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(anyVariant(GameGroup(14).variants), noBot),
+          familyChannel = true,
+          gameFamily = "fiveinarow"
+        )
     case object BreakthroughTroykaFamily
         extends Channel(
           name = s"All ${VariantKeys.gameFamilyName(GameFamily.BreakthroughTroyka())}",
@@ -751,7 +760,25 @@ object Tv {
           icon = FIRV.Gomoku.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.FiveInARow(FIRV.Gomoku)), noBot),
-          familyChannel = true,
+          familyChannel = false,
+          gameFamily = "fiveinarow"
+        )
+    case object Pente
+        extends Channel(
+          name = VariantKeys.variantName(Variant.FiveInARow(FIRV.Pente)),
+          icon = FIRV.Pente.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.FiveInARow(FIRV.Pente)), noBot),
+          familyChannel = false,
+          gameFamily = "fiveinarow"
+        )
+    case object Renju
+        extends Channel(
+          name = VariantKeys.variantName(Variant.FiveInARow(FIRV.Renju)),
+          icon = FIRV.Renju.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.FiveInARow(FIRV.Renju)), noBot),
+          familyChannel = false,
           gameFamily = "fiveinarow"
         )
     case object Bot
@@ -838,7 +865,10 @@ object Tv {
       Abalone,
       GrandAbalone,
       Entropy,
+      FiveInARowFamily,
       Gomoku,
+      Pente,
+      Renju,
       Bot,
       Computer
     )

@@ -42,6 +42,12 @@ export interface SocketPass {
   variant: string;
   b?: 1;
 }
+export interface SocketSelectSquares {
+  variant: string;
+  lib: number;
+  s: string;
+  b?: 1;
+}
 export interface SocketDoRoll {
   variant: string;
   b?: 1;

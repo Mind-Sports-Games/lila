@@ -16,6 +16,7 @@ import strategygames.{
   MoveMetrics,
   Pass as StratPass,
   SelectSquares as StratSelectSquares,
+  Offer10 as StratOffer10,
   Swap as StratSwap,
   Swap2 as StratSwap2,
   Status,
@@ -224,6 +225,7 @@ final private class Player(
         case ss: StratSelectSquares => ss.toUci.uci
         case sw: StratSwap          => sw.toUci.uci
         case sw2: StratSwap2        => sw2.toUci.uci
+        case o: StratOffer10        => o.toUci.uci
       }
     )
 

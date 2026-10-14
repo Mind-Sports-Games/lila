@@ -1,5 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
+import { fiveInARow } from 'stratutils';
 import * as chessground from './ground';
 import { Coords as CgCoords } from 'chessground/types';
 import {
@@ -391,6 +392,7 @@ function renderPlayerScore(
   position: Position,
   playerIndex: string,
   variantKey: VariantKey,
+  fen: string,
 ): VNode | undefined {
   const defaultMancalaRole = 's';
   const children: VNode[] = [];
@@ -421,6 +423,10 @@ function renderPlayerScore(
   } else if (variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19') {
     children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-top' + '.' + playerIndex, children);
+  } else if (variantKey === 'pente') {
+    const stone = fiveInARow.seatColor(fen, playerIndex as PlayerIndex) === 'black' ? 'b-piece' : 'w-piece';
+    children.push(h(`piece.${stone}.${playerIndex}`, { attrs: { 'data-score': score } }));
+    return h('div.game-score.game-score-top.' + playerIndex + '.captures', { attrs: { title: 'Captures' } }, children);
   } else if (variantKey === 'backgammon' || variantKey === 'hyper' || variantKey === 'nackgammon') {
     for (let i = 0; i < score; i++) {
       children.push(h('piece.side-piece.' + playerIndex + (i === 0 ? ' first' : '')));
@@ -559,12 +565,11 @@ export default function (ctrl: AnalyseCtrl): VNode {
         'go9x9',
         'go13x13',
         'go19x19',
-        'gomoku',
       ].includes(variantKey) &&
-      !((gaugeOn || !!playerBars) && ['octagonflipello', 'go9x9', 'go13x13', 'go19x19', 'gomoku'].includes(variantKey)),
+      !((gaugeOn || !!playerBars) && ['octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey)),
     needsNoCoords =
       ctrl.embed ||
-      (['shogi', 'minishogi', 'octagonflipello', 'go9x9', 'go13x13', 'go19x19', 'gomoku'].includes(variantKey) &&
+      (['shogi', 'minishogi', 'octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey) &&
         (gaugeOn || !!playerBars)) ||
       (['xiangqi', 'minixiangqi'].includes(variantKey) && !!playerBars), // coordinates for xiangqi game family only label columns // Oware has a short height, which means we can display coords, even with player bars
     tour = relayTour(ctrl),
@@ -604,7 +609,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
       }
       case 'go9x9':
       case 'go13x13':
-      case 'go19x19': {
+      case 'go19x19':
+      case 'pente': {
         const p1Score = getScoreFromFen(variantKey, fen, 'p1');
         const p2Score = getScoreFromFen(variantKey, fen, 'p2');
         topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
@@ -645,6 +651,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'grandabalone',
     'entropy',
     'gomoku',
+    'pente',
+    'renju',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';
@@ -714,7 +722,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
             ],
           ),
         gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,
-        tour || !showScoreBox ? null : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
+        tour || !showScoreBox ? null : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey, fen),
         tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'top'),
         tour || !showScoreBox ? null : renderPlayerScoreNames(ctrl),
         tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
@@ -736,7 +744,9 @@ export default function (ctrl: AnalyseCtrl): VNode {
                       retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),
                     ]),
               ])),
-        tour || !showScoreBox ? null : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey),
+        tour || !showScoreBox
+          ? null
+          : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey, fen),
         tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'bottom'),
         tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
         gamebookPlayView || tour ? null : controls(ctrl),

@@ -1,5 +1,5 @@
 $go-variants: ('go9x9', 'go13x13', 'go19x19');
-$fiveinarow-variants: ('gomoku');
+$fiveinarow-variants: ('gomoku', 'pente', 'renju');
 // both play stones on the line intersections, so their coords line up with the lines
 $intersection-variants: join($go-variants, $fiveinarow-variants, comma);
 $forced-outer-coords-variants: join(

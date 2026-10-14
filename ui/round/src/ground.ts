@@ -116,9 +116,17 @@ export function makeConfig(ctrl: RoundController): Config {
       },
     },
     dropmode: {
-      showDropDests: !['go9x9', 'go13x13', 'go19x19', 'gomoku', 'backgammon', 'hyper', 'nackgammon'].includes(
-        data.game.variant.key,
-      ),
+      showDropDests: ![
+        'go9x9',
+        'go13x13',
+        'go19x19',
+        'gomoku',
+        'pente',
+        'renju',
+        'backgammon',
+        'hyper',
+        'nackgammon',
+      ].includes(data.game.variant.key),
       dropDests: playing ? stratUtils.readDropsByRole(data.possibleDropsByRole) : new Map(),
       active: data.onlyDropsVariant && playing ? true : false,
       piece:
@@ -178,7 +186,7 @@ export function makeConfig(ctrl: RoundController): Config {
                           ? 'https://playstrategy.org/assets/piece/entropy/' +
                             data.pref.pieceSet.filter(ps => ps.gameFamily === 'entropy')[0].name +
                             '/'
-                          : variantKey === 'gomoku'
+                          : variantKey === 'gomoku' || variantKey === 'pente' || variantKey === 'renju'
                             ? 'https://playstrategy.org/assets/piece/fiveinarow/' +
                               data.pref.pieceSet.filter(ps => ps.gameFamily === 'fiveinarow')[0].name +
                               '/'

@@ -8,7 +8,7 @@ import play.api.libs.json.JsObject
 
 import lila.tree.Branch
 
-// five in a row's swap and swap2, which change no stone on the board
+// five in a row's swap and swap2, which change no stone on the board, only who plays which colour
 case class AnaSwap(
     variant: Variant,
     fen: FEN,
@@ -47,12 +47,12 @@ case class AnaSwap(
 
 object AnaSwap {
 
-  def parse(o: JsObject, swap2: Boolean): Option[AnaSwap] =
+  def parse(o: JsObject, swap2: Boolean) =
     for {
       d <- o.obj("d")
       gl = GameLogic(d.int("lib").getOrElse(GameLogic.FiveInARow().id))
       v  = Variant.orDefault(gl, ~d.str("variant"))
-      fen  <- d.str("fen").map { fen => FEN.apply(gl, fen) }
+      fen  <- d.str("fen") map { fen => FEN.apply(gl, fen) }
       path <- d.str("path")
     } yield AnaSwap(
       variant = v,

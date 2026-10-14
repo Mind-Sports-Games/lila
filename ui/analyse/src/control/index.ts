@@ -37,6 +37,7 @@ export interface ControlConfig {
     onSelectDice?(dice: unknown[]): void;
     onButtonClick?(button: string): void;
     onUserLift?(dest: string): void;
+    onSelect?(key: string): void;
   };
 
   // Dests / ground refresh

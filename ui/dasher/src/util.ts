@@ -128,6 +128,8 @@ export function convertVariantKeyToGameFamily(variantKey: VariantKey | DraughtsV
     case 'entropy':
       return 'entropy';
     case 'gomoku':
+    case 'pente':
+    case 'renju':
       return 'fiveinarow';
     default:
       return 'chess';

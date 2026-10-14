@@ -334,7 +334,9 @@ final class User(
                   "abalone"                -> leaderboards.abalone,
                   "grandabalone"           -> leaderboards.grandabalone,
                   "entropy"                -> leaderboards.entropy,
-                  "gomoku"                 -> leaderboards.gomoku
+                  "gomoku"                 -> leaderboards.gomoku,
+                  "pente"                  -> leaderboards.pente,
+                  "renju"                  -> leaderboards.renju
                 )
               )
             }

@@ -402,6 +402,16 @@ object GameDiff {
           (step: strategygames.fiveinarow.OpeningStep) =>
             (step != strategygames.fiveinarow.OpeningStep.Play).option(BSONString(step.fen.toString))
         )
+        dOpt(
+          score,
+          _.history.score,
+          (o: Score) => o.nonEmpty so { BSONHandlers.scoreWriter writeOpt o }
+        )
+        dOpt(
+          offered,
+          fiveInARowBoard(_).offered,
+          (o: List[strategygames.fiveinarow.Pos]) => o.nonEmpty.option(BSONString(o.map(_.key).mkString(",")))
+        )
       }
       case GameLogic.Dameo() => {
         dTry(oldPgn, _.actionStrs, writeBytes compose newLibStorageWriter)

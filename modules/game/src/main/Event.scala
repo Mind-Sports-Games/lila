@@ -29,6 +29,7 @@ import strategygames.{
   SelectSquares as StratSelectSquares,
   Situation,
   Status,
+  Offer10 as StratOffer10,
   Swap as StratSwap,
   Swap2 as StratSwap2,
   Undo as StratUndo
@@ -1001,7 +1002,7 @@ object Event {
       )
   }
 
-  // five in a row's swap and swap2: the board is unchanged, the typ names the action
+  // five in a row's swap, swap2 and offer10: the board is unchanged, the typ names the action
   case class Swap(
       gf: GameFamily,
       uci: String,
@@ -1070,6 +1071,9 @@ object Event {
 
     def apply(swap2: StratSwap2, situation: Situation, state: State, clock: Option[ClockEvent]): Swap =
       apply(swap2.toUci.uci, swap2.player, situation, state, clock)
+
+    def apply(offer10: StratOffer10, situation: Situation, state: State, clock: Option[ClockEvent]): Swap =
+      apply(offer10.toUci.uci, offer10.player, situation, state, clock)
   }
 
   case class CubeAction(

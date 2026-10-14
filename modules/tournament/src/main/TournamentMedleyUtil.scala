@@ -101,7 +101,9 @@ object TournamentMedleyUtil {
       "abalone"                -> slow,
       "grandabalone"           -> slow,
       "entropy"                -> slow,
-      "gomoku"                 -> medium
+      "gomoku"                 -> medium,
+      "pente"                  -> medium,
+      "renju"                  -> medium
     )
   }
 

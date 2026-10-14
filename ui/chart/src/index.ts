@@ -219,4 +219,6 @@ export const oppositeColorVariants = [
   'go13x13',
   'go19x19',
   'gomoku',
+  'pente',
+  'renju',
 ];

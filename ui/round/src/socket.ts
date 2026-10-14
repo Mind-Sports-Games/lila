@@ -89,6 +89,7 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
     drawcounter: ctrl.apiAction,
     swap: ctrl.apiAction,
     swap2: ctrl.apiAction,
+    offer10: ctrl.apiAction,
     endturn: ctrl.apiAction,
     undo: ctrl.apiAction,
     cubeaction: ctrl.apiAction,

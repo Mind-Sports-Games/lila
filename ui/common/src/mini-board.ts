@@ -80,9 +80,9 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
                               ? { width: 9, height: 9 }
                               : $el.hasClass('variant-go13x13')
                                 ? { width: 13, height: 13 }
-                                : $el.hasClass('variant-gomoku')
+                                : $el.hasClass('variant-gomoku') || $el.hasClass('variant-renju')
                                   ? { width: 15, height: 15 }
-                                  : $el.hasClass('variant-go19x19')
+                                  : $el.hasClass('variant-go19x19') || $el.hasClass('variant-pente')
                                     ? { width: 19, height: 19 }
                                     : $el.hasClass('variant-backgammon') ||
                                         $el.hasClass('variant-hyper') ||

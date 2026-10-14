@@ -311,6 +311,10 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
             trans.gameFinished.txt()
           case Variant.FiveInARow(strategygames.fiveinarow.variant.Gomoku) =>
             trans.gameFinished.txt()
+          case Variant.FiveInARow(strategygames.fiveinarow.variant.Pente) =>
+            trans.gameFinished.txt()
+          case Variant.FiveInARow(strategygames.fiveinarow.variant.Renju) =>
+            trans.gameFinished.txt()
           case _ => trans.variantEnding.txt()
         }
       case _ => ""

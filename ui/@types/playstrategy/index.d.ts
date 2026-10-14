@@ -324,7 +324,9 @@ declare type VariantKey =
   | 'abalone'
   | 'grandabalone'
   | 'entropy'
-  | 'gomoku';
+  | 'gomoku'
+  | 'pente'
+  | 'renju';
 
 declare type DraughtsVariantKey =
   | 'international'
@@ -395,7 +397,9 @@ declare type Perf =
   | 'abalone'
   | 'grandabalone'
   | 'entropy'
-  | 'gomoku';
+  | 'gomoku'
+  | 'pente'
+  | 'renju';
 
 //declare type Color = 'white' | 'black';
 declare type PlayerName =

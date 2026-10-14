@@ -83,6 +83,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     events: {
       move: ctrl.userMove,
       dropNewPiece: ctrl.userNewPiece,
+      select: hooks.onSelect,
       selectDice: hooks.onSelectDice,
       buttonClick: hooks.onButtonClick,
       insert(elements: cg.Elements) {
@@ -145,7 +146,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
                             ? 'https://playstrategy.org/assets/piece/entropy/' +
                               d.pref.pieceSet.filter(ps => ps.gameFamily === 'entropy')[0].name +
                               '/'
-                            : cgVariantKey === 'gomoku'
+                            : cgVariantKey === 'gomoku' || cgVariantKey === 'pente' || cgVariantKey === 'renju'
                               ? 'https://playstrategy.org/assets/piece/fiveinarow/' +
                                 d.pref.pieceSet.filter(ps => ps.gameFamily === 'fiveinarow')[0].name +
                                 '/'

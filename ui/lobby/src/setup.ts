@@ -858,7 +858,17 @@ export default class Setup {
           key = 'entropy';
           break;
         case '15':
-          key = 'gomoku';
+          switch (variantId[1]) {
+            case '1':
+              key = 'gomoku';
+              break;
+            case '2':
+              key = 'pente';
+              break;
+            case '4':
+              key = 'renju';
+              break;
+          }
           break;
       }
       const $selected = $ratings

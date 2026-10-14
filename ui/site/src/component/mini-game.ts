@@ -1,7 +1,7 @@
 import { Coords as CgCoords } from 'chessground/types';
 import * as domData from 'common/data';
 import { variantFromElement } from 'common/mini-board';
-import { displayScore, fenPlayerIndex, parseLastMove, backgammon as bgUtils, gomoku } from 'stratutils';
+import { displayScore, fenPlayerIndex, parseLastMove, backgammon as bgUtils, fiveInARow } from 'stratutils';
 import clockWidget from './clock-widget';
 
 interface UpdateData {
@@ -96,9 +96,9 @@ export const init = (node: HTMLElement) => {
                               ? { width: 9, height: 9 }
                               : $el.hasClass('variant-go13x13')
                                 ? { width: 13, height: 13 }
-                                : $el.hasClass('variant-gomoku')
+                                : $el.hasClass('variant-gomoku') || $el.hasClass('variant-renju')
                                   ? { width: 15, height: 15 }
-                                  : $el.hasClass('variant-go19x19')
+                                  : $el.hasClass('variant-go19x19') || $el.hasClass('variant-pente')
                                     ? { width: 19, height: 19 }
                                     : $el.hasClass('variant-backgammon') ||
                                         $el.hasClass('variant-hyper') ||
@@ -189,9 +189,9 @@ export const update = (node: HTMLElement, data: UpdateData) => {
   renderClock(data.p1, data.p1Delay, data.p1Pending, 'p1');
   renderClock(data.p2, data.p2Delay, data.p2Pending, 'p2');
 
-  if (gomoku.isGomoku(variantFromElement($el)))
+  if (fiveInARow.isFiveInARow(variantFromElement($el)))
     (['p1', 'p2'] as const).forEach(playerIndex =>
-      gomoku.setSeatColorIcon(
+      fiveInARow.setSeatColorIcon(
         node.querySelector(`.mini-game__score--${playerIndex}`)?.parentElement?.querySelector('.mini-game__user'),
         data.fen,
         playerIndex,

@@ -26,6 +26,10 @@ trait ChessgroundHelper {
           if (ctx.pref.is3d) ""
           else {
             // TODO we shouldn't be unwrapping Pos here. And does this work with different board sizes? Why a fixed 7?
+            val fiveInARowSize = board match {
+              case Board.FiveInARow(b) => b.boardSize.width
+              case _                   => 15
+            }
             def top(p: Pos) = p match {
               case Pos.Chess(p)        => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case Pos.Dameo(p)        => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
@@ -36,7 +40,8 @@ trait ChessgroundHelper {
               case Pos.Backgammon(p)   => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case Pos.Abalone(p)      => orient.fold(8 - p.y, p.y - 1) * 12.5
               case Pos.Entropy(p)      => orient.fold(6 - p.rank.index, p.rank.index) * 100.0 / 7
-              case Pos.FiveInARow(p)   => orient.fold(14 - p.rank.index, p.rank.index) * 100.0 / 15
+              case Pos.FiveInARow(p)   =>
+                orient.fold(fiveInARowSize - 1 - p.rank.index, p.rank.index) * 100.0 / fiveInARowSize
               case _                   => sys.error("Invalid Pos type")
             }
             def left(p: Pos) = p match {
@@ -49,7 +54,8 @@ trait ChessgroundHelper {
               case Pos.Backgammon(p)   => orient.fold(p.file.index, 7 - p.file.index) * 12.5
               case Pos.Abalone(p)      => orient.fold(p.x - 1, 8 - p.x) * 12.5
               case Pos.Entropy(p)      => orient.fold(p.file.index, 6 - p.file.index) * 100.0 / 7
-              case Pos.FiveInARow(p)   => orient.fold(p.file.index, 14 - p.file.index) * 100.0 / 15
+              case Pos.FiveInARow(p)   =>
+                orient.fold(p.file.index, fiveInARowSize - 1 - p.file.index) * 100.0 / fiveInARowSize
               case _                   => sys.error("Invalid Pos type")
             }
             val highlights = ctx.pref.highlight so lastMove.distinct.map { pos =>

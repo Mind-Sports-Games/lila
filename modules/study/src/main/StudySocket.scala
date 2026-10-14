@@ -21,8 +21,10 @@ import lila.socket.{
   AnaEndTurn,
   AnaLift,
   AnaMove,
+  AnaOffer10,
   AnaPass,
   AnaRoll,
+  AnaSelectSquares,
   AnaSwap
 }
 import lila.tree.Node.{ defaultNodeJsonWriter, Comment, Gamebook, Shape, Shapes }
@@ -119,6 +121,14 @@ final private class StudySocket(
         case t @ ("anaSwap" | "anaSwap2") =>
           AnaSwap.parse(o, swap2 = t == "anaSwap2") foreach { swap =>
             who foreach gameAction(studyId, swap, MoveOpts.parse(o))
+          }
+        case "anaOffer10" =>
+          AnaOffer10.parse(o) foreach { offer10 =>
+            who foreach gameAction(studyId, offer10, MoveOpts.parse(o))
+          }
+        case "anaSelectSquares" =>
+          AnaSelectSquares.parse(o) foreach { selectSquares =>
+            who foreach gameAction(studyId, selectSquares, MoveOpts.parse(o))
           }
         case "deleteNode" =>
           reading[AtPosition](o) { position =>

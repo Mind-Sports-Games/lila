@@ -15,6 +15,7 @@ import {
   EditChapterData,
 } from './study/interfaces';
 import { FormData as StudyFormData } from './study/studyForm';
+import type { fiveInARow } from 'stratutils';
 
 interface DestsCache {
   [fen: string]: AnaDests;
@@ -63,7 +64,8 @@ export type StudySocketSendParams =
   | [t: 'anaDrop', d: AnaDrop & MoveOpts]
   | [t: 'anaLift', d: AnaLift & MoveOpts]
   | [t: 'anaPass', d: AnaPass & MoveOpts]
-  | [t: 'anaSwap' | 'anaSwap2', d: AnaPass & MoveOpts]
+  | [t: 'anaSwap' | 'anaSwap2' | 'anaOffer10', d: AnaPass & MoveOpts]
+  | [t: 'anaSelectSquares', d: AnaPass & { s: string } & MoveOpts]
   | [t: 'anaRoll', d: AnaRoll & MoveOpts]
   | [t: 'anaDrawCounter', d: AnaDrawCounter & MoveOpts]
   | [t: 'anaEndTurn', d: AnaEndTurn & MoveOpts]
@@ -92,7 +94,8 @@ export interface Socket {
   sendAnaDrop(d: AnaDrop): void;
   sendAnaLift(d: AnaLift): void;
   sendAnaPass(d: AnaPass): void;
-  sendAnaSwap(action: 'swap' | 'swap2', d: AnaPass): void;
+  sendAnaSwap(action: fiveInARow.OpeningAction, d: AnaPass): void;
+  sendAnaPick(d: AnaPass & { s: string }): void;
   sendAnaRoll(d: AnaRoll): void;
   sendAnaDrawCounter(d: AnaDrawCounter): void;
   sendAnaEndTurn(d: AnaEndTurn): void;
@@ -233,12 +236,20 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     anaMoveTimeout = setTimeout(() => sendAnaPass(req), 3000);
   }
 
-  function sendAnaSwap(action: 'swap' | 'swap2', req: AnaPass) {
+  function sendAnaSwap(action: fiveInARow.OpeningAction, req: AnaPass) {
     clearTimeout(anaMoveTimeout);
     withoutStandardVariant(req);
     addStudyData(req, true);
-    send(action === 'swap' ? 'anaSwap' : 'anaSwap2', req);
+    send(action === 'swap' ? 'anaSwap' : action === 'swap2' ? 'anaSwap2' : 'anaOffer10', req);
     anaMoveTimeout = setTimeout(() => sendAnaSwap(action, req), 3000);
+  }
+
+  function sendAnaPick(req: AnaPass & { s: string }) {
+    clearTimeout(anaMoveTimeout);
+    withoutStandardVariant(req);
+    addStudyData(req, true);
+    send('anaSelectSquares', req);
+    anaMoveTimeout = setTimeout(() => sendAnaPick(req), 3000);
   }
 
   function sendAnaRoll(req: AnaRoll) {
@@ -279,6 +290,7 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     sendAnaLift,
     sendAnaPass,
     sendAnaSwap,
+    sendAnaPick,
     sendAnaRoll,
     sendAnaDrawCounter,
     sendAnaEndTurn,

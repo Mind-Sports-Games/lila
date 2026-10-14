@@ -19,7 +19,16 @@ export function allowAnalysisForVariant(variant: VariantKey) {
 
 // need to support interactive lesson mode within a study
 // doesn't work for multiaction games yet
-const noGameBookVariants: string[] = ['monster', 'amazons', 'backgammon', 'hyper', 'nackgammon', 'gomoku'];
+const noGameBookVariants: string[] = [
+  'monster',
+  'amazons',
+  'backgammon',
+  'hyper',
+  'nackgammon',
+  'gomoku',
+  'pente',
+  'renju',
+];
 
 // Means that the interactive lesson (gamebook) in studies on playstrategy will work.
 export function allowGameBookStudyForVariant(variant: VariantKey) {

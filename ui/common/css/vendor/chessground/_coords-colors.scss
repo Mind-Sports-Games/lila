@@ -25,8 +25,7 @@
   --cg-coord-color-entropy: #fff;
   --cg-coord-shadow-entropy: 0 1px 2px #000;
 
-  --cg-coord-color-gomoku: #fff;
-  --cg-coord-shadow-gomoku: 0 1px 2px #000;
+  --cg-coord-color-fiveinarow: #fff;
 }
 
 coords {
@@ -225,13 +224,14 @@ coords {
     }
   }
 }
-.variant-gomoku {
+.variant-gomoku,
+.variant-pente,
+.variant-renju {
   cg-coords-container {
     coords.ranks,
     coords.files {
       coord:nth-child(n) {
-        text-shadow: var(--cg-coord-shadow-gomoku);
-        color: var(--cg-coord-color-gomoku);
+        color: var(--cg-coord-color-fiveinarow);
       }
     }
   }
