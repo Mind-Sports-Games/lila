@@ -213,7 +213,7 @@ object side {
     )
 
   // series worth following edition to edition; hourlies, dailies and one-offs are not
-  private def isSeries(tour: Tournament) =
+  def isSeries(tour: Tournament) =
     tour.schedule.exists { s =>
       !Set[Schedule.Freq](Schedule.Freq.Hourly, Schedule.Freq.Daily, Schedule.Freq.Unique).contains(s.freq)
     }

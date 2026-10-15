@@ -26,7 +26,7 @@ object show {
       title = s"${tour.name()} • ${showEnglishDate(tour.startsAt)}",
       moreJs = frag(
         jsModule("tournament"),
-        eventJsonLd(tour),
+        (!tour.isFinished && side.isSeries(tour)).option(eventJsonLd(tour)),
         embedJsUnsafeLoadThen(s"""PlayStrategyTournament(${safeJsonValue(
             Json.obj(
               "data"   -> data,
@@ -95,7 +95,8 @@ object show {
       )
     )
 
-  // tournaments are events: structured data makes them eligible for event rich results
+  // an upcoming edition of a series, as an event for rich results; never a past one, as schema.org
+  // has no status for an event that is over
   private def eventJsonLd(tour: Tournament)(implicit ctx: Context) =
     raw(
       s"""<script type="application/ld+json">${safeJsonValue(
