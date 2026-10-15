@@ -75,18 +75,24 @@ div.analyse .analyse__side {
 }
 
 /* Body copy under the board. It starts in main.analyse, which the analyse app empties on mount, so
-   the app lifts it into its grid. The per-variant layouts each restate grid-template-areas, so no
-   area name is shared by all of them: from two columns up the block asks for the last column and
-   lets the grid put it on the first free row, which is under the tools panel (and under the
-   advice list of a game that has one). On one column it simply comes last. */
+   the app lifts it into its grid. On one column it comes after every row, the FEN and PGN included;
+   on two, in the last column's first free row; on three, in the acpl area beside the FEN and PGN,
+   which every three-column layout has and a free board leaves empty. */
 .analyse__about {
+  grid-row: -1 / span 1;
   margin: $block-gap 1em;
   font-size: 0.85em;
   color: $c-font-dim;
 
   @include breakpoint($mq-col2) {
+    grid-row: auto;
     grid-column: -2 / -1;
     margin: $block-gap 0 0;
+  }
+
+  @include breakpoint($mq-col3) {
+    grid-area: acpl;
+    margin: 0;
   }
 
   h2 {
