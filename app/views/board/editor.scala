@@ -7,6 +7,7 @@ import lila.api.Context
 import lila.app.templating.Environment.*
 import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
+import views.html.library.bits as libraryBits
 
 object editor {
 
@@ -62,12 +63,12 @@ object editor {
     frag(
       h2(
         a(href := routes.Library.variant(variant.key))(
-          trans.aboutX(views.html.library.bits.searchName(variant))
+          trans.aboutX(libraryBits.searchName(variant))
         )
       ),
-      p(views.html.library.bits.objectiveSentence(variant)),
-      p(views.html.library.bits.editorDescription(variant)),
-      views.html.library.bits.hasLibraryPages(variant).option(
+      p(libraryBits.objectiveSentence(variant)),
+      p(libraryBits.editorDescription(variant)),
+      libraryBits.hasLibraryPages(variant).option(
         p(cls := "editor__about__links")(
           a(cls := "button", href := s"/?variant=${variant.key}#game")(trans.createAGame())
         )

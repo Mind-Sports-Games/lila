@@ -15,9 +15,11 @@ import lila.common.extensions.*
 import lila.hub.LightTeam.*
 import lila.memo.CacheApi.*
 import lila.tournament.TournamentForm
-import lila.tournament.{ ShieldTableApi, Tournament as Tour, VisibleTournaments }
+import lila.tournament.{ Schedule, ShieldTableApi, TournamentShield, VisibleTournaments }
+import lila.tournament.Tournament as Tour
 import lila.swiss.Swiss as LSwiss
 import lila.user.User as UserModel
+import views.html.library.bits as libraryBits
 
 final class Tournament(
     env: Env,
@@ -36,9 +38,9 @@ final class Tournament(
   private val msoHistoryCache =
     env.memo.cacheApi.unit[List[html.tournament.msoHistory.Edition]] {
       _.refreshAfterWrite(1.day).buildAsyncFuture { _ =>
-        val team = views.html.library.bits.msoTeamId
+        val team = libraryBits.msoTeamId
         repo.finishedOfTeam(team, List(lila.common.Freq.MSOGP), List(lila.common.Freq.MSO21)) zip
-          env.swiss.api.finishedNamedAll(team, views.html.library.bits.msoGrandPrixName) map {
+          env.swiss.api.finishedNamedAll(team, libraryBits.msoGrandPrixName) map {
             case (arenas, swisses) =>
               (arenas.map(Left(_)) ::: swisses.map(Right(_))).sortBy {
                 case Left(t)  => -t.startsAt.getMillis
@@ -650,11 +652,11 @@ final class Tournament(
         case None                        => notFound
         case Some(v) if v.key != variant =>
           MovedPermanently(routes.Tournament.historyVariant(freq, v.key, page).url).fuccess
-        case Some(_) if !lila.tournament.Schedule.Freq(freq).exists(html.tournament.history.hasSeries) =>
+        case Some(_) if !Schedule.Freq(freq).exists(html.tournament.history.hasSeries) =>
           MovedPermanently(routes.Tournament.history(freq, page).url).fuccess
         case Some(v)
-            if lila.tournament.Schedule.Freq(freq).contains(lila.tournament.Schedule.Freq.Shield) &&
-              lila.tournament.TournamentShield.Category.byKey(v.key).isDefined =>
+            if Schedule.Freq(freq).contains(Schedule.Freq.Shield) &&
+              TournamentShield.Category.byKey(v.key).isDefined =>
           MovedPermanently(routes.Tournament.categShields(v.key).url).fuccess
         case Some(v) => renderHistory(freq, page, v.some)
       }
@@ -663,7 +665,7 @@ final class Tournament(
   def historyGroup(freq: String, group: String, page: Int) =
     Open { implicit ctx =>
       val history = views.html.tournament.history
-      (history.groupByKey(group), lila.tournament.Schedule.Freq(freq).filter(history.hasSeries)) match {
+      (history.groupByKey(group), Schedule.Freq(freq).filter(history.hasSeries)) match {
         case (None, _)       => notFound
         case (Some(_), None) => MovedPermanently(routes.Tournament.history(freq, page).url).fuccess
         case (Some(g), Some(f)) =>
@@ -681,10 +683,10 @@ final class Tournament(
       v: Option[Variant],
       group: Option[strategygames.GameGroup] = None
   )(implicit ctx: Context) =
-    lila.tournament.Schedule.Freq(freq) so { fr =>
+    Schedule.Freq(freq) so { fr =>
       for {
         pager <- api.history(fr, page, v.map(List(_)) orElse group.map(_.variants) getOrElse Nil)
-        summary <- v.filter(_ => fr == lila.tournament.Schedule.Freq.Yearly).so { variant =>
+        summary <- v.filter(_ => fr == Schedule.Freq.Yearly).so { variant =>
           repo.finishedSeries(fr, variant) zip repo.nextScheduled(fr, variant) map { case (all, next) =>
             html.tournament.history.Summary(all, next).some
           }

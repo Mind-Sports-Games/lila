@@ -93,7 +93,9 @@ object bits {
       )
     )
 
-  def canUnfeature(implicit ctx: Context) = isGranted(_.StudyAdmin) || isGranted(_.Shadowban)
+  def canUnfeature(u: lila.user.User) =
+    lila.security.Granter(_.StudyAdmin)(u) || lila.security.Granter(_.Shadowban)(u)
+  def canUnfeature(implicit ctx: Context): Boolean = ctx.me.exists(canUnfeature)
 
   // mods: an unfeatured study wears its state, and the tag puts it back in the listings
   private def featureForm(s: lila.study.Study.WithChaptersAndLiked) =

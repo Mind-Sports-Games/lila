@@ -208,7 +208,9 @@ object show {
     val tutorial = bits.studyLink(variant)
     val others   = studies.filterNot(s => tutorial.has(s.study.id.value)).take(6)
     others.nonEmpty.option(
-      div(cls := List("library__studies" -> true, "library__studies--beside-leaderboard" -> besideLeaderboard))(
+      div(
+        cls := List("library__studies" -> true, "library__studies--beside-leaderboard" -> besideLeaderboard)
+      )(
         div(cls := "color-choice title")(
           div(dataIcon := "4"),
           h2(trans.libraryStudies()),
@@ -231,7 +233,8 @@ object show {
   // the game it derives from, the games derived from it, then the ones merely alike
   private def relatedSection(variant: Variant)(implicit ctx: Context) = {
     val related =
-      (bits.parentVariant(variant).toList ::: bits.childVariants(variant) ::: bits.relatedVariants(variant)).distinct
+      (bits.parentVariant(variant).toList ::: bits.childVariants(variant) ::: bits.relatedVariants(variant))
+        .distinct
     related.nonEmpty.option {
       div(cls := "library-related")(
         h2(trans.relatedGames()),
@@ -264,13 +267,10 @@ object show {
           div(" ")
         ),
         p {
-          // raw HTML: a string argument would be escaped
-          val msoLink =
-            raw(a(href := routes.Page.lonePage("mind-sports-olympiad"))("Mind Sports Olympiad").render)
-          def gamesLink(id: String) = raw(a(href := routes.Study.show(id))(trans.msoGamesLink()).render)
-          val grandPrixLink =
-            if (bits.hasMsoOnline(variant))
-              raw(a(href := routes.Tournament.msoHistory)(trans.msoGrandPrix()).render)
+          val msoLink = a(href := routes.Page.lonePage("mind-sports-olympiad"))("Mind Sports Olympiad")
+          def gamesLink(id: String) = a(href := routes.Study.show(id))(trans.msoGamesLink())
+          val grandPrixLink: Frag =
+            if (bits.hasMsoOnline(variant)) a(href := routes.Tournament.msoHistory)(trans.msoGrandPrix())
             else trans.msoGrandPrix()
           mso match {
             // the games of an event are in a study only once somebody has recorded them

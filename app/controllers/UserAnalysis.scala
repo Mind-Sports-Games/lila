@@ -13,6 +13,7 @@ import lila.app.*
 import lila.game.Pov
 import lila.round.Forecast.{ forecastJsonWriter, forecastStepJsonFormat }
 import lila.round.JsonView.WithFlags
+import views.html.library.bits as libraryBits
 
 final class UserAnalysis(
     env: Env,
@@ -28,7 +29,7 @@ final class UserAnalysis(
     Variant.byKey.get(key).exists(views.html.board.userAnalysis.analysisVariants.contains)
 
   private def aliasRedirect(key: String, rest: String = "") =
-    views.html.library.bits.canonicalVariantKey(key) map { canonical =>
+    libraryBits.canonicalVariantKey(key) map { canonical =>
       Open { implicit ctx =>
         if (hasAnalysisBoard(canonical))
           fuccess(MovedPermanently(routes.UserAnalysis.parseArg(s"$canonical$rest").url))
@@ -75,7 +76,7 @@ final class UserAnalysis(
   // only a variant key gets a localised URL, never a pasted position; the same gate as the
   // bare URL, so /fr/analysis/<key> never serves a board the English page refuses
   def langLoad(lang: String, key: String) =
-    views.html.library.bits.canonicalVariantKey(key) match {
+    libraryBits.canonicalVariantKey(key) match {
       case Some(canonical) if hasAnalysisBoard(canonical) =>
         Action(MovedPermanently(routes.UserAnalysis.langLoad(lang, canonical).url))
       case Some(_) => Open { implicit ctx => notFound }

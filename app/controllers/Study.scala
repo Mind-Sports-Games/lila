@@ -152,7 +152,7 @@ final class Study(
   def byVariant(key: String, order: String, page: Int) =
     Open { implicit ctx =>
       Reasonable(page) {
-        strategygames.variant.Variant.all.find(_.key == key) match {
+        strategygames.variant.Variant.byKey.get(key) match {
           case None          => notFound
           case Some(variant) =>
             env.study.pager.byVariant(variant, ctx.me, Order(order), page) map { pag =>
@@ -392,7 +392,7 @@ final class Study(
 
   // featured: in the listings, indexable and in the sitemap; unfeatured still opens by its URL
   def feature(id: String) =
-    SecureF(canUnfeature) { implicit ctx => me =>
+    SecureF(html.study.bits.canUnfeature) { implicit ctx => me =>
       OptionFuResult(env.study.api.byId(id)) { study =>
         env.study.studyRepo.feature(study.id) >>
           env.mod.logApi.studyFeature(me.id, study.id.value, study.name.value) inject
@@ -401,7 +401,7 @@ final class Study(
     }
 
   def featureByOwner(username: String, v: Boolean) =
-    SecureF(canUnfeature) { implicit ctx => me =>
+    SecureF(html.study.bits.canUnfeature) { implicit ctx => me =>
       OptionFuResult(env.user.repo.named(username)) { owner =>
         env.study.studyRepo.setTrashByOwner(owner.id, !v) flatMap { nb =>
           env.mod.logApi.studyFeatureByOwner(me.id, owner.id, v, nb) inject
@@ -409,8 +409,6 @@ final class Study(
         }
       }
     }
-
-  private def canUnfeature(u: lila.user.User) = isGranted(_.StudyAdmin, u) || isGranted(_.Shadowban, u)
 
   def embed(id: String, chapterId: String) =
     Action.async { implicit req =>

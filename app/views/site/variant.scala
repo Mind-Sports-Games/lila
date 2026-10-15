@@ -7,6 +7,7 @@ import lila.app.ui.ScalatagsTemplate.*
 import lila.i18n.VariantKeys
 
 import strategygames.variant.Variant
+import views.html.library.bits as libraryBits
 
 object variant {
 
@@ -17,13 +18,13 @@ object variant {
   )(implicit ctx: Context) =
     layout(
       active = variant.some,
-      title = views.html.library.bits.rulesTitle(variant),
+      title = libraryBits.rulesTitle(variant),
       klass = "box-pad page variant",
       openGraph = lila.app.ui
         .OpenGraph(
-          title = views.html.library.bits.rulesTitle(variant),
+          title = libraryBits.rulesTitle(variant),
           url = s"$netBaseUrl${routes.Page.variant(variant.key).url}",
-          description = views.html.library.bits.rulesDescription(variant)
+          description = libraryBits.rulesDescription(variant)
         )
         .some
     )(
@@ -33,24 +34,24 @@ object variant {
       ),
       div(cls := "variant__intro")(
         h2(cls := "headline")(VariantKeys.variantTitle(variant)),
-        views.html.library.bits.parentVariant(variant).map { parent =>
+        libraryBits.parentVariant(variant).map { parent =>
           p(
             trans.variantOf(
-              views.html.library.bits.searchName(variant),
-              a(href := routes.Page.variant(parent.key))(views.html.library.bits.searchName(parent))
+              libraryBits.searchName(variant),
+              a(href := routes.Page.variant(parent.key))(libraryBits.searchName(parent))
             )
           )
         }
       ),
       div(cls := "body")(raw(~doc.getHtml("pages.content", resolver))),
-      views.html.library.bits.hasLibraryPages(variant).option(
+      libraryBits.hasLibraryPages(variant).option(
         p(cls := "variant__about")(
-          trans.playVariantOnlineFree(views.html.library.bits.nameWithAlias(variant)),
+          trans.playVariantOnlineFree(libraryBits.nameWithAlias(variant)),
           " ",
           VariantKeys.variantTitle(variant),
           ". ",
           a(href := routes.Library.variant(variant.key))(
-            trans.allAboutX(views.html.library.bits.searchName(variant)),
+            trans.allAboutX(libraryBits.searchName(variant)),
             " »"
           )
         )

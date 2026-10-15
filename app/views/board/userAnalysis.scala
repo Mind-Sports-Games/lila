@@ -12,6 +12,7 @@ import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 import lila.rating.PerfType.iconByVariant
 import lila.i18n.VariantKeys
+import views.html.library.bits as libraryBits
 
 object userAnalysis {
 
@@ -39,7 +40,7 @@ object userAnalysis {
       if (variant == Variant.libStandard(GameLogic.Chess())) routes.UserAnalysis.index.url
       else routes.UserAnalysis.parseArg(variant.key).url
     views.html.base.layout(
-      title = views.html.library.bits.analysisTitle(variant),
+      title = libraryBits.analysisTitle(variant),
       boardFamily = variant.gameFamily.key.some,
       soleBoardFamily = true,
       moreCss = frag(
@@ -72,9 +73,9 @@ object userAnalysis {
       csp = defaultCsp.withWebAssembly.some,
       openGraph = lila.app.ui
         .OpenGraph(
-          title = views.html.library.bits.analysisTitle(variant),
+          title = libraryBits.analysisTitle(variant),
           url = s"$netBaseUrl$canonical",
-          description = views.html.library.bits.analysisDescription(variant)
+          description = libraryBits.analysisDescription(variant)
         )
         .some,
       zoomable = true,
@@ -84,7 +85,7 @@ object userAnalysis {
       frag(
         // outside main: the analyse app empties main.analyse on mount, so a heading in there
         // would be gone before a rendering crawler saw it
-        h1(cls := "offscreen")(views.html.library.bits.analysisTitle(variant)),
+        h1(cls := "offscreen")(libraryBits.analysisTitle(variant)),
         main(cls := s"analyse variant-${variant.key}")(
         pov.game.synthetic.option(
           st.aside(cls := "analyse__side")(
@@ -110,12 +111,12 @@ object userAnalysis {
           st.section(cls := "analyse__about")(
             h2(
               a(href := routes.Library.variant(variant.key))(
-                trans.aboutX(views.html.library.bits.searchName(variant))
+                trans.aboutX(libraryBits.searchName(variant))
               )
             ),
-            p(views.html.library.bits.objectiveSentence(variant)),
-            p(views.html.library.bits.analysisDescription(variant)),
-            views.html.library.bits.hasLibraryPages(variant).option(
+            p(libraryBits.objectiveSentence(variant)),
+            p(libraryBits.analysisDescription(variant)),
+            libraryBits.hasLibraryPages(variant).option(
               p(cls := "analyse__about__links")(
                 a(cls := "button", href := s"/?variant=${variant.key}#game")(trans.createAGame())
               )

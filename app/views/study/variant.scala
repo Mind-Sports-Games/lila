@@ -8,11 +8,12 @@ import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.study.Order
 import lila.study.Study.WithChaptersAndLiked
+import views.html.library.bits as libraryBits
 
 object variant {
 
   def show(variant: Variant, pag: Paginator[WithChaptersAndLiked], order: Order)(implicit ctx: Context) = {
-    val title = trans.variantStudies.txt(views.html.library.bits.searchName(variant))
+    val title = trans.variantStudies.txt(libraryBits.searchName(variant))
     views.html.base.layout(
       title = title,
       robots = netConfig.crawlable && pag.currentPage == 1,

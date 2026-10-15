@@ -7,6 +7,7 @@ import lila.api.Context
 import lila.app.{ *, given }
 import lila.memo.CacheApi.*
 import lila.puzzle.Puzzle
+import views.html.library.bits as libraryBits
 
 final class Library(env: Env) extends LilaController(env) {
 
@@ -23,14 +24,14 @@ final class Library(env: Env) extends LilaController(env) {
 
   def variant(key: String) =
     Open { implicit ctx =>
-      views.html.library.bits.canonicalVariantKey(key) match {
+      libraryBits.canonicalVariantKey(key) match {
         case Some(canonical) => MovedPermanently(routes.Library.variant(canonical).url).fuccess
         case None            => showVariant(key)
       }
     }
 
   def langVariant(lang: String, key: String) =
-    views.html.library.bits.canonicalVariantKey(key) match {
+    libraryBits.canonicalVariantKey(key) match {
       case Some(canonical) =>
         Action(MovedPermanently(routes.Library.langVariant(lang, canonical).url))
       case None =>
@@ -49,7 +50,7 @@ final class Library(env: Env) extends LilaController(env) {
           Variant.byKey.get(key).fold(fuccess(Nil -> Nil)) { variant =>
             env.tournament.tournamentRepo
               .finishedSeriesOfTeam(
-                views.html.library.bits.msoTeamId,
+                libraryBits.msoTeamId,
                 List(lila.common.Freq.MSOGP),
                 // the 2021 online edition, before the Grand Prix series began: created by PlayStrategy
                 // itself, for no team
@@ -57,8 +58,8 @@ final class Library(env: Env) extends LilaController(env) {
                 variant
               ) zip
               env.swiss.api.finishedNamed(
-                views.html.library.bits.msoTeamId,
-                views.html.library.bits.msoGrandPrixName,
+                libraryBits.msoTeamId,
+                libraryBits.msoGrandPrixName,
                 variant
               )
           }
@@ -66,7 +67,7 @@ final class Library(env: Env) extends LilaController(env) {
     }
 
   private def showVariant(key: String)(implicit ctx: Context): Fu[Result] =
-    Variant.all.find(_.key == key) match {
+    Variant.byKey.get(key) match {
       case Some(variant) => {
         val tvChannel = lila.tv.Tv.Channel.find(variant.key)
         for {
@@ -96,7 +97,7 @@ final class Library(env: Env) extends LilaController(env) {
               featuredGame,
               dailyPuzzle,
               studies,
-              views.html.library.bits.grandPrixEditions(gpArenas, gpSwisses)
+              libraryBits.grandPrixEditions(gpArenas, gpSwisses)
             )
         )
       }

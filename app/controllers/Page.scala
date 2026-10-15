@@ -6,6 +6,7 @@ import strategygames.variant.Variant
 import lila.api.Context
 import lila.app.*
 import lila.i18n.VariantKeys
+import views.html.library.bits as libraryBits
 
 final class Page(
     env: Env,
@@ -58,7 +59,7 @@ final class Page(
 
   def variant(key: String) =
     Open { implicit ctx =>
-      views.html.library.bits.canonicalVariantKey(key) match {
+      libraryBits.canonicalVariantKey(key) match {
         case Some(canonical) => MovedPermanently(routes.Page.variant(canonical).url).fuccess
         case None            => showVariantPage(key)
       }

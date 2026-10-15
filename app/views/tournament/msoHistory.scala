@@ -6,13 +6,14 @@ import lila.app.ui.ScalatagsTemplate.*
 import lila.i18n.VariantKeys
 import lila.swiss.Swiss
 import lila.tournament.Tournament
+import views.html.library.bits as libraryBits
 
 object msoHistory {
 
   type Edition = Either[Tournament, Swiss]
 
   def canRefresh(me: lila.user.User) =
-    lila.security.Granter(_.Admin)(me) || me.id == views.html.library.bits.msoTeamId
+    lila.security.Granter(_.Admin)(me) || me.id == libraryBits.msoTeamId
 
   private def startsAt(e: Edition) = e.fold(_.startsAt, _.startsAt)
 
@@ -37,7 +38,7 @@ object msoHistory {
           "Every online tournament of the ",
           a(href := routes.Page.lonePage("mind-sports-olympiad"))("Mind Sports Olympiad"),
           " on PlayStrategy: the 2021 arenas and the MSO Grand Prix since. New tournaments are announced in ",
-          a(href := routes.Team.show(views.html.library.bits.msoTeamId))("the Mind Sports Olympiad group"),
+          a(href := routes.Team.show(libraryBits.msoTeamId))("the Mind Sports Olympiad group"),
           "."
         ),
         ctx.me.exists(canRefresh).option(

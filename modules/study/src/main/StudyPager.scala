@@ -105,8 +105,8 @@ final class StudyPager(
   private val variantStudyIds = cacheApi[String, List[Study.Id]](64, "study.pager.variantStudyIds") {
     _.expireAfterWrite(5.minutes)
       .buildAsyncFuture { key =>
-        Variant.all
-          .find(_.key == key)
+        Variant.byKey
+          .get(key)
           .fold(fuccess(List.empty[Study.Id]))(chapterRepo.studyIdsByVariant(_) flatMap studyRepo.featured)
       }
   }
