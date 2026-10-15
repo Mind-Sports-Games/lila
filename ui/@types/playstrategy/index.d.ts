@@ -527,6 +527,7 @@ interface Variant {
   lib: number;
   boardSize: BoardDim;
   iconChar?: string;
+  clientEval: boolean; // whether the browser can run an engine for it: the server decides
 }
 
 interface DraughtsVariant {

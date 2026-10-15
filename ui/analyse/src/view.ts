@@ -298,7 +298,7 @@ function controls(ctrl: AnalyseCtrl) {
                 ]
               : [
                   ctrl.ceval.allowed() &&
-                  allowClientEvalForVariant(ctrl.ceval.variant.key) &&
+                  allowClientEvalForVariant(ctrl.ceval.variant) &&
                   allowExplorerForVariant(ctrl.ceval.variant.key)
                     ? h('button.fbt', {
                         attrs: {
@@ -314,7 +314,7 @@ function controls(ctrl: AnalyseCtrl) {
                     : null,
                   ctrl.ceval.possible &&
                   ctrl.ceval.allowed() &&
-                  allowClientEvalForVariant(ctrl.ceval.variant.key) &&
+                  allowClientEvalForVariant(ctrl.ceval.variant) &&
                   !ctrl.isGamebook() &&
                   allowPracticeWithComputer(ctrl.ceval.variant.key)
                     ? h('button.fbt', {
@@ -729,10 +729,10 @@ export default function (ctrl: AnalyseCtrl): VNode {
                 ...(menuIsOpen
                   ? [actionMenu(ctrl)]
                   : [
-                      ctrl.ceval.allowed && allowClientEvalForVariant(ctrl.ceval.variant.key)
+                      ctrl.ceval.allowed && allowClientEvalForVariant(ctrl.ceval.variant)
                         ? cevalView.renderCeval(ctrl)
                         : null,
-                      ctrl.ceval.allowed && allowClientEvalForVariant(ctrl.ceval.variant.key) && showCevalPvs
+                      ctrl.ceval.allowed && allowClientEvalForVariant(ctrl.ceval.variant) && showCevalPvs
                         ? cevalView.renderPvs(variantKey)(ctrl)
                         : null,
                       renderAnalyse(ctrl, concealOf),

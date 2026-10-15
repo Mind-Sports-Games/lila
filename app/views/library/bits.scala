@@ -318,19 +318,12 @@ object bits {
   def rulesDescription(variant: Variant)(implicit lang: Lang) =
     trans.variantRulesDescription.txt(nameWithAlias(variant), searchName(variant))
 
-  // no browser engine: this is noClientEvalVariants in ui/ceval/src/util.ts, to keep in step with it
-  private val noBrowserEngine = Set(
-    "monster", "linesOfAction", "scrambledEggs", "dameo", "amazons", "minibreakthroughtroyka",
-    "antiflipello", "octagonflipello", "oware", "togyzkumalak", "bestemshe", "go9x9", "go13x13", "go19x19",
-    "backgammon", "hyper", "nackgammon", "abalone", "grandabalone", "entropy"
-  )
-
   def editorDescription(variant: Variant)(implicit lang: Lang) =
     trans.variantEditorDescription.txt(nameWithAlias(variant), searchName(variant))
 
   // the engine behind the analysis board, when it has one (the same Fairy-Stockfish build serves both)
   def analysisEngine(variant: Variant): Option[String] =
-    if (!variant.hasFishnet || noBrowserEngine(variant.key)) None
+    if (!variant.hasFishnet || !lila.game.BrowserEngine.has(variant)) None
     else if (variant.gameLogic == GameLogic.Chess()) Some("Stockfish")
     else Some("Fairy-Stockfish")
 

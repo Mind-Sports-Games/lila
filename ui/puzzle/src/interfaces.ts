@@ -85,6 +85,7 @@ export interface Vm {
     short: string;
     name: string;
     lib: number;
+    clientEval: boolean;
     boardSize: {
       width: number;
       height: number;
@@ -167,6 +168,7 @@ export interface PuzzleGame {
     short: string;
     name: string;
     lib: number;
+    clientEval: boolean;
     boardSize: {
       width: number;
       height: number;
