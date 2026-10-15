@@ -81,6 +81,7 @@ db.study.createIndex({ topics: 1, likes: -1 }, { partialFilterExpression: { topi
 db.study.createIndex({ uids: 1, rank: -1 }, { partialFilterExpression: { topics: { $exists: 1 } } });
 
 db.study_chapter_flat.createIndex({ studyId: 1, order: 1 });
+db.study_chapter_flat.createIndex({ 'setup.variant.gl': 1, 'setup.variant.v': 1 });
 db.study_chapter_flat.createIndex(
   { 'relay.fideIds': 1 },
   { partialFilterExpression: { 'relay.fideIds': { $exists: true } } },

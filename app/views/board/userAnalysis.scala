@@ -12,6 +12,7 @@ import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 import lila.rating.PerfType.iconByVariant
 import lila.i18n.VariantKeys
+import views.html.library.bits as libraryBits
 
 object userAnalysis {
 
@@ -33,9 +34,15 @@ object userAnalysis {
     )
       .filterNot(noAnalysisVariants.contains(_))
 
-  def apply(data: JsObject, pov: lila.game.Pov, withForecast: Boolean = false)(implicit ctx: Context) =
+  def apply(data: JsObject, pov: lila.game.Pov, withForecast: Boolean = false)(implicit ctx: Context) = {
+    val variant = pov.game.variant
+    val canonical =
+      if (variant == Variant.libStandard(GameLogic.Chess())) routes.UserAnalysis.index.url
+      else routes.UserAnalysis.parseArg(variant.key).url
     views.html.base.layout(
-      title = trans.analysis.txt(),
+      title = libraryBits.analysisTitle(variant),
+      boardFamily = variant.gameFamily.key.some,
+      soleBoardFamily = true,
       moreCss = frag(
         cssTag("analyse.free"),
         pov.game.variant.hasDetachedPocket.option(
@@ -64,17 +71,22 @@ object userAnalysis {
           )}""")
       ),
       csp = defaultCsp.withWebAssembly.some,
-      chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
-          title = "Strategy games analysis board",
-          url = s"$netBaseUrl${routes.UserAnalysis.index.url}",
-          description = "Analyse strategy game positions and variations on an interactive board"
+          title = libraryBits.analysisTitle(variant),
+          url = s"$netBaseUrl$canonical",
+          description = libraryBits.analysisDescription(variant)
         )
         .some,
-      zoomable = true
+      zoomable = true,
+      canonicalPath = canonical.some,
+      alternates = true
     ) {
-      main(cls := "analyse")(
+      frag(
+        // outside main: the analyse app empties main.analyse on mount, so a heading in there
+        // would be gone before a rendering crawler saw it
+        h1(cls := "offscreen")(libraryBits.analysisTitle(variant)),
+        main(cls := s"analyse variant-${variant.key}")(
         pov.game.synthetic.option(
           st.aside(cls := "analyse__side")(
             views.html.base.bits.mselect(
@@ -92,9 +104,26 @@ object userAnalysis {
             )
           )
         ),
-        div(cls := "analyse__board main-board")(chessgroundBoard),
-        div(cls := "analyse__tools"),
-        div(cls := "analyse__controls")
+          div(cls := "analyse__board main-board")(chessgroundBoard),
+          div(cls := "analyse__tools"),
+          div(cls := "analyse__controls"),
+          // the analyse app empties this element on mount: it lifts the section into its grid first
+          st.section(cls := "analyse__about")(
+            h2(
+              a(href := routes.Library.variant(variant.key))(
+                trans.aboutX(libraryBits.searchName(variant))
+              )
+            ),
+            p(libraryBits.objectiveSentence(variant)),
+            p(libraryBits.analysisDescription(variant)),
+            libraryBits.hasLibraryPages(variant).option(
+              p(cls := "analyse__about__links")(
+                a(cls := "button", href := s"/?variant=${variant.key}#game")(trans.createAGame())
+              )
+            )
+          )
+        )
       )
     }
+  }
 }

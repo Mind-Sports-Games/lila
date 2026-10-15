@@ -92,6 +92,8 @@ object replay {
 
     bits.layout(
       title = titleOf(pov),
+      boardFamily = pov.game.variant.gameFamily.key.some,
+      soleBoardFamily = true,
       moreCss = frag(
         cssTag("analyse.round"),
         pov.game.variant.hasDetachedPocket.option(
@@ -125,7 +127,7 @@ object replay {
       openGraph = povOpenGraph(pov).some
     )(
       frag(
-        main(cls := "analyse")(
+        main(cls := s"analyse variant-${game.variant.key}")(
           st.aside(cls := "analyse__side")(
             views.html.game
               .side(

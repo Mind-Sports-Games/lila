@@ -1,9 +1,4 @@
-import { Chessground } from 'chessground';
-import Draughtsground from 'draughtsground';
 import * as miniGame from './component/mini-game';
-
-window.Chessground = Chessground;
-window.Draughtsground = Draughtsground;
 
 function resize() {
   const el = document.querySelector('#featured-game') as HTMLElement;

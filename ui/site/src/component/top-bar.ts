@@ -19,7 +19,7 @@ export default function () {
     document.body.classList.toggle('masked', (e.target as HTMLInputElement).checked),
   );
 
-  $('#top').on('click', 'a.toggle', function (this: HTMLElement) {
+  $('#top').on('click', '.toggle', function (this: HTMLElement) {
     const $p = $(this).parent().toggleClass('shown');
     $p.siblings('.shown').removeClass('shown');
     pubsub.emit('top.toggle.' + this.id);
@@ -125,7 +125,6 @@ export default function () {
     $('#top .dasher .toggle').one('mouseover click', function (this: HTMLElement) {
       if (booted) return;
       booted = true;
-      $(this).removeAttr('href');
       const $el = $('#dasher_app').html(initiatingHtml),
         playing = $('body').hasClass('playing');
       loadHashedCssPath('dasher');
@@ -157,8 +156,12 @@ export default function () {
         $('body').addClass('clinput');
       },
     });
-    $wrap.find('a').on({
+    $wrap.find('button').on({
       mouseover: boot,
+      // a button would take the focus off the input, and the input's blur closes the box
+      mousedown(e: Event) {
+        e.preventDefault();
+      },
       click() {
         $('body').hasClass('clinput') ? $input[0]!.blur() : $input[0]!.focus();
       },

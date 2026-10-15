@@ -18,6 +18,7 @@ object jsI18n {
       trans.white,
       trans.black,
       trans.variant,
+      trans.playVariantOnlineFreeTitle,
       trans.clearBoard,
       trans.startPosition,
       trans.cancel,

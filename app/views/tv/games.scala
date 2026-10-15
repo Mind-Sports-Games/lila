@@ -9,6 +9,7 @@ object games {
   def apply(channel: lila.tv.Tv.Channel, povs: List[lila.game.Pov], champions: lila.tv.Tv.Champions)(implicit
       ctx: Context
   ) =
+    // no openGraph: the list turns over every few minutes, and what gets shared is a game
     views.html.base.layout(
       title = s"${channel.name} • ${trans.currentGames.txt()}",
       moreCss = cssTag("tv.games")
@@ -18,6 +19,7 @@ object games {
           side.channels(channel, champions, "/games")
         ),
         div(cls := "page-menu__content now-playing")(
+          h1(cls := "offscreen")(channel.name),
           povs map { views.html.game.mini(_) }
         )
       )

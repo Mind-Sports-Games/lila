@@ -47,7 +47,8 @@ object bits {
     views.html.base.layout(
       title = title,
       moreCss = cssTag("user-tournament"),
-      moreJs = moreJs
+      moreJs = moreJs,
+      robots = u.crawlable
     ) {
       main(cls := "page-menu")(
         st.nav(cls := "page-menu__menu subnav")(

@@ -102,12 +102,22 @@ final class JsonView(
       "text"       -> simul.text
     )
 
+  // the group a variant is chosen under in the join dialog. FairySF is a catch-all group that claims
+  // every FairySF variant and is shown nowhere, so it is left out of the lookup.
+  private val groups = strategygames.GameGroup.all.filterNot(_ == strategygames.GameGroup.FairySF())
+
   private def variantJson(speed: strategygames.Speed)(v: strategygames.variant.Variant) =
-    Json.obj(
-      "key"  -> v.key,
-      "icon" -> lila.game.PerfPicker.perfType(speed, v, none).map(_.iconChar.toString),
-      "name" -> VariantKeys.variantName(v)
-    )
+    Json
+      .obj(
+        "key"  -> v.key,
+        "icon" -> lila.game.PerfPicker.perfType(speed, v, none).map(_.iconChar.toString),
+        "name" -> VariantKeys.variantName(v)
+      )
+      .add(
+        "group" -> groups
+          .find(_.variants.contains(v))
+          .map(g => Json.obj("key" -> g.key, "name" -> VariantKeys.gameGroupName(g)))
+      )
 
   private def playerJson(player: SimulPlayer): Fu[JsObject] =
     getLightUser(player.user) map { light =>

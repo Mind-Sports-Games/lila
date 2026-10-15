@@ -35,7 +35,9 @@ object page {
         cssTag("user.show"),
         isGranted(_.UserModView).option(cssTag("mod.user"))
       ),
-      robots = u.count.game >= 10
+      robots = u.crawlable,
+      // /@/dang and /@/DANG both serve this page: one canonical, in the stored casing, like og:url
+      canonicalPath = routes.User.show(u.username).url.some
     ) {
       main(cls := "page-menu", dataUsername := u.username)(
         st.aside(cls := "page-menu__menu")(side(u, info.ranks, none)),
@@ -65,7 +67,7 @@ object page {
         (filters.current.name == "search").option(cssTag("user.show.search")),
         isGranted(_.UserModView).option(cssTag("mod.user"))
       ),
-      robots = u.count.game >= 10
+      robots = u.crawlable
     ) {
       main(cls := "page-menu", dataUsername := u.username)(
         st.aside(cls := "page-menu__menu")(side(u, info.ranks, none)),
@@ -81,9 +83,8 @@ object page {
       infiniteScrollTag,
       jsModule("user"),
       info.ratingChart.map { ratingChart =>
-        frag(
-          jsModule("chart.ratingHistory"),
-          embedJsUnsafeLoadThen(s"playstrategy.ratingHistoryChart($ratingChart)")
+        embedJsUnsafeLoadThen(
+          s"playstrategy.lazyChart('.rating-history-container','chart.ratingHistory',()=>playstrategy.ratingHistoryChart($ratingChart))"
         )
       },
       withSearch.option(jsModule("gameSearch")),

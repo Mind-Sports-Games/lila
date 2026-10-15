@@ -1,14 +1,15 @@
 import * as xhr from 'common/xhr';
-import * as domData from 'common/data';
+import * as miniBoard from 'common/mini-board';
 
 playstrategy.load.then(() => {
-  setTimeout(() => {
-    $('div.captcha').each(function (this: HTMLElement) {
-      const $captcha = $(this),
-        $board = $captcha.find('.mini-board'),
-        $input = $captcha.find('input').val(''),
-        cg = domData.get($board[0]!, 'chessground'),
-        fen = cg.getFen(),
+  $('div.captcha').each(function (this: HTMLElement) {
+    const $captcha = $(this),
+      $board = $captcha.find('.mini-board'),
+      $input = $captcha.find('input').val('');
+    // init is idempotent and memoised per node, so this both guarantees the board
+    // exists and reuses the one the site boot may already have started.
+    miniBoard.init($board[0] as HTMLElement).then(cg => {
+      const fen = cg.getFen(),
         destsObj = $board.data('moves'),
         dests = new Map();
       for (const k in destsObj) dests.set(k, destsObj[k].match(/.{2}/g));
@@ -31,7 +32,7 @@ playstrategy.load.then(() => {
         $input.val(solution);
         xhr.text(xhr.url($captcha.data('check-url'), { solution })).then(data => {
           $captcha.toggleClass('success', data == '1').toggleClass('failure', data != '1');
-          if (data == '1') domData.get($board[0]!, 'chessground').stop();
+          if (data == '1') cg.stop();
           else
             setTimeout(
               () =>
@@ -45,5 +46,5 @@ playstrategy.load.then(() => {
         });
       };
     });
-  }, 1000);
+  });
 });

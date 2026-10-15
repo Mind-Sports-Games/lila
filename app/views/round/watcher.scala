@@ -43,6 +43,7 @@ object watcher {
     bits.layout(
       variant = pov.game.variant,
       title = s"${gameVsText(pov.game, withRatings = true)} • spectator",
+      soleBoardFamily = true,
       moreJs = frag(
         roundNvuiTag,
         roundTag(gameLogic),
@@ -54,10 +55,10 @@ object watcher {
             )
           )})""")
       ),
-      openGraph = povOpenGraph(pov).some,
-      chessground = false
+      openGraph = povOpenGraph(pov).some
     )(
       main(cls := "round")(
+        h1(cls := "offscreen")(gameVsText(pov.game, withRatings = true)),
         st.aside(cls := "round__side")(
           bits.side(pov, data, tour, simul, userTv, bookmarked, swissPairingGames),
           chatOption.map(_ => chat.frag)
@@ -76,10 +77,11 @@ object watcher {
       variant = pov.game.variant,
       title = gameVsText(pov.game, withRatings = true),
       openGraph = povOpenGraph(pov).some,
-      chessground = false
+      soleBoardFamily = true
     )(
       frag(
         main(cls := "round")(
+          h1(cls := "offscreen")(gameVsText(pov.game, withRatings = true)),
           st.aside(cls := "round__side")(
             game.side(
               pov,

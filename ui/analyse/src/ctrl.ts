@@ -150,6 +150,7 @@ export default class AnalyseCtrl {
   cgConfig: any; // latest chessground config (useful for revert)
   music?: any;
   nvui?: NvuiPlugin;
+  aboutHtml?: string;
 
   constructor(
     readonly opts: AnalyseOpts,

@@ -13,7 +13,8 @@ object theme {
       ctx: Context
   ) =
     views.html.base.layout(
-      title = "Puzzle themes",
+      title = s"${lila.i18n.VariantKeys.variantName(variant)} — ${trans.puzzle.puzzleThemes.txt()}",
+      canonicalPath = routes.Puzzle.themes(variant.key).url.some,
       moreCss = cssTag("puzzle.page")
     )(
       main(cls := "page-menu")(

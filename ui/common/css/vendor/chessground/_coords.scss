@@ -1,16 +1,3 @@
-$go-variants: ('go9x9', 'go13x13', 'go19x19');
-$forced-outer-coords-variants: (
-  'shogi',
-  'minishogi',
-  'xiangqi',
-  'minixiangqi',
-  'octagonflipello',
-  'oware',
-  'go9x9',
-  'go13x13',
-  'go19x19'
-);
-
 /* hidden coords */
 cg-coords-container.hidden-coords {
   display: none;

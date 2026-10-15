@@ -48,7 +48,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   const session = new PuzzleSession(opts.data.theme.key, opts.data.game.variant.key, opts.data.user?.id, hasStreak);
 
   // required by ceval
-  vm.showComputer = () => vm.mode === 'view' && allowClientEvalForVariant(vm.variant.key);
+  vm.showComputer = () => vm.mode === 'view' && allowClientEvalForVariant(vm.variant);
   vm.showAutoShapes = () => true;
 
   const throttleSound = (name: string) => throttle(100, () => playstrategy.sound.play(name));

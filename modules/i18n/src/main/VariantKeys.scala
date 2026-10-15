@@ -16,6 +16,11 @@ object VariantKeys {
   def variantTitle(variant: Variant)(implicit lang: Lang = defaultLang) =
     new I18nKey(s"variantTitle:${variant.key}").txt()
 
+  // alternative name people search for (Reversi, Japanese chess...), or a qualifier
+  // (board game, chess variant) when the name is ambiguous; empty for chess/backgammon
+  def variantAlias(variant: Variant)(implicit lang: Lang = defaultLang): Option[String] =
+    Some(new I18nKey(s"variantAlias:${variant.key}").txt().trim).filter(_.nonEmpty)
+
   def gameFamilyName(gameFamily: GameFamily)(implicit lang: Lang = defaultLang) =
     new I18nKey(s"variantName:${gameFamily.key match {
         case "loa" => "linesOfAction"

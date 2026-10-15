@@ -1,7 +1,7 @@
 package lila.simul
 
 import cats.implicits.*
-import strategygames.{ GameFamily, GameLogic }
+import strategygames.GameFamily
 import strategygames.{ ByoyomiClock, Clock, ClockConfig }
 import strategygames.format.FEN
 import strategygames.variant.Variant
@@ -73,7 +73,7 @@ object SimulForm {
         name = host.titleUsername,
         clockConfig = Clock.Config(15, 0),
         clockExtra = clockExtraDefault,
-        variants = List(s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}"),
+        variants = Nil,
         position = none,
         playerIndex = playerIndexDefault,
         text = "",
@@ -83,13 +83,20 @@ object SimulForm {
       )
     )
 
+  // what a simul plays when none is picked: a player who joins can play any of them
+  val anyVariant: List[Variant] = Variant.all.filterNot(_.fromPositionVariant)
+
+  def isAnyVariant(variants: List[Variant]) = variants.toSet == anyVariant.toSet
+
   def edit(host: User, teams: List[LeaderTeam], simul: Simul) =
     baseForm(host, teams).fill(
       Setup(
         name = simul.name,
         clockConfig = simul.clock.config,
         clockExtra = simul.clock.hostExtraMinutes,
-        variants = simul.variants.map(v => s"${v.gameFamily.id}_${v.id}"),
+        // a simul open to any variant was posted with none picked, and is edited the same way
+        variants =
+          if (isAnyVariant(simul.variants)) Nil else simul.variants.map(v => s"${v.gameFamily.id}_${v.id}"),
         position = simul.position,
         playerIndex = simul.playerIndex | "random",
         text = simul.text,
@@ -113,7 +120,7 @@ object SimulForm {
               .map(v => s"${v.gameFamily.id}_${v.id}")
               .toSet contains g
           )
-        }.verifying("At least one variant", _.nonEmpty),
+        },
         "position"         -> optional(lila.common.Form.fen.playableStrict),
         "playerIndex"      -> stringIn(playerIndexChoices),
         "text"             -> cleanText,
@@ -161,13 +168,16 @@ object SimulForm {
         hostExtraTime = clockExtra * 60
       )
 
-    def actualVariants: List[Variant] = variants map { v =>
-      Variant
-        .orDefault(
-          GameFamily(v.split("_")(0).toInt).gameLogic,
-          v.split("_")(1).toInt
-        )
-    }
+    def actualVariants: List[Variant] =
+      if (variants.isEmpty) anyVariant
+      else
+        variants map { v =>
+          Variant
+            .orDefault(
+              GameFamily(v.split("_")(0).toInt).gameLogic,
+              v.split("_")(1).toInt
+            )
+        }
 
     def realPosition = position.filterNot(_.initial)
 

@@ -63,7 +63,6 @@
       "src/memory.ts"
     ],
     "sync": {
-      "../../node_modules/chessground/dist/chessground.min.js": "public/npm",
       "node_modules/hopscotch/dist/js/hopscotch.min.js": "public/vendor/hopscotch/dist/js",
       "node_modules/hopscotch/dist/css/hopscotch.min.css": "public/vendor/hopscotch/dist/css",
       "node_modules/hopscotch/dist/img": "public/vendor/hopscotch/dist",
@@ -73,8 +72,6 @@
     "hashed": [
       "font/playstrategy.woff",
       "font/playstrategy.woff2",
-      "font/playstrategy.chess.woff",
-      "font/playstrategy.chess.woff2",
       "javascripts/vendor/cash.min.js",
       "javascripts/vendor/howler.min.js",
       "javascripts/vendor/mousetrap.min.js",

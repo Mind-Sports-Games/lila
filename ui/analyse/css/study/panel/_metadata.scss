@@ -79,6 +79,10 @@
   }
 }
 
+.study__hub {
+  margin: 0.8em 1em 0 1em;
+}
+
 .study__topics {
   @extend %flex-center, %roboto;
 

@@ -229,7 +229,7 @@ export default function (
     playstrategy.pubsub.emit('palantir.toggle', data.features.chat && !!members.myMember());
     const computer: boolean = !isGamebookPlay() && !!(data.chapter.features.computer || data.chapter.practice);
     if (!computer) ctrl.getCeval().enabled(false);
-    ctrl.getCeval().allowed(computer && allowClientEvalForVariant(ctrl.data.game.variant.key));
+    ctrl.getCeval().allowed(computer && allowClientEvalForVariant(ctrl.data.game.variant));
     if (!data.chapter.features.explorer) ctrl.explorer.disable();
     ctrl.explorer.allowed(data.chapter.features.explorer);
   }

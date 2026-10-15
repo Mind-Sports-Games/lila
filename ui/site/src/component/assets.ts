@@ -24,6 +24,34 @@ export const hashedAssetUrl = (path: string, opts: AssetUrlOpts = {}) => {
   return baseUrl + '/assets' + '/' + path;
 };
 
+// zxcvbn is large: load it on focus, or at once for a field already focused
+export const lazyPasswordComplexity = (id: string) => {
+  const field = document.getElementById(id);
+  if (!field) return;
+  const load = () =>
+    loadModule('passwordComplexity').then(() => window.PlayStrategyPassword.addPasswordChangeListener(id));
+  if (document.activeElement === field) load();
+  else field.addEventListener('focus', load, { once: true });
+};
+
+// Chart.js loads when its container is about to be seen
+export const lazyChart = (selector: string, module: string, draw: () => void): void => {
+  const el = document.querySelector(selector);
+  if (!el) return;
+  const load = () => loadModule(module).then(draw);
+  if (!window.IntersectionObserver) return void load();
+  const observer = new IntersectionObserver(
+    entries => {
+      if (entries.some(e => e.isIntersecting)) {
+        observer.disconnect();
+        load();
+      }
+    },
+    { rootMargin: '300px' },
+  );
+  observer.observe(el);
+};
+
 const loadedCss = new Map<string, true>();
 
 // still used to load external libs css (hopscotch, shepherd)

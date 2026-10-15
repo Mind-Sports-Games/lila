@@ -250,6 +250,30 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
         }
       }
 
+  def studyIdsByVariant(variant: Variant): Fu[List[Study.Id]] =
+    coll {
+      _.distinctEasy[String, List](
+        "studyId",
+        $doc("setup.variant.gl" -> variant.gameLogic.id, "setup.variant.v" -> variant.id),
+        readPref
+      ).map(_.map(Study.Id.apply))
+    }
+
+  def variantKeysByStudyIds(studyIds: List[Study.Id]): Fu[Map[Study.Id, Set[String]]] =
+    coll {
+      _.find($doc("studyId".$in(studyIds)), $doc("studyId" -> true, "setup.variant" -> true).some)
+        .cursor[Bdoc](readPref)
+        .list() map { docs =>
+        val pairs: List[(Study.Id, String)] = for {
+          doc     <- docs
+          studyId <- doc.getAsOpt[Study.Id]("studyId")
+          setup   <- doc.getAsOpt[Bdoc]("setup")
+          variant <- setup.getAsOpt[Variant]("variant")
+        } yield studyId -> variant.key
+        pairs.groupMap(_._1)(_._2).view.mapValues(_.toSet).toMap
+      }
+    }
+
   def idNames(studyId: Study.Id): Fu[List[Chapter.IdName]] =
     coll {
       _.find(

@@ -107,6 +107,7 @@ object bits {
             div(cls := "blog-post-card__container")(
               img(
                 src             := post.image,
+                alt             := post.title,
                 cls             := "blog-post-card__image",
                 widthA          := 400,
                 heightA         := 400 * 10 / 16,

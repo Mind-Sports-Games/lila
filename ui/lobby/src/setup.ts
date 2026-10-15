@@ -1382,22 +1382,13 @@ export default class Setup {
       $gameGroupInput.val('0');
       $opponentInput.val('friend');
     }
-    const gameGroupFromVariant = (variant: string) => {
-      const gameLogicId = variant.split('_')[0];
-      switch (gameLogicId) {
-        case '6':
-          return '7'; //oware
-        case '13':
-          return '1'; //dameo
-        case '14':
-          return '13'; //entropy
-        default:
-          return gameLogicId;
-      }
-    };
+    // the server writes each variant's group on its radio, so the pairs that do not follow the
+    // family id - oware under mancala, dameo under draughts - need no rule here
+    const gameGroupOf = (el: HTMLElement) => $(el).attr('data-gamegroup');
     if (forceVariant && inputVariant) {
       $variantInput.val(inputVariant);
-      $gameGroupInput.val(gameGroupFromVariant(inputVariant as string));
+      const forced = $variantInput.filter(`[value="${inputVariant}"]`)[0];
+      if (forced) $gameGroupInput.val(gameGroupOf(forced) as string);
     }
     $form.find('optgroup').each((_, optgroup: HTMLElement) => {
       optgroup.setAttribute('label', optgroup.getAttribute('name') || '');
@@ -1484,7 +1475,7 @@ export default class Setup {
         const toShow: HTMLElement[] = [];
         const toHide: HTMLElement[] = [];
         $variantInput.each(function (this: HTMLElement) {
-          if (gameGroupFromVariant($(this).val() as string) === gameGroup) {
+          if (gameGroupOf(this) === gameGroup) {
             toShow.push($(this).parent()[0]);
             numInGroup++;
           } else {
@@ -1642,6 +1633,16 @@ export default class Setup {
         });
       }
     });
+
+    // the clock section was opened without a click: show the custom clock settings the way a click
+    // would. After the loop, as each section it runs through hides them again.
+    if (
+      (forceVariant || forceFromPosition) &&
+      $timeModeDefaults.hasClass('active') &&
+      ($timeModeDefaults.find('input').filter(':checked').val() as string) === 'custom'
+    ) {
+      $timeModeDefaults.trigger('change');
+    }
 
     $collapsibleSections.find('input, label').on('click', function (e) {
       e.stopPropagation();

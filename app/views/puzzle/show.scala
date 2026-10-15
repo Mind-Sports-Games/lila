@@ -15,9 +15,13 @@ object show {
       pref: JsObject,
       difficulty: Option[lila.puzzle.PuzzleDifficulty] = None
   )(implicit ctx: Context) = {
-    val isStreak = data.value.contains("streak")
+    val isStreak       = data.value.contains("streak")
+    val variantPuzzles = trans.variantPuzzles.txt(lila.i18n.VariantKeys.variantName(puzzle.variant))
     views.html.base.layout(
-      title = if (isStreak) "Puzzle Streak" else trans.puzzles.txt(),
+      boardFamily = puzzle.variant.gameFamily.key.some,
+      soleBoardFamily = true,
+      namePieceSets = true,
+      title = if (isStreak) "Puzzle Streak" else variantPuzzles,
       moreCss = cssTag("puzzle"),
       moreJs = frag(
         jsModule("puzzle"),
@@ -33,13 +37,12 @@ object show {
           )})""")
       ),
       csp = defaultCsp.withWebAssembly.some,
-      chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
           image = cdnUrl(routes.Export.puzzleThumbnail(puzzle.id.value).url).some,
           title =
             if (isStreak) "Puzzle Streak"
-            else s"Chess tactic #${puzzle.id} - ${puzzle.playerIndex.name.capitalize} to play",
+            else s"$variantPuzzles #${puzzle.id} - ${puzzle.playerIndex.name.capitalize} to play",
           url = s"$netBaseUrl${routes.Puzzle.show(puzzle.variant.key, puzzle.id.value).url}",
           description =
             if (isStreak) trans.puzzle.streakDescription.txt()
@@ -54,13 +57,17 @@ object show {
       zoomable = true,
       playing = true
     ) {
-      main(cls := "puzzle")(
-        st.aside(cls := "puzzle__side")(
-          div(cls := "puzzle__side__metas")
-        ),
-        div(cls := s"puzzle__board main-board variant-${puzzle.variant.key}")(chessgroundBoard),
-        div(cls := "puzzle__tools"),
-        div(cls := "puzzle__controls")
+      frag(
+        // a streak draws its own h1 in the side panel
+        (!isStreak).option(h1(cls := "offscreen")(variantPuzzles)),
+        main(cls := "puzzle")(
+          st.aside(cls := "puzzle__side")(
+            div(cls := "puzzle__side__metas")
+          ),
+          div(cls := s"puzzle__board main-board variant-${puzzle.variant.key}")(chessgroundBoard),
+          div(cls := "puzzle__tools"),
+          div(cls := "puzzle__controls")
+        )
       )
     }
   }

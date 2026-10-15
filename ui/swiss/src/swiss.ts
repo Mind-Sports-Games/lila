@@ -1,6 +1,4 @@
 import { init, VNode, classModule, attributesModule } from 'snabbdom';
-import Draughtsground from 'draughtsground';
-import { Chessground } from 'chessground';
 import { SwissOpts } from './interfaces';
 import SwissCtrl from './ctrl';
 import PlayStrategyChat from 'chat';
@@ -36,8 +34,4 @@ function start(opts: SwissOpts) {
 }
 (window as any).PlayStrategySwiss = { start };
 
-// that's for the rest of playstrategy to access chessground
-// without having to include it a second time
-window.Chessground = Chessground;
-window.Draughtsground = Draughtsground;
 window.PlayStrategyChat = PlayStrategyChat;

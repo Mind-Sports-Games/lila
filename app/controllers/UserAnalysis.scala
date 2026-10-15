@@ -13,6 +13,7 @@ import lila.app.*
 import lila.game.Pov
 import lila.round.Forecast.{ forecastJsonWriter, forecastStepJsonFormat }
 import lila.round.JsonView.WithFlags
+import views.html.library.bits as libraryBits
 
 final class UserAnalysis(
     env: Env,
@@ -22,11 +23,32 @@ final class UserAnalysis(
 
   def index = load("", Variant.libStandard(GameLogic.Chess()))
 
+  // a name or a key in the wrong case redirects to the canonical URL; an alias for a variant with
+  // no analysis board stops here
+  private def hasAnalysisBoard(key: String) =
+    Variant.byKey.get(key).exists(views.html.board.userAnalysis.analysisVariants.contains)
+
+  private def aliasRedirect(key: String, rest: String = "") =
+    libraryBits.canonicalVariantKey(key) map { canonical =>
+      Open { implicit ctx =>
+        if (hasAnalysisBoard(canonical))
+          fuccess(MovedPermanently(routes.UserAnalysis.parseArg(s"$canonical$rest").url))
+        else notFound
+      }
+    }
+
   def parseArg(arg: String) =
     arg.split("/", 2) match {
-      case Array(key)      => load("", Variant.orDefault(key))
+      case Array(key) =>
+        aliasRedirect(key) | {
+          // a variant with no analysis board would render a board without pieces
+          Variant.byKey.get(key).filterNot(views.html.board.userAnalysis.analysisVariants.contains) match {
+            case Some(_) => Open { implicit ctx => notFound }
+            case None    => load("", Variant.orDefault(key))
+          }
+        }
       case Array(key, fen) =>
-        Variant.byKey get key match {
+        aliasRedirect(key, s"/$fen") | (Variant.byKey get key match {
           case Some(variant) => load(fen, variant)
           case _ if FEN.clean(GameLogic.Chess(), fen) == Variant.libStandard(GameLogic.Chess()).initialFen =>
             load(arg, Variant.libStandard(GameLogic.Chess()))
@@ -37,23 +59,48 @@ final class UserAnalysis(
                 .apply(GameLogic.Chess(), "fromPosition")
                 .getOrElse(Variant.orDefault(GameLogic.Chess(), 3))
             )
-        }
+        })
       case _ => load("", Variant.libStandard(GameLogic.Chess()))
     }
 
   def load(urlFen: String, variant: Variant) =
     Open { implicit ctx =>
-      val decodedFen: Option[FEN] = lila.common.String
-        .decodeUriPath(urlFen)
-        .filter(_.trim.nonEmpty)
-        .orElse(get("fen")) map (s => FEN.clean(variant.gameLogic, s))
-      val pov         = makePov(decodedFen, variant)
-      val orientation = get("orientation").flatMap(PlayerIndex.fromName) | pov.playerIndex
-      env.api.roundApi
-        .userAnalysisJson(pov, ctx.pref, decodedFen, orientation, owner = false, me = ctx.me) map { data =>
-        EnableSharedArrayBuffer(Ok(html.board.userAnalysis(data, pov)))
-      }
+      loadPage(urlFen, variant)
     }
+
+  def langIndex(lang: String) =
+    LangPage(routes.UserAnalysis.index.url)(ctx =>
+      loadPage("", Variant.libStandard(GameLogic.Chess()))(using ctx)
+    )(lang)
+
+  // only a variant key gets a localised URL, never a pasted position; the same gate as the
+  // bare URL, so /fr/analysis/<key> never serves a board the English page refuses
+  def langLoad(lang: String, key: String) =
+    libraryBits.canonicalVariantKey(key) match {
+      case Some(canonical) if hasAnalysisBoard(canonical) =>
+        Action(MovedPermanently(routes.UserAnalysis.langLoad(lang, canonical).url))
+      case Some(_) => Open { implicit ctx => notFound }
+      case None =>
+        LangPage(routes.UserAnalysis.parseArg(key).url)(ctx =>
+          Variant.byKey.get(key).filter(views.html.board.userAnalysis.analysisVariants.contains) match {
+            case Some(variant) => loadPage("", variant)(using ctx)
+            case None          => notFound(using ctx)
+          }
+        )(lang)
+    }
+
+  private def loadPage(urlFen: String, variant: Variant)(implicit ctx: Context): Fu[Result] = {
+    val decodedFen: Option[FEN] = lila.common.String
+      .decodeUriPath(urlFen)
+      .filter(_.trim.nonEmpty)
+      .orElse(get("fen")) map (s => FEN.clean(variant.gameLogic, s))
+    val pov         = makePov(decodedFen, variant)
+    val orientation = get("orientation").flatMap(PlayerIndex.fromName) | pov.playerIndex
+    env.api.roundApi
+      .userAnalysisJson(pov, ctx.pref, decodedFen, orientation, owner = false, me = ctx.me) map { data =>
+      EnableSharedArrayBuffer(Ok(html.board.userAnalysis(data, pov)))
+    }
+  }
 
   private[controllers] def makePov(fen: Option[FEN], variant: Variant): Pov =
     makePov {

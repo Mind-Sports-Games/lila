@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="abalone">桌游</string>
+  <string name="antichess">反向国际象棋</string>
+  <string name="atomic">国际象棋变体</string>
+  <string name="backgammon">西洋双陆棋</string>
+  <string name="chess960">菲舍尔任意制象棋</string>
+  <string name="crazyhouse">国际象棋变体</string>
+  <string name="english">西洋跳棋</string>
+  <string name="fiveCheck">五将国际象棋变体</string>
+  <string name="flipello">黑白棋，翻转棋</string>
+  <string name="go13x13">围棋 13路盘</string>
+  <string name="go19x19">围棋 19路盘</string>
+  <string name="go9x9">围棋 9路盘</string>
+  <string name="horde">国际象棋变体</string>
+  <string name="international">国际跳棋，10x10</string>
+  <string name="kingOfTheHill">山丘之王国际象棋变体</string>
+  <string name="linesOfAction">LOA 桌游</string>
+  <string name="minishogi">5x5 将棋</string>
+  <string name="minixiangqi">7x7 中国象棋</string>
+  <string name="monster">国际象棋变体</string>
+  <string name="noCastling">不能王车易位的国际象棋</string>
+  <string name="oware">播棋，曼卡拉</string>
+  <string name="racingKings">国际象棋变体</string>
+  <string name="scrambledEggs">Claude Soucie 的 Lines of Action 变体</string>
+  <string name="shogi">将棋，日本象棋</string>
+  <string name="threeCheck">三将国际象棋变体</string>
+  <string name="xiangqi">中国象棋</string>
+</resources>

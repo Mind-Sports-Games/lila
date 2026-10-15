@@ -23,7 +23,7 @@ object replayBot {
       moreCss = cssTag("analyse.round"),
       openGraph = povOpenGraph(pov).some
     ) {
-      main(cls := "analyse")(
+      main(cls := s"analyse variant-${pov.game.variant.key}")(
         st.aside(cls := "analyse__side")(
           views.html.game
             .side(pov, initialFen, none, simul = simul, bookmarked = false, swissPairingGames = None)

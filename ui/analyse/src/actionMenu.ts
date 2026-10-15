@@ -222,7 +222,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
   ];
 
   const cevalConfig: MaybeVNodes =
-    ceval && ceval.possible && ceval.allowed() && allowClientEvalForVariant(ceval.variant.key)
+    ceval && ceval.possible && ceval.allowed() && allowClientEvalForVariant(ceval.variant)
       ? ([h('h2', noarg('computerAnalysis'))] as MaybeVNodes)
           .concat([
             ctrlBoolSetting(

@@ -2,8 +2,6 @@ import { attributesModule, classModule, init } from 'snabbdom';
 import PlayStrategyRound from './boot';
 import PlayStrategyChat from 'chat';
 import menuHover from 'common/menuHover';
-import Draughtsground from 'draughtsground';
-import { Chessground } from 'chessground';
 import RoundController from './ctrl';
 import { RoundData, RoundOpts, Step } from './interfaces';
 import MoveOn from './moveOn';
@@ -89,7 +87,3 @@ export function app(opts: RoundOpts): RoundApi {
 export { PlayStrategyRound };
 
 window.PlayStrategyChat = PlayStrategyChat;
-// that's for the rest of playstrategy to access chessground
-// without having to include it a second time
-window.Chessground = Chessground;
-window.Draughtsground = Draughtsground; // We need both for the "ongoing games" underneath the current one.
