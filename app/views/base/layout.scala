@@ -257,7 +257,10 @@ object layout {
     val (urlLang, unprefixed) =
       if (alternates) SeoLang.splitPath(ctx.req.path) else (none, ctx.req.path)
     val barePath              = canonicalPath | unprefixed
-    val canonicalUrl          = s"$netBaseUrl${urlLang.fold("")(e => s"/${e.href}")}$barePath"
+    // the page number is the one query parameter that changes what a page shows
+    val pageQuery = canonicalPath.isEmpty so
+      ctx.req.getQueryString("page").flatMap(_.toIntOption).filter(_ > 1).so(p => s"?page=$p")
+    val canonicalUrl = s"$netBaseUrl${urlLang.fold("")(e => s"/${e.href}")}$barePath$pageQuery"
 
     frag(
       doctype,
