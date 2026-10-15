@@ -73,8 +73,9 @@ object history {
   ) = {
     // a family named after one of its games says so, or the two pages would share a title
     val subject = variant.map(VariantKeys.variantName) orElse group.map(VariantKeys.gameGroupName)
-    val heading = subject.fold(s"${nameOf(freq)} tournaments") { s =>
-      s"${nameOf(freq)} $s tournaments" + group.so(_ => ", all variants")
+    val heading = subject.fold(trans.historyHeading.txt(nameOf(freq))) { s =>
+      if (group.isDefined) trans.historyHeadingFamily.txt(nameOf(freq), s)
+      else trans.historyHeadingGame.txt(nameOf(freq), s)
     }
     val stats = summary.map { s =>
       series.Stats(s.all.flatMap { t =>
@@ -82,26 +83,19 @@ object history {
       })
     }
     val wording = variant.map { v =>
-      series.Wording(
-        holderLabel = "Reigning champion",
-        unit = "title",
-        unitsName = s"${nameOf(freq)} ${VariantKeys.variantName(v)} titles",
-        arenaName = s"${nameOf(freq)} ${VariantKeys.variantName(v)} Arena",
-        takeLabel = "Take the title",
-        contested = false
-      )
+      series.Wording(contested = false, subject = s"${nameOf(freq)} ${VariantKeys.variantName(v)}")
     }
     views.html.base.layout(
-      title = subject.fold(heading)(_ => s"$heading — every edition and winner"),
+      title = subject.fold(heading)(_ => trans.historyTitle.txt(heading)),
       moreJs = infiniteScrollTag,
       moreCss = frag(cssTag("tournament.history"), summary.isDefined.option(cssTag("tournament.leaderboard"))),
       canonicalPath = pageUrl(freq, variant, group).some,
       openGraph = subject.map { name =>
         lila.app.ui.OpenGraph(
-          title = s"$heading — every edition and winner",
+          title = trans.historyTitle.txt(heading),
           url = s"$netBaseUrl${pageUrl(freq, variant, group)}",
           description =
-            s"Every edition of the ${nameOf(freq)} $name arena on PlayStrategy, with its winner." +
+            trans.historyDescription.txt(s"${nameOf(freq)} $name") +
               (stats zip wording).map { case (st, w) => series.description(st, w) }.getOrElse("")
         )
       }
@@ -127,7 +121,7 @@ object history {
                 a(
                   cls  := List("text" -> true, "active" -> (variant.isEmpty && group.isEmpty)),
                   href := url(freq, none)
-                )("All games"),
+                )(trans.historyAllGames()),
                 displayedGameGroups.map { g =>
                   a(
                     cls := List(

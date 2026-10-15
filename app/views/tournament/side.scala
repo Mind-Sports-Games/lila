@@ -75,7 +75,7 @@ object side {
                   a(
                     cls   := "defender__edition",
                     href  := routes.Tournament.show(prev.id),
-                    title := s"Previous edition: ${showDate(prev.startsAt)}"
+                    title := trans.seriesPreviousEdition.txt(showDate(prev.startsAt))
                   )(holderLabel(tour)),
                   userIdLink(winner.some)
                 )
@@ -218,23 +218,26 @@ object side {
       !Set[Schedule.Freq](Schedule.Freq.Hourly, Schedule.Freq.Daily, Schedule.Freq.Unique).contains(s.freq)
     }
 
-  private def holderLabel(tour: Tournament) =
-    if (tour.isShield) "Defender:"
-    else if (tour.schedule.exists(_.freq == Schedule.Freq.Yearly)) "Reigning champion:"
-    else "Last winner:"
+  private def holderLabel(tour: Tournament)(implicit ctx: Context) =
+    if (tour.isShield) trans.seriesDefender.txt()
+    else if (tour.schedule.exists(_.freq == Schedule.Freq.Yearly)) trans.seriesReigningChampionLabel.txt()
+    else trans.seriesLastWinner.txt()
 
   private def seriesNav(tour: Tournament)(implicit ctx: Context): Option[Frag] =
     tour.schedule.filter(_ => isSeries(tour)).map { sched =>
       val variantName = VariantKeys.variantName(tour.variant)
       val (seriesUrl, seriesLabel) =
         if (tour.isShield && TournamentShield.Category.byKey(tour.variant.key).isDefined)
-          routes.Tournament.categShields(tour.variant.key).url -> s"$variantName Shield: Leaderboard"
+          routes.Tournament.categShields(tour.variant.key).url ->
+            trans.seriesLeaderboardOf.txt(trans.shieldCategName.txt(variantName))
         else if (sched.freq == Schedule.Freq.Yearly)
-          history.url(sched.freq, tour.variant.some) -> s"${sched.freq.display} $variantName: Leaderboard"
+          history.url(sched.freq, tour.variant.some) ->
+            trans.seriesLeaderboardOf.txt(s"${sched.freq.display} $variantName")
         else if (history.hasSeries(sched.freq))
-          history.url(sched.freq, tour.variant.some) -> s"${sched.freq.display} $variantName: all editions"
+          history.url(sched.freq, tour.variant.some) ->
+            trans.seriesAllEditionsOf.txt(s"${sched.freq.display} $variantName")
         else
-          history.url(sched.freq, none) -> s"${sched.freq.display}: all editions"
+          history.url(sched.freq, none) -> trans.seriesAllEditionsOf.txt(sched.freq.display)
       p(cls := "series-nav", dataIcon := "g")(a(href := seriesUrl)(seriesLabel))
     }
 }

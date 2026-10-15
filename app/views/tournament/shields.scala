@@ -14,29 +14,24 @@ object shields {
 
   def apply(history: TournamentShield.History)(implicit ctx: Context) =
     views.html.base.layout(
-      title = "Tournament Shields — current holders for every game",
+      title = trans.shieldsTitle.txt(),
       moreCss = frag(cssTag("tournament.leaderboard"), cssTag("slist")),
       wrapClass = "full-screen-force",
       openGraph = lila.app.ui
         .OpenGraph(
-          title = "Tournament Shields — current holders for every game",
+          title = trans.shieldsTitle.txt(),
           url = s"$netBaseUrl${routes.Tournament.shields.url}",
-          description =
-            "Who holds the shield of every game on PlayStrategy: the monthly shield arena of each game crowns a holder who keeps the trophy until the next one."
+          description = trans.shieldsDescription.txt()
         )
         .some
     ) {
       main(cls := "page-menu tournament-shields-page")(
         views.html.user.bits.communityMenu("shield"),
         div(cls := "page-menu__content box box-pad")(
-          h1("Tournament Shields"),
-          p(cls := "tournament-shields__intro")(
-            "Every game has a monthly shield arena. The winner holds the shield until the next edition; the shield leaderboards count who has held it most."
-          ),
-          h2("Headhunter:"),
-          p(cls := "tournament-shields__hint")(
-            "The best shield players of the last two months (5, 3 and 2 points for 1st, 2nd and 3rd place in any shield, 1 for playing, best result per shield), and the longest shield streaks currently held."
-          ),
+          h1(trans.shieldsHeading()),
+          p(cls := "tournament-shields__intro")(trans.shieldsIntro()),
+          h2(trans.shieldsHeadhunter()),
+          p(cls := "tournament-shields__hint")(trans.shieldsHeadhunterHint()),
           div(cls := "shield-leaderboards")(
             ShieldTableApi.Category.all.map { category =>
               section(
@@ -48,11 +43,11 @@ object shields {
               )
             },
             section(
-              h2(a(href := routes.Tournament.shieldStreaks)("Hot streaks"))
+              h2(a(href := routes.Tournament.shieldStreaks)(trans.shieldsHotStreaks()))
             )
           ),
-          h2("Medley Shields:"),
-          p(cls := "tournament-shields__hint")("One shield per game family, played across several of its variants."),
+          h2(trans.shieldsMedley()),
+          p(cls := "tournament-shields__hint")(trans.shieldsMedleyHint()),
           div(cls := "medley-shields")(
             TournamentShield.MedleyShield.all.map { medley =>
               section(
@@ -67,8 +62,8 @@ object shields {
               )
             }
           ),
-          h2("Variant Shields:"),
-          p(cls := "tournament-shields__hint")("The current holder and the recent editions of every game's shield."),
+          h2(trans.shieldsVariant()),
+          p(cls := "tournament-shields__hint")(trans.shieldsVariantHint()),
           div(cls := "tournament-shields")(
             history.sorted.map { case (categ, awards) =>
               section(
@@ -102,7 +97,7 @@ object shields {
         }
       }
       .sortBy { case (_, reign, _) => (-reign.count, reign.from.getMillis) }
-    val title = "Hot streaks — shield defenders to stop"
+    val title = trans.shieldsStreaksTitle.txt()
     views.html.base.layout(
       title = title,
       moreCss = frag(cssTag("tournament.leaderboard"), cssTag("slist")),
@@ -110,19 +105,23 @@ object shields {
         .OpenGraph(
           title = title,
           url = s"$netBaseUrl${routes.Tournament.shieldStreaks.url}",
-          description = "Every shield currently held for two editions or more, longest streak first, with the next arena to take it back: " +
-            bounties.take(5).map { case (categ, reign, _) => s"${categ.name} (${usernameOrId(reign.userId)}, ${reign.count})" }.mkString(", ")
+          description = trans.shieldsStreaksDescription.txt(
+            bounties
+              .take(5)
+              .map { case (categ, reign, _) =>
+                s"${categ.name} (${usernameOrId(reign.userId)}, ${reign.count})"
+              }
+              .mkString(", ")
+          )
         )
         .some
     ) {
       main(cls := "page-menu page-small tournament-categ-shields shield-headhunter")(
         views.html.user.bits.communityMenu("shield"),
         div(cls := "page-menu__content box")(
-          h1(a(href := routes.Tournament.shields, dataIcon := "I", cls := "text"), "Hot streaks"),
-          p(cls := "shield-headhunter__intro")(
-            "Defenders currently holding their shield for two editions or more, longest streak first. Stop them at the next one."
-          ),
-          if (bounties.isEmpty) p(cls := "shield-headhunter__intro")("No defender is on a streak right now.")
+          h1(a(href := routes.Tournament.shields, dataIcon := "I", cls := "text"), trans.shieldsHotStreaks()),
+          p(cls := "shield-headhunter__intro")(trans.shieldsStreaksIntro()),
+          if (bounties.isEmpty) p(cls := "shield-headhunter__intro")(trans.shieldsNoStreak())
           else
             table(cls := "slist slist-pad shield-headhunter__list")(
               tbody(
@@ -134,11 +133,13 @@ object shields {
                       )
                     ),
                     td(userIdLink(reign.userId.some, withOnline = false)),
-                    td(cls := "shield-headhunter__streak")(strong(reign.count), " in a row"),
+                    td(cls := "shield-headhunter__streak")(
+                      trans.seriesInARow(raw(strong(reign.count).render))
+                    ),
                     td(cls := "shield-headhunter__next")(
                       next.map { t =>
                         a(cls := "button", href := routes.Tournament.show(t.id))(
-                          "Take the shield · ",
+                          s"${trans.seriesTakeShield.txt()} · ",
                           absClientDateTime(t.startsAt)
                         )
                       }
@@ -157,15 +158,9 @@ object shields {
       awards: List[TournamentShield.Award],
       next: Option[Tournament]
   )(implicit ctx: Context) = {
-    val title = s"${categ.name} Shield — monthly tournament champions"
+    val title = trans.shieldCategTitle.txt(categ.name)
     val stats = series.Stats(awards.map(aw => series.Win(aw.owner.value, aw.date, routes.Tournament.show(aw.tourId).url)))
-    val wording = series.Wording(
-      holderLabel = "Current holder",
-      unit = "shield",
-      unitsName = s"${categ.name} shields",
-      arenaName = "shield arena",
-      takeLabel = "Take the shield"
-    )
+    val wording = series.Wording(contested = true, subject = categ.name)
     views.html.base.layout(
       title = title,
       moreCss = frag(cssTag("tournament.leaderboard"), cssTag("slist")),
@@ -173,8 +168,7 @@ object shields {
         .OpenGraph(
           title = title,
           url = s"$netBaseUrl${routes.Tournament.categShields(categ.key).url}",
-          description = s"Every holder of the monthly ${categ.name} Shield arena on PlayStrategy." +
-            series.description(stats, wording)
+          description = trans.shieldCategDescription.txt(categ.name) + series.description(stats, wording)
         )
         .some
     ) {
@@ -183,11 +177,11 @@ object shields {
         div(cls := "page-menu__content box")(
           h1(
             a(href := routes.Tournament.shields, dataIcon := "I", cls := "text"),
-            categ.name,
-            " Shield"
+            trans.shieldCategName(categ.name)
           ),
           p(cls := "tournament-categ-shields__intro")(
-            s"The ${categ.name} Shield is a monthly arena; its winner holds the shield until the next edition. ",
+            trans.shieldCategIntro(categ.name),
+            " ",
             a(href := routes.Library.variant(categ.variant.key))(trans.aboutX(categ.name))
           ),
           series.holderCard(
@@ -198,7 +192,7 @@ object shields {
           ),
           series.record(stats, wording),
           series.podium(stats, wording),
-          h2(cls := "shield-section")("Roll of honour"),
+          h2(cls := "shield-section")(trans.seriesRollOfHonour()),
           ol(cls := "shield-roll")(awards.map { aw =>
             li(
               span(cls := "shield-trophy")(categ.iconChar.toString),
@@ -219,7 +213,7 @@ object shields {
       ctx: Context
   ) =
     views.html.base.layout(
-      title = "Shield Leaderboard",
+      title = trans.shieldLeaderboard.txt(),
       moreCss = frag(cssTag("tournament.leaderboard"), cssTag("slist"))
     ) {
       main(cls := "page-small box tournament-categ-shields")(
@@ -266,18 +260,12 @@ object shields {
   ) = {
     def editionUrl(e: Either[Tournament, Swiss]) =
       e.fold(arena => routes.Tournament.show(arena.id).url, swiss => routes.Swiss.show(swiss.id.value).url)
-    val name  = s"${medleyShield.name} Medley Shield"
-    val title = s"$name — tournament champions"
+    val name  = trans.medleyShieldName.txt(medleyShield.name)
+    val title = trans.medleyShieldTitle.txt(name)
     val stats = series.Stats(history.flatMap { e =>
       e.fold(_.winnerId, _.winnerId).map(w => series.Win(w, e.fold(_.startsAt, _.startsAt), editionUrl(e)))
     })
-    val wording = series.Wording(
-      holderLabel = "Current holder",
-      unit = "shield",
-      unitsName = s"$name shields",
-      arenaName = "medley shield",
-      takeLabel = "Take the shield"
-    )
+    val wording = series.Wording(contested = true, subject = name)
     views.html.base.layout(
       title = title,
       moreCss = frag(cssTag("tournament.leaderboard"), cssTag("slist")),
@@ -285,7 +273,7 @@ object shields {
         .OpenGraph(
           title = title,
           url = s"$netBaseUrl${routes.Tournament.medleyShield(medleyShield.key).url}",
-          description = s"Every holder of the $name on PlayStrategy." + series.description(stats, wording)
+          description = trans.medleyShieldDescription.txt(name) + series.description(stats, wording)
         )
         .some
     ) {
@@ -293,9 +281,7 @@ object shields {
         views.html.user.bits.communityMenu("shield"),
         div(cls := "page-menu__content box")(
           h1(a(href := routes.Tournament.shields, dataIcon := "I", cls := "text"), name),
-          p(cls := "tournament-categ-shields__intro")(
-            s"The $name is played across several variants of the same family; its winner holds the shield until the next edition."
-          ),
+          p(cls := "tournament-categ-shields__intro")(trans.medleyShieldIntro(name)),
           series.holderCard(
             stats,
             next.map(n => series.Next(editionUrl(n), n.fold(_.startsAt, _.startsAt))),
@@ -307,12 +293,12 @@ object shields {
           ),
           series.record(stats, wording),
           series.podium(stats, wording),
-          h2(cls := "shield-section")("Format"),
+          h2(cls := "shield-section")(trans.medleyShieldFormat()),
           p(cls := "shield-format")(medleyShield.arenaFormatFull),
-          h2(cls := "shield-section")("Variants in this medley"),
+          h2(cls := "shield-section")(trans.medleyShieldVariants()),
           if (medleyShield.hasAllVariants)
             p(cls := "shield-format")(
-              a(cls := "all-variants", href := routes.Page.variantHome)("All variants on PlayStrategy!")
+              a(cls := "all-variants", href := routes.Page.variantHome)(trans.medleyShieldAllVariants())
             )
           else
             div(cls := "medley-variants")(
@@ -328,7 +314,7 @@ object shields {
                 )
               }
             ),
-          h2(cls := "shield-section")("Roll of honour"),
+          h2(cls := "shield-section")(trans.seriesRollOfHonour()),
           ol(cls := "shield-roll")(history.map { aw =>
             li(
               userIdLink(aw.fold(_.winnerId, _.winnerId)),
