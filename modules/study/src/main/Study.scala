@@ -53,7 +53,7 @@ case class Study(
   def isTrash = trash.has(true)
 
 
-  // what a crawler may see, and what the sitemap lists (StudyRepo.selectNotable is the query form):
+  // what search engines may index, and what the sitemap lists (StudyRepo.selectNotable is the query form):
   // a like from anyone but the owner, one of the site's own accounts, or pinned to the library pages,
   // unless a mod unfeatured it
   def notable = !isTrash && (

@@ -187,8 +187,7 @@ final class Study(
   private def showQuery(query: Fu[Option[WithChapter]])(implicit ctx: Context): Fu[Result] =
     OptionFuResult(query) { oldSc =>
       CanViewResult(oldSc.study) {
-        if (!oldSc.study.notable && HTTPRequest.isCrawler(ctx.req)) notFound
-        else for {
+        for {
           (sc, data) <- getJsonData(oldSc)
           res        <- negotiate(
             html = for {
@@ -391,7 +390,7 @@ final class Study(
       env.study.api.adminInvite(id, me) inject Redirect(routes.Study.show(id))
     }
 
-  // featured: in the listings, served to crawlers and in the sitemap; unfeatured still opens by its URL
+  // featured: in the listings, indexable and in the sitemap; unfeatured still opens by its URL
   def feature(id: String) =
     SecureF(canUnfeature) { implicit ctx => me =>
       OptionFuResult(env.study.api.byId(id)) { study =>
