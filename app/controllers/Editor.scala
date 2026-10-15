@@ -90,11 +90,14 @@ final class Editor(env: Env) extends LilaController(env) {
       }
     }
 
+  // a fragment for the editor's own request when the variant changes, not a page: 404 to anyone else
   def about(key: String) =
     Open { implicit ctx =>
-      Variant.byKey.get(key) match {
-        case Some(variant) => fuccess(Ok(html.board.editor.about(variant)))
-        case None          => notFound
+      XhrOnly {
+        Variant.byKey.get(key) match {
+          case Some(variant) => fuccess(Ok(html.board.editor.about(variant)))
+          case None          => notFound
+        }
       }
     }
 
