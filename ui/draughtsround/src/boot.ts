@@ -1,4 +1,5 @@
 import * as xhr from 'common/xhr';
+import { register as registerPieceSets } from 'common/piece-sprite';
 import { RoundOpts, RoundData } from './interfaces';
 import { RoundApi, app } from './draughtsround';
 import { ChatCtrl } from 'chat';
@@ -9,6 +10,7 @@ export default function PlayStrategyDraughtsRound(opts: RoundOpts): void {
   const element = document.querySelector('.round__app') as HTMLElement,
     data: RoundData = opts.data;
   playstrategy.pageVariant = data.game.variant.key;
+  registerPieceSets(data.pref.pieceSet);
   if (data.tournament) $('body').data('tournament-id', data.tournament.id);
   playstrategy.socket = new playstrategy.StrongSocket(data.url.socket, data.player.version, {
     params: { userTv: data.userTv && data.userTv.id },

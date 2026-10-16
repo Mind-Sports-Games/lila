@@ -15,6 +15,36 @@
     cursor: inherit;
   }
 
+  // under the board on one column; bottom right, beside the FEN and URL, from two
+  .editor__about {
+    grid-area: about;
+    margin-top: 1.5em;
+    font-size: 0.85em;
+    color: $c-font-dim;
+
+    h2 {
+      margin-bottom: 0.3em;
+      font-size: 1.15em;
+      font-weight: bold;
+      color: $c-font;
+    }
+
+    p {
+      margin-bottom: 0.6em;
+    }
+
+    &__links {
+      display: flex;
+      flex-flow: row wrap;
+      align-items: center;
+      gap: 0.5em 1em;
+    }
+
+    &__rules {
+      font-weight: bold;
+    }
+  }
+
   .copyables {
     grid-area: copyables;
     margin: 2rem 0 0 1rem;

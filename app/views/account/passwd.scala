@@ -12,10 +12,9 @@ object passwd {
       title = trans.changePassword.txt(),
       active = "password",
       evenMoreJs = frag(
-        embedJsUnsafeLoadThen("""
-          playstrategy.loadModule('passwordComplexity').then(() =>
-            PlayStrategyPassword.addPasswordChangeListener('form3-newPasswd1')
-          )""")
+        embedJsUnsafeLoadThen(
+          """playstrategy.lazyPasswordComplexity('form3-newPasswd1')"""
+        )
       )
     ) {
       div(cls := "account box box-pad")(

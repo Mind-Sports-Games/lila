@@ -8,7 +8,7 @@ import lila.api.Context
 import lila.app.templating.Environment.*
 import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.markdownLinksOrRichText
-import lila.tournament.{ TeamBattle, Tournament, TournamentShield }
+import lila.tournament.{ Schedule, TeamBattle, Tournament, TournamentShield }
 import lila.i18n.VariantKeys
 
 object side {
@@ -20,7 +20,8 @@ object side {
       verdicts: lila.tournament.Condition.All.WithVerdicts,
       streamers: List[lila.user.User.ID],
       shieldOwner: Option[TournamentShield.OwnerId],
-      chat: Boolean
+      chat: Boolean,
+      previous: Option[Tournament] = None
   )(implicit ctx: Context) =
     frag(
       div(cls := "tour__meta")(
@@ -65,14 +66,25 @@ object side {
         ),
         tour.teamBattle map teamBattle(tour),
         tour.spotlight map { s =>
-          st.section(
+          st.section(cls := "spotlight")(
             markdownLinksOrRichText(s.description),
-            shieldOwner map { owner =>
-              p(cls := "defender", dataIcon := "5")(
-                "Defender:",
-                userIdLink(owner.value.some)
-              )
-            }
+            // the defender won the previous edition; without one on record, the shield holder from the cache
+            previous.filter(_ => isSeries(tour)).flatMap(prev => prev.winnerId.map(prev -> _)) match {
+              case Some((prev, winner)) =>
+                p(cls := "defender", dataIcon := "5")(
+                  a(
+                    cls   := "defender__edition",
+                    href  := routes.Tournament.show(prev.id),
+                    title := trans.seriesPreviousEdition.txt(showDate(prev.startsAt))
+                  )(holderLabel(tour)),
+                  userIdLink(winner.some)
+                )
+              case None =>
+                shieldOwner map { owner =>
+                  p(cls := "defender", dataIcon := "5")(holderLabel(tour), userIdLink(owner.value.some))
+                }
+            },
+            seriesNav(tour)
           )
         },
         // tour.medleyVariants.map { medleyVariants =>
@@ -199,4 +211,33 @@ object side {
         )
       )
     )
+
+  // series worth following edition to edition; hourlies, dailies and one-offs are not
+  def isSeries(tour: Tournament) =
+    tour.schedule.exists { s =>
+      !Set[Schedule.Freq](Schedule.Freq.Hourly, Schedule.Freq.Daily, Schedule.Freq.Unique).contains(s.freq)
+    }
+
+  private def holderLabel(tour: Tournament)(implicit ctx: Context) =
+    if (tour.isShield) trans.seriesDefender.txt()
+    else if (tour.schedule.exists(_.freq == Schedule.Freq.Yearly)) trans.seriesReigningChampionLabel.txt()
+    else trans.seriesLastWinner.txt()
+
+  private def seriesNav(tour: Tournament)(implicit ctx: Context): Option[Frag] =
+    tour.schedule.filter(_ => isSeries(tour)).map { sched =>
+      val variantName = VariantKeys.variantName(tour.variant)
+      val (seriesUrl, seriesLabel) =
+        if (tour.isShield && TournamentShield.Category.byKey(tour.variant.key).isDefined)
+          routes.Tournament.categShields(tour.variant.key).url ->
+            trans.seriesLeaderboardOf.txt(trans.shieldCategName.txt(variantName))
+        else if (sched.freq == Schedule.Freq.Yearly)
+          history.url(sched.freq, tour.variant.some) ->
+            trans.seriesLeaderboardOf.txt(s"${sched.freq.display} $variantName")
+        else if (history.hasSeries(sched.freq))
+          history.url(sched.freq, tour.variant.some) ->
+            trans.seriesAllEditionsOf.txt(s"${sched.freq.display} $variantName")
+        else
+          history.url(sched.freq, none) -> trans.seriesAllEditionsOf.txt(sched.freq.display)
+      p(cls := "series-nav", dataIcon := "g")(a(href := seriesUrl)(seriesLabel))
+    }
 }

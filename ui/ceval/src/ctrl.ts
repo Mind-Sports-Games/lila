@@ -96,7 +96,7 @@ export default function (opts: CevalOpts): CevalCtrl {
   const multiPv = storedProp(storageKey('ceval.multipv'), opts.multiPvDefault || 1);
   const infinite = storedProp('ceval.infinite', false);
   let curEval: Tree.ClientEval | null = null;
-  const allowed = prop(allowedForVariant(opts.variant.key));
+  const allowed = prop(allowedForVariant(opts.variant));
   const enabled = prop(opts.possible && allowed() && enabledAfterDisable());
   const downloadProgress = prop(0);
   let started: Started | false = false;

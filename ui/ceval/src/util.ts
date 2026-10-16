@@ -1,40 +1,3 @@
-const noClientEvalVariants = [
-  'monster',
-  'linesOfAction',
-  'scrambledEggs',
-  'international',
-  'antidraughts',
-  'breakthrough', // BKRTHRU
-  'russian',
-  'brazilian',
-  'pool',
-  'portuguese',
-  'english',
-  'fromPositionDraughts',
-  'frisian',
-  'frysk',
-  'dameo',
-  'amazons',
-  'minibreakthroughtroyka', // Note: it looks like fairySF decided the board starts from a5, thus it's computations seem to be wrong
-  'antiflipello',
-  'octagonflipello',
-  'oware',
-  'togyzkumalak',
-  'bestemshe',
-  'go9x9',
-  'go13x13',
-  'go19x19',
-  'backgammon',
-  'hyper',
-  'nackgammon',
-  'abalone',
-  'grandabalone',
-  'entropy',
-  'gomoku',
-  'pente',
-  'renju',
-];
-
 const noPathVizualizationVariants: VariantKey[] = [
   'shogi',
   'minishogi',
@@ -121,8 +84,9 @@ export function sanIrreversible(variant: VariantKey, san: string): boolean {
   return (variant === 'threeCheck' || variant === 'fiveCheck') && san.includes('+');
 }
 
-export function allowedForVariant(variant: VariantKey) {
-  return noClientEvalVariants.indexOf(variant) == -1;
+// the server says which games the browser can run an engine for (lila.game.BrowserEngine)
+export function allowedForVariant(variant: { clientEval: boolean }) {
+  return variant.clientEval;
 }
 
 export function allowPv(variant: VariantKey) {

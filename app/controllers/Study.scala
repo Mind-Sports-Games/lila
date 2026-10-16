@@ -65,13 +65,15 @@ final class Study(
 
   def byOwner(username: String, order: String, page: Int) =
     Open { implicit ctx =>
-      env.user.repo.named(username).flatMap {
-        _.fold(notFound(using ctx)) { owner =>
-          env.study.pager.byOwner(owner, ctx.me, Order(order), page) flatMap { pag =>
-            negotiate(
-              html = Ok(html.study.list.byOwner(pag, Order(order), owner)).fuccess,
-              api = _ => apiStudies(pag)
-            )
+      Reasonable(page) {
+        env.user.repo.named(username).flatMap {
+          _.fold(notFound(using ctx)) { owner =>
+            env.study.pager.byOwner(owner, ctx.me, Order(order), page) flatMap { pag =>
+              negotiate(
+                html = Ok(html.study.list.byOwner(pag, Order(order), owner)).fuccess,
+                api = _ => apiStudies(pag)
+              )
+            }
           }
         }
       }
@@ -133,13 +135,30 @@ final class Study(
 
   def byTopic(name: String, order: String, page: Int) =
     Open { implicit ctx =>
-      lila.study.StudyTopic.fromStr(name) match {
-        case None        => notFound
-        case Some(topic) =>
-          env.study.pager.byTopic(topic, ctx.me, Order(order), page) zip
-            ctx.me.so(u => env.study.topicApi.userTopics(u.id).dmap(some)) map { case (pag, topics) =>
-              Ok(html.study.topic.show(topic, pag, Order(order), topics))
+      Reasonable(page) {
+        lila.study.StudyTopic.fromStr(name) match {
+          case None        => notFound
+          case Some(topic) =>
+            env.study.pager.byTopic(topic, ctx.me, Order(order), page) zip
+              ctx.me.so(u => env.study.topicApi.userTopics(u.id).dmap(some)) map { case (pag, topics) =>
+                Ok(html.study.topic.show(topic, pag, Order(order), topics))
+              }
+        }
+      }
+    }
+
+  def byVariantDefault(key: String, page: Int) = byVariant(key, Order.default.key, page)
+
+  def byVariant(key: String, order: String, page: Int) =
+    Open { implicit ctx =>
+      Reasonable(page) {
+        strategygames.variant.Variant.byKey.get(key) match {
+          case None          => notFound
+          case Some(variant) =>
+            env.study.pager.byVariant(variant, ctx.me, Order(order), page) map { pag =>
+              Ok(html.study.variant.show(variant, pag, Order(order)))
             }
+        }
       }
     }
 
@@ -175,7 +194,18 @@ final class Study(
               chat      <- chatOf(sc.study)
               sVersion  <- env.study.version(sc.study.id)
               streamers <- streamersOf(sc.study)
-            } yield EnableSharedArrayBuffer(Ok(html.study.show(sc.study, data, chat, sVersion, streamers))),
+            } yield EnableSharedArrayBuffer(
+              Ok(
+                html.study.show(
+                  sc.study,
+                  data,
+                  chat,
+                  sVersion,
+                  streamers,
+                  sc.chapter.setup.variant.gameFamily.key.some
+                )
+              )
+            ),
             api = _ =>
               chatOf(sc.study).map { chatOpt =>
                 Ok(
@@ -287,14 +317,36 @@ final class Study(
         )
     }
 
+  private val CreateLimitPerUser = new lila.memo.RateLimit[lila.user.User.ID](
+    credits = 30 * 2,
+    duration = 24.hour,
+    key = "study.create.user"
+  )
+
+  private val CreateLimitPerIP = new lila.memo.RateLimit[IpAddress](
+    credits = 50 * 2,
+    duration = 24.hour,
+    key = "study.create.ip"
+  )
+
   private def createStudy(data: lila.study.StudyForm.importGame.Data, me: lila.user.User)(implicit
       ctx: Context
-  ) =
-    env.study.api.importGame(lila.study.StudyMaker.ImportGame(data), me) flatMap {
-      _.fold(notFound) { sc =>
-        Redirect(routes.Study.show(sc.study.id.value)).fuccess
-      }
-    }
+  ) = {
+    // adding a chapter to an existing study is free; a new study costs a normal user 2 credits
+    val cost =
+      if (data.as != lila.study.StudyForm.importGame.AsNewStudy) 0
+      else if (isGranted(_.Coach) || me.hasTitle) 1
+      else 2
+    CreateLimitPerUser(me.id, cost = cost) {
+      CreateLimitPerIP(HTTPRequest.ipAddress(ctx.req), cost = cost) {
+        env.study.api.importGame(lila.study.StudyMaker.ImportGame(data), me) flatMap {
+          _.fold(notFound) { sc =>
+            Redirect(routes.Study.show(sc.study.id.value)).fuccess
+          }
+        }
+      }(rateLimitedFu)
+    }(rateLimitedFu)
+  }
 
   def delete(id: String) =
     Auth { _ => me =>
@@ -336,6 +388,26 @@ final class Study(
   def admin(id: String) =
     Secure(_.StudyAdmin) { _ => me =>
       env.study.api.adminInvite(id, me) inject Redirect(routes.Study.show(id))
+    }
+
+  // featured: in the listings, indexable and in the sitemap; unfeatured still opens by its URL
+  def feature(id: String) =
+    SecureF(html.study.bits.canUnfeature) { implicit ctx => me =>
+      OptionFuResult(env.study.api.byId(id)) { study =>
+        env.study.studyRepo.feature(study.id) >>
+          env.mod.logApi.studyFeature(me.id, study.id.value, study.name.value) inject
+          Redirect(HTTPRequest.referer(ctx.req) | routes.Study.show(id).url)
+      }
+    }
+
+  def featureByOwner(username: String, v: Boolean) =
+    SecureF(html.study.bits.canUnfeature) { implicit ctx => me =>
+      OptionFuResult(env.user.repo.named(username)) { owner =>
+        env.study.studyRepo.setTrashByOwner(owner.id, !v) flatMap { nb =>
+          env.mod.logApi.studyFeatureByOwner(me.id, owner.id, v, nb) inject
+            Redirect(routes.Study.byOwnerDefault(owner.username))
+        }
+      }
     }
 
   def embed(id: String, chapterId: String) =

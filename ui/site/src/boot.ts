@@ -122,8 +122,8 @@ export function boot() {
     if (navigator.userAgent.includes('Edge/'))
       setTimeout(() => {
         //TODO loop through all piece-sprite objects
-        const sprite = document.getElementById('piece-sprite-chess') as HTMLLinkElement;
-        sprite.href = sprite.href.replace('.css', '.external.css');
+        const sprite = document.getElementById('piece-sprite-chess') as HTMLLinkElement | null;
+        if (sprite) sprite.href = sprite.href.replace('.css', '.external.css');
       }, 1000);
 
     // prevent zoom when keyboard shows on iOS

@@ -1,7 +1,6 @@
 import { attributesModule, classModule, init, VNode } from 'snabbdom';
 import menuHover from 'common/menuHover';
 import RacerCtrl from './ctrl';
-import { Chessground } from 'chessground';
 import { RacerOpts } from './interfaces';
 
 const patch = init([classModule, attributesModule]);
@@ -26,9 +25,5 @@ export function PlayStrategyRacer(opts: RacerOpts) {
   menuHover();
   $('script').remove();
 }
-
-// that's for the rest of playstrategy to access chessground
-// without having to include it a second time
-window.Chessground = Chessground;
 
 (window as any).PlayStrategyRacer = PlayStrategyRacer; // esbuild

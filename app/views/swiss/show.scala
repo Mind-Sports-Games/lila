@@ -58,7 +58,6 @@ object show {
         cssTag("swiss.show"),
         hasScheduleInput.option(cssTag("flatpickr"))
       ),
-      chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
           title = s"${fullName(s)}: ${VariantKeys.variantName(s.variant)} ${s.clock.show} #${s.id}",

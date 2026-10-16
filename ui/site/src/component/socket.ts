@@ -98,7 +98,12 @@ export default class StrongSocket {
     };
     this.version = version;
     this.pubsub.on('socket.send', this.send);
-    window.addEventListener('unload', this.destroy);
+    // not 'unload', which blocks the back/forward cache; an open socket can too, so it closes on the
+    // way in and opens again on the way back
+    window.addEventListener('pagehide', () => this.destroy());
+    window.addEventListener('pageshow', e => {
+      if (e.persisted) this.connect();
+    });
     this.connect();
   }
 

@@ -227,6 +227,7 @@ $('#asset-version-message').text(window.playstrategy.info.message);"""
       main(cls := "page-menu")(
         st.nav(cls := "page-menu__menu subnav")(
           a(activeCls("about"), href := "/about")(trans.aboutX("playstrategy.org")),
+          a(activeCls("partners"), href := routes.Page.menuPage("partners"))("Partners"),
           a(activeCls("faq"), href := routes.Main.faq)(trans.faq.faqAbbreviation()),
           a(activeCls("contact"), href := routes.Main.contact)(trans.contact.contact()),
           a(activeCls("tos"), href := routes.Page.tos)(trans.termsOfService()),

@@ -7,6 +7,7 @@ import lila.app.ui.ScalatagsTemplate.*
 import lila.i18n.VariantKeys
 
 import strategygames.variant.Variant
+import views.html.library.bits as libraryBits
 
 object variant {
 
@@ -17,12 +18,44 @@ object variant {
   )(implicit ctx: Context) =
     layout(
       active = variant.some,
-      title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
-      klass = "box-pad page variant"
+      title = libraryBits.rulesTitle(variant),
+      klass = "box-pad page variant",
+      openGraph = lila.app.ui
+        .OpenGraph(
+          title = libraryBits.rulesTitle(variant),
+          url = s"$netBaseUrl${routes.Page.variant(variant.key).url}",
+          description = libraryBits.rulesDescription(variant)
+        )
+        .some
     )(
-      h1(cls := "text", dataIcon := variant.perfIcon)(VariantKeys.variantName(variant)),
-      h2(cls := "headline")(VariantKeys.variantTitle(variant)),
-      div(cls := "body")(raw(~doc.getHtml("pages.content", resolver)))
+      div(cls := "variant__head")(
+        h1(cls := "text", dataIcon := variant.perfIcon)(VariantKeys.variantName(variant)),
+        a(cls := "button", href := s"/?variant=${variant.key}#game")(trans.createAGame())
+      ),
+      div(cls := "variant__intro")(
+        h2(cls := "headline")(VariantKeys.variantTitle(variant)),
+        libraryBits.parentVariant(variant).map { parent =>
+          p(
+            trans.variantOf(
+              libraryBits.searchName(variant),
+              a(href := routes.Page.variant(parent.key))(libraryBits.searchName(parent))
+            )
+          )
+        }
+      ),
+      div(cls := "body")(raw(~doc.getHtml("pages.content", resolver))),
+      libraryBits.hasLibraryPages(variant).option(
+        p(cls := "variant__about")(
+          trans.playVariantOnlineFree(libraryBits.nameWithAlias(variant)),
+          " ",
+          VariantKeys.variantTitle(variant),
+          ". ",
+          a(href := routes.Library.variant(variant.key))(
+            trans.allAboutX(libraryBits.searchName(variant)),
+            " »"
+          )
+        )
+      )
     )
 
   def home(
@@ -30,7 +63,7 @@ object variant {
       resolver: io.prismic.DocumentLinkResolver
   )(implicit ctx: Context) =
     layout(
-      title = "PlayStrategy Games",
+      title = "Board game rules — how to play every game on PlayStrategy",
       klass = "variants"
     )(
       h1("PlayStrategy Games"),

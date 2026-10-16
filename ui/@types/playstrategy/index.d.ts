@@ -24,6 +24,8 @@ interface PlayStrategy {
   loadScript(url: string, opts?: AssetUrlOpts): Promise<void>;
   loadScriptCJS(url: string, opts?: AssetUrlOpts): Promise<void>;
   loadModule(name: string): Promise<void>;
+  lazyPasswordComplexity(fieldId: string): void;
+  lazyChart(selector: string, module: string, draw: () => void): void;
   hopscotch: any;
   userComplete: () => Promise<UserComplete>;
   slider(): Promise<void>;
@@ -51,7 +53,7 @@ interface PlayStrategy {
   socket: any;
   sound: SoundI;
   miniBoard: {
-    init(node: HTMLElement): void;
+    init(node: HTMLElement): Promise<any>;
     initAll(parent?: HTMLElement): void;
   };
   miniGame: {
@@ -245,7 +247,6 @@ interface Window {
 
   moment: any;
   Mousetrap: any;
-  Chessground: any;
   libraryChartData?: any;
   InfiniteScroll(selector: string): void;
   playstrategyReplayMusic: () => {
@@ -533,6 +534,7 @@ interface Variant {
   lib: number;
   boardSize: BoardDim;
   iconChar?: string;
+  clientEval: boolean; // whether the browser can run an engine for it: the server decides
 }
 
 interface DraughtsVariant {

@@ -27,11 +27,8 @@ object perfStat {
       moreJs = frag(
         jsModule("user"),
         ratingChart.map { rc =>
-          frag(
-            jsModule("chart.ratingHistory"),
-            embedJsUnsafeLoadThen(
-              s"playstrategy.ratingHistoryChart($rc,'${perfType.trans(using lila.i18n.defaultLang)}');"
-            )
+          embedJsUnsafeLoadThen(
+            s"playstrategy.lazyChart('.rating-history-container','chart.ratingHistory',()=>playstrategy.ratingHistoryChart($rc,'${perfType.trans(using lila.i18n.defaultLang)}'))"
           )
         }
       ),

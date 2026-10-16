@@ -185,7 +185,7 @@ object JsonView {
 
   // TODO we shouldn't have to unwrap per game logic
   implicit val variantWriter: OWrites[Variant] = OWrites { v =>
-    v match {
+    (v match {
       case Variant.Draughts(draughtsVariant) =>
         Json.obj(
           "key"       -> v.key,
@@ -279,7 +279,7 @@ object JsonView {
             "height" -> 8
           )
         )
-    }
+    }) ++ Json.obj("clientEval" -> BrowserEngine.has(v))
   }
 
   implicit val boardSizeFairyWriter: Writes[strategygames.fairysf.Board.BoardSize] =

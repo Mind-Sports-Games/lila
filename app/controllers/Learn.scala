@@ -1,27 +1,19 @@
 package controllers
 
-import lila.app.{ *, given }
+import lila.app.*
 
 import play.api.data.*
 import play.api.data.Forms.*
 import play.api.libs.json.*
-import views.html
 
 final class Learn(env: Env) extends LilaController(env) {
 
-  import lila.learn.JSONHandlers.*
   import lila.core.lilaism.Lilaism.unapply
 
+  // the learn app is not shipped: 404 until it is, so search engines drop the blank page
   def index =
     Open { implicit ctx =>
-      pageHit
-      ctx.me
-        .so { me =>
-          env.learn.api.get(me) map { Json.toJson(_) } map some
-        }
-        .map { progress =>
-          Ok(html.learn.index(progress))
-        }
+      notFound
     }
 
   private val scoreForm = Form(

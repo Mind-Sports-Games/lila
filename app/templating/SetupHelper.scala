@@ -177,25 +177,41 @@ trait SetupHelper { self: I18nHelper =>
   )(variant: Variant) =
     (encode(variant), variantName(variant), VariantKeys.variantTitle(variant).some)
 
-  def translatedGameGroupIconChoices(implicit lang: Lang): List[SelectChoice] = {
-    val displayOrder = List(
-      GameGroup.Chess(),
-      GameGroup.Draughts(),
-      GameGroup.Go(),
-      GameGroup.Backgammon(),
-      GameGroup.Shogi(),
-      GameGroup.BreakthroughTroyka(),
-      GameGroup.Flipello(),
-      GameGroup.Mancala(),
-      GameGroup.Xiangqi(),
-      GameGroup.LinesOfAction(),
-      GameGroup.Abalone(),
-      GameGroup.Amazons(),
-      GameGroup.Entropy(),
-      GameGroup.FiveInARow()
-    )
-    displayOrder.map(translatedGameGroupIconChoice)
-  }
+  // The groups the two-stage picker offers, in the order it shows them. GameGroup.all also holds
+  // FairySF, a catch-all that claims every FairySF variant and is shown nowhere, so a lookup over
+  // all of them would put shogi, xiangqi and flipello under it.
+  val displayedGameGroups: List[GameGroup] = List(
+    GameGroup.Chess(),
+    GameGroup.Draughts(),
+    GameGroup.Go(),
+    GameGroup.Backgammon(),
+    GameGroup.Shogi(),
+    GameGroup.BreakthroughTroyka(),
+    GameGroup.Flipello(),
+    GameGroup.Mancala(),
+    GameGroup.Xiangqi(),
+    GameGroup.LinesOfAction(),
+    GameGroup.Abalone(),
+    GameGroup.Amazons(),
+    GameGroup.Entropy(),
+    GameGroup.FiveInARow()
+  )
+
+  // the group button a game family sits under. Not the group's id: the family id of the group's
+  // first variant (Mancala reads 7, Draughts 1)
+  val gameGroupValueByFamilyId: Map[String, String] =
+    displayedGameGroups.flatMap { group =>
+      group.variants.map(v => encodeGameFamilyId(v.gameFamily) -> encodeGameGroupId(group))
+    }.toMap
+
+  // the group's own id, which the library chart keys its series by
+  val gameGroupIdByFamilyId: Map[String, String] =
+    displayedGameGroups.flatMap { group =>
+      group.variants.map(v => encodeGameFamilyId(v.gameFamily) -> group.id.toString)
+    }.toMap
+
+  def translatedGameGroupIconChoices(implicit lang: Lang): List[SelectChoice] =
+    displayedGameGroups.map(translatedGameGroupIconChoice)
 
   private def translatedGameGroupIconChoice(
       gameGroup: GameGroup
