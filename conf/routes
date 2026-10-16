@@ -248,6 +248,9 @@ POST  /streamer/picture/delete         controllers.Streamer.pictureDelete
 GET   /streamer/:username              controllers.Streamer.show(username: String)
 GET   /streamer/:username/redirect     controllers.Streamer.redirect(username: String)
 
+# Pages before Round: 8-letter names like "partners" otherwise match a game id
+GET   /$uid<privacy|thanks|about|partners|changelog> controllers.Page.menuPage(uid: String)
+
 # Round
 GET   /$gameId<\w{8}>                               controllers.Round.watcher(gameId: String, playerIndex: String = "p1")
 GET   /$gameId<\w{8}>/$playerIndex<p1|p2>           controllers.Round.watcher(gameId: String, playerIndex: String)
@@ -786,7 +789,6 @@ POST  /push/subscribe                  controllers.Push.webSubscribe
 
 # Pages
 GET   /terms-of-service                controllers.Page.tos
-GET   /$uid<privacy|thanks|about|partners|changelog> controllers.Page.menuPage(uid: String)
 GET   /contact                         controllers.Main.contact
 GET   /faq                             controllers.Main.faq
 GET   /source                          controllers.Page.source
