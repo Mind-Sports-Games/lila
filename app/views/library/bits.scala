@@ -112,7 +112,7 @@ object bits {
   ) = Some(MsoEvent(gameCode, Some(code), worldChampionship, study, others))
 
   // games the MSO has not run an online tournament for yet: their page links no online tournaments
-  private val noMsoOnline = Set("entropy")
+  private val noMsoOnline = Set("entropy", "pente", "renju")
 
   def hasMsoOnline(variant: Variant): Boolean = !noMsoOnline(variant.key)
 
@@ -130,6 +130,7 @@ object bits {
       case "togyzkumalak" => mso("TO", "TOOC")
       case "shogi"        => mso("SH", "SHOC")
       case "xiangqi"      => mso("CC", "CCOC")
+      case "gomoku"       => mso("GK", "GKOC")
       case "backgammon"   =>
         mso(
           "BA",
@@ -187,7 +188,8 @@ object bits {
     List("dameo", "frisian"),
     List("antidraughts", "breakthrough"),
     List("fiveCheck", "threeCheck"),
-    List("oware", "togyzkumalak")
+    List("oware", "togyzkumalak"),
+    List("gomoku", "pente", "renju")
   )
 
   def relatedVariants(variant: Variant): List[Variant] =
