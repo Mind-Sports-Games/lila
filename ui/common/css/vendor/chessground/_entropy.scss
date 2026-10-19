@@ -13,6 +13,17 @@ $entropy-dest-ring-width: 0.286cqw;
 $entropy-dest-ring: rgba(0, 0, 0, 0.45);
 $entropy-premove-dest-ring: rgba(20, 30, 85, 0.5);
 
+// one accent for the player's own move and one for a premove, each drawn as a circle: a dot over a
+// counter, ringed in the pattern halo so it reads on all seven counters, or a ring on the bare board.
+$entropy-highlight: rgb(224, 33, 138);
+$entropy-premove-highlight: rgb(20, 30, 85);
+$entropy-dot-inset: 38%;
+$entropy-dot-outline-width: 0.2cqw;
+$entropy-dot-outline: rgba($entropy-pattern-halo, $entropy-pattern-halo-opacity);
+$entropy-halo-inset: 1.5%;
+$entropy-halo-width: 0.35cqw;
+$entropy-hover-fill-opacity: 0.35;
+
 .variant-entropy {
   cg-container {
     width: calc(100% * 7);
@@ -84,6 +95,72 @@ $entropy-premove-dest-ring: rgba(20, 30, 85, 0.5);
     &.premove-dest::before {
       inset: $entropy-premove-dest-ring-inset;
       border-color: $entropy-premove-dest-ring;
+    }
+
+    &.move-dest:hover {
+      background: none;
+
+      &::before {
+        background: rgba($entropy-highlight, $entropy-hover-fill-opacity);
+      }
+    }
+
+    &.premove-dest:hover {
+      background: none;
+
+      &::before {
+        background: rgba($entropy-premove-highlight, $entropy-hover-fill-opacity);
+      }
+    }
+
+    &.selected,
+    &.current-premove.counter {
+      background: none !important;
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: $entropy-halo-inset;
+        border: $entropy-halo-width solid $entropy-highlight;
+        border-radius: 50%;
+      }
+    }
+
+    &.current-premove {
+      background: none !important;
+
+      &.counter::before {
+        border-color: $entropy-premove-highlight;
+      }
+
+      &:not(.counter)::before {
+        content: '';
+        position: absolute;
+        inset: $entropy-dest-ring-inset;
+        background: rgba($entropy-premove-highlight, $entropy-hover-fill-opacity);
+        border-radius: 50%;
+      }
+    }
+
+    &.last-move {
+      background: none;
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: $entropy-dot-inset;
+        border: $entropy-dest-ring-width solid $entropy-highlight;
+        border-radius: 50%;
+      }
+
+      &.counter {
+        z-index: z('cg__svg.direction');
+
+        &::after {
+          background: $entropy-highlight;
+          border: $entropy-dot-outline-width solid $entropy-dot-outline;
+        }
+      }
     }
   }
 }
