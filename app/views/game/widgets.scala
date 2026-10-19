@@ -85,7 +85,7 @@ object widgets {
                   g.winner.map { winner =>
                     frag(
                       (gameEndStatus(g) != "").option(", "),
-                      trans.playerIndexIsVictorious(g.playerTrans(winner.playerIndex))
+                      trans.playerIndexIsVictorious(resultName(g, winner.playerIndex))
                     )
                   }
                 )

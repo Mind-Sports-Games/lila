@@ -18,7 +18,7 @@ import isCol1 from 'common/isCol1';
 import isCol3 from 'common/isCol3';
 import { playable } from 'game';
 import * as router from 'game/router';
-import statusView from 'game/view/status';
+import statusView, { winnerName } from 'game/view/status';
 import { path as treePath } from 'tree';
 import { render as renderTreeView } from './treeView/treeView';
 import * as control from './control';
@@ -72,7 +72,7 @@ function renderResult(ctrl: AnalyseCtrl): VNode[] {
       default:
         result = '½-½';
     }
-    const winner = ctrl.data.game.winnerPlayer;
+    const winner = winnerName(ctrl);
     statusNodes = [statusView(ctrl), winner ? ', ' + ctrl.trans('playerIndexIsVictorious', winner) : null];
   } else {
     const outcome = ctrl.outcome();

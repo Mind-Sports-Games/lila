@@ -179,6 +179,12 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
     }
   }
 
+  def resultName(game: Game, p: PlayerIndex)(implicit lang: Lang): String = {
+    val player = game.player(p)
+    if (player.aiLevel.isDefined) playerText(player)
+    else player.userId.flatMap(lightUser).map(_.name).orElse(player.name) | game.playerTrans(p)
+  }
+
   def gameEndStatus(game: Game)(implicit lang: Lang): String =
     game.status match {
       case S.Aborted => trans.gameAborted.txt()
@@ -194,73 +200,73 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
       case S.PerpetualCheck => trans.perpetualCheck.txt()
       case S.Resign         =>
         game.loser match {
-          case Some(p) if p.playerIndex.p1 => trans.playerIndexResigned(game.playerTrans(P1)).v
-          case _                           => trans.playerIndexResigned(game.playerTrans(P2)).v
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexResigned(resultName(game, P1)).v
+          case _                           => trans.playerIndexResigned(resultName(game, P2)).v
         }
       case S.ResignGammon =>
         game.loser match {
-          case Some(p) if p.playerIndex.p1 => trans.playerIndexResignedGammon(game.playerTrans(P1)).v
-          case _                           => trans.playerIndexResignedGammon(game.playerTrans(P2)).v
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexResignedGammon(resultName(game, P1)).v
+          case _                           => trans.playerIndexResignedGammon(resultName(game, P2)).v
         }
       case S.ResignBackgammon =>
         game.loser match {
-          case Some(p) if p.playerIndex.p1 => trans.playerIndexResignedBackgammon(game.playerTrans(P1)).v
-          case _                           => trans.playerIndexResignedBackgammon(game.playerTrans(P2)).v
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexResignedBackgammon(resultName(game, P1)).v
+          case _                           => trans.playerIndexResignedBackgammon(resultName(game, P2)).v
         }
       case S.ResignMatch =>
         game.loser match {
-          case Some(p) if p.playerIndex.p1 => trans.playerIndexResignedMatch(game.playerTrans(P1)).v
-          case _                           => trans.playerIndexResignedMatch(game.playerTrans(P2)).v
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexResignedMatch(resultName(game, P1)).v
+          case _                           => trans.playerIndexResignedMatch(resultName(game, P2)).v
         }
       case S.CubeDropped =>
         game.loser match {
-          case Some(p) if p.playerIndex.p1 => trans.playerIndexDroppedTheCube(game.playerTrans(P1)).v
-          case _                           => trans.playerIndexDroppedTheCube(game.playerTrans(P2)).v
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexDroppedTheCube(resultName(game, P1)).v
+          case _                           => trans.playerIndexDroppedTheCube(resultName(game, P2)).v
         }
       case S.UnknownFinish => trans.finished.txt()
       case S.Stalemate     => trans.stalemate.txt()
       case S.Timeout       =>
         game.loser match {
-          case Some(p) if p.playerIndex.p1 => trans.playerIndexLeftTheGame(game.playerTrans(P1)).v
-          case Some(_)                     => trans.playerIndexLeftTheGame(game.playerTrans(P2)).v
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexLeftTheGame(resultName(game, P1)).v
+          case Some(_)                     => trans.playerIndexLeftTheGame(resultName(game, P2)).v
           case None                        => trans.draw.txt()
         }
       case S.Draw      => trans.draw.txt()
       case S.Outoftime =>
         (game.turnPlayerIndex, game.loser) match {
-          case (P1, Some(_)) => trans.playerIndexTimeOut(game.playerTrans(P1)).v
-          case (P1, None)    => trans.playerIndexTimeOut(game.playerTrans(P1)).v + " • " + trans.draw.txt()
-          case (P2, Some(_)) => trans.playerIndexTimeOut(game.playerTrans(P2)).v
-          case (P2, None)    => trans.playerIndexTimeOut(game.playerTrans(P2)).v + " • " + trans.draw.txt()
+          case (P1, Some(_)) => trans.playerIndexTimeOut(resultName(game, P1)).v
+          case (P1, None)    => trans.playerIndexTimeOut(resultName(game, P1)).v + " • " + trans.draw.txt()
+          case (P2, Some(_)) => trans.playerIndexTimeOut(resultName(game, P2)).v
+          case (P2, None)    => trans.playerIndexTimeOut(resultName(game, P2)).v + " • " + trans.draw.txt()
         }
       case S.OutoftimeGammon =>
         game.loser match {
-          case Some(p) if p.playerIndex.p1 => trans.playerIndexLosesByGammonTimeOut(game.playerTrans(P1)).v
-          case _                           => trans.playerIndexLosesByGammonTimeOut(game.playerTrans(P2)).v
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexLosesByGammonTimeOut(resultName(game, P1)).v
+          case _                           => trans.playerIndexLosesByGammonTimeOut(resultName(game, P2)).v
         }
       case S.OutoftimeBackgammon =>
         game.loser match {
           case Some(p) if p.playerIndex.p1 =>
-            trans.playerIndexLosesByBackgammonTimeOut(game.playerTrans(P1)).v
-          case _ => trans.playerIndexLosesByBackgammonTimeOut(game.playerTrans(P2)).v
+            trans.playerIndexLosesByBackgammonTimeOut(resultName(game, P1)).v
+          case _ => trans.playerIndexLosesByBackgammonTimeOut(resultName(game, P2)).v
         }
       case S.RuleOfGin =>
         game.winner match {
-          case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByRuleOfGin(game.playerTrans(P1)).v
-          case _                           => trans.playerIndexWinsByRuleOfGin(game.playerTrans(P2)).v
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByRuleOfGin(resultName(game, P1)).v
+          case _                           => trans.playerIndexWinsByRuleOfGin(resultName(game, P2)).v
         }
       case S.GinGammon =>
         game.winner match {
-          case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByGinGammon(game.playerTrans(P1)).v
-          case _                           => trans.playerIndexWinsByGinGammon(game.playerTrans(P2)).v
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByGinGammon(resultName(game, P1)).v
+          case _                           => trans.playerIndexWinsByGinGammon(resultName(game, P2)).v
         }
       case S.GinBackgammon =>
         game.winner match {
-          case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByGinBackgammon(game.playerTrans(P1)).v
-          case _                           => trans.playerIndexWinsByGinBackgammon(game.playerTrans(P2)).v
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByGinBackgammon(resultName(game, P1)).v
+          case _                           => trans.playerIndexWinsByGinBackgammon(resultName(game, P2)).v
         }
       case S.NoStart =>
-        trans.playerIndexDidntMove(game.playerTrans(game.loser.fold(PlayerIndex.p1)(_.playerIndex))).v
+        trans.playerIndexDidntMove(resultName(game, game.loser.fold(PlayerIndex.p1)(_.playerIndex))).v
       case S.Cheat         => trans.cheatDetected.txt()
       case S.SingleWin     => trans.backgammonSingleWin.txt()
       case S.GammonWin     => trans.backgammonGammonWin.txt()

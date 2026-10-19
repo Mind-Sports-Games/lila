@@ -31,6 +31,7 @@ private object jsI18n {
     trans.playerIndexWinsByGinBackgammon,
     trans.playingRightNow,
     trans.playerIndexIsVictorious,
+    trans.aiNameLevelAiLevel,
     trans.promotion,
     trans.cheatDetected,
     trans.kingInTheCenter,

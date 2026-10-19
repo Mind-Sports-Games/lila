@@ -138,7 +138,7 @@ object side {
             game.winner.map { winner =>
               frag(
                 separator,
-                trans.playerIndexIsVictorious(game.playerTrans(winner.playerIndex))
+                trans.playerIndexIsVictorious(resultName(game, winner.playerIndex))
               )
             }
           )

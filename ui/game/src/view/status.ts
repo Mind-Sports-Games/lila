@@ -1,5 +1,26 @@
 import { Ctrl } from '../interfaces';
 
+function resultName(ctrl: Ctrl, playerIndex: PlayerIndex | undefined, playerName: PlayerName | undefined): string {
+  if (!playerName) return '';
+  const d = ctrl.data,
+    player = [d.player, d.opponent].find(p => p.playerIndex === playerIndex),
+    name = player?.user
+      ? player.user.username
+      : player?.ai
+        ? ctrl.trans('aiNameLevelAiLevel', 'Stockfish', player.ai)
+        : player?.name;
+  return name || playerName;
+}
+
+export function winnerName(ctrl: Ctrl): string {
+  return resultName(ctrl, ctrl.data.game.winner, ctrl.data.game.winnerPlayer);
+}
+
+export function loserName(ctrl: Ctrl): string {
+  const winner = ctrl.data.game.winner;
+  return resultName(ctrl, winner ? (winner === 'p1' ? 'p2' : 'p1') : undefined, ctrl.data.game.loserPlayer);
+}
+
 export default function status(ctrl: Ctrl): string {
   const noarg = ctrl.trans.noarg,
     d = ctrl.data;
@@ -19,19 +40,19 @@ export default function status(ctrl: Ctrl): string {
       }
       return '';
     case 'resign':
-      return ctrl.trans('playerIndexResigned', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return ctrl.trans('playerIndexResigned', loserName(ctrl));
     case 'resignGammon':
-      return ctrl.trans('playerIndexResignedGammon', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return ctrl.trans('playerIndexResignedGammon', loserName(ctrl));
     case 'resignBackgammon':
-      return ctrl.trans('playerIndexResignedBackgammon', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return ctrl.trans('playerIndexResignedBackgammon', loserName(ctrl));
     case 'resignMatch':
-      return ctrl.trans('playerIndexResignedMatch', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return ctrl.trans('playerIndexResignedMatch', loserName(ctrl));
     case 'cubeDropped':
-      return ctrl.trans('playerIndexDroppedTheCube', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return ctrl.trans('playerIndexDroppedTheCube', loserName(ctrl));
     case 'stalemate':
       return noarg('stalemate');
     case 'timeout':
-      return d.game.loserPlayer ? ctrl.trans('playerIndexLeftTheGame', d.game.loserPlayer) : noarg('draw');
+      return d.game.loserPlayer ? ctrl.trans('playerIndexLeftTheGame', loserName(ctrl)) : noarg('draw');
     case 'draw':
       return noarg('draw');
     case 'outoftime':
@@ -39,20 +60,20 @@ export default function status(ctrl: Ctrl): string {
       //  d.game.winner ? '' : ` • ${noarg('draw')}`
       //}`;
       return d.game.loserPlayer
-        ? ctrl.trans('playerIndexTimeOut', d.game.loserPlayer)
+        ? ctrl.trans('playerIndexTimeOut', loserName(ctrl))
         : `${ctrl.trans('playerIndexTimeOut', '')} • ${noarg('draw')}`;
     case 'outoftimeGammon':
-      return ctrl.trans('playerIndexLosesByGammonTimeOut', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return ctrl.trans('playerIndexLosesByGammonTimeOut', loserName(ctrl));
     case 'outoftimeBackgammon':
-      return ctrl.trans('playerIndexLosesByBackgammonTimeOut', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return ctrl.trans('playerIndexLosesByBackgammonTimeOut', loserName(ctrl));
     case 'ruleOfGin':
-      return ctrl.trans('playerIndexWinsByRuleOfGin', d.game.winnerPlayer ? d.game.winnerPlayer : '');
+      return ctrl.trans('playerIndexWinsByRuleOfGin', winnerName(ctrl));
     case 'ginGammon':
-      return ctrl.trans('playerIndexWinsByGinGammon', d.game.winnerPlayer ? d.game.winnerPlayer : '');
+      return ctrl.trans('playerIndexWinsByGinGammon', winnerName(ctrl));
     case 'ginBackgammon':
-      return ctrl.trans('playerIndexWinsByGinBackgammon', d.game.winnerPlayer ? d.game.winnerPlayer : '');
+      return ctrl.trans('playerIndexWinsByGinBackgammon', winnerName(ctrl));
     case 'noStart':
-      return ctrl.trans('playerIndexDidntMove', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return ctrl.trans('playerIndexDidntMove', loserName(ctrl));
     case 'cheat':
       return noarg('cheatDetected');
     case 'perpetualCheck':

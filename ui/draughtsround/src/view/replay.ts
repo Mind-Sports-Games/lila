@@ -5,7 +5,7 @@ import * as util from '../util';
 import isCol1 from 'common/isCol1';
 import RoundController from '../ctrl';
 import throttle from 'common/throttle';
-import viewStatus from 'game/view/status';
+import viewStatus, { winnerName } from 'game/view/status';
 import { game as gameRoute } from 'game/router';
 import { h, VNode } from 'snabbdom';
 import { Step, MaybeVNodes } from '../interfaces';
@@ -79,7 +79,7 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
         result = ctrl.data.pref.draughtsResult ? '1-1' : '½-½';
     }
   if (result || status.aborted(ctrl.data)) {
-    const winner = ctrl.data.game.winnerPlayer;
+    const winner = winnerName(ctrl);
     return h('div.result-wrap', [
       h('p.result', result || ''),
       h(
