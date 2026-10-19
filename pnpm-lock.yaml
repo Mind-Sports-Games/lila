@@ -13,7 +13,7 @@ importers:
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/e391b56a82b7c71e7663082a797f6fc21b18776d
       chessground:
         specifier: github:Mind-Sports-Games/chessground#pla-1216-add-gomoku-lila-supporting-repos
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e2cb84f595310434e9036344b9ebfd61cb1fe17e
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/280afe82b22cf88c909304f30e283e606d709ac8
       stratops:
         specifier: github:Mind-Sports-Games/stratops#pla-1216-add-gomoku-lila-supporting-repos
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/dd342c2227a203a3820c2fa758a19cd74e5df8f2
@@ -865,8 +865,8 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e2cb84f595310434e9036344b9ebfd61cb1fe17e:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e2cb84f595310434e9036344b9ebfd61cb1fe17e}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/280afe82b22cf88c909304f30e283e606d709ac8:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/280afe82b22cf88c909304f30e283e606d709ac8}
     version: 7.11.1-pstrat3.41
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1809,7 +1809,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e2cb84f595310434e9036344b9ebfd61cb1fe17e: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/280afe82b22cf88c909304f30e283e606d709ac8: {}
 
   chokidar@3.6.0:
     dependencies:

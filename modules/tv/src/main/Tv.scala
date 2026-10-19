@@ -259,7 +259,7 @@ object Tv {
     case object FiveInARowFamily
         extends Channel(
           name = s"All ${GameGroup(14).name}",
-          icon = FIRV.Gomoku.perfIcon.toString,
+          icon = FIRV.Renju.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(anyVariant(GameGroup(14).variants), noBot),
           familyChannel = true,
