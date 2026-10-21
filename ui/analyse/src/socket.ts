@@ -65,7 +65,7 @@ export type StudySocketSendParams =
   | [t: 'anaLift', d: AnaLift & MoveOpts]
   | [t: 'anaPass', d: AnaPass & MoveOpts]
   | [t: 'anaSwap' | 'anaSwap2' | 'anaOffer10', d: AnaPass & MoveOpts]
-  | [t: 'anaSelectSquares', d: AnaPass & { s: string } & MoveOpts]
+  | [t: 'anaSelectSquares', d: AnaPass & { sq: string } & MoveOpts]
   | [t: 'anaRoll', d: AnaRoll & MoveOpts]
   | [t: 'anaDrawCounter', d: AnaDrawCounter & MoveOpts]
   | [t: 'anaEndTurn', d: AnaEndTurn & MoveOpts]
@@ -95,7 +95,7 @@ export interface Socket {
   sendAnaLift(d: AnaLift): void;
   sendAnaPass(d: AnaPass): void;
   sendAnaSwap(action: fiveInARow.OpeningAction, d: AnaPass): void;
-  sendAnaPick(d: AnaPass & { s: string }): void;
+  sendAnaPick(d: AnaPass & { sq: string }): void;
   sendAnaRoll(d: AnaRoll): void;
   sendAnaDrawCounter(d: AnaDrawCounter): void;
   sendAnaEndTurn(d: AnaEndTurn): void;
@@ -244,7 +244,7 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     anaMoveTimeout = setTimeout(() => sendAnaSwap(action, req), 3000);
   }
 
-  function sendAnaPick(req: AnaPass & { s: string }) {
+  function sendAnaPick(req: AnaPass & { sq: string }) {
     clearTimeout(anaMoveTimeout);
     withoutStandardVariant(req);
     addStudyData(req, true);

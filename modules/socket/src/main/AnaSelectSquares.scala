@@ -50,7 +50,7 @@ object AnaSelectSquares {
       v  = Variant.orDefault(gl, ~d.str("variant"))
       fen     <- d.str("fen") map { fen => FEN.apply(gl, fen) }
       path    <- d.str("path")
-      squares <- d.str("s") map { _.split(",").toList.flatMap(Pos.fromKey(gl, _)) }
+      squares <- d.str("sq") map { _.split(",").toList.flatMap(Pos.fromKey(gl, _)) }
     } yield AnaSelectSquares(
       variant = v,
       fen = fen,

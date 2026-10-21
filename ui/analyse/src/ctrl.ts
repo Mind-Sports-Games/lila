@@ -672,7 +672,7 @@ export default class AnalyseCtrl {
       lib: this.data.game.variant.lib,
       fen: this.node.fen,
       path: this.path,
-      s: key,
+      sq: key,
     };
     if (this.practice) this.practice.onUserMove();
     this.controlConfig.onUserAction?.();

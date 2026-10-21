@@ -976,7 +976,7 @@ export default class RoundController {
     stratUtils.fiveInARow.isFiveInARow(this.data.game.variant.key) && !this.replaying() && this.data.selectMode;
 
   pickedStone = (): cg.Key | undefined =>
-    this.canPick() ? Array.from(this.chessground.state.selectedPieces.keys())[0] : undefined;
+    this.canPick() && this.chessground ? Array.from(this.chessground.state.selectedPieces.keys())[0] : undefined;
 
   sendPick = (): void => {
     const picked = this.pickedStone();
@@ -984,7 +984,7 @@ export default class RoundController {
     const pick: SocketSelectSquares = {
       variant: this.data.game.variant.key,
       lib: this.data.game.variant.lib,
-      s: picked,
+      sq: picked,
     };
     if (blur.get()) pick.b = 1;
     this.resign(false);
@@ -1068,8 +1068,10 @@ export default class RoundController {
     } else if (this.clock) this.clock.setClock(d, d.clock!.p1, d.clock!.p2, d.clock!.p1Pending, d.clock!.p2Pending);
     if (this.corresClock) this.corresClock.update(d.correspondence.p1, d.correspondence.p2);
     if (!this.replaying()) ground.reload(this);
-    if (stratUtils.fiveInARow.isFiveInARow(d.game.variant.key))
+    if (stratUtils.fiveInARow.isFiveInARow(d.game.variant.key)) {
       this.syncFiveInARowPlayerColors(d.steps[d.steps.length - 1].fen);
+      if (!d.selectMode) this.chessground.resetSelectedPieces();
+    }
     this.doForcedActions();
     this.setTitle();
     this.moveOn.next();

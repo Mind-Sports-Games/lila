@@ -378,7 +378,7 @@ export function swapOptions(ctrl: RoundController) {
   if (!canSwap && !canSwap2 && !canOffer10) return null;
   const colour = stratUtils.fiveInARow.nextStone(fen) === 'b-piece' ? 'Black' : 'White';
   const choice = (action: stratUtils.fiveInARow.OpeningAction, label: string) =>
-    h('button.button', { hook: util.bind('click', () => ctrl.sendSwap(action)) }, label);
+    h('button.button', { key: action, hook: util.bind('click', () => ctrl.sendSwap(action)) }, label);
   const others = [
     canSwap ? 'swap colours' : null,
     canSwap2 ? 'swap colours and place 2 stones' : null,
@@ -400,7 +400,12 @@ function pickOptions(ctrl: RoundController) {
     h('p', "Select one of the offered stones to keep as Black's fifth, then place the sixth stone."),
     h(
       'button.button',
-      { attrs: { disabled: !picked }, hook: util.bind('click', () => ctrl.sendPick()) },
+      {
+        key: 'pick',
+        class: { disabled: !picked },
+        attrs: { disabled: !picked },
+        hook: util.bind('click', () => ctrl.sendPick()),
+      },
       picked ? `Keep ${picked}` : 'Keep',
     ),
   ]);

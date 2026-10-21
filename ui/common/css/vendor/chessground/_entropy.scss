@@ -13,15 +13,14 @@ $entropy-dest-ring-width: 0.286cqw;
 $entropy-dest-ring: rgba(0, 0, 0, 0.45);
 $entropy-premove-dest-ring: rgba(20, 30, 85, 0.5);
 
-// one accent for the player's own move and one for a premove, each drawn as a circle: a dot over a
-// counter, ringed in the pattern halo so it reads on all seven counters, or a ring on the bare board.
-$entropy-highlight: rgb(224, 33, 138);
+// one accent for the player's own move and one for a premove. The last move is a dot over a counter,
+// ringed in the pattern halo so it reads on all seven counters, or a ring in the dest colour on the bare
+// board. A selected or premoved counter has its square's corners shaded, as chess marks an occupied dest.
+$entropy-highlight: #aaaaaa;
 $entropy-premove-highlight: rgb(20, 30, 85);
 $entropy-dot-inset: 38%;
 $entropy-dot-outline-width: 0.2cqw;
 $entropy-dot-outline: rgba($entropy-pattern-halo, $entropy-pattern-halo-opacity);
-$entropy-halo-inset: 1.5%;
-$entropy-halo-width: 0.35cqw;
 $entropy-hover-fill-opacity: 0.35;
 
 .variant-entropy {
@@ -113,24 +112,15 @@ $entropy-hover-fill-opacity: 0.35;
       }
     }
 
-    &.selected,
-    &.current-premove.counter {
-      background: none !important;
-
-      &::before {
-        content: '';
-        position: absolute;
-        inset: $entropy-halo-inset;
-        border: $entropy-halo-width solid $entropy-highlight;
-        border-radius: 50%;
-      }
+    &.selected {
+      background: radial-gradient(transparent 0%, transparent 79%, $entropy-dest-ring 80%) !important;
     }
 
     &.current-premove {
       background: none !important;
 
-      &.counter::before {
-        border-color: $entropy-premove-highlight;
+      &.counter {
+        background: radial-gradient(transparent 0%, transparent 79%, $entropy-premove-dest-ring 80%) !important;
       }
 
       &:not(.counter)::before {
@@ -149,7 +139,7 @@ $entropy-hover-fill-opacity: 0.35;
         content: '';
         position: absolute;
         inset: $entropy-dot-inset;
-        border: $entropy-dest-ring-width solid $entropy-highlight;
+        border: $entropy-dest-ring-width solid $entropy-dest-ring;
         border-radius: 50%;
       }
 
