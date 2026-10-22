@@ -116,6 +116,9 @@ object side {
           showNonEmptyPerf(u.perfs.abalone, PerfType.orDefault("abalone")),
           showNonEmptyPerf(u.perfs.grandabalone, PerfType.orDefault("grandabalone")),
           showNonEmptyPerf(u.perfs.entropy, PerfType.orDefault("entropy")),
+          showNonEmptyPerf(u.perfs.gomoku, PerfType.orDefault("gomoku")),
+          showNonEmptyPerf(u.perfs.pente, PerfType.orDefault("pente")),
+          showNonEmptyPerf(u.perfs.renju, PerfType.orDefault("renju")),
           u.noBot.option(
             frag(
               hr,

@@ -33,6 +33,9 @@ object StatusText {
       case SingleWin                             => s"${winner(win)} wins."
       case GammonWin                             => s"${winner(win)} wins by gammon."
       case BackgammonWin                         => s"${winner(win)} wins by backgammon."
+      case LineOfFive                            => s"${winner(win)} wins with five in a row."
+      case TenCaptures                           => s"${winner(win)} wins by capturing ten stones."
+      case ForbiddenMove                         => s"${loser(win)} loses by a forbidden move."
       case VariantEnd                            =>
         variant match {
           case Variant.Chess(strategygames.chess.variant.KingOfTheHill) =>

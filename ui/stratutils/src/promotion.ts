@@ -59,6 +59,9 @@ export const possiblePromotion = (
     case 'abalone':
     case 'grandabalone':
     case 'entropy':
+    case 'gomoku':
+    case 'pente':
+    case 'renju':
       return false;
     case 'shogi':
       return (

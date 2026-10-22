@@ -13,7 +13,20 @@ import lila.common.Bus
 import lila.room.RoomSocket.{ Protocol as RP, * }
 import lila.socket.RemoteSocket.{ Protocol as P, * }
 import lila.socket.Socket.{ makeMessage, Sri }
-import lila.socket.{ AnaAny, AnaDests, AnaDrawCounter, AnaDrop, AnaEndTurn, AnaLift, AnaMove, AnaPass, AnaRoll }
+import lila.socket.{
+  AnaAny,
+  AnaDests,
+  AnaDrawCounter,
+  AnaDrop,
+  AnaEndTurn,
+  AnaLift,
+  AnaMove,
+  AnaOffer10,
+  AnaPass,
+  AnaRoll,
+  AnaSelectSquares,
+  AnaSwap
+}
 import lila.tree.Node.{ defaultNodeJsonWriter, Comment, Gamebook, Shape, Shapes }
 import lila.user.User
 
@@ -104,6 +117,18 @@ final private class StudySocket(
         case "anaEndTurn" =>
           AnaEndTurn.parse(o) foreach { endTurn =>
             who foreach gameAction(studyId, endTurn, MoveOpts.parse(o))
+          }
+        case t @ ("anaSwap" | "anaSwap2") =>
+          AnaSwap.parse(o, swap2 = t == "anaSwap2") foreach { swap =>
+            who foreach gameAction(studyId, swap, MoveOpts.parse(o))
+          }
+        case "anaOffer10" =>
+          AnaOffer10.parse(o) foreach { offer10 =>
+            who foreach gameAction(studyId, offer10, MoveOpts.parse(o))
+          }
+        case "anaSelectSquares" =>
+          AnaSelectSquares.parse(o) foreach { selectSquares =>
+            who foreach gameAction(studyId, selectSquares, MoveOpts.parse(o))
           }
         case "deleteNode" =>
           reading[AtPosition](o) { position =>

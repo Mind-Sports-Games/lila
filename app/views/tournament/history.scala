@@ -129,7 +129,7 @@ object history {
                       "group"  -> true,
                       "active" -> open.contains(g)
                     ),
-                    dataIcon := g.variants.headOption.map(_.perfIcon.toString).getOrElse(""),
+                    dataIcon := gameGroupIcon(g),
                     // an active chip steps back out: a family chip drops the filter entirely,
                     // whether the page is showing that family or one of its games
                     href := (if (open.contains(g)) url(freq, none) else groupUrl(freq, g))

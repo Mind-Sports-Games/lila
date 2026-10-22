@@ -442,8 +442,8 @@ object SwissJson {
         "orientation" -> g.naturalOrientation.name,
         "p1"          -> boardPlayerJson(p1),
         "p2"          -> boardPlayerJson(p2),
-        "p1Color"     -> g.variant.playerColors(P1),
-        "p2Color"     -> g.variant.playerColors(P2)
+        "p1Color"     -> g.playerColor(P1),
+        "p2Color"     -> g.playerColor(P2)
       )
       .add(
         "clock" -> g.clock.ifTrue(g.isBeingPlayed).map { c =>

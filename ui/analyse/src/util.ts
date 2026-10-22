@@ -294,6 +294,9 @@ const noServerEvalVariants = [
   'abalone',
   'grandabalone',
   'entropy',
+  'gomoku',
+  'pente',
+  'renju',
 ];
 
 export function allowServerEvalForVariant(variant: VariantKey) {

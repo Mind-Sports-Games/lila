@@ -43,6 +43,7 @@ import {
   SocketMove,
   SocketDrop,
   SocketPass,
+  SocketSelectSquares,
   SocketDoRoll,
   SocketLift,
   SocketEndTurn,
@@ -352,9 +353,10 @@ export default class RoundController {
     activePlayerIndex: boolean,
     currentPlayerIndex: 'p1' | 'p2',
     s: State,
+    fen: string,
   ): void => {
     if (activePlayerIndex) {
-      return setDropMode(s, stratUtils.onlyDropsVariantPiece(s.variant as VariantKey, currentPlayerIndex));
+      return setDropMode(s, stratUtils.onlyDropsVariantPiece(s.variant as VariantKey, currentPlayerIndex, fen));
     } else {
       return cancelDropMode(s);
     }
@@ -484,6 +486,7 @@ export default class RoundController {
           this.data.player.playerIndex === this.data.game.player,
           this.data.player.playerIndex,
           this.chessground.state,
+          round.lastStep(this.data).fen,
         );
       } else {
         cancelDropMode(this.chessground.state);
@@ -709,6 +712,11 @@ export default class RoundController {
         setTimeout(this.showExpiration, 350);
       }
     }
+    // renju: white picks one of the stones black offered
+    if (stratUtils.fiveInARow.isFiveInARow(d.game.variant.key)) {
+      d.selectMode = playing && activePlayerIndex && stratUtils.fiveInARow.canPick(o.fen);
+      if (!d.selectMode) this.chessground.resetSelectedPieces();
+    }
     this.setTitle();
     if (!this.replaying()) {
       if (o.uci === 'undo') {
@@ -780,8 +788,13 @@ export default class RoundController {
       if (d.game.variant.key === 'entropy' && o.uci.startsWith('draw')) {
         this.chessground.set({ fen: o.fen });
       }
+      // ensure player colours are correct
+      if (stratUtils.fiveInARow.isFiveInARow(d.game.variant.key)) {
+        this.chessground.set({ fen: o.fen });
+        this.syncFiveInARowPlayerColors(o.fen);
+      }
       if (d.onlyDropsVariant) {
-        this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);
+        this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state, o.fen);
       }
       if (o.promotion) ground.promote(this.chessground, o.promotion.key, o.promotion.pieceClass);
       this.chessground.set({
@@ -808,7 +821,7 @@ export default class RoundController {
         },
       });
       if (o.check) sound.check();
-      if (o.uci === 'pass') sound.move();
+      if (o.uci === 'pass' || o.uci === 'swap' || o.uci === 'swap2' || o.uci === 'offer10') sound.move();
       blur.onMove();
       playstrategy.pubsub.emit('ply', this.ply);
 
@@ -944,6 +957,40 @@ export default class RoundController {
     this.actualSendMove('drawcounter', draw);
   };
 
+  sendSwap = (action: stratUtils.fiveInARow.OpeningAction): void => {
+    const swap: SocketPass = {
+      variant: this.data.game.variant.key,
+    };
+    if (blur.get()) swap.b = 1;
+    this.resign(false);
+    this.actualSendMove(action, swap);
+  };
+
+  canSwap = (action: stratUtils.fiveInARow.OpeningAction): boolean => {
+    if (!stratUtils.fiveInARow.isFiveInARow(this.data.game.variant.key)) return false;
+    if (!this.isPlaying() || this.replaying() || !game.isPlayerTurn(this.data)) return false;
+    return stratUtils.fiveInARow.offers(action, round.lastStep(this.data).fen);
+  };
+
+  canPick = (): boolean =>
+    stratUtils.fiveInARow.isFiveInARow(this.data.game.variant.key) && !this.replaying() && this.data.selectMode;
+
+  pickedStone = (): cg.Key | undefined =>
+    this.canPick() && this.chessground ? Array.from(this.chessground.state.selectedPieces.keys())[0] : undefined;
+
+  sendPick = (): void => {
+    const picked = this.pickedStone();
+    if (!picked) return;
+    const pick: SocketSelectSquares = {
+      variant: this.data.game.variant.key,
+      lib: this.data.game.variant.lib,
+      sq: picked,
+    };
+    if (blur.get()) pick.b = 1;
+    this.resign(false);
+    this.actualSendMove('selectSquares', pick);
+  };
+
   sendLift = (variant: VariantKey, key: cg.Key): void => {
     sound.move();
     const lift: SocketLift = {
@@ -996,6 +1043,16 @@ export default class RoundController {
     this.preDrop = undefined;
   }
 
+  // a swap changes which colour each seat plays; the side box players are server rendered, p1 then p2
+  private syncFiveInARowPlayerColors = (fen: string): void => {
+    const d = this.data;
+    d.player.playerColor = stratUtils.fiveInARow.seatColor(fen, d.player.playerIndex);
+    d.opponent.playerColor = stratUtils.fiveInARow.seatColor(fen, d.opponent.playerIndex);
+    document
+      .querySelectorAll('.game__meta__players .player')
+      .forEach((el, i) => stratUtils.fiveInARow.setSeatColorIcon(el, fen, i === 0 ? 'p1' : 'p2'));
+  };
+
   reload = (d: RoundData): void => {
     if (d.steps.length !== this.data.steps.length) {
       this.ply = d.steps[d.steps.length - 1].ply;
@@ -1011,6 +1068,10 @@ export default class RoundController {
     } else if (this.clock) this.clock.setClock(d, d.clock!.p1, d.clock!.p2, d.clock!.p1Pending, d.clock!.p2Pending);
     if (this.corresClock) this.corresClock.update(d.correspondence.p1, d.correspondence.p2);
     if (!this.replaying()) ground.reload(this);
+    if (stratUtils.fiveInARow.isFiveInARow(d.game.variant.key)) {
+      this.syncFiveInARowPlayerColors(d.steps[d.steps.length - 1].fen);
+      if (!d.selectMode) this.chessground.resetSelectedPieces();
+    }
     this.doForcedActions();
     this.setTitle();
     this.moveOn.next();

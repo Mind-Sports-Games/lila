@@ -13,6 +13,7 @@ import { render as keyboardMove } from '../keyboardMove';
 import { render as renderGround } from '../ground';
 import { renderTable } from './table';
 import { Player } from 'game';
+import { fiveInARow } from 'stratutils';
 
 function renderMaterial(
   material: MaterialDiffSide,
@@ -42,6 +43,7 @@ function renderPlayerScore(
   playerIndex: string,
   variantKey: VariantKey,
   captures: boolean,
+  fen: string,
 ): VNode {
   const defaultMancalaRole = 's';
   const children: VNode[] = [];
@@ -79,6 +81,15 @@ function renderPlayerScore(
           title: captures ? 'Captures' : 'Score',
         },
       },
+      children,
+    );
+  } else if (variantKey === 'pente') {
+    // a seat's captures follow the colour it plays, so its stone shows that colour
+    const stone = fiveInARow.seatColor(fen, playerIndex as PlayerIndex) === 'black' ? 'b-piece' : 'w-piece';
+    children.push(h(`piece.${stone}.${playerIndex}`, { attrs: { 'data-score': score } }));
+    return h(
+      'div.game-score.game-score-' + position + '.' + playerIndex + '.captures',
+      { attrs: { title: 'Captures' } },
       children,
     );
   } else if (variantKey === 'backgammon' || variantKey === 'hyper' || variantKey === 'nackgammon') {
@@ -227,6 +238,14 @@ export function main(ctrl: RoundController): VNode {
         }
         break;
       }
+      case 'pente': {
+        const p1Score = util.getScoreFromFen(variantKey, fen, 'p1');
+        const p2Score = util.getScoreFromFen(variantKey, fen, 'p2');
+        topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+        bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+        captures = true;
+        break;
+      }
       case 'nackgammon':
       case 'hyper':
       case 'backgammon': {
@@ -286,6 +305,9 @@ export function main(ctrl: RoundController): VNode {
     'abalone',
     'grandabalone',
     'entropy',
+    'gomoku',
+    'pente',
+    'renju',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';
@@ -307,6 +329,7 @@ export function main(ctrl: RoundController): VNode {
           h(
             'div.round__app__board.main-board' + (ctrl.data.pref.blindfold ? '.blindfold' : ''),
             {
+              class: fiveInARow.zoneClasses(variantKey, fen),
               hook:
                 'ontouchstart' in window
                   ? undefined
@@ -314,14 +337,14 @@ export function main(ctrl: RoundController): VNode {
             },
             [renderGround(ctrl), promotion.view(ctrl)],
           ),
-          showScoreBox ? renderPlayerScore(topScore, 'top', topPlayerIndex, variantKey, captures) : null,
+          showScoreBox ? renderPlayerScore(topScore, 'top', topPlayerIndex, variantKey, captures, fen) : null,
           showScoreBox ? renderPlayerScoreNames(ctrl.data.player, ctrl.data.opponent, topPlayerIndex) : null,
           crazyView(ctrl, topPlayerIndex, 'top') ||
             renderMaterial(material[topPlayerIndex], -score, 'top', d.hasGameScore, checks[topPlayerIndex]),
           ...renderTable(ctrl),
           crazyView(ctrl, bottomPlayerIndex, 'bottom') ||
             renderMaterial(material[bottomPlayerIndex], score, 'bottom', d.hasGameScore, checks[bottomPlayerIndex]),
-          showScoreBox ? renderPlayerScore(bottomScore, 'bottom', bottomPlayerIndex, variantKey, captures) : null,
+          showScoreBox ? renderPlayerScore(bottomScore, 'bottom', bottomPlayerIndex, variantKey, captures, fen) : null,
           ctrl.bgAnalysis.view(),
           ctrl.keyboardMove ? keyboardMove(ctrl.keyboardMove) : null,
         ],

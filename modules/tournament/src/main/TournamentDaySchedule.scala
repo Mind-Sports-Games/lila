@@ -100,7 +100,10 @@ object TournamentDaySchedule {
             Variant.wrap(strategygames.go.variant.Go19x19)                     -> Byoyomi510x5,
             Variant.wrap(strategygames.abalone.variant.Abalone)                -> Delay62,
             Variant.wrap(strategygames.abalone.variant.GrandAbalone)           -> Delay66,
-            Variant.Entropy(strategygames.entropy.variant.Entropy)                -> Blitz
+            Variant.Entropy(strategygames.entropy.variant.Entropy)                -> Blitz,
+            Variant.FiveInARow(strategygames.fiveinarow.variant.Gomoku)           -> Blitz32,
+            Variant.FiveInARow(strategygames.fiveinarow.variant.Pente)            -> Blitz32,
+            Variant.FiveInARow(strategygames.fiveinarow.variant.Renju)            -> Blitz32
           )
         )
 

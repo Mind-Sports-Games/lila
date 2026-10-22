@@ -54,8 +54,8 @@ final class JsonView(rematches: Rematches) {
       .add("tournamentId" -> game.tournamentId)
       .add("swissId" -> game.swissId)
       .add("winner" -> game.winnerPlayerIndex)
-      .add("winnerPlayer" -> game.winnerPlayerIndex.map(PlayerName(game.variant, _)))
-      .add("loserPlayer" -> game.winnerPlayerIndex.map(w => PlayerName(game.variant, !w)))
+      .add("winnerPlayer" -> game.winnerPlayerIndex.map(PlayerName(game, _)))
+      .add("loserPlayer" -> game.winnerPlayerIndex.map(w => PlayerName(game, !w)))
       .add("lastMove" -> game.lastActionKeys)
       .add("check" -> game.situation.checkSquare.map(_.key))
       .add("rematch" -> rematches.of(game.id))
@@ -260,6 +260,14 @@ object JsonView {
           "lib"       -> v.gameLogic.id,
           "boardSize" -> entropyVariant.boardSize
         )
+      case Variant.FiveInARow(fiveInARowVariant) =>
+        Json.obj(
+          "key"       -> v.key,
+          "name"      -> VariantKeys.variantName(v),
+          "short"     -> VariantKeys.variantShortName(v),
+          "lib"       -> v.gameLogic.id,
+          "boardSize" -> fiveInARowVariant.boardSize
+        )
       case _ =>
         Json.obj(
           "key"       -> v.key,
@@ -332,6 +340,14 @@ object JsonView {
 
   implicit val boardSizeEntropyWriter: Writes[strategygames.entropy.Board.BoardSize] =
     Writes[strategygames.entropy.Board.BoardSize] { b =>
+      Json.obj(
+        "width"  -> b.width,
+        "height" -> b.height
+      )
+    }
+
+  implicit val boardSizeFiveInARowWriter: Writes[strategygames.fiveinarow.Board.BoardSize] =
+    Writes[strategygames.fiveinarow.Board.BoardSize] { b =>
       Json.obj(
         "width"  -> b.width,
         "height" -> b.height

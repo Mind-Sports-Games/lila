@@ -10,6 +10,8 @@ export * as promotion from './promotion';
 export * as dameo from './dameo';
 export * as backgammon from './backgammon';
 export * as entropy from './entropy';
+export * as fiveInARow from './fiveInARow';
+import { isFiveInARow, dropPiece as fiveInARowDropPiece, seatToMove as fiveInARowSeatToMove } from './fiveInARow';
 
 export const initialFen: Fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
@@ -82,6 +84,9 @@ export const uci2move = (uci: string): cg.Key[] | undefined => {
     uci == 'roll' ||
     uci == 'endturn' ||
     uci == 'undo' ||
+    uci == 'swap' ||
+    uci == 'swap2' ||
+    uci == 'offer10' ||
     uci.startsWith('draw') ||
     uci.includes('/') ||
     uci.substring(0, 3) == 'ss:' ||
@@ -118,7 +123,7 @@ export function displayScore(variant: VariantKey, fen: string, playerIndex: stri
 
 // Works for all games including those with multi-digit ranks (e.g. Xiangqi "e9e10", Grand Abalone "k10h8").
 export function parseLastMove(lm: string): Key[] | undefined {
-  if (!lm || lm === 'pass') return undefined;
+  if (!lm || lm === 'pass' || lm === 'swap' || lm === 'swap2' || lm === 'offer10') return undefined;
   if (lm[1] === '@') return [lm.slice(2) as Key];
   return (lm.match(/[a-z]\d+/g) as Key[] | null) ?? undefined;
 }
@@ -134,6 +139,7 @@ export function fenPlayerIndex(variant: VariantKey, fen: string) {
   if (['dameo'].includes(variant)) {
     return fen.split(':')[0] === 'W' ? 'p1' : 'p2';
   }
+  if (isFiveInARow(variant)) return fiveInARowSeatToMove(fen);
   const p2String = ['oware', 'togyzkumalak', 'bestemshe'].includes(variant) ? ' N' : ' b';
   return fen.indexOf(p2String) > 0 ? 'p2' : 'p1';
 }
@@ -144,8 +150,16 @@ interface Piece {
   promoted?: boolean;
 }
 
-export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1' | 'p2'): Piece | undefined {
+export function onlyDropsVariantPiece(
+  variant: VariantKey,
+  turnPlayerIndex: 'p1' | 'p2',
+  fen?: string,
+): Piece | undefined {
   switch (variant) {
+    case 'gomoku':
+    case 'pente':
+    case 'renju':
+      return fen ? fiveInARowDropPiece(fen, turnPlayerIndex) : undefined;
     case 'flipello':
     case 'flipello10':
     case 'antiflipello':
@@ -179,6 +193,9 @@ const noFishnetVariants: VariantKey[] = [
   'abalone',
   'grandabalone',
   'entropy',
+  'gomoku',
+  'pente',
+  'renju',
 ];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;

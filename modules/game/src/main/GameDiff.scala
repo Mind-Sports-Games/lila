@@ -381,6 +381,38 @@ object GameDiff {
           (r: Int) => (r != 1).option(BSONInteger(r))
         )
       }
+      case GameLogic.FiveInARow() => {
+        def fiveInARowBoard(g: Game) = g.board match {
+          case Board.FiveInARow(b) => b
+          case _                   => sys.error("Wrong board type")
+        }
+        dTry(oldPgn, _.actionStrs, writeBytes compose newLibStorageWriter)
+        dTry(binaryPieces, fiveInARowBoard(_).pieces, writeBytes compose BinaryFormat.piece.writeFiveInARow)
+        d(positionHashes, _.history.positionHashes, w.bytes)
+        d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
+        d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
+        dOpt(
+          blackSeat,
+          fiveInARowBoard(_).blackSeat,
+          (p: PlayerIndex) => (p == P2).option(BSONInteger(2))
+        )
+        dOpt(
+          openingStep,
+          fiveInARowBoard(_).openingStep,
+          (step: strategygames.fiveinarow.OpeningStep) =>
+            (step != strategygames.fiveinarow.OpeningStep.Play).option(BSONString(step.fen.toString))
+        )
+        dOpt(
+          score,
+          _.history.score,
+          (o: Score) => o.nonEmpty so { BSONHandlers.scoreWriter writeOpt o }
+        )
+        dOpt(
+          offered,
+          fiveInARowBoard(_).offered,
+          (o: List[strategygames.fiveinarow.Pos]) => o.nonEmpty.option(BSONString(o.map(_.key).mkString(",")))
+        )
+      }
       case GameLogic.Dameo() => {
         dTry(oldPgn, _.actionStrs, writeBytes compose newLibStorageWriter)
         dTry(

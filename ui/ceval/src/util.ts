@@ -62,6 +62,9 @@ const noPracticeWithComputerVariants: VariantKey[] = [
   'abalone',
   'grandabalone',
   'entropy',
+  'gomoku',
+  'pente',
+  'renju',
 ];
 
 export function isEvalBetter(a: Tree.ClientEval, b?: Tree.ClientEval): boolean {

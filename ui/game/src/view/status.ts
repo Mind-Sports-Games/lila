@@ -1,6 +1,55 @@
 import { Ctrl } from '../interfaces';
 
+type Side = 'winner' | 'loser';
+
+type Description = string | { key: I18nKey; side: Side };
+
+function sidePlayerIndex(ctrl: Ctrl, side: Side): PlayerIndex | undefined {
+  const winner = ctrl.data.game.winner;
+  if (side === 'winner') return winner;
+  return winner ? (winner === 'p1' ? 'p2' : 'p1') : undefined;
+}
+
+function sidePlayer(ctrl: Ctrl, side: Side) {
+  const playerIndex = sidePlayerIndex(ctrl, side);
+  return [ctrl.data.player, ctrl.data.opponent].find(p => p.playerIndex === playerIndex);
+}
+
+function sideName(ctrl: Ctrl, side: Side): string {
+  const playerName = side === 'winner' ? ctrl.data.game.winnerPlayer : ctrl.data.game.loserPlayer;
+  if (!playerName) return '';
+  const player = sidePlayer(ctrl, side),
+    name = player?.user
+      ? player.user.username
+      : player?.ai
+        ? ctrl.trans('aiNameLevelAiLevel', 'Stockfish', player.ai)
+        : player?.name;
+  return name || playerName;
+}
+
+function sideNode<T>(ctrl: Ctrl, side: Side, userLink: (username: string) => T): string | T {
+  const name = sideName(ctrl, side),
+    user = name ? sidePlayer(ctrl, side)?.user : undefined;
+  return user ? userLink(user.username) : name;
+}
+
+export function winnerName(ctrl: Ctrl): string {
+  return sideName(ctrl, 'winner');
+}
+
+// the status names a side by its colour, leaving the name to the victorious part
 export default function status(ctrl: Ctrl): string {
+  const description = describe(ctrl);
+  if (typeof description === 'string') return description;
+  const colour = description.side === 'winner' ? ctrl.data.game.winnerPlayer : ctrl.data.game.loserPlayer;
+  return ctrl.trans(description.key, colour ?? '');
+}
+
+export function victoriousNodes<T>(ctrl: Ctrl, userLink: (username: string) => T): Array<string | T> | undefined {
+  return winnerName(ctrl) ? ctrl.trans.vdom('playerIndexIsVictorious', sideNode(ctrl, 'winner', userLink)) : undefined;
+}
+
+function describe(ctrl: Ctrl): Description {
   const noarg = ctrl.trans.noarg,
     d = ctrl.data;
   switch (d.game.status.name) {
@@ -19,19 +68,19 @@ export default function status(ctrl: Ctrl): string {
       }
       return '';
     case 'resign':
-      return ctrl.trans('playerIndexResigned', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return { key: 'playerIndexResigned', side: 'loser' };
     case 'resignGammon':
-      return ctrl.trans('playerIndexResignedGammon', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return { key: 'playerIndexResignedGammon', side: 'loser' };
     case 'resignBackgammon':
-      return ctrl.trans('playerIndexResignedBackgammon', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return { key: 'playerIndexResignedBackgammon', side: 'loser' };
     case 'resignMatch':
-      return ctrl.trans('playerIndexResignedMatch', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return { key: 'playerIndexResignedMatch', side: 'loser' };
     case 'cubeDropped':
-      return ctrl.trans('playerIndexDroppedTheCube', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return { key: 'playerIndexDroppedTheCube', side: 'loser' };
     case 'stalemate':
       return noarg('stalemate');
     case 'timeout':
-      return d.game.loserPlayer ? ctrl.trans('playerIndexLeftTheGame', d.game.loserPlayer) : noarg('draw');
+      return d.game.loserPlayer ? { key: 'playerIndexLeftTheGame', side: 'loser' } : noarg('draw');
     case 'draw':
       return noarg('draw');
     case 'outoftime':
@@ -39,20 +88,20 @@ export default function status(ctrl: Ctrl): string {
       //  d.game.winner ? '' : ` • ${noarg('draw')}`
       //}`;
       return d.game.loserPlayer
-        ? ctrl.trans('playerIndexTimeOut', d.game.loserPlayer)
+        ? { key: 'playerIndexTimeOut', side: 'loser' }
         : `${ctrl.trans('playerIndexTimeOut', '')} • ${noarg('draw')}`;
     case 'outoftimeGammon':
-      return ctrl.trans('playerIndexLosesByGammonTimeOut', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return { key: 'playerIndexLosesByGammonTimeOut', side: 'loser' };
     case 'outoftimeBackgammon':
-      return ctrl.trans('playerIndexLosesByBackgammonTimeOut', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return { key: 'playerIndexLosesByBackgammonTimeOut', side: 'loser' };
     case 'ruleOfGin':
-      return ctrl.trans('playerIndexWinsByRuleOfGin', d.game.winnerPlayer ? d.game.winnerPlayer : '');
+      return { key: 'playerIndexWinsByRuleOfGin', side: 'winner' };
     case 'ginGammon':
-      return ctrl.trans('playerIndexWinsByGinGammon', d.game.winnerPlayer ? d.game.winnerPlayer : '');
+      return { key: 'playerIndexWinsByGinGammon', side: 'winner' };
     case 'ginBackgammon':
-      return ctrl.trans('playerIndexWinsByGinBackgammon', d.game.winnerPlayer ? d.game.winnerPlayer : '');
+      return { key: 'playerIndexWinsByGinBackgammon', side: 'winner' };
     case 'noStart':
-      return ctrl.trans('playerIndexDidntMove', d.game.loserPlayer ? d.game.loserPlayer : '');
+      return { key: 'playerIndexDidntMove', side: 'loser' };
     case 'cheat':
       return noarg('cheatDetected');
     case 'perpetualCheck':
@@ -63,6 +112,12 @@ export default function status(ctrl: Ctrl): string {
       return noarg('backgammonGammonWin');
     case 'backgammonWin':
       return noarg('backgammonBackgammonWin');
+    case 'lineOfFive':
+      return { key: 'playerIndexMadeFiveInARow', side: 'winner' };
+    case 'tenCaptures':
+      return { key: 'playerIndexCapturedTenStones', side: 'winner' };
+    case 'forbiddenMove':
+      return { key: 'playerIndexMadeAForbiddenMove', side: 'loser' };
     case 'variantEnd':
       switch (d.game.variant.key) {
         case 'kingOfTheHill':
@@ -112,6 +167,10 @@ export default function status(ctrl: Ctrl): string {
           return noarg('gameFinished');
         case 'abalone':
         case 'grandabalone':
+          return noarg('gameFinished');
+        case 'gomoku':
+        case 'pente':
+        case 'renju':
           return noarg('gameFinished');
         case 'entropy':
           return noarg('gameFinished');

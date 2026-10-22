@@ -193,7 +193,8 @@ trait SetupHelper { self: I18nHelper =>
     GameGroup.LinesOfAction(),
     GameGroup.Abalone(),
     GameGroup.Amazons(),
-    GameGroup.Entropy()
+    GameGroup.Entropy(),
+    GameGroup.FiveInARow()
   )
 
   // the group button a game family sits under. Not the group's id: the family id of the group's
@@ -209,6 +210,17 @@ trait SetupHelper { self: I18nHelper =>
       group.variants.map(v => encodeGameFamilyId(v.gameFamily) -> group.id.toString)
     }.toMap
 
+  // the variant whose icon stands for a group, where it is not the group's first variant
+  private val gameGroupIconVariant: Map[GameGroup, Variant] = Map(
+    GameGroup.FiveInARow() -> Variant.FiveInARow(strategygames.fiveinarow.variant.Renju)
+  )
+
+  def gameGroupIcon(gameGroup: GameGroup): String =
+    gameGroupIconVariant
+      .get(gameGroup)
+      .orElse(gameGroup.variants.headOption)
+      .fold("")(_.perfIcon.toString)
+
   def translatedGameGroupIconChoices(implicit lang: Lang): List[SelectChoice] =
     displayedGameGroups.map(translatedGameGroupIconChoice)
 
@@ -217,7 +229,7 @@ trait SetupHelper { self: I18nHelper =>
   )(implicit lang: Lang): SelectChoice =
     (
       encodeGameGroupId(gameGroup),
-      gameGroup.variants.headOption.map(_.perfIcon.toString()).getOrElse(""),
+      gameGroupIcon(gameGroup),
       VariantKeys.gameGroupName(gameGroup).replace("Of ", "of ").some
     )
 

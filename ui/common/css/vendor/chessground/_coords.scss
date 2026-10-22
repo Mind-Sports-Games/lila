@@ -473,7 +473,7 @@ coords {
     }
   }
 
-  @each $variant in $go-variants {
+  @each $variant in $intersection-variants {
     .variant-#{$variant} &.files {
       &.p1,
       &.p2 {
@@ -683,13 +683,42 @@ coords {
     }
   }
 
-  // Go specific outer coords adjustments
-  @each $variant in $go-variants {
+  // Go and five in a row outer coords adjustments
+  @each $variant in $intersection-variants {
     .variant-#{$variant} cg-coords-container.outer-coords .ranks {
       &.p1,
       &.p2 {
         top: -4px;
       }
     }
+  }
+}
+
+@each $variant in $fiveinarow-variants {
+  .variant-#{$variant} cg-coords-container.inner-coords coords,
+  .variant-#{$variant} cg-coords-container.outer-coords coords {
+    coord {
+      flex: 1 1 0;
+    }
+
+    &.files.p1 coord,
+    &.files.p2 coord {
+      padding-left: 0;
+    }
+
+    &.ranks.p1,
+    &.ranks.p2 {
+      top: 0;
+
+      coord {
+        display: flex;
+        align-items: center;
+        transform: none;
+      }
+    }
+  }
+
+  .variant-#{$variant} cg-coords-container.inner-coords coords.ranks coord {
+    justify-content: flex-end;
   }
 }

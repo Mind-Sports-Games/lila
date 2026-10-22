@@ -131,6 +131,7 @@ trait Positional { self: Config =>
     case GameLogic.Abalone()      => true // no fromPosition yet
     case GameLogic.Dameo()        => true // no fromPosition yet
     case GameLogic.Entropy()      => true // no fromPosition yet
+    case GameLogic.FiveInARow()   => true // no fromPosition yet
   }
 
   lazy val validKingCount = variant.gameLogic match {
