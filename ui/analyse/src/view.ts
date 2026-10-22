@@ -18,7 +18,8 @@ import isCol1 from 'common/isCol1';
 import isCol3 from 'common/isCol3';
 import { playable } from 'game';
 import * as router from 'game/router';
-import statusView, { winnerName } from 'game/view/status';
+import { statusNodes, victoriousNodes } from 'game/view/status';
+import { userLink } from 'common/userLink';
 import { path as treePath } from 'tree';
 import { render as renderTreeView } from './treeView/treeView';
 import * as control from './control';
@@ -60,7 +61,7 @@ import { allowedForVariant as allowClientEvalForVariant, allowPracticeWithComput
 import { variantKeyToRules } from 'stratops/variants/util';
 function renderResult(ctrl: AnalyseCtrl): VNode[] {
   let result: string | undefined;
-  let statusNodes: (string | VNode | null)[] | undefined;
+  let statusParts: (string | VNode)[] | undefined;
   if (ctrl.data.game.status.id >= 30) {
     switch (ctrl.data.game.winner) {
       case 'p1':
@@ -72,19 +73,19 @@ function renderResult(ctrl: AnalyseCtrl): VNode[] {
       default:
         result = '½-½';
     }
-    const winner = winnerName(ctrl);
-    statusNodes = [statusView(ctrl), winner ? ', ' + ctrl.trans('playerIndexIsVictorious', winner) : null];
+    const victorious = victoriousNodes(ctrl, userLink);
+    statusParts = [...statusNodes(ctrl, userLink), ...(victorious ? [', ', ...victorious] : [])];
   } else {
     const outcome = ctrl.outcome();
     if (outcome) {
       result = outcome.winner === 'p1' ? '1-0' : outcome.winner === 'p2' ? '0-1' : '½-½';
-      statusNodes = [ctrl.trans.noarg('gameFinished')];
+      statusParts = [ctrl.trans.noarg('gameFinished')];
     }
   }
   const tags: VNode[] = [];
-  if (result && statusNodes) {
+  if (result && statusParts) {
     tags.push(h('div.result', result));
-    tags.push(h('div.status', statusNodes));
+    tags.push(h('div.status', statusParts));
   }
   return tags;
 }
@@ -713,6 +714,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
           h(
             addChapterId(study, 'div.analyse__board.main-board'),
             {
+              class: fiveInARow.zoneClasses(variantKey, ctrl.node.fen),
               hook:
                 'ontouchstart' in window || ctrl.gamebookPlay()
                   ? undefined

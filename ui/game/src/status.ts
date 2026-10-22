@@ -28,6 +28,9 @@ export const ids = {
   outoftimeBackgammon: 49,
   cubeDropped: 50,
   resignMatch: 51,
+  lineOfFive: 52,
+  tenCaptures: 53,
+  forbiddenMove: 54,
   variantEnd: 60,
 };
 

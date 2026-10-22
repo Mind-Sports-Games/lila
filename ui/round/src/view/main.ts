@@ -329,6 +329,7 @@ export function main(ctrl: RoundController): VNode {
           h(
             'div.round__app__board.main-board' + (ctrl.data.pref.blindfold ? '.blindfold' : ''),
             {
+              class: fiveInARow.zoneClasses(variantKey, fen),
               hook:
                 'ontouchstart' in window
                   ? undefined

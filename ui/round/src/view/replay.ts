@@ -6,7 +6,8 @@ import { allowAnalysisForVariant } from 'common/analysis';
 import isCol1 from 'common/isCol1';
 import RoundController from '../ctrl';
 import throttle from 'common/throttle';
-import viewStatus, { winnerName } from 'game/view/status';
+import { statusNodes, victoriousNodes } from 'game/view/status';
+import { userLink } from 'common/userLink';
 import { game as gameRoute } from 'game/router';
 import { h, VNode } from 'snabbdom';
 import { Step, MaybeVNodes } from '../interfaces';
@@ -122,7 +123,7 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
         result = '½-½';
     }
   if (result || status.aborted(ctrl.data)) {
-    const winner = winnerName(ctrl);
+    const victorious = victoriousNodes(ctrl, userLink);
     return h('div.result-wrap', [
       h('p.result', result || ''),
       h(
@@ -133,7 +134,7 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
             else setTimeout(() => ctrl.autoScroll(), 200);
           }),
         },
-        [viewStatus(ctrl), winner ? ' • ' + ctrl.trans('playerIndexIsVictorious', winner) : ''],
+        [...statusNodes(ctrl, userLink), ...(victorious ? [' • ', ...victorious] : [])],
       ),
     ]);
   }

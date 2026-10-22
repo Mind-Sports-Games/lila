@@ -1,9 +1,24 @@
 import { Ctrl } from '../interfaces';
 
-function resultName(ctrl: Ctrl, playerIndex: PlayerIndex | undefined, playerName: PlayerName | undefined): string {
+type Side = 'winner' | 'loser';
+
+type Description = string | { key: I18nKey; side: Side };
+
+function sidePlayerIndex(ctrl: Ctrl, side: Side): PlayerIndex | undefined {
+  const winner = ctrl.data.game.winner;
+  if (side === 'winner') return winner;
+  return winner ? (winner === 'p1' ? 'p2' : 'p1') : undefined;
+}
+
+function sidePlayer(ctrl: Ctrl, side: Side) {
+  const playerIndex = sidePlayerIndex(ctrl, side);
+  return [ctrl.data.player, ctrl.data.opponent].find(p => p.playerIndex === playerIndex);
+}
+
+function sideName(ctrl: Ctrl, side: Side): string {
+  const playerName = side === 'winner' ? ctrl.data.game.winnerPlayer : ctrl.data.game.loserPlayer;
   if (!playerName) return '';
-  const d = ctrl.data,
-    player = [d.player, d.opponent].find(p => p.playerIndex === playerIndex),
+  const player = sidePlayer(ctrl, side),
     name = player?.user
       ? player.user.username
       : player?.ai
@@ -12,16 +27,41 @@ function resultName(ctrl: Ctrl, playerIndex: PlayerIndex | undefined, playerName
   return name || playerName;
 }
 
+function sideNode<T>(ctrl: Ctrl, side: Side, userLink: (username: string) => T): string | T {
+  const name = sideName(ctrl, side),
+    user = name ? sidePlayer(ctrl, side)?.user : undefined;
+  return user ? userLink(user.username) : name;
+}
+
 export function winnerName(ctrl: Ctrl): string {
-  return resultName(ctrl, ctrl.data.game.winner, ctrl.data.game.winnerPlayer);
+  return sideName(ctrl, 'winner');
 }
 
 export function loserName(ctrl: Ctrl): string {
-  const winner = ctrl.data.game.winner;
-  return resultName(ctrl, winner ? (winner === 'p1' ? 'p2' : 'p1') : undefined, ctrl.data.game.loserPlayer);
+  return sideName(ctrl, 'loser');
 }
 
 export default function status(ctrl: Ctrl): string {
+  const description = describe(ctrl);
+  return typeof description === 'string'
+    ? description
+    : ctrl.trans(description.key, sideName(ctrl, description.side));
+}
+
+export function statusNodes<T>(ctrl: Ctrl, userLink: (username: string) => T): Array<string | T> {
+  const description = describe(ctrl);
+  return typeof description === 'string'
+    ? [description]
+    : ctrl.trans.vdom(description.key, sideNode(ctrl, description.side, userLink));
+}
+
+export function victoriousNodes<T>(ctrl: Ctrl, userLink: (username: string) => T): Array<string | T> | undefined {
+  return winnerName(ctrl)
+    ? ctrl.trans.vdom('playerIndexIsVictorious', sideNode(ctrl, 'winner', userLink))
+    : undefined;
+}
+
+function describe(ctrl: Ctrl): Description {
   const noarg = ctrl.trans.noarg,
     d = ctrl.data;
   switch (d.game.status.name) {
@@ -40,19 +80,19 @@ export default function status(ctrl: Ctrl): string {
       }
       return '';
     case 'resign':
-      return ctrl.trans('playerIndexResigned', loserName(ctrl));
+      return { key: 'playerIndexResigned', side: 'loser' };
     case 'resignGammon':
-      return ctrl.trans('playerIndexResignedGammon', loserName(ctrl));
+      return { key: 'playerIndexResignedGammon', side: 'loser' };
     case 'resignBackgammon':
-      return ctrl.trans('playerIndexResignedBackgammon', loserName(ctrl));
+      return { key: 'playerIndexResignedBackgammon', side: 'loser' };
     case 'resignMatch':
-      return ctrl.trans('playerIndexResignedMatch', loserName(ctrl));
+      return { key: 'playerIndexResignedMatch', side: 'loser' };
     case 'cubeDropped':
-      return ctrl.trans('playerIndexDroppedTheCube', loserName(ctrl));
+      return { key: 'playerIndexDroppedTheCube', side: 'loser' };
     case 'stalemate':
       return noarg('stalemate');
     case 'timeout':
-      return d.game.loserPlayer ? ctrl.trans('playerIndexLeftTheGame', loserName(ctrl)) : noarg('draw');
+      return d.game.loserPlayer ? { key: 'playerIndexLeftTheGame', side: 'loser' } : noarg('draw');
     case 'draw':
       return noarg('draw');
     case 'outoftime':
@@ -60,20 +100,20 @@ export default function status(ctrl: Ctrl): string {
       //  d.game.winner ? '' : ` • ${noarg('draw')}`
       //}`;
       return d.game.loserPlayer
-        ? ctrl.trans('playerIndexTimeOut', loserName(ctrl))
+        ? { key: 'playerIndexTimeOut', side: 'loser' }
         : `${ctrl.trans('playerIndexTimeOut', '')} • ${noarg('draw')}`;
     case 'outoftimeGammon':
-      return ctrl.trans('playerIndexLosesByGammonTimeOut', loserName(ctrl));
+      return { key: 'playerIndexLosesByGammonTimeOut', side: 'loser' };
     case 'outoftimeBackgammon':
-      return ctrl.trans('playerIndexLosesByBackgammonTimeOut', loserName(ctrl));
+      return { key: 'playerIndexLosesByBackgammonTimeOut', side: 'loser' };
     case 'ruleOfGin':
-      return ctrl.trans('playerIndexWinsByRuleOfGin', winnerName(ctrl));
+      return { key: 'playerIndexWinsByRuleOfGin', side: 'winner' };
     case 'ginGammon':
-      return ctrl.trans('playerIndexWinsByGinGammon', winnerName(ctrl));
+      return { key: 'playerIndexWinsByGinGammon', side: 'winner' };
     case 'ginBackgammon':
-      return ctrl.trans('playerIndexWinsByGinBackgammon', winnerName(ctrl));
+      return { key: 'playerIndexWinsByGinBackgammon', side: 'winner' };
     case 'noStart':
-      return ctrl.trans('playerIndexDidntMove', loserName(ctrl));
+      return { key: 'playerIndexDidntMove', side: 'loser' };
     case 'cheat':
       return noarg('cheatDetected');
     case 'perpetualCheck':
@@ -84,6 +124,12 @@ export default function status(ctrl: Ctrl): string {
       return noarg('backgammonGammonWin');
     case 'backgammonWin':
       return noarg('backgammonBackgammonWin');
+    case 'lineOfFive':
+      return { key: 'playerIndexMadeFiveInARow', side: 'winner' };
+    case 'tenCaptures':
+      return { key: 'playerIndexCapturedTenStones', side: 'winner' };
+    case 'forbiddenMove':
+      return { key: 'playerIndexMadeAForbiddenMove', side: 'loser' };
     case 'variantEnd':
       switch (d.game.variant.key) {
         case 'kingOfTheHill':

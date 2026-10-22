@@ -82,6 +82,9 @@
   <string name="playerIndexResignedBackgammon">%s resigned a backgammon</string>
   <string name="playerIndexResignedMatch">%s resigned the match</string>
   <string name="playerIndexDroppedTheCube">%s dropped the cube</string>
+  <string name="playerIndexMadeFiveInARow">%s made five in a row</string>
+  <string name="playerIndexCapturedTenStones">%s captured ten stones</string>
+  <string name="playerIndexMadeAForbiddenMove">%s made a forbidden move</string>
   <string name="whiteResigned">White resigned</string>
   <string name="blackResigned">Black resigned</string>
   <string name="playerIndexLeftTheGame">%s left the game</string>

@@ -102,6 +102,9 @@ export type StatusName =
   | 'singleWin'
   | 'gammonWin'
   | 'backgammonWin'
+  | 'lineOfFive'
+  | 'tenCaptures'
+  | 'forbiddenMove'
   | 'variantEnd'
   | 'perpetualCheck'
   | 'unknownFinish';

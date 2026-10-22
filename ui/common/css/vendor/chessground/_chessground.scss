@@ -176,6 +176,23 @@ span.mini-game.variant-togyzkumalak.is2d {
   }
 }
 
+// renju's opening: the square about the centre the next stone must go inside, drawn on the cell edges so
+// it runs between the lines and never hides one
+@for $zone from 0 through 4 {
+  .renju-zone-#{$zone} cg-container::after {
+    content: '';
+    position: absolute;
+    left: calc(100% * #{7 - $zone} / 15);
+    top: calc(100% * #{7 - $zone} / 15);
+    width: calc(100% * #{2 * $zone + 1} / 15);
+    height: calc(100% * #{2 * $zone + 1} / 15);
+    box-sizing: border-box;
+    border: 2px dotted rgba(200, 30, 30, 0.9);
+    pointer-events: none;
+    z-index: z('cg__svg.cg-shapes');
+  }
+}
+
 .variant-nackgammon square,
 .variant-hyper square,
 .variant-backgammon square {

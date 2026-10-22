@@ -84,8 +84,8 @@ object widgets {
                   gameEndStatus(g),
                   g.winner.map { winner =>
                     frag(
-                      (gameEndStatus(g) != "").option(", "),
-                      trans.playerIndexIsVictorious(resultName(g, winner.playerIndex))
+                      gameEndStatus(g).render.nonEmpty.option(", "),
+                      trans.playerIndexIsVictorious(resultLink(g, winner.playerIndex))
                     )
                   }
                 )

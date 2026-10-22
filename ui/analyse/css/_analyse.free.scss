@@ -92,7 +92,7 @@ div.analyse .analyse__side {
 
   @include breakpoint($mq-col3) {
     grid-area: acpl;
-    margin: 0;
+    margin: $block-gap 0 0;
   }
 
   h2 {

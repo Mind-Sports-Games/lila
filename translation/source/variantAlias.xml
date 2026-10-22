@@ -52,5 +52,5 @@
   <string name="entropy"></string>
   <string name="gomoku">Five in a Row</string>
   <string name="pente"></string>
-  <string name="renju">tournament Gomoku</string>
+  <string name="renju">professional Gomoku</string>
 </resources>

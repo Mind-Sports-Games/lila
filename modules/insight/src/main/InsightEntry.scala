@@ -99,7 +99,9 @@ object Termination {
       case S.Resign | S.ResignMatch | S.ResignGammon | S.ResignBackgammon | S.CubeDropped => Resignation
       case S.Draw                                                                         => Draw
       case S.Stalemate                                                                    => Stalemate
-      case S.Mate | S.SingleWin | S.GammonWin | S.BackgammonWin | S.VariantEnd            => Checkmate
+      case S.Mate | S.SingleWin | S.GammonWin | S.BackgammonWin | S.VariantEnd | S.LineOfFive |
+          S.TenCaptures | S.ForbiddenMove =>
+        Checkmate
       case S.PerpetualCheck                                                               => Perpetual
       case S.Cheat                                                                        => Resignation
       case S.Created | S.Started | S.Aborted | S.NoStart | S.UnknownFinish                =>

@@ -26,7 +26,15 @@ export function openingStep(fen: string): string {
   return field(fen, 3) ?? '-';
 }
 
-const stonesOnBoard = (fen: string): number => (field(fen, 0)?.match(/[BW]/g) ?? []).length;
+export const stonesOnBoard = (fen: string): number => (field(fen, 0)?.match(/[BW]/g) ?? []).length;
+
+// renju's Taraguchi-10 restricts the first five stones: with n down, the next goes within n points of the
+// centre, the (2n + 1) square about it; undefined once the next stone may go anywhere
+export function placementZone(fen: string): number | undefined {
+  const step = openingStep(fen),
+    placed = stonesOnBoard(fen);
+  return (step === 'p' || step === 'q') && placed < 5 ? placed : undefined;
+}
 
 // one seat drops both colours while the opening and the swap2 pair are being placed, and in renju white
 // picks one of the offered stones before black's fifth is on the board
@@ -82,6 +90,14 @@ export function canPick(fen: string): boolean {
 // the colour a seat currently plays: a swap hands black to the other seat
 export function seatColor(fen: string, playerIndex: CGPlayerIndex): PlayerColor {
   return blackSeat(fen) === playerIndex ? 'black' : 'white';
+}
+
+// the board classes that draw renju's placement zone for the position shown, each zone size its own class
+export function zoneClasses(variant: string, fen: string): Record<string, boolean> {
+  const zone = variant === 'renju' ? placementZone(fen) : undefined;
+  const classes: Record<string, boolean> = {};
+  for (let n = 0; n < 5; n++) classes[`renju-zone-${n}`] = zone === n;
+  return classes;
 }
 
 // redraw the player colour icons a swap has changed, given each seat's icon element

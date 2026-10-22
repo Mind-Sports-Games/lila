@@ -266,6 +266,9 @@ final private class Player(
       case Status.GammonWin      => finisher.other(game, _.GammonWin, game.situation.winner)
       case Status.BackgammonWin  => finisher.other(game, _.BackgammonWin, game.situation.winner)
       case Status.CubeDropped    => finisher.other(game, _.CubeDropped, game.situation.winner)
+      case Status.LineOfFive     => finisher.other(game, _.LineOfFive, game.situation.winner)
+      case Status.TenCaptures    => finisher.other(game, _.TenCaptures, game.situation.winner)
+      case Status.ForbiddenMove  => finisher.other(game, _.ForbiddenMove, game.situation.winner)
       case Status.Stalemate if !game.variant.stalemateIsDraw =>
         finisher.other(game, _.Stalemate, game.situation.winner)
       case status @ (Status.Stalemate | Status.Draw) => finisher.other(game, _ => status, None)
