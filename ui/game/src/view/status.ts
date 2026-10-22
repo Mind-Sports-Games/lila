@@ -37,20 +37,12 @@ export function winnerName(ctrl: Ctrl): string {
   return sideName(ctrl, 'winner');
 }
 
-export function loserName(ctrl: Ctrl): string {
-  return sideName(ctrl, 'loser');
-}
-
+// the status names a side by its colour, leaving the name to the victorious part
 export default function status(ctrl: Ctrl): string {
   const description = describe(ctrl);
-  return typeof description === 'string' ? description : ctrl.trans(description.key, sideName(ctrl, description.side));
-}
-
-export function statusNodes<T>(ctrl: Ctrl, userLink: (username: string) => T): Array<string | T> {
-  const description = describe(ctrl);
-  return typeof description === 'string'
-    ? [description]
-    : ctrl.trans.vdom(description.key, sideNode(ctrl, description.side, userLink));
+  if (typeof description === 'string') return description;
+  const colour = description.side === 'winner' ? ctrl.data.game.winnerPlayer : ctrl.data.game.loserPlayer;
+  return ctrl.trans(description.key, colour ?? '');
 }
 
 export function victoriousNodes<T>(ctrl: Ctrl, userLink: (username: string) => T): Array<string | T> | undefined {

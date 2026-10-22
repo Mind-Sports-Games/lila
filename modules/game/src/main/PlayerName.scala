@@ -18,8 +18,19 @@ object PlayerName {
       p.fold("Second player as Order", "First player as Order")
     else variant.playerNames(p)
 
+  // five in a row names a seat by its stones' colour, which a swap hands to the other seat
+  def apply(game: Game, p: PlayerIndex): String =
+    if (game.variant.gameLogic == GameLogic.FiveInARow()) game.playerColor(p).capitalize
+    else apply(game.variant, p)
+
   def translated(variant: Variant, p: PlayerIndex)(implicit lang: Lang): String =
-    apply(variant, p) match {
+    translate(apply(variant, p))
+
+  def translated(game: Game, p: PlayerIndex)(implicit lang: Lang): String =
+    translate(apply(game, p))
+
+  private def translate(name: String)(implicit lang: Lang): String =
+    name match {
       case "White" => trans.white.txt()
       case "Black" => trans.black.txt()
       // Xiangqi add back in when adding red as a colour for Xiangqi

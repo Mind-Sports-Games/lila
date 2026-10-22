@@ -5,7 +5,7 @@ import * as util from '../util';
 import isCol1 from 'common/isCol1';
 import RoundController from '../ctrl';
 import throttle from 'common/throttle';
-import { statusNodes, victoriousNodes } from 'game/view/status';
+import viewStatus, { victoriousNodes } from 'game/view/status';
 import { userLink } from 'common/userLink';
 import { game as gameRoute } from 'game/router';
 import { h, VNode } from 'snabbdom';
@@ -80,7 +80,7 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
         result = ctrl.data.pref.draughtsResult ? '1-1' : '½-½';
     }
   if (result || status.aborted(ctrl.data)) {
-    const statusParts = statusNodes(ctrl, userLink).filter(part => part !== ''),
+    const statusParts = [viewStatus(ctrl)].filter(part => part !== ''),
       victorious = victoriousNodes(ctrl, userLink);
     return h('div.result-wrap', [
       h('p.result', result || ''),

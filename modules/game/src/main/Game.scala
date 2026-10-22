@@ -1143,7 +1143,7 @@ case class Game(
   def playerPov(p: Player)                          = pov(p.playerIndex)
   def loserPov                                      = loser map playerPov
 
-  def playerTrans(p: PlayerIndex)(implicit lang: Lang) = PlayerName.translated(variant, p)
+  def playerTrans(p: PlayerIndex)(implicit lang: Lang) = PlayerName.translated(this, p)
 
   def setAnalysed = copy(metadata = metadata.copy(analysed = true))
 

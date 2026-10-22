@@ -36,6 +36,9 @@ export function placementZone(fen: string): number | undefined {
   return (step === 'p' || step === 'q') && placed < 5 ? placed : undefined;
 }
 
+// renju offers the other seat a swap after each of the first five stones
+export const swapFollowsDrop = (fen: string): boolean => placementZone(fen) !== undefined;
+
 // one seat drops both colours while the opening and the swap2 pair are being placed, and in renju white
 // picks one of the offered stones before black's fifth is on the board
 export function seatToMove(fen: string): CGPlayerIndex {

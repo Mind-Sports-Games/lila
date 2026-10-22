@@ -6,12 +6,13 @@ import { allowAnalysisForVariant } from 'common/analysis';
 import isCol1 from 'common/isCol1';
 import RoundController from '../ctrl';
 import throttle from 'common/throttle';
-import { statusNodes, victoriousNodes } from 'game/view/status';
+import viewStatus, { victoriousNodes } from 'game/view/status';
 import { userLink } from 'common/userLink';
 import { game as gameRoute } from 'game/router';
 import { h, VNode } from 'snabbdom';
 import { Step, MaybeVNodes } from '../interfaces';
 import { variantClassFromKey } from 'stratops/variants/util';
+import * as stratUtils from 'stratutils';
 import { GameFamily as BackgammonFamily } from 'stratops/variants/backgammon/GameFamily';
 import { GameFamily as DameoFamily } from 'stratops/variants/dameo/GameFamily';
 import { GameFamily as EntropyFamily } from 'stratops/variants/entropy/GameFamily';
@@ -134,7 +135,7 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
             else setTimeout(() => ctrl.autoScroll(), 200);
           }),
         },
-        [...statusNodes(ctrl, userLink), ...(victorious ? [' • ', ...victorious] : [])],
+        [viewStatus(ctrl), ...(victorious ? [' • ', ...victorious] : [])],
       ),
     ]);
   }
@@ -267,7 +268,12 @@ function renderButtons(ctrl: RoundController) {
 
 function initMessage(ctrl: RoundController) {
   const d = ctrl.data;
-  return !isCol1() && game.isPlayerPlaying(d) && !game.playerHasPlayedTurn(d) && !d.player.spectator
+  // five in a row's opening box says whose stones are whose instead
+  return !isCol1() &&
+    !stratUtils.fiveInARow.isFiveInARow(d.game.variant.key) &&
+    game.isPlayerPlaying(d) &&
+    !game.playerHasPlayedTurn(d) &&
+    !d.player.spectator
     ? h('div.message', util.justIcon(''), [
         h('div', [
           ctrl.trans('youPlayThePlayerIndexPieces', d.player.playerName),
