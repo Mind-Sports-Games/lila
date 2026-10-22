@@ -415,7 +415,8 @@ function openingGuide(fen: string, colour: string): string | undefined {
     return `Place two more stones: White, then Black. Next: ${colour}. Your opponent then chooses which colour to play.`;
   const zone = stratUtils.fiveInARow.placementZone(fen);
   if (zone === 0) return 'Place the first stone, Black, on the centre point.';
-  if (zone !== undefined) return `Place the ${ordinals[zone]} stone, ${colour}, inside the dotted ${zoneSize(zone)} square.`;
+  if (zone !== undefined)
+    return `Place the ${ordinals[zone]} stone, ${colour}, inside the dotted ${zoneSize(zone)} square.`;
   return undefined;
 }
 

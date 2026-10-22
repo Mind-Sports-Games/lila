@@ -43,9 +43,7 @@ export function loserName(ctrl: Ctrl): string {
 
 export default function status(ctrl: Ctrl): string {
   const description = describe(ctrl);
-  return typeof description === 'string'
-    ? description
-    : ctrl.trans(description.key, sideName(ctrl, description.side));
+  return typeof description === 'string' ? description : ctrl.trans(description.key, sideName(ctrl, description.side));
 }
 
 export function statusNodes<T>(ctrl: Ctrl, userLink: (username: string) => T): Array<string | T> {
@@ -56,9 +54,7 @@ export function statusNodes<T>(ctrl: Ctrl, userLink: (username: string) => T): A
 }
 
 export function victoriousNodes<T>(ctrl: Ctrl, userLink: (username: string) => T): Array<string | T> | undefined {
-  return winnerName(ctrl)
-    ? ctrl.trans.vdom('playerIndexIsVictorious', sideNode(ctrl, 'winner', userLink))
-    : undefined;
+  return winnerName(ctrl) ? ctrl.trans.vdom('playerIndexIsVictorious', sideNode(ctrl, 'winner', userLink)) : undefined;
 }
 
 function describe(ctrl: Ctrl): Description {
