@@ -15,7 +15,7 @@ interface Friend {
 export default class OnlineFriends {
   titleEl: HTMLElement;
   countEl: HTMLElement;
-  loaded = false;
+  badgeEl: HTMLElement;
   receivedOnlineFriends = false;
   trans: Trans;
   users: Map<string, Friend>;
@@ -23,8 +23,7 @@ export default class OnlineFriends {
   constructor(readonly el: HTMLElement) {
     this.titleEl = this.el.querySelector('.friend_box_button') as HTMLElement;
     this.countEl = this.el.querySelector('.friend_box_count') as HTMLElement;
-    this.titleEl.addEventListener('click', this.load);
-    this.titleEl.addEventListener('mouseover', this.load);
+    this.badgeEl = this.titleEl.querySelector('.friend_box_badge') as HTMLElement;
     this.trans = trans(JSON.parse(this.el.getAttribute('data-i18n')!));
     this.users = new Map();
     pubsub.on('socket.in.following_onlines', this.receive);
@@ -32,15 +31,11 @@ export default class OnlineFriends {
     pubsub.on('socket.in.following_leaves', this.leaves);
     pubsub.on('socket.in.following_playing', this.playing);
     pubsub.on('socket.in.following_stopped_playing', this.stoppedPlaying);
+    // the badge needs the count up front; ask again on each (re)connection
+    pubsub.on('socket.open', this.request);
+    this.request();
   }
-  load = () => {
-    if (!this.loaded) {
-      this.loaded = true;
-      pubsub.emit('socket.send', 'following_onlines');
-      // the socket may not be open yet: let the next hover or click ask again
-      setTimeout(() => (this.loaded = this.receivedOnlineFriends), 5000);
-    }
-  };
+  request = () => pubsub.emit('socket.send', 'following_onlines');
   receive = (friends: TitleName[], msg: { playing: string[]; patrons: string[] }) => {
     this.users.clear();
     this.receivedOnlineFriends = true;
@@ -63,6 +58,7 @@ export default class OnlineFriends {
         this.titleEl.title = count;
         this.titleEl.setAttribute('aria-label', count);
         this.countEl.textContent = count;
+        this.badgeEl.innerHTML = ids.length > 99 ? '99<sup>+</sup>' : ids.length ? `${ids.length}` : '';
         this.el.querySelector('.list')!.innerHTML = ids.map(id => this.renderFriend(this.users.get(id)!)).join('');
       });
   };

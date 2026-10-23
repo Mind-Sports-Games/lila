@@ -7,8 +7,39 @@
     line-height: $site-header-height;
     padding: 0 0.7rem;
 
-    &::before {
+    span::before {
       font-size: 1.3em;
+    }
+
+    .friend_box_icon {
+      position: relative;
+    }
+
+    // a plain number at the bottom: the top-right badges are for challenges and notifications
+    .friend_box_badge {
+      position: absolute;
+      bottom: -4px;
+      // anchored left so extra digits grow away from the icon
+      left: calc(100% - 0.35em + 1px);
+      padding: 0 3px;
+      line-height: 15px;
+      color: $c-font-dim;
+      font-size: 11px;
+      font-weight: bold;
+      white-space: nowrap;
+
+      &:empty {
+        display: none;
+      }
+
+      // "99+": a small raised plus keeps clear of the next icon
+      sup {
+        position: absolute;
+        top: 0.1em;
+        left: calc(100% - 3px);
+        font-size: 0.75em;
+        line-height: 1;
+      }
     }
   }
 

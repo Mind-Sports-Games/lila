@@ -130,9 +130,8 @@ object layout {
         tpe        := "button",
         cls        := "friend_box_button toggle link",
         title      := trans.friends.txt(),
-        aria.label := trans.friends.txt(),
-        dataIcon   := "f"
-      ),
+        aria.label := trans.friends.txt()
+      )(span(cls := "friend_box_icon", dataIcon := "f")(span(cls := "friend_box_badge"))),
       div(cls := "content_wrap dropdown")(
         div(cls := "friend_box_count")(trans.nbFriendsOnline.plural(2, "-")),
         div(cls := "content list")
