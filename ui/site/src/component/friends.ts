@@ -17,6 +17,8 @@ export default class OnlineFriends {
   countEl: HTMLElement;
   badgeEl: HTMLElement;
   receivedOnlineFriends = false;
+  repaintPending = false;
+  listDirty = false;
   trans: Trans;
   users: Map<string, Friend>;
 
@@ -24,6 +26,7 @@ export default class OnlineFriends {
     this.titleEl = this.el.querySelector('.friend_box_button') as HTMLElement;
     this.countEl = this.el.querySelector('.friend_box_count') as HTMLElement;
     this.badgeEl = this.titleEl.querySelector('.friend_box_badge') as HTMLElement;
+    this.titleEl.addEventListener('click', this.renderList);
     this.trans = trans(JSON.parse(this.el.getAttribute('data-i18n')!));
     this.users = new Map();
     pubsub.on('socket.in.following_onlines', this.receive);
@@ -50,17 +53,28 @@ export default class OnlineFriends {
       .forEach(u => (u.patron = true));
     this.repaint();
   };
+  // one repaint per frame, however many events arrive (leaves come in 5s batches)
   repaint = () => {
-    if (this.receivedOnlineFriends)
-      requestAnimationFrame(() => {
-        const ids = Array.from(this.users.keys()).sort();
-        const count = this.trans.plural('nbFriendsOnline', ids.length);
-        this.titleEl.title = count;
-        this.titleEl.setAttribute('aria-label', count);
-        this.countEl.textContent = count;
-        this.badgeEl.innerHTML = ids.length > 99 ? '99<sup>+</sup>' : ids.length ? `${ids.length}` : '';
-        this.el.querySelector('.list')!.innerHTML = ids.map(id => this.renderFriend(this.users.get(id)!)).join('');
-      });
+    if (!this.receivedOnlineFriends || this.repaintPending) return;
+    this.repaintPending = true;
+    requestAnimationFrame(() => {
+      this.repaintPending = false;
+      const nb = this.users.size;
+      const count = this.trans.plural('nbFriendsOnline', nb);
+      this.titleEl.title = count;
+      this.titleEl.setAttribute('aria-label', count);
+      this.countEl.textContent = count;
+      this.badgeEl.innerHTML = nb > 99 ? '99<sup>+</sup>' : nb ? `${nb}` : '';
+      this.listDirty = true;
+      if (this.el.classList.contains('shown')) this.renderList();
+    });
+  };
+  // the list is only built while the dropdown is open, or when it gets opened
+  renderList = () => {
+    if (!this.listDirty) return;
+    this.listDirty = false;
+    const ids = Array.from(this.users.keys()).sort();
+    this.el.querySelector('.list')!.innerHTML = ids.map(id => this.renderFriend(this.users.get(id)!)).join('');
   };
   renderFriend = (friend: Friend) => {
     const icon = `<i class="line${friend.patron ? ' patron' : ''}"></i>`,
