@@ -111,7 +111,7 @@ final class BotVsBotCoordinator(
             challenger = toRegistered(spec.variant, timeControl)(p1User),
             destUser = p2User.some,
             rematchOf = none,
-            isBotvsBotStream = true
+            botVsBotSource = stream.source.some
           )
           challengeApi.create(challenge) flatMap {
             case false =>
@@ -153,21 +153,28 @@ final class BotVsBotCoordinator(
 
   private val runners: List[StreamRunner] = BotVsBotConfig.streams.map(new StreamRunner(_))
 
+  private val spotlight       = new AtomicReference[Option[StreamRunner]](none)
+  private val spotlightExpiry = new AtomicReference[Option[Cancellable]](none)
+
+  private def allRunners: List[StreamRunner] = runners ++ spotlight.get()
+
   Bus.subscribeFun("finishGame") {
     case actorApi.FinishGame(game, _, _) =>
-      runners.find(_.ownsGame(game.id)).foreach { runner =>
+      allRunners.find(_.ownsGame(game.id)).foreach { runner =>
         if (runner.isRunning) runner.gameFinished(game.id)
       }
   }
 
   Bus.subscribeFun("botVsBot") {
     case lila.hub.actorApi.bot.BotVsBotStart => start().discard
-    case lila.hub.actorApi.bot.BotVsBotStop  => stop()
+    case lila.hub.actorApi.bot.BotVsBotStop =>
+      stop()
+      stopSpotlight()
     case lila.hub.actorApi.bot.BotVsBotRestart =>
       stop()
       start().discard
     case lila.hub.actorApi.bot.BotVsBotStatus(promise) =>
-      promise.success(runners.map(_.status()).mkString("\n"))
+      promise.success(allRunners.map(_.status()).mkString("\n"))
     case lila.hub.actorApi.bot.BotVsBotStartStream(name, promise) =>
       runners.find(_.stream.name == name) match {
         case Some(runner) => runner.start().discard; promise.success(s"Stream '$name' start requested")
@@ -183,6 +190,30 @@ final class BotVsBotCoordinator(
         case Some(runner) => runner.stop(); runner.start().discard; promise.success(s"Stream '$name' restart requested")
         case None         => promise.success(s"Stream not found: '$name'. Available: ${runners.map(_.stream.name).mkString(", ")}")
       }
+    case lila.hub.actorApi.bot.BotVsBotSpotlightStart(args, promise) =>
+      promise.success(BotVsBotSpotlight.parse(args).fold(identity, startSpotlight))
+    case lila.hub.actorApi.bot.BotVsBotSpotlightStop(promise) =>
+      promise.success(spotlight.get().fold("No spotlight stream running") { _ =>
+        stopSpotlight()
+        "Spotlight stream stopped"
+      })
+  }
+
+  private def startSpotlight(config: BotVsBotSpotlight): String = {
+    stopSpotlight()
+    val runner = new StreamRunner(config.stream)
+    spotlight.set(runner.some)
+    runner.start().discard
+    config.duration.foreach { duration =>
+      spotlightExpiry.set(scheduler.scheduleOnce(duration)(stopSpotlight()).some)
+    }
+    val variants = config.stream.games.map(_.variant.key).distinct.mkString(", ")
+    s"Spotlight stream started on $variants${config.duration.fold(", until stopped")(d => s" for $d")}"
+  }
+
+  private def stopSpotlight(): Unit = {
+    spotlightExpiry.getAndSet(none).foreach(_.cancel())
+    spotlight.getAndSet(none).foreach(_.stop())
   }
 
   def start(): Funit = {

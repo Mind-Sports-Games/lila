@@ -325,4 +325,6 @@ package bot {
   case class BotVsBotStartStream(name: String, promise: scala.concurrent.Promise[String])
   case class BotVsBotStopStream(name: String, promise: scala.concurrent.Promise[String])
   case class BotVsBotRestartStream(name: String, promise: scala.concurrent.Promise[String])
+  case class BotVsBotSpotlightStart(args: List[String], promise: scala.concurrent.Promise[String])
+  case class BotVsBotSpotlightStop(promise: scala.concurrent.Promise[String])
 }
