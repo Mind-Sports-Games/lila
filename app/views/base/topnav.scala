@@ -37,8 +37,7 @@ object topnav {
       st.section(
         linkTitle(routes.Library.home.path, trans.games()),
         div(role := "group")(
-          a(href := routes.Library.home)(trans.gameLibrary()),
-          a(href := routes.Memory.home)(trans.memoryGame())
+          a(href := routes.Library.home)(trans.gameLibrary())
         )
       ),
       ctx.noBot.option(
@@ -47,7 +46,8 @@ object topnav {
           div(role := "group")(
             a(href := routes.Puzzle.base)(trans.puzzles()),
             a(href := routes.Puzzle.themesBase)(trans.puzzle.puzzleThemes()),
-            a(href := routes.Puzzle.dashboardBase)(trans.puzzle.puzzleDashboard())
+            a(href := routes.Puzzle.dashboardBase)(trans.puzzle.puzzleDashboard()),
+            a(href := routes.Memory.home)(trans.memoryGame())
             // a(href := routes.Puzzle.streak)("Puzzle Streak")
             // a(href := routes.Storm.home)("Puzzle Storm"),
             // a(href := routes.Racer.home)("Puzzle Racer")
