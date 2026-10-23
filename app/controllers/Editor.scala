@@ -66,14 +66,22 @@ final class Editor(env: Env) extends LilaController(env) {
 
   def index = load("")
 
+  // /editor/abalone is a page of its own; anything else in that slot is a FEN
+  def variant(key: String) =
+    Variant.byKey.get(key).fold(load(key))(v => renderEditor(none, v.some))
+
   def load(urlFen: String) =
-    Open { implicit ctx =>
-      val urlVariant: Option[String] = ctx.req.getQueryString("variant")
-      val fenStr                     = lila.common.String
+    renderEditor(
+      lila.common.String
         .decodeUriPath(urlFen)
         .map(_.replace('_', ' ').trim)
-        .filter(_.nonEmpty)
-      val variant     = Variant.orDefault(urlVariant.getOrElse(""))
+        .filter(_.nonEmpty),
+      none
+    )
+
+  private def renderEditor(fenStr: Option[String], pathVariant: Option[Variant]) =
+    Open { implicit ctx =>
+      val variant     = pathVariant | Variant.orDefault(ctx.req.getQueryString("variant").getOrElse(""))
       val orientation = ctx.req.getQueryString("orientation")
       fuccess {
         val situation = readFen(fenStr, variant)
