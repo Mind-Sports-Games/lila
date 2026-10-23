@@ -1016,4 +1016,8 @@
   <string name="historyTitle">%s — toutes les éditions et leurs vainqueurs</string>
   <string name="historyDescription">Toutes les éditions de l\'arène %s sur PlayStrategy, avec leur vainqueur.</string>
   <string name="historyAllGames">Tous les jeux</string>
+  <string name="variantBoardEditorTitle">Éditeur de plateau %s — composez n\'importe quelle position</string>
+  <string name="variantBoardEditorDescription">Éditeur de plateau %s en ligne et gratuit : composez une position à la main ou depuis un FEN, puis analysez-la, jouez-la contre l\'ordinateur ou partagez-la.</string>
+  <string name="signInDescription">Connectez-vous à PlayStrategy pour jouer aux échecs, aux dames, au go, au backgammon, à Othello et à 40 autres jeux de société en ligne gratuitement, avec classements, tournois et analyse.</string>
+  <string name="signUpDescription">Créez un compte PlayStrategy gratuit pour jouer aux échecs, aux dames, au go, au backgammon, à Othello et à 40 autres jeux de société en ligne : parties classées, tournois, problèmes et analyse, sans publicité.</string>
 </resources>

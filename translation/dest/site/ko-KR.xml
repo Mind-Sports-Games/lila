@@ -872,4 +872,8 @@
   <string name="variantPuzzles">%s 퍼즐</string>
   <string name="libraryTitle">무료로 온라인 플레이할 수 있는 보드게임 — PlayStrategy 라이브러리</string>
   <string name="libraryDescription">PlayStrategy의 모든 게임: 체스와 그 변형, 체커, 바둑, 백개먼, 오델로, 쇼기, 샹치, 만칼라, 아발론, Lines of Action 등 — 규칙, 튜토리얼, 토너먼트, 통계와 함께.</string>
+  <string name="variantBoardEditorTitle">%s 보드 에디터 — 원하는 포지션 만들기</string>
+  <string name="variantBoardEditorDescription">무료 온라인 %s 보드 에디터: 직접 또는 FEN으로 포지션을 만들고 분석하거나, 컴퓨터와 두거나, 공유하세요.</string>
+  <string name="signInDescription">PlayStrategy에 로그인하여 체스, 체커, 바둑, 백개먼, 오델로 등 40가지가 넘는 보드게임을 무료로 온라인에서 즐기세요. 레이팅, 토너먼트, 분석 제공.</string>
+  <string name="signUpDescription">무료 PlayStrategy 계정을 만들고 체스, 체커, 바둑, 백개먼, 오델로 등 40가지가 넘는 보드게임을 온라인에서 즐기세요: 레이팅 대국, 토너먼트, 퍼즐, 분석, 광고 없음.</string>
 </resources>
