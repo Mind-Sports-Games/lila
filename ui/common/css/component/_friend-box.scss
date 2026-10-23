@@ -1,56 +1,55 @@
 #friend_box {
-  display: none;
-
-  @include breakpoint($mq-topnav-visible $mq-site-header-tall) {
-    display: block;
-  }
-
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  z-index: z('friend-box');
-  background: $c-bg-popup;
-  border: $border;
-  border-right: 0;
-  border-bottom: 0;
-  border-top-left-radius: $box-radius-size;
+  position: relative;
   font-size: 0.9rem;
-  min-width: 150px;
-  max-height: 95%;
 
-  /* improve scroll perfs */
-  backface-visibility: hidden;
+  .friend_box_button {
+    height: $site-header-height;
+    line-height: $site-header-height;
+    padding: 0 0.7rem;
 
-  @include hoverflow;
-
-  .friend_box_title {
-    @extend %metal;
-
-    cursor: pointer;
-    padding: 3px 5px;
-    border-bottom: $border;
-
-    &:hover {
-      @extend %metal-hover;
+    &::before {
+      font-size: 1.3em;
     }
   }
 
+  .friend_box_count {
+    white-space: nowrap;
+    padding: 0.5em 0.75em;
+  }
+
+  .content_wrap {
+    @extend %box-radius;
+
+    left: calc(50% - 100px);
+    right: auto;
+    min-width: 200px;
+    max-height: 95vh;
+    overflow: hidden;
+  }
+
   .content {
+    @include hoverflow;
+
     max-height: 80vh;
     overflow-x: hidden;
     overflow-y: auto;
+    border-top: $border;
+
+    &:empty {
+      display: none;
+    }
 
     div {
       display: flex;
 
       &:hover {
-        background: mix($c-secondary, $c-bg-popup, 10%);
+        background: mix($c-secondary, $c-bg-header-dropdown, 10%);
       }
     }
 
     a {
       flex: 1 1 100%;
-      padding: 3px 0px;
+      padding: 4px 0.25em;
       display: block;
       transition: background 0.13s;
 
@@ -61,7 +60,7 @@
       &.user-link {
         @extend %ellipsis;
 
-        max-width: 150px;
+        max-width: 200px;
 
         .line::before {
           color: $c-good;

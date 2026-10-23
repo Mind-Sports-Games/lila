@@ -14,26 +14,35 @@ interface Friend {
 
 export default class OnlineFriends {
   titleEl: HTMLElement;
+  countEl: HTMLElement;
   loaded = false;
+  receivedOnlineFriends = false;
   trans: Trans;
   users: Map<string, Friend>;
 
   constructor(readonly el: HTMLElement) {
-    this.titleEl = this.el.querySelector('.friend_box_title') as HTMLElement;
-    this.titleEl.addEventListener('click', () => {
-      this.el.querySelector('.content_wrap')?.classList.toggle('none');
-      if (!this.loaded) {
-        this.loaded = true;
-        pubsub.emit('socket.send', 'following_onlines');
-      }
-    });
+    this.titleEl = this.el.querySelector('.friend_box_button') as HTMLElement;
+    this.countEl = this.el.querySelector('.friend_box_count') as HTMLElement;
+    this.titleEl.addEventListener('click', this.load);
+    this.titleEl.addEventListener('mouseover', this.load);
     this.trans = trans(JSON.parse(this.el.getAttribute('data-i18n')!));
     this.users = new Map();
     pubsub.on('socket.in.following_onlines', this.receive);
-    ['enters', 'leaves', 'playing', 'stopped_playing'].forEach(k => pubsub.on('socket.in.following_' + k, this[k]));
+    pubsub.on('socket.in.following_enters', this.enters);
+    pubsub.on('socket.in.following_leaves', this.leaves);
+    pubsub.on('socket.in.following_playing', this.playing);
+    pubsub.on('socket.in.following_stopped_playing', this.stoppedPlaying);
   }
+  load = () => {
+    if (!this.loaded) {
+      this.loaded = true;
+      this.countEl.textContent = this.trans.plural('nbFriendsOnline', 0);
+      pubsub.emit('socket.send', 'following_onlines');
+    }
+  };
   receive = (friends: TitleName[], msg: { playing: string[]; patrons: string[] }) => {
     this.users.clear();
+    this.receivedOnlineFriends = true;
     friends.forEach(this.insert);
     msg.playing
       .map(p => this.users.get(p))
@@ -46,14 +55,13 @@ export default class OnlineFriends {
     this.repaint();
   };
   repaint = () => {
-    if (this.loaded)
+    if (this.receivedOnlineFriends)
       requestAnimationFrame(() => {
         const ids = Array.from(this.users.keys()).sort();
-        this.titleEl.innerHTML = this.trans.plural(
-          'nbFriendsOnline',
-          ids.length,
-          this.loaded ? `<strong>${ids.length}</strong>` : '-',
-        );
+        const count = this.trans.plural('nbFriendsOnline', ids.length);
+        this.titleEl.title = count;
+        this.titleEl.setAttribute('aria-label', count);
+        this.countEl.textContent = count;
         this.el.querySelector('.nobody')?.classList.toggle('none', !!ids[0]);
         this.el.querySelector('.list')!.innerHTML = ids.map(id => this.renderFriend(this.users.get(id)!)).join('');
       });
@@ -84,7 +92,7 @@ export default class OnlineFriends {
     this.insert(titleName).playing = true;
     this.repaint();
   };
-  stopped_playing = (titleName: TitleName) => {
+  stoppedPlaying = (titleName: TitleName) => {
     this.insert(titleName).playing = false;
     this.repaint();
   };
