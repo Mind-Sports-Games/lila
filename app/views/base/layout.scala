@@ -134,7 +134,7 @@ object layout {
         dataIcon   := "f"
       ),
       div(cls := "content_wrap dropdown")(
-        div(cls := "friend_box_count")(trans.nbFriendsOnline.plural(0, "")),
+        div(cls := "friend_box_count")(trans.nbFriendsOnline.plural(2, "-")),
         div(cls := "content list")
       )
     )

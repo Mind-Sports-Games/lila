@@ -36,8 +36,9 @@ export default class OnlineFriends {
   load = () => {
     if (!this.loaded) {
       this.loaded = true;
-      this.countEl.textContent = this.trans.plural('nbFriendsOnline', 0);
       pubsub.emit('socket.send', 'following_onlines');
+      // the socket may not be open yet: let the next hover or click ask again
+      setTimeout(() => (this.loaded = this.receivedOnlineFriends), 5000);
     }
   };
   receive = (friends: TitleName[], msg: { playing: string[]; patrons: string[] }) => {
@@ -62,7 +63,6 @@ export default class OnlineFriends {
         this.titleEl.title = count;
         this.titleEl.setAttribute('aria-label', count);
         this.countEl.textContent = count;
-        this.el.querySelector('.nobody')?.classList.toggle('none', !!ids[0]);
         this.el.querySelector('.list')!.innerHTML = ids.map(id => this.renderFriend(this.users.get(id)!)).join('');
       });
   };
