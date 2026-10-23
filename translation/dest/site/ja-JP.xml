@@ -870,4 +870,8 @@
   <string name="variantPuzzles">%s の問題</string>
   <string name="libraryTitle">無料でオンライン対戦できるボードゲーム — PlayStrategy ライブラリ</string>
   <string name="libraryDescription">PlayStrategy のすべてのゲーム：チェスとその変則ルール、チェッカー、囲碁、バックギャモン、オセロ、将棋、シャンチー、マンカラ、アバロン、Lines of Action など。ルール、チュートリアル、トーナメント、統計付き。</string>
+  <string name="variantBoardEditorTitle">%s ボードエディター — 任意の局面を作成</string>
+  <string name="variantBoardEditorDescription">無料のオンライン %s ボードエディター：手動または FEN から局面を作成し、解析・コンピュータ対局・共有ができます。</string>
+  <string name="signInDescription">PlayStrategy にログインして、チェス、チェッカー、囲碁、バックギャモン、オセロなど40種類以上のボードゲームを無料でオンライン対戦。レーティング、トーナメント、解析つき。</string>
+  <string name="signUpDescription">無料の PlayStrategy アカウントを作成して、チェス、チェッカー、囲碁、バックギャモン、オセロなど40種類以上のボードゲームをオンラインで。レーティング対局、トーナメント、問題、解析、広告なし。</string>
 </resources>

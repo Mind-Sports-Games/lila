@@ -924,4 +924,8 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="msoGrandPrix">Grand Prix MSO</string>
   <string name="msoGrandPrixEvent">%s no Grande Prémio MSO</string>
   <string name="msoGrandPrixVenue">O Grande Prémio online da %2$s joga-se no PlayStrategy, e %1$s é um dos seus jogos.</string>
+  <string name="variantBoardEditorTitle">Editor de tabuleiro de %s — monte qualquer posição</string>
+  <string name="variantBoardEditorDescription">Editor de tabuleiro de %s online e gratuito: monte qualquer posição à mão ou a partir de um FEN e depois analise, jogue contra o computador ou compartilhe.</string>
+  <string name="signInDescription">Entre no PlayStrategy para jogar xadrez, damas, go, gamão, Othello e mais 40 jogos de tabuleiro online de graça, com ratings, torneios e análise.</string>
+  <string name="signUpDescription">Crie uma conta gratuita no PlayStrategy para jogar xadrez, damas, go, gamão, Othello e mais 40 jogos de tabuleiro online: partidas valendo rating, torneios, problemas e análise, sem anúncios.</string>
 </resources>
