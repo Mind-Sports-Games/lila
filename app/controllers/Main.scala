@@ -130,6 +130,13 @@ Allow: /
 Disallow: /game/export/
 Disallow: /games/export/
 Allow: /game/export/gif/thumbnail/
+Disallow: /*?referrer=
+Disallow: /account/
+Disallow: /inbox
+Disallow: /notify
+Disallow: /challenge
+Disallow: /study/mine/
+Disallow: /player/opponents
 
 User-agent: Twitterbot
 Allow: /

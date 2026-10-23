@@ -14,6 +14,14 @@ object login {
   def apply(form: Form[?], referrer: Option[String])(implicit ctx: Context) =
     views.html.base.layout(
       title = trans.signIn.txt(),
+      // a page people search for by name: it deserves better than the site-wide pitch
+      openGraph = lila.app.ui
+        .OpenGraph(
+          title = trans.signIn.txt(),
+          url = s"$netBaseUrl${routes.Auth.login.url}",
+          description = trans.signInDescription.txt()
+        )
+        .some,
       moreJs = frag(
         jsModule("login"),
         embedJsUnsafeLoadThen("""PlayStrategyLogin.loginStart()""")

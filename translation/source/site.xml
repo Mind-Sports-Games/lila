@@ -576,6 +576,8 @@ computer analysis, game chat and shareable URL.</string>
   <string name="membersOnly">Members only</string>
   <string name="boardEditor">Board editor</string>
   <string name="boardEditorTitle">Chess board editor — set up any position, chess variants and fairy chess</string>
+  <string name="signInDescription">Sign in to PlayStrategy to play chess, draughts, Go, backgammon, Othello and 40 other board games online for free, with ratings, tournaments and analysis.</string>
+  <string name="signUpDescription">Create a free PlayStrategy account to play chess, draughts, Go, backgammon, Othello and 40 other board games online: rated games, tournaments, puzzles and analysis, with no ads.</string>
   <string name="variantBoardEditorTitle">%s board editor — set up any position</string>
   <string name="variantBoardEditorDescription">Free online %s board editor: set up any position by hand or from a FEN, then analyse it, play it against the computer or share it.</string>
   <string name="boardEditorDescription">Free online board editor for chess, chess variants and 40 other games: set up any position by hand or from a FEN, then analyse it, play it against the computer or share it.</string>
