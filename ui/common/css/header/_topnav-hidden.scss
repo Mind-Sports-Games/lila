@@ -183,4 +183,9 @@
      * has no width, and that menu is mainly for mobile. */
     // padding-right: 15px;
   }
+
+  // the hamburger is absolutely positioned: keep its room in the header row
+  .site-title-nav {
+    flex: 0 0 $site-header-height;
+  }
 }

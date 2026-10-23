@@ -8,7 +8,7 @@ import strategygames.{ GameFamily, Mode, P1, P2, Player as PlayerIndex, Speed }
 import org.joda.time.DateTime
 import scala.util.Random
 
-import lila.game.{ Game, PlayerName }
+import lila.game.{ Game, PlayerName, Source }
 import lila.i18n.{ I18nKey, I18nKeys }
 import play.api.i18n.Lang
 import lila.rating.PerfType
@@ -34,7 +34,7 @@ case class Challenge(
     declineReason: Option[Challenge.DeclineReason] = None,
     multiMatch: Option[Boolean] = None,
     backgammonPoints: Option[Int] = None,
-    isBotvsBotStream: Boolean = false
+    botVsBotSource: Option[Source] = None
 ) {
 
   import Challenge.*
@@ -262,7 +262,7 @@ object Challenge {
       multiMatch: Boolean = false,
       // this could be extended into 'gameSettings' if more game specific fields are required
       backgammonPoints: Option[Int] = None,
-      isBotvsBotStream: Boolean = false
+      botVsBotSource: Option[Source] = None
   ): Challenge = {
     val (playerIndexChoice, finalPlayerIndex) = playerIndex match {
       case "p1" => PlayerIndexChoice.P1     -> P1
@@ -321,7 +321,7 @@ object Challenge {
       name = name,
       multiMatch = multiMatch.option(true),
       backgammonPoints = backgammonPoints,
-      isBotvsBotStream = isBotvsBotStream
+      botVsBotSource = botVsBotSource
     )
     if (multiMatch && !challenge.customStartingPosition) challenge = challenge.copy(multiMatch = none)
     if (challenge.mode.rated && !challenge.isMultiMatch && challenge.customStartingPosition)

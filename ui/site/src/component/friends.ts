@@ -14,26 +14,34 @@ interface Friend {
 
 export default class OnlineFriends {
   titleEl: HTMLElement;
-  loaded = false;
+  countEl: HTMLElement;
+  badgeEl: HTMLElement;
+  receivedOnlineFriends = false;
+  repaintPending = false;
+  listDirty = false;
   trans: Trans;
   users: Map<string, Friend>;
 
   constructor(readonly el: HTMLElement) {
-    this.titleEl = this.el.querySelector('.friend_box_title') as HTMLElement;
-    this.titleEl.addEventListener('click', () => {
-      this.el.querySelector('.content_wrap')?.classList.toggle('none');
-      if (!this.loaded) {
-        this.loaded = true;
-        pubsub.emit('socket.send', 'following_onlines');
-      }
-    });
+    this.titleEl = this.el.querySelector('.friend_box_button') as HTMLElement;
+    this.countEl = this.el.querySelector('.friend_box_count') as HTMLElement;
+    this.badgeEl = this.titleEl.querySelector('.friend_box_badge') as HTMLElement;
+    this.titleEl.addEventListener('click', this.renderList);
     this.trans = trans(JSON.parse(this.el.getAttribute('data-i18n')!));
     this.users = new Map();
     pubsub.on('socket.in.following_onlines', this.receive);
-    ['enters', 'leaves', 'playing', 'stopped_playing'].forEach(k => pubsub.on('socket.in.following_' + k, this[k]));
+    pubsub.on('socket.in.following_enters', this.enters);
+    pubsub.on('socket.in.following_leaves', this.leaves);
+    pubsub.on('socket.in.following_playing', this.playing);
+    pubsub.on('socket.in.following_stopped_playing', this.stoppedPlaying);
+    // the badge needs the count up front; ask again on each (re)connection
+    pubsub.on('socket.open', this.request);
+    this.request();
   }
+  request = () => pubsub.emit('socket.send', 'following_onlines');
   receive = (friends: TitleName[], msg: { playing: string[]; patrons: string[] }) => {
     this.users.clear();
+    this.receivedOnlineFriends = true;
     friends.forEach(this.insert);
     msg.playing
       .map(p => this.users.get(p))
@@ -45,18 +53,28 @@ export default class OnlineFriends {
       .forEach(u => (u.patron = true));
     this.repaint();
   };
+  // one repaint per frame, however many events arrive (leaves come in 5s batches)
   repaint = () => {
-    if (this.loaded)
-      requestAnimationFrame(() => {
-        const ids = Array.from(this.users.keys()).sort();
-        this.titleEl.innerHTML = this.trans.plural(
-          'nbFriendsOnline',
-          ids.length,
-          this.loaded ? `<strong>${ids.length}</strong>` : '-',
-        );
-        this.el.querySelector('.nobody')?.classList.toggle('none', !!ids[0]);
-        this.el.querySelector('.list')!.innerHTML = ids.map(id => this.renderFriend(this.users.get(id)!)).join('');
-      });
+    if (!this.receivedOnlineFriends || this.repaintPending) return;
+    this.repaintPending = true;
+    requestAnimationFrame(() => {
+      this.repaintPending = false;
+      const nb = this.users.size;
+      const count = this.trans.plural('nbFriendsOnline', nb);
+      this.titleEl.title = count;
+      this.titleEl.setAttribute('aria-label', count);
+      this.countEl.textContent = count;
+      this.badgeEl.innerHTML = nb > 99 ? '99<sup>+</sup>' : nb ? `${nb}` : '';
+      this.listDirty = true;
+      if (this.el.classList.contains('shown')) this.renderList();
+    });
+  };
+  // the list is only built while the dropdown is open, or when it gets opened
+  renderList = () => {
+    if (!this.listDirty) return;
+    this.listDirty = false;
+    const ids = Array.from(this.users.keys()).sort();
+    this.el.querySelector('.list')!.innerHTML = ids.map(id => this.renderFriend(this.users.get(id)!)).join('');
   };
   renderFriend = (friend: Friend) => {
     const icon = `<i class="line${friend.patron ? ' patron' : ''}"></i>`,
@@ -84,7 +102,7 @@ export default class OnlineFriends {
     this.insert(titleName).playing = true;
     this.repaint();
   };
-  stopped_playing = (titleName: TitleName) => {
+  stoppedPlaying = (titleName: TitleName) => {
     this.insert(titleName).playing = false;
     this.repaint();
   };
