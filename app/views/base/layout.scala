@@ -124,6 +124,20 @@ object layout {
       div(id := "dasher_app", cls := "dropdown")
     )
 
+  private def friendBox(implicit ctx: Context) =
+    div(id := "friend_box", dataI18n := safeJsonValue(i18nJsObject(i18nKeys)))(
+      button(
+        tpe        := "button",
+        cls        := "friend_box_button toggle link",
+        title      := trans.friends.txt(),
+        aria.label := trans.friends.txt()
+      )(span(cls := "friend_box_icon", dataIcon := "f")(span(cls := "friend_box_badge"))),
+      div(cls := "content_wrap dropdown")(
+        div(cls := "friend_box_count")(trans.nbFriendsOnline.plural(2, "-")),
+        div(cls := "content list")
+      )
+    )
+
   private def allNotifications(implicit ctx: Context) =
     spaceless(s"""<div>
   <a id="challenge-toggle" class="toggle link">
@@ -368,19 +382,6 @@ object layout {
               "is3d"    -> ctx.pref.is3d
             )
           )(body),
-          ctx.me
-            .exists(_.enabled)
-            .option(
-              div(
-                id       := "friend_box",
-                dataI18n := safeJsonValue(i18nJsObject(i18nKeys))
-              )(
-                div(cls := "friend_box_title")(trans.nbFriendsOnline.plural(0, iconTag("S"))),
-                div(cls := "content_wrap none")(
-                  div(cls := "content list")
-                )
-              )
-            ),
           a(id := "reconnecting", cls := "link text", dataIcon := "B")(trans.reconnecting()),
           loadScripts(moreJs)
         )
@@ -461,7 +462,7 @@ object layout {
             )
           else
             ctx.me map { me =>
-              frag(allNotifications, dasher(me))
+              frag(me.enabled.option(friendBox), allNotifications, dasher(me))
             } getOrElse { (!ctx.pageData.error).option(anonDasher(playing)) }
         )
       )
