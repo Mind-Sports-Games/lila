@@ -13,7 +13,9 @@ final private class StudyMaker(
 
   def apply(data: StudyMaker.ImportGame, user: User): Fu[Study.WithChapter] =
     (data.form.gameId so gameRepo.gameWithInitialFen).flatMap {
-      case Some((game, initialFen)) if game.metadata.multiPointState.isEmpty =>
+      // a game with no analysis board has no chapter either: the board would draw empty
+      case Some((game, initialFen))
+          if game.metadata.multiPointState.isEmpty && game.variant.hasAnalysisBoard =>
         createFromPov(data, Pov(game, data.form.orientation), initialFen, user)
       case Some(_) => createFromScratch(data, user)
       case None    => createFromScratch(data, user)
