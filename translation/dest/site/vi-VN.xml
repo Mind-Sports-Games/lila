@@ -608,8 +608,8 @@
   <string name="keyShowOrHideComments">hiện/ẩn bình luận</string>
   <string name="keyEnterOrExitVariation">vào/thoát biến thể cờ</string>
   <string name="newTournament">Giải đấu mới</string>
-  <string name="tournamentHomeTitle">Giải đấu cờ vua với nhiều thiết lập thời gian và thể loại phong phú</string>
-  <string name="tournamentHomeDescription">Chơi các giải đấu cờ vua tốc độ! Tham gia một giải đấu chính thức, hoặc tự tạo giải đấu của bạn. Cờ Chớp, cờ Nhanh, cờ Cổ Điển, cờ 960, cờ \"Vua của Đồi\", cờ \"Ba lần Chiếu\", và nhiều lựa chọn khác cho niềm vui đánh cờ vô tận.</string>
+  <string name="tournamentHomeTitle">Giải đấu đấu trường — đang diễn ra và sắp tới, ở mọi trò chơi</string>
+  <string name="tournamentHomeDescription">Giải đấu đấu trường trên PlayStrategy: cờ vua, cờ đam, cờ vây, backgammon, Othello, Abalone và mọi trò chơi khác. Đang diễn ra, sắp tới, và ai đã thắng.</string>
   <string name="tournamentNotFound">Giải đấu không tìm thấy</string>
   <string name="tournamentDoesNotExist">Giải đấu này không tồn tại.</string>
   <string name="tournamentMayHaveBeenCanceled">Nó có thể đã bị huỷ, nếu tất cả người chơi rời giải trước khi giải đấu bắt đầu.</string>

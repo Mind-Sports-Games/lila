@@ -705,8 +705,6 @@
   <string name="keyShowOrHideComments">pokaži/skrij komentarje</string>
   <string name="keyEnterOrExitVariation">vstopi/izstopi v varianto</string>
   <string name="newTournament">Nov turnir</string>
-  <string name="tournamentHomeTitle">Turnir z možnostjo različnih variant in različnih igralnih časov</string>
-  <string name="tournamentHomeDescription">Igraj turnirje z hitrim tempom! Pridruži se uradnemu turnirju ali ustvari svoj turnir. Hitropotezno, Pospešeno, Klasično, Šah960, Trojni šah in ostale možnosti so na voljo za neskončno šahovsko zabavo.</string>
   <string name="tournamentNotFound">Turnir ni najden</string>
   <string name="tournamentDoesNotExist">Ta turnir ne obstaja.</string>
   <string name="tournamentMayHaveBeenCanceled">Lahko je odpovedan, če so vsi igralci zapustili turnir preden se je začel.</string>

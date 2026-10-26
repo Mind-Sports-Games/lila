@@ -655,8 +655,6 @@
   <string name="keyShowOrHideComments">mostrar/ocultar comentaris</string>
   <string name="keyEnterOrExitVariation">entrar/sortir variació</string>
   <string name="newTournament">Nou torneig</string>
-  <string name="tournamentHomeTitle">Torneig d\'escacs amb diversos controls de temps i variants</string>
-  <string name="tournamentHomeDescription">Juga tornejos d\'escacs ràpids! Uneix-te a un torneig programat o crea\'n un de propi. Bullet, Blitz, Classic, Chess960, King of the Hill, Threecheck i moltes més opcions perquè no s\'acabi la diversió dels escacs.</string>
   <string name="tournamentNotFound">No s\'ha trobat el torneig</string>
   <string name="tournamentDoesNotExist">Aquest torneig no existeix.</string>
   <string name="tournamentMayHaveBeenCanceled">Pot ser que s\'hagi cancel·lat, si tots els jugadors l\'han abandonat abans que comencés.</string>

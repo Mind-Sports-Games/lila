@@ -644,8 +644,6 @@
   <string name="keyShowOrHideComments">टिपण्णी दिखाएँ/छिपाएँ</string>
   <string name="keyEnterOrExitVariation">अंदर बाहर करे</string>
   <string name="newTournament">नया टूर्नमेंट बनायें</string>
-  <string name="tournamentHomeTitle">शतरंज का टूर्नमेंट, अलग अलग खेल समय और प्रकार के साथ</string>
-  <string name="tournamentHomeDescription">तेज़ रफ़्तार वाले शतरंज टूर्नमेंट खेलिए! आधिकारिक अन्यूसशीट टूर्नमेंट मे भाग लें, या खुद का टूर्नमेंट बनायें! Bullet, Blitz, Classical, Chess960, King of the Hill, Threecheck और अधिक प्रकार के मज़ेदार शतरंज के किस्म खेलिए!</string>
   <string name="tournamentNotFound">टूर्नामेंट नहीं मिला</string>
   <string name="tournamentDoesNotExist">यह टूर्नामेंट मौजूद नहीं है।</string>
   <string name="tournamentMayHaveBeenCanceled">टूर्नमेंट रद्द् हो गया होगा, अगर सभी खिलाड़ी टूर्नमेंट शुरू होने से पहले चले तौंरमेंट छोड़ चुके है</string>

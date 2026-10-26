@@ -656,8 +656,8 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="keyShowOrHideComments">mostrar/ocultar os comentários</string>
   <string name="keyEnterOrExitVariation">entrar/sair da variante</string>
   <string name="newTournament">Novo torneio</string>
-  <string name="tournamentHomeTitle">Torneios de xadrez com diversos ritmos de jogo e variantes</string>
-  <string name="tournamentHomeDescription">Joga xadrez em ritmo acelerado! Entra num torneio oficial agendado ou cria o teu próprio. Bullet, blitz, clássico, chess960, rei da colina, três xeques e mais opções disponíveis para uma diversão ilimitada.</string>
+  <string name="tournamentHomeTitle">Torneios em arena — a decorrer e próximos, em todos os jogos</string>
+  <string name="tournamentHomeDescription">Torneios em arena no PlayStrategy: xadrez, damas, go, gamão, Othello, Abalone e todos os outros jogos. O que está a decorrer, o que vem a seguir, quem ganhou.</string>
   <string name="tournamentNotFound">Torneio não encontrado</string>
   <string name="tournamentDoesNotExist">Este torneio não existe.</string>
   <string name="tournamentMayHaveBeenCanceled">O torneio pode ter sido cancelado, se todos os jogadores tiverem saíram antes do seu começo.</string>

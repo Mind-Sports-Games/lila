@@ -654,8 +654,8 @@
   <string name="keyShowOrHideComments">zeige/verberge Kommentare</string>
   <string name="keyEnterOrExitVariation">Variante wählen/verlassen</string>
   <string name="newTournament">Neues Turnier</string>
-  <string name="tournamentHomeTitle">Schachturnier mit verschiedenen Zeitkontrollen und Schachvarianten</string>
-  <string name="tournamentHomeDescription">Spiele rasante Turniere! Trete einem geplanten Turnier bei oder erstelle ein neues. Bullet, Blitz, Klassisch, Chess960, King of the Hill, Threecheck und weitere Schachvarianten für grenzenlosen Spaß.</string>
+  <string name="tournamentHomeTitle">Arena-Turniere — laufende und kommende Turniere in jedem Spiel</string>
+  <string name="tournamentHomeDescription">Arena-Turniere auf PlayStrategy: Schach, Dame, Go, Backgammon, Othello, Abalone und jedes andere Spiel. Was jetzt läuft, was als Nächstes kommt, wer gewonnen hat.</string>
   <string name="tournamentNotFound">Turnier nicht gefunden</string>
   <string name="tournamentDoesNotExist">Dieses Turnier existiert nicht.</string>
   <string name="tournamentMayHaveBeenCanceled">Womöglich wurde es abgesagt, weil zu Turnierbeginn kein Spieler (mehr) registriert war.</string>

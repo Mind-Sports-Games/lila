@@ -725,8 +725,6 @@
   <string name="keyShowOrHideComments">diskouez/skoachañ an evezhiadennoù</string>
   <string name="keyEnterOrExitVariation">mont ebarzh/kuitaat an eilstumm</string>
   <string name="newTournament">Tournamant nevez</string>
-  <string name="tournamentHomeTitle">Tournamantoù echedoù o zizh hag o variantoù liesseurt</string>
-  <string name="tournamentHomeDescription">C\'hoariit tournamantoù echedoù fonnus! Kemerit perzh en un tournamant ofisiel raktreset, pe krouit hoc\'h hini. Bullet, Blitz, Klasel, Echedoù960, Roue d\'ar c\'hreiz, Tribec\'h, ha dibaboù all evit ur blijadur beurbadus gant an echedoù.</string>
   <string name="tournamentNotFound">N\'eo ket bet kavet an tournamant</string>
   <string name="tournamentDoesNotExist">N\'eus ket diouzh an tournamant-mañ.</string>
   <string name="tournamentMayHaveBeenCanceled">Marteze eo bet nullet an tournamant dre ma \'z eo aet kuit an holl c\'hoarerien a-raok ma krogfe.</string>

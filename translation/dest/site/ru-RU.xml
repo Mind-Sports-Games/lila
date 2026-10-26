@@ -722,8 +722,8 @@
   <string name="keyShowOrHideComments">показать/скрыть комментарии</string>
   <string name="keyEnterOrExitVariation">ввести/закрыть вариант</string>
   <string name="newTournament">Новый турнир</string>
-  <string name="tournamentHomeTitle">Шахматный турнир по различным вариантам шахмат и контролем времени</string>
-  <string name="tournamentHomeDescription">Играйте в быстрые шахматы на турнире! Выбирайте любой из официальных турниров PlayStrategy или создайте свой собственный. Пуля, блиц, классика, шахматы Фишера, король в центре, три шаха и другие варианты игры обеспечат вам бесконечное шахматное удовольствие!</string>
+  <string name="tournamentHomeTitle">Турниры «Арена» — текущие и предстоящие, во всех играх</string>
+  <string name="tournamentHomeDescription">Турниры «Арена» на PlayStrategy: шахматы, шашки, го, нарды, отелло, Abalone и все остальные игры. Что идёт сейчас, что будет дальше, кто побеждал.</string>
   <string name="tournamentNotFound">Турнир не найден</string>
   <string name="tournamentDoesNotExist">Такого турнира не существует.</string>
   <string name="tournamentMayHaveBeenCanceled">Может быть отменён в том случае, если все игроки покинули турнир до его старта.</string>

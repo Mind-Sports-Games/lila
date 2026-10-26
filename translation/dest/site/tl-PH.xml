@@ -644,8 +644,6 @@
   <string name="keyShowOrHideComments">ipakita/itago ang mga komento</string>
   <string name="keyEnterOrExitVariation">pumasok/lumabas na pagkakaiba-iba</string>
   <string name="newTournament">Bagong torneo</string>
-  <string name="tournamentHomeTitle">Paligsahan ng Chess tampok ang ibat-ibang pagkontrol sa oras at mga pagkakaiba-iba</string>
-  <string name="tournamentHomeDescription">Maglaro ng mabilis sa mga paligsahn ng chess! Sumali sa opisyal na nakaiskedyul na mga paligsahan, o gumawa na iyong sarili. Bullet, Blitz, Classical, Chess960, King of the Hill, Threecheck, at marami pang magagamit para sa walang katapusang kasayahan ng chess.</string>
   <string name="tournamentNotFound">Hindi mahanap ang torneo</string>
   <string name="tournamentDoesNotExist">Itong torneo nato ay hindi nag-eexist</string>
   <string name="tournamentMayHaveBeenCanceled">Ito ay maaring makansela, kung lahat ng mga manlalaro ay umalis bago magsimula ang paligsahan.</string>
