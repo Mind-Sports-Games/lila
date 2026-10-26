@@ -829,7 +829,7 @@
   <string name="clickToRevealEmailAddress">[ クリックでメールアドレスを表示 ]</string>
   <string name="playstrategySiteTitle">ボードゲームを無料でオンライン対戦 — チェス、チェッカー、囲碁、バックギャモン、オセロなど</string>
   <string name="playstrategySiteTitleShort">ボードゲームを無料でオンライン対戦 — チェス、チェッカー、囲碁、バックギャモン</string>
-  <string name="playstrategySiteDescription">ボードゲームを無料でオンライン対戦：チェスとその変則ルール、チェッカー、囲碁、バックギャモン、オセロ、将棋、シャンチー、マンカラ、アバロンなど。Mind Sports Olympiad 公式オンラインプラットフォーム。無料・オープンソース、リアルタイム対局と通信対局に対応。</string>
+  <string name="playstrategySiteDescription">ボードゲームを無料でオンラインで対戦・解析・学習。Mind Sports Olympiad 公式プラットフォーム。チェス、チェッカー、囲碁、バックギャモン、オセロ、マンカラ、アバロンなど。 無料・オープンソース・広告なし。リアルタイム対局と通信対局、タクティクス問題、研究、全ゲームの解析盤。</string>
   <string name="playstrategyAboutSummary">%1$s は2人用ボードゲームのリアルタイム対戦プラットフォームであり、Mind Sports Olympiad の公式オンラインプラットフォームです。チェス、囲碁、オセロ、マンカラ、チェッカー、バックギャモン、アバロンなど40種類以上のゲームを、この無料・オープンソースのサイトで。</string>
   <string name="playVariantOnlineFree">%s を無料でオンライン対戦：リアルタイムまたは通信対局、レーティング戦またはカジュアル戦で、世界中のプレイヤーと。</string>
   <string name="playVariantOnlineFreeTitle">%s を無料でオンライン対戦</string>

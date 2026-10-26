@@ -831,7 +831,7 @@
   <string name="clickToRevealEmailAddress">[이메일 주소를 보려면 클릭]</string>
   <string name="playstrategySiteTitle">보드게임 무료 온라인 플레이 — 체스, 체커, 바둑, 백개먼, 오델로 등</string>
   <string name="playstrategySiteTitleShort">보드게임 무료 온라인 플레이 — 체스, 체커, 바둑, 백개먼</string>
-  <string name="playstrategySiteDescription">보드게임을 무료로 온라인에서 즐기세요: 체스와 체스 변형, 체커, 바둑, 백개먼, 오델로, 쇼기, 샹치, 만칼라, 아발론 등. Mind Sports Olympiad 공식 온라인 플랫폼. 무료, 오픈 소스, 실시간 또는 통신 대국.</string>
+  <string name="playstrategySiteDescription">보드게임을 무료로 온라인에서 두고, 분석하고, 배우세요. Mind Sports Olympiad 공식 플랫폼. 체스, 체커, 바둑, 백개먼, 오델로, 만칼라, 아발론 등. 무료, 오픈 소스, 광고 없음. 실시간 또는 통신 대국, 퍼즐, 연구, 모든 게임의 분석판.</string>
   <string name="playstrategyAboutSummary">%1$s은(는) 2인용 보드게임을 실시간으로 즐기는 플랫폼이자 Mind Sports Olympiad의 공식 온라인 플랫폼입니다. 체스, 바둑, 오델로, 만칼라, 체커, 백개먼, 아발론 등 40가지가 넘는 게임을 이 무료 오픈 소스 사이트에서 즐길 수 있습니다.</string>
   <string name="playVariantOnlineFree">%s을(를) 무료로 온라인에서 플레이하세요: 실시간 또는 통신 대국, 레이팅 또는 친선전, 전 세계 플레이어와 함께.</string>
   <string name="playVariantOnlineFreeTitle">%s 무료 온라인 플레이</string>
