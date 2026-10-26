@@ -827,7 +827,7 @@
   <string name="clickToRevealEmailAddress">[点击显示电子邮件地址]</string>
   <string name="playstrategySiteTitle">免费在线玩桌游 — 国际象棋、跳棋、围棋、双陆棋、黑白棋等</string>
   <string name="playstrategySiteTitleShort">免费在线玩桌游 — 国际象棋、跳棋、围棋、双陆棋</string>
-  <string name="playstrategySiteDescription">免费在线玩桌游：国际象棋及其变体、跳棋、围棋、双陆棋、黑白棋、将棋、中国象棋、播棋、Abalone 等。Mind Sports Olympiad 官方在线平台。免费、开源，支持实时对局和通信对局。</string>
+  <string name="playstrategySiteDescription">免费在线桌游。在 Mind Sports Olympiad 官方平台对局、分析、学习国际象棋、跳棋、围棋、双陆棋、黑白棋、播棋、Abalone。 免费、开源、无广告，支持实时与通信对局，提供谜题、研讨和每种棋类的分析棋盘。</string>
   <string name="playstrategyAboutSummary">%1$s 是一个双人桌游实时对战平台，也是 Mind Sports Olympiad 的官方在线平台。40 多种游戏，包括国际象棋、围棋、黑白棋、播棋、跳棋、双陆棋、Abalone……尽在这个免费开源的网站。</string>
   <string name="playVariantOnlineFree">免费在线玩 %s：实时或通信对局，积分或休闲，对手来自世界各地。</string>
   <string name="playVariantOnlineFreeTitle">免费在线玩 %s</string>

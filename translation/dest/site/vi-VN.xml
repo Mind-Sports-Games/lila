@@ -812,7 +812,7 @@
   <string name="unsubscribe">Hủy đăng ký</string>
   <string name="playstrategySiteTitle">Chơi board game trực tuyến miễn phí — cờ vua, cờ đam, cờ vây, backgammon, Othello và hơn thế nữa</string>
   <string name="playstrategySiteTitleShort">Chơi board game trực tuyến miễn phí — cờ vua, cờ đam, cờ vây, backgammon</string>
-  <string name="playstrategySiteDescription">Chơi board game trực tuyến miễn phí: cờ vua và các biến thể, cờ đam, cờ vây, backgammon, Othello, shogi, cờ tướng, mancala, Abalone và nhiều hơn nữa. Nền tảng trực tuyến chính thức của Mind Sports Olympiad. Miễn phí, mã nguồn mở, chơi trực tiếp hoặc theo lượt.</string>
+  <string name="playstrategySiteDescription">Board game trực tuyến, miễn phí, trên nền tảng của Mind Sports Olympiad: chơi, phân tích và học cờ vua, cờ đam, cờ vây, backgammon, Othello, mancala, Abalone. Miễn phí, mã nguồn mở, không quảng cáo, chơi trực tiếp hoặc theo lượt, với câu đố, nghiên cứu và bàn phân tích cho mọi trò chơi.</string>
   <string name="playstrategyAboutSummary">%1$s là nền tảng thời gian thực để chơi các board game hai người, và là nền tảng trực tuyến chính thức của Mind Sports Olympiad. Hơn 40 trò chơi khác nhau gồm cờ vua, cờ vây, Othello, mancala, cờ đam, backgammon, Abalone… trên trang web miễn phí và mã nguồn mở này.</string>
   <string name="playVariantOnlineFree">Chơi %s trực tuyến miễn phí: trực tiếp hoặc theo lượt, có xếp hạng hoặc giao hữu, với người chơi trên toàn thế giới.</string>
   <string name="playVariantOnlineFreeTitle">Chơi %s trực tuyến miễn phí</string>
