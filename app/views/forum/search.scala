@@ -12,6 +12,8 @@ object search {
     val title = s"""${trans.search.search.txt()} "${text.trim}""""
     views.html.base.layout(
       title = title,
+      // a search result is not a page of its own, and most queries find nothing
+      robots = false,
       moreJs = infiniteScrollTag,
       moreCss = cssTag("forum")
     )(

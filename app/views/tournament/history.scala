@@ -36,9 +36,6 @@ object history {
       case _        => none
     }
 
-  // the families with a page of their own, so the sitemap and the chips cannot disagree
-  def displayedGroups = displayedGameGroups.filter(soleVariant(_).isEmpty)
-
   def groupByKey(key: String): Option[GameGroup] =
     displayedGameGroups.find(_.key == key)
 
@@ -181,7 +178,7 @@ object history {
 
   private def nameOf(f: Freq) = if (f == Freq.Weekend) "Elite" else f.display
 
-  // the sitemap lists one page per frequency, and one per series (see Main.sitemap)
+  // the sitemap lists one page per frequency (see Main.sitemap)
   val allFreqs = List(
     Freq.Annual,
     Freq.Introductory,

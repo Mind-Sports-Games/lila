@@ -163,6 +163,8 @@ object shields {
     val wording = series.Wording(contested = true, subject = categ.name)
     views.html.base.layout(
       title = title,
+      // a category no one has ever held is an empty page
+      robots = netConfig.crawlable && (awards.nonEmpty || next.isDefined),
       moreCss = frag(cssTag("tournament.leaderboard"), cssTag("slist")),
       openGraph = lila.app.ui
         .OpenGraph(
