@@ -568,8 +568,6 @@
   <string name="keyShowOrHideComments">dangos/cuddio nodau</string>
   <string name="keyEnterOrExitVariation">mynd i mewn i/allan o amrywiad</string>
   <string name="newTournament">Cystadleuaeth newydd</string>
-  <string name="tournamentHomeTitle">Cystadleuaeth gwyddbwyll gyda amrywiadau a rheoliad amser.</string>
-  <string name="tournamentHomeDescription">Chwaraewch cystadlaeaethau gwyddbwyll cyflym! Ymynwch at gystadleuaeth efo rheoliad swyddogol neu grewch eich cystadleuaeth eich hunan. Bwled, Mellten, Clasurol, Gwyddbwyll960, Teyrn y Bryn, Trisiach ac opsiynau arall ar gael ar gyfer hwyl gwyddbwyll dros ben.</string>
   <string name="tournamentNotFound">Methais ffeindio\'r cystadleuaeth</string>
   <string name="tournamentDoesNotExist">Nid ydy\'r cystadleuaeth yn bodoli.</string>
   <string name="tournamentMayHaveBeenCanceled">Efallai erthylwyd y cystadleuaeth os gadawodd pob chwaraewr cyn iddo gychwyn.</string>

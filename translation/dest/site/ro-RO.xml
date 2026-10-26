@@ -681,8 +681,6 @@
   <string name="keyShowOrHideComments">arată/ascunde comentarii</string>
   <string name="keyEnterOrExitVariation">acceptă/respinge variație</string>
   <string name="newTournament">Turneu nou</string>
-  <string name="tournamentHomeTitle">Turneu de șah cu control de timp și variante</string>
-  <string name="tournamentHomeDescription">Joacă turnee rapide de șah! Intră într-un turneu oficial planificat sau crează-ți-l tu. Bullet (Glonț),  Blitz (Fulger), Classical (Clasic), Chess960, Regele în centru, Trei șahuri și alte opțiuni sunt disponibile pentru o distracție continuă.</string>
   <string name="tournamentNotFound">Turneul nu a fost găsit</string>
   <string name="tournamentDoesNotExist">Acest turneu nu există.</string>
   <string name="tournamentMayHaveBeenCanceled">Posibil să fi fost anulat, dacă toți jucătorii au plecat înainte de începerea turneului.</string>

@@ -599,8 +599,6 @@ kompýuter derňewi, oýun çäti we paýlaşmaga URL alýaňyz.</string>
   <string name="keyShowOrHideComments">teswirleri görkez/gizle</string>
   <string name="keyEnterOrExitVariation">warianty aç/ýap</string>
   <string name="newTournament">Täze bäsleşik</string>
-  <string name="tournamentHomeTitle">Dürli wagt dolandyrmasyny we küşt wariantlaryny öz içine alýan küşt bäsleşigi</string>
-  <string name="tournamentHomeDescription">Çalt depginli küşt bäsleşiklerinde oýnaň! Rejelenen bäsleşiklere gatnaşyň ýa-da öz bäsleşigiňizi döredip. Çäksiz küşt lezzeti üçin bullet, blitz, nusgawy, küşt960, merkeziň şasy, 3-şah we beýleki opsiýalar.</string>
   <string name="tournamentNotFound">Beýle bäsleşik tapylmady</string>
   <string name="tournamentDoesNotExist">Beýle bäsleşik ýok.</string>
   <string name="tournamentMayHaveBeenCanceled">Eger ähli gatnaşyjylar bäsleşik başlamanka bäsleşigi terketse bäsleşik ýatyrlan bolup biler.</string>

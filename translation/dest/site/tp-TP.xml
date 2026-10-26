@@ -657,8 +657,6 @@ o musi lon lipu pona. sina wile ala pana e nimi li wile ala e ilo. sitelen esun 
   <string name="keyShowOrHideComments">o pana (ala) lukin e toki anpa</string>
   <string name="keyEnterOrExitVariation">nasin open/pini</string>
   <string name="newTournament">o open e musi pi musi mute</string>
-  <string name="tournamentHomeTitle">utala musi pi musi pi jan lawa moli pi nasin ante pi nasin tenpo ante</string>
-  <string name="tournamentHomeDescription">o musi e musi pi tenpo lili! musi mute li lon.</string>
   <string name="tournamentNotFound">musi pi musi mute li lon ala</string>
   <string name="tournamentDoesNotExist">musi pi musi mute li lon ala</string>
   <string name="tournamentMayHaveBeenCanceled">jan ale li lon, la ona li pini</string>

@@ -563,7 +563,6 @@
   <string name="keyShowOrHideComments">კომენტარების ჩვენება/დამალვა</string>
   <string name="keyEnterOrExitVariation">ვარიაციაში შესვლა/გამოსვლა</string>
   <string name="newTournament">ახალი ტურნირი</string>
-  <string name="tournamentHomeTitle">ჭადრაკის ტურნირი სხვადასხვა დროითი კონტროლითა და ვარიანტებით</string>
   <string name="tournamentNotFound">ტურნირი ნაპოვნი არ არის</string>
   <string name="tournamentDoesNotExist">აღნიშნული ტურნირი არ არსებობს.</string>
   <string name="tournamentMayHaveBeenCanceled">ტურნირი შესაძლოა გაუქმებული იყოს, თუ ის ყველა მოთამაშემ დატოვა მის დაწყებამდე.</string>

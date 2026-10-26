@@ -640,8 +640,6 @@ rekenaar analise, kletskamer en deelbare URL te kry.</string>
   <string name="keyShowOrHideComments">vertoon/versteek kommentaar</string>
   <string name="keyEnterOrExitVariation">betree/verlaat variasie</string>
   <string name="newTournament">Nuwe toernooi</string>
-  <string name="tournamentHomeTitle">Skaaktoernooie met verskeie tydkontroles en variante</string>
-  <string name="tournamentHomeDescription">Speel hoë-tempo skaak toernooie! Sluit aan by \'n amptelik geskeduleerde toernooi, of skep jou eie. Bullet, Blitz, klassiek, Skaak960, Heuwel Heerser, Trippelskaak, en meer beskikbare opsies vir oneindige skaak pret.</string>
   <string name="tournamentNotFound">Toernooi nie te vinde</string>
   <string name="tournamentDoesNotExist">Dié toernooi bestaan nie.</string>
   <string name="tournamentMayHaveBeenCanceled">Dit kon gekanselleer wees, indien alle spelers die toernooi verlaat het voor die aanvang daarvan.</string>

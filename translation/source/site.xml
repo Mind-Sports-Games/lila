@@ -808,8 +808,8 @@ computer analysis, game chat and shareable URL.</string>
   <string name="keyShowOrHideComments">show/hide comments</string>
   <string name="keyEnterOrExitVariation">enter/exit variation</string>
   <string name="newTournament">New tournament</string>
-  <string name="tournamentHomeTitle">Chess tournaments featuring various time controls and variants</string>
-  <string name="tournamentHomeDescription">Play fast-paced chess tournaments! Join an official scheduled tournament, or create your own. Bullet, Blitz, Classical, Chess960, King of the Hill, Threecheck, and more options available for endless chess fun.</string>
+  <string name="tournamentHomeTitle">Arena tournaments — live and upcoming events in every game</string>
+  <string name="tournamentHomeDescription">Arena tournaments on PlayStrategy, in Chess, Draughts, Go, Backgammon, Othello, Abalone and every other game: what is running now, what is next, who has won.</string>
   <string name="tournamentNotFound">Tournament not found</string>
   <string name="tournamentDoesNotExist">This tournament does not exist.</string>
   <string name="tournamentMayHaveBeenCanceled">The tournament may have been cancelled if all players left before it started.</string>

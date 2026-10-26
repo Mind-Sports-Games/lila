@@ -645,8 +645,6 @@
   <string name="keyShowOrHideComments">Rəyləri göstər/gizlə</string>
   <string name="keyEnterOrExitVariation">giriş/çıxış variasiyası</string>
   <string name="newTournament">Yeni turnir</string>
-  <string name="tournamentHomeTitle">Müxtəlif zaman kontrollu və variantlı şahmat turnirləri</string>
-  <string name="tournamentHomeDescription">Sürətli şahmat turnirləri oyna! Rəsmi təyin olunmuş turnirlərə qoşul və ya özün turnir yarat. Bullet, Blitz, Klassik, Chess960, King of the Hill, Threecheck və digər sonsuz şahmat əyləncəsi.</string>
   <string name="tournamentNotFound">Turnir tapılmadı</string>
   <string name="tournamentDoesNotExist">Bu turnir mövcud deyil</string>
   <string name="tournamentMayHaveBeenCanceled">Əgər turnir başlamadan öncə bütün oyunçular turniri tərk edərsə, turnir ləğv oluna bilər.</string>
