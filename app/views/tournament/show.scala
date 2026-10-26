@@ -24,6 +24,8 @@ object show {
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s"${tour.name()} • ${showEnglishDate(tour.startsAt)}",
+      // an edition that ended without a winner is a page about nothing happening
+      robots = netConfig.crawlable && !(tour.isFinished && tour.winnerId.isEmpty),
       moreJs = frag(
         jsModule("tournament"),
         (!tour.isFinished && side.isSeries(tour)).option(eventJsonLd(tour)),

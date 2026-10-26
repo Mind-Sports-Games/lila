@@ -169,8 +169,9 @@ object list {
     // no openGraph: a listing turns over, and what gets shared is a study
     views.html.base.layout(
       title = title,
-      // only the first page of a listing is worth indexing; the rest is a crawl path into every study
-      robots = netConfig.crawlable && pag.currentPage == 1,
+      // only the first page of a listing is worth indexing, and only if it holds something; the
+      // rest is a crawl path into every study
+      robots = netConfig.crawlable && pag.currentPage == 1 && pag.nbResults > 0,
       // every order of a listing holds the same studies: the orderless route is the one page
       canonicalPath = canonical.map(_.url),
       moreCss = cssTag("study.index"),
