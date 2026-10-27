@@ -603,8 +603,6 @@
   <string name="keyShowOrHideComments">сэтгэгдлийг ил эсвэл далд болгох</string>
   <string name="keyEnterOrExitVariation">хувилбараас гарах/орох</string>
   <string name="newTournament">Шинэ тэмцээн</string>
-  <string name="tournamentHomeTitle">Янз бүрийн цагын хязгаарлалт болон шатрын төрөлтэй тэмцээн</string>
-  <string name="tournamentHomeDescription">Түргэн нүүдэлт шатрын тэмцээн! Албан ёсны хуваарьт тэмцээнүүдэд оролцох эсвэл та өөрөө тэмцээн зохион байгуулж болно.</string>
   <string name="tournamentNotFound">Тэмцээн олдсонгүй</string>
   <string name="tournamentDoesNotExist">Энэ тэмцээн олдсонгүй.</string>
   <string name="tournamentMayHaveBeenCanceled">Тэмцээн эхлэхээс өмнө бүх тоглогчид тэмцээнийг орхисон бол энэхүү тэмцээн цуцлагдсан болно.</string>

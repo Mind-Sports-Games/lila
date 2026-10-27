@@ -724,8 +724,6 @@
   <string name="keyShowOrHideComments">zobrazte/skryjte komentáře</string>
   <string name="keyEnterOrExitVariation">Zobraz variantu</string>
   <string name="newTournament">Nový turnaj</string>
-  <string name="tournamentHomeTitle">Šachový turnaj nabízí různé časové možnosti a varianty</string>
-  <string name="tournamentHomeDescription">Zahrajte si rychlý šachový turnaj! Připojte se k oficiálnímu plánovanému turnaji, nebo si vytvořte vlastní. Bullet, Blitz, Klasické, Chess960(Fisherovky), Král v centru, Tři šachy a další možnosti jsou k dispozici pro nekonečnou šachovou zábavu.</string>
   <string name="tournamentNotFound">Turnaj nenalezen</string>
   <string name="tournamentDoesNotExist">Tento turnaj neexistuje.</string>
   <string name="tournamentMayHaveBeenCanceled">Možná byl zrušen, jestliže jej opustili všichni hráči před jeho začátkem.</string>

@@ -654,8 +654,6 @@
   <string name="keyShowOrHideComments">kommentek megjelenítése/elrejtése</string>
   <string name="keyEnterOrExitVariation">ki/belépés változatba</string>
   <string name="newTournament">Új torna</string>
-  <string name="tournamentHomeTitle">A sakk bajnokságokban lehetőség van különböző időbeállítások és változatok beállítására</string>
-  <string name="tournamentHomeDescription">Vegyél részt villám-versenyeken! Csatlakozz hivatalos versenyekhez, vagy hozz létre egyet saját magad. Bullet, Blitz, Hagyományos, Sakk960, King of the Hill, Threecheck és mások elérhetők, hogy minél jobban élvezd a sakkot.</string>
   <string name="tournamentNotFound">A verseny nem található</string>
   <string name="tournamentDoesNotExist">Ez a torna nem létezik.</string>
   <string name="tournamentMayHaveBeenCanceled">A versenyt törölték, mivel az összes játékos kilépett, mielőtt elkezdődött volna.</string>

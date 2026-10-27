@@ -639,8 +639,6 @@
   <string name="keyShowOrHideComments">vís/fjal viðmerkingar</string>
   <string name="keyEnterOrExitVariation">lat upp/lat aftur avbrigdi</string>
   <string name="newTournament">Nýggj kapping</string>
-  <string name="tournamentHomeTitle">Talvkappingar við ymiskum tíðaravmarkingum og avbrigdum</string>
-  <string name="tournamentHomeDescription">Telva í talvkappingum við høgari ferð! Far upp í eina almenna tíðarásetta kapping ella set tína egnu kapping á stovn. Bullet, snar, vanligt, Chess960, King of the Hill, Threecheck, og aðrir valmøguleikar eru.</string>
   <string name="tournamentNotFound">Kapping ikki funnin</string>
   <string name="tournamentDoesNotExist">Kappingin er ikki til.</string>
   <string name="tournamentMayHaveBeenCanceled">Kappingin er møguliga avlýst, um allir telvarar fóru burturúr, áðrenn hon byrjaði.</string>

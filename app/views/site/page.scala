@@ -10,7 +10,8 @@ object page {
   def lone(doc: io.prismic.Document, resolver: io.prismic.DocumentLinkResolver)(implicit ctx: Context) =
     views.html.base.layout(
       moreCss = cssTag("page"),
-      title = ~doc.getText("pages.title")
+      title = ~doc.getText("pages.title"),
+      openGraph = openGraphOf(doc, resolver, ctx.req.path)
     ) {
       main(cls := "page-small box box-pad page")(pageContent(doc, resolver))
     }
@@ -22,8 +23,39 @@ object page {
       title = ~doc.getText("pages.title"),
       active = active,
       contentCls = "page box box-pad",
-      moreCss = cssTag("page")
+      moreCss = cssTag("page"),
+      openGraph = openGraphOf(doc, resolver, ctx.req.path)
     )(pageContent(doc, resolver))
+
+  // a Prismic page carries no description of its own, so the site's blurb stands in on every one of
+  // them. The opening of the body says what the page is, and it is already in Prismic's language.
+  private[html] def bodyDescription(
+      doc: io.prismic.Document,
+      resolver: io.prismic.DocumentLinkResolver
+  ): Option[String] =
+    doc.getHtml("pages.content", resolver).map { body =>
+      lila.common.String.html
+        .unescapeHtml(body.replaceAll("<[^>]*>", " "))
+        .replaceAll("\\s+", " ")
+        .trim
+    } flatMap { text =>
+      // a whole first sentence reads better than a cut one, as long as a snippet still holds it
+      val sentence = text.indexOf(". ") match {
+        case -1 => text
+        case i  => text.take(i + 1)
+      }
+      (if (sentence.lengthIs <= 165) sentence else lila.common.String.shorten(text, 155, "…")).some
+        .filter(_.nonEmpty)
+    }
+
+  private def openGraphOf(doc: io.prismic.Document, resolver: io.prismic.DocumentLinkResolver, url: String) =
+    bodyDescription(doc, resolver).map { description =>
+      lila.app.ui.OpenGraph(
+        title = ~doc.getText("pages.title"),
+        url = s"$netBaseUrl$url",
+        description = description
+      )
+    }
 
   private def pageContent(doc: io.prismic.Document, resolver: io.prismic.DocumentLinkResolver) = frag(
     h1(doc.getText("pages.title")),
@@ -214,12 +246,14 @@ $('#asset-version-message').text(window.playstrategy.info.message);"""
       active: String,
       contentCls: String = "",
       moreCss: Frag = emptyFrag,
-      moreJs: Frag = emptyFrag
+      moreJs: Frag = emptyFrag,
+      openGraph: Option[lila.app.ui.OpenGraph] = None
   )(body: Frag)(implicit ctx: Context) =
     views.html.base.layout(
       title = title,
       moreCss = moreCss,
-      moreJs = moreJs
+      moreJs = moreJs,
+      openGraph = openGraph
     ) {
       val sep                  = div(cls := "sep")
       val external             = frag(" ", i(dataIcon := "0"))

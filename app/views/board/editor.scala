@@ -18,9 +18,18 @@ object editor {
       positionsJson: String,
       positionsByVariantJson: String,
       orientation: Option[String] = None
-  )(implicit ctx: Context) =
+  )(implicit ctx: Context) = {
+    val variantName = lila.i18n.VariantKeys.variantName(variant)
+    val isStandard  = variant.key == "standard"
+    val pageTitle   =
+      if (isStandard) trans.boardEditorTitle.txt() else trans.variantBoardEditorTitle.txt(variantName)
+    val pageDescription =
+      if (isStandard) trans.boardEditorDescription.txt()
+      else trans.variantBoardEditorDescription.txt(variantName)
+    val canonical =
+      if (isStandard) routes.Editor.index.url else routes.Editor.variant(variant.key).url
     views.html.base.layout(
-      title = trans.boardEditorTitle.txt(),
+      title = pageTitle,
       boardFamily = variant.gameFamily.key.some,
       soleBoardFamily = true,
       namePieceSets = true,
@@ -37,12 +46,12 @@ object editor {
       zoomable = true,
       openGraph = lila.app.ui
         .OpenGraph(
-          title = trans.boardEditorTitle.txt(),
-          url = s"$netBaseUrl${routes.Editor.index.url}",
-          description = trans.boardEditorDescription.txt()
+          title = pageTitle,
+          url = s"$netBaseUrl$canonical",
+          description = pageDescription
         )
         .some,
-      canonicalPath = routes.Editor.index.url.some
+      canonicalPath = canonical.some
     )(
       frag(
         // outside the element the editor empties on mount
@@ -58,6 +67,7 @@ object editor {
         )
       )
     )
+  }
 
   def about(variant: strategygames.variant.Variant)(implicit ctx: Context): Frag =
     frag(

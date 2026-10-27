@@ -655,8 +655,6 @@
   <string name="keyShowOrHideComments">vis/skjul kommentar</string>
   <string name="keyEnterOrExitVariation">Start/slut variation</string>
   <string name="newTournament">Ny turnering</string>
-  <string name="tournamentHomeTitle">Skakturnering med forskellige tidskontroller og varianter</string>
-  <string name="tournamentHomeDescription">Spil tempofyldte skakturneringer! Meld dig til en officielt organiseret turnering eller opret din egen. Bullet, Blitz, Klassisk, Chess960, King of the Hill, Tre-check og andre muligheder for ubegrænset skaksjov.</string>
   <string name="tournamentNotFound">Turnering ikke fundet</string>
   <string name="tournamentDoesNotExist">Denne turnering eksisterer ikke.</string>
   <string name="tournamentMayHaveBeenCanceled">Den kan være blevet aflyst, hvis alle spillere forlod den før turneringsstart.</string>

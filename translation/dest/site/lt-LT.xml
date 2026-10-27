@@ -722,8 +722,6 @@ kompiuterinę analizę, partijos pokalbį bei URL dalinimuisi.</string>
   <string name="keyShowOrHideComments">rodyti/slėpti komentarus</string>
   <string name="keyEnterOrExitVariation">įeiti/išeiti iš variacijos</string>
   <string name="newTournament">Naujas turnyras</string>
-  <string name="tournamentHomeTitle">Šachmatų turnyras su įvairiomis laiko kontrolėmis ir variantais</string>
-  <string name="tournamentHomeDescription">Žaiskite aukšto tempo šachmatų turnyruose! Prisijunkite prie oficialaus suplanuoto turnyro arba sukurkite savo.</string>
   <string name="tournamentNotFound">Turnyras nerastas</string>
   <string name="tournamentDoesNotExist">Turnyras neegzistuoja.</string>
   <string name="tournamentMayHaveBeenCanceled">Jis galėjo būti atšauktas, jeigu iki jo pradžios išėjo visi žaidėjai.</string>

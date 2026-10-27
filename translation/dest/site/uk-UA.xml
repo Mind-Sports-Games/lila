@@ -700,8 +700,6 @@
   <string name="keyShowOrHideComments">показати/приховати коментарі</string>
   <string name="keyEnterOrExitVariation">зайти/вийти з варіанту</string>
   <string name="newTournament">Новий турнір</string>
-  <string name="tournamentHomeTitle">Шаховий турнір із різними контролем часу та варіантами</string>
-  <string name="tournamentHomeDescription">Грайте у швидкі шахи на турнірі! Приєднуйтеся до запланованих офіційних турнірів або створіть власний. Куля, бліц, класичні шахи, шахи Фішера, \"Цар гори\", \"Три шахи\" та інші варіанти забезпечать нескінченне задоволення.</string>
   <string name="tournamentNotFound">Турнір не знайдено</string>
   <string name="tournamentDoesNotExist">Цей турнір не існує.</string>
   <string name="tournamentMayHaveBeenCanceled">Турнір міг бути скасований, якщо всі гравці залишили його до початку.</string>

@@ -638,8 +638,6 @@
   <string name="keyShowOrHideComments">shfaq/fshih komentet</string>
   <string name="keyEnterOrExitVariation">hyr/dil nga variacioni</string>
   <string name="newTournament">Turne i ri</string>
-  <string name="tournamentHomeTitle">Turne shahu me kontrolle kohore dhe variante të ndryshme.</string>
-  <string name="tournamentHomeDescription">Luaj turne me ritëm të  shpejtë! Bashkohu një turneu zyrtar të  planifikuar, ose krijo tëndin. Bullet, Blitz, Klasik, Shah960, Mbret i Kodrës, Treshah, dhe shumë mundësi të tjera për një argëtim të pafund në shah.</string>
   <string name="tournamentNotFound">Turneu nuk u gjend</string>
   <string name="tournamentDoesNotExist">Ky turne nuk ekziston</string>
   <string name="tournamentMayHaveBeenCanceled">Mund të jetë anuluar, nëse të gjithë lojtarët ikën para se të fillonte turneu.</string>

@@ -614,8 +614,15 @@
   <string name="keyShowOrHideComments">댓글 표시/숨기기</string>
   <string name="keyEnterOrExitVariation">변수 입력/취소</string>
   <string name="newTournament">새로운 토너먼트</string>
-  <string name="tournamentHomeTitle">다양한 제한시간과 게임방식을 지원하는 체스 토너먼트</string>
-  <string name="tournamentHomeDescription">빠른 체스 토너먼트를 즐겨 보세요! 공식 일정이 잡힌 토너먼트에 참가할 수도, 당신만의 토너먼트를 만들 수도 있습니다. 불릿, 블릿츠, 클래식, 체스960, 언덕의 제왕, 삼연속체크를 비롯하여 다양한 게임방식을 즐길 수 있습니다.</string>
+  <string name="tournamentHomeTitle">아레나 토너먼트｜체스, 체커, 바둑, 백개먼 등</string>
+  <string name="swissHomeTitle">스위스 토너먼트｜체스, 체커, 바둑, 백개먼 등</string>
+  <string name="swissHomeDescription">PlayStrategy의 스위스 토너먼트. 체스, 체커, 바둑, 백개먼, 오델로, 아발론 등. 정해진 라운드 수, 점수로 대진, 탈락 없음.</string>
+  <string name="blogTitle">PlayStrategy 블로그｜새 게임, 새 기능, 이벤트</string>
+  <string name="blogDescription">PlayStrategy 소식. 새로 추가한 게임, 새로 만든 기능, 우리가 여는 대회, 그리고 Mind Sports Olympiad 참관기.</string>
+  <string name="historyFreqDescription">PlayStrategy의 %s 아레나. 각 회차의 날짜, 참가 인원, 우승자.</string>
+  <string name="studyHomeDescription">PlayStrategy의 연구. 해설이 달린 기보, 레슨, 레퍼토리를 체스, 체커, 바둑, 오델로, Lines Of Action 등 분석판이 있는 모든 게임에서.</string>
+  <string name="variantPuzzleThemesDescription">PlayStrategy의 %s 퍼즐 테마. 모티프를 고르고 실전 국면에서 이기는 수를 찾아보세요.</string>
+  <string name="tournamentHomeDescription">PlayStrategy의 아레나 토너먼트: 체스, 체커, 바둑, 백개먼, 오델로, 아발론과 그 밖의 모든 게임. 지금 열리는 대회, 다음 대회, 역대 우승자.</string>
   <string name="tournamentNotFound">토너먼트를 찾을 수 없습니다</string>
   <string name="tournamentDoesNotExist">존재하지 않는 토너먼트입니다.</string>
   <string name="tournamentMayHaveBeenCanceled">모든 플레이어가 퇴장하여 취소된 게임일 수 있습니다.</string>
@@ -831,7 +838,7 @@
   <string name="clickToRevealEmailAddress">[이메일 주소를 보려면 클릭]</string>
   <string name="playstrategySiteTitle">보드게임 무료 온라인 플레이 — 체스, 체커, 바둑, 백개먼, 오델로 등</string>
   <string name="playstrategySiteTitleShort">보드게임 무료 온라인 플레이 — 체스, 체커, 바둑, 백개먼</string>
-  <string name="playstrategySiteDescription">보드게임을 무료로 온라인에서 즐기세요: 체스와 체스 변형, 체커, 바둑, 백개먼, 오델로, 쇼기, 샹치, 만칼라, 아발론 등. Mind Sports Olympiad 공식 온라인 플랫폼. 무료, 오픈 소스, 실시간 또는 통신 대국.</string>
+  <string name="playstrategySiteDescription">보드게임을 무료로 온라인에서 두고, 분석하고, 배우세요. Mind Sports Olympiad 공식 플랫폼. 체스, 체커, 바둑, 백개먼, 오델로, 만칼라, 아발론 등. 무료, 오픈 소스, 광고 없음. 실시간 또는 통신 대국, 퍼즐, 연구, 모든 게임의 분석판.</string>
   <string name="playstrategyAboutSummary">%1$s은(는) 2인용 보드게임을 실시간으로 즐기는 플랫폼이자 Mind Sports Olympiad의 공식 온라인 플랫폼입니다. 체스, 바둑, 오델로, 만칼라, 체커, 백개먼, 아발론 등 40가지가 넘는 게임을 이 무료 오픈 소스 사이트에서 즐길 수 있습니다.</string>
   <string name="playVariantOnlineFree">%s을(를) 무료로 온라인에서 플레이하세요: 실시간 또는 통신 대국, 레이팅 또는 친선전, 전 세계 플레이어와 함께.</string>
   <string name="playVariantOnlineFreeTitle">%s 무료 온라인 플레이</string>
@@ -849,7 +856,7 @@
   <string name="msoAllTournaments">MSO 온라인 토너먼트 전체</string>
   <string name="aboutMso">Mind Sports Olympiad 소개</string>
   <string name="variantOf">%1$s은(는) %2$s의 변형입니다.</string>
-  <string name="boardEditorTitle">체스 보드 에디터 — 원하는 국면 만들기, 체스 변형과 페어리 체스</string>
+  <string name="boardEditorTitle">체스 보드 에디터 — 원하는 포지션 만들기</string>
   <string name="boardEditorDescription">체스, 체스 변형 및 40개의 다른 게임을 위한 무료 온라인 보드 에디터입니다. 직접 또는 FEN으로 원하는 국면을 만들어 분석하고, 컴퓨터와 대국하거나 공유해 보세요.</string>
   <string name="msoWorldChampionship">%s 세계 선수권</string>
   <string name="msoWorldChampionshipVenue">%2$s의 %1$s 세계 선수권은 현장에서 열리며, %3$s은 PlayStrategy에 공개됩니다. PlayStrategy는 온라인 %4$s도 개최합니다.</string>
@@ -872,4 +879,8 @@
   <string name="variantPuzzles">%s 퍼즐</string>
   <string name="libraryTitle">무료로 온라인 플레이할 수 있는 보드게임 — PlayStrategy 라이브러리</string>
   <string name="libraryDescription">PlayStrategy의 모든 게임: 체스와 그 변형, 체커, 바둑, 백개먼, 오델로, 쇼기, 샹치, 만칼라, 아발론, Lines of Action 등 — 규칙, 튜토리얼, 토너먼트, 통계와 함께.</string>
+  <string name="variantBoardEditorTitle">%s 보드 에디터 — 원하는 포지션 만들기</string>
+  <string name="variantBoardEditorDescription">무료 온라인 %s 보드 에디터: 직접 또는 FEN으로 포지션을 만들고 분석하거나, 컴퓨터와 두거나, 공유하세요.</string>
+  <string name="signInDescription">PlayStrategy에 로그인하여 체스, 체커, 바둑, 백개먼, 오델로 등 40가지가 넘는 보드게임을 무료로 온라인에서 즐기세요. 레이팅, 토너먼트, 분석 제공.</string>
+  <string name="signUpDescription">무료 PlayStrategy 계정을 만들고 체스, 체커, 바둑, 백개먼, 오델로 등 40가지가 넘는 보드게임을 온라인에서 즐기세요: 레이팅 대국, 토너먼트, 퍼즐, 분석, 광고 없음.</string>
 </resources>

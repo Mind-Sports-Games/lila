@@ -36,9 +36,6 @@ object history {
       case _        => none
     }
 
-  // the families with a page of their own, so the sitemap and the chips cannot disagree
-  def displayedGroups = displayedGameGroups.filter(soleVariant(_).isEmpty)
-
   def groupByKey(key: String): Option[GameGroup] =
     displayedGameGroups.find(_.key == key)
 
@@ -86,7 +83,11 @@ object history {
       series.Wording(contested = false, subject = s"${nameOf(freq)} ${VariantKeys.variantName(v)}")
     }
     views.html.base.layout(
-      title = subject.fold(heading)(_ => trans.historyTitle.txt(heading)),
+      title = trans.historyTitle.txt(heading),
+      // a series with no edition yet is not a page to offer a searcher
+      robots = netConfig.crawlable && (pager.nbResults > 0 || summary.isDefined),
+      // a frequency hub has no series of its own to put on a card, but it still says what it is
+      description = subject.isEmpty.option(trans.historyFreqDescription.txt(nameOf(freq))),
       moreJs = infiniteScrollTag,
       moreCss = frag(cssTag("tournament.history"), summary.isDefined.option(cssTag("tournament.leaderboard"))),
       canonicalPath = pageUrl(freq, variant, group).some,
@@ -181,7 +182,7 @@ object history {
 
   private def nameOf(f: Freq) = if (f == Freq.Weekend) "Elite" else f.display
 
-  // the sitemap lists one page per frequency, and one per series (see Main.sitemap)
+  // the sitemap lists one page per frequency (see Main.sitemap)
   val allFreqs = List(
     Freq.Annual,
     Freq.Introductory,

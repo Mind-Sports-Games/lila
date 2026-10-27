@@ -656,8 +656,15 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="keyShowOrHideComments">mostrar/ocultar os comentários</string>
   <string name="keyEnterOrExitVariation">entrar/sair da variante</string>
   <string name="newTournament">Novo torneio</string>
-  <string name="tournamentHomeTitle">Torneios de xadrez com diversos ritmos de jogo e variantes</string>
-  <string name="tournamentHomeDescription">Joga xadrez em ritmo acelerado! Entra num torneio oficial agendado ou cria o teu próprio. Bullet, blitz, clássico, chess960, rei da colina, três xeques e mais opções disponíveis para uma diversão ilimitada.</string>
+  <string name="tournamentHomeTitle">Torneios em arena — xadrez, damas, go, gamão e mais</string>
+  <string name="swissHomeTitle">Torneios suíços — xadrez, damas, go, gamão e mais</string>
+  <string name="swissHomeDescription">Torneios suíços no PlayStrategy, em xadrez, damas, go, gamão, Othello, Abalone e mais: um número fixo de rondas, emparelhados por pontuação, sem eliminação.</string>
+  <string name="blogTitle">Blogue do PlayStrategy — jogos, funcionalidades, eventos</string>
+  <string name="blogDescription">Novidades do PlayStrategy: os jogos que adicionamos, as funcionalidades que construímos e os eventos que organizamos, com relatos das Mind Sports Olympiad.</string>
+  <string name="historyFreqDescription">Arenas %s no PlayStrategy: a data de cada edição, quantos jogaram e quem venceu.</string>
+  <string name="studyHomeDescription">Estudos no PlayStrategy: partidas comentadas, lições e repertórios em xadrez, go, Othello, Lines Of Action e qualquer outro jogo com tabuleiro de análise.</string>
+  <string name="variantPuzzleThemesDescription">Temas de problemas de %s no PlayStrategy: escolha um motivo e encontre os lances vencedores em posições de partidas reais.</string>
+  <string name="tournamentHomeDescription">Torneios em arena no PlayStrategy: xadrez, damas, go, gamão, Othello, Abalone e todos os outros jogos. O que está a decorrer, o que vem a seguir, quem ganhou.</string>
   <string name="tournamentNotFound">Torneio não encontrado</string>
   <string name="tournamentDoesNotExist">Este torneio não existe.</string>
   <string name="tournamentMayHaveBeenCanceled">O torneio pode ter sido cancelado, se todos os jogadores tiverem saíram antes do seu começo.</string>
@@ -883,13 +890,13 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="timeAlmostUp">O tempo está quase a terminar!</string>
   <string name="playstrategySiteTitle">Jogue jogos de tabuleiro online grátis — xadrez, damas, go, gamão, Othello e mais</string>
   <string name="playstrategySiteTitleShort">Jogue jogos de tabuleiro online grátis — xadrez, damas, go, gamão</string>
-  <string name="playstrategySiteDescription">Jogue jogos de tabuleiro online grátis: xadrez e suas variantes, damas, go, gamão, Othello, shogi, xiangqi, mancala, Abalone e mais. A plataforma online oficial da Mind Sports Olympiad. Grátis, de código aberto, ao vivo ou por correspondência.</string>
+  <string name="playstrategySiteDescription">Jogos de tabuleiro online e grátis, na plataforma da Mind Sports Olympiad: jogue, analise e aprenda xadrez, damas, go, gamão, Othello, mancala, Abalone. Grátis, de código aberto, sem anúncios, em direto ou por correspondência, com quebra-cabeças, estudos e um tabuleiro de análise para cada jogo.</string>
   <string name="playstrategyAboutSummary">%1$s é uma plataforma em tempo real para jogos de tabuleiro para dois jogadores, e a plataforma online oficial da Mind Sports Olympiad. Mais de 40 jogos diferentes, incluindo xadrez, go, Othello, mancala, damas, gamão, Abalone… neste site gratuito e de código aberto.</string>
   <string name="playVariantOnlineFree">Jogue %s online grátis: ao vivo ou por correspondência, valendo rating ou amistoso, contra jogadores do mundo todo.</string>
   <string name="playVariantOnlineFreeTitle">Jogar %s online grátis</string>
   <string name="variantRulesTitle">Regras de %1$s — como jogar %2$s</string>
   <string name="variantAnalysisTitle">Tabuleiro de análise de %s — motor e solucionador gratuitos</string>
-  <string name="variantAnalysisDescription">Analise posições de %1$s com um motor e um solucionador gratuitos (%3$s): monte qualquer posição, explore as variantes e veja os melhores movimentos. Jogue %2$s online grátis no PlayStrategy.</string>
+  <string name="variantAnalysisDescription">Analise posições de %1$s com um motor e um solucionador gratuitos (%3$s): monte qualquer posição e veja os melhores movimentos. Jogue %2$s online grátis no PlayStrategy.</string>
   <string name="variantAnalysisTitleNoEngine">Tabuleiro de análise de %s — análise online gratuita</string>
   <string name="variantAnalysisDescriptionNoEngine">Analise posições de %1$s num tabuleiro online gratuito: monte qualquer posição, explore as variantes e partilhe-as. Jogue %2$s online grátis no PlayStrategy.</string>
   <string name="variantAnalysisDescriptionServerEngine">Analise posições de %1$s num tabuleiro online gratuito: monte qualquer posição, explore as variantes e partilhe-as. As partidas terminadas recebem uma análise gratuita do %3$s. Jogue %2$s online grátis no PlayStrategy.</string>
@@ -901,8 +908,8 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="msoAllTournaments">Todos os torneios online da MSO</string>
   <string name="aboutMso">Sobre a Mind Sports Olympiad</string>
   <string name="variantOf">%1$s é uma variante de %2$s.</string>
-  <string name="boardEditorTitle">Editor de tabuleiro de xadrez — monte qualquer posição, variantes de xadrez e xadrez fantasia</string>
-  <string name="boardEditorDescription">Editor de tabuleiro online gratuito para xadrez, variantes de xadrez e outros 40 jogos: monte qualquer posição à mão ou a partir de um FEN, depois analise-a, jogue-a contra o computador ou partilhe-a.</string>
+  <string name="boardEditorTitle">Editor de tabuleiro de xadrez — monte qualquer posição</string>
+  <string name="boardEditorDescription">Editor de tabuleiro online e gratuito para xadrez, suas variantes e todos os nossos jogos: monte qualquer posição à mão ou a partir de um FEN e analise.</string>
   <string name="allAboutX">Tudo sobre %s no PlayStrategy</string>
   <string name="variantEditorDescription">Monte qualquer posição de %1$s num editor de tabuleiro online gratuito, depois analise-a ou jogue-a. Jogue %2$s online de graça no PlayStrategy.</string>
   <string name="variantStudies">Estudos de %s</string>
@@ -911,7 +918,7 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="playVariantOnlineFreeDescription">Jogue %s online grátis contra jogadores do mundo todo. Partidas ao vivo e por correspondência, torneios, ratings e análise no PlayStrategy.</string>
   <string name="variantPuzzles">Problemas de %s</string>
   <string name="libraryTitle">Jogos de tabuleiro para jogar online grátis — a biblioteca do PlayStrategy</string>
-  <string name="libraryDescription">Todos os jogos do PlayStrategy: xadrez e suas variantes, damas, go, gamão, Othello, shogi, xiangqi, mancala, Abalone, Lines of Action e mais — com regras, tutoriais, torneios e estatísticas.</string>
+  <string name="libraryDescription">Todos os jogos do PlayStrategy com regras, tutoriais, torneios e estatísticas: xadrez, damas, go, gamão, Othello, mancala, Abalone e mais.</string>
   <string name="msoWorldChampionship">Campeonato Mundial de %s</string>
   <string name="msoWorldChampionshipVenue">O Campeonato Mundial de %1$s da %2$s é disputado presencialmente; suas %3$s são publicadas no PlayStrategy, que também recebe o %4$s online.</string>
   <string name="msoEvent">%s na Mind Sports Olympiad</string>
@@ -924,4 +931,8 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="msoGrandPrix">Grand Prix MSO</string>
   <string name="msoGrandPrixEvent">%s no Grande Prémio MSO</string>
   <string name="msoGrandPrixVenue">O Grande Prémio online da %2$s joga-se no PlayStrategy, e %1$s é um dos seus jogos.</string>
+  <string name="variantBoardEditorTitle">Editor de tabuleiro de %s — monte qualquer posição</string>
+  <string name="variantBoardEditorDescription">Editor de tabuleiro de %s online e gratuito: monte qualquer posição à mão ou a partir de um FEN e depois analise ou jogue contra o computador.</string>
+  <string name="signInDescription">Entre no PlayStrategy para jogar xadrez, damas, go, gamão, Othello e mais de 40 jogos de tabuleiro online de graça, com ratings, torneios e análise.</string>
+  <string name="signUpDescription">Crie uma conta gratuita no PlayStrategy para jogar xadrez, damas, go, gamão, Othello e mais de 40 jogos de tabuleiro online. Partidas valendo rating, torneios, problemas e análise, sem anúncios.</string>
 </resources>

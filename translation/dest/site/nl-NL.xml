@@ -656,8 +656,6 @@
   <string name="keyShowOrHideComments">toon/verberg opmerkingen</string>
   <string name="keyEnterOrExitVariation">vermeld/stop variant</string>
   <string name="newTournament">Nieuw toernooi</string>
-  <string name="tournamentHomeTitle">Schaaktoernooi met verschillende speelduur en varianten</string>
-  <string name="tournamentHomeDescription">Speel snelle schaaktoernooien! Neem deel aan een officieel gepland toernooi, of maak er zelf een. Bullet, Blitz, Classical, Chess960, King of the Hill, Threecheck, en meer opties verkrijgbaar voor eindeloos schaakplezier.</string>
   <string name="tournamentNotFound">Toernooi niet gevonden</string>
   <string name="tournamentDoesNotExist">Dit toernooi bestaat niet.</string>
   <string name="tournamentMayHaveBeenCanceled">Het is mogelijk afgelast, indien alle spelers zijn weggegaan voordat het toernooi gestart was.</string>

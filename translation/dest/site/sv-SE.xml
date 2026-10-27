@@ -653,8 +653,6 @@
   <string name="keyShowOrHideComments">visa/göm kommentarer</string>
   <string name="keyEnterOrExitVariation">påbörja/avsluta variant</string>
   <string name="newTournament">Ny turnering</string>
-  <string name="tournamentHomeTitle">Schackturnering med olika betänketider och schackvarianter</string>
-  <string name="tournamentHomeDescription">Spela snabba schackturneringar! Delta i en officiell schemalagd turnering, eller skapa din egen. Bullet, Blitz, Classical, Chess960, King of the Hill, Threecheck och fler alternativ erbjuds för ändlösa schacknöjen.</string>
   <string name="tournamentNotFound">Turneringen kunde inte hittas</string>
   <string name="tournamentDoesNotExist">Denna turnering finns inte.</string>
   <string name="tournamentMayHaveBeenCanceled">Turneringen kan blivit inställd om alla spelare lämnade innan den började.</string>

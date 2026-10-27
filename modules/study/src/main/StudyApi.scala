@@ -610,7 +610,8 @@ final class StudyApi(
     data.manyGames match {
       case Some(datas) =>
         lila.common.LilaFuture.applySequentially(datas) { data =>
-          addChapter(studyId, data, sticky)(who)
+          // a refused game is already reported below; the rest of the batch still goes in
+          addChapter(studyId, data, sticky)(who).recoverDefault
         }
       case _ =>
         sequenceStudy(studyId) { study =>

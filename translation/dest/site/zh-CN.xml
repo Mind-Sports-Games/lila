@@ -610,8 +610,15 @@
   <string name="keyShowOrHideComments">显示／隐藏评论</string>
   <string name="keyEnterOrExitVariation">进入／退出变着</string>
   <string name="newTournament">新锦标赛</string>
-  <string name="tournamentHomeTitle">国际象棋锦标赛均设有不同的时间限制和变体</string>
-  <string name="tournamentHomeDescription">参加快节奏的国际象棋锦标赛！欢迎参与PlayStrategy官方的锦标赛或创建自己的锦标赛。子弹超快棋，闪电超快棋，经典，菲舍尔任意制，王居中，三次将军，并提供更多的选择给您带来无尽的国际象棋乐趣。</string>
+  <string name="tournamentHomeTitle">竞技场比赛｜国际象棋、跳棋、围棋、双陆棋等</string>
+  <string name="swissHomeTitle">瑞士锦标赛｜国际象棋、跳棋、围棋、双陆棋等</string>
+  <string name="swissHomeDescription">PlayStrategy 的瑞士制比赛，涵盖国际象棋、跳棋、围棋、双陆棋、黑白棋、Abalone 等：固定轮数，按分数配对，无人淘汰。</string>
+  <string name="blogTitle">PlayStrategy 博客｜新棋类、新功能与活动</string>
+  <string name="blogDescription">PlayStrategy 的最新消息：我们新增的棋类、开发的功能、举办的赛事，以及 Mind Sports Olympiad 的现场报道。</string>
+  <string name="historyFreqDescription">PlayStrategy 的 %s 竞技场：每届的日期、参赛人数和冠军。</string>
+  <string name="studyHomeDescription">PlayStrategy 的研讨：带注解的棋局、课程与开局库，涵盖国际象棋、跳棋、围棋、黑白棋、Lines Of Action 等所有配备分析棋盘的棋类。</string>
+  <string name="variantPuzzleThemesDescription">PlayStrategy 的 %s 训练主题：选择一个主题，在真实对局的局面中找到制胜着法。</string>
+  <string name="tournamentHomeDescription">PlayStrategy 的竞技场比赛：国际象棋、跳棋、围棋、双陆棋、黑白棋、Abalone 以及其他所有棋类。正在进行的比赛、下一场，以及历届冠军。</string>
   <string name="tournamentNotFound">找不到该锦标赛</string>
   <string name="tournamentDoesNotExist">该锦标赛不存在。</string>
   <string name="tournamentMayHaveBeenCanceled">该锦标赛可能已被取消，假如所有的选手在比赛开始之前退赛。</string>
@@ -827,7 +834,7 @@
   <string name="clickToRevealEmailAddress">[点击显示电子邮件地址]</string>
   <string name="playstrategySiteTitle">免费在线玩桌游 — 国际象棋、跳棋、围棋、双陆棋、黑白棋等</string>
   <string name="playstrategySiteTitleShort">免费在线玩桌游 — 国际象棋、跳棋、围棋、双陆棋</string>
-  <string name="playstrategySiteDescription">免费在线玩桌游：国际象棋及其变体、跳棋、围棋、双陆棋、黑白棋、将棋、中国象棋、播棋、Abalone 等。Mind Sports Olympiad 官方在线平台。免费、开源，支持实时对局和通信对局。</string>
+  <string name="playstrategySiteDescription">免费在线桌游。在 Mind Sports Olympiad 官方平台对局、分析、学习国际象棋、跳棋、围棋、双陆棋、黑白棋、播棋、Abalone。 免费、开源、无广告，支持实时与通信对局，提供谜题、研讨和每种棋类的分析棋盘。</string>
   <string name="playstrategyAboutSummary">%1$s 是一个双人桌游实时对战平台，也是 Mind Sports Olympiad 的官方在线平台。40 多种游戏，包括国际象棋、围棋、黑白棋、播棋、跳棋、双陆棋、Abalone……尽在这个免费开源的网站。</string>
   <string name="playVariantOnlineFree">免费在线玩 %s：实时或通信对局，积分或休闲，对手来自世界各地。</string>
   <string name="playVariantOnlineFreeTitle">免费在线玩 %s</string>
@@ -845,7 +852,7 @@
   <string name="msoAllTournaments">MSO 全部在线赛事</string>
   <string name="aboutMso">关于 Mind Sports Olympiad</string>
   <string name="variantOf">%1$s是%2$s的变体。</string>
-  <string name="boardEditorTitle">国际象棋棋盘编辑器 — 摆出任意局面，支持国际象棋变体和奇异象棋</string>
+  <string name="boardEditorTitle">国际象棋棋盘编辑器 — 摆出任意局面</string>
   <string name="boardEditorDescription">免费的在线棋盘编辑器，支持国际象棋、国际象棋变体及其他40种游戏：手动或通过 FEN 摆出任意局面，然后分析、与电脑对弈或分享。</string>
   <string name="msoWorldChampionship">%s世界锦标赛</string>
   <string name="msoWorldChampionshipVenue">%2$s 的%1$s世界锦标赛在线下举行，%3$s会发布在 PlayStrategy 上，PlayStrategy 同时也承办在线的 %4$s。</string>
@@ -868,4 +875,8 @@
   <string name="variantPuzzles">%s 谜题</string>
   <string name="libraryTitle">可免费在线玩的桌游 — PlayStrategy 游戏库</string>
   <string name="libraryDescription">PlayStrategy 的所有游戏：国际象棋及其变体、跳棋、围棋、双陆棋、黑白棋、将棋、中国象棋、播棋、Abalone、Lines of Action 等——附规则、教程、锦标赛和统计。</string>
+  <string name="variantBoardEditorTitle">%s 棋盘编辑器 — 摆出任意局面</string>
+  <string name="variantBoardEditorDescription">免费在线 %s 棋盘编辑器：手动摆子或从 FEN 载入局面，然后分析、与电脑对弈或分享。</string>
+  <string name="signInDescription">登录 PlayStrategy，免费在线玩国际象棋、跳棋、围棋、双陆棋、黑白棋等 40 多种桌游，含积分、锦标赛和分析。</string>
+  <string name="signUpDescription">注册免费的 PlayStrategy 账号，在线玩国际象棋、跳棋、围棋、双陆棋、黑白棋等 40 多种桌游：积分对局、锦标赛、谜题和分析，无广告。</string>
 </resources>

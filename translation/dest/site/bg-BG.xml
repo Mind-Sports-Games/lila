@@ -647,8 +647,6 @@
   <string name="keyShowOrHideComments">покажи/скрий коментарите</string>
   <string name="keyEnterOrExitVariation">влез/излез от вариацията</string>
   <string name="newTournament">Нов турнир</string>
-  <string name="tournamentHomeTitle">Шахматният турнир включва различни времеви контроли и варианти</string>
-  <string name="tournamentHomeDescription">Играй в състезания по бърз шахмат! Участвай в разписаните състезания или създай свое собствено. Bullet, Blitz, Classical, Chess960, King of the Hill, Threecheck и още възможности предоставящи безкрайна шахматна забава.</string>
   <string name="tournamentNotFound">Турнирът не е намерен</string>
   <string name="tournamentDoesNotExist">Този турнир не съществува.</string>
   <string name="tournamentMayHaveBeenCanceled">Може да е отменен, ако всички участници са напуснали преди да е започнало.</string>

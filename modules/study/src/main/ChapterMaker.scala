@@ -7,6 +7,7 @@ import strategygames.{ GameLogic, Player as PlayerIndex, PocketData }
 import strategygames.chess.variant.Variant as ChessVariant
 import lila.chat.{ Chat, ChatApi }
 import lila.game.{ Game, Namer }
+import lila.i18n.VariantKeys
 import lila.user.User
 
 final private class ChapterMaker(
@@ -27,6 +28,14 @@ final private class ChapterMaker(
           case Some(pgn) => fromFenOrPgnOrBlank(study, data.copy(pgn = pgn.some), order, userId)
           case _         => fromFenOrPgnOrBlank(study, data, order, userId)
         }
+      // the variant select offers only the variants with an analysis board; an imported game has
+      // to clear the same bar, or its chapter draws a board with no pieces on it
+      case Some(game) if !game.variant.hasAnalysisBoard =>
+        fufail(
+          ValidationException(
+            s"${VariantKeys.variantName(game.variant)} has no analysis board, so it cannot be a chapter"
+          )
+        )
       case Some(game) => fromGame(study, game, data, order, userId)
     } map { (c: Chapter) =>
       if (c.name.value.isEmpty) c.copy(name = Chapter.defaultName(order)) else c
