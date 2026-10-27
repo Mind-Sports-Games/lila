@@ -10,11 +10,11 @@ object home {
 
   def apply(featured: FeaturedSwisses)(implicit ctx: Context) =
     views.html.base.layout(
-      title = "Swiss tournaments",
+      title = trans.swissHomeTitle.txt(),
       moreCss = cssTag("swiss.home")
     ) {
       main(cls := "page-small box box-pad page swiss-home")(
-        h1("Swiss tournaments"),
+        h1(trans.swiss.swissTournaments()),
         renderList("Now playing")(featured.started),
         renderList("Starting soon")(featured.created),
         div(cls := "swiss-home__infos")(

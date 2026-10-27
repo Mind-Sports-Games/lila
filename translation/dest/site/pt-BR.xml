@@ -656,7 +656,8 @@
   <string name="keyShowOrHideComments">mostrar/ocultar comentários</string>
   <string name="keyEnterOrExitVariation">entrar/sair da variante</string>
   <string name="newTournament">Novo torneio</string>
-  <string name="tournamentHomeTitle">Torneios Arena — em andamento e próximos, em todos os jogos</string>
+  <string name="tournamentHomeTitle">Torneios Arena — xadrez, damas, go, gamão e mais</string>
+  <string name="swissHomeTitle">Torneios Suíços — xadrez, damas, go, gamão e mais</string>
   <string name="tournamentHomeDescription">Torneios Arena no PlayStrategy: xadrez, damas, go, gamão, Othello, Abalone e todos os outros jogos. O que está acontecendo, o que vem a seguir, quem ganhou.</string>
   <string name="tournamentNotFound">Torneio não encontrado</string>
   <string name="tournamentDoesNotExist">Este torneio não existe.</string>

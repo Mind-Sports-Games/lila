@@ -808,7 +808,8 @@ computer analysis, game chat and shareable URL.</string>
   <string name="keyShowOrHideComments">show/hide comments</string>
   <string name="keyEnterOrExitVariation">enter/exit variation</string>
   <string name="newTournament">New tournament</string>
-  <string name="tournamentHomeTitle">Arena tournaments — live and upcoming events in every game</string>
+  <string name="tournamentHomeTitle">Arena tournaments — Chess, Draughts, Go, Backgammon and more</string>
+  <string name="swissHomeTitle">Swiss tournaments — Chess, Draughts, Go, Backgammon and more</string>
   <string name="tournamentHomeDescription">Arena tournaments on PlayStrategy, in Chess, Draughts, Go, Backgammon, Othello, Abalone and every other game: what is running now, what is next, who has won.</string>
   <string name="tournamentNotFound">Tournament not found</string>
   <string name="tournamentDoesNotExist">This tournament does not exist.</string>

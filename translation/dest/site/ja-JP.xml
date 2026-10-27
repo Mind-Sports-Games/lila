@@ -612,7 +612,8 @@
   <string name="keyShowOrHideComments">コメントを表示する/隠す</string>
   <string name="keyEnterOrExitVariation">変化に入る/出る</string>
   <string name="newTournament">新しいトーナメント</string>
-  <string name="tournamentHomeTitle">アリーナ トーナメント｜開催中と開催予定、すべてのゲームで</string>
+  <string name="tournamentHomeTitle">アリーナ トーナメント｜チェス、囲碁、バックギャモンほか</string>
+  <string name="swissHomeTitle">スイス式トーナメント｜チェス、囲碁、バックギャモンほか</string>
   <string name="tournamentHomeDescription">PlayStrategy のアリーナ トーナメント：チェス、チェッカー、囲碁、バックギャモン、オセロ、アバロン、その他すべてのゲーム。開催中の大会、次の予定、歴代の優勝者。</string>
   <string name="tournamentNotFound">トーナメントが見つかりません</string>
   <string name="tournamentDoesNotExist">このトーナメントは存在しません</string>

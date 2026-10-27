@@ -608,7 +608,8 @@
   <string name="keyShowOrHideComments">hiện/ẩn bình luận</string>
   <string name="keyEnterOrExitVariation">vào/thoát biến thể cờ</string>
   <string name="newTournament">Giải đấu mới</string>
-  <string name="tournamentHomeTitle">Giải đấu đấu trường — đang diễn ra và sắp tới, ở mọi trò chơi</string>
+  <string name="tournamentHomeTitle">Giải đấu đấu trường — cờ vua, cờ đam, cờ vây, backgammon</string>
+  <string name="swissHomeTitle">Các giải đấu hệ Thụy Sĩ — cờ vua, cờ đam, cờ vây, backgammon</string>
   <string name="tournamentHomeDescription">Giải đấu đấu trường trên PlayStrategy: cờ vua, cờ đam, cờ vây, backgammon, Othello, Abalone và mọi trò chơi khác. Đang diễn ra, sắp tới, và ai đã thắng.</string>
   <string name="tournamentNotFound">Giải đấu không tìm thấy</string>
   <string name="tournamentDoesNotExist">Giải đấu này không tồn tại.</string>

@@ -722,7 +722,8 @@
   <string name="keyShowOrHideComments">показать/скрыть комментарии</string>
   <string name="keyEnterOrExitVariation">ввести/закрыть вариант</string>
   <string name="newTournament">Новый турнир</string>
-  <string name="tournamentHomeTitle">Турниры «Арена» — текущие и предстоящие, во всех играх</string>
+  <string name="tournamentHomeTitle">Турниры «Арена» — шахматы, шашки, го, нарды и другие</string>
+  <string name="swissHomeTitle">Турниры по швейцарской системе — шахматы, шашки, го, нарды</string>
   <string name="tournamentHomeDescription">Турниры «Арена» на PlayStrategy: шахматы, шашки, го, нарды, отелло, Abalone и все остальные игры. Что идёт сейчас, что будет дальше, кто побеждал.</string>
   <string name="tournamentNotFound">Турнир не найден</string>
   <string name="tournamentDoesNotExist">Такого турнира не существует.</string>
