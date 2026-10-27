@@ -84,6 +84,8 @@ object history {
     }
     views.html.base.layout(
       title = trans.historyTitle.txt(heading),
+      // a series with no edition yet is not a page to offer a searcher
+      robots = netConfig.crawlable && (pager.nbResults > 0 || summary.isDefined),
       // a frequency hub has no series of its own to put on a card, but it still says what it is
       description = subject.isEmpty.option(trans.historyFreqDescription.txt(nameOf(freq))),
       moreJs = infiniteScrollTag,
