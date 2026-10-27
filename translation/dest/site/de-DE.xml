@@ -933,6 +933,6 @@
   <string name="msoGrandPrixVenue">Der Online-Grand-Prix der %2$s wird auf PlayStrategy gespielt, und %1$s ist eines seiner Spiele.</string>
   <string name="variantBoardEditorTitle">%s-Brett-Editor — jede Stellung aufbauen</string>
   <string name="variantBoardEditorDescription">Kostenloser Online-Brett-Editor für %s: Stellungen von Hand oder aus einer FEN aufbauen, dann analysieren oder gegen den Computer spielen.</string>
-  <string name="signInDescription">Melde dich bei PlayStrategy an, um Schach, Dame, Go, Backgammon und 40 weitere Brettspiele kostenlos online zu spielen — mit Wertung, Turnieren und Analyse.</string>
-  <string name="signUpDescription">Erstelle ein kostenloses PlayStrategy-Konto und spiele Schach, Dame, Go, Backgammon, Othello und 40 weitere Brettspiele online: gewertete Partien, Turniere, Aufgaben und Analyse, ohne Werbung.</string>
+  <string name="signInDescription">Melde dich bei PlayStrategy an, um Schach, Dame, Go, Backgammon und über 40 weitere Brettspiele kostenlos online zu spielen — mit Wertung und Analyse.</string>
+  <string name="signUpDescription">Erstelle ein kostenloses PlayStrategy-Konto und spiele Schach, Dame, Go, Backgammon, Othello und über 40 weitere Brettspiele online. Gewertete Partien, Turniere, Aufgaben und Analyse, ohne Werbung.</string>
 </resources>

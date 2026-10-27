@@ -1025,6 +1025,6 @@
   <string name="historyAllGames">Tous les jeux</string>
   <string name="variantBoardEditorTitle">Éditeur de plateau %s — composez une position</string>
   <string name="variantBoardEditorDescription">Éditeur de plateau %s en ligne et gratuit : composez une position à la main ou depuis un FEN, puis analysez-la ou jouez-la contre l\'ordinateur.</string>
-  <string name="signInDescription">Connectez-vous à PlayStrategy pour jouer aux échecs, au go, au backgammon, à Othello et à 40 autres jeux en ligne gratuitement, avec classements et analyse.</string>
-  <string name="signUpDescription">Créez un compte PlayStrategy gratuit pour jouer aux échecs, aux dames, au go, au backgammon, à Othello et à 40 autres jeux de société en ligne : parties classées, tournois, problèmes et analyse, sans publicité.</string>
+  <string name="signInDescription">Connectez-vous à PlayStrategy pour jouer aux échecs, au go, au backgammon, à Othello et à plus de 40 autres jeux en ligne gratuitement, avec classements.</string>
+  <string name="signUpDescription">Créez un compte PlayStrategy gratuit pour jouer aux échecs, aux dames, au go, au backgammon, à Othello et à plus de 40 autres jeux en ligne. Parties classées, tournois, problèmes et analyse, sans publicité.</string>
 </resources>
