@@ -358,6 +358,8 @@ export default class EditorCtrl {
     this.extraPositions = [startPos, { fen: 'prompt', name: this.trans('loadPosition') }, ...extraFromPositions];
     this.positions = newPositions.filter(p => !p.eco?.startsWith('X'));
     this.setRules(variantKeyToRules(variantKey));
+    // the board has to become the new variant's before anything reads a FEN off it
+    this.startPosition();
     this.refreshAbout(variantKey);
   }
 
@@ -382,7 +384,6 @@ export default class EditorCtrl {
       if (rules == '5check') this.remainingChecks = RemainingChecks.fiveCheck();
       else this.remainingChecks = RemainingChecks.default();
     }
-    this.onChange();
   }
 
   isVariantStandardInitialPosition(): boolean {

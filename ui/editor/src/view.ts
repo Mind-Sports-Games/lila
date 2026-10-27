@@ -187,7 +187,6 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                 on: {
                   change(e) {
                     ctrl.changeVariant((e.target as HTMLSelectElement).value as VariantKey);
-                    ctrl.startPosition();
                   },
                 },
               },
