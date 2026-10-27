@@ -230,8 +230,8 @@ export default class EditorCtrl {
   }
 
   makeUrl(baseUrl: string, fen: string): string {
-    // an untouched board is the variant's own editor page, which has a URL of its own
-    const untouched = fen === variantClassFromKey(this.variantKey).getInitialFen(this.turn);
+    // an untouched board is the variant's own editor page, which has a URL of its own and p1 to move
+    const untouched = fen === variantClassFromKey(this.variantKey).getInitialFen('p1');
     if (untouched && !this.options.orientation)
       return baseUrl.replace(/\/$/, '') + (this.variantKey === 'standard' ? '' : `/${this.variantKey}`);
     let urlParams = this.variantKey !== 'standard' ? `?variant=${this.variantKey}` : '';
