@@ -658,6 +658,12 @@
   <string name="newTournament">Nuevo torneo</string>
   <string name="tournamentHomeTitle">Torneos arena — ajedrez, damas, go, backgammon y más</string>
   <string name="swissHomeTitle">Torneos suizos — ajedrez, damas, go, backgammon y más</string>
+  <string name="swissHomeDescription">Torneos suizos en PlayStrategy, en ajedrez, damas, go, backgammon, Othello, Abalone y más: un número fijo de rondas, emparejados por puntuación, sin eliminados.</string>
+  <string name="blogTitle">Blog de PlayStrategy — juegos, características, eventos</string>
+  <string name="blogDescription">Novedades de PlayStrategy: los juegos que añadimos, las características que creamos y los eventos que organizamos, con crónicas de las Mind Sports Olympiad.</string>
+  <string name="historyFreqDescription">Arenas %s en PlayStrategy: la fecha de cada edición, cuántos jugaron y quién ganó.</string>
+  <string name="studyHomeDescription">Estudios en PlayStrategy: partidas comentadas, lecciones y repertorios en ajedrez, go, Othello, Lines Of Action y cualquier otro juego con tablero de análisis.</string>
+  <string name="variantPuzzleThemesDescription">Ejercicios de %s por temas en PlayStrategy: elige un motivo y encuentra las jugadas ganadoras en posiciones de partidas reales.</string>
   <string name="tournamentHomeDescription">Torneos arena en PlayStrategy: ajedrez, damas, go, backgammon, Othello, Abalone y todos los demás juegos. Lo que se juega ahora, lo que viene, quién ha ganado.</string>
   <string name="tournamentNotFound">No se encontró el torneo</string>
   <string name="tournamentDoesNotExist">Este torneo no existe.</string>

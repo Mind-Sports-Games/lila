@@ -662,6 +662,12 @@
   <string name="newTournament">Nouveau tournoi</string>
   <string name="tournamentHomeTitle">Tournois Arène — échecs, dames, go, backgammon et plus</string>
   <string name="swissHomeTitle">Tournois suisses — échecs, dames, go, backgammon et plus</string>
+  <string name="swissHomeDescription">Tournois suisses sur PlayStrategy, aux échecs, dames, go, backgammon, Othello, Abalone et plus : un nombre de rondes fixe, appariés au score, sans élimination.</string>
+  <string name="blogTitle">Blog PlayStrategy — jeux, fonctionnalités, événements</string>
+  <string name="blogDescription">L\'actualité de PlayStrategy : les jeux ajoutés, les fonctionnalités construites et les événements organisés, avec les comptes rendus des Mind Sports Olympiad.</string>
+  <string name="historyFreqDescription">Les arènes %s sur PlayStrategy : la date de chaque édition, le nombre de joueurs et le vainqueur.</string>
+  <string name="studyHomeDescription">Les études sur PlayStrategy : parties commentées, leçons et répertoires aux échecs, go, Othello, Lines Of Action et tout autre jeu doté d\'un plateau d\'analyse.</string>
+  <string name="variantPuzzleThemesDescription">Les thèmes des problèmes de %s sur PlayStrategy : choisissez un motif et trouvez les coups gagnants dans des positions tirées de vraies parties.</string>
   <string name="tournamentHomeDescription">Les tournois Arène de PlayStrategy : échecs, dames, go, backgammon, Othello, Abalone et tous les autres jeux. Ce qui se joue, ce qui vient, qui a gagné.</string>
   <string name="tournamentNotFound">Tournoi inexistant</string>
   <string name="tournamentDoesNotExist">Ce tournoi n\'existe pas.</string>

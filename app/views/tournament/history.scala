@@ -83,7 +83,9 @@ object history {
       series.Wording(contested = false, subject = s"${nameOf(freq)} ${VariantKeys.variantName(v)}")
     }
     views.html.base.layout(
-      title = subject.fold(heading)(_ => trans.historyTitle.txt(heading)),
+      title = trans.historyTitle.txt(heading),
+      // a frequency hub has no series of its own to put on a card, but it still says what it is
+      description = subject.isEmpty.option(trans.historyFreqDescription.txt(nameOf(freq))),
       moreJs = infiniteScrollTag,
       moreCss = frag(cssTag("tournament.history"), summary.isDefined.option(cssTag("tournament.leaderboard"))),
       canonicalPath = pageUrl(freq, variant, group).some,

@@ -612,6 +612,12 @@
   <string name="newTournament">新锦标赛</string>
   <string name="tournamentHomeTitle">竞技场比赛｜国际象棋、跳棋、围棋、双陆棋等</string>
   <string name="swissHomeTitle">瑞士锦标赛｜国际象棋、跳棋、围棋、双陆棋等</string>
+  <string name="swissHomeDescription">PlayStrategy 的瑞士制比赛，涵盖国际象棋、跳棋、围棋、双陆棋、黑白棋、Abalone 等：固定轮数，按分数配对，无人淘汰。</string>
+  <string name="blogTitle">PlayStrategy 博客｜新棋类、新功能与活动</string>
+  <string name="blogDescription">PlayStrategy 的最新消息：我们新增的棋类、开发的功能、举办的赛事，以及 Mind Sports Olympiad 的现场报道。</string>
+  <string name="historyFreqDescription">PlayStrategy 的 %s 竞技场：每届的日期、参赛人数和冠军。</string>
+  <string name="studyHomeDescription">PlayStrategy 的研讨：带注解的棋局、课程与开局库，涵盖国际象棋、跳棋、围棋、黑白棋、Lines Of Action 等所有配备分析棋盘的棋类。</string>
+  <string name="variantPuzzleThemesDescription">PlayStrategy 的 %s 训练主题：选择一个主题，在真实对局的局面中找到制胜着法。</string>
   <string name="tournamentHomeDescription">PlayStrategy 的竞技场比赛：国际象棋、跳棋、围棋、双陆棋、黑白棋、Abalone 以及其他所有棋类。正在进行的比赛、下一场，以及历届冠军。</string>
   <string name="tournamentNotFound">找不到该锦标赛</string>
   <string name="tournamentDoesNotExist">该锦标赛不存在。</string>

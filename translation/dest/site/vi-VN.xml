@@ -610,6 +610,12 @@
   <string name="newTournament">Giải đấu mới</string>
   <string name="tournamentHomeTitle">Giải đấu đấu trường — cờ vua, cờ đam, cờ vây, backgammon</string>
   <string name="swissHomeTitle">Các giải đấu hệ Thụy Sĩ — cờ vua, cờ đam, cờ vây, backgammon</string>
+  <string name="swissHomeDescription">Giải đấu hệ Thụy Sĩ trên PlayStrategy, ở cờ vua, cờ đam, cờ vây, backgammon, Othello, Abalone và hơn nữa: số vòng cố định, ghép cặp theo điểm, không ai bị loại.</string>
+  <string name="blogTitle">Blog PlayStrategy — trò chơi mới, tính năng mới và sự kiện</string>
+  <string name="blogDescription">Tin tức từ PlayStrategy: trò chơi mới, tính năng mới, sự kiện chúng tôi tổ chức, cùng tường thuật từ Mind Sports Olympiad.</string>
+  <string name="historyFreqDescription">Các đấu trường %s trên PlayStrategy: ngày của mỗi kỳ, số người chơi và người thắng.</string>
+  <string name="studyHomeDescription">Nghiên cứu trên PlayStrategy: ván đấu có chú giải, bài học và kho khai cuộc, ở cờ vua, cờ vây, Othello, Lines Of Action và mọi trò chơi có bàn phân tích.</string>
+  <string name="variantPuzzleThemesDescription">Chủ đề câu đố %s trên PlayStrategy: chọn một mô-típ và tìm nước đi thắng trong các thế cờ từ ván đấu thật.</string>
   <string name="tournamentHomeDescription">Giải đấu đấu trường trên PlayStrategy: cờ vua, cờ đam, cờ vây, backgammon, Othello, Abalone và mọi trò chơi khác. Đang diễn ra, sắp tới, và ai đã thắng.</string>
   <string name="tournamentNotFound">Giải đấu không tìm thấy</string>
   <string name="tournamentDoesNotExist">Giải đấu này không tồn tại.</string>

@@ -616,6 +616,12 @@
   <string name="newTournament">새로운 토너먼트</string>
   <string name="tournamentHomeTitle">아레나 토너먼트｜체스, 체커, 바둑, 백개먼 등</string>
   <string name="swissHomeTitle">스위스 토너먼트｜체스, 체커, 바둑, 백개먼 등</string>
+  <string name="swissHomeDescription">PlayStrategy의 스위스 토너먼트. 체스, 체커, 바둑, 백개먼, 오델로, 아발론 등. 정해진 라운드 수, 점수로 대진, 탈락 없음.</string>
+  <string name="blogTitle">PlayStrategy 블로그｜새 게임, 새 기능, 이벤트</string>
+  <string name="blogDescription">PlayStrategy 소식. 새로 추가한 게임, 새로 만든 기능, 우리가 여는 대회, 그리고 Mind Sports Olympiad 참관기.</string>
+  <string name="historyFreqDescription">PlayStrategy의 %s 아레나. 각 회차의 날짜, 참가 인원, 우승자.</string>
+  <string name="studyHomeDescription">PlayStrategy의 연구. 해설이 달린 기보, 레슨, 레퍼토리를 체스, 체커, 바둑, 오델로, Lines Of Action 등 분석판이 있는 모든 게임에서.</string>
+  <string name="variantPuzzleThemesDescription">PlayStrategy의 %s 퍼즐 테마. 모티프를 고르고 실전 국면에서 이기는 수를 찾아보세요.</string>
   <string name="tournamentHomeDescription">PlayStrategy의 아레나 토너먼트: 체스, 체커, 바둑, 백개먼, 오델로, 아발론과 그 밖의 모든 게임. 지금 열리는 대회, 다음 대회, 역대 우승자.</string>
   <string name="tournamentNotFound">토너먼트를 찾을 수 없습니다</string>
   <string name="tournamentDoesNotExist">존재하지 않는 토너먼트입니다.</string>
