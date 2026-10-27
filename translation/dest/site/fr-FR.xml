@@ -660,7 +660,8 @@
   <string name="keyShowOrHideComments">montrer/cacher les annotations</string>
   <string name="keyEnterOrExitVariation">entrer dans/sortir d\'une variante</string>
   <string name="newTournament">Nouveau tournoi</string>
-  <string name="tournamentHomeTitle">Tournois Arène — en cours et à venir, dans tous les jeux</string>
+  <string name="tournamentHomeTitle">Tournois Arène — échecs, dames, go, backgammon et plus</string>
+  <string name="swissHomeTitle">Tournois suisses — échecs, dames, go, backgammon et plus</string>
   <string name="tournamentHomeDescription">Les tournois Arène de PlayStrategy : échecs, dames, go, backgammon, Othello, Abalone et tous les autres jeux. Ce qui se joue, ce qui vient, qui a gagné.</string>
   <string name="tournamentNotFound">Tournoi inexistant</string>
   <string name="tournamentDoesNotExist">Ce tournoi n\'existe pas.</string>

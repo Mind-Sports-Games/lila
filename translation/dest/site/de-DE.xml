@@ -654,7 +654,8 @@
   <string name="keyShowOrHideComments">zeige/verberge Kommentare</string>
   <string name="keyEnterOrExitVariation">Variante wählen/verlassen</string>
   <string name="newTournament">Neues Turnier</string>
-  <string name="tournamentHomeTitle">Arena-Turniere — laufende und kommende Turniere in jedem Spiel</string>
+  <string name="tournamentHomeTitle">Arena-Turniere — Schach, Dame, Go, Backgammon und mehr</string>
+  <string name="swissHomeTitle">Schweizer System — Schach, Dame, Go, Backgammon und mehr</string>
   <string name="tournamentHomeDescription">Arena-Turniere auf PlayStrategy: Schach, Dame, Go, Backgammon, Othello, Abalone und jedes andere Spiel. Was jetzt läuft, was als Nächstes kommt, wer gewonnen hat.</string>
   <string name="tournamentNotFound">Turnier nicht gefunden</string>
   <string name="tournamentDoesNotExist">Dieses Turnier existiert nicht.</string>

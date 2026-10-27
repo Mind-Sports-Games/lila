@@ -610,7 +610,8 @@
   <string name="keyShowOrHideComments">显示／隐藏评论</string>
   <string name="keyEnterOrExitVariation">进入／退出变着</string>
   <string name="newTournament">新锦标赛</string>
-  <string name="tournamentHomeTitle">竞技场比赛｜正在进行和即将开始，涵盖所有棋类</string>
+  <string name="tournamentHomeTitle">竞技场比赛｜国际象棋、跳棋、围棋、双陆棋等</string>
+  <string name="swissHomeTitle">瑞士锦标赛｜国际象棋、跳棋、围棋、双陆棋等</string>
   <string name="tournamentHomeDescription">PlayStrategy 的竞技场比赛：国际象棋、跳棋、围棋、双陆棋、黑白棋、Abalone 以及其他所有棋类。正在进行的比赛、下一场，以及历届冠军。</string>
   <string name="tournamentNotFound">找不到该锦标赛</string>
   <string name="tournamentDoesNotExist">该锦标赛不存在。</string>
