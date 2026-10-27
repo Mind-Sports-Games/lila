@@ -36,6 +36,7 @@ $c-support: $c-brag;
 
   &__text {
     flex: 1 1 auto;
+    min-width: 0;
     color: $c-support;
 
     @include transition;
