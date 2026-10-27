@@ -425,7 +425,7 @@
   <string name="youAreNotInTeam">You are not in the team %s</string>
   <string name="backToGame">Back to game</string>
   <string name="siteDescription">Free online chess server. Play chess in a clean interface. No registration, no ads, no plugin required. Play chess with the computer, friends or random opponents.</string>
-  <string name="playstrategySiteDescription">Board games online, free, on the Mind Sports Olympiad platform: play, analyse and learn Chess, Draughts, Go, Backgammon, Othello, Mancala, Abalone and more. Free and open source, no ads, live or by correspondence, with puzzles, studies and an analysis board for every game.</string>
+  <string name="playstrategySiteDescription">Board games online, free, on the Mind Sports Olympiad platform: play and learn Chess, Draughts (checkers), Go, Backgammon, Othello, Mancala, Abalone and more. Free and open source, no ads, live or by correspondence, with puzzles, studies and an analysis board for every game.</string>
   <string name="playstrategySiteTitle">Play board games online free — Chess, Draughts, Go, Backgammon, Othello and more</string>
   <string name="playstrategySiteTitleShort">Play board games online free — Chess, Draughts, Go, Backgammon</string>
   <string name="playVariantOnlineFree">Play %s online for free: live or by correspondence, rated or casual, against players from all over the world.</string>
