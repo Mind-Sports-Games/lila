@@ -66,7 +66,6 @@ final class Editor(env: Env) extends LilaController(env) {
 
   def index = load("")
 
-  // /editor/abalone is a page of its own; anything else in that slot is a FEN
   def variant(key: String) =
     Variant.byKey.get(key).fold(load(key))(v => renderEditor(none, v.some))
 
