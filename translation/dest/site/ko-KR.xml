@@ -856,7 +856,7 @@
   <string name="msoAllTournaments">MSO 온라인 토너먼트 전체</string>
   <string name="aboutMso">Mind Sports Olympiad 소개</string>
   <string name="variantOf">%1$s은(는) %2$s의 변형입니다.</string>
-  <string name="boardEditorTitle">체스 보드 에디터 — 원하는 국면 만들기, 체스 변형과 페어리 체스</string>
+  <string name="boardEditorTitle">체스 보드 에디터 — 원하는 포지션 만들기</string>
   <string name="boardEditorDescription">체스, 체스 변형 및 40개의 다른 게임을 위한 무료 온라인 보드 에디터입니다. 직접 또는 FEN으로 원하는 국면을 만들어 분석하고, 컴퓨터와 대국하거나 공유해 보세요.</string>
   <string name="msoWorldChampionship">%s 세계 선수권</string>
   <string name="msoWorldChampionshipVenue">%2$s의 %1$s 세계 선수권은 현장에서 열리며, %3$s은 PlayStrategy에 공개됩니다. PlayStrategy는 온라인 %4$s도 개최합니다.</string>

@@ -902,7 +902,7 @@
   <string name="playVariantOnlineFreeTitle">Jouer à %s en ligne gratuitement</string>
   <string name="variantRulesTitle">Règles de %1$s — comment jouer à %2$s</string>
   <string name="variantAnalysisTitle">Plateau d'analyse de %s — moteur et solveur gratuits</string>
-  <string name="variantAnalysisDescription">Analysez les positions de %1$s avec un moteur et un solveur gratuits (%3$s) : composez n'importe quelle position, explorez les variantes et voyez les meilleurs coups. Jouez à %2$s en ligne gratuitement sur PlayStrategy.</string>
+  <string name="variantAnalysisDescription">Analysez les positions de %1$s avec un moteur et un solveur gratuits (%3$s) : composez une position et voyez les meilleurs coups. Jouez à %2$s en ligne gratuitement sur PlayStrategy.</string>
   <string name="variantAnalysisTitleNoEngine">Plateau d'analyse de %s — analyse en ligne gratuite</string>
   <string name="variantAnalysisDescriptionNoEngine">Analysez les positions de %1$s sur un plateau en ligne gratuit : composez n'importe quelle position, explorez les variantes et partagez-les. Jouez à %2$s en ligne gratuitement sur PlayStrategy.</string>
   <string name="variantAnalysisDescriptionServerEngine">Analysez les positions de %1$s sur un plateau en ligne gratuit : composez n'importe quelle position, explorez les variantes et partagez-les. Les parties terminées bénéficient d'une analyse %3$s gratuite. Jouez à %2$s en ligne gratuitement sur PlayStrategy.</string>
@@ -916,7 +916,7 @@
   <string name="playVariantOnlineFreeDescription">Jouez à %s en ligne gratuitement contre des joueurs du monde entier. Parties en direct et par correspondance, tournois, classements et analyse sur PlayStrategy.</string>
   <string name="variantPuzzles">Problèmes de %s</string>
   <string name="libraryTitle">Jeux de société à jouer en ligne gratuitement — la ludothèque PlayStrategy</string>
-  <string name="libraryDescription">Tous les jeux de PlayStrategy : les échecs et leurs variantes, les dames, le go, le backgammon, Othello, le shogi, le xiangqi, le mancala, Abalone, Lines of Action et plus — avec règles, tutoriels, tournois et statistiques.</string>
+  <string name="libraryDescription">Tous les jeux de PlayStrategy avec leurs règles, tutoriels, tournois et statistiques : échecs, dames, go, backgammon, Othello, mancala, Abalone et plus.</string>
   <string name="msoWorldChampionship">Championnat du monde de %s</string>
   <string name="msoWorldChampionshipVenue">Le championnat du monde de %1$s des %2$s se joue en présentiel ; ses %3$s sont publiées sur PlayStrategy, qui accueille aussi le %4$s en ligne.</string>
   <string name="msoEvent">%s aux Mind Sports Olympiad</string>
@@ -932,8 +932,8 @@
   <string name="msoAllTournaments">Tous les tournois en ligne du MSO</string>
   <string name="aboutMso">À propos de la Mind Sports Olympiad</string>
   <string name="variantOf">%1$s est une variante de %2$s.</string>
-  <string name="boardEditorTitle">Éditeur de position d’échecs — composez n’importe quelle position, variantes d’échecs et échecs féeriques</string>
-  <string name="boardEditorDescription">Éditeur de position en ligne gratuit pour les échecs, leurs variantes et 40 autres jeux : composez n’importe quelle position à la main ou depuis un FEN, puis analysez-la, jouez-la contre l’ordinateur ou partagez-la.</string>
+  <string name="boardEditorTitle">Éditeur de plateau d\'échecs — composez une position</string>
+  <string name="boardEditorDescription">Éditeur de plateau en ligne et gratuit pour les échecs, leurs variantes et tous nos jeux : composez une position à la main ou depuis un FEN, puis analysez-la.</string>
   <string name="msoGrandPrix">Grand Prix MSO</string>
   <string name="msoGrandPrixEvent">%s au Grand Prix MSO</string>
   <string name="msoGrandPrixVenue">Le Grand Prix en ligne de la %2$s se joue sur PlayStrategy, et %1$s en fait partie.</string>
@@ -991,7 +991,7 @@
   <string name="seriesLeaderboardOf">%s : classement</string>
   <string name="seriesAllEditionsOf">%s : toutes les éditions</string>
   <string name="shieldsTitle">Boucliers de tournoi — les détenteurs de chaque jeu</string>
-  <string name="shieldsDescription">Qui détient le bouclier de chaque jeu sur PlayStrategy : l\'arène mensuelle du bouclier de chaque jeu couronne un détenteur qui garde le trophée jusqu\'à la suivante.</string>
+  <string name="shieldsDescription">Qui détient le bouclier de chaque jeu sur PlayStrategy : l\'arène mensuelle du bouclier couronne un détenteur qui garde le trophée jusqu\'à la suivante.</string>
   <string name="shieldsHeading">Boucliers de tournoi</string>
   <string name="shieldsIntro">Chaque jeu a son arène mensuelle du bouclier. Le vainqueur détient le bouclier jusqu\'à l\'édition suivante ; les classements des boucliers comptent qui l\'a détenu le plus souvent.</string>
   <string name="shieldsHeadhunter">Chasseur de têtes :</string>
@@ -1023,8 +1023,8 @@
   <string name="historyTitle">%s — toutes les éditions et leurs vainqueurs</string>
   <string name="historyDescription">Toutes les éditions de l\'arène %s sur PlayStrategy, avec leur vainqueur.</string>
   <string name="historyAllGames">Tous les jeux</string>
-  <string name="variantBoardEditorTitle">Éditeur de plateau %s — composez n\'importe quelle position</string>
-  <string name="variantBoardEditorDescription">Éditeur de plateau %s en ligne et gratuit : composez une position à la main ou depuis un FEN, puis analysez-la, jouez-la contre l\'ordinateur ou partagez-la.</string>
-  <string name="signInDescription">Connectez-vous à PlayStrategy pour jouer aux échecs, aux dames, au go, au backgammon, à Othello et à 40 autres jeux de société en ligne gratuitement, avec classements, tournois et analyse.</string>
+  <string name="variantBoardEditorTitle">Éditeur de plateau %s — composez une position</string>
+  <string name="variantBoardEditorDescription">Éditeur de plateau %s en ligne et gratuit : composez une position à la main ou depuis un FEN, puis analysez-la ou jouez-la contre l\'ordinateur.</string>
+  <string name="signInDescription">Connectez-vous à PlayStrategy pour jouer aux échecs, au go, au backgammon, à Othello et à 40 autres jeux en ligne gratuitement, avec classements et analyse.</string>
   <string name="signUpDescription">Créez un compte PlayStrategy gratuit pour jouer aux échecs, aux dames, au go, au backgammon, à Othello et à 40 autres jeux de société en ligne : parties classées, tournois, problèmes et analyse, sans publicité.</string>
 </resources>

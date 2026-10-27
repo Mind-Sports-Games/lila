@@ -825,7 +825,7 @@
   <string name="playVariantOnlineFreeTitle">Chơi %s trực tuyến miễn phí</string>
   <string name="variantRulesTitle">Luật chơi %1$s — cách chơi %2$s</string>
   <string name="variantAnalysisTitle">Bàn phân tích %s — máy phân tích và trình giải miễn phí</string>
-  <string name="variantAnalysisDescription">Phân tích các thế trận %1$s bằng máy phân tích và trình giải miễn phí (%3$s): bày quân ở bất kỳ thế nào, khám phá các biến và xem những nước đi tốt nhất. Chơi %2$s trực tuyến miễn phí trên PlayStrategy.</string>
+  <string name="variantAnalysisDescription">Phân tích thế trận %1$s bằng máy phân tích và trình giải miễn phí (%3$s): bày quân thế nào cũng được và xem nước đi tốt nhất. Chơi %2$s miễn phí trên PlayStrategy.</string>
   <string name="variantAnalysisTitleNoEngine">Bàn phân tích %s — phân tích trực tuyến miễn phí</string>
   <string name="variantAnalysisDescriptionNoEngine">Phân tích các thế trận %1$s trên bàn trực tuyến miễn phí: bày quân ở bất kỳ thế nào, khám phá các biến và chia sẻ chúng. Chơi %2$s trực tuyến miễn phí trên PlayStrategy.</string>
   <string name="variantAnalysisDescriptionServerEngine">Phân tích các thế trận %1$s trên bàn trực tuyến miễn phí: bày quân ở bất kỳ thế nào, khám phá các biến và chia sẻ chúng. Các ván đã kết thúc được %3$s phân tích miễn phí. Chơi %2$s trực tuyến miễn phí trên PlayStrategy.</string>
@@ -837,8 +837,8 @@
   <string name="msoAllTournaments">Tất cả giải đấu trực tuyến của MSO</string>
   <string name="aboutMso">Về Mind Sports Olympiad</string>
   <string name="variantOf">%1$s là một biến thể của %2$s.</string>
-  <string name="boardEditorTitle">Trình chỉnh sửa bàn cờ vua — dựng bất kỳ thế cờ nào, các biến thể cờ vua và cờ tiên</string>
-  <string name="boardEditorDescription">Trình chỉnh sửa bàn cờ trực tuyến miễn phí cho cờ vua, các biến thể cờ vua và 40 trò chơi khác: dựng bất kỳ thế cờ nào bằng tay hoặc từ FEN, rồi phân tích, chơi với máy hoặc chia sẻ.</string>
+  <string name="boardEditorTitle">Trình soạn bàn cờ vua — dựng bất kỳ thế cờ nào</string>
+  <string name="boardEditorDescription">Trình soạn bàn cờ trực tuyến miễn phí cho cờ vua, các biến thể và mọi trò chơi khác: dựng thế cờ bằng tay hoặc từ FEN, rồi phân tích.</string>
   <string name="msoWorldChampionship">Giải vô địch thế giới %s</string>
   <string name="msoWorldChampionshipVenue">Giải vô địch thế giới %1$s của %2$s được tổ chức trực tiếp; các %3$s được đăng trên PlayStrategy, nơi cũng tổ chức %4$s trực tuyến.</string>
   <string name="msoEvent">%s tại Mind Sports Olympiad</string>
@@ -859,7 +859,7 @@
   <string name="playVariantOnlineFreeDescription">Chơi %s trực tuyến miễn phí với người chơi trên toàn thế giới. Ván đấu trực tiếp và theo lượt, giải đấu, xếp hạng và phân tích trên PlayStrategy.</string>
   <string name="variantPuzzles">Câu đố %s</string>
   <string name="libraryTitle">Các board game có thể chơi trực tuyến miễn phí — thư viện PlayStrategy</string>
-  <string name="libraryDescription">Mọi trò chơi trên PlayStrategy: cờ vua và các biến thể, cờ đam, cờ vây, backgammon, Othello, shogi, cờ tướng, mancala, Abalone, Lines of Action và hơn thế nữa — kèm luật chơi, hướng dẫn, giải đấu và thống kê.</string>
+  <string name="libraryDescription">Mọi trò chơi trên PlayStrategy cùng luật, hướng dẫn, giải đấu và thống kê: cờ vua, cờ đam, cờ vây, backgammon, Othello, mancala, Abalone và hơn nữa.</string>
   <string name="variantBoardEditorTitle">Trình soạn bàn cờ %s — dựng bất kỳ thế cờ nào</string>
   <string name="variantBoardEditorDescription">Trình soạn bàn cờ %s trực tuyến miễn phí: dựng thế cờ bằng tay hoặc từ FEN, rồi phân tích, chơi với máy hoặc chia sẻ.</string>
   <string name="signInDescription">Đăng nhập PlayStrategy để chơi cờ vua, cờ đam, cờ vây, backgammon, Othello và hơn 40 board game khác trực tuyến miễn phí, có xếp hạng, giải đấu và phân tích.</string>

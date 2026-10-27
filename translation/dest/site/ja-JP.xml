@@ -854,7 +854,7 @@
   <string name="msoAllTournaments">MSOのオンライントーナメント一覧</string>
   <string name="aboutMso">Mind Sports Olympiadについて</string>
   <string name="variantOf">%1$sは%2$sのバリアントです。</string>
-  <string name="boardEditorTitle">チェス盤エディタ — 好きな局面を作成、チェスバリアントとフェアリーチェス</string>
+  <string name="boardEditorTitle">チェス ボードエディター — 任意の局面を作成</string>
   <string name="boardEditorDescription">チェス、チェスバリアント、ほか40のゲームに対応した無料のオンライン盤面エディタ。手動またはFENで好きな局面を作成し、分析したり、コンピュータと対戦したり、共有したりできます。</string>
   <string name="msoWorldChampionship">%s世界選手権</string>
   <string name="msoWorldChampionshipVenue">%2$sの%1$s世界選手権は現地で開催され、その%3$sはPlayStrategyで公開されています。PlayStrategyはオンラインの%4$sも開催しています。</string>
