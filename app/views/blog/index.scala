@@ -17,7 +17,8 @@ object index {
 
     val primaryPost = (pager.currentPage == 1).so(pager.currentPageResults.headOption)
     views.html.base.layout(
-      title = "Blog",
+      title = trans.blogTitle.txt(),
+      description = trans.blogDescription.txt().some,
       moreCss = cssTag("blog"),
       csp = bits.csp,
       moreJs = infiniteScrollTag

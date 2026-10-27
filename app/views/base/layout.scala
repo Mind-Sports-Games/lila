@@ -238,6 +238,8 @@ object layout {
       moreJs: Frag = emptyFrag,
       playing: Boolean = false,
       openGraph: Option[lila.app.ui.OpenGraph] = None,
+      // what the page is, for a page that says it in the meta but has no card to share
+      description: Option[String] = None,
       zoomable: Boolean = false,
       csp: Option[ContentSecurityPolicy] = None,
       wrapClass: String = "",
@@ -285,8 +287,11 @@ object layout {
           pieceSprite(boardFamily, soleBoardFamily),
           ctx.nonce map lazyPieceScript,
           meta(
-            content := openGraph.fold(trans.playstrategySiteDescription.txt())(o => o.description),
-            name    := "description"
+            content := openGraph
+              .map(_.description)
+              .orElse(description)
+              .getOrElse(trans.playstrategySiteDescription.txt()),
+            name := "description"
           ),
           link(rel := "mask-icon", href := staticAssetUrl("logo/playstrategy.svg"), color := "black"),
           favicons,

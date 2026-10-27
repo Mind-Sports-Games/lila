@@ -810,6 +810,12 @@ computer analysis, game chat and shareable URL.</string>
   <string name="newTournament">New tournament</string>
   <string name="tournamentHomeTitle">Arena tournaments — Chess, Draughts, Go, Backgammon and more</string>
   <string name="swissHomeTitle">Swiss tournaments — Chess, Draughts, Go, Backgammon and more</string>
+  <string name="swissHomeDescription">Swiss tournaments on PlayStrategy, in Chess, Draughts, Go, Backgammon, Othello, Abalone and more: a set number of rounds, paired by score, nobody knocked out.</string>
+  <string name="blogTitle">PlayStrategy blog — new games, features and events</string>
+  <string name="blogDescription">News from PlayStrategy: the games we add, the features we build and the events we run, with reports from the Mind Sports Olympiad.</string>
+  <string name="historyFreqDescription">%s arenas on PlayStrategy: the date of each edition, how many played, and who won.</string>
+  <string name="studyHomeDescription">Studies on PlayStrategy: annotated games, lessons and repertoires in Chess, Draughts, Go, Othello, Lines Of Action and any other game with an analysis board.</string>
+  <string name="variantPuzzleThemesDescription">%s puzzle themes on PlayStrategy: pick a motif and find the winning moves in positions taken from real games.</string>
   <string name="tournamentHomeDescription">Arena tournaments on PlayStrategy, in Chess, Draughts, Go, Backgammon, Othello, Abalone and every other game: what is running now, what is next, who has won.</string>
   <string name="tournamentNotFound">Tournament not found</string>
   <string name="tournamentDoesNotExist">This tournament does not exist.</string>

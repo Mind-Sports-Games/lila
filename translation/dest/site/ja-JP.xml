@@ -614,6 +614,12 @@
   <string name="newTournament">新しいトーナメント</string>
   <string name="tournamentHomeTitle">アリーナ トーナメント｜チェス、囲碁、バックギャモンほか</string>
   <string name="swissHomeTitle">スイス式トーナメント｜チェス、囲碁、バックギャモンほか</string>
+  <string name="swissHomeDescription">PlayStrategy のスイス式トーナメント。チェス、チェッカー、囲碁、バックギャモン、オセロ、アバロンなど。ラウンド数は固定、スコアで組み合わせ、敗退なし。</string>
+  <string name="blogTitle">PlayStrategy ブログ｜新しいゲーム、新機能、イベント</string>
+  <string name="blogDescription">PlayStrategy の最新情報。追加したゲーム、作った機能、開催したイベント、そして Mind Sports Olympiad のレポート。</string>
+  <string name="historyFreqDescription">PlayStrategy の %s アリーナ。各回の開催日、参加人数、優勝者。</string>
+  <string name="studyHomeDescription">PlayStrategy の研究。解説付きの棋譜、レッスン、レパートリーを、チェス、チェッカー、囲碁、オセロ、Lines Of Action など解析盤のある全ゲームで。</string>
+  <string name="variantPuzzleThemesDescription">PlayStrategy の %s 問題のテーマ。モチーフを選び、実戦の局面から勝ち筋を見つけよう。</string>
   <string name="tournamentHomeDescription">PlayStrategy のアリーナ トーナメント：チェス、チェッカー、囲碁、バックギャモン、オセロ、アバロン、その他すべてのゲーム。開催中の大会、次の予定、歴代の優勝者。</string>
   <string name="tournamentNotFound">トーナメントが見つかりません</string>
   <string name="tournamentDoesNotExist">このトーナメントは存在しません</string>

@@ -656,6 +656,12 @@
   <string name="newTournament">Neues Turnier</string>
   <string name="tournamentHomeTitle">Arena-Turniere — Schach, Dame, Go, Backgammon und mehr</string>
   <string name="swissHomeTitle">Schweizer System — Schach, Dame, Go, Backgammon und mehr</string>
+  <string name="swissHomeDescription">Schweizer System auf PlayStrategy, in Schach, Dame, Go, Backgammon, Othello, Abalone und mehr: feste Rundenzahl, Paarung nach Punkten, niemand scheidet aus.</string>
+  <string name="blogTitle">PlayStrategy-Blog — neue Spiele, Funktionen und Events</string>
+  <string name="blogDescription">Neues von PlayStrategy: neue Spiele, neue Funktionen, unsere Events — mit Berichten von der Mind Sports Olympiad.</string>
+  <string name="historyFreqDescription">%s-Arenen auf PlayStrategy: das Datum jeder Ausgabe, wie viele mitgespielt haben und wer gewonnen hat.</string>
+  <string name="studyHomeDescription">Studien auf PlayStrategy: kommentierte Partien, Lektionen und Repertoires in Schach, Go, Othello, Lines Of Action und jedem anderen Spiel mit Analysebrett.</string>
+  <string name="variantPuzzleThemesDescription">%s-Aufgabenthemen auf PlayStrategy: Motiv wählen und in Stellungen aus echten Partien die Gewinnzüge finden.</string>
   <string name="tournamentHomeDescription">Arena-Turniere auf PlayStrategy: Schach, Dame, Go, Backgammon, Othello, Abalone und jedes andere Spiel. Was jetzt läuft, was als Nächstes kommt, wer gewonnen hat.</string>
   <string name="tournamentNotFound">Turnier nicht gefunden</string>
   <string name="tournamentDoesNotExist">Dieses Turnier existiert nicht.</string>

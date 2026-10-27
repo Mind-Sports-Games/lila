@@ -11,6 +11,7 @@ object home {
   def apply(featured: FeaturedSwisses)(implicit ctx: Context) =
     views.html.base.layout(
       title = trans.swissHomeTitle.txt(),
+      description = trans.swissHomeDescription.txt().some,
       moreCss = cssTag("swiss.home")
     ) {
       main(cls := "page-small box box-pad page swiss-home")(

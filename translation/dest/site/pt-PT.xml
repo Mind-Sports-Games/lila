@@ -658,6 +658,12 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="newTournament">Novo torneio</string>
   <string name="tournamentHomeTitle">Torneios em arena — xadrez, damas, go, gamão e mais</string>
   <string name="swissHomeTitle">Torneios suíços — xadrez, damas, go, gamão e mais</string>
+  <string name="swissHomeDescription">Torneios suíços no PlayStrategy, em xadrez, damas, go, gamão, Othello, Abalone e mais: um número fixo de rondas, emparelhados por pontuação, sem eliminação.</string>
+  <string name="blogTitle">Blogue do PlayStrategy — jogos, funcionalidades, eventos</string>
+  <string name="blogDescription">Novidades do PlayStrategy: os jogos que adicionamos, as funcionalidades que construímos e os eventos que organizamos, com relatos das Mind Sports Olympiad.</string>
+  <string name="historyFreqDescription">Arenas %s no PlayStrategy: a data de cada edição, quantos jogaram e quem venceu.</string>
+  <string name="studyHomeDescription">Estudos no PlayStrategy: partidas comentadas, lições e repertórios em xadrez, go, Othello, Lines Of Action e qualquer outro jogo com tabuleiro de análise.</string>
+  <string name="variantPuzzleThemesDescription">Temas de problemas de %s no PlayStrategy: escolha um motivo e encontre os lances vencedores em posições de partidas reais.</string>
   <string name="tournamentHomeDescription">Torneios em arena no PlayStrategy: xadrez, damas, go, gamão, Othello, Abalone e todos os outros jogos. O que está a decorrer, o que vem a seguir, quem ganhou.</string>
   <string name="tournamentNotFound">Torneio não encontrado</string>
   <string name="tournamentDoesNotExist">Este torneio não existe.</string>

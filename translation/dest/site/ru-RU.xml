@@ -724,6 +724,12 @@
   <string name="newTournament">Новый турнир</string>
   <string name="tournamentHomeTitle">Турниры «Арена» — шахматы, шашки, го, нарды и другие</string>
   <string name="swissHomeTitle">Турниры по швейцарской системе — шахматы, шашки, го, нарды</string>
+  <string name="swissHomeDescription">Турниры по швейцарской системе на PlayStrategy — шахматы, шашки, го, нарды, Abalone и другие: фиксированное число туров, жеребьёвка по очкам, без выбывания.</string>
+  <string name="blogTitle">Блог PlayStrategy — новые игры, возможности и события</string>
+  <string name="blogDescription">Новости PlayStrategy: игры, которые мы добавляем, возможности, которые мы делаем, и турниры, которые мы проводим, с репортажами с Mind Sports Olympiad.</string>
+  <string name="historyFreqDescription">Арены %s на PlayStrategy: дата каждого выпуска, число участников и победитель.</string>
+  <string name="studyHomeDescription">Исследования на PlayStrategy: партии с комментариями, уроки и репертуары — шахматы, шашки, го, отелло, Lines Of Action и любая игра с доской анализа.</string>
+  <string name="variantPuzzleThemesDescription">Темы задач по %s на PlayStrategy: выберите мотив и находите выигрывающие ходы в позициях из реальных партий.</string>
   <string name="tournamentHomeDescription">Турниры «Арена» на PlayStrategy: шахматы, шашки, го, нарды, отелло, Abalone и все остальные игры. Что идёт сейчас, что будет дальше, кто побеждал.</string>
   <string name="tournamentNotFound">Турнир не найден</string>
   <string name="tournamentDoesNotExist">Такого турнира не существует.</string>

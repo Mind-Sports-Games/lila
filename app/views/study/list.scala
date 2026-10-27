@@ -21,7 +21,8 @@ object list {
       pag = pag,
       searchFilter = "",
       url = o => routes.Study.all(o),
-      canonical = routes.Study.allDefault().some
+      canonical = routes.Study.allDefault().some,
+      description = trans.studyHomeDescription.txt().some
     )
 
   def byOwner(pag: Paginator[WithChaptersAndLiked], order: Order, owner: User)(implicit ctx: Context) =
@@ -164,7 +165,8 @@ object list {
       searchFilter: String,
       topics: Option[StudyTopics] = None,
       modActions: Option[Frag] = None,
-      canonical: Option[Call] = None
+      canonical: Option[Call] = None,
+      description: Option[String] = None
   )(implicit ctx: Context) =
     // no openGraph: a listing turns over, and what gets shared is a study
     views.html.base.layout(
@@ -174,6 +176,7 @@ object list {
       robots = netConfig.crawlable && pag.currentPage == 1 && pag.nbResults > 0,
       // every order of a listing holds the same studies: the orderless route is the one page
       canonicalPath = canonical.map(_.url),
+      description = description,
       moreCss = cssTag("study.index"),
       wrapClass = "full-screen-force",
       moreJs = infiniteScrollTag
