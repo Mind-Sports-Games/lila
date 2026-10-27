@@ -932,6 +932,6 @@
   <string name="msoGrandPrixVenue">El Gran Premio online de la %2$s se juega en PlayStrategy, y %1$s es uno de sus juegos.</string>
   <string name="variantBoardEditorTitle">Editor de tablero de %s — crea cualquier posición</string>
   <string name="variantBoardEditorDescription">Editor de tablero de %s online y gratuito: crea cualquier posición a mano o desde un FEN, y luego analízala o juégala contra el ordenador.</string>
-  <string name="signInDescription">Inicia sesión en PlayStrategy para jugar al ajedrez, las damas, el go, Othello y otros 40 juegos de mesa online gratis, con clasificaciones, torneos y análisis.</string>
-  <string name="signUpDescription">Crea una cuenta gratuita en PlayStrategy para jugar al ajedrez, las damas, el go, el backgammon, Othello y otros 40 juegos de mesa online: partidas clasificadas, torneos, problemas y análisis, sin anuncios.</string>
+  <string name="signInDescription">Inicia sesión en PlayStrategy para jugar al ajedrez, las damas, el go, Othello y más de 40 juegos de mesa online gratis, con clasificaciones y análisis.</string>
+  <string name="signUpDescription">Crea una cuenta gratuita en PlayStrategy para jugar al ajedrez, las damas, el go, el backgammon, Othello y más de 40 juegos de mesa online. Partidas clasificadas, torneos, problemas y análisis, sin anuncios.</string>
 </resources>

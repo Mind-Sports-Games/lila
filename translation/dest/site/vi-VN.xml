@@ -863,5 +863,5 @@
   <string name="variantBoardEditorTitle">Trình soạn bàn cờ %s — dựng bất kỳ thế cờ nào</string>
   <string name="variantBoardEditorDescription">Trình soạn bàn cờ %s trực tuyến miễn phí: dựng thế cờ bằng tay hoặc từ FEN, rồi phân tích, chơi với máy hoặc chia sẻ.</string>
   <string name="signInDescription">Đăng nhập PlayStrategy để chơi cờ vua, cờ đam, cờ vây, backgammon, Othello và hơn 40 board game khác trực tuyến miễn phí, có xếp hạng, giải đấu và phân tích.</string>
-  <string name="signUpDescription">Tạo tài khoản PlayStrategy miễn phí để chơi cờ vua, cờ đam, cờ vây, backgammon, Othello và hơn 40 board game khác: ván có xếp hạng, giải đấu, câu đố và phân tích, không quảng cáo.</string>
+  <string name="signUpDescription">Tạo tài khoản PlayStrategy miễn phí để chơi cờ vua, cờ đam, cờ vây, backgammon, Othello và hơn 40 board game khác. Ván có xếp hạng, giải đấu, câu đố và phân tích, không quảng cáo.</string>
 </resources>
