@@ -852,7 +852,7 @@
   <string name="msoAllTournaments">MSO 全部在线赛事</string>
   <string name="aboutMso">关于 Mind Sports Olympiad</string>
   <string name="variantOf">%1$s是%2$s的变体。</string>
-  <string name="boardEditorTitle">国际象棋棋盘编辑器 — 摆出任意局面，支持国际象棋变体和奇异象棋</string>
+  <string name="boardEditorTitle">国际象棋棋盘编辑器 — 摆出任意局面</string>
   <string name="boardEditorDescription">免费的在线棋盘编辑器，支持国际象棋、国际象棋变体及其他40种游戏：手动或通过 FEN 摆出任意局面，然后分析、与电脑对弈或分享。</string>
   <string name="msoWorldChampionship">%s世界锦标赛</string>
   <string name="msoWorldChampionshipVenue">%2$s 的%1$s世界锦标赛在线下举行，%3$s会发布在 PlayStrategy 上，PlayStrategy 同时也承办在线的 %4$s。</string>

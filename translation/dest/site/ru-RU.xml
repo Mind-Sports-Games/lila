@@ -981,8 +981,8 @@
   <string name="msoAllTournaments">Все онлайн-турниры MSO</string>
   <string name="aboutMso">О Mind Sports Olympiad</string>
   <string name="variantOf">%1$s — вариант игры %2$s.</string>
-  <string name="boardEditorTitle">Редактор шахматной доски — расставьте любую позицию, варианты шахмат и сказочные шахматы</string>
-  <string name="boardEditorDescription">Бесплатный онлайн-редактор доски для шахмат, вариантов шахмат и ещё 40 игр: расставьте любую позицию вручную или из FEN, затем проанализируйте её, сыграйте с компьютером или поделитесь ею.</string>
+  <string name="boardEditorTitle">Редактор доски: шахматы — составьте любую позицию</string>
+  <string name="boardEditorDescription">Бесплатный онлайн-редактор доски для шахмат, их вариантов и всех остальных игр: составьте позицию вручную или из FEN, затем разберите её.</string>
   <string name="allAboutX">Всё о %s на PlayStrategy</string>
   <string name="variantEditorDescription">Расставьте любую позицию %1$s в бесплатном онлайн-редакторе доски, затем проанализируйте её или сыграйте. Играйте в %2$s онлайн бесплатно на PlayStrategy.</string>
   <string name="variantStudies">Студии: %s</string>
@@ -991,7 +991,7 @@
   <string name="playVariantOnlineFreeDescription">Играйте в %s онлайн бесплатно с игроками со всего мира. Партии в реальном времени и по переписке, турниры, рейтинги и анализ на PlayStrategy.</string>
   <string name="variantPuzzles">Задачи: %s</string>
   <string name="libraryTitle">Настольные игры, в которые можно играть онлайн бесплатно — библиотека PlayStrategy</string>
-  <string name="libraryDescription">Все игры PlayStrategy: шахматы и их варианты, шашки, го, нарды, отелло, сёги, сянци, манкала, Abalone, Lines of Action и другие — с правилами, обучением, турнирами и статистикой.</string>
+  <string name="libraryDescription">Все игры PlayStrategy с правилами, руководствами, турнирами и статистикой: шахматы, шашки, го, нарды, отелло, манкала, Abalone и другие.</string>
   <string name="msoWorldChampionship">Чемпионат мира по %s</string>
   <string name="msoWorldChampionshipVenue">Чемпионат мира %2$s по %1$s проходит очно; его %3$s публикуются на PlayStrategy, где также проводится онлайн %4$s.</string>
   <string name="msoEvent">%s на Mind Sports Olympiad</string>
@@ -1005,7 +1005,7 @@
   <string name="msoGrandPrixEvent">%s на Гран-при MSO</string>
   <string name="msoGrandPrixVenue">Онлайн Гран-при %2$s проходит на PlayStrategy, и %1$s — одна из его игр.</string>
   <string name="variantBoardEditorTitle">Редактор доски: %s — составьте любую позицию</string>
-  <string name="variantBoardEditorDescription">Бесплатный онлайн-редактор доски для игры %s: составьте позицию вручную или из FEN, затем разберите её, сыграйте против компьютера или поделитесь ею.</string>
+  <string name="variantBoardEditorDescription">Бесплатный онлайн-редактор доски для игры %s: составьте позицию вручную или из FEN, затем разберите её или сыграйте против компьютера.</string>
   <string name="signInDescription">Войдите на PlayStrategy, чтобы бесплатно играть онлайн в шахматы, шашки, го, нарды, реверси и ещё 40 настольных игр — с рейтингом, турнирами и анализом.</string>
   <string name="signUpDescription">Создайте бесплатный аккаунт на PlayStrategy и играйте онлайн в шахматы, шашки, го, нарды, реверси и ещё 40 настольных игр: рейтинговые партии, турниры, задачи и анализ, без рекламы.</string>
 </resources>

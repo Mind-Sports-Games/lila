@@ -464,7 +464,7 @@
   <string name="msoGrandPrixVenue">The %2$s's online Grand Prix is played on PlayStrategy, and %1$s is one of its games.</string>
   <string name="variantPuzzles">%s puzzles</string>
   <string name="libraryTitle">Board games you can play online free — the PlayStrategy library</string>
-  <string name="libraryDescription">Every game on PlayStrategy: Chess and its variants, Checkers and Draughts, Go, Backgammon, Othello, Shogi, Xiangqi, Mancala, Abalone, Lines Of Action and more — with rules, tutorials, tournaments and statistics.</string>
+  <string name="libraryDescription">Every game on PlayStrategy with its rules, tutorials, tournaments and statistics: Chess, Draughts, Go, Backgammon, Othello, Mancala, Abalone and more.</string>
   <string name="xJoinedTeamY">%1$s joined team %2$s</string>
   <string name="xCreatedTeamY">%1$s created team %2$s</string>
   <string name="xStartedStreaming">%s started streaming</string>
@@ -575,12 +575,12 @@ computer analysis, game chat and shareable URL.</string>
   <string name="averageOpponent">Average opponent</string>
   <string name="membersOnly">Members only</string>
   <string name="boardEditor">Board editor</string>
-  <string name="boardEditorTitle">Chess board editor — set up any position, Chess variants and fairy chess</string>
+  <string name="boardEditorTitle">Chess board editor — set up any position</string>
   <string name="signInDescription">Sign in to PlayStrategy to play Chess, Draughts, Go, Backgammon, Othello and 40 other board games online for free, with ratings, tournaments and analysis.</string>
   <string name="signUpDescription">Create a free PlayStrategy account to play Chess, Draughts, Go, Backgammon, Othello and 40 other board games online: rated games, tournaments, puzzles and analysis, with no ads.</string>
   <string name="variantBoardEditorTitle">%s board editor — set up any position</string>
   <string name="variantBoardEditorDescription">Free online %s board editor: set up any position by hand or from a FEN, then analyse it, play it against the computer or share it.</string>
-  <string name="boardEditorDescription">Free online board editor for Chess, Chess variants and 40 other games: set up any position by hand or from a FEN, then analyse it, play it against the computer or share it.</string>
+  <string name="boardEditorDescription">Free online board editor for Chess, its variants and all our other games: set up any position by hand or from a FEN, then analyse it, play it or share it.</string>
   <string name="setTheBoard">Set the board</string>
   <string name="popularOpenings">Popular openings</string>
   <string name="startPosition">Starting position</string>
