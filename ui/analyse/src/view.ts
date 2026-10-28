@@ -389,6 +389,7 @@ function addChapterId(study: StudyCtrl | undefined, cssClass: string) {
 }
 
 function renderPlayerScore(
+  ctrl: AnalyseCtrl,
   score: number,
   position: Position,
   playerIndex: string,
@@ -427,7 +428,11 @@ function renderPlayerScore(
   } else if (variantKey === 'pente') {
     const stone = fiveInARow.seatColor(fen, playerIndex as PlayerIndex) === 'black' ? 'b-piece' : 'w-piece';
     children.push(h(`piece.${stone}.${playerIndex}`, { attrs: { 'data-score': score } }));
-    return h('div.game-score.game-score-top.' + playerIndex + '.captures', { attrs: { title: 'Captures' } }, children);
+    return h(
+      'div.game-score.game-score-top.' + playerIndex + '.captures',
+      { attrs: { title: ctrl.trans.noarg('captures') } },
+      children,
+    );
   } else if (variantKey === 'backgammon' || variantKey === 'hyper' || variantKey === 'nackgammon') {
     for (let i = 0; i < score; i++) {
       children.push(h('piece.side-piece.' + playerIndex + (i === 0 ? ' first' : '')));
@@ -730,7 +735,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
             ],
           ),
         gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,
-        tour || !showScoreBox ? null : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey, fen),
+        tour || !showScoreBox ? null : renderPlayerScore(ctrl, topScore, 'top', ctrl.topPlayerIndex(), variantKey, fen),
         tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'top'),
         tour || !showScoreBox ? null : renderPlayerScoreNames(ctrl),
         tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
@@ -754,7 +759,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
               ])),
         tour || !showScoreBox
           ? null
-          : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey, fen),
+          : renderPlayerScore(ctrl, bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey, fen),
         tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'bottom'),
         tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
         gamebookPlayView || tour ? null : controls(ctrl),

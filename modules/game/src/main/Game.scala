@@ -368,6 +368,7 @@ case class Game(
       winner = game.situation.winner,
       p1OffersDraw = p1Player.isOfferingDraw,
       p2OffersDraw = p2Player.isOfferingDraw,
+      drawOfferAllowed = game.drawOfferAllowed,
       p1OffersSelectSquares = p1Player.isOfferingSelectSquares,
       p2OffersSelectSquares = p2Player.isOfferingSelectSquares
     )
@@ -400,7 +401,7 @@ case class Game(
           Event.SelectSquares(ss, game.situation, state, clockEvent, updated.board.pocketData)
         case sw: Swap   => Event.Swap(sw, game.situation, state, clockEvent)
         case sw2: Swap2 => Event.Swap(sw2, game.situation, state, clockEvent)
-        case o: Offer10 => Event.Swap(o, game.situation, state, clockEvent)
+        case o: Offer10 => Event.Offer10(o, game.situation, state, clockEvent)
       }
     } :: {
       // abstraction leak, I know.
@@ -739,6 +740,7 @@ case class Game(
   def playerCanOfferDraw(playerIndex: PlayerIndex) =
     started && playable &&
       turnCount >= 2 &&
+      stratGame.drawOfferAllowed &&
       !player(playerIndex).isOfferingDraw &&
       !opponent(playerIndex).isAi &&
       !playerHasOfferedDrawRecently(playerIndex)
@@ -1379,7 +1381,7 @@ object Game {
     // five in a row
     val blackSeat   = "bs" // stored only once P2 plays black
     val openingStep = "op" // stored only during the opening
-    val offered     = "of" // renju's offered fifth stones, stored only until white picks one
+    val offered     = "of" // renju's offered fifth stones, stored until white makes the offered drop
     // go
     val selectedSquares     = "ss" // the dead stones selected in go
     val deadStoneOfferState = "os" // state of the dead stone offer

@@ -50,7 +50,7 @@
   <string name="abalone">Push six of your opponent's marbles off the board to win</string>
   <string name="grandabalone">Push ten of your opponent's marbles off the board to win</string>
   <string name="entropy">Build symmetric colour patterns as Order, and break them up as Chaos</string>
-  <string name="gomoku">Be the first to make an unbroken line of five stones</string>
+  <string name="gomoku">Be the first to make an unbroken line of exactly five stones</string>
   <string name="pente">Make five in a row, or capture ten stones by closing off pairs</string>
   <string name="renju">Make exactly five in a row; black must avoid the forbidden double three, double four and overline</string>
 </resources>

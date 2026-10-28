@@ -43,7 +43,6 @@ import {
   SocketMove,
   SocketDrop,
   SocketPass,
-  SocketSelectSquares,
   SocketDoRoll,
   SocketLift,
   SocketEndTurn,
@@ -712,11 +711,6 @@ export default class RoundController {
         setTimeout(this.showExpiration, 350);
       }
     }
-    // renju: white picks one of the stones black offered
-    if (stratUtils.fiveInARow.isFiveInARow(d.game.variant.key)) {
-      d.selectMode = playing && activePlayerIndex && stratUtils.fiveInARow.canPick(o.fen);
-      if (!d.selectMode) this.chessground.resetSelectedPieces();
-    }
     this.setTitle();
     if (!this.replaying()) {
       if (o.uci === 'undo') {
@@ -837,6 +831,7 @@ export default class RoundController {
       }
     }
     d.game.threefold = !!o.threefold;
+    d.game.drawOfferAllowed = !!o.drawOfferAllowed;
     delete d.game.gameMessage;
     if (o.gameMessage) d.game.gameMessage = o.gameMessage;
 
@@ -972,25 +967,6 @@ export default class RoundController {
     return stratUtils.fiveInARow.offers(action, round.lastStep(this.data).fen);
   };
 
-  canPick = (): boolean =>
-    stratUtils.fiveInARow.isFiveInARow(this.data.game.variant.key) && !this.replaying() && this.data.selectMode;
-
-  pickedStone = (): cg.Key | undefined =>
-    this.canPick() && this.chessground ? Array.from(this.chessground.state.selectedPieces.keys())[0] : undefined;
-
-  sendPick = (): void => {
-    const picked = this.pickedStone();
-    if (!picked) return;
-    const pick: SocketSelectSquares = {
-      variant: this.data.game.variant.key,
-      lib: this.data.game.variant.lib,
-      sq: picked,
-    };
-    if (blur.get()) pick.b = 1;
-    this.resign(false);
-    this.actualSendMove('selectSquares', pick);
-  };
-
   sendLift = (variant: VariantKey, key: cg.Key): void => {
     sound.move();
     const lift: SocketLift = {
@@ -1070,7 +1046,6 @@ export default class RoundController {
     if (!this.replaying()) ground.reload(this);
     if (stratUtils.fiveInARow.isFiveInARow(d.game.variant.key)) {
       this.syncFiveInARowPlayerColors(d.steps[d.steps.length - 1].fen);
-      if (!d.selectMode) this.chessground.resetSelectedPieces();
     }
     this.doForcedActions();
     this.setTitle();

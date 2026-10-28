@@ -84,7 +84,7 @@
   <string name="playerIndexDroppedTheCube">%s dropped the cube</string>
   <string name="playerIndexMadeFiveInARow">%s made five in a row</string>
   <string name="playerIndexCapturedTenStones">%s captured ten stones</string>
-  <string name="playerIndexMadeAForbiddenMove">%s made a forbidden move</string>
+  <string name="playerIndexMadeAForbiddenAction">%s made a forbidden move</string>
   <string name="whiteResigned">White resigned</string>
   <string name="blackResigned">Black resigned</string>
   <string name="playerIndexLeftTheGame">%s left the game</string>
@@ -177,7 +177,41 @@
   <string name="perpetualWarning">Warning! One further perpetual check/chase will lose the game.</string>
   <string name="perpetualWarningOpponent">Your opponent has been warned about perpetual check/chase.</string>
   <string name="subsequentPassWarning">Warning! Subsequent double pass without playing any stone on the board will end the game with 0 dead stones.</string>
-  <string name="forbiddenMoveWarning">Warning! Black has a forbidden point: a double three, double four or overline loses the game.</string>
+  <string name="forbiddenActionWarning">Warning! Black has a forbidden point: a double three, double four or overline loses the game.</string>
+  <string name="captures">Captures</string>
+  <string name="score">Score</string>
+  <string name="youAreCurrentlyX">You are currently %s.</string>
+  <string name="placeTheFirstStoneOnTheCentrePoint">Place the first stone, Black, on the centre point.</string>
+  <string name="placeTheSecondStoneInsideTheDottedSquare">Place the second stone, %s, inside the dotted 3×3 square.</string>
+  <string name="placeTheThirdStoneInsideTheDottedSquare">Place the third stone, %s, inside the dotted 5×5 square.</string>
+  <string name="placeTheFourthStoneInsideTheDottedSquare">Place the fourth stone, %s, inside the dotted 7×7 square.</string>
+  <string name="placeTheFifthStoneInsideTheDottedSquare">Place the fifth stone, %s, inside the dotted 9×9 square.</string>
+  <string name="placeAStoneToPlayOnAsX">Place a stone to play on as %s.</string>
+  <string name="yourOpponentCanThenSwap">Your opponent will then have the opportunity to swap.</string>
+  <plurals name="placeNbStonesThenOpponentChoosesColour">
+    <item quantity="one">Place %1$s stone: %2$s. Your opponent then chooses which colour to play.</item>
+    <item quantity="other">Place %1$s stones: %2$s. Your opponent then chooses which colour to play.</item>
+  </plurals>
+  <plurals name="placeNbMoreStonesThenOpponentChoosesColour">
+    <item quantity="one">Place %1$s more stone: %2$s. Your opponent then chooses which colour to play.</item>
+    <item quantity="other">Place %1$s more stones: %2$s. Your opponent then chooses which colour to play.</item>
+  </plurals>
+  <string name="xThenY">%1$s, then %2$s</string>
+  <plurals name="placeNbMoreStonesForWhiteToChooseFrom">
+    <item quantity="one">Place %s more stone for White to choose a fifth from.</item>
+    <item quantity="other">Place %s more stones for White to choose a fifth from.</item>
+  </plurals>
+  <string name="placeBlacksFifthStoneOnAnOfferedStone">Place Black's fifth stone on one of the offered stones, then place the sixth stone.</string>
+  <string name="alternativelySwapColours">Alternatively, swap colours.</string>
+  <string name="alternativelySwapColoursOrSwapTwo">Alternatively, swap colours, or swap colours and place 2 stones.</string>
+  <string name="alternativelySwapColoursOrOfferTen">Alternatively, swap colours, or offer 10 fifth stones for White to choose from.</string>
+  <string name="alternativelyOfferTen">Alternatively, offer 10 fifth stones for White to choose from.</string>
+  <string name="swapColours">Swap colours</string>
+  <string name="swapColoursAndPlaceTwoStones">Swap colours and place 2 stones</string>
+  <string name="offerTenFifthStones">Offer 10 fifth stones for White to choose from</string>
+  <string name="swap">Swap</string>
+  <string name="swapTwo">Swap 2</string>
+  <string name="offerTen">Offer 10</string>
   <string name="threefoldRepetition">Repetition</string>
   <string name="claimADraw">Claim a draw</string>
   <string name="offerDraw">Offer draw</string>

@@ -116,8 +116,8 @@ function describe(ctrl: Ctrl): Description {
       return { key: 'playerIndexMadeFiveInARow', side: 'winner' };
     case 'tenCaptures':
       return { key: 'playerIndexCapturedTenStones', side: 'winner' };
-    case 'forbiddenMove':
-      return { key: 'playerIndexMadeAForbiddenMove', side: 'loser' };
+    case 'forbiddenAction':
+      return { key: 'playerIndexMadeAForbiddenAction', side: 'loser' };
     case 'variantEnd':
       switch (d.game.variant.key) {
         case 'kingOfTheHill':

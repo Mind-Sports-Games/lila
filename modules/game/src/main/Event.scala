@@ -112,6 +112,7 @@ object Event {
         .add("takebackable" -> takebackable)
         .add("wDraw" -> state.p1OffersDraw)
         .add("bDraw" -> state.p2OffersDraw)
+        .add("drawOfferAllowed" -> state.drawOfferAllowed)
         .add("canOnlyRollDice" -> canOnlyRollDice)
         .add("canEndTurn" -> canEndTurn)
         .add("canUndo" -> canUndo)
@@ -1002,7 +1003,6 @@ object Event {
       )
   }
 
-  // five in a row's swap, swap2 and offer10: the board is unchanged, the typ names the action
   case class Swap(
       gf: GameFamily,
       uci: String,
@@ -1071,9 +1071,65 @@ object Event {
 
     def apply(swap2: StratSwap2, situation: Situation, state: State, clock: Option[ClockEvent]): Swap =
       apply(swap2.toUci.uci, swap2.player, situation, state, clock)
+  }
 
-    def apply(offer10: StratOffer10, situation: Situation, state: State, clock: Option[ClockEvent]): Swap =
-      apply(offer10.toUci.uci, offer10.player, situation, state, clock)
+  // renju's offer10: black offers ten candidate fifth stones beside the board
+  case class Offer10(
+      gf: GameFamily,
+      uci: String,
+      actor: PlayerIndex,
+      fen: String,
+      takebackable: Boolean,
+      state: State,
+      clock: Option[ClockEvent],
+      possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]]
+  ) extends Event {
+    def typ  = "offer10"
+    def data =
+      Action.data(
+        gf,
+        fen,
+        false,
+        None,
+        None,
+        false,
+        None,
+        takebackable,
+        false,
+        false,
+        false,
+        state,
+        clock,
+        Map.empty,
+        possibleDrops,
+        possibleDropsByRole,
+        None,
+        None,
+        None,
+        None,
+        None
+      ) {
+        Json.obj(
+          "uci" -> uci,
+          "san" -> uci
+        )
+      }
+    override def moveBy = Some(actor)
+  }
+  object Offer10 {
+    def apply(offer10: StratOffer10, situation: Situation, state: State, clock: Option[ClockEvent]): Offer10 =
+      Offer10(
+        gf = situation.board.variant.gameFamily,
+        uci = offer10.toUci.uci,
+        actor = offer10.player,
+        fen = Forsyth.>>(situation.board.variant.gameLogic, situation).value,
+        takebackable = situation.takebackable,
+        state = state,
+        clock = clock,
+        possibleDrops = situation.drops,
+        possibleDropsByRole = situation.dropsByRole
+      )
   }
 
   case class CubeAction(
@@ -1599,6 +1655,7 @@ object Event {
       winner: Option[PlayerIndex],
       p1OffersDraw: Boolean,
       p2OffersDraw: Boolean,
+      drawOfferAllowed: Boolean,
       p1OffersSelectSquares: Boolean,
       p2OffersSelectSquares: Boolean
   ) extends Event {
@@ -1614,6 +1671,7 @@ object Event {
         .add("winner" -> winner)
         .add("wDraw" -> p1OffersDraw)
         .add("bDraw" -> p2OffersDraw)
+        .add("drawOfferAllowed" -> drawOfferAllowed)
         .add("wSelectSquares" -> p1OffersSelectSquares)
         .add("bSelectSquares" -> p2OffersSelectSquares)
   }

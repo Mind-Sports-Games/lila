@@ -30,7 +30,7 @@ export const ids = {
   resignMatch: 51,
   lineOfFive: 52,
   tenCaptures: 53,
-  forbiddenMove: 54,
+  forbiddenAction: 54,
   variantEnd: 60,
 };
 

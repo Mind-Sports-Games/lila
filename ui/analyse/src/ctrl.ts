@@ -665,21 +665,6 @@ export default class AnalyseCtrl {
     this.redraw();
   };
 
-  // renju: white keeps one of black's offered stones as the fifth
-  sendPick = (key: Key): void => {
-    const pick = {
-      variant: this.data.game.variant.key,
-      lib: this.data.game.variant.lib,
-      fen: this.node.fen,
-      path: this.path,
-      sq: key,
-    };
-    if (this.practice) this.practice.onUserMove();
-    this.controlConfig.onUserAction?.();
-    this.socket.sendAnaPick(pick);
-    this.redraw();
-  };
-
   sendDrawCounter = (role: CgRole): void => {
     const drawCounter: AnaDrawCounter = {
       role,

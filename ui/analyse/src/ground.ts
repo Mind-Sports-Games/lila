@@ -83,7 +83,6 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     events: {
       move: ctrl.userMove,
       dropNewPiece: ctrl.userNewPiece,
-      select: hooks.onSelect,
       selectDice: hooks.onSelectDice,
       buttonClick: hooks.onButtonClick,
       insert(elements: cg.Elements) {

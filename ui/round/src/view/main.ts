@@ -38,6 +38,7 @@ function renderMaterial(
 }
 
 function renderPlayerScore(
+  ctrl: RoundController,
   score: number,
   position: Position,
   playerIndex: string,
@@ -78,7 +79,7 @@ function renderPlayerScore(
       'div.game-score.game-score-' + position + '.' + playerIndex + capturesClass,
       {
         attrs: {
-          title: captures ? 'Captures' : 'Score',
+          title: ctrl.noarg(captures ? 'captures' : 'score'),
         },
       },
       children,
@@ -89,7 +90,7 @@ function renderPlayerScore(
     children.push(h(`piece.${stone}.${playerIndex}`, { attrs: { 'data-score': score } }));
     return h(
       'div.game-score.game-score-' + position + '.' + playerIndex + '.captures',
-      { attrs: { title: 'Captures' } },
+      { attrs: { title: ctrl.noarg('captures') } },
       children,
     );
   } else if (variantKey === 'backgammon' || variantKey === 'hyper' || variantKey === 'nackgammon') {
@@ -337,14 +338,16 @@ export function main(ctrl: RoundController): VNode {
             },
             [renderGround(ctrl), promotion.view(ctrl)],
           ),
-          showScoreBox ? renderPlayerScore(topScore, 'top', topPlayerIndex, variantKey, captures, fen) : null,
+          showScoreBox ? renderPlayerScore(ctrl, topScore, 'top', topPlayerIndex, variantKey, captures, fen) : null,
           showScoreBox ? renderPlayerScoreNames(ctrl.data.player, ctrl.data.opponent, topPlayerIndex) : null,
           crazyView(ctrl, topPlayerIndex, 'top') ||
             renderMaterial(material[topPlayerIndex], -score, 'top', d.hasGameScore, checks[topPlayerIndex]),
           ...renderTable(ctrl),
           crazyView(ctrl, bottomPlayerIndex, 'bottom') ||
             renderMaterial(material[bottomPlayerIndex], score, 'bottom', d.hasGameScore, checks[bottomPlayerIndex]),
-          showScoreBox ? renderPlayerScore(bottomScore, 'bottom', bottomPlayerIndex, variantKey, captures, fen) : null,
+          showScoreBox
+            ? renderPlayerScore(ctrl, bottomScore, 'bottom', bottomPlayerIndex, variantKey, captures, fen)
+            : null,
           ctrl.bgAnalysis.view(),
           ctrl.keyboardMove ? keyboardMove(ctrl.keyboardMove) : null,
         ],

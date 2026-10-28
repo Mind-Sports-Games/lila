@@ -77,7 +77,7 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
       case (_, Some(l), CubeDropped, _)                => s"${playerText(l)} dropped the cube"
       case (Some(w), _, LineOfFive, _)                 => s"${playerText(w)} won with five in a row"
       case (Some(w), _, TenCaptures, _)                => s"${playerText(w)} won by capturing ten stones"
-      case (_, Some(l), ForbiddenMove, _)              => s"${playerText(l)} lost by a forbidden move"
+      case (_, Some(l), ForbiddenAction, _)            => s"${playerText(l)} lost by a forbidden move"
       case (Some(w), _, RuleOfGin, _)                  => s"${playerText(w)} won by rule of gin"
       case (Some(w), _, GinGammon, _)                  => s"${playerText(w)} won a gammon by rule of gin"
       case (Some(w), _, GinBackgammon, _)              => s"${playerText(w)} won a backgammon by rule of gin"
@@ -246,10 +246,10 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
           case Some(p) if p.playerIndex.p1 => trans.playerIndexCapturedTenStones(game.playerTrans(P1))
           case _                           => trans.playerIndexCapturedTenStones(game.playerTrans(P2))
         }
-      case S.ForbiddenMove =>
+      case S.ForbiddenAction =>
         game.loser match {
-          case Some(p) if p.playerIndex.p1 => trans.playerIndexMadeAForbiddenMove(game.playerTrans(P1))
-          case _                           => trans.playerIndexMadeAForbiddenMove(game.playerTrans(P2))
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexMadeAForbiddenAction(game.playerTrans(P1))
+          case _                           => trans.playerIndexMadeAForbiddenAction(game.playerTrans(P2))
         }
       case S.UnknownFinish => trans.finished.txt()
       case S.Stalemate     => trans.stalemate.txt()

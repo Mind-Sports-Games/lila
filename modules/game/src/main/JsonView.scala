@@ -60,6 +60,7 @@ final class JsonView(rematches: Rematches) {
       .add("check" -> game.situation.checkSquare.map(_.key))
       .add("rematch" -> rematches.of(game.id))
       .add("canOfferDraw" -> game.variant.canOfferDraw)
+      .add("drawOfferAllowed" -> game.stratGame.drawOfferAllowed)
       .add("drawOffers" -> (!game.drawOffers.isEmpty).option(game.drawOffers.normalizedTurns))
       .add(
         "canDoPassAction" -> (game.situation.passes.size > 0 || game.variant.gameLogic == GameLogic.Entropy())

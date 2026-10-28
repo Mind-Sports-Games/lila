@@ -42,12 +42,6 @@ export interface SocketPass {
   variant: string;
   b?: 1;
 }
-export interface SocketSelectSquares {
-  variant: string;
-  lib: number;
-  sq: string;
-  b?: 1;
-}
 export interface SocketDoRoll {
   variant: string;
   b?: 1;
@@ -192,6 +186,7 @@ export interface ApiAction extends Step {
   takebackable: boolean;
   wDraw: boolean;
   bDraw: boolean;
+  drawOfferAllowed?: boolean;
   crazyhouse?: CrazyData;
   role?: cg.Role;
   drops?: string;

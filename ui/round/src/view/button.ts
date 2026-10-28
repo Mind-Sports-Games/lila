@@ -345,7 +345,7 @@ export function gameMessage(ctrl: RoundController) {
       return null; //other messages only for current player in xiangqi/minixiangqi
     }
   }
-  // renju's forbidden move warning is for black, about to drop
+  // renju's forbidden action warning is for black, about to drop
   if (stratUtils.fiveInARow.isFiveInARow(ctrl.data.game.variant.key) && !game.isPlayerTurn(ctrl.data)) return null;
   return ctrl.data.game.gameMessage
     ? h('div.suggestion', [
@@ -368,15 +368,14 @@ export function cancelDrawOffer(ctrl: RoundController) {
 export function swapOptions(ctrl: RoundController) {
   if (!stratUtils.fiveInARow.isFiveInARow(ctrl.data.game.variant.key)) return null;
   const fen = round.lastStep(ctrl.data).fen;
-  if (ctrl.canPick()) return pickOptions(ctrl);
-  if (ctrl.isPlaying() && game.isPlayerTurn(ctrl.data) && stratUtils.fiveInARow.offering(fen))
-    return openingBox(
-      `Place ${stratUtils.fiveInARow.stonesStillToOffer(fen)} more stones for White to pick a fifth from.`,
-    );
+  if (ctrl.isPlaying() && game.isPlayerTurn(ctrl.data) && stratUtils.fiveInARow.offering(fen)) {
+    const left = stratUtils.fiveInARow.stonesStillToOffer(fen);
+    return openingBox(ctrl.trans.plural('placeNbMoreStonesForWhiteToChooseFrom', left));
+  }
   const canSwap = ctrl.canSwap('swap'),
     canSwap2 = ctrl.canSwap('swap2'),
     canOffer10 = ctrl.canSwap('offer10');
-  const colour = stoneName(stratUtils.fiveInARow.nextStone(fen));
+  const colour = stoneName(ctrl, stratUtils.fiveInARow.nextStone(fen));
   if (!canSwap && !canSwap2 && !canOffer10) {
     const guide =
       ctrl.isPlaying() && !ctrl.replaying() && game.isPlayerTurn(ctrl.data) && openingGuide(ctrl, fen, colour);
@@ -384,22 +383,21 @@ export function swapOptions(ctrl: RoundController) {
   }
   const zone = stratUtils.fiveInARow.placementZone(fen);
   const placing =
-    zone !== undefined
-      ? `Place the ${ordinals[zone]} stone, ${colour}, inside the dotted ${zoneSize(zone)} square`
-      : `Place a stone to play on as ${colour}`;
+    zone !== undefined ? ctrl.trans(placeInZone[zone], colour) : ctrl.trans('placeAStoneToPlayOnAsX', colour);
   const choice = (action: stratUtils.fiveInARow.OpeningAction, label: string) =>
-    h('button.button', { key: action, hook: util.bind('click', () => ctrl.sendSwap(action)) }, label);
-  const others = [
-    canSwap ? 'swap colours' : null,
-    canSwap2 ? 'swap colours and place 2 stones' : null,
-    canOffer10 ? 'offer 10 fifth stones for White to pick from' : null,
-  ].filter(o => o !== null);
-  const choices = others.length > 1 ? `${others.slice(0, -1).join(', ')}, or ${others[others.length - 1]}` : others[0];
+    h('button.button', { key: action, hook: util.bind('click', () => ctrl.sendSwap(action)) }, ctrl.noarg(label));
+  const alternatives = canOffer10
+    ? canSwap
+      ? 'alternativelySwapColoursOrOfferTen'
+      : 'alternativelyOfferTen'
+    : canSwap2
+      ? 'alternativelySwapColoursOrSwapTwo'
+      : 'alternativelySwapColours';
   return openingBox(
-    `${currentColour(ctrl, fen)} ${placing}${swapToFollow(fen)}. Alternatively, ${choices}.`,
-    canSwap ? choice('swap', 'Swap') : null,
-    canSwap2 ? choice('swap2', 'Swap 2') : null,
-    canOffer10 ? choice('offer10', 'Offer 10') : null,
+    [currentColour(ctrl, fen), placing, swapToFollow(ctrl, fen), ctrl.noarg(alternatives)].filter(Boolean).join(' '),
+    canSwap ? choice('swap', 'swap') : null,
+    canSwap2 ? choice('swap2', 'swapTwo') : null,
+    canOffer10 ? choice('offer10', 'offerTen') : null,
   );
 }
 
@@ -407,24 +405,28 @@ export function swapOptions(ctrl: RoundController) {
 const openingBox = (text: string, ...buttons: MaybeVNodes) =>
   h('div.suggestion.swap-options', [h('p', { attrs: { 'data-icon': '\ue005' } }, text), ...buttons]);
 
-const ordinals = ['first', 'second', 'third', 'fourth', 'fifth'];
+// indexed by placement zone; zone n is the dotted (2n+1)×(2n+1) square
+const placeInZone = [
+  'placeTheFirstStoneOnTheCentrePoint',
+  'placeTheSecondStoneInsideTheDottedSquare',
+  'placeTheThirdStoneInsideTheDottedSquare',
+  'placeTheFourthStoneInsideTheDottedSquare',
+  'placeTheFifthStoneInsideTheDottedSquare',
+];
 
-const counts = ['no', 'one', 'two', 'three'];
-
-const zoneSize = (zone: number): string => `${2 * zone + 1}×${2 * zone + 1}`;
-
-const stoneName = (stone: string): string => (stone === 'b-piece' ? 'Black' : 'White');
+const stoneName = (ctrl: RoundController, stone: string): string => ctrl.noarg(stone === 'b-piece' ? 'black' : 'white');
 
 const currentColour = (ctrl: RoundController, fen: string): string =>
-  `You are currently ${stratUtils.fiveInARow.seatColor(fen, ctrl.data.player.playerIndex) === 'black' ? 'Black' : 'White'}.`;
+  ctrl.trans('youAreCurrentlyX', ctrl.noarg(stratUtils.fiveInARow.seatColor(fen, ctrl.data.player.playerIndex)));
 
-const swapToFollow = (fen: string): string =>
-  stratUtils.fiveInARow.swapFollowsDrop(fen) ? ', and the opponent will have the opportunity to swap' : '';
+const swapToFollow = (ctrl: RoundController, fen: string): string =>
+  stratUtils.fiveInARow.swapFollowsDrop(fen) ? ctrl.noarg('yourOpponentCanThenSwap') : '';
 
 // the stones still to place, alternating from the next one, e.g. "White, then Black"
-function stoneSequence(first: string, count: number): string {
-  const stones = Array.from({ length: count }, (_, i) => (i % 2 === 0 ? first : first === 'Black' ? 'White' : 'Black'));
-  return stones.length > 1 ? `${stones.slice(0, -1).join(', ')}, then ${stones[stones.length - 1]}` : stones[0];
+function stoneSequence(ctrl: RoundController, first: string, count: number): string {
+  const other = first === ctrl.noarg('black') ? ctrl.noarg('white') : ctrl.noarg('black');
+  const stones = Array.from({ length: count }, (_, i) => (i % 2 === 0 ? first : other));
+  return stones.reduce((sequence, stone) => ctrl.trans('xThenY', sequence, stone));
 }
 
 // what the opening asks of the player to move when there is no choice to make
@@ -433,34 +435,19 @@ function openingGuide(ctrl: RoundController, fen: string, colour: string): strin
   if (step === 'o' || step === 's') {
     const placed = stratUtils.fiveInARow.stonesOnBoard(fen),
       left = (step === 'o' ? 3 : 5) - placed;
-    return `Place ${counts[left]} ${placed ? 'more ' : ''}stone${left > 1 ? 's' : ''}: ${stoneSequence(colour, left)}. Your opponent then chooses which colour to play.`;
+    return ctrl.trans.plural(
+      placed ? 'placeNbMoreStonesThenOpponentChoosesColour' : 'placeNbStonesThenOpponentChoosesColour',
+      left,
+      stoneSequence(ctrl, colour, left),
+    );
   }
+  if (stratUtils.fiveInARow.awaitsOfferedDrop(fen))
+    return `${currentColour(ctrl, fen)} ${ctrl.noarg('placeBlacksFifthStoneOnAnOfferedStone')}`;
   const zone = stratUtils.fiveInARow.placementZone(fen);
   if (zone === undefined) return undefined;
-  const placing =
-    zone === 0
-      ? 'Place the first stone, Black, on the centre point'
-      : `Place the ${ordinals[zone]} stone, ${colour}, inside the dotted ${zoneSize(zone)} square`;
-  return `${currentColour(ctrl, fen)} ${placing}${swapToFollow(fen)}.`;
-}
-
-// renju: white keeps one of black's offered stones as the fifth, then places the sixth
-function pickOptions(ctrl: RoundController) {
-  const picked = ctrl.pickedStone(),
-    fen = round.lastStep(ctrl.data).fen;
-  return openingBox(
-    `${currentColour(ctrl, fen)} Select one of the offered stones to keep as Black's fifth, then place the sixth stone.`,
-    h(
-      'button.button',
-      {
-        key: 'pick',
-        class: { disabled: !picked },
-        attrs: { disabled: !picked },
-        hook: util.bind('click', () => ctrl.sendPick()),
-      },
-      picked ? `Keep ${picked}` : 'Keep',
-    ),
-  );
+  return [currentColour(ctrl, fen), ctrl.trans(placeInZone[zone], colour), swapToFollow(ctrl, fen)]
+    .filter(Boolean)
+    .join(' ');
 }
 
 export function answerOpponentDrawOffer(ctrl: RoundController) {

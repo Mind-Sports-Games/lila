@@ -513,8 +513,7 @@ final class JsonView(
             ||
               pov.opponent.isOfferingSelectSquares
         ) && !pov.game.deadStoneOfferState.map(_.is(DeadStoneOfferState.RejectedOffer)).contains(true)
-      case Situation.FiveInARow(s) => s.canSelectSquares && pov.game.turnOf(pov.player)
-      case _                       => false
+      case _ => false
     }
 
   // draughts and dameo

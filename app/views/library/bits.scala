@@ -111,8 +111,8 @@ object bits {
       others: List[(String, String)] = Nil
   ) = Some(MsoEvent(gameCode, Some(code), worldChampionship, study, others))
 
-  // games the MSO has not run an online tournament for yet: their page links no online tournaments
-  private val noMsoOnline = Set("entropy", "pente", "renju")
+  // games the MSO has not run an online tournament for yet but are in msoEvent: their page links no online tournaments
+  private val noMsoOnline = Set("entropy", "gomoku")
 
   def hasMsoOnline(variant: Variant): Boolean = !noMsoOnline(variant.key)
 

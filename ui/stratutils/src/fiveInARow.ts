@@ -40,7 +40,7 @@ export function placementZone(fen: string): number | undefined {
 export const swapFollowsDrop = (fen: string): boolean => placementZone(fen) !== undefined;
 
 // one seat drops both colours while the opening and the swap2 pair are being placed, and in renju white
-// picks one of the offered stones before black's fifth is on the board
+// drops black's fifth on one of the offered stones
 export function seatToMove(fen: string): CGPlayerIndex {
   const step = openingStep(fen);
   if (step === 'o') return 'p1';
@@ -81,12 +81,12 @@ export function offering(fen: string): boolean {
   return openingStep(fen) === 'x';
 }
 
-// an offered stone is a lowercase b, beside the board until white picks one
+// an offered stone is a lowercase b, beside the board until white makes the offered drop
 export function stonesStillToOffer(fen: string): number {
   return 10 - (field(fen, 0)?.match(/b/g) ?? []).length;
 }
 
-export function canPick(fen: string): boolean {
+export function awaitsOfferedDrop(fen: string): boolean {
   return openingStep(fen) === 'k';
 }
 

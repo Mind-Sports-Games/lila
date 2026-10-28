@@ -13,7 +13,7 @@ importers:
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/e391b56a82b7c71e7663082a797f6fc21b18776d
       chessground:
         specifier: github:Mind-Sports-Games/chessground#pla-1216-add-gomoku-lila-supporting-repos
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/280afe82b22cf88c909304f30e283e606d709ac8
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6f38819e73a1cfa8ca12b3e6520e808c442ade6b
       stratops:
         specifier: github:Mind-Sports-Games/stratops#pla-1216-add-gomoku-lila-supporting-repos
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/dd342c2227a203a3820c2fa758a19cd74e5df8f2
@@ -140,16 +140,16 @@ importers:
     dependencies:
       chart.js:
         specifier: ^4.4.8
-        version: 4.5.1
+        version: 4.6.1
       chartjs-adapter-dayjs-4:
         specifier: ^1.0.4
-        version: 1.0.4(chart.js@4.5.1)(dayjs@1.11.23)
+        version: 1.0.4(chart.js@4.6.1)(dayjs@1.11.23)
       chartjs-plugin-datalabels:
         specifier: ^2.2.0
-        version: 2.2.0(chart.js@4.5.1)
+        version: 2.2.0(chart.js@4.6.1)
       chartjs-plugin-zoom:
         specifier: ^2.2.0
-        version: 2.2.0(chart.js@4.5.1)
+        version: 2.2.0(chart.js@4.6.1)
       common:
         specifier: workspace:*
         version: link:../common
@@ -365,7 +365,7 @@ importers:
         version: link:../chart
       chart.js:
         specifier: ^4.4.8
-        version: 4.5.1
+        version: 4.6.1
       common:
         specifier: workspace:*
         version: link:../common
@@ -840,8 +840,8 @@ packages:
     resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
-  chart.js@4.5.1:
-    resolution: {integrity: sha512-GIjfiT9dbmHRiYi6Nl2yFCq7kkwdkp1W/lp2J99rX0yo9tgJGn3lKQATztIjb5tVtevcBtIdICNWqlq5+E8/Pw==}
+  chart.js@4.6.1:
+    resolution: {integrity: sha512-hJyniucsFmq//EvXYvJ6c6mahPoI3kaxdjVH8awTaJ/fDNWeSqqqArixMJWkWNN6fcYvPU3HneSANFNYtRi61g==}
     engines: {pnpm: '>=8'}
 
   chartjs-adapter-dayjs-4@1.0.4:
@@ -865,8 +865,8 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/280afe82b22cf88c909304f30e283e606d709ac8:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/280afe82b22cf88c909304f30e283e606d709ac8}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6f38819e73a1cfa8ca12b3e6520e808c442ade6b:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6f38819e73a1cfa8ca12b3e6520e808c442ade6b}
     version: 7.11.1-pstrat3.41
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1788,28 +1788,28 @@ snapshots:
 
   chalk@5.6.2: {}
 
-  chart.js@4.5.1:
+  chart.js@4.6.1:
     dependencies:
       '@kurkle/color': 0.3.4
 
-  chartjs-adapter-dayjs-4@1.0.4(chart.js@4.5.1)(dayjs@1.11.23):
+  chartjs-adapter-dayjs-4@1.0.4(chart.js@4.6.1)(dayjs@1.11.23):
     dependencies:
-      chart.js: 4.5.1
+      chart.js: 4.6.1
       dayjs: 1.11.23
 
-  chartjs-plugin-datalabels@2.2.0(chart.js@4.5.1):
+  chartjs-plugin-datalabels@2.2.0(chart.js@4.6.1):
     dependencies:
-      chart.js: 4.5.1
+      chart.js: 4.6.1
 
-  chartjs-plugin-zoom@2.2.0(chart.js@4.5.1):
+  chartjs-plugin-zoom@2.2.0(chart.js@4.6.1):
     dependencies:
       '@types/hammerjs': 2.0.46
-      chart.js: 4.5.1
+      chart.js: 4.6.1
       hammerjs: 2.0.8
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/280afe82b22cf88c909304f30e283e606d709ac8: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6f38819e73a1cfa8ca12b3e6520e808c442ade6b: {}
 
   chokidar@3.6.0:
     dependencies:

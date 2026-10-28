@@ -231,7 +231,7 @@ final class PgnDump(
                 case RuleOfGin | GinGammon | GinBackgammon                       => "Rule of Gin"
                 case Resign | ResignMatch | ResignGammon | ResignBackgammon | CubeDropped | Draw | Stalemate |
                     Mate | PerpetualCheck | VariantEnd | SingleWin | GammonWin | BackgammonWin | LineOfFive |
-                    TenCaptures | ForbiddenMove =>
+                    TenCaptures | ForbiddenAction =>
                   "Normal"
                 case Cheat         => "Rules infraction"
                 case UnknownFinish => "Unknown"
