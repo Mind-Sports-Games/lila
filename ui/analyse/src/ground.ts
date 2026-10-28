@@ -145,7 +145,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
                             ? 'https://playstrategy.org/assets/piece/entropy/' +
                               d.pref.pieceSet.filter(ps => ps.gameFamily === 'entropy')[0].name +
                               '/'
-                            : cgVariantKey === 'gomoku' || cgVariantKey === 'pente' || cgVariantKey === 'renju'
+                            : stratUtils.fiveInARow.isFiveInARow(cgVariantKey)
                               ? 'https://playstrategy.org/assets/piece/fiveinarow/' +
                                 d.pref.pieceSet.filter(ps => ps.gameFamily === 'fiveinarow')[0].name +
                                 '/'

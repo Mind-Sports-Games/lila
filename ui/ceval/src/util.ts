@@ -1,3 +1,5 @@
+import { fiveInARow } from 'stratutils';
+
 const noPathVizualizationVariants: VariantKey[] = [
   'shogi',
   'minishogi',
@@ -62,9 +64,7 @@ const noPracticeWithComputerVariants: VariantKey[] = [
   'abalone',
   'grandabalone',
   'entropy',
-  'gomoku',
-  'pente',
-  'renju',
+  ...fiveInARow.variants,
 ];
 
 export function isEvalBetter(a: Tree.ClientEval, b?: Tree.ClientEval): boolean {

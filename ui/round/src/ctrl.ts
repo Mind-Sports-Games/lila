@@ -782,10 +782,14 @@ export default class RoundController {
       if (d.game.variant.key === 'entropy' && o.uci.startsWith('draw')) {
         this.chessground.set({ fen: o.fen });
       }
-      // ensure player colours are correct
+      // only draw from fen when necessary
       if (stratUtils.fiveInARow.isFiveInARow(d.game.variant.key)) {
-        this.chessground.set({ fen: o.fen });
-        this.syncFiveInARowPlayerColors(o.fen);
+        if (stratUtils.fiveInARow.isOpeningAction(o.uci)) {
+          this.chessground.set({ fen: o.fen });
+          this.syncFiveInARowPlayerColors(o.fen);
+        } else if (this.chessground.getFen() !== o.fen.split(' ')[0]) {
+          this.chessground.set({ fen: o.fen });
+        }
       }
       if (d.onlyDropsVariant) {
         this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state, o.fen);
@@ -815,7 +819,7 @@ export default class RoundController {
         },
       });
       if (o.check) sound.check();
-      if (o.uci === 'pass' || o.uci === 'swap' || o.uci === 'swap2' || o.uci === 'offer10') sound.move();
+      if (o.uci === 'pass' || stratUtils.fiveInARow.isOpeningAction(o.uci)) sound.move();
       blur.onMove();
       playstrategy.pubsub.emit('ply', this.ply);
 
@@ -1335,7 +1339,7 @@ export default class RoundController {
     const data = {
       variant: this.data.game.variant.key,
       lib: this.data.game.variant.lib,
-      s: squares.join(','),
+      sq: squares.join(','),
     };
     this.socket.sendLoading('select-squares-offer', data);
   };

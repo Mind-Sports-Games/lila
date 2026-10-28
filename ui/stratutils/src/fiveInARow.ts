@@ -54,7 +54,11 @@ export function dropPiece(fen: string, playerIndex: CGPlayerIndex): CGPiece {
 }
 
 // the actions besides a drop that the opening offers
-export type OpeningAction = 'swap' | 'swap2' | 'offer10';
+export const openingActions = ['swap', 'swap2', 'offer10'] as const;
+export type OpeningAction = (typeof openingActions)[number];
+
+export const isOpeningAction = (uci: string): uci is OpeningAction =>
+  (openingActions as readonly string[]).includes(uci);
 
 export function offers(action: OpeningAction, fen: string): boolean {
   if (action === 'swap') return canSwap(fen);

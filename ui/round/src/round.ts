@@ -6,6 +6,7 @@ import RoundController from './ctrl';
 import { RoundData, RoundOpts, Step } from './interfaces';
 import MoveOn from './moveOn';
 import { main as view } from './view/main';
+import { fiveInARow } from 'stratutils';
 
 export interface RoundApi {
   socketReceive(typ: string, data: any): boolean;
@@ -57,7 +58,7 @@ export const massage = (d: RoundData): void => {
   if (d.correspondence) d.correspondence.showBar = d.pref.clockBar;
 
   if (
-    ['horde', 'monster', 'crazyhouse', 'shogi', 'minishogi', 'amazons', 'gomoku', 'pente', 'renju'].includes(
+    ['horde', 'monster', 'crazyhouse', 'shogi', 'minishogi', 'amazons', ...fiveInARow.variants].includes(
       d.game.variant.key,
     )
   )

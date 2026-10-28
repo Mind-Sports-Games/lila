@@ -656,9 +656,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'abalone',
     'grandabalone',
     'entropy',
-    'gomoku',
-    'pente',
-    'renju',
+    ...fiveInARow.variants,
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

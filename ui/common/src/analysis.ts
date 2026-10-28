@@ -1,3 +1,5 @@
+import { fiveInARow } from 'stratutils';
+
 // need to support multi action games in analysis
 const noAnalysisBoardVariants: string[] = [
   'antidraughts',
@@ -25,9 +27,7 @@ const noGameBookVariants: string[] = [
   'backgammon',
   'hyper',
   'nackgammon',
-  'gomoku',
-  'pente',
-  'renju',
+  ...fiveInARow.variants,
 ];
 
 // Means that the interactive lesson (gamebook) in studies on playstrategy will work.

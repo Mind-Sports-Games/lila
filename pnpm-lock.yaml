@@ -16,7 +16,7 @@ importers:
         version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6f38819e73a1cfa8ca12b3e6520e808c442ade6b
       stratops:
         specifier: github:Mind-Sports-Games/stratops#pla-1216-add-gomoku-lila-supporting-repos
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/dd342c2227a203a3820c2fa758a19cd74e5df8f2
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5df1015c44e92f97585ba26befcef72cc9671ce9
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -1423,8 +1423,8 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/dd342c2227a203a3820c2fa758a19cd74e5df8f2:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/dd342c2227a203a3820c2fa758a19cd74e5df8f2}
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5df1015c44e92f97585ba26befcef72cc9671ce9:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5df1015c44e92f97585ba26befcef72cc9671ce9}
     version: 0.8.1-pstrat5.34
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -2350,7 +2350,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/dd342c2227a203a3820c2fa758a19cd74e5df8f2:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5df1015c44e92f97585ba26befcef72cc9671ce9:
     dependencies:
       '@badrap/result': 0.2.13
 

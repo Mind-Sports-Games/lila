@@ -17,7 +17,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     !ctrl.outcome() && fiveInARow.offers(action, ctrl.node.fen);
 
   ctrl.controlConfig.handleControlAction = action => {
-    if (action !== 'swap' && action !== 'swap2' && action !== 'offer10') return false;
+    if (!fiveInARow.isOpeningAction(action)) return false;
     if (offered(action)) ctrl.sendSwap(action);
     return true;
   };

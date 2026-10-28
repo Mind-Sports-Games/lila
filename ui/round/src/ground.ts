@@ -120,9 +120,7 @@ export function makeConfig(ctrl: RoundController): Config {
         'go9x9',
         'go13x13',
         'go19x19',
-        'gomoku',
-        'pente',
-        'renju',
+        ...stratUtils.fiveInARow.variants,
         'backgammon',
         'hyper',
         'nackgammon',
@@ -186,7 +184,7 @@ export function makeConfig(ctrl: RoundController): Config {
                           ? 'https://playstrategy.org/assets/piece/entropy/' +
                             data.pref.pieceSet.filter(ps => ps.gameFamily === 'entropy')[0].name +
                             '/'
-                          : variantKey === 'gomoku' || variantKey === 'pente' || variantKey === 'renju'
+                          : stratUtils.fiveInARow.isFiveInARow(variantKey)
                             ? 'https://playstrategy.org/assets/piece/fiveinarow/' +
                               data.pref.pieceSet.filter(ps => ps.gameFamily === 'fiveinarow')[0].name +
                               '/'

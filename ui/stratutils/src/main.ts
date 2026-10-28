@@ -11,7 +11,13 @@ export * as dameo from './dameo';
 export * as backgammon from './backgammon';
 export * as entropy from './entropy';
 export * as fiveInARow from './fiveInARow';
-import { isFiveInARow, dropPiece as fiveInARowDropPiece, seatToMove as fiveInARowSeatToMove } from './fiveInARow';
+import {
+  isFiveInARow,
+  isOpeningAction as isFiveInARowOpeningAction,
+  variants as fiveInARowVariants,
+  dropPiece as fiveInARowDropPiece,
+  seatToMove as fiveInARowSeatToMove,
+} from './fiveInARow';
 
 export const initialFen: Fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
@@ -84,9 +90,7 @@ export const uci2move = (uci: string): cg.Key[] | undefined => {
     uci == 'roll' ||
     uci == 'endturn' ||
     uci == 'undo' ||
-    uci == 'swap' ||
-    uci == 'swap2' ||
-    uci == 'offer10' ||
+    isFiveInARowOpeningAction(uci) ||
     uci.startsWith('draw') ||
     uci.includes('/') ||
     uci.substring(0, 3) == 'ss:' ||
@@ -123,7 +127,7 @@ export function displayScore(variant: VariantKey, fen: string, playerIndex: stri
 
 // Works for all games including those with multi-digit ranks (e.g. Xiangqi "e9e10", Grand Abalone "k10h8").
 export function parseLastMove(lm: string): Key[] | undefined {
-  if (!lm || lm === 'pass' || lm === 'swap' || lm === 'swap2' || lm === 'offer10') return undefined;
+  if (!lm || lm === 'pass' || isFiveInARowOpeningAction(lm)) return undefined;
   if (lm[1] === '@') return [lm.slice(2) as Key];
   return (lm.match(/[a-z]\d+/g) as Key[] | null) ?? undefined;
 }
@@ -193,9 +197,7 @@ const noFishnetVariants: VariantKey[] = [
   'abalone',
   'grandabalone',
   'entropy',
-  'gomoku',
-  'pente',
-  'renju',
+  ...fiveInARowVariants,
 ];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;
