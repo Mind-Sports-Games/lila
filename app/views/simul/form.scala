@@ -131,7 +131,7 @@ object form {
                     label(
                       cls      := "text variants__family-name",
                       `for`    := inputId,
-                      dataIcon := g.variants.headOption.fold("")(_.perfIcon.toString)
+                      dataIcon := gameGroupIcon(g)
                     )(VariantKeys.gameGroupName(g), span(cls := "variants__count"))
                   )
                 case _ => emptyFrag

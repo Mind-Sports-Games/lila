@@ -230,7 +230,8 @@ final class PgnDump(
                 case Timeout | Outoftime | OutoftimeGammon | OutoftimeBackgammon => "Time forfeit"
                 case RuleOfGin | GinGammon | GinBackgammon                       => "Rule of Gin"
                 case Resign | ResignMatch | ResignGammon | ResignBackgammon | CubeDropped | Draw | Stalemate |
-                    Mate | PerpetualCheck | VariantEnd | SingleWin | GammonWin | BackgammonWin =>
+                    Mate | PerpetualCheck | VariantEnd | SingleWin | GammonWin | BackgammonWin | LineOfFive |
+                    TenCaptures | ForbiddenAction =>
                   "Normal"
                 case Cheat         => "Rules infraction"
                 case UnknownFinish => "Unknown"

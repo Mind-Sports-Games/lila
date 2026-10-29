@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.Tags
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.Variant
-import strategygames.{ GameLogic, Player as PlayerIndex, PocketData }
+import strategygames.{ GameLogic, Player as PlayerIndex }
 import strategygames.chess.variant.Variant as ChessVariant
 import lila.chat.{ Chat, ChatApi }
 import lila.game.{ Game, Namer }
@@ -111,7 +111,7 @@ final private class ChapterMaker(
           fen = variant.initialFen,
           check = false,
           clock = none,
-          pocketData = variant.dropsVariant.option(PocketData.init(variant.gameLogic)),
+          pocketData = Node.initialPocketData(variant),
           children = Node.emptyChildren
         ) -> false
     }) match {

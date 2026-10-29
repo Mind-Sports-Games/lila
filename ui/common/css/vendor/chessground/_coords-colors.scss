@@ -24,6 +24,8 @@
 
   --cg-coord-color-entropy: #fff;
   --cg-coord-shadow-entropy: 0 1px 2px #000;
+
+  --cg-coord-color-fiveinarow: #fff;
 }
 
 coords {
@@ -218,6 +220,18 @@ coords {
       coord {
         text-shadow: var(--cg-coord-shadow-entropy);
         color: var(--cg-coord-color-entropy);
+      }
+    }
+  }
+}
+.variant-gomoku,
+.variant-pente,
+.variant-renju {
+  cg-coords-container {
+    coords.ranks,
+    coords.files {
+      coord:nth-child(n) {
+        color: var(--cg-coord-color-fiveinarow);
       }
     }
   }

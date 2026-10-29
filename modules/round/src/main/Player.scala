@@ -16,6 +16,9 @@ import strategygames.{
   MoveMetrics,
   Pass as StratPass,
   SelectSquares as StratSelectSquares,
+  Offer10 as StratOffer10,
+  Swap as StratSwap,
+  Swap2 as StratSwap2,
   Status,
   Undo as StratUndo
 }
@@ -220,6 +223,9 @@ final private class Player(
         case ca: StratCubeAction    => ca.toUci.uci
         case u: StratUndo           => u.toUci.uci
         case ss: StratSelectSquares => ss.toUci.uci
+        case sw: StratSwap          => sw.toUci.uci
+        case sw2: StratSwap2        => sw2.toUci.uci
+        case o: StratOffer10        => o.toUci.uci
       }
     )
 
@@ -253,13 +259,16 @@ final private class Player(
 
   private def moveFinish(game: Game)(implicit proxy: GameProxy): Fu[Events] =
     game.status match {
-      case Status.Mate           => finisher.other(game, _.Mate, game.situation.winner)
-      case Status.PerpetualCheck => finisher.other(game, _.PerpetualCheck, game.situation.winner)
-      case Status.VariantEnd     => finisher.other(game, _.VariantEnd, game.situation.winner)
-      case Status.SingleWin      => finisher.other(game, _.SingleWin, game.situation.winner)
-      case Status.GammonWin      => finisher.other(game, _.GammonWin, game.situation.winner)
-      case Status.BackgammonWin  => finisher.other(game, _.BackgammonWin, game.situation.winner)
-      case Status.CubeDropped    => finisher.other(game, _.CubeDropped, game.situation.winner)
+      case Status.Mate            => finisher.other(game, _.Mate, game.situation.winner)
+      case Status.PerpetualCheck  => finisher.other(game, _.PerpetualCheck, game.situation.winner)
+      case Status.VariantEnd      => finisher.other(game, _.VariantEnd, game.situation.winner)
+      case Status.SingleWin       => finisher.other(game, _.SingleWin, game.situation.winner)
+      case Status.GammonWin       => finisher.other(game, _.GammonWin, game.situation.winner)
+      case Status.BackgammonWin   => finisher.other(game, _.BackgammonWin, game.situation.winner)
+      case Status.CubeDropped     => finisher.other(game, _.CubeDropped, game.situation.winner)
+      case Status.LineOfFive      => finisher.other(game, _.LineOfFive, game.situation.winner)
+      case Status.TenCaptures     => finisher.other(game, _.TenCaptures, game.situation.winner)
+      case Status.ForbiddenAction => finisher.other(game, _.ForbiddenAction, game.situation.winner)
       case Status.Stalemate if !game.variant.stalemateIsDraw =>
         finisher.other(game, _.Stalemate, game.situation.winner)
       case status @ (Status.Stalemate | Status.Draw) => finisher.other(game, _ => status, None)

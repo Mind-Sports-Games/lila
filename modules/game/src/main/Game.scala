@@ -34,6 +34,9 @@ import strategygames.{
   Situation,
   Speed,
   Status,
+  Offer10,
+  Swap,
+  Swap2,
   Undo
 }
 import strategygames.variant.Variant
@@ -67,6 +70,12 @@ case class Game(
   def board        = stratGame.situation.board
   def history      = stratGame.situation.board.history
   def variant      = stratGame.situation.board.variant
+
+  // five in a row: a swap moves black to the other seat, so a seat's colour follows the board
+  def playerColor(playerIndex: PlayerIndex): String = board match {
+    case strategygames.Board.FiveInARow(b) if b.blackSeat == P2 => variant.playerColors(!playerIndex)
+    case _                                                      => variant.playerColors(playerIndex)
+  }
   def turnCount    = stratGame.turnCount
   def plies        = stratGame.plies
   def clock        = stratGame.clock
@@ -359,6 +368,7 @@ case class Game(
       winner = game.situation.winner,
       p1OffersDraw = p1Player.isOfferingDraw,
       p2OffersDraw = p2Player.isOfferingDraw,
+      drawOfferAllowed = game.drawOfferAllowed,
       p1OffersSelectSquares = p1Player.isOfferingSelectSquares,
       p2OffersSelectSquares = p2Player.isOfferingSelectSquares
     )
@@ -389,6 +399,9 @@ case class Game(
           Event.Undo(u, game.situation, state, clockEvent, updated.board.pocketData)
         case ss: SelectSquares =>
           Event.SelectSquares(ss, game.situation, state, clockEvent, updated.board.pocketData)
+        case sw: Swap   => Event.Swap(sw, game.situation, state, clockEvent)
+        case sw2: Swap2 => Event.Swap(sw2, game.situation, state, clockEvent)
+        case o: Offer10 => Event.Offer10(o, game.situation, state, clockEvent)
       }
     } :: {
       // abstraction leak, I know.
@@ -413,6 +426,10 @@ case class Game(
         )
       else if (updated.board.variant.gameLogic == GameLogic.Entropy())
         List(Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2))
+      else if (updated.board.variant.gameLogic == GameLogic.FiveInARow())
+        updated.board.variant.hasGameScore so List(
+          Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
+        )
       // TODO Abalone is this how we want to represent score? Maybe look at Backgammon
       else if (updated.board.variant.gameLogic == GameLogic.Abalone())
         // Is this even necessary as score is in the fen?
@@ -452,6 +469,7 @@ case class Game(
       case "togyzkumalak" | "bestemshe"    => history.score(playerIndex).toString()
       case "abalone" | "grandabalone"      => history.score(playerIndex).toString()
       case "entropy"                       => history.score(playerIndex).toString()
+      case "pente"                         => history.score(playerIndex).toString()
       case "go9x9" | "go13x13" | "go19x19" =>
         val fen   = Forsyth.>>(variant.gameLogic, situation)
         val score = (if (playerIndex.name == "p1") fen.player1Score else fen.player2Score) / 10.0
@@ -466,7 +484,8 @@ case class Game(
 
   def displayScore: Option[Score] =
     if variant.gameLogic == GameLogic.Togyzkumalak() || variant.gameLogic == GameLogic
-        .Backgammon() || variant.gameLogic == GameLogic.Abalone() || variant.gameLogic == GameLogic.Entropy()
+        .Backgammon() || variant.gameLogic == GameLogic.Abalone() || variant.gameLogic == GameLogic.Entropy() ||
+      (variant.gameLogic == GameLogic.FiveInARow() && variant.hasGameScore)
     then history.score.some
     else if (variant.gameLogic == GameLogic.Go()) {
       if (finished || selectSquaresPossible) history.score.some
@@ -485,6 +504,9 @@ case class Game(
       case _: Uci.DrawCounter   => "draw"
       case _: Uci.CubeAction    => "cube"
       case _: Uci.SelectSquares => "ss:"
+      case _: Uci.Swap          => "swap"
+      case _: Uci.Swap2         => "swap2"
+      case _: Uci.Offer10       => "offer10"
       case _                    => sys.error("Type Error")
     }
 
@@ -718,6 +740,7 @@ case class Game(
   def playerCanOfferDraw(playerIndex: PlayerIndex) =
     started && playable &&
       turnCount >= 2 &&
+      stratGame.drawOfferAllowed &&
       !player(playerIndex).isOfferingDraw &&
       !opponent(playerIndex).isAi &&
       !playerHasOfferedDrawRecently(playerIndex)
@@ -1122,7 +1145,7 @@ case class Game(
   def playerPov(p: Player)                          = pov(p.playerIndex)
   def loserPov                                      = loser map playerPov
 
-  def playerTrans(p: PlayerIndex)(implicit lang: Lang) = PlayerName.translated(variant, p)
+  def playerTrans(p: PlayerIndex)(implicit lang: Lang) = PlayerName.translated(this, p)
 
   def setAnalysed = copy(metadata = metadata.copy(analysed = true))
 
@@ -1355,6 +1378,10 @@ object Game {
     val multiPointState = "mps"
     // entropy
     val round = "rd"
+    // five in a row
+    val blackSeat   = "bs" // stored only once P2 plays black
+    val openingStep = "op" // stored only during the opening
+    val offered     = "of" // renju's offered fifth stones, stored until white makes the offered drop
     // go
     val selectedSquares     = "ss" // the dead stones selected in go
     val deadStoneOfferState = "os" // state of the dead stone offer

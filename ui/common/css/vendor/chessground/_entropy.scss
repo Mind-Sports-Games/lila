@@ -13,6 +13,16 @@ $entropy-dest-ring-width: 0.286cqw;
 $entropy-dest-ring: rgba(0, 0, 0, 0.45);
 $entropy-premove-dest-ring: rgba(20, 30, 85, 0.5);
 
+// one accent for the player's own move and one for a premove. The last move is a dot over a counter,
+// ringed in the pattern halo so it reads on all seven counters, or a ring in the dest colour on the bare
+// board. A selected or premoved counter has its square's corners shaded, as chess marks an occupied dest.
+$entropy-highlight: #aaaaaa;
+$entropy-premove-highlight: rgb(20, 30, 85);
+$entropy-dot-inset: 38%;
+$entropy-dot-outline-width: 0.2cqw;
+$entropy-dot-outline: rgba($entropy-pattern-halo, $entropy-pattern-halo-opacity);
+$entropy-hover-fill-opacity: 0.35;
+
 .variant-entropy {
   cg-container {
     width: calc(100% * 7);
@@ -84,6 +94,63 @@ $entropy-premove-dest-ring: rgba(20, 30, 85, 0.5);
     &.premove-dest::before {
       inset: $entropy-premove-dest-ring-inset;
       border-color: $entropy-premove-dest-ring;
+    }
+
+    &.move-dest:hover {
+      background: none;
+
+      &::before {
+        background: rgba($entropy-highlight, $entropy-hover-fill-opacity);
+      }
+    }
+
+    &.premove-dest:hover {
+      background: none;
+
+      &::before {
+        background: rgba($entropy-premove-highlight, $entropy-hover-fill-opacity);
+      }
+    }
+
+    &.selected {
+      background: radial-gradient(transparent 0%, transparent 79%, $entropy-dest-ring 80%) !important;
+    }
+
+    &.current-premove {
+      background: none !important;
+
+      &.counter {
+        background: radial-gradient(transparent 0%, transparent 79%, $entropy-premove-dest-ring 80%) !important;
+      }
+
+      &:not(.counter)::before {
+        content: '';
+        position: absolute;
+        inset: $entropy-dest-ring-inset;
+        background: rgba($entropy-premove-highlight, $entropy-hover-fill-opacity);
+        border-radius: 50%;
+      }
+    }
+
+    &.last-move {
+      background: none;
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: $entropy-dot-inset;
+        border: $entropy-dest-ring-width solid $entropy-dest-ring;
+        border-radius: 50%;
+      }
+
+      &.counter {
+        z-index: z('cg__svg.direction');
+
+        &::after {
+          background: $entropy-highlight;
+          border: $entropy-dot-outline-width solid $entropy-dot-outline;
+        }
+      }
     }
   }
 }

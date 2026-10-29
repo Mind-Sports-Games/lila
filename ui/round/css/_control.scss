@@ -36,6 +36,18 @@
     .button {
       margin: 0.5em 0 0 0;
     }
+
+    &.swap-options p {
+      display: flex;
+      align-items: center;
+      text-align: left;
+
+      &::before {
+        color: $c-font-dim;
+        font-size: 2em;
+        margin-right: 0.5em;
+      }
+    }
   }
 
   .pending {

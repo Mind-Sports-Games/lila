@@ -12,11 +12,11 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/e391b56a82b7c71e7663082a797f6fc21b18776d
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.40
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/9e7852878f5edde778c00019224b7a395ea5e3e1
+        specifier: github:Mind-Sports-Games/chessground#pla-1216-add-gomoku-lila-supporting-repos
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e57bfbd73075f582e71b02a36b548039c0e4fad8
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.33
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/0fe0912d6d9af9a69ea7e40e91ebdefa96b36ccd
+        specifier: github:Mind-Sports-Games/stratops#pla-1216-add-gomoku-lila-supporting-repos
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5df1015c44e92f97585ba26befcef72cc9671ce9
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -140,16 +140,16 @@ importers:
     dependencies:
       chart.js:
         specifier: ^4.4.8
-        version: 4.5.1
+        version: 4.6.1
       chartjs-adapter-dayjs-4:
         specifier: ^1.0.4
-        version: 1.0.4(chart.js@4.5.1)(dayjs@1.11.23)
+        version: 1.0.4(chart.js@4.6.1)(dayjs@1.11.23)
       chartjs-plugin-datalabels:
         specifier: ^2.2.0
-        version: 2.2.0(chart.js@4.5.1)
+        version: 2.2.0(chart.js@4.6.1)
       chartjs-plugin-zoom:
         specifier: ^2.2.0
-        version: 2.2.0(chart.js@4.5.1)
+        version: 2.2.0(chart.js@4.6.1)
       common:
         specifier: workspace:*
         version: link:../common
@@ -365,7 +365,7 @@ importers:
         version: link:../chart
       chart.js:
         specifier: ^4.4.8
-        version: 4.5.1
+        version: 4.6.1
       common:
         specifier: workspace:*
         version: link:../common
@@ -840,8 +840,8 @@ packages:
     resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
-  chart.js@4.5.1:
-    resolution: {integrity: sha512-GIjfiT9dbmHRiYi6Nl2yFCq7kkwdkp1W/lp2J99rX0yo9tgJGn3lKQATztIjb5tVtevcBtIdICNWqlq5+E8/Pw==}
+  chart.js@4.6.1:
+    resolution: {integrity: sha512-hJyniucsFmq//EvXYvJ6c6mahPoI3kaxdjVH8awTaJ/fDNWeSqqqArixMJWkWNN6fcYvPU3HneSANFNYtRi61g==}
     engines: {pnpm: '>=8'}
 
   chartjs-adapter-dayjs-4@1.0.4:
@@ -865,9 +865,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/9e7852878f5edde778c00019224b7a395ea5e3e1:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/9e7852878f5edde778c00019224b7a395ea5e3e1}
-    version: 7.11.1-pstrat3.40
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e57bfbd73075f582e71b02a36b548039c0e4fad8:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e57bfbd73075f582e71b02a36b548039c0e4fad8}
+    version: 7.11.1-pstrat3.41
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   chokidar@3.6.0:
@@ -1169,8 +1169,8 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
-  lilconfig@3.1.3:
-    resolution: {integrity: sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw==}
+  lilconfig@3.1.4:
+    resolution: {integrity: sha512-zJZyBmQhArDRefuWTypZxwDpFDIYmrj8ypSBvwGD5P13Y95s6DjzKgu4DVdGbeQa5PDEsAOCAPNk4X+QOR006w==}
     engines: {node: '>=14'}
 
   lint-staged@15.5.2:
@@ -1423,9 +1423,9 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/0fe0912d6d9af9a69ea7e40e91ebdefa96b36ccd:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/0fe0912d6d9af9a69ea7e40e91ebdefa96b36ccd}
-    version: 0.8.1-pstrat5.33
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5df1015c44e92f97585ba26befcef72cc9671ce9:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5df1015c44e92f97585ba26befcef72cc9671ce9}
+    version: 0.8.1-pstrat5.34
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   string-argv@0.3.2:
@@ -1788,28 +1788,28 @@ snapshots:
 
   chalk@5.6.2: {}
 
-  chart.js@4.5.1:
+  chart.js@4.6.1:
     dependencies:
       '@kurkle/color': 0.3.4
 
-  chartjs-adapter-dayjs-4@1.0.4(chart.js@4.5.1)(dayjs@1.11.23):
+  chartjs-adapter-dayjs-4@1.0.4(chart.js@4.6.1)(dayjs@1.11.23):
     dependencies:
-      chart.js: 4.5.1
+      chart.js: 4.6.1
       dayjs: 1.11.23
 
-  chartjs-plugin-datalabels@2.2.0(chart.js@4.5.1):
+  chartjs-plugin-datalabels@2.2.0(chart.js@4.6.1):
     dependencies:
-      chart.js: 4.5.1
+      chart.js: 4.6.1
 
-  chartjs-plugin-zoom@2.2.0(chart.js@4.5.1):
+  chartjs-plugin-zoom@2.2.0(chart.js@4.6.1):
     dependencies:
       '@types/hammerjs': 2.0.46
-      chart.js: 4.5.1
+      chart.js: 4.6.1
       hammerjs: 2.0.8
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/9e7852878f5edde778c00019224b7a395ea5e3e1: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e57bfbd73075f582e71b02a36b548039c0e4fad8: {}
 
   chokidar@3.6.0:
     dependencies:
@@ -2123,7 +2123,7 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  lilconfig@3.1.3: {}
+  lilconfig@3.1.4: {}
 
   lint-staged@15.5.2:
     dependencies:
@@ -2131,7 +2131,7 @@ snapshots:
       commander: 13.1.0
       debug: 4.4.3
       execa: 8.0.1
-      lilconfig: 3.1.3
+      lilconfig: 3.1.4
       listr2: 8.3.3
       micromatch: 4.0.8
       pidtree: 0.6.1
@@ -2350,7 +2350,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/0fe0912d6d9af9a69ea7e40e91ebdefa96b36ccd:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5df1015c44e92f97585ba26befcef72cc9671ce9:
     dependencies:
       '@badrap/result': 0.2.13
 

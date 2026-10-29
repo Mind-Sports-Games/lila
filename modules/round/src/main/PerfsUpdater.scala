@@ -123,6 +123,12 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.grandabalone, ratingsB.grandabalone, game)
               case Variant.Entropy(strategygames.entropy.variant.Entropy) =>
                 updateRatings(ratingsW.entropy, ratingsB.entropy, game)
+              case Variant.FiveInARow(strategygames.fiveinarow.variant.Gomoku) =>
+                updateRatings(ratingsW.gomoku, ratingsB.gomoku, game)
+              case Variant.FiveInARow(strategygames.fiveinarow.variant.Pente) =>
+                updateRatings(ratingsW.pente, ratingsB.pente, game)
+              case Variant.FiveInARow(strategygames.fiveinarow.variant.Renju) =>
+                updateRatings(ratingsW.renju, ratingsB.renju, game)
               case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
@@ -206,6 +212,9 @@ final class PerfsUpdater(
       abalone: Rating,
       grandabalone: Rating,
       entropy: Rating,
+      gomoku: Rating,
+      pente: Rating,
+      renju: Rating,
       ultraBullet: Rating,
       bullet: Rating,
       blitz: Rating,
@@ -263,6 +272,9 @@ final class PerfsUpdater(
       abalone = perfs.abalone.toRating,
       grandabalone = perfs.grandabalone.toRating,
       entropy = perfs.entropy.toRating,
+      gomoku = perfs.gomoku.toRating,
+      pente = perfs.pente.toRating,
+      renju = perfs.renju.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
       blitz = perfs.blitz.toRating,
@@ -542,6 +554,21 @@ final class PerfsUpdater(
             perfs.entropy,
             ratings.entropy
           ),
+          gomoku = addRatingVariant(
+            Variant.FiveInARow(strategygames.fiveinarow.variant.Gomoku),
+            perfs.gomoku,
+            ratings.gomoku
+          ),
+          pente = addRatingVariant(
+            Variant.FiveInARow(strategygames.fiveinarow.variant.Pente),
+            perfs.pente,
+            ratings.pente
+          ),
+          renju = addRatingVariant(
+            Variant.FiveInARow(strategygames.fiveinarow.variant.Renju),
+            perfs.renju,
+            ratings.renju
+          ),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
           bullet = addRatingIf(isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),
@@ -604,6 +631,9 @@ final class PerfsUpdater(
           abalone = r(PT.orDefault("abalone"), perfs.abalone, perfs1.abalone),
           grandabalone = r(PT.orDefault("grandabalone"), perfs.grandabalone, perfs1.grandabalone),
           entropy = r(PT.orDefault("entropy"), perfs.entropy, perfs1.entropy),
+          gomoku = r(PT.orDefault("gomoku"), perfs.gomoku, perfs1.gomoku),
+          pente = r(PT.orDefault("pente"), perfs.pente, perfs1.pente),
+          renju = r(PT.orDefault("renju"), perfs.renju, perfs1.renju),
           bullet = r(PT.orDefault("bullet"), perfs.bullet, perfs1.bullet),
           blitz = r(PT.orDefault("blitz"), perfs.blitz, perfs1.blitz),
           rapid = r(PT.orDefault("rapid"), perfs.rapid, perfs1.rapid),

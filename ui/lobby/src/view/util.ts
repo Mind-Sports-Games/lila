@@ -84,4 +84,7 @@ export const perfIcons: any = {
   Abalone: '\ue927',
   'Grand Abalone': '\ue92C',
   Entropy: '\ue938',
+  Gomoku: '\ue93A',
+  Pente: '\ue93B',
+  Renju: '\ue93C',
 };

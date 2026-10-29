@@ -1,5 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
+import { fiveInARow } from 'stratutils';
 import * as chessground from './ground';
 import { Coords as CgCoords } from 'chessground/types';
 import {
@@ -17,7 +18,8 @@ import isCol1 from 'common/isCol1';
 import isCol3 from 'common/isCol3';
 import { playable } from 'game';
 import * as router from 'game/router';
-import statusView from 'game/view/status';
+import viewStatus, { victoriousNodes } from 'game/view/status';
+import { userLink } from 'common/userLink';
 import { path as treePath } from 'tree';
 import { render as renderTreeView } from './treeView/treeView';
 import * as control from './control';
@@ -59,7 +61,7 @@ import { allowedForVariant as allowClientEvalForVariant, allowPracticeWithComput
 import { variantKeyToRules } from 'stratops/variants/util';
 function renderResult(ctrl: AnalyseCtrl): VNode[] {
   let result: string | undefined;
-  let statusNodes: (string | VNode | null)[] | undefined;
+  let statusParts: (string | VNode)[] | undefined;
   if (ctrl.data.game.status.id >= 30) {
     switch (ctrl.data.game.winner) {
       case 'p1':
@@ -71,19 +73,19 @@ function renderResult(ctrl: AnalyseCtrl): VNode[] {
       default:
         result = '½-½';
     }
-    const winner = ctrl.data.game.winnerPlayer;
-    statusNodes = [statusView(ctrl), winner ? ', ' + ctrl.trans('playerIndexIsVictorious', winner) : null];
+    const victorious = victoriousNodes(ctrl, userLink);
+    statusParts = [viewStatus(ctrl), ...(victorious ? [', ', ...victorious] : [])];
   } else {
     const outcome = ctrl.outcome();
     if (outcome) {
       result = outcome.winner === 'p1' ? '1-0' : outcome.winner === 'p2' ? '0-1' : '½-½';
-      statusNodes = [ctrl.trans.noarg('gameFinished')];
+      statusParts = [ctrl.trans.noarg('gameFinished')];
     }
   }
   const tags: VNode[] = [];
-  if (result && statusNodes) {
+  if (result && statusParts) {
     tags.push(h('div.result', result));
-    tags.push(h('div.status', statusNodes));
+    tags.push(h('div.status', statusParts));
   }
   return tags;
 }
@@ -387,10 +389,12 @@ function addChapterId(study: StudyCtrl | undefined, cssClass: string) {
 }
 
 function renderPlayerScore(
+  ctrl: AnalyseCtrl,
   score: number,
   position: Position,
   playerIndex: string,
   variantKey: VariantKey,
+  fen: string,
 ): VNode | undefined {
   const defaultMancalaRole = 's';
   const children: VNode[] = [];
@@ -421,6 +425,14 @@ function renderPlayerScore(
   } else if (variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19') {
     children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-top' + '.' + playerIndex, children);
+  } else if (variantKey === 'pente') {
+    const stone = fiveInARow.seatColor(fen, playerIndex as PlayerIndex) === 'black' ? 'b-piece' : 'w-piece';
+    children.push(h(`piece.${stone}.${playerIndex}`, { attrs: { 'data-score': score } }));
+    return h(
+      'div.game-score.game-score-top.' + playerIndex + '.captures',
+      { attrs: { title: ctrl.trans.noarg('captures') } },
+      children,
+    );
   } else if (variantKey === 'backgammon' || variantKey === 'hyper' || variantKey === 'nackgammon') {
     for (let i = 0; i < score; i++) {
       children.push(h('piece.side-piece.' + playerIndex + (i === 0 ? ' first' : '')));
@@ -603,7 +615,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
       }
       case 'go9x9':
       case 'go13x13':
-      case 'go19x19': {
+      case 'go19x19':
+      case 'pente': {
         const p1Score = getScoreFromFen(variantKey, fen, 'p1');
         const p2Score = getScoreFromFen(variantKey, fen, 'p2');
         topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
@@ -643,6 +656,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'abalone',
     'grandabalone',
     'entropy',
+    ...fiveInARow.variants,
   ].includes(variantKey)
     ? '.piece-letter'
     : '';
@@ -703,6 +717,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
           h(
             addChapterId(study, 'div.analyse__board.main-board'),
             {
+              class: fiveInARow.zoneClasses(variantKey, ctrl.node.fen),
               hook:
                 'ontouchstart' in window || ctrl.gamebookPlay()
                   ? undefined
@@ -718,7 +733,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
             ],
           ),
         gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,
-        tour || !showScoreBox ? null : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
+        tour || !showScoreBox ? null : renderPlayerScore(ctrl, topScore, 'top', ctrl.topPlayerIndex(), variantKey, fen),
         tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'top'),
         tour || !showScoreBox ? null : renderPlayerScoreNames(ctrl),
         tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
@@ -740,7 +755,9 @@ export default function (ctrl: AnalyseCtrl): VNode {
                       retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),
                     ]),
               ])),
-        tour || !showScoreBox ? null : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey),
+        tour || !showScoreBox
+          ? null
+          : renderPlayerScore(ctrl, bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey, fen),
         tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'bottom'),
         tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
         gamebookPlayView || tour ? null : controls(ctrl),

@@ -38,6 +38,7 @@ export interface BaseGame {
   winnerPlayer?: PlayerName;
   loserPlayer?: PlayerName;
   canOfferDraw?: boolean;
+  drawOfferAllowed?: boolean;
   drawOffers?: number[];
   canDoPassAction?: boolean;
   plyCentis?: number[];
@@ -102,6 +103,9 @@ export type StatusName =
   | 'singleWin'
   | 'gammonWin'
   | 'backgammonWin'
+  | 'lineOfFive'
+  | 'tenCaptures'
+  | 'forbiddenAction'
   | 'variantEnd'
   | 'perpetualCheck'
   | 'unknownFinish';

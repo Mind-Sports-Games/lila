@@ -52,5 +52,8 @@ export const perf = {
     abalone: '\ue927',
     grandabalone: '\ue92C',
     entropy: '\ue938',
+    gomoku: '\ue93A',
+    pente: '\ue93B',
+    renju: '\ue93C',
   },
 };

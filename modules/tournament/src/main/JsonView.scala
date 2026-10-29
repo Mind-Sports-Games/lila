@@ -331,8 +331,8 @@ final class JsonView(
         "color"       -> game.variant.playerNames(
           game.naturalOrientation
         ), // app BC https://github.com/ornicar/lila/issues/7195
-        "p1Color"  -> game.variant.playerColors(P1),
-        "p2Color"  -> game.variant.playerColors(P2),
+        "p1Color"  -> game.playerColor(P1),
+        "p2Color"  -> game.playerColor(P2),
         "lastMove" -> game.lastActionKeys.getOrElse(""),
         "p1"       -> ofPlayer(featured.p1, game.player(P1)),
         "p2"       -> ofPlayer(featured.p2, game.player(P2))

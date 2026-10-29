@@ -857,6 +857,19 @@ export default class Setup {
         case '14':
           key = 'entropy';
           break;
+        case '15':
+          switch (variantId[1]) {
+            case '1':
+              key = 'gomoku';
+              break;
+            case '2':
+              key = 'pente';
+              break;
+            case '4':
+              key = 'renju';
+              break;
+          }
+          break;
       }
       const $selected = $ratings
         .hide()
@@ -868,7 +881,7 @@ export default class Setup {
     const showStartingImages = () => {
       const variantId = ($variantInput.filter(':checked').val() as string).split('_');
       const class_list =
-        'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon breakthroughtroyka abalone dameo entropy';
+        'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon breakthroughtroyka abalone dameo entropy fiveinarow';
       let key = 'chess';
       switch (variantId[0]) {
         case '0':
@@ -915,6 +928,9 @@ export default class Setup {
           break;
         case '14':
           key = 'entropy';
+          break;
+        case '15':
+          key = 'fiveinarow';
           break;
       }
       $playerIndex.removeClass(class_list);
@@ -1511,8 +1527,6 @@ export default class Setup {
                 return '9_4'; // Go 19x19
               case '11':
                 return '11_9'; // Breakthrough Troyka
-              case '13':
-                return '14_1'; // Entropy
               default:
                 return `${gameGroup}_1`;
             }

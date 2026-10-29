@@ -186,6 +186,7 @@ export interface ApiAction extends Step {
   takebackable: boolean;
   wDraw: boolean;
   bDraw: boolean;
+  drawOfferAllowed?: boolean;
   crazyhouse?: CrazyData;
   role?: cg.Role;
   drops?: string;

@@ -123,17 +123,19 @@ export const boardDimensions = ($el: Cash): { width: number; height: number } =>
                       ? { width: 9, height: 9 }
                       : $el.hasClass('variant-go13x13')
                         ? { width: 13, height: 13 }
-                        : $el.hasClass('variant-go19x19')
-                          ? { width: 19, height: 19 }
-                          : $el.hasClass('variant-backgammon') ||
-                              $el.hasClass('variant-hyper') ||
-                              $el.hasClass('variant-nackgammon')
-                            ? { width: 12, height: 2 }
-                            : $el.hasClass('variant-grandabalone')
-                              ? { width: 11, height: 11 }
-                              : $el.hasClass('variant-abalone')
-                                ? { width: 9, height: 9 }
-                                : { width: 8, height: 8 };
+                        : $el.hasClass('variant-gomoku') || $el.hasClass('variant-renju')
+                          ? { width: 15, height: 15 }
+                          : $el.hasClass('variant-go19x19') || $el.hasClass('variant-pente')
+                            ? { width: 19, height: 19 }
+                            : $el.hasClass('variant-backgammon') ||
+                                $el.hasClass('variant-hyper') ||
+                                $el.hasClass('variant-nackgammon')
+                              ? { width: 12, height: 2 }
+                              : $el.hasClass('variant-grandabalone')
+                                ? { width: 11, height: 11 }
+                                : $el.hasClass('variant-abalone')
+                                  ? { width: 9, height: 9 }
+                                  : { width: 8, height: 8 };
 
 // @TODO: rename into variantKeyFromElement
 export const variantFromElement = (element: Cash): string => {
