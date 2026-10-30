@@ -40,10 +40,18 @@ final private[api] class Cli(
       fuccess("Bot vs bot start requested")
     case "bot-vs-bot" :: "stop" :: Nil =>
       Bus.publish(lila.hub.actorApi.bot.BotVsBotStop, "botVsBot")
-      fuccess("Bot vs bot stop requested")
+      fuccess("Bot vs bot stop requested (spotlight included)")
     case "bot-vs-bot" :: "status" :: Nil =>
       val promise = scala.concurrent.Promise[String]()
       Bus.publish(lila.hub.actorApi.bot.BotVsBotStatus(promise), "botVsBot")
+      promise.future
+    case "bot-vs-bot" :: "spotlight" :: "stop" :: Nil =>
+      val promise = scala.concurrent.Promise[String]()
+      Bus.publish(lila.hub.actorApi.bot.BotVsBotSpotlightStop(promise), "botVsBot")
+      promise.future
+    case "bot-vs-bot" :: "spotlight" :: rest =>
+      val promise = scala.concurrent.Promise[String]()
+      Bus.publish(lila.hub.actorApi.bot.BotVsBotSpotlightStart(rest, promise), "botVsBot")
       promise.future
     case "bot-vs-bot" :: "start" :: rest if rest.nonEmpty =>
       val promise = scala.concurrent.Promise[String]()
