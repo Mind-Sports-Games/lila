@@ -70,9 +70,7 @@ object dev {
           ),
           pre("""announce 10 minutes PlayStrategy will restart!
 announce cancel
-bot-vs-bot (status | (start/stop/restart) [{stream}])
-bot-vs-bot spotlight {variantKey,...} [bots={botId},{botId}] [clock={min}+{inc}] [hours={n}]
-bot-vs-bot spotlight stop
+bot-vs-bot (status | (start/stop/restart) [{stream name or id}])
 change asset version
 eval-cache drop {chess-variant} {fen}
 fishnet client (create {username} | (delete/enable/disable) {key})

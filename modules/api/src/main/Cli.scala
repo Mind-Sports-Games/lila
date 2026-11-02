@@ -35,39 +35,16 @@ final private[api] class Cli(
   }
 
   def process = {
-    case "bot-vs-bot" :: "start" :: Nil =>
-      Bus.publish(lila.hub.actorApi.bot.BotVsBotStart, "botVsBot")
-      fuccess("Bot vs bot start requested")
-    case "bot-vs-bot" :: "stop" :: Nil =>
-      Bus.publish(lila.hub.actorApi.bot.BotVsBotStop, "botVsBot")
-      fuccess("Bot vs bot stop requested (spotlight included)")
-    case "bot-vs-bot" :: "status" :: Nil =>
-      val promise = scala.concurrent.Promise[String]()
-      Bus.publish(lila.hub.actorApi.bot.BotVsBotStatus(promise), "botVsBot")
-      promise.future
-    case "bot-vs-bot" :: "spotlight" :: "stop" :: Nil =>
-      val promise = scala.concurrent.Promise[String]()
-      Bus.publish(lila.hub.actorApi.bot.BotVsBotSpotlightStop(promise), "botVsBot")
-      promise.future
-    case "bot-vs-bot" :: "spotlight" :: rest =>
-      val promise = scala.concurrent.Promise[String]()
-      Bus.publish(lila.hub.actorApi.bot.BotVsBotSpotlightStart(rest, promise), "botVsBot")
-      promise.future
-    case "bot-vs-bot" :: "start" :: rest if rest.nonEmpty =>
-      val promise = scala.concurrent.Promise[String]()
-      Bus.publish(lila.hub.actorApi.bot.BotVsBotStartStream(rest.mkString(" "), promise), "botVsBot")
-      promise.future
-    case "bot-vs-bot" :: "stop" :: rest if rest.nonEmpty =>
-      val promise = scala.concurrent.Promise[String]()
-      Bus.publish(lila.hub.actorApi.bot.BotVsBotStopStream(rest.mkString(" "), promise), "botVsBot")
-      promise.future
-    case "bot-vs-bot" :: "restart" :: Nil =>
-      Bus.publish(lila.hub.actorApi.bot.BotVsBotRestart, "botVsBot")
-      fuccess("Bot vs bot restart requested")
-    case "bot-vs-bot" :: "restart" :: rest if rest.nonEmpty =>
-      val promise = scala.concurrent.Promise[String]()
-      Bus.publish(lila.hub.actorApi.bot.BotVsBotRestartStream(rest.mkString(" "), promise), "botVsBot")
-      promise.future
+    case "bot-vs-bot" :: "status" :: Nil  => botVsBot(lila.hub.actorApi.bot.BotVsBotStatus.apply)
+    case "bot-vs-bot" :: "start" :: Nil   => botVsBot(lila.hub.actorApi.bot.BotVsBotStart.apply)
+    case "bot-vs-bot" :: "stop" :: Nil    => botVsBot(lila.hub.actorApi.bot.BotVsBotStop.apply)
+    case "bot-vs-bot" :: "restart" :: Nil => botVsBot(lila.hub.actorApi.bot.BotVsBotRestart.apply)
+    case "bot-vs-bot" :: "start" :: rest =>
+      botVsBot(lila.hub.actorApi.bot.BotVsBotStartStream(rest.mkString(" "), _))
+    case "bot-vs-bot" :: "stop" :: rest =>
+      botVsBot(lila.hub.actorApi.bot.BotVsBotStopStream(rest.mkString(" "), _))
+    case "bot-vs-bot" :: "restart" :: rest =>
+      botVsBot(lila.hub.actorApi.bot.BotVsBotRestartStream(rest.mkString(" "), _))
     case "uptime" :: Nil => fuccess(s"${lila.common.Uptime.seconds} seconds")
     case "change" :: ("asset" | "assets") :: "version" :: Nil => {
       import lila.common.AssetVersion
@@ -108,6 +85,12 @@ final private[api] class Cli(
     case "bus" :: "dump" :: Nil =>
       val keys = Bus.keys
       fuccess(s"${keys.size}\n ${keys mkString "\n"}")
+  }
+
+  private def botVsBot(message: scala.concurrent.Promise[String] => Any): Fu[String] = {
+    val promise = scala.concurrent.Promise[String]()
+    Bus.publish(message(promise), "botVsBot")
+    promise.future
   }
 
   private def run(args: List[String]): Fu[String] = {

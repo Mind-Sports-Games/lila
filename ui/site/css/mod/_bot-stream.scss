@@ -1,0 +1,35 @@
+.bot-streams {
+  &__messages {
+    @extend %box-padding-horiz;
+
+    p {
+      margin-bottom: 1em;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8em;
+
+    .button-red {
+      margin-inline-start: 1.5em;
+    }
+  }
+
+  &__games {
+    @extend %box-padding-horiz;
+
+    padding-bottom: 2em;
+  }
+
+  &__game {
+    padding: 0.3em;
+
+    > a:first-child {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.3em;
+    }
+  }
+}

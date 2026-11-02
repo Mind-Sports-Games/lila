@@ -49,6 +49,7 @@ object Permission {
   case object ManageTeam       extends Permission("MANAGE_TEAM", "Manage teams")
   case object ManageTournament extends Permission("MANAGE_TOURNAMENT", "Manage tournaments")
   case object ManageEvent      extends Permission("MANAGE_EVENT", "Manage events")
+  case object ManageBotStreams extends Permission("MANAGE_BOT_STREAMS", "Manage bot streams")
   case object ManageSimul      extends Permission("MANAGE_SIMUL", "Manage simuls")
   case object ChangePermission extends Permission("CHANGE_PERMISSION", "Change permissions")
   case object PublicMod        extends Permission("PUBLIC_MOD", "Mod badge")
@@ -155,6 +156,7 @@ object Permission {
           ManageTournament,
           ManageSimul,
           ManageEvent,
+          ManageBotStreams,
           NotifySlack,
           PracticeConfig,
           PuzzleCurator,
@@ -228,6 +230,7 @@ object Permission {
     "Content" -> List(
       Relay,
       ManageEvent,
+      ManageBotStreams,
       ManageTournament,
       ManageSimul,
       StudyAdmin,
