@@ -1381,7 +1381,6 @@ object Game {
     // five in a row
     val blackSeat   = "bs" // stored only once P2 plays black
     val openingStep = "op" // stored only during the opening
-    val offered     = "of" // renju's offered fifth stones, stored until white makes the offered drop
     // go
     val selectedSquares     = "ss" // the dead stones selected in go
     val deadStoneOfferState = "os" // state of the dead stone offer

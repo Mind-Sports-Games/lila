@@ -407,11 +407,6 @@ object GameDiff {
           _.history.score,
           (o: Score) => o.nonEmpty so { BSONHandlers.scoreWriter writeOpt o }
         )
-        dOpt(
-          offered,
-          fiveInARowBoard(_).offered,
-          (o: List[strategygames.fiveinarow.Pos]) => o.nonEmpty.option(BSONString(o.map(_.key).mkString(",")))
-        )
       }
       case GameLogic.Dameo() => {
         dTry(oldPgn, _.actionStrs, writeBytes compose newLibStorageWriter)
