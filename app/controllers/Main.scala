@@ -188,6 +188,10 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
             routes.Blog.index().url,
             routes.Editor.index.url
           ) :::
+            // the standard chess board is /editor, listed above
+            views.html.board.editor.variantKeys.toList.sorted
+              .filterNot(_ == chessStandard.key)
+              .map(k => routes.Editor.variant(k).url) :::
             variants.map(v => routes.Page.variant(v.key).url) :::
             lila.puzzle.Puzzle.puzzleVariants.map(v => routes.Puzzle.home(v.key).url) :::
             lila.puzzle.Puzzle.puzzleVariants.map(v => routes.Puzzle.themes(v.key).url) :::

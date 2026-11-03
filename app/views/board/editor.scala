@@ -11,6 +11,33 @@ import views.html.library.bits as libraryBits
 
 object editor {
 
+  // the variants the editor's own select offers; keep in step with ui/editor/src/view.ts
+  val variantKeys: Set[String] = Set(
+    "standard",
+    "antichess",
+    "atomic",
+    "crazyhouse",
+    "horde",
+    "kingOfTheHill",
+    "racingKings",
+    "threeCheck",
+    "fiveCheck",
+    "monster",
+    "minibreakthroughtroyka",
+    "breakthroughtroyka",
+    "linesOfAction",
+    "scrambledEggs",
+    "flipello",
+    "flipello10",
+    "antiflipello",
+    "octagonflipello",
+    "xiangqi",
+    "minixiangqi",
+    "amazons",
+    "abalone",
+    "grandabalone"
+  )
+
   def apply(
       sit: Situation,
       fen: FEN,
@@ -55,7 +82,7 @@ object editor {
     )(
       frag(
         // outside the element the editor empties on mount
-        h1(cls := "offscreen")(trans.boardEditor()),
+        h1(cls := "offscreen")(pageTitle),
         main(id := "board-editor")(
           div(cls := s"board-editor variant-${variant.key}")(
             div(cls := "spare"),

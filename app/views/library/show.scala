@@ -84,8 +84,10 @@ object show {
                 "Tutorial"
               )
             },
-            a(cls := "library-editor", href := routes.Editor.variant(variant.key).url)(
-              "Editor"
+            views.html.board.editor.variantKeys(variant.key).option(
+              a(cls := "library-editor", href := routes.Editor.variant(variant.key).url)(
+                "Editor"
+              )
             ),
             variant.hasAnalysisBoard.option(
               a(
