@@ -7,6 +7,18 @@
 .site-buttons {
   @extend %flex-center-nowrap;
 
+  min-width: 0;
+
+  // only the username shrinks when the header runs out of room
+  > * {
+    flex-shrink: 0;
+  }
+
+  > .dasher {
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
   // the search and preferences toggles are buttons, not links: they go nowhere
   button.link,
   button.toggle {
@@ -108,8 +120,9 @@
 }
 
 #user_tag {
+  @extend %nowrap-ellipsis;
+
   padding-right: 1rem;
-  white-space: nowrap;
 }
 
 #notify-app .initiating {
