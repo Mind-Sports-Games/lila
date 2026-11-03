@@ -28,11 +28,10 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
   private def forTeamsSelect(ids: Seq[TeamID]) = $doc("forTeams".$in(ids))
   private def sinceSelect(date: DateTime)      = $doc("startsAt".$gt(date))
   private def libSelect(lib: GameLogic)        = $doc("lib" -> lib.id)
-  // only standard chess is stored with no variant field; international draughts is its own game
-  // logic's standard but carries its id, so $exists(false) alone never finds it. Every caller pairs
-  // this with libSelect, which keeps the ids of two game logics apart.
+  // only standard chess is stored with no variant field; every other standard, international
+  // draughts included, carries its id
   private def variantSelect(variant: Variant)  =
-    if (variant.standardVariant) $or($doc("variant".$exists(false)), $doc("variant" -> variant.id))
+    if (variant.key == "standard") $doc("variant".$exists(false))
     else $doc("variant" -> variant.id)
   private val nonEmptySelect           = $doc("nbPlayers".$ne(0))
   private[tournament] val selectUnique = $doc("schedule.freq" -> "unique")
