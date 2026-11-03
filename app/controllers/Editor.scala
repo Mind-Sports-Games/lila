@@ -12,6 +12,7 @@ import strategygames.chess.format.Forsyth as ChessForsyth
 
 import lila.app.*
 import lila.common.Json.*
+import views.html.library.bits as libraryBits
 
 final class Editor(env: Env) extends LilaController(env) {
 
@@ -66,8 +67,13 @@ final class Editor(env: Env) extends LilaController(env) {
 
   def index = load("")
 
+  // a name or a key in the wrong case redirects to the canonical URL, as /library and /analysis do
   def variant(key: String) =
-    Variant.byKey.get(key).fold(load(key))(v => renderEditor(none, v.some))
+    libraryBits
+      .canonicalVariantKey(key)
+      .fold(Variant.byKey.get(key).fold(load(key))(v => renderEditor(none, v.some)))(canonical =>
+        Action(MovedPermanently(routes.Editor.variant(canonical).url))
+      )
 
   def load(urlFen: String) =
     renderEditor(
