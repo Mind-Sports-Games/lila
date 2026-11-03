@@ -124,6 +124,8 @@ function studyButton(ctrl: AnalyseCtrl) {
     );
   if (ctrl.study || ctrl.ongoing || ctrl.embed) return;
   if (ctrl.synthetic && !isChess(ctrl.data.game.variant.key)) return;
+  // a variant with no analysis board is refused server side, so do not offer it
+  if (!ctrl.data.game.variant.hasAnalysisBoard) return;
   if (ctrl.data.game.multiPointState) return;
   return h(
     'form',

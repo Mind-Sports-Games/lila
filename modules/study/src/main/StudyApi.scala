@@ -145,6 +145,8 @@ final class StudyApi(
           .insert(sc.chapter)
           .andDo(indexStudy(sc.study))
           .andDo(scheduleTimeline(sc.study.id)) inject sc.some
+    } recover { case _: ChapterMaker.ValidationException =>
+      none
     }
 
   def clone(me: User, prev: Study): Fu[Option[Study]] =

@@ -535,6 +535,7 @@ interface Variant {
   boardSize: BoardDim;
   iconChar?: string;
   clientEval: boolean; // whether the browser can run an engine for it: the server decides
+  hasAnalysisBoard: boolean; // studies and the analysis board refuse the variants without one
 }
 
 interface DraughtsVariant {
