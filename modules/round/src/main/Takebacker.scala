@@ -1,5 +1,6 @@
 package lila.round
 
+import cats.data.Validated
 import strategygames.{ GameLogic, Player as PlayerIndex }
 import lila.common.Bus
 import lila.game.{ Event, Game, GameRepo, Pov, Progress, Rewind, UciMemo }
@@ -27,12 +28,13 @@ final private class Takebacker(
             val povTurn = playerIndex == pov.game.turnPlayerIndex
             if (pov.opponent.proposeTakebackAt == pov.game.plies && povTurn)
               // go back until the playerindex switches
-              takebackSwitchPlayer(game)
+              takebackSwitchPlayer(game, !playerIndex)
             else
               // go back one ply. if playerindex has not switched, continue going back
               takebackRetainPlayer(game, !playerIndex)
           }.dmap(_ -> situation.reset)
-        case Pov(game, _) if pov.game.playableByAi => takebackSwitchPlayer(game).dmap(_ -> situation)
+        case Pov(game, playerIndex) if pov.game.playableByAi =>
+          takebackSwitchPlayer(game, playerIndex).dmap(_ -> situation)
         case Pov(game, playerIndex) if pov.opponent.isAi =>
           takebackRetainPlayer(game, playerIndex).dmap(_ -> situation)
         case Pov(game, playerIndex) if pov.opponent.isPSBot =>
@@ -119,13 +121,19 @@ final private class Takebacker(
       !currentPlayerTakingBack(game) &&
       game.actionStrs.takeRight(3).map(_.size) == Vector(2, 1, 1)
 
-  private def takebackSwitchPlayer(game: Game)(implicit proxy: GameProxy): Fu[Events] =
-    if (alwaysRewindSinglePly(game) || currentPlayerTakingBack(game)) rewindPly(game)
+  // a five in a row turn can be several drops, or a swap2 and its stones, and is taken back whole
+  private def rewindsToTurnStart(game: Game): Boolean =
+    game.variant.gameLogic == GameLogic.FiveInARow()
+
+  private def takebackSwitchPlayer(game: Game, requester: PlayerIndex)(implicit proxy: GameProxy): Fu[Events] =
+    if (rewindsToTurnStart(game)) rewindToTurnStartOf(game, requester)
+    else if (alwaysRewindSinglePly(game) || currentPlayerTakingBack(game)) rewindPly(game)
     else rewindTurnAndPly(game)
   private def takebackRetainPlayer(game: Game, requester: PlayerIndex)(implicit
       proxy: GameProxy
   ): Fu[Events] =
-    if (chaosTakingBackToDrop(game, requester)) rewindTwoTurnsAndPly(game)
+    if (rewindsToTurnStart(game)) rewindToTurnStartOf(game, requester)
+    else if (chaosTakingBackToDrop(game, requester)) rewindTwoTurnsAndPly(game)
     else if (alwaysRewindSinglePly(game) || !currentPlayerTakingBack(game)) rewindPly(game)
     else rewindTurnAndPly(game)
 
@@ -158,6 +166,18 @@ final private class Takebacker(
       }
       _      <- uciMemo.set(prog3.game, fen)
       events <- saveAndNotify(prog3)
+    } yield events
+
+  // drops whole turns, the requester's part-played one included, until the requester is to move
+  private def rewindToTurnStartOf(game: Game, requester: PlayerIndex)(implicit proxy: GameProxy): Fu[Events] =
+    for {
+      fen  <- gameRepo.initialFen(game)
+      prog <- Rewind(game, fen, false).andThen { first =>
+        if (first.game.turnPlayerIndex == requester || first.game.actionStrs.isEmpty) Validated.valid(first)
+        else Rewind(first.game, fen, false).map(second => first.withGame(second.game))
+      }.toEither.toFuture
+      _      <- uciMemo.set(prog.game, fen)
+      events <- saveAndNotify(prog)
     } yield events
 
   // private def double(game: Game)(implicit proxy: GameProxy): Fu[Events] =

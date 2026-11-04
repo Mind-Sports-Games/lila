@@ -41,7 +41,7 @@ export const takebackable = (data: BaseGameData): boolean =>
   !data.opponent.proposingTakeback;
 
 export const drawable = (data: BaseGameData): boolean =>
-  playable(data) && data.game.turns >= 2 && !data.player.offeringDraw && !hasAi(data);
+  playable(data) && data.game.turns >= 2 && !!data.game.drawOfferAllowed && !data.player.offeringDraw && !hasAi(data);
 
 export const resignable = (data: BaseGameData): boolean => playable(data) && !abortable(data);
 

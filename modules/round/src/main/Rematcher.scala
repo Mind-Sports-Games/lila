@@ -176,6 +176,9 @@ final private class Rematcher(
               .Board(sit.board.pieces, variant)
               .withPosition(sit.board.position)
           )
+        // the opening step lives in the history and differs by variant: renju opens with Taraguchi-10
+        case (GameLogic.FiveInARow(), Variant.FiveInARow(variant), _) =>
+          Board.FiveInARow(strategygames.fiveinarow.Board.init(variant))
         case _ =>
           Board(game.variant.gameLogic, pieces, variant = game.variant).withHistory(
             History(

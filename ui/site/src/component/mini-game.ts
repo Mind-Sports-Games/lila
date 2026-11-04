@@ -3,7 +3,7 @@ import * as domData from 'common/data';
 import { boardDimensions, variantFromElement } from 'common/mini-board';
 import { loadChessground, loadDraughtsground } from 'common/board-lib';
 import { ensureFor as ensurePieceSprite } from 'common/piece-sprite';
-import { displayScore, fenPlayerIndex, parseLastMove, backgammon as bgUtils } from 'stratutils';
+import { displayScore, fenPlayerIndex, parseLastMove, backgammon as bgUtils, fiveInARow } from 'stratutils';
 import clockWidget from './clock-widget';
 
 interface UpdateData {
@@ -148,6 +148,15 @@ export const update = (node: HTMLElement, data: UpdateData) => {
   };
   renderClock(data.p1, data.p1Delay, data.p1Pending, 'p1');
   renderClock(data.p2, data.p2Delay, data.p2Pending, 'p2');
+
+  if (fiveInARow.isFiveInARow(variantFromElement($el)))
+    (['p1', 'p2'] as const).forEach(playerIndex =>
+      fiveInARow.setSeatColorIcon(
+        node.querySelector(`.mini-game__score--${playerIndex}`)?.parentElement?.querySelector('.mini-game__user'),
+        data.fen,
+        playerIndex,
+      ),
+    );
 
   if (!isMultiPoint(multiPointState)) {
     ['p1', 'p2'].forEach(playerIndex => {

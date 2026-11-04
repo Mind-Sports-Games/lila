@@ -147,6 +147,52 @@ span.mini-game.variant-togyzkumalak.is2d {
   height: calc(100% / 19);
 }
 
+.variant-gomoku square,
+.variant-renju square {
+  width: calc(100% / 15);
+  height: calc(100% / 15);
+}
+
+.variant-pente square {
+  width: calc(100% / 19);
+  height: calc(100% / 19);
+}
+
+// as go marks its last stone: a white ring on a black stone, a black ring on a white one. The class names
+// the stone's colour because a swap means the seat cannot say which colour it is.
+.variant-gomoku square.last-move,
+.variant-pente square.last-move,
+.variant-renju square.last-move {
+  background-color: transparent;
+  background-size: cover;
+  z-index: 3;
+
+  &.black-stone {
+    background-image: url(../images/board/go/highlights/p1.svg);
+  }
+
+  &.white-stone {
+    background-image: url(../images/board/go/highlights/p2.svg);
+  }
+}
+
+// renju's opening: the square about the centre the next stone must go inside, drawn on the cell edges so
+// it runs between the lines and never hides one
+@for $zone from 0 through 4 {
+  .renju-zone-#{$zone} cg-container::after {
+    content: '';
+    position: absolute;
+    left: calc(100% * #{7 - $zone} / 15);
+    top: calc(100% * #{7 - $zone} / 15);
+    width: calc(100% * #{2 * $zone + 1} / 15);
+    height: calc(100% * #{2 * $zone + 1} / 15);
+    box-sizing: border-box;
+    border: 2px dotted rgba(200, 30, 30, 0.9);
+    pointer-events: none;
+    z-index: z('cg__svg.cg-shapes');
+  }
+}
+
 .variant-nackgammon square,
 .variant-hyper square,
 .variant-backgammon square {
@@ -717,6 +763,17 @@ square {
   height: calc(100% / 19);
 }
 
+.variant-gomoku piece,
+.variant-renju piece {
+  width: calc(100% / 15);
+  height: calc(100% / 15);
+}
+
+.variant-pente piece {
+  width: calc(100% / 19);
+  height: calc(100% / 19);
+}
+
 .variant-nackgammon piece,
 .variant-hyper piece,
 .variant-backgammon piece {
@@ -871,6 +928,17 @@ piece {
   padding-bottom: calc(100% / 19);
 }
 
+.variant-gomoku cg-helper,
+.variant-renju cg-helper {
+  width: calc(100% / 15);
+  padding-bottom: calc(100% / 15);
+}
+
+.variant-pente cg-helper {
+  width: calc(100% / 19);
+  padding-bottom: calc(100% / 19);
+}
+
 .variant-nackgammon cg-helper,
 .variant-hyper cg-helper,
 .variant-backgammon cg-helper {
@@ -957,6 +1025,17 @@ cg-helper {
 }
 
 .variant-go19x19 cg-container {
+  width: calc(100% * 19);
+  height: calc(100% * 19);
+}
+
+.variant-gomoku cg-container,
+.variant-renju cg-container {
+  width: calc(100% * 15);
+  height: calc(100% * 15);
+}
+
+.variant-pente cg-container {
   width: calc(100% * 19);
   height: calc(100% * 19);
 }

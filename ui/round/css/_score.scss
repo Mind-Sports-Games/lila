@@ -18,6 +18,7 @@ $score-variants-square: (
   'go9x9',
   'go13x13',
   'go19x19',
+  'pente',
   'abalone',
   'grandabalone'
 );
@@ -29,7 +30,8 @@ $go-variants: ('go9x9', 'go13x13', 'go19x19');
 .variant-octagonflipello .game-score,
 .variant-go9x9 .game-score,
 .variant-go13x13 .game-score,
-.variant-go19x19 .game-score {
+.variant-go19x19 .game-score,
+.variant-pente .game-score {
   piece::after {
     @extend %active, %box-radius;
 
@@ -60,7 +62,8 @@ $go-variants: ('go9x9', 'go13x13', 'go19x19');
 
 .variant-go9x9 .game-score.captures,
 .variant-go13x13 .game-score.captures,
-.variant-go19x19 .game-score.captures {
+.variant-go19x19 .game-score.captures,
+.variant-pente .game-score.captures {
   piece::after {
     @extend %active-secondary;
   }
@@ -549,6 +552,20 @@ body .variant-grandabalone .game-score piece.hole-piece {
         margin-top: $block-gap;
       }
     }
+  }
+}
+
+.variant-pente .game-score {
+  background-color: #d6d6d6;
+
+  @include breakpoint($mq-col2-uniboard) {
+    width: 25%;
+    padding-top: 25%;
+  }
+
+  @include breakpoint($mq-landscape-mobile) {
+    width: 20%;
+    padding-top: 20%;
   }
 }
 

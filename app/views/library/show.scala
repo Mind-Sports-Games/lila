@@ -221,7 +221,7 @@ object show {
             div(cls := "study")(
               views.html.study.bits.widget(s, h3),
               s.study.library.has(true).option(
-                span(cls := "library__pin", dataIcon := "\ue93a", title := trans.libraryStudyPinned.txt())
+                span(cls := "library__pin", dataIcon := "\ue946", title := trans.libraryStudyPinned.txt())
               )
             )
           }

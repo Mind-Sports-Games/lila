@@ -621,6 +621,38 @@ object TournamentShield {
           2
         )
 
+    private def randomFiveInARowVariantOrder(variants: List[Variant]) =
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
+        Random.shuffle(variants),
+        None,
+        arenaMinutes,
+        fiveInARowRounds
+      )
+    private val fiveInARowVariants =
+      Variant.all.filter(_.gameFamily == GameFamily.FiveInARow()).filterNot(_.fromPositionVariant)
+
+    private val fiveInARowRounds = fiveInARowVariants.size
+
+    case object FiveInARowMedley
+        extends MedleyShield(
+          "shieldFiveInARowMedley",
+          "sfm",
+          VariantKeys.gameFamilyName(GameFamily.FiveInARow()),
+          Condition.TeamMember("playstrategy-five-in-a-row", "PlayStrategy Five in a Row"),
+          fiveInARowVariants,
+          randomFiveInARowVariantOrder,
+          Blitz32,
+          Some(2),
+          7,
+          16,
+          arenaMinutes,
+          fiveInARowRounds,
+          "",
+          s"Arena which is divided between all ${fiveInARowRounds} variants in the ${VariantKeys.gameFamilyName(GameFamily.FiveInARow())} family.",
+          s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.FiveInARow())} Medley Arena!",
+          31
+        )
+
     val all = List(
       PlayStrategyMedley,  // Weekly - Sun evenings
       ChessVariantsMedley, // Weekly - Sat evenings
@@ -634,7 +666,8 @@ object TournamentShield {
       BackgammonMedley,    // Monthly - 1st Sat afternoon
       BreakthroughMedley,  // Monthly - 4rd Sat afternoon
       AbaloneMedley,       // Monthly - 3rd Sun afternoon
-      ChessgammonMedley    // Monthly - 1st Sun afternoon
+      ChessgammonMedley,   // Monthly - 1st Sun afternoon
+      FiveInARowMedley     // Monthly - 2nd Sun afternoon
     )
 
     val allWeekly  = all.filter(_.weekOfMonth.isEmpty)
@@ -1028,6 +1061,27 @@ object TournamentShield {
           15,
           1
         )
+    case object Gomoku
+        extends Category(
+          Variant.FiveInARow(strategygames.fiveinarow.variant.Gomoku),
+          Blitz32,
+          3,
+          1
+        )
+    case object Pente
+        extends Category(
+          Variant.FiveInARow(strategygames.fiveinarow.variant.Pente),
+          Blitz32,
+          13,
+          1
+        )
+    case object Renju
+        extends Category(
+          Variant.FiveInARow(strategygames.fiveinarow.variant.Renju),
+          Blitz32,
+          20,
+          1
+        )
 
     val all: List[Category] = List(
       Chess,
@@ -1077,7 +1131,10 @@ object TournamentShield {
       Nackgammon,
       Abalone,
       GrandAbalone,
-      Entropy
+      Entropy,
+      Gomoku,
+      Pente,
+      Renju
     )
 
     def of(t: Tournament): Option[Category] = all.find(_.matches(t))

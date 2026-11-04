@@ -17,7 +17,8 @@ $game-family: (
   'backgammon',
   'abalone',
   'dameo',
-  'entropy'
+  'entropy',
+  'fiveinarow'
 );
 
 $game-family-random-pieces: (
@@ -35,7 +36,8 @@ $game-family-random-pieces: (
   'wbS.svg',
   'bwS.svg',
   'wbK.png',
-  'mixed.svg'
+  'mixed.svg',
+  'bwS.svg'
 );
 
 $game-family-p1-pieces: (
@@ -53,7 +55,8 @@ $game-family-p1-pieces: (
   'backgammon/wooden/w.svg',
   'abalone/classic/bS.svg',
   'dameo/wide_crown_dameo/wK.svg',
-  'entropy/classic_entropy/R.svg'
+  'entropy/classic_entropy/R.svg',
+  'fiveinarow/classic_stone/B.svg'
 );
 
 $game-family-p2-pieces: (
@@ -71,7 +74,8 @@ $game-family-p2-pieces: (
   'backgammon/wooden/b.svg',
   'abalone/classic/wS.svg',
   'dameo/wide_crown_dameo/bK.svg',
-  'entropy/classic_entropy/B.svg'
+  'entropy/classic_entropy/B.svg',
+  'fiveinarow/classic_stone/W.svg'
 );
 
 .game-setup {

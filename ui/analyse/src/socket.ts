@@ -15,6 +15,7 @@ import {
   EditChapterData,
 } from './study/interfaces';
 import { FormData as StudyFormData } from './study/studyForm';
+import type { fiveInARow } from 'stratutils';
 
 interface DestsCache {
   [fen: string]: AnaDests;
@@ -63,6 +64,7 @@ export type StudySocketSendParams =
   | [t: 'anaDrop', d: AnaDrop & MoveOpts]
   | [t: 'anaLift', d: AnaLift & MoveOpts]
   | [t: 'anaPass', d: AnaPass & MoveOpts]
+  | [t: 'anaSwap' | 'anaSwap2' | 'anaOffer10', d: AnaPass & MoveOpts]
   | [t: 'anaRoll', d: AnaRoll & MoveOpts]
   | [t: 'anaDrawCounter', d: AnaDrawCounter & MoveOpts]
   | [t: 'anaEndTurn', d: AnaEndTurn & MoveOpts]
@@ -91,6 +93,7 @@ export interface Socket {
   sendAnaDrop(d: AnaDrop): void;
   sendAnaLift(d: AnaLift): void;
   sendAnaPass(d: AnaPass): void;
+  sendAnaSwap(action: fiveInARow.OpeningAction, d: AnaPass): void;
   sendAnaRoll(d: AnaRoll): void;
   sendAnaDrawCounter(d: AnaDrawCounter): void;
   sendAnaEndTurn(d: AnaEndTurn): void;
@@ -231,6 +234,14 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     anaMoveTimeout = setTimeout(() => sendAnaPass(req), 3000);
   }
 
+  function sendAnaSwap(action: fiveInARow.OpeningAction, req: AnaPass) {
+    clearTimeout(anaMoveTimeout);
+    withoutStandardVariant(req);
+    addStudyData(req, true);
+    send(action === 'swap' ? 'anaSwap' : action === 'swap2' ? 'anaSwap2' : 'anaOffer10', req);
+    anaMoveTimeout = setTimeout(() => sendAnaSwap(action, req), 3000);
+  }
+
   function sendAnaRoll(req: AnaRoll) {
     clearTimeout(anaMoveTimeout);
     withoutStandardVariant(req);
@@ -268,6 +279,7 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     sendAnaDrop,
     sendAnaLift,
     sendAnaPass,
+    sendAnaSwap,
     sendAnaRoll,
     sendAnaDrawCounter,
     sendAnaEndTurn,
