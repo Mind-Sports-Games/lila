@@ -7,13 +7,71 @@
     }
   }
 
-  &__actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8em;
+  &__priority {
+    color: $c-brag;
+    margin-inline-end: 0.3em;
+  }
 
-    .button-red {
-      margin-inline-start: 1.5em;
+  td.bot-streams__actions {
+    height: 1px;
+
+    > div {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.5em;
+    }
+
+    button {
+      width: 100%;
+    }
+  }
+
+  @include breakpoint($mq-not-small) {
+    .slist {
+      thead {
+        display: none;
+      }
+
+      tbody tr {
+        display: block;
+        padding: 0.8em 1rem;
+        border-top: $border;
+      }
+
+      td,
+      td:first-child {
+        display: block;
+        padding: 0.3em 0;
+        overflow-wrap: anywhere;
+      }
+
+      td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.8em;
+        color: $c-font-dim;
+        text-transform: uppercase;
+      }
+
+      td:first-child::before {
+        display: none;
+      }
+
+      td:first-child {
+        font-size: 1.2em;
+      }
+    }
+
+    td.bot-streams__actions {
+      height: auto;
+      padding-top: 0.6em;
+
+      > div {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
     }
   }
 
@@ -32,4 +90,12 @@
       margin-bottom: 0.3em;
     }
   }
+}
+
+.bot-stream__add {
+  margin-bottom: 1.5em;
+}
+
+.form-group .bot-streams__priority {
+  margin-inline-end: 0;
 }

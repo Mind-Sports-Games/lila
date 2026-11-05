@@ -11,6 +11,12 @@ import lila.game.{ Game, Pov }
 object botStream {
 
   private val dataVariants = attr("data-variants")
+  private val dataLabel    = attr("data-label")
+
+  private val priorityHelp = "Ranked above other bot games on TV. Use it to show off a newly released game."
+
+  private val priorityIcon =
+    span(cls := "bot-streams__priority", dataIcon := "S", title := s"Priority stream. $priorityHelp")
 
   def create(form: Form[?])(implicit ctx: Context) =
     layout(title = "New bot stream", css = "mod.form", moreJs = formJs) {
@@ -79,28 +85,27 @@ object botStream {
             streams.map { s =>
               val live = status.get(s.id)
               tr(
-                td(
-                  a(href := routes.BotStream.edit(s.id))(strong(s.name)),
-                  s.spotlight.option(frag(br, em("Spotlight")))
+                td(dataLabel := "Stream")(
+                  a(href := routes.BotStream.edit(s.id))(strong(s.priority.option(priorityIcon), s.name))
                 ),
-                td(
+                td(dataLabel := "Matchups")(
                   s.matchups.map { m =>
                     div(
-                      userIdLink(m.p1.some, withOnline = false),
+                      userIdLink(m.p1.some, withOnline = false, withTitle = false),
                       " vs ",
-                      userIdLink(m.p2.some, withOnline = false),
+                      userIdLink(m.p2.some, withOnline = false, withTitle = false),
                       ": ",
                       variantsSummary(m.variants)
                     )
                   }
                 ),
-                td(s.clock.show),
-                td(
+                td(dataLabel := "Clock")(s.clock.show),
+                td(dataLabel := "UTC end")(
                   s.until.fold[Frag]("Until stopped") { until =>
                     frag(showDateTimeUTC(until), br, momentFromNow(until))
                   }
                 ),
-                td(
+                td(dataLabel := "State")(
                   strong(coordinator.state(s)),
                   live.map { l =>
                     frag(
@@ -116,14 +121,16 @@ object botStream {
                   }
                 ),
                 td(cls := "bot-streams__actions")(
-                  live.isEmpty.option(command(routes.BotStream.start(s.id), "Start")),
-                  (live.isDefined || s.active).option(command(routes.BotStream.stop(s.id), "Stop")),
-                  live.isDefined.option(command(routes.BotStream.restart(s.id), "Restart")),
-                  command(
-                    routes.BotStream.delete(s.id),
-                    "Delete",
-                    klass = "button-red confirm",
-                    confirm = s"Delete the bot stream ${s.name}?".some
+                  div(
+                    live.isEmpty.option(command(routes.BotStream.start(s.id), "Start")),
+                    (live.isDefined || s.active).option(command(routes.BotStream.stop(s.id), "Stop")),
+                    live.isDefined.option(command(routes.BotStream.restart(s.id), "Restart")),
+                    command(
+                      routes.BotStream.delete(s.id),
+                      "Delete",
+                      klass = "button-red confirm",
+                      confirm = s"Delete the bot stream ${s.name}?".some
+                    )
                   )
                 )
               )
@@ -204,9 +211,9 @@ object botStream {
       form3.split(
         form3.group(form("name"), raw("Name"), half = true)(form3.input(_)),
         form3.checkbox(
-          form("spotlight"),
-          raw("Spotlight"),
-          help = raw("Ranked above other bot games on TV. Use it to show off a newly released game.").some,
+          form("priority"),
+          frag(priorityIcon, " Priority"),
+          help = raw(priorityHelp).some,
           half = true
         )
       ),
@@ -265,7 +272,10 @@ object botStream {
           )
         )
       },
-      form3.action(form3.submit(trans.apply()))
+      form3.actions(
+        a(href := routes.BotStream.manager)(trans.cancel()),
+        form3.submit(trans.apply())
+      )
     )
   }
 

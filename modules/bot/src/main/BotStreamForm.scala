@@ -65,7 +65,7 @@ object BotStreamForm {
   def form = Form(
     mapping(
       "name"           -> text(minLength = 3, maxLength = 60),
-      "spotlight"      -> boolean,
+      "priority"       -> boolean,
       "clock"          -> clockConfigMappingsMinutes(clockTimes, clockByoyomi).verifying("Invalid clock", validClock),
       "until"          -> optional(utcDate),
       "matchups"       -> list(
@@ -80,7 +80,7 @@ object BotStreamForm {
   ).fill(
     Data(
       name = "",
-      spotlight = true,
+      priority = true,
       clock = Clock.Config(180, 2),
       until = DateTime.now.plusWeeks(2).some,
       matchups = Nil
@@ -89,7 +89,7 @@ object BotStreamForm {
 
   case class Data(
       name: String,
-      spotlight: Boolean,
+      priority: Boolean,
       clock: ClockConfig,
       until: Option[DateTime],
       matchups: List[MatchupData]
@@ -103,7 +103,7 @@ object BotStreamForm {
         name = name.trim,
         matchups = validMatchups,
         clock = clock,
-        spotlight = spotlight,
+        priority = priority,
         active = false,
         until = until,
         createdBy = by,
@@ -116,7 +116,7 @@ object BotStreamForm {
         name = name.trim,
         matchups = validMatchups,
         clock = clock,
-        spotlight = spotlight,
+        priority = priority,
         until = until,
         updatedAt = DateTime.now
       )
@@ -127,7 +127,7 @@ object BotStreamForm {
     def make(stream: BotStream) =
       Data(
         name = stream.name,
-        spotlight = stream.spotlight,
+        priority = stream.priority,
         clock = stream.clock,
         until = stream.until,
         matchups = stream.matchups.map { m =>

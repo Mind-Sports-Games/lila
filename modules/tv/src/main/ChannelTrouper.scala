@@ -91,12 +91,12 @@ final private[tv] class ChannelTrouper(
     candidates.maximumByOption(g => (tier(g), score(g)))
   }
 
-  // live human games beat live spotlight stream games beat other live bot games beat correspondence
+  // live human games beat live priority stream games beat other live bot games beat correspondence
   // games, regardless of rating; unlimited games never reach here (excluded at candidate intake)
   private def tier(game: Game): Int =
     if (!game.hasClock) 1
     else if (!Tv.hasBot(lightUserSync)(game)) 4
-    else if (game.source contains lila.game.Source.BotVsBotSpotlight) 3
+    else if (game.source contains lila.game.Source.BotVsBotPriority) 3
     else 2
 
   // live games must have moved recently or they're dropped in favour of a fresher candidate;

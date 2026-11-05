@@ -13,7 +13,7 @@ final class BotStreamRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionCon
   import BotStreamRepo.*
 
   def all: Fu[List[BotStream]] =
-    coll.find($empty).sort($doc("spotlight" -> -1, "name" -> 1)).cursor[BotStream]().list(100)
+    coll.find($empty).sort($doc("priority" -> -1, "name" -> 1)).cursor[BotStream]().list(100)
 
   def byId(id: BotStream.ID): Fu[Option[BotStream]] = coll.byId[BotStream](id)
 

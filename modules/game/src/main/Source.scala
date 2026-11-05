@@ -20,7 +20,7 @@ object Source {
   case object Pool              extends Source(id = 12)
   case object Swiss             extends Source(id = 13)
   case object BotVsBotStream    extends Source(id = 14)
-  case object BotVsBotSpotlight extends Source(id = 15)
+  case object BotVsBotPriority  extends Source(id = 15)
 
   val all  = List(
     Lobby,
@@ -35,7 +35,7 @@ object Source {
     Pool,
     Swiss,
     BotVsBotStream,
-    BotVsBotSpotlight
+    BotVsBotPriority 
   )
   val byId = all map { v =>
     (v.id, v)
@@ -52,7 +52,7 @@ object Source {
     Pool,
     Swiss,
     BotVsBotStream,
-    BotVsBotSpotlight
+    BotVsBotPriority 
   )
   val expirable: Set[Source] = Set(Lobby, Tournament, Pool, Swiss)
 

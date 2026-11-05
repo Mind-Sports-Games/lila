@@ -64,7 +64,7 @@ const stream = (id, name, matchups) => ({
   name,
   matchups,
   clock: { t: 'fischer', limit: 180, increment: 2 },
-  spotlight: false,
+  priority: false,
   active: true,
   createdBy: 'playstrategy',
   createdAt: now,

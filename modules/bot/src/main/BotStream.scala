@@ -13,7 +13,7 @@ case class BotStream(
     name: String,
     matchups: List[BotStream.Matchup],
     clock: ClockConfig,
-    spotlight: Boolean,
+    priority: Boolean,
     active: Boolean,
     until: Option[DateTime],
     createdBy: User.ID,
@@ -25,7 +25,7 @@ case class BotStream(
 
   def isExpired = until.exists(_.isBeforeNow)
 
-  def source = if (spotlight) Source.BotVsBotSpotlight else Source.BotVsBotStream
+  def source = if (priority) Source.BotVsBotPriority else Source.BotVsBotStream
 
   lazy val games: List[BotVsBotGame] =
     matchups.flatMap { m =>
@@ -37,7 +37,7 @@ case class BotStream(
   def botIds: Set[User.ID] = matchups.flatMap(m => List(m.p1, m.p2)).toSet
 
   def sameDefinition(other: BotStream) =
-    name == other.name && matchups == other.matchups && clock == other.clock && spotlight == other.spotlight
+    name == other.name && matchups == other.matchups && clock == other.clock && priority == other.priority
 }
 
 object BotStream {
