@@ -35,6 +35,7 @@ import strategygames.backgammon
 import strategygames.abalone
 import strategygames.entropy
 import strategygames.fiveinarow
+import strategygames.yonkoma
 import strategygames.format.FEN
 import strategygames.chess.variant.{ Standard as ChessStandard, Variant as ChessVariant }
 import strategygames.draughts.variant.{ Standard as DraughtsStandard, Variant as DraughtsVariant }
@@ -50,6 +51,7 @@ import strategygames.abalone.variant.{ Abalone as AbaloneStandard, Variant as Ab
 import strategygames.dameo.variant.{ Dameo as DameoStandard, Variant as DameoVariant }
 import strategygames.entropy.variant.{ Entropy as EntropyStandard, Variant as EntropyVariant }
 import strategygames.fiveinarow.variant.{ Gomoku as FiveInARowStandard, Variant as FiveInARowVariant }
+import strategygames.yonkoma.variant.{ Variant as YonkomaVariant, Yonkoma10x10 as YonkomaStandard }
 import org.joda.time.DateTime
 import reactivemongo.api.bson.*
 import scala.util.{ Success, Try }
@@ -871,6 +873,42 @@ object BSONHandlers {
         (fiveInARowGame, defaultMetaData)
       }
 
+      def readYonkomaGame(r: BSON.Reader): (StratGame, Metadata) = {
+
+        val gameVariant = YonkomaVariant(r.intD(F.variant)) | YonkomaStandard
+
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Yonkoma(), r.bytesD(F.oldPgn), playedPlies)
+
+        def turnUcis(turnStr: Option[String]) =
+          turnStr.map(_.split(",").toList.flatMap(yonkoma.format.Uci.apply)).getOrElse(List.empty)
+
+        val yonkomaGame = StratGame.Yonkoma(
+          yonkoma.Game(
+            situation = yonkoma.Situation(
+              yonkoma.Board(
+                pieces = BinaryFormat.piece.readYonkoma(r.bytes(F.binaryPieces)),
+                history = yonkoma.History(
+                  lastTurn = turnUcis(r.strO(F.historyLastTurn)),
+                  currentTurn = turnUcis(r.strO(F.historyCurrentTurn)),
+                  positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
+                  halfMoveClock = r.intD(F.halfMoveClock)
+                ),
+                variant = gameVariant
+              ),
+              player = turnPlayerIndex
+            ),
+            actionStrs = actionStrs,
+            clock = clock,
+            plies = plies,
+            turnCount = turns,
+            startedAtPly = startedAtPly,
+            startedAtTurn = startedAtTurn
+          )
+        )
+
+        (yonkomaGame, defaultMetaData)
+      }
+
       val libId                 = r.intD(F.lib)
       val (stratGame, metadata) = libId match {
         case 0  => readChessGame(r)
@@ -884,6 +922,7 @@ object BSONHandlers {
         case 8  => readDameoGame(r)
         case 9  => readEntropyGame(r)
         case 10 => readFiveInARowGame(r)
+        case 11 => readYonkomaGame(r)
         case _  => sys.error(s"Invalid game in the database, libId: ${libId}")
       }
 
@@ -1097,6 +1136,19 @@ object BSONHandlers {
               F.openingStep        -> (board.openingStep != fiveinarow.OpeningStep.Play)
                 .option(board.openingStep.fen.toString),
               F.score              -> o.history.score.nonEmpty.option(o.history.score)
+            )
+          case GameLogic.Yonkoma() =>
+            $doc(
+              F.oldPgn -> NewLibStorage.OldBin
+                .encodeActionStrs(o.variant.gameFamily, o.actionStrs take Game.maxTurns),
+              F.binaryPieces -> BinaryFormat.piece.writeYonkoma(o.board match {
+                case Board.Yonkoma(board) => board.pieces
+                case _                    => sys.error("invalid yonkoma board")
+              }),
+              F.halfMoveClock      -> (o.history.halfMoveClock != 0).option(o.history.halfMoveClock),
+              F.positionHashes     -> o.history.positionHashes,
+              F.historyLastTurn    -> o.history.lastTurnUciString,
+              F.historyCurrentTurn -> o.history.currentTurnUciString
             )
           case _ => // chess or fail
             if (o.variant.key == "standard")

@@ -307,6 +307,8 @@ export function main(ctrl: RoundController): VNode {
     'grandabalone',
     'entropy',
     ...fiveInARow.variants,
+    'yonkoma10x10',
+    'yonkoma12x12',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

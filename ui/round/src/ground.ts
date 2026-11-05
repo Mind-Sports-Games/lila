@@ -188,17 +188,21 @@ export function makeConfig(ctrl: RoundController): Config {
                             ? 'https://playstrategy.org/assets/piece/fiveinarow/' +
                               data.pref.pieceSet.filter(ps => ps.gameFamily === 'fiveinarow')[0].name +
                               '/'
-                            : variantKey === 'abalone' || variantKey === 'grandabalone'
-                              ? 'https://playstrategy.org/assets/piece/abalone/' +
-                                data.pref.pieceSet.filter(ps => ps.gameFamily === 'abalone')[0].name +
+                            : variantKey === 'yonkoma10x10' || variantKey === 'yonkoma12x12'
+                              ? 'https://playstrategy.org/assets/piece/yonkoma/' +
+                                data.pref.pieceSet.filter(ps => ps.gameFamily === 'yonkoma')[0].name +
                                 '/'
-                              : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
-                                ? 'https://playstrategy.org/assets/piece/xiangqi/' +
-                                  data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                              : variantKey === 'abalone' || variantKey === 'grandabalone'
+                                ? 'https://playstrategy.org/assets/piece/abalone/' +
+                                  data.pref.pieceSet.filter(ps => ps.gameFamily === 'abalone')[0].name +
                                   '/'
-                                : 'https://playstrategy.org/assets/piece/chess/' +
-                                  data.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
-                                  '/',
+                                : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
+                                  ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+                                    data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                                    '/'
+                                  : 'https://playstrategy.org/assets/piece/chess/' +
+                                    data.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+                                    '/',
       },
     },
     disableContextMenu: true,

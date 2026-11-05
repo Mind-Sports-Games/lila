@@ -92,6 +92,10 @@ entropy_themes = [
 fiveinarow_themes = [
   ['classic_stone', 'svg']
 ]
+yonkoma_themes = [
+  ['classic_yonkoma', 'svg'],
+  ['red_blue_yonkoma', 'svg']
+]
 amazons_themes = [
   ['queen', 'svg'],
   ['arrow', 'svg'],
@@ -178,6 +182,8 @@ xiangqi_variants = ['xiangqi', 'minixiangqi']
 flipello_variants = ['flipello', 'flipello10', 'antiflipello', 'octagonflipello']
 amazons_variants = ['amazons']
 entropy_variants = ['entropy']
+yonkoma_variants = ['yonkoma10x10', 'yonkoma12x12']
+yonkoma_roles = ['c-piece']
 # a counter's owner changes as it lands, so both players share the one image per colour
 entropy_roles = ['w-piece', 'k-piece', 'y-piece', 'g-piece', 'r-piece', 'b-piece', 'p-piece']
 fiveinarow_variants = ['gomoku', 'pente', 'renju']
@@ -1070,4 +1076,41 @@ abalone_themes.map { |theme|
     }
   }.flatten
   File.open(dest_dir + 'abalone-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_abalone_game + classes_abalone_variant).join("\n") }
+}
+
+# inline SVG yonkoma
+yonkoma_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_yonkoma = (['.yonkoma.is2d'] + yonkoma_variants.map { |variant| '.is2d .variant-' + variant }).map { |scope|
+    colors.map { |color|
+      yonkoma_roles.map { |role|
+        piece = color[0] + role.upcase[0]
+        file = source_dir + 'yonkoma/' + name + '/' + piece + '.' + ext
+        File.open(file, 'r') do|image_file|
+          image = image_file.read
+          base64 = Base64.strict_encode64(image)
+          scope + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+            "background-image:url('data:image/" + types[ext] + base64 + "')}"
+        end
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'yonkoma-' + name + '.css', 'w') { |f| f.puts merge_rules(classes_yonkoma).join("\n") }
+}
+
+# external SVG yonkoma
+yonkoma_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_yonkoma = (['.yonkoma.is2d'] + yonkoma_variants.map { |variant| '.is2d .variant-' + variant }).map { |scope|
+    colors.map { |color|
+      yonkoma_roles.map { |role|
+        piece = color[0] + role.upcase[0]
+        scope + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+          "background-image:url('/assets/piece/" + 'yonkoma/' + name + "/" + piece + "." + ext + "')}"
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'yonkoma-' + name + '.external.css', 'w') { |f| f.puts merge_rules(classes_yonkoma).join("\n") }
 }

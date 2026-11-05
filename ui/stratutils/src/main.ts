@@ -198,6 +198,8 @@ const noFishnetVariants: VariantKey[] = [
   'grandabalone',
   'entropy',
   ...fiveInARowVariants,
+  'yonkoma10x10',
+  'yonkoma12x12',
 ];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;

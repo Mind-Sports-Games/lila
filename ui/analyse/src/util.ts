@@ -295,6 +295,8 @@ const noServerEvalVariants = [
   'grandabalone',
   'entropy',
   ...fiveInARow.variants,
+  'yonkoma10x10',
+  'yonkoma12x12',
 ];
 
 export function allowServerEvalForVariant(variant: VariantKey) {

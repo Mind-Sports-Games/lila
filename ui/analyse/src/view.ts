@@ -657,6 +657,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'grandabalone',
     'entropy',
     ...fiveInARow.variants,
+    'yonkoma10x10',
+    'yonkoma12x12',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

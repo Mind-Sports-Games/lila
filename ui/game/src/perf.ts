@@ -55,5 +55,7 @@ export const perf = {
     gomoku: '\ue93A',
     pente: '\ue93B',
     renju: '\ue93C',
+    yonkoma10x10: '\ue947',
+    yonkoma12x12: '\ue948',
   },
 };

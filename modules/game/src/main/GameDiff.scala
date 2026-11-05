@@ -423,6 +423,21 @@ object GameDiff {
         d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
         d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
       }
+      case GameLogic.Yonkoma() => {
+        dTry(oldPgn, _.actionStrs, writeBytes compose newLibStorageWriter)
+        dTry(
+          binaryPieces,
+          _.board match {
+            case Board.Yonkoma(b) => b.pieces
+            case _                => sys.error("Wrong board type")
+          },
+          writeBytes compose BinaryFormat.piece.writeYonkoma
+        )
+        dOpt(halfMoveClock, _.history.halfMoveClock, w.intO)
+        d(positionHashes, _.history.positionHashes, w.bytes)
+        d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
+        d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
+      }
     }
 
     d(turns, _.turnCount, w.int)

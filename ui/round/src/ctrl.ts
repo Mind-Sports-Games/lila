@@ -339,6 +339,8 @@ export default class RoundController {
         'abalone',
         'grandabalone',
         'entropy',
+        'yonkoma10x10',
+        'yonkoma12x12',
       ].includes(this.data.game.variant.key)
     )
       return false;
@@ -1526,6 +1528,7 @@ export default class RoundController {
         this.forcePass(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
       }
       if (d.game.variant.key === 'entropy') this.doEntropyForcedActions();
+      if (['yonkoma10x10', 'yonkoma12x12'].includes(d.game.variant.key)) this.doYonkomaForcedActions();
       //backgammon roll dice at start of turn or end turn when no moves
       if (['backgammon', 'hyper', 'nackgammon'].includes(d.game.variant.key)) {
         if (d.canOnlyRollDice) setTimeout(() => this.forceRollDice(d.game.variant.key), this.forcedActionDelayMillis);
@@ -1556,6 +1559,21 @@ export default class RoundController {
       this.chessground.state.onlyDropsVariant = !!role;
       if (role) setDropMode(this.chessground.state, { playerIndex: d.game.player, role });
     }
+  };
+
+  private yonkomaPassPending = false;
+
+  // passing is not allowed in yonkoma, but a player with no legal move has the turn skipped:
+  // the server names that pass as the forced action and the stuck player's client plays it
+  private doYonkomaForcedActions = (): void => {
+    if (this.data.forcedAction !== 'pass' || this.yonkomaPassPending) return;
+    this.yonkomaPassPending = true;
+    setTimeout(() => {
+      this.yonkomaPassPending = false;
+      const d = this.data;
+      if (d.forcedAction === 'pass' && this.isPlaying() && !this.replaying() && d.player.playerIndex === d.game.player)
+        this.sendPass(d.game.variant.key);
+    }, this.forcedActionDelayMillis);
   };
 
   private delayedInit = () => {
