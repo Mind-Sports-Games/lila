@@ -638,8 +638,6 @@
   <string name="keyShowOrHideComments">(mal)montri komentojn</string>
   <string name="keyEnterOrExitVariation">eniru/forlasu variaĵon</string>
   <string name="newTournament">Nova konkurso</string>
-  <string name="tournamentHomeTitle">Ŝaka konkurso kun diversaj tempokontroloj kaj variaĵoj</string>
-  <string name="tournamentHomeDescription">Ludu en rapidaj konkursoj! Aliĝu al oficialaj konkursoj aŭ kreu vian propran. Unminuta ŝako, Kvinminuta ŝako, Klasika ŝako, Ŝak960, Triŝako kaj aliaj variaĵoj haveblas por senfina ĝuo.</string>
   <string name="tournamentNotFound">Konkurso netrovita</string>
   <string name="tournamentDoesNotExist">Konkurso ne ekzistas</string>
   <string name="tournamentMayHaveBeenCanceled">Eble ĝi ne okazos ĉar malaliĝis ĉiuj ludontoj antaŭ la komenco de la konkurso.</string>

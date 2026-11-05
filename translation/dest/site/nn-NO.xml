@@ -656,8 +656,6 @@ få en computeranalyse, chatte eller dele ein URL.</string>
   <string name="keyShowOrHideComments">syn/gøym kommentarar</string>
   <string name="keyEnterOrExitVariation">gå inn i/gå ut av varianten</string>
   <string name="newTournament">Ny turnering</string>
-  <string name="tournamentHomeTitle">Sjakkturnering med varierande tid og sjakkvariantar</string>
-  <string name="tournamentHomeDescription">Spel fartsfylde sjakkturneringar! Delta i offisielle, planlagde turneringar eller lag dine eigne. Lynsjakk, snøggsjakk, og andre variantar er tilgjengeleg for endelaus sjakkmoro.</string>
   <string name="tournamentNotFound">Kan ikke finne turneringa</string>
   <string name="tournamentDoesNotExist">Denna turneringa finst ikkje.</string>
   <string name="tournamentMayHaveBeenCanceled">Den kan ha blitt avbroten om alle spelarane trakk seg før turneringa starta.</string>

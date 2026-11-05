@@ -12,6 +12,7 @@ import strategygames.chess.format.Forsyth as ChessForsyth
 
 import lila.app.*
 import lila.common.Json.*
+import views.html.library.bits as libraryBits
 
 final class Editor(env: Env) extends LilaController(env) {
 
@@ -66,14 +67,26 @@ final class Editor(env: Env) extends LilaController(env) {
 
   def index = load("")
 
+  // a name or a key in the wrong case redirects to the canonical URL, as /library and /analysis do
+  def variant(key: String) =
+    libraryBits
+      .canonicalVariantKey(key)
+      .fold(Variant.byKey.get(key).fold(load(key))(v => renderEditor(none, v.some)))(canonical =>
+        Action(MovedPermanently(routes.Editor.variant(canonical).url))
+      )
+
   def load(urlFen: String) =
-    Open { implicit ctx =>
-      val urlVariant: Option[String] = ctx.req.getQueryString("variant")
-      val fenStr                     = lila.common.String
+    renderEditor(
+      lila.common.String
         .decodeUriPath(urlFen)
         .map(_.replace('_', ' ').trim)
-        .filter(_.nonEmpty)
-      val variant     = Variant.orDefault(urlVariant.getOrElse(""))
+        .filter(_.nonEmpty),
+      none
+    )
+
+  private def renderEditor(fenStr: Option[String], pathVariant: Option[Variant]) =
+    Open { implicit ctx =>
+      val variant     = pathVariant | Variant.orDefault(ctx.req.getQueryString("variant").getOrElse(""))
       val orientation = ctx.req.getQueryString("orientation")
       fuccess {
         val situation = readFen(fenStr, variant)

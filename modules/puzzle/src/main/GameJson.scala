@@ -91,12 +91,13 @@ final private class GameJson(
 
   // TODO wil need to support draughts differently (see game/jsonView example)
   private def variantJson(game: Game) = Json.obj(
-    "key"       -> game.variant.key,
-    "name"      -> VariantKeys.variantName(game.variant),
-    "short"     -> VariantKeys.variantShortName(game.variant),
-    "lib"        -> game.variant.gameLogic.id,
-    "boardSize"  -> boardSize(game.variant),
-    "clientEval" -> lila.game.BrowserEngine.has(game.variant)
+    "key"              -> game.variant.key,
+    "name"             -> VariantKeys.variantName(game.variant),
+    "short"            -> VariantKeys.variantShortName(game.variant),
+    "lib"              -> game.variant.gameLogic.id,
+    "boardSize"        -> boardSize(game.variant),
+    "clientEval"       -> lila.game.BrowserEngine.has(game.variant),
+    "hasAnalysisBoard" -> game.variant.hasAnalysisBoard
   )
 
   def boardSize(variant: Variant) = variant match {

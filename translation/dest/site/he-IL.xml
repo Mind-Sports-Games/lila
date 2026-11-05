@@ -722,8 +722,6 @@
   <string name="keyShowOrHideComments">הצג/הסתר הערות</string>
   <string name="keyEnterOrExitVariation">כנס לגרסה\ צא מגרסה</string>
   <string name="newTournament">טורניר חדש</string>
-  <string name="tournamentHomeTitle">טורניר שחמט הכולל משחקים עם גרסאות רבות הגבלות זמן וגרסאות שונות</string>
-  <string name="tournamentHomeDescription">תשחק בטורנירי השחמט המהיר! הצטרף לטורניר רשמי ומתוכנן, או תיצור אחד משלך. ברק, בליץ, קלאסי, שחמט 960, מלך הגבעה, שח משולש,  ואפשרויות נוספות של משחקי שחמט מהנים.</string>
   <string name="tournamentNotFound">הטורניר לא נמצא</string>
   <string name="tournamentDoesNotExist">הטורניר הזה אינו קיים.</string>
   <string name="tournamentMayHaveBeenCanceled">קיימת אפשרות שהטורניר בוטל, במקרה שכל השחקנים יצאו ממנו לפני התחלתו.</string>

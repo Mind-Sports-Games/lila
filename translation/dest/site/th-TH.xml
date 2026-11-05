@@ -600,8 +600,6 @@
   <string name="keyShowOrHideComments">แสดง/ซ่อนความคิดเห็น</string>
   <string name="keyEnterOrExitVariation">เข้าสู่/ออกจากตัวแปรกติกา</string>
   <string name="newTournament">ทัวร์นาเมนต์ใหม่</string>
-  <string name="tournamentHomeTitle">ทัวร์นาเมนต์หมากรุกซึ่งมีการควบคุมเวลาและตัวแปรกติกาต่างๆ</string>
-  <string name="tournamentHomeDescription">เล่นทัวร์นาเมนต์หมากรุกได้ทันที! เข้าร่วมทัวร์นาเมนต์ที่กำหนดเวลาไว้อย่างเป็นทางการ หรือสร้างขึ้นด้วยตัวคุณเอง  มีทั้งบุลลิท, บลิทซ์, คลาสสิก, หมากรุก960, ราชันย์แห่งขุนเขา, สามรุก, และตัวเลือกที่มีให้อีกมากมายเพื่อความสนุกที่ไม่รู้จบของหมากรุก</string>
   <string name="tournamentNotFound">ไม่พบทัวร์นาเมนต์</string>
   <string name="tournamentDoesNotExist">ทัวร์นาเมนต์นี้ไม่มีอยู่</string>
   <string name="tournamentMayHaveBeenCanceled">มันอาจถูกยกเลิกไปแล้ว หากผู้เล่นทุกคนออกไปก่อนที่ทัวร์นาเมนต์จะเริ่มต้น</string>

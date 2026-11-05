@@ -635,8 +635,6 @@
   <string name="keyShowOrHideComments">تبصرے دکھائیں\چھپائیں</string>
   <string name="keyEnterOrExitVariation">متبادل چالیں داخل\خارج</string>
   <string name="newTournament">نیا مسابقہ</string>
-  <string name="tournamentHomeTitle">مختلف انواع اور دورانیوں پر مشتمل مسابقہ</string>
-  <string name="tournamentHomeDescription">تیز رفتار مسابقوں میں حصہ لیں! مقررہ رسمی مسابقوں میں شامل ہوں، یا خود آپ مسابقہ شروع کریں۔ بلٹ، بلٹز، کلاسیکی،۹۶۰ شطرنج، میدان کا بادشاہ، تین شہ، اور دیگر نوع کی شطرنج کی لامتناہی تفریح کا موقعہ۔</string>
   <string name="tournamentNotFound">مسابقہ موجود نہیں</string>
   <string name="tournamentDoesNotExist">یہ مسابقہ موجود نہیں</string>
   <string name="tournamentMayHaveBeenCanceled">مسابقہ شروع ہونے سے پہلے اگر تمام کھلاڑی خارج ہو جائیں تو مسابقہ باقی نہیں رہتا۔</string>

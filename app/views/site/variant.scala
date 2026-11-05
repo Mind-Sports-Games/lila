@@ -64,7 +64,16 @@ object variant {
   )(implicit ctx: Context) =
     layout(
       title = "Board game rules — how to play every game on PlayStrategy",
-      klass = "variants"
+      klass = "variants",
+      openGraph = page
+        .bodyDescription(doc, resolver)
+        .map(description =>
+          lila.app.ui.OpenGraph(
+            title = "Board game rules — how to play every game on PlayStrategy",
+            url = s"$netBaseUrl${routes.Page.variantHome.url}",
+            description = description
+          )
+        )
     )(
       h1("PlayStrategy Games"),
       div(cls := "body box__pad")(raw(~doc.getHtml("pages.content", resolver))),
@@ -84,7 +93,7 @@ object variant {
       title: String,
       klass: String,
       active: Option[Variant] = None,
-      openGraph: Option[lila.app.ui.OpenGraph] = None
+      openGraph: Option[lila.app.ui.OpenGraph]
   )(body: Modifier*)(implicit ctx: Context) =
     views.html.base.layout(
       title = title,

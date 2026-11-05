@@ -11,6 +11,33 @@ import views.html.library.bits as libraryBits
 
 object editor {
 
+  // the variants the editor's own select offers; keep in step with ui/editor/src/view.ts
+  val variantKeys: Set[String] = Set(
+    "standard",
+    "antichess",
+    "atomic",
+    "crazyhouse",
+    "horde",
+    "kingOfTheHill",
+    "racingKings",
+    "threeCheck",
+    "fiveCheck",
+    "monster",
+    "minibreakthroughtroyka",
+    "breakthroughtroyka",
+    "linesOfAction",
+    "scrambledEggs",
+    "flipello",
+    "flipello10",
+    "antiflipello",
+    "octagonflipello",
+    "xiangqi",
+    "minixiangqi",
+    "amazons",
+    "abalone",
+    "grandabalone"
+  )
+
   def apply(
       sit: Situation,
       fen: FEN,
@@ -18,9 +45,18 @@ object editor {
       positionsJson: String,
       positionsByVariantJson: String,
       orientation: Option[String] = None
-  )(implicit ctx: Context) =
+  )(implicit ctx: Context) = {
+    val variantName = lila.i18n.VariantKeys.variantName(variant)
+    val isStandard  = variant.key == "standard"
+    val pageTitle   =
+      if (isStandard) trans.boardEditorTitle.txt() else trans.variantBoardEditorTitle.txt(variantName)
+    val pageDescription =
+      if (isStandard) trans.boardEditorDescription.txt()
+      else trans.variantBoardEditorDescription.txt(variantName)
+    val canonical =
+      if (isStandard) routes.Editor.index.url else routes.Editor.variant(variant.key).url
     views.html.base.layout(
-      title = trans.boardEditorTitle.txt(),
+      title = pageTitle,
       boardFamily = variant.gameFamily.key.some,
       soleBoardFamily = true,
       namePieceSets = true,
@@ -37,16 +73,16 @@ object editor {
       zoomable = true,
       openGraph = lila.app.ui
         .OpenGraph(
-          title = trans.boardEditorTitle.txt(),
-          url = s"$netBaseUrl${routes.Editor.index.url}",
-          description = trans.boardEditorDescription.txt()
+          title = pageTitle,
+          url = s"$netBaseUrl$canonical",
+          description = pageDescription
         )
         .some,
-      canonicalPath = routes.Editor.index.url.some
+      canonicalPath = canonical.some
     )(
       frag(
         // outside the element the editor empties on mount
-        h1(cls := "offscreen")(trans.boardEditor()),
+        h1(cls := "offscreen")(pageTitle),
         main(id := "board-editor")(
           div(cls := s"board-editor variant-${variant.key}")(
             div(cls := "spare"),
@@ -58,6 +94,7 @@ object editor {
         )
       )
     )
+  }
 
   def about(variant: strategygames.variant.Variant)(implicit ctx: Context): Frag =
     frag(
