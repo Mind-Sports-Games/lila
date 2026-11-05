@@ -50,15 +50,21 @@ final class BotVsBotCoordinator(
       logger.info(s"[${stream.name}] stopped")
     }
 
+    private def cyclePosition: Int = {
+      val len = stream.games.length
+      val idx = cycleIdx.get()
+      if (currentGame.get().isDefined) (idx + len - 1) % len + 1 else idx + 1
+    }
+
     def liveStatus = BotStreamStatus(
       currentGame = currentGame.get(),
-      cyclePosition = cycleIdx.get() + 1,
+      cyclePosition = cyclePosition,
       cycleLength = stream.games.length,
       missingBots = stream.botIds.diff(onlineApiUsers.get)
     )
 
     def status(): String = {
-      val cyclePos = s"${cycleIdx.get() + 1}/${stream.games.length}"
+      val cyclePos = s"$cyclePosition/${stream.games.length}"
       if (running.get())
         currentGame.get().fold(s"[${stream.name}] Running — no game in progress (cycle $cyclePos)")(id =>
           s"[${stream.name}] Running — current game: $id (cycle $cyclePos)"

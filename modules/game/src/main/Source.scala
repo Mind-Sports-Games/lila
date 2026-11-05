@@ -22,7 +22,7 @@ object Source {
   case object BotVsBotStream    extends Source(id = 14)
   case object BotVsBotPriority  extends Source(id = 15)
 
-  val all  = List(
+  val all = List(
     Lobby,
     Friend,
     Ai,
@@ -35,13 +35,13 @@ object Source {
     Pool,
     Swiss,
     BotVsBotStream,
-    BotVsBotPriority 
+    BotVsBotPriority
   )
   val byId = all map { v =>
     (v.id, v)
   } toMap
 
-  val searchable             = List(
+  val searchable = List(
     Lobby,
     Friend,
     Ai,
@@ -52,7 +52,7 @@ object Source {
     Pool,
     Swiss,
     BotVsBotStream,
-    BotVsBotPriority 
+    BotVsBotPriority
   )
   val expirable: Set[Source] = Set(Lobby, Tournament, Pool, Swiss)
 
