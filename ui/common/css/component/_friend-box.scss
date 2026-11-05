@@ -1,56 +1,86 @@
 #friend_box {
-  display: none;
-
-  @include breakpoint($mq-topnav-visible $mq-site-header-tall) {
-    display: block;
-  }
-
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  z-index: z('friend-box');
-  background: $c-bg-popup;
-  border: $border;
-  border-right: 0;
-  border-bottom: 0;
-  border-top-left-radius: $box-radius-size;
+  position: relative;
   font-size: 0.9rem;
-  min-width: 150px;
-  max-height: 95%;
 
-  /* improve scroll perfs */
-  backface-visibility: hidden;
+  .friend_box_button {
+    height: $site-header-height;
+    line-height: $site-header-height;
+    padding: 0 0.7rem;
 
-  @include hoverflow;
+    span::before {
+      font-size: 1.3em;
+    }
 
-  .friend_box_title {
-    @extend %metal;
+    .friend_box_icon {
+      position: relative;
+    }
 
-    cursor: pointer;
-    padding: 3px 5px;
-    border-bottom: $border;
+    // a plain number at the bottom: the top-right badges are for challenges and notifications
+    .friend_box_badge {
+      position: absolute;
+      bottom: -4px;
+      // anchored left so extra digits grow away from the icon
+      left: calc(100% - 0.35em + 1px);
+      padding: 0 3px;
+      line-height: 15px;
+      color: $c-font-dim;
+      font-size: 11px;
+      font-weight: bold;
+      white-space: nowrap;
 
-    &:hover {
-      @extend %metal-hover;
+      &:empty {
+        display: none;
+      }
+
+      // "99+": a small raised plus keeps clear of the next icon
+      sup {
+        position: absolute;
+        top: 0.1em;
+        left: calc(100% - 3px);
+        font-size: 0.75em;
+        line-height: 1;
+      }
     }
   }
 
+  .friend_box_count {
+    white-space: nowrap;
+    padding: 0.5em 0.75em;
+  }
+
+  .content_wrap {
+    @extend %box-radius;
+
+    left: calc(50% - 100px);
+    right: auto;
+    min-width: 200px;
+    max-height: 95vh;
+    overflow: hidden;
+  }
+
   .content {
+    @include hoverflow;
+
     max-height: 80vh;
     overflow-x: hidden;
     overflow-y: auto;
+    border-top: $border;
+
+    &:empty {
+      display: none;
+    }
 
     div {
       display: flex;
 
       &:hover {
-        background: mix($c-secondary, $c-bg-popup, 10%);
+        background: mix($c-secondary, $c-bg-header-dropdown, 10%);
       }
     }
 
     a {
       flex: 1 1 100%;
-      padding: 3px 0px;
+      padding: 4px 0.25em;
       display: block;
       transition: background 0.13s;
 
@@ -61,7 +91,7 @@
       &.user-link {
         @extend %ellipsis;
 
-        max-width: 150px;
+        max-width: 200px;
 
         .line::before {
           color: $c-good;
@@ -83,26 +113,5 @@
     i.line {
       opacity: 0.6;
     }
-  }
-
-  .nobody {
-    text-align: center;
-    height: 100%;
-    padding: 3px 5px;
-
-    span {
-      display: block;
-      margin: 5px;
-    }
-  }
-
-  a.find {
-    display: none;
-    margin: 7px;
-    font-style: normal;
-  }
-
-  .nobody:hover a.find {
-    display: block;
   }
 }

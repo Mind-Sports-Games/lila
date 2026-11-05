@@ -27,7 +27,11 @@ object PoolList {
       Wave(37 seconds, 30 players),
       Variant.Abalone(strategygames.abalone.variant.Abalone)
     ),
-    PoolConfig(3 ++ 5, Wave(40 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Amazons)),
+    PoolConfig(
+      3 ++ 2,
+      Wave(40 seconds, 30 players),
+      Variant.FiveInARow(strategygames.fiveinarow.variant.Gomoku)
+    ),
     PoolConfig(
       5 ++ 0,
       Wave(43 seconds, 30 players),

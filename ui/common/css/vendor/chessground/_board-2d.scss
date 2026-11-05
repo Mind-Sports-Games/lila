@@ -177,6 +177,14 @@ $entropy-board-files: (
   'wood': 'wood.svg',
 );
 
+$fiveinarow-board-files: (
+  'wood': 'wood.svg',
+);
+
+$fiveinarow-19x19-board-files: (
+  'wood': 'wood19x19.svg',
+);
+
 $shogi-variants: ('shogi'); //must use same board
 
 $xiangqi-variants: ('xiangqi'); // must use same board
@@ -208,6 +216,19 @@ $abalone-variants: ('abalone', 'grandabalone');
 @each $color, $file in $entropy-board-files {
   .entropy-#{$color} .variant-entropy.is2d cg-board {
     background-image: url(../images/board/entropy/#{$file});
+  }
+}
+
+@each $color, $file in $fiveinarow-board-files {
+  .fiveinarow-#{$color} .variant-gomoku.is2d cg-board,
+  .fiveinarow-#{$color} .variant-renju.is2d cg-board {
+    background-image: url(../images/board/fiveinarow/#{$file});
+  }
+}
+
+@each $color, $file in $fiveinarow-19x19-board-files {
+  .fiveinarow-#{$color} .variant-pente.is2d cg-board {
+    background-image: url(../images/board/fiveinarow/#{$file});
   }
 }
 
@@ -359,6 +380,19 @@ $abalone-variants: ('abalone', 'grandabalone');
 @each $color, $file in $entropy-board-files {
   .entropy-#{$color} .is2d .variant-entropy cg-board {
     background-image: url(../images/board/entropy/#{$file});
+  }
+}
+
+@each $color, $file in $fiveinarow-board-files {
+  .fiveinarow-#{$color} .is2d .variant-gomoku cg-board,
+  .fiveinarow-#{$color} .is2d .variant-renju cg-board {
+    background-image: url(../images/board/fiveinarow/#{$file});
+  }
+}
+
+@each $color, $file in $fiveinarow-19x19-board-files {
+  .fiveinarow-#{$color} .is2d .variant-pente cg-board {
+    background-image: url(../images/board/fiveinarow/#{$file});
   }
 }
 

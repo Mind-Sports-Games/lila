@@ -49,4 +49,7 @@
   <string name="abalone">Abalone</string>
   <string name="grandabalone">XAba</string>
   <string name="entropy">Entropy</string>
+  <string name="gomoku">Gomoku</string>
+  <string name="pente">Pente</string>
+  <string name="renju">Renju</string>
 </resources>

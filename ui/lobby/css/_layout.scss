@@ -28,13 +28,13 @@ $mq-not-col3: $mq-not-small;
   }
 
   @include breakpoint($mq-col2) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-rows: auto repeat(3, fit-content(0));
     grid-template-areas: 'blog   blog' 'table  table' 'app    app' 'side   chat' 'tv   puzzle' 'tours tours' 'winner  winner' 'simuls simuls' 'gamelist gamelist' 'forum  forum' 'weekcha  info';
   }
 
   @include breakpoint($mq-col3) {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: auto repeat(2, fit-content(0));
     grid-template-areas: 'side    blog    blog' 'table   app     app' 'chat    app     app' 'tv      tours  tours' 'puzzle  winner   winner' '.   simuls  simuls' 'weekcha gamelist gamelist' 'info  forum forum ';
 
@@ -55,7 +55,7 @@ $mq-not-col3: $mq-not-small;
   }
 
   @include breakpoint($mq-col4) {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     grid-template-rows: repeat(2, fit-content(0));
     grid-template-areas: 'side    blog    blog    table' 'side   app     app    chat' 'puzzle app app chat' 'tv tours tours winner' '.      simuls  simuls .' 'gamelist gamelist gamelist gamelist' 'weekcha  forum    forum    info';
 

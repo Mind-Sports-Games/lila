@@ -4,7 +4,7 @@ import strategygames.format.pgn.{ Glyph, Glyphs }
 import strategygames.format.{ FEN, Uci }
 import strategygames.format.UciCharPair
 import strategygames.variant.Variant
-import strategygames.{ Centis, Player as PlayerIndex, PocketData }
+import strategygames.{ Centis, GameLogic, Player as PlayerIndex, PocketData }
 
 import lila.tree.Eval.Score
 import lila.tree.Node.{ Comment, Comments, Gamebook, Shapes }
@@ -331,6 +331,10 @@ object Node {
     override def toString = "ROOT"
   }
 
+  // five in a row drops its stones without a pocket
+  def initialPocketData(variant: Variant): Option[PocketData] =
+    (variant.dropsVariant && variant.gameLogic != GameLogic.FiveInARow()).option(PocketData.init(variant.gameLogic))
+
   object Root {
 
     def default(variant: Variant) =
@@ -342,7 +346,7 @@ object Node {
         fen = variant.initialFen,
         check = false,
         clock = none,
-        pocketData = variant.dropsVariant.option(PocketData.init(variant.gameLogic)),
+        pocketData = initialPocketData(variant),
         children = emptyChildren
       )
 

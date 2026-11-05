@@ -99,7 +99,10 @@ object list {
               userTopPerf(leaderboards.nackgammon, PerfType.orDefault("nackgammon")),
               userTopPerf(leaderboards.abalone, PerfType.orDefault("abalone")),
               userTopPerf(leaderboards.grandabalone, PerfType.orDefault("grandabalone")),
-              userTopPerf(leaderboards.entropy, PerfType.orDefault("entropy"))
+              userTopPerf(leaderboards.entropy, PerfType.orDefault("entropy")),
+              userTopPerf(leaderboards.gomoku, PerfType.orDefault("gomoku")),
+              userTopPerf(leaderboards.pente, PerfType.orDefault("pente")),
+              userTopPerf(leaderboards.renju, PerfType.orDefault("renju"))
             )
           )
         )

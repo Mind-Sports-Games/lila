@@ -40,6 +40,9 @@ type variantConfirmsType = {
   abalone: string;
   grandabalone: string;
   entropy: string;
+  gomoku: string;
+  pente: string;
+  renju: string;
 };
 
 const variantConfirms: variantConfirmsType = {
@@ -104,6 +107,12 @@ const variantConfirms: variantConfirmsType = {
     "This is a Grand Abalone game!\n\nThe aim of the game is to be the first to push ten of your opponent's marbles off the board.",
   entropy:
     'This is an Entropy game!\n\nThe game is played over two rounds with roles swapped. Chaos draws and places counters; Order slides them to build symmetric colour patterns, scoring as it goes. The higher score wins.',
+  gomoku:
+    'This is a Gomoku game!\n\nThe first to make an unbroken line of exactly five stones wins; six or more in a row does not count. It opens with swap2: Player 1 places three stones, then Player 2 may play on, swap colours, or place two more and let Player 1 choose a colour.',
+  pente:
+    "This is a Pente game!\n\nOn a 19x19 board, the first to make an unbroken line of five or more stones wins, or the first to capture ten stones. Closing off exactly two of your opponent's stones in a line captures them. It opens with swap2, as gomoku does.",
+  renju:
+    'This is a Renju game!\n\nBlack wins only with exactly five in a row, and loses at once by making a double three, a double four or an overline. White wins with five or more. It opens with Taraguchi-10: the first stones go near the centre with a swap offered after each, and black may offer ten fifth stones for white to choose from.',
 };
 
 function storageKey(key: string) {

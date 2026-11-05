@@ -57,6 +57,9 @@ case class Perfs(
     abalone: Perf,
     grandabalone: Perf,
     entropy: Perf,
+    gomoku: Perf,
+    pente: Perf,
+    renju: Perf,
     ultraBullet: Perf,
     bullet: Perf,
     blitz: Perf,
@@ -124,6 +127,9 @@ case class Perfs(
       "abalone"                -> abalone,
       "grandabalone"           -> grandabalone,
       "entropy"                -> entropy,
+      "gomoku"                 -> gomoku,
+      "pente"                  -> pente,
+      "renju"                  -> renju,
       "ultraBullet"            -> ultraBullet,
       "bullet"                 -> bullet,
       "blitz"                  -> blitz,
@@ -248,6 +254,9 @@ case class Perfs(
     "abalone"                -> abalone,
     "grandabalone"           -> grandabalone,
     "entropy"                -> entropy,
+    "gomoku"                 -> gomoku,
+    "pente"                  -> pente,
+    "renju"                  -> renju,
     "ultraBullet"            -> ultraBullet,
     "bullet"                 -> bullet,
     "blitz"                  -> blitz,
@@ -319,6 +328,9 @@ case object Perfs {
   val default = {
     val p = Perf.default
     Perfs(
+      p,
+      p,
+      p,
       p,
       p,
       p,
@@ -455,6 +467,9 @@ case object Perfs {
       case Variant.Abalone(strategygames.abalone.variant.Abalone)                => Some(_.abalone)
       case Variant.Abalone(strategygames.abalone.variant.GrandAbalone)           => Some(_.grandabalone)
       case Variant.Entropy(strategygames.entropy.variant.Entropy)                => Some(_.entropy)
+      case Variant.FiveInARow(strategygames.fiveinarow.variant.Gomoku)           => Some(_.gomoku)
+      case Variant.FiveInARow(strategygames.fiveinarow.variant.Pente)            => Some(_.pente)
+      case Variant.FiveInARow(strategygames.fiveinarow.variant.Renju)            => Some(_.renju)
       case _                                                                     => none
     }
 
@@ -540,6 +555,9 @@ case object Perfs {
         abalone = perf("abalone"),
         grandabalone = perf("grandabalone"),
         entropy = perf("entropy"),
+        gomoku = perf("gomoku"),
+        pente = perf("pente"),
+        renju = perf("renju"),
         ultraBullet = perf("ultraBullet"),
         bullet = perf("bullet"),
         blitz = perf("blitz"),
@@ -610,6 +628,9 @@ case object Perfs {
         "abalone"                -> notNew(o.abalone),
         "grandabalone"           -> notNew(o.grandabalone),
         "entropy"                -> notNew(o.entropy),
+        "gomoku"                 -> notNew(o.gomoku),
+        "pente"                  -> notNew(o.pente),
+        "renju"                  -> notNew(o.renju),
         "ultraBullet"            -> notNew(o.ultraBullet),
         "bullet"                 -> notNew(o.bullet),
         "blitz"                  -> notNew(o.blitz),
@@ -680,7 +701,10 @@ case object Perfs {
       nackgammon: List[User.LightPerf],
       abalone: List[User.LightPerf],
       grandabalone: List[User.LightPerf],
-      entropy: List[User.LightPerf]
+      entropy: List[User.LightPerf],
+      gomoku: List[User.LightPerf],
+      pente: List[User.LightPerf],
+      renju: List[User.LightPerf]
   ) {
     def forVariant(variant: Variant): List[User.LightPerf] = {
       val key = variant.key
@@ -740,11 +764,17 @@ case object Perfs {
       "nackgammon"             -> nackgammon,
       "abalone"                -> abalone,
       "grandabalone"           -> grandabalone,
-      "entropy"                -> entropy
+      "entropy"                -> entropy,
+      "gomoku"                 -> gomoku,
+      "pente"                  -> pente,
+      "renju"                  -> renju
     )
   }
 
   val emptyLeaderboards = Leaderboards(
+    Nil,
+    Nil,
+    Nil,
     Nil,
     Nil,
     Nil,
