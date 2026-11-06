@@ -12,7 +12,6 @@ import strategygames.variant.Variant
 import lila.challenge.{ Challenge, ChallengeApi }
 import lila.common.Bus
 import lila.game.{ Game, actorApi }
-import lila.hub.actorApi.bot.*
 import lila.hub.actorApi.map.Tell
 import lila.hub.actorApi.round.NextGameLinked
 import lila.user.UserRepo
@@ -62,15 +61,6 @@ final class BotVsBotCoordinator(
       cycleLength = stream.games.length,
       missingBots = stream.botIds.diff(onlineApiUsers.get)
     )
-
-    def status(): String = {
-      val cyclePos = s"$cyclePosition/${stream.games.length}"
-      if (running.get())
-        currentGame.get().fold(s"[${stream.name}] Running — no game in progress (cycle $cyclePos)")(id =>
-          s"[${stream.name}] Running — current game: $id (cycle $cyclePos)"
-        )
-      else s"[${stream.name}] Stopped (cycle $cyclePos)"
-    }
 
     def gameFinished(finishedGameId: Game.ID): Unit = {
       currentGame.set(none)
@@ -221,48 +211,11 @@ final class BotVsBotCoordinator(
         funit
       } >> start(stream) inject s"Bot stream '${stream.name}' restarted"
 
-  private def startAll: Funit = repo.activateAllUnexpired >> sync(_ => true)
-
-  private def stopAll: Funit = repo.deactivateAll >> refresh
-
-  private def restartAll: Funit = sync(_ => autoStart, restart = true)
-
-  private def statusText: Fu[String] =
-    repo.all map { streams =>
-      if (streams.isEmpty) "No bot streams"
-      else
-        streams
-          .map { s =>
-            runners.get(s.id).fold(s"[${s.name}] ${state(s)}")(_.status())
-          }
-          .mkString("\n")
-    }
-
-  private def withStream(idOrName: String)(f: BotStream => Fu[String]): Fu[String] =
-    repo.byIdOrName(idOrName) flatMap {
-      case Some(stream) => f(stream)
-      case None         =>
-        repo.all map { streams =>
-          s"Bot stream not found: '$idOrName'. Available: ${streams.map(_.name).mkString(", ")}"
-        }
-    }
-
   Bus.subscribeFun("finishGame") {
     case actorApi.FinishGame(game, _, _) =>
       runners.values.find(_.ownsGame(game.id)).foreach { runner =>
         if (runner.isRunning) runner.gameFinished(game.id)
       }
-  }
-
-  Bus.subscribeFun("botVsBot") {
-    case BotVsBotStatus(promise)  => promise.completeWith(statusText)
-    case BotVsBotStart(promise)   => promise.completeWith(startAll inject "Started every bot stream that has not expired")
-    case BotVsBotStop(promise)    =>
-      promise.completeWith(stopAll inject "Stopped every bot stream and marked them inactive")
-    case BotVsBotRestart(promise) => promise.completeWith(restartAll inject "Restarted every running bot stream")
-    case BotVsBotStartStream(name, promise)   => promise.completeWith(withStream(name)(start))
-    case BotVsBotStopStream(name, promise)    => promise.completeWith(withStream(name)(stop))
-    case BotVsBotRestartStream(name, promise) => promise.completeWith(withStream(name)(restart))
   }
 
   scheduler.scheduleWithFixedDelay(1.minute, 1.minute) { () =>
@@ -271,7 +224,7 @@ final class BotVsBotCoordinator(
 
   private[bot] def init(): Unit = {
     if (autoStart) logger.info("Bot vs bot auto-start enabled, starting active streams")
-    else logger.info("Bot vs bot auto-start disabled in config (start streams from the mod page or CLI)")
+    else logger.info("Bot vs bot auto-start disabled in config (start streams from the mod page)")
     refresh.discard
   }
 }

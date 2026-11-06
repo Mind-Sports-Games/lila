@@ -12,15 +12,27 @@
     margin-inline-end: 0.3em;
   }
 
-  td.bot-streams__actions {
-    height: 1px;
+  .slist td {
+    padding: 0.5rem;
 
+    &:first-child {
+      padding-left: var(--box-padding);
+    }
+
+    &:last-child {
+      padding-right: var(--box-padding);
+    }
+  }
+
+  td.bot-streams__clock {
+    white-space: nowrap;
+  }
+
+  td.bot-streams__actions {
     > div {
-      height: 100%;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 0.5em;
+      gap: 0.9em;
     }
 
     button {
@@ -89,6 +101,33 @@
       font-weight: bold;
       margin-bottom: 0.3em;
     }
+  }
+}
+
+.bot-stream__matchups-group > .form-label {
+  font-size: 1.2em;
+}
+
+.bot-stream__matchup {
+  @extend %box-radius;
+
+  border: $border;
+  background: $c-bg-zebra;
+  padding: 1em 1.2em 0.2em;
+  margin-bottom: 1em;
+
+  > .form-label {
+    font-size: 0.85em;
+    text-transform: uppercase;
+    color: $c-font-dim;
+  }
+
+  .form-group {
+    margin-bottom: 1.2rem;
+  }
+
+  .form-group .form-label {
+    font-weight: normal;
   }
 }
 

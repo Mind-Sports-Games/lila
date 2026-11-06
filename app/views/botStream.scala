@@ -66,7 +66,7 @@ object botStream {
           (!coordinator.autoStart).option(
             p(
               strong("Auto-start is off in config (autoBotvsBot.enabled)."),
-              " Streams only run once started here or from the CLI, and do not resume after a restart."
+              " Streams only run once started here, and do not resume after a restart."
             )
           )
         ),
@@ -99,7 +99,7 @@ object botStream {
                     )
                   }
                 ),
-                td(dataLabel := "Clock")(s.clock.show),
+                td(cls := "bot-streams__clock", dataLabel := "Clock")(s.clock.show),
                 td(dataLabel := "UTC end")(
                   s.until.fold[Frag]("Until stopped") { until =>
                     frag(showDateTimeUTC(until), br, momentFromNow(until))
@@ -174,10 +174,10 @@ object botStream {
     form3.group(form(s"matchups[$index]"), raw(s"Matchup $number"), klass = "bot-stream__matchup") { _ =>
       frag(
         form3.split(
-          form3.group(form(s"matchups[$index].p1"), raw("Bot"), half = true)(
+          form3.group(form(s"matchups[$index].p1"), raw("Bot 1"), half = true)(
             form3.select(_, botChoices, default = "".some)
           ),
-          form3.group(form(s"matchups[$index].p2"), raw("Opponent bot"), half = true)(
+          form3.group(form(s"matchups[$index].p2"), raw("Bot 2"), half = true)(
             form3.select(_, botChoices, default = "".some)
           )
         ),
@@ -249,6 +249,7 @@ object botStream {
       form3.group(
         form("matchups"),
         raw("Matchups"),
+        klass = "bot-stream__matchups-group",
         help = raw(
           s"Every variant of a matchup is played with both bots taking each side. Up to ${BotStreamForm.maxMatchups} matchups; an empty one is skipped."
         ).some
@@ -268,7 +269,7 @@ object botStream {
           )("Add matchup"),
           tag("details")(
             tag("summary")("All variant keys"),
-            p(BotVsBotConfig.streamableVariants.map(v => s"${v.key} (${v.name})").mkString(", "))
+            p(BotVsBotConfig.streamableVariants.map(_.key).mkString(", "))
           )
         )
       },

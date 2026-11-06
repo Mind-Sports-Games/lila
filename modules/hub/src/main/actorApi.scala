@@ -317,12 +317,3 @@ package plan {
   case class PlanExpire(userId: String)
 }
 
-package bot {
-  case class BotVsBotStart(promise: scala.concurrent.Promise[String])
-  case class BotVsBotStop(promise: scala.concurrent.Promise[String])
-  case class BotVsBotRestart(promise: scala.concurrent.Promise[String])
-  case class BotVsBotStatus(promise: scala.concurrent.Promise[String])
-  case class BotVsBotStartStream(name: String, promise: scala.concurrent.Promise[String])
-  case class BotVsBotStopStream(name: String, promise: scala.concurrent.Promise[String])
-  case class BotVsBotRestartStream(name: String, promise: scala.concurrent.Promise[String])
-}
