@@ -451,6 +451,13 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.FiveInARow(strategygames.fiveinarow.variant.Renju), Blitz32)(
         new DateTime(2026, 12, 25, 0, 0)
+      ),
+      // the first free Fridays after the 2026 list; they belong in the 2027 list once it exists
+      scheduleYearly24hr(Variant.Yonkoma(strategygames.yonkoma.variant.Yonkoma10x10), Blitz32)(
+        new DateTime(2027, 1, 1, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Yonkoma(strategygames.yonkoma.variant.Yonkoma12x12), Blitz32)(
+        new DateTime(2027, 1, 8, 0, 0)
       )
     ).flatten
 

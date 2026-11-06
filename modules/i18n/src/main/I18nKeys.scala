@@ -59,6 +59,7 @@ val `threeChecks` = new I18nKey("threeChecks")
 val `fiveChecks` = new I18nKey("fiveChecks")
 val `raceFinished` = new I18nKey("raceFinished")
 val `checkersConnected` = new I18nKey("checkersConnected")
+val `crosscutCompleted` = new I18nKey("crosscutCompleted")
 val `gameFinished` = new I18nKey("gameFinished")
 val `backgammonSingleWin` = new I18nKey("backgammonSingleWin")
 val `backgammonGammonWin` = new I18nKey("backgammonGammonWin")
@@ -2536,6 +2537,9 @@ val `nackgammon` = new I18nKey("variantName:nackgammon")
 val `abalone` = new I18nKey("variantName:abalone")
 val `grandabalone` = new I18nKey("variantName:grandabalone")
 val `entropy` = new I18nKey("variantName:entropy")
+val `yonkoma` = new I18nKey("variantName:yonkoma")
+val `yonkoma10x10` = new I18nKey("variantName:yonkoma10x10")
+val `yonkoma12x12` = new I18nKey("variantName:yonkoma12x12")
 }
 
 object variantShortName {
@@ -2589,6 +2593,8 @@ val `nackgammon` = new I18nKey("variantShortName:nackgammon")
 val `abalone` = new I18nKey("variantShortName:abalone")
 val `grandabalone` = new I18nKey("variantShortName:grandabalone")
 val `entropy` = new I18nKey("variantShortName:entropy")
+val `yonkoma10x10` = new I18nKey("variantShortName:yonkoma10x10")
+val `yonkoma12x12` = new I18nKey("variantShortName:yonkoma12x12")
 }
 
 object variantTitle {
@@ -2642,6 +2648,8 @@ val `nackgammon` = new I18nKey("variantTitle:nackgammon")
 val `abalone` = new I18nKey("variantTitle:abalone")
 val `grandabalone` = new I18nKey("variantTitle:grandabalone")
 val `entropy` = new I18nKey("variantTitle:entropy")
+val `yonkoma10x10` = new I18nKey("variantTitle:yonkoma10x10")
+val `yonkoma12x12` = new I18nKey("variantTitle:yonkoma12x12")
 }
 
 object variantAlias {
@@ -2695,6 +2703,8 @@ val `nackgammon` = new I18nKey("variantAlias:nackgammon")
 val `abalone` = new I18nKey("variantAlias:abalone")
 val `grandabalone` = new I18nKey("variantAlias:grandabalone")
 val `entropy` = new I18nKey("variantAlias:entropy")
+val `yonkoma10x10` = new I18nKey("variantAlias:yonkoma10x10")
+val `yonkoma12x12` = new I18nKey("variantAlias:yonkoma12x12")
 }
 
 object onboarding {

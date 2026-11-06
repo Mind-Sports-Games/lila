@@ -339,6 +339,7 @@ export default class RoundController {
         'abalone',
         'grandabalone',
         'entropy',
+        ...stratUtils.yonkoma.variants,
       ].includes(this.data.game.variant.key)
     )
       return false;

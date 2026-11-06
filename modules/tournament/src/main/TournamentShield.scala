@@ -1082,6 +1082,20 @@ object TournamentShield {
           20,
           1
         )
+    case object Yonkoma10x10
+        extends Category(
+          Variant.Yonkoma(strategygames.yonkoma.variant.Yonkoma10x10),
+          Blitz32,
+          4,
+          1
+        )
+    case object Yonkoma12x12
+        extends Category(
+          Variant.Yonkoma(strategygames.yonkoma.variant.Yonkoma12x12),
+          Blitz32,
+          11,
+          1
+        )
 
     val all: List[Category] = List(
       Chess,
@@ -1134,7 +1148,9 @@ object TournamentShield {
       Entropy,
       Gomoku,
       Pente,
-      Renju
+      Renju,
+      Yonkoma10x10,
+      Yonkoma12x12
     )
 
     def of(t: Tournament): Option[Category] = all.find(_.matches(t))

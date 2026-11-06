@@ -870,6 +870,9 @@ export default class Setup {
               break;
           }
           break;
+        case '16':
+          key = variantId[1] === '2' ? 'yonkoma12x12' : 'yonkoma10x10';
+          break;
       }
       const $selected = $ratings
         .hide()
@@ -881,7 +884,7 @@ export default class Setup {
     const showStartingImages = () => {
       const variantId = ($variantInput.filter(':checked').val() as string).split('_');
       const class_list =
-        'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon breakthroughtroyka abalone dameo entropy fiveinarow';
+        'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon breakthroughtroyka abalone dameo entropy fiveinarow yonkoma';
       let key = 'chess';
       switch (variantId[0]) {
         case '0':
@@ -931,6 +934,9 @@ export default class Setup {
           break;
         case '15':
           key = 'fiveinarow';
+          break;
+        case '16':
+          key = 'yonkoma';
           break;
       }
       $playerIndex.removeClass(class_list);

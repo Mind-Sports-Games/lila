@@ -450,6 +450,10 @@ final class JsonView(
           .playableBy(pov.player)
           .option(Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion))
       case (Situation.FiveInARow(_), Variant.FiveInARow(_)) => None
+      case (Situation.Yonkoma(_), Variant.Yonkoma(_)) =>
+        pov.game
+          .playableBy(pov.player)
+          .option(Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion))
       case _ => sys.error("Mismatch of types for possibleMoves")
     }
 
@@ -484,6 +488,7 @@ final class JsonView(
         pov.game
           .playableBy(pov.player)
           .option(Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty)))
+      case (Situation.Yonkoma(_), Variant.Yonkoma(_)) => None
       case _ => sys.error("Mismatch of types for possibleDropsByrole")
     }
 

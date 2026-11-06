@@ -62,9 +62,12 @@ final class JsonView(rematches: Rematches) {
       .add("canOfferDraw" -> game.variant.canOfferDraw)
       .add("drawOfferAllowed" -> game.stratGame.drawOfferAllowed)
       .add("drawOffers" -> (!game.drawOffers.isEmpty).option(game.drawOffers.normalizedTurns))
-      .add(
-        "canDoPassAction" -> (game.situation.passes.size > 0 || game.variant.gameLogic == GameLogic.Entropy())
-      )
+      .add("canDoPassAction" -> (game.variant.gameLogic match {
+        case GameLogic.Entropy() => true
+        // yonkoma's pass is the skipped turn of a stuck player, which the server plays for him
+        case GameLogic.Yonkoma() => false
+        case _                   => game.situation.passes.size > 0
+      }))
       .add("multiMatch" -> game.metadata.multiMatchGameNr.map { index =>
         Json
           .obj("index" -> index)
@@ -269,6 +272,14 @@ object JsonView {
           "lib"       -> v.gameLogic.id,
           "boardSize" -> fiveInARowVariant.boardSize
         )
+      case Variant.Yonkoma(yonkomaVariant) =>
+        Json.obj(
+          "key"       -> v.key,
+          "name"      -> VariantKeys.variantName(v),
+          "short"     -> VariantKeys.variantShortName(v),
+          "lib"       -> v.gameLogic.id,
+          "boardSize" -> yonkomaVariant.boardSize
+        )
       case _ =>
         Json.obj(
           "key"       -> v.key,
@@ -349,6 +360,14 @@ object JsonView {
 
   implicit val boardSizeFiveInARowWriter: Writes[strategygames.fiveinarow.Board.BoardSize] =
     Writes[strategygames.fiveinarow.Board.BoardSize] { b =>
+      Json.obj(
+        "width"  -> b.width,
+        "height" -> b.height
+      )
+    }
+
+  implicit val boardSizeYonkomaWriter: Writes[strategygames.yonkoma.Board.BoardSize] =
+    Writes[strategygames.yonkoma.Board.BoardSize] { b =>
       Json.obj(
         "width"  -> b.width,
         "height" -> b.height

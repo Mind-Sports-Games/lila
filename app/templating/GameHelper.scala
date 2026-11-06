@@ -349,7 +349,8 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
             trans.gameFinished.txt()
           case Variant.FiveInARow(strategygames.fiveinarow.variant.Renju) =>
             trans.gameFinished.txt()
-          case _ => trans.variantEnding.txt()
+          case Variant.Yonkoma(_) => trans.crosscutCompleted.txt()
+          case _                  => trans.variantEnding.txt()
         }
       case _ => ""
     }

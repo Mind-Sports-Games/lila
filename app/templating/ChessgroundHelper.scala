@@ -42,6 +42,9 @@ trait ChessgroundHelper {
               case Pos.Entropy(p)      => orient.fold(6 - p.rank.index, p.rank.index) * 100.0 / 7
               case Pos.FiveInARow(p)   =>
                 orient.fold(fiveInARowSize - 1 - p.rank.index, p.rank.index) * 100.0 / fiveInARowSize
+              case Pos.Yonkoma(p)      =>
+                val n = board.variant.toYonkoma.height
+                orient.fold(n - 1 - p.rank.index, p.rank.index) * 100.0 / n
               case _                   => sys.error("Invalid Pos type")
             }
             def left(p: Pos) = p match {
@@ -56,6 +59,9 @@ trait ChessgroundHelper {
               case Pos.Entropy(p)      => orient.fold(p.file.index, 6 - p.file.index) * 100.0 / 7
               case Pos.FiveInARow(p)   =>
                 orient.fold(p.file.index, fiveInARowSize - 1 - p.file.index) * 100.0 / fiveInARowSize
+              case Pos.Yonkoma(p)      =>
+                val n = board.variant.toYonkoma.width
+                orient.fold(p.file.index, n - 1 - p.file.index) * 100.0 / n
               case _                   => sys.error("Invalid Pos type")
             }
             val highlights = ctx.pref.highlight so lastMove.distinct.map { pos =>
@@ -178,6 +184,14 @@ trait ChessgroundHelper {
           }
         )
       case (board: Board.FiveInARow, history: History.FiveInARow) =>
+        chessground(
+          board = board,
+          orient = pov.playerIndex,
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
+            List(orig, dest)
+          }
+        )
+      case (board: Board.Yonkoma, history: History.Yonkoma) =>
         chessground(
           board = board,
           orient = pov.playerIndex,

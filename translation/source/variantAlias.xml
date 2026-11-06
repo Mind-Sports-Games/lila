@@ -53,4 +53,6 @@
   <string name="gomoku">Five in a Row</string>
   <string name="pente"></string>
   <string name="renju">professional Gomoku</string>
+  <string name="yonkoma10x10">Mark Steere's game of four checkers, 10x10 board</string>
+  <string name="yonkoma12x12">Mark Steere's game of four checkers, 12x12 board</string>
 </resources>

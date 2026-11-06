@@ -157,13 +157,17 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
                                   ? 'https://playstrategy.org/assets/piece/dameo/' +
                                     d.pref.pieceSet.filter(ps => ps.gameFamily === 'dameo')[0].name +
                                     '/'
-                                  : cgVariantKey === 'xiangqi' || cgVariantKey === 'minixiangqi'
-                                    ? 'https://playstrategy.org/assets/piece/xiangqi/' +
-                                      d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                                  : stratUtils.yonkoma.isYonkoma(cgVariantKey)
+                                    ? 'https://playstrategy.org/assets/piece/yonkoma/' +
+                                      d.pref.pieceSet.filter(ps => ps.gameFamily === 'yonkoma')[0].name +
                                       '/'
-                                    : 'https://playstrategy.org/assets/piece/chess/' +
-                                      d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
-                                      '/',
+                                    : cgVariantKey === 'xiangqi' || cgVariantKey === 'minixiangqi'
+                                      ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+                                        d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                                        '/'
+                                      : 'https://playstrategy.org/assets/piece/chess/' +
+                                        d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+                                        '/',
       },
     },
     highlight: {

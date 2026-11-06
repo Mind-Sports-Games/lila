@@ -11,6 +11,7 @@ import { configure as configureFlipello } from './variants/flipello';
 import { configure as configureCrazy } from './variants/crazy';
 import { configure as configureEntropy } from './variants/entropy';
 import { configure as configureFiveInARow } from './variants/fiveInARow';
+import { configure as configureYonkoma } from './variants/yonkoma';
 
 type Configure = (ctrl: AnalyseCtrl) => void;
 
@@ -24,6 +25,7 @@ const byFamily: Partial<Record<GameFamilyKey, Configure>> = {
   shogi: configureCrazy,
   entropy: configureEntropy,
   fiveinarow: configureFiveInARow,
+  yonkoma: configureYonkoma,
 };
 
 const byKey: Partial<Record<VariantKey, Configure>> = {
