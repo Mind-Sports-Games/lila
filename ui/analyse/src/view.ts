@@ -1,6 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
-import { fiveInARow } from 'stratutils';
+import { fiveInARow, yonkoma } from 'stratutils';
 import * as chessground from './ground';
 import { Coords as CgCoords } from 'chessground/types';
 import {
@@ -657,8 +657,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'grandabalone',
     'entropy',
     ...fiveInARow.variants,
-    'yonkoma10x10',
-    'yonkoma12x12',
+    ...yonkoma.variants,
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

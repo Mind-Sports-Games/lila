@@ -727,21 +727,26 @@ object BinaryFormat {
         .to(Map)
     }
 
+    // the squares of the board the game is played on, in index order: 100 on the 10x10
+    // board, 144 on the 12x12 one
+    private def yonkomaSquares(variant: yonkoma.variant.Variant): List[yonkoma.Pos] =
+      yonkoma.Pos.all.filter(variant.boardSize.onBoard)
+
     // as for go: 0 is an empty square and the checker's binaryInt is 1
-    def writeYonkoma(pieces: yonkoma.PieceMap): ByteArray = {
+    def writeYonkoma(pieces: yonkoma.PieceMap, variant: yonkoma.variant.Variant): ByteArray = {
       def posInt(pos: yonkoma.Pos): Int =
         (pieces get pos).fold(0) { piece =>
           piece.player.fold(0, 128) + piece.role.binaryInt
         }
-      ByteArray(yonkoma.Pos.all.map(posInt(_).toByte).toArray)
+      ByteArray(yonkomaSquares(variant).map(posInt(_).toByte).toArray)
     }
 
-    def readYonkoma(ba: ByteArray): yonkoma.PieceMap = {
+    def readYonkoma(ba: ByteArray, variant: yonkoma.variant.Variant): yonkoma.PieceMap = {
       def intPiece(int: Int): Option[yonkoma.Piece] =
         yonkoma.Role.allByBinaryInt.get(int & 127) map { role =>
           yonkoma.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
         }
-      (yonkoma.Pos.all zip ba.value).view
+      (yonkomaSquares(variant) zip ba.value).view
         .flatMap { case (pos, int) =>
           intPiece(int) map (pos -> _)
         }
@@ -767,7 +772,8 @@ object BinaryFormat {
       case GameLogic.Entropy() => writeEntropy(entropy.Board.init(entropy.variant.Entropy).pieces)
       case GameLogic.FiveInARow() =>
         writeFiveInARow(fiveinarow.Board.init(fiveinarow.variant.Gomoku).pieces)
-      case GameLogic.Yonkoma() => writeYonkoma(yonkoma.Board.init(yonkoma.variant.Yonkoma10x10).pieces)
+      case GameLogic.Yonkoma() =>
+        writeYonkoma(yonkoma.Board.init(yonkoma.variant.Yonkoma10x10).pieces, yonkoma.variant.Yonkoma10x10)
       case _                   =>
         sys.error("Cant write to binary for lib")
     }

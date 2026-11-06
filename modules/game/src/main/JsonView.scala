@@ -64,7 +64,7 @@ final class JsonView(rematches: Rematches) {
       .add("drawOffers" -> (!game.drawOffers.isEmpty).option(game.drawOffers.normalizedTurns))
       .add("canDoPassAction" -> (game.variant.gameLogic match {
         case GameLogic.Entropy() => true
-        // yonkoma's pass is the skipped turn of a stuck player, which the client plays by itself
+        // yonkoma's pass is the skipped turn of a stuck player, which the server plays for him
         case GameLogic.Yonkoma() => false
         case _                   => game.situation.passes.size > 0
       }))

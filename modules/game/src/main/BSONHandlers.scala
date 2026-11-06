@@ -886,7 +886,7 @@ object BSONHandlers {
           yonkoma.Game(
             situation = yonkoma.Situation(
               yonkoma.Board(
-                pieces = BinaryFormat.piece.readYonkoma(r.bytes(F.binaryPieces)),
+                pieces = BinaryFormat.piece.readYonkoma(r.bytes(F.binaryPieces), gameVariant),
                 history = yonkoma.History(
                   lastTurn = turnUcis(r.strO(F.historyLastTurn)),
                   currentTurn = turnUcis(r.strO(F.historyCurrentTurn)),
@@ -1141,8 +1141,8 @@ object BSONHandlers {
             $doc(
               F.oldPgn -> NewLibStorage.OldBin
                 .encodeActionStrs(o.variant.gameFamily, o.actionStrs take Game.maxTurns),
-              F.binaryPieces -> BinaryFormat.piece.writeYonkoma(o.board match {
-                case Board.Yonkoma(board) => board.pieces
+              F.binaryPieces -> (o.board match {
+                case Board.Yonkoma(board) => BinaryFormat.piece.writeYonkoma(board.pieces, board.variant)
                 case _                    => sys.error("invalid yonkoma board")
               }),
               F.halfMoveClock      -> (o.history.halfMoveClock != 0).option(o.history.halfMoveClock),

@@ -157,7 +157,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
                                   ? 'https://playstrategy.org/assets/piece/dameo/' +
                                     d.pref.pieceSet.filter(ps => ps.gameFamily === 'dameo')[0].name +
                                     '/'
-                                  : cgVariantKey === 'yonkoma10x10' || cgVariantKey === 'yonkoma12x12'
+                                  : stratUtils.yonkoma.isYonkoma(cgVariantKey)
                                     ? 'https://playstrategy.org/assets/piece/yonkoma/' +
                                       d.pref.pieceSet.filter(ps => ps.gameFamily === 'yonkoma')[0].name +
                                       '/'

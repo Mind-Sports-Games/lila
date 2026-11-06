@@ -428,10 +428,10 @@ object GameDiff {
         dTry(
           binaryPieces,
           _.board match {
-            case Board.Yonkoma(b) => b.pieces
+            case Board.Yonkoma(b) => (b.pieces, b.variant)
             case _                => sys.error("Wrong board type")
           },
-          writeBytes compose BinaryFormat.piece.writeYonkoma
+          { case (pieces, variant) => writeBytes(BinaryFormat.piece.writeYonkoma(pieces, variant)) }
         )
         dOpt(halfMoveClock, _.history.halfMoveClock, w.intO)
         d(positionHashes, _.history.positionHashes, w.bytes)

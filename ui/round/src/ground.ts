@@ -188,7 +188,7 @@ export function makeConfig(ctrl: RoundController): Config {
                             ? 'https://playstrategy.org/assets/piece/fiveinarow/' +
                               data.pref.pieceSet.filter(ps => ps.gameFamily === 'fiveinarow')[0].name +
                               '/'
-                            : variantKey === 'yonkoma10x10' || variantKey === 'yonkoma12x12'
+                            : stratUtils.yonkoma.isYonkoma(variantKey)
                               ? 'https://playstrategy.org/assets/piece/yonkoma/' +
                                 data.pref.pieceSet.filter(ps => ps.gameFamily === 'yonkoma')[0].name +
                                 '/'

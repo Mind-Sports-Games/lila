@@ -1,5 +1,5 @@
 import { h, VNode, Hooks, Attrs } from 'snabbdom';
-import { fixCrazySan, getScore, entropy, fiveInARow } from 'stratutils';
+import { fixCrazySan, getScore, entropy, fiveInARow, yonkoma } from 'stratutils';
 import * as cg from 'chessground/types';
 
 export { autolink, innerHTML, enrichText, richHTML, toYouTubeEmbed, toTwitchEmbed } from 'common/richText';
@@ -295,8 +295,7 @@ const noServerEvalVariants = [
   'grandabalone',
   'entropy',
   ...fiveInARow.variants,
-  'yonkoma10x10',
-  'yonkoma12x12',
+  ...yonkoma.variants,
 ];
 
 export function allowServerEvalForVariant(variant: VariantKey) {

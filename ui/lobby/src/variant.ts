@@ -116,9 +116,9 @@ const variantConfirms: variantConfirmsType = {
   renju:
     'This is a Renju game!\n\nBlack wins only with exactly five in a row, and loses at once by making a double three, a double four or an overline. White wins with five or more. It opens with Taraguchi-10: the first stones go near the centre with a swap offered after each, and black may offer ten fifth stones for white to choose from.',
   yonkoma10x10:
-    'This is a Yonkoma game!\n\nEach player has two checkers that slide like bishops. A move must bring the checker closer to the two enemy checkers, or keep that distance and move away from its partner. Whoever completes a crosscut (all four checkers in a 2x2 block) loses.',
+    'This is a Yonkoma game!\n\nEach player has two checkers that slide like bishops. A move must bring the checker closer to the two enemy checkers, or keep that distance and move away from its partner. Whoever completes a crosscut (all four checkers in a 2x2 block, each player holding one of its diagonals) loses.',
   yonkoma12x12:
-    'This is a Yonkoma game on a 12x12 board!\n\nEach player has two checkers that slide like bishops. A move must bring the checker closer to the two enemy checkers, or keep that distance and move away from its partner. Whoever completes a crosscut (all four checkers in a 2x2 block) loses.',
+    'This is a Yonkoma game on a 12x12 board!\n\nEach player has two checkers that slide like bishops. A move must bring the checker closer to the two enemy checkers, or keep that distance and move away from its partner. Whoever completes a crosscut (all four checkers in a 2x2 block, each player holding one of its diagonals) loses.',
 };
 
 function storageKey(key: string) {
