@@ -23,6 +23,8 @@ object menu {
         .option(a(cls := active.active("tour"), href := routes.TournamentCrud.index(1))("Tournaments")),
       isGranted(_.ManageEvent)
         .option(a(cls := active.active("event"), href := routes.Event.manager)("Events")),
+      isGranted(_.ManageBotStreams)
+        .option(a(cls := active.active("bot-stream"), href := routes.BotStream.manager)("Bot streams")),
       isGranted(_.SeeReport)
         .option(a(cls := active.active("irwin"), href := routes.Irwin.dashboard)("Irwin dashboard")),
       isGranted(_.Shadowban).option(

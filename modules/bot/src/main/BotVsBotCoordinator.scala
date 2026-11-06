@@ -1,6 +1,7 @@
 package lila.bot
 
 import java.util.concurrent.atomic.{ AtomicBoolean, AtomicInteger, AtomicReference }
+import scala.collection.concurrent.TrieMap
 import scala.concurrent.ExecutionContext
 import akka.actor.{ Cancellable, Scheduler }
 import play.api.Configuration
@@ -16,20 +17,20 @@ import lila.hub.actorApi.round.NextGameLinked
 import lila.user.UserRepo
 
 final class BotVsBotCoordinator(
+    repo: BotStreamRepo,
     userRepo: UserRepo,
     challengeApi: ChallengeApi,
     onlineApiUsers: OnlineApiUsers,
     appConfig: Configuration
 )(implicit ec: ExecutionContext, scheduler: Scheduler) {
 
-  private val enabled = new AtomicBoolean(appConfig.getOptional[Boolean]("autoBotvsBot.enabled") | false)
+  val autoStart = appConfig.getOptional[Boolean]("autoBotvsBot.enabled") | false
 
-  private class StreamRunner(val stream: BotVsBotStream) {
+  private class StreamRunner(val stream: BotStream) {
     private val running     = new AtomicBoolean(false)
     private val currentGame = new AtomicReference[Option[Game.ID]](none)
     private val watchdog    = new AtomicReference[Option[Cancellable]](none)
     private val cycleIdx    = new AtomicInteger(scala.util.Random.nextInt(stream.games.length))
-    private val botIds      = stream.games.flatMap(g => List(g.p1.id, g.p2.id)).toSet
 
     def isRunning: Boolean = running.get()
 
@@ -48,14 +49,18 @@ final class BotVsBotCoordinator(
       logger.info(s"[${stream.name}] stopped")
     }
 
-    def status(): String = {
-      val cyclePos = s"${cycleIdx.get() + 1}/${stream.games.length}"
-      if (running.get())
-        currentGame.get().fold(s"[${stream.name}] Running — no game in progress (cycle $cyclePos)")(id =>
-          s"[${stream.name}] Running — current game: $id (cycle $cyclePos)"
-        )
-      else s"[${stream.name}] Stopped (cycle $cyclePos)"
+    private def cyclePosition: Int = {
+      val len = stream.games.length
+      val idx = cycleIdx.get()
+      if (currentGame.get().isDefined) (idx + len - 1) % len + 1 else idx + 1
     }
+
+    def liveStatus = BotStreamStatus(
+      currentGame = currentGame.get(),
+      cyclePosition = cyclePosition,
+      cycleLength = stream.games.length,
+      missingBots = stream.botIds.diff(onlineApiUsers.get)
+    )
 
     def gameFinished(finishedGameId: Game.ID): Unit = {
       currentGame.set(none)
@@ -71,7 +76,7 @@ final class BotVsBotCoordinator(
           cycleIdx.set((idx + 1) % stream.games.length)
           createGame(spec, finishedGameId)
         case None =>
-          val missing = botIds.diff(online)
+          val missing = stream.botIds.diff(online)
           logger.info(s"[${stream.name}] no bots available — missing ${missing.mkString(", ")}, retrying in 30s")
           scheduler.scheduleOnce(30.seconds)(startNextGame(finishedGameId).discard)
           funit
@@ -111,7 +116,7 @@ final class BotVsBotCoordinator(
             challenger = toRegistered(spec.variant, timeControl)(p1User),
             destUser = p2User.some,
             rematchOf = none,
-            isBotvsBotStream = true
+            botVsBotSource = stream.source.some
           )
           challengeApi.create(challenge) flatMap {
             case false =>
@@ -148,53 +153,78 @@ final class BotVsBotCoordinator(
     }
   }
 
+
   private def tellRound(gameId: Game.ID, msg: Any): Unit =
     Bus.publish(Tell(gameId, msg), "roundSocket")
 
-  private val runners: List[StreamRunner] = BotVsBotConfig.streams.map(new StreamRunner(_))
+  private val runners = TrieMap.empty[BotStream.ID, StreamRunner]
+
+  private val syncSequencer =
+    new lila.hub.DuctSequencer(maxSize = 64, timeout = 10.seconds, name = "botVsBotSync")
+
+  private def sync(canStart: BotStream.ID => Boolean, restart: Boolean = false): Funit =
+    syncSequencer {
+      repo.all map { streams =>
+        val wanted     = streams.filter(_.shouldRun).map(s => s.id -> s).toMap
+        val wasRunning = runners.keySet.toSet
+        runners.foreach { case (id, runner) =>
+          if (restart || !wanted.get(id).exists(runner.stream.sameDefinition)) {
+            runners.remove(id)
+            runner.stop()
+          }
+        }
+        wanted.values.foreach { stream =>
+          if (!runners.contains(stream.id) && (wasRunning(stream.id) || canStart(stream.id))) {
+            val runner = new StreamRunner(stream)
+            runners.put(stream.id, runner)
+            runner.start().discard
+          }
+        }
+      }
+    }
+
+  def refresh: Funit = sync(_ => autoStart)
+
+  def liveStatus: Map[BotStream.ID, BotStreamStatus] =
+    runners.view.mapValues(_.liveStatus).toMap
+
+  def state(stream: BotStream): String =
+    if (runners.contains(stream.id)) "Running"
+    else if (stream.isExpired) "Expired"
+    else if (stream.active) "Active, not running"
+    else "Stopped"
+
+  def start(stream: BotStream): Fu[String] =
+    if (stream.isExpired) fuccess(s"Bot stream '${stream.name}' has expired: move its end date first")
+    else
+      repo.setActive(stream.id, true) >> sync(id => autoStart || id == stream.id) inject
+        s"Bot stream '${stream.name}' started"
+
+  def stop(stream: BotStream): Fu[String] =
+    repo.setActive(stream.id, false) >> refresh inject s"Bot stream '${stream.name}' stopped"
+
+  def restart(stream: BotStream): Fu[String] =
+    if (stream.isExpired) fuccess(s"Bot stream '${stream.name}' has expired: move its end date first")
+    else
+      syncSequencer {
+        runners.remove(stream.id).foreach(_.stop())
+        funit
+      } >> start(stream) inject s"Bot stream '${stream.name}' restarted"
 
   Bus.subscribeFun("finishGame") {
     case actorApi.FinishGame(game, _, _) =>
-      runners.find(_.ownsGame(game.id)).foreach { runner =>
+      runners.values.find(_.ownsGame(game.id)).foreach { runner =>
         if (runner.isRunning) runner.gameFinished(game.id)
       }
   }
 
-  Bus.subscribeFun("botVsBot") {
-    case lila.hub.actorApi.bot.BotVsBotStart => start().discard
-    case lila.hub.actorApi.bot.BotVsBotStop  => stop()
-    case lila.hub.actorApi.bot.BotVsBotRestart =>
-      stop()
-      start().discard
-    case lila.hub.actorApi.bot.BotVsBotStatus(promise) =>
-      promise.success(runners.map(_.status()).mkString("\n"))
-    case lila.hub.actorApi.bot.BotVsBotStartStream(name, promise) =>
-      runners.find(_.stream.name == name) match {
-        case Some(runner) => runner.start().discard; promise.success(s"Stream '$name' start requested")
-        case None         => promise.success(s"Stream not found: '$name'. Available: ${runners.map(_.stream.name).mkString(", ")}")
-      }
-    case lila.hub.actorApi.bot.BotVsBotStopStream(name, promise) =>
-      runners.find(_.stream.name == name) match {
-        case Some(runner) => runner.stop(); promise.success(s"Stream '$name' stopped")
-        case None         => promise.success(s"Stream not found: '$name'. Available: ${runners.map(_.stream.name).mkString(", ")}")
-      }
-    case lila.hub.actorApi.bot.BotVsBotRestartStream(name, promise) =>
-      runners.find(_.stream.name == name) match {
-        case Some(runner) => runner.stop(); runner.start().discard; promise.success(s"Stream '$name' restart requested")
-        case None         => promise.success(s"Stream not found: '$name'. Available: ${runners.map(_.stream.name).mkString(", ")}")
-      }
+  scheduler.scheduleWithFixedDelay(1.minute, 1.minute) { () =>
+    refresh.discard
   }
 
-  def start(): Funit = {
-    runners.foreach(_.start().discard)
-    funit
+  private[bot] def init(): Unit = {
+    if (autoStart) logger.info("Bot vs bot auto-start enabled, starting active streams")
+    else logger.info("Bot vs bot auto-start disabled in config (start streams from the mod page)")
+    refresh.discard
   }
-
-  def stop(): Unit = runners.foreach(_.stop())
-
-  private[bot] def init(): Unit =
-    if (enabled.get()) {
-      logger.info(s"Bot vs bot auto-start enabled (${runners.length} streams), starting on init")
-      start().discard
-    } else logger.info("Bot vs bot auto-start disabled in config (use CLI to start manually)")
 }

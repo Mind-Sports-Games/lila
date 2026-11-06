@@ -1,6 +1,7 @@
 package lila.bot
 
 import com.softwaremill.macwire.*
+import lila.common.config.CollName
 import lila.socket.IsOnline
 
 @Module
@@ -14,7 +15,8 @@ final class Env(
     isOfferingRematch: lila.round.IsOfferingRematch,
     spam: lila.security.Spam,
     isOnline: IsOnline,
-    appConfig: play.api.Configuration
+    appConfig: play.api.Configuration,
+    db: lila.db.Db
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: akka.actor.ActorSystem,
@@ -30,7 +32,11 @@ final class Env(
 
   lazy val onlineApiUsers: OnlineApiUsers = wire[OnlineApiUsers]
 
+  private lazy val streamRepo = new BotStreamRepo(db(appConfig.get[CollName]("bot.collection.stream")))
+
   lazy val coordinator: BotVsBotCoordinator = wire[BotVsBotCoordinator]
+
+  lazy val streamApi: BotStreamApi = wire[BotStreamApi]
 
   val form = BotForm
 
