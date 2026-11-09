@@ -66,7 +66,7 @@ object variant {
       title = "Board game rules — how to play every game on PlayStrategy",
       klass = "variants",
       openGraph = page
-        .bodyDescription(doc, resolver)
+        .bodyDescription(doc)
         .map(description =>
           lila.app.ui.OpenGraph(
             title = "Board game rules — how to play every game on PlayStrategy",

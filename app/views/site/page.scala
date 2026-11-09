@@ -11,7 +11,7 @@ object page {
     views.html.base.layout(
       moreCss = cssTag("page"),
       title = ~doc.getText("pages.title"),
-      openGraph = openGraphOf(doc, resolver, ctx.req.path)
+      openGraph = openGraphOf(doc, ctx.req.path)
     ) {
       main(cls := "page-small box box-pad page")(pageContent(doc, resolver))
     }
@@ -24,32 +24,35 @@ object page {
       active = active,
       contentCls = "page box box-pad",
       moreCss = cssTag("page"),
-      openGraph = openGraphOf(doc, resolver, ctx.req.path)
+      openGraph = openGraphOf(doc, ctx.req.path)
     )(pageContent(doc, resolver))
 
-  // a Prismic page carries no description of its own, so the site's blurb stands in on every one of
-  // them. The opening of the body says what the page is, and it is already in Prismic's language.
-  private[html] def bodyDescription(
-      doc: io.prismic.Document,
-      resolver: io.prismic.DocumentLinkResolver
-  ): Option[String] =
-    doc.getHtml("pages.content", resolver).map { body =>
-      lila.common.String.html
-        .unescapeHtml(body.replaceAll("<[^>]*>", " "))
-        .replaceAll("\\s+", " ")
-        .trim
-    } flatMap { text =>
-      // a whole first sentence reads better than a cut one, as long as a snippet still holds it
-      val sentence = text.indexOf(". ") match {
-        case -1 => text
-        case i  => text.take(i + 1)
-      }
-      (if (sentence.lengthIs <= 165) sentence else lila.common.String.shorten(text, 155, "…")).some
-        .filter(_.nonEmpty)
-    }
+  // a full stop, unless it closes "eg." and the like
+  private val sentenceEnd =
+    """(?<!\be\.g)(?<!\beg)(?<!\bi\.e)(?<!\bie)(?<!\betc)(?<!\bvs)(?<!\bcf)\.\s""".r
 
-  private def openGraphOf(doc: io.prismic.Document, resolver: io.prismic.DocumentLinkResolver, url: String) =
-    bodyDescription(doc, resolver).map { description =>
+  // a Prismic page has no description field: its first paragraph says what it is, below any heading,
+  // in as many whole sentences as a snippet holds
+  private[html] def bodyDescription(doc: io.prismic.Document): Option[String] =
+    doc
+      .getStructuredText("pages.content")
+      .flatMap(_.blocks.collectFirst {
+        case io.prismic.Fragment.StructuredText.Block.Paragraph(text, _, _) if text.trim.nonEmpty =>
+          text.replaceAll("\\s+", " ").trim
+      })
+      .map { para =>
+        if (para.lengthIs <= 165) para
+        else
+          sentenceEnd.findAllMatchIn(para).map(_.start + 1).takeWhile(_ <= 165).toList.lastOption match {
+            case Some(end) => para.take(end)
+            case None      =>
+              val cut = para.take(156)
+              cut.take(cut.lastIndexOf(' ')).reverse.dropWhile(" ,;:".contains(_)).reverse + "…"
+          }
+      }
+
+  private def openGraphOf(doc: io.prismic.Document, url: String) =
+    bodyDescription(doc).map { description =>
       lila.app.ui.OpenGraph(
         title = ~doc.getText("pages.title"),
         url = s"$netBaseUrl$url",
