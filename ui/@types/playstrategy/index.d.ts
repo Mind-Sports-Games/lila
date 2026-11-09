@@ -226,7 +226,7 @@ declare namespace Editor {
     standardInitialPosition: boolean;
     playerIndex?: PlayerIndex;
     variantKey?: VariantKey;
-    handledVariants?: { key: VariantKey; name: string }[]; // the games the editor handles, each with a page of its own
+    handledVariants?: { key: VariantKey; name: string; url: string }[]; // the games the editor handles, and their page
   }
 
   export interface Options {

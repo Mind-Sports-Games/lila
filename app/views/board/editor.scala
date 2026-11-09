@@ -44,6 +44,11 @@ object editor {
 
   val handledKeys: Set[String] = handledVariants.map(_.key).toSet
 
+  // a game's page in the editor, if it has one: /editor for chess, /editor/<key> for another it handles
+  def pageUrl(variant: Variant): Option[String] =
+    if (variant.key == "standard") routes.Editor.index.url.some
+    else handledKeys(variant.key).option(routes.Editor.variant(variant.key).url)
+
   def apply(
       sit: Situation,
       fen: FEN,
@@ -52,19 +57,19 @@ object editor {
       positionsByVariantJson: String,
       orientation: Option[String] = None
   )(implicit ctx: Context) = {
-    // only a variant the select offers has a page of its own; any other (?variant=) is /editor's
-    val (pageTitle, pageDescription, canonical) =
-      if (variant.key != "standard" && handledKeys(variant.key)) {
+    // a game with no page of its own (?variant=) is shown as /editor
+    val canonical = pageUrl(variant) | routes.Editor.index.url
+
+    val (pageTitle, pageDescription) =
+      if (canonical == routes.Editor.index.url)
+        (trans.boardEditorTitle.txt(), trans.boardEditorDescription.txt())
+      else {
         val name = VariantKeys.variantName(variant)
-        (
-          trans.variantBoardEditorTitle.txt(name),
-          trans.variantBoardEditorDescription.txt(name),
-          routes.Editor.variant(variant.key).url
-        )
-      } else (trans.boardEditorTitle.txt(), trans.boardEditorDescription.txt(), routes.Editor.index.url)
-    val handledVariantsJson = safeJsonValue(
-      JsArray(handledVariants.map(v => Json.obj("key" -> v.key, "name" -> VariantKeys.variantName(v))))
-    )
+        (trans.variantBoardEditorTitle.txt(name), trans.variantBoardEditorDescription.txt(name))
+      }
+    val handledVariantsJson = safeJsonValue(JsArray(handledVariants.flatMap { v =>
+      pageUrl(v).map(url => Json.obj("key" -> v.key, "name" -> VariantKeys.variantName(v), "url" -> url))
+    }))
     views.html.base.layout(
       title = pageTitle,
       boardFamily = variant.gameFamily.key.some,

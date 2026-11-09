@@ -231,10 +231,10 @@ export default class EditorCtrl {
 
   makeUrl(baseUrl: string, fen: string): string {
     // an untouched board is the variant's own editor page, if it has one, with p1 to move
-    const ownPage = !!this.cfg.handledVariants?.some(v => v.key === this.variantKey);
+    const page = this.cfg.handledVariants?.find(v => v.key === this.variantKey);
     const untouched = fen === variantClassFromKey(this.variantKey).getInitialFen('p1');
-    if (ownPage && untouched && !this.options.orientation)
-      return baseUrl.replace(/\/$/, '') + (this.variantKey === 'standard' ? '' : `/${this.variantKey}`);
+    // the page's path, on baseUrl's origin
+    if (page && untouched && !this.options.orientation) return new URL(page.url, new URL(baseUrl, location.href)).href;
     let urlParams = this.variantKey !== 'standard' ? `?variant=${this.variantKey}` : '';
     if (this.options.orientation) {
       urlParams += (urlParams.length === 0 ? '?' : '&') + `orientation=${this.options.orientation}`;

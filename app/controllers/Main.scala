@@ -185,13 +185,9 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
             routes.Swiss.home.url,
             // not /training: it renders the most-played variant's trainer, which is listed below
             routes.Study.allDefault().url,
-            routes.Blog.index().url,
-            routes.Editor.index.url
+            routes.Blog.index().url
           ) :::
-            // the standard chess board is /editor, listed above
-            views.html.board.editor.handledKeys.toList.sorted
-              .filterNot(_ == chessStandard.key)
-              .map(k => routes.Editor.variant(k).url) :::
+            views.html.board.editor.handledVariants.flatMap(views.html.board.editor.pageUrl) :::
             variants.map(v => routes.Page.variant(v.key).url) :::
             lila.puzzle.Puzzle.puzzleVariants.map(v => routes.Puzzle.home(v.key).url) :::
             lila.puzzle.Puzzle.puzzleVariants.map(v => routes.Puzzle.themes(v.key).url)
