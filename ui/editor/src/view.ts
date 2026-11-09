@@ -3,7 +3,7 @@ import { MouchEvent, NumberPair } from 'chessground/types';
 import { dragNewPiece } from 'chessground/drag';
 import { eventPosition, opposite } from 'chessground/util';
 import { parseFen } from 'stratops/fen';
-import EditorCtrl from './ctrl';
+import EditorCtrl, { allVariants } from './ctrl';
 import chessground from './chessground';
 import { Selected, CastlingToggle, EditorState } from './interfaces';
 import { VariantKey as stratopsVariantKey } from 'stratops/variants/types';
@@ -83,32 +83,6 @@ function variant2option(key: stratopsVariantKey, name: string, ctrl: EditorCtrl)
     `${ctrl.trans.noarg('variant')} | ${name}`,
   );
 }
-
-const allVariants: Array<[stratopsVariantKey, string]> = [
-  [stratopsVariantKey.standard, 'Standard'],
-  [stratopsVariantKey.antichess, 'Antichess'],
-  [stratopsVariantKey.atomic, 'Atomic'],
-  [stratopsVariantKey.crazyhouse, 'Crazyhouse'],
-  [stratopsVariantKey.horde, 'Horde'],
-  [stratopsVariantKey.kingOfTheHill, 'King of the Hill'],
-  [stratopsVariantKey.racingKings, 'Racing Kings'],
-  [stratopsVariantKey.threeCheck, 'Three-check'],
-  [stratopsVariantKey.fiveCheck, 'Five-check'],
-  [stratopsVariantKey.monster, 'Monster'],
-  [stratopsVariantKey.minibreakthroughtroyka, 'Mini Breakthrough'],
-  [stratopsVariantKey.breakthroughtroyka, 'Breakthrough'],
-  [stratopsVariantKey.linesOfAction, 'Lines of Action'],
-  [stratopsVariantKey.scrambledEggs, 'Scrambled Eggs'],
-  [stratopsVariantKey.flipello, 'Othello'],
-  [stratopsVariantKey.flipello10, 'Grand Othello'],
-  [stratopsVariantKey.antiflipello, 'AntiOthello'],
-  [stratopsVariantKey.octagonflipello, 'Octagon Othello'],
-  [stratopsVariantKey.xiangqi, 'Xiangqi'],
-  [stratopsVariantKey.minixiangqi, 'Mini Xiangqi'],
-  [stratopsVariantKey.amazons, 'Amazons'],
-  [stratopsVariantKey.abalone, 'Abalone'],
-  [stratopsVariantKey.grandAbalone, 'Grand Abalone'],
-];
 
 function controls(ctrl: EditorCtrl, state: EditorState): VNode {
   const position2option = function (pos: Editor.OpeningPosition): VNode {

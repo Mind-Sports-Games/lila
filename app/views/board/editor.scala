@@ -11,7 +11,7 @@ import views.html.library.bits as libraryBits
 
 object editor {
 
-  // the variants the editor's own select offers; keep in step with ui/editor/src/view.ts
+  // the variants the editor's own select offers; keep in step with ui/editor/src/ctrl.ts
   val variantKeys: Set[String] = Set(
     "standard",
     "antichess",
@@ -47,14 +47,15 @@ object editor {
       orientation: Option[String] = None
   )(implicit ctx: Context) = {
     val variantName = lila.i18n.VariantKeys.variantName(variant)
-    val isStandard  = variant.key == "standard"
-    val pageTitle   =
-      if (isStandard) trans.boardEditorTitle.txt() else trans.variantBoardEditorTitle.txt(variantName)
+    // only a variant the select offers has a page of its own; any other (?variant=) is /editor's
+    val ownPage   = variant.key != "standard" && variantKeys(variant.key)
+    val pageTitle =
+      if (ownPage) trans.variantBoardEditorTitle.txt(variantName) else trans.boardEditorTitle.txt()
     val pageDescription =
-      if (isStandard) trans.boardEditorDescription.txt()
-      else trans.variantBoardEditorDescription.txt(variantName)
+      if (ownPage) trans.variantBoardEditorDescription.txt(variantName)
+      else trans.boardEditorDescription.txt()
     val canonical =
-      if (isStandard) routes.Editor.index.url else routes.Editor.variant(variant.key).url
+      if (ownPage) routes.Editor.variant(variant.key).url else routes.Editor.index.url
     views.html.base.layout(
       title = pageTitle,
       boardFamily = variant.gameFamily.key.some,
