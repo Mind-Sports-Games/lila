@@ -67,13 +67,21 @@ final class Editor(env: Env) extends LilaController(env) {
 
   def index = load("")
 
-  // a name or a key in the wrong case redirects to the canonical URL, as /library and /analysis do
-  def variant(key: String) =
-    libraryBits
-      .canonicalVariantKey(key)
-      .fold(Variant.byKey.get(key).fold(load(key))(v => renderEditor(none, v.some)))(canonical =>
+  // as /analysis: a name redirects to the key, and a game the editor cannot set up is a 404
+  def variant(key: String) = {
+    val editable = html.board.editor.variantKeys
+    libraryBits.canonicalVariantKey(key) match {
+      case Some(canonical) if editable(canonical) =>
         Action(MovedPermanently(routes.Editor.variant(canonical).url))
-      )
+      case Some(_) => Open { implicit ctx => notFound }
+      case None    =>
+        Variant.byKey.get(key) match {
+          case Some(v) if editable(v.key) => renderEditor(none, v.some)
+          case Some(_)                    => Open { implicit ctx => notFound }
+          case None                       => load(key)
+        }
+    }
+  }
 
   def load(urlFen: String) =
     renderEditor(
