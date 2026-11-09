@@ -3,7 +3,7 @@ import { MouchEvent, NumberPair } from 'chessground/types';
 import { dragNewPiece } from 'chessground/drag';
 import { eventPosition, opposite } from 'chessground/util';
 import { parseFen } from 'stratops/fen';
-import EditorCtrl, { allVariants } from './ctrl';
+import EditorCtrl from './ctrl';
 import chessground from './chessground';
 import { Selected, CastlingToggle, EditorState } from './interfaces';
 import { VariantKey as stratopsVariantKey } from 'stratops/variants/types';
@@ -71,7 +71,7 @@ function isChessRules(variantKey: VariantKey): boolean {
   return variantClassFromKey(variantKey).family == 'chess';
 }
 
-function variant2option(key: stratopsVariantKey, name: string, ctrl: EditorCtrl): VNode {
+function variant2option(key: VariantKey, name: string, ctrl: EditorCtrl): VNode {
   return h(
     'option',
     {
@@ -164,7 +164,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   },
                 },
               },
-              allVariants.map(x => variant2option(x[0], x[1], ctrl)),
+              (ctrl.cfg.handledVariants || []).map(v => variant2option(v.key, v.name, ctrl)),
             ),
           ]),
           h('div.actions', [

@@ -189,7 +189,7 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
             routes.Editor.index.url
           ) :::
             // the standard chess board is /editor, listed above
-            views.html.board.editor.variantKeys.toList.sorted
+            views.html.board.editor.handledKeys.toList.sorted
               .filterNot(_ == chessStandard.key)
               .map(k => routes.Editor.variant(k).url) :::
             variants.map(v => routes.Page.variant(v.key).url) :::

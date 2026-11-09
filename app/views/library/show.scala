@@ -84,7 +84,7 @@ object show {
                 "Tutorial"
               )
             },
-            views.html.board.editor.variantKeys(variant.key).option(
+            views.html.board.editor.handledKeys(variant.key).option(
               a(cls := "library-editor", href := routes.Editor.variant(variant.key).url)(
                 "Editor"
               )

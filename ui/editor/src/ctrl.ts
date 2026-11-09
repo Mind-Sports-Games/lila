@@ -12,35 +12,7 @@ import { replacePocketsInFen } from 'common/editor';
 import { ensureFamily as ensurePieceSprite } from 'common/piece-sprite';
 import throttle from 'common/throttle';
 import { variantClass, variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
-import { VariantKey as stratopsVariantKey } from 'stratops/variants/types';
 import { Key, Variant as CGVariant } from 'chessground/types';
-
-// the variants the select offers, each with a page of its own; keep in step with app/views/board/editor.scala
-export const allVariants: Array<[stratopsVariantKey, string]> = [
-  [stratopsVariantKey.standard, 'Standard'],
-  [stratopsVariantKey.antichess, 'Antichess'],
-  [stratopsVariantKey.atomic, 'Atomic'],
-  [stratopsVariantKey.crazyhouse, 'Crazyhouse'],
-  [stratopsVariantKey.horde, 'Horde'],
-  [stratopsVariantKey.kingOfTheHill, 'King of the Hill'],
-  [stratopsVariantKey.racingKings, 'Racing Kings'],
-  [stratopsVariantKey.threeCheck, 'Three-check'],
-  [stratopsVariantKey.fiveCheck, 'Five-check'],
-  [stratopsVariantKey.monster, 'Monster'],
-  [stratopsVariantKey.minibreakthroughtroyka, 'Mini Breakthrough'],
-  [stratopsVariantKey.breakthroughtroyka, 'Breakthrough'],
-  [stratopsVariantKey.linesOfAction, 'Lines of Action'],
-  [stratopsVariantKey.scrambledEggs, 'Scrambled Eggs'],
-  [stratopsVariantKey.flipello, 'Othello'],
-  [stratopsVariantKey.flipello10, 'Grand Othello'],
-  [stratopsVariantKey.antiflipello, 'AntiOthello'],
-  [stratopsVariantKey.octagonflipello, 'Octagon Othello'],
-  [stratopsVariantKey.xiangqi, 'Xiangqi'],
-  [stratopsVariantKey.minixiangqi, 'Mini Xiangqi'],
-  [stratopsVariantKey.amazons, 'Amazons'],
-  [stratopsVariantKey.abalone, 'Abalone'],
-  [stratopsVariantKey.grandAbalone, 'Grand Abalone'],
-];
 
 export default class EditorCtrl {
   cfg: Editor.Config;
@@ -259,7 +231,7 @@ export default class EditorCtrl {
 
   makeUrl(baseUrl: string, fen: string): string {
     // an untouched board is the variant's own editor page, if it has one, with p1 to move
-    const ownPage = allVariants.some(([key]) => key === this.variantKey);
+    const ownPage = !!this.cfg.handledVariants?.some(v => v.key === this.variantKey);
     const untouched = fen === variantClassFromKey(this.variantKey).getInitialFen('p1');
     if (ownPage && untouched && !this.options.orientation)
       return baseUrl.replace(/\/$/, '') + (this.variantKey === 'standard' ? '' : `/${this.variantKey}`);

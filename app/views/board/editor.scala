@@ -2,8 +2,12 @@ package views.html.board
 
 import strategygames.format.FEN
 import strategygames.Situation
+import strategygames.variant.Variant
+
+import play.api.libs.json.{ JsArray, Json }
 
 import lila.api.Context
+import lila.i18n.VariantKeys
 import lila.app.templating.Environment.*
 import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
@@ -11,8 +15,8 @@ import views.html.library.bits as libraryBits
 
 object editor {
 
-  // the variants the editor's own select offers; keep in step with ui/editor/src/ctrl.ts
-  val variantKeys: Set[String] = Set(
+  // the games the editor handles: its select, in this order, and a page of its own for each
+  val handledVariants: List[Variant] = List(
     "standard",
     "antichess",
     "atomic",
@@ -36,26 +40,31 @@ object editor {
     "amazons",
     "abalone",
     "grandabalone"
-  )
+  ).flatMap(Variant.byKey.get)
+
+  val handledKeys: Set[String] = handledVariants.map(_.key).toSet
 
   def apply(
       sit: Situation,
       fen: FEN,
-      variant: strategygames.variant.Variant,
+      variant: Variant,
       positionsJson: String,
       positionsByVariantJson: String,
       orientation: Option[String] = None
   )(implicit ctx: Context) = {
-    val variantName = lila.i18n.VariantKeys.variantName(variant)
     // only a variant the select offers has a page of its own; any other (?variant=) is /editor's
-    val ownPage   = variant.key != "standard" && variantKeys(variant.key)
-    val pageTitle =
-      if (ownPage) trans.variantBoardEditorTitle.txt(variantName) else trans.boardEditorTitle.txt()
-    val pageDescription =
-      if (ownPage) trans.variantBoardEditorDescription.txt(variantName)
-      else trans.boardEditorDescription.txt()
-    val canonical =
-      if (ownPage) routes.Editor.variant(variant.key).url else routes.Editor.index.url
+    val (pageTitle, pageDescription, canonical) =
+      if (variant.key != "standard" && handledKeys(variant.key)) {
+        val name = VariantKeys.variantName(variant)
+        (
+          trans.variantBoardEditorTitle.txt(name),
+          trans.variantBoardEditorDescription.txt(name),
+          routes.Editor.variant(variant.key).url
+        )
+      } else (trans.boardEditorTitle.txt(), trans.boardEditorDescription.txt(), routes.Editor.index.url)
+    val handledVariantsJson = safeJsonValue(
+      JsArray(handledVariants.map(v => Json.obj("key" -> v.key, "name" -> VariantKeys.variantName(v))))
+    )
     views.html.base.layout(
       title = pageTitle,
       boardFamily = variant.gameFamily.key.some,
@@ -64,7 +73,7 @@ object editor {
       moreJs = frag(
         jsModule("editor"),
         embedJsUnsafeLoadThen(
-          s"""const data=${safeJsonValue(bits.jsData(sit, fen, variant))};data.positions=$positionsJson;data.positionsByVariant=$positionsByVariantJson;
+          s"""const data=${safeJsonValue(bits.jsData(sit, fen, variant))};data.positions=$positionsJson;data.positionsByVariant=$positionsByVariantJson;data.handledVariants=$handledVariantsJson;
           data.options = data.options || {};
           ${orientation.fold("")(o => s"data.options.orientation='${o}';\n")}
       PlayStrategyEditor(document.getElementById('board-editor'), data);"""
@@ -97,7 +106,7 @@ object editor {
     )
   }
 
-  def about(variant: strategygames.variant.Variant)(implicit ctx: Context): Frag =
+  def about(variant: Variant)(implicit ctx: Context): Frag =
     frag(
       h2(
         a(href := routes.Library.variant(variant.key))(
