@@ -267,8 +267,8 @@ object botStream {
             attr("data-max")     := BotStreamForm.maxMatchups,
             (matchupRows >= BotStreamForm.maxMatchups).option(style := "display: none")
           )("Add matchup"),
-          tag("details")(
-            tag("summary")("All variant keys"),
+          div(
+            strong("All variant keys"),
             p(BotVsBotConfig.streamableVariants.map(_.key).mkString(", "))
           )
         )
