@@ -617,8 +617,8 @@ computer analysis, game chat and shareable URL.</string>
   <string name="signInDescription">Sign in to PlayStrategy to play Chess, Draughts, Go, Backgammon, Othello and more than 40 other board games online for free, with ratings and analysis.</string>
   <string name="signUpDescription">Create a free PlayStrategy account to play Chess, Draughts, Go, Backgammon, Othello and more than 40 other board games online. Rated games, tournaments, puzzles and analysis, with no ads.</string>
   <string name="variantBoardEditorTitle">%s board editor — set up any position</string>
-  <string name="variantBoardEditorDescription">Free online %s board editor: set up any position by hand or from a FEN, then analyse it, play it against the computer or share it.</string>
-  <string name="boardEditorDescription">Free online board editor for Chess, its variants and all our other games: set up any position by hand or from a FEN, then analyse it, play it or share it.</string>
+  <string name="variantBoardEditorDescription">Free online %s board editor: set up any position by hand or from a FEN, then analyse it or share it.</string>
+  <string name="boardEditorDescription">Free online board editor for Chess, Othello, Xiangqi, Abalone, Amazons and more: set up any position by hand or from a FEN, then analyse, play or share it.</string>
   <string name="setTheBoard">Set the board</string>
   <string name="popularOpenings">Popular openings</string>
   <string name="startPosition">Starting position</string>
