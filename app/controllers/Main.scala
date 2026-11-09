@@ -194,12 +194,17 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
               .map(k => routes.Editor.variant(k).url) :::
             variants.map(v => routes.Page.variant(v.key).url) :::
             lila.puzzle.Puzzle.puzzleVariants.map(v => routes.Puzzle.home(v.key).url) :::
-            lila.puzzle.Puzzle.puzzleVariants.map(v => routes.Puzzle.themes(v.key).url) :::
-            freqs.map(f => html.tournament.history.url(f, none))
+            lila.puzzle.Puzzle.puzzleVariants.map(v => routes.Puzzle.themes(v.key).url)
+        // a history page with no finished edition is noindex: the same test, so it is not submitted
+        val tourRepo = env.tournament.tournamentRepo
         for {
-          studies <- env.study.studyRepo.notable(10000)
-          shields <- env.tournament.shieldApi.history(none) // in memory, filled by /tournament/shields
-          winners <- env.tournament.winners.all             // in memory, filled by the homepage
+          studies    <- env.study.studyRepo.notable(10000)
+          shields    <- env.tournament.shieldApi.history(none) // in memory, filled by /tournament/shields
+          winners    <- env.tournament.winners.all             // in memory, filled by the homepage
+          heldFreqs  <- lila.common.LilaFuture.filter(freqs)(tourRepo.hasFinishedByFreq(_))
+          heldYearly <- lila.common.LilaFuture.filter(variants) { v =>
+            tourRepo.hasFinishedByFreq(Freq.Yearly, List(v))
+          }
         } yield {
           def loc(path: String, lastmod: Option[org.joda.time.DateTime] = none, children: String = "") = {
             val mod = lastmod.fold("")(d => s"<lastmod>${d.toString("yyyy-MM-dd")}</lastmod>")
@@ -213,10 +218,11 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
           // of the per-game series, only the yearly one is a page in its own right: it names a
           // holder, a record and a podium. The other frequencies, and every per-family page, just
           // filter the same table by game - reachable by the chips, not worth submitting.
-          val seriesUrls = variants.map { v =>
+          val seriesUrls = heldYearly.map { v =>
             val lastEdition = winners.variants.get(v.key).flatMap(_.yearly)
             loc(html.tournament.history.url(Freq.Yearly, v.some), lastEdition.map(_.date))
           }
+          val freqUrls = heldFreqs.map(f => loc(html.tournament.history.url(f, none)))
           // a category with no award yet has no page
           val shieldUrls = lila.tournament.TournamentShield.Category.all.flatMap { categ =>
             shields.value.get(categ).flatMap(_.headOption) map { last =>
@@ -226,6 +232,7 @@ Sitemap: ${env.net.baseUrl.value}${routes.Blog.sitemapTxt.url}
           val urls =
             paths.map(p => loc(p)) :::
               localisedPaths.map(p => loc(p, children = alternates(p))) :::
+              freqUrls :::
               seriesUrls :::
               shieldUrls :::
               studies.map(s => loc(routes.Study.show(s.id.value).url, s.updatedAt.some))

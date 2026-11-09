@@ -149,18 +149,28 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .dmap { new lila.db.paginator.StaticAdapter(_) }
 
   // empty means every game; several variants need an $or, as a group can span game logics
+  private def finishedByFreqSelect(freq: Schedule.Freq, variants: List[Variant]) =
+    $doc("schedule.freq" -> freq, "status" -> Status.Finished.id) ++ (variants match {
+      case Nil      => $empty
+      case v :: Nil => libSelect(v.gameLogic) ++ variantSelect(v)
+      case many     => $or(many.map(v => libSelect(v.gameLogic) ++ variantSelect(v))*)
+    })
+
   def finishedByFreqAdapter(freq: Schedule.Freq, variants: List[Variant] = Nil) =
     new lila.db.paginator.Adapter[Tournament](
       collection = coll,
-      selector = $doc("schedule.freq" -> freq, "status" -> Status.Finished.id) ++ (variants match {
-        case Nil      => $empty
-        case v :: Nil => libSelect(v.gameLogic) ++ variantSelect(v)
-        case many     => $or(many.map(v => libSelect(v.gameLogic) ++ variantSelect(v))*)
-      }),
+      selector = finishedByFreqSelect(freq, variants),
       projection = none,
       sort = $sort.desc("startsAt"),
       readPreference = ReadPreference.secondaryPreferred
     )
+
+  // whether finishedByFreqAdapter has anything to page through
+  def hasFinishedByFreq(freq: Schedule.Freq, variants: List[Variant] = Nil): Fu[Boolean] =
+    coll
+      .find(finishedByFreqSelect(freq, variants), $id(true).some)
+      .one[Bdoc](ReadPreference.secondaryPreferred)
+      .dmap(_.isDefined)
 
   def isUnfinished(tourId: Tournament.ID): Fu[Boolean] =
     coll.exists($id(tourId) ++ unfinishedSelect)

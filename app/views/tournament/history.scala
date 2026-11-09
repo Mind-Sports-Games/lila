@@ -85,7 +85,7 @@ object history {
     views.html.base.layout(
       title = trans.historyTitle.txt(heading),
       // a series with no edition yet is not a page to offer a searcher
-      robots = netConfig.crawlable && (pager.nbResults > 0 || summary.isDefined),
+      robots = netConfig.crawlable && pager.nbResults > 0,
       // a frequency hub has no series of its own to put on a card, but it still says what it is
       description = subject.isEmpty.option(trans.historyFreqDescription.txt(nameOf(freq))),
       moreJs = infiniteScrollTag,
@@ -182,7 +182,7 @@ object history {
 
   private def nameOf(f: Freq) = if (f == Freq.Weekend) "Elite" else f.display
 
-  // the sitemap lists one page per frequency (see Main.sitemap)
+  // the sitemap lists the page of each frequency that has held an edition (see Main.sitemap)
   val allFreqs = List(
     Freq.Annual,
     Freq.Introductory,
