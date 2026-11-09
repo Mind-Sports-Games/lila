@@ -26,11 +26,20 @@ final class BotVsBotCoordinator(
 
   val autoStart = appConfig.getOptional[Boolean]("autoBotvsBot.enabled") | false
 
-  private class StreamRunner(val stream: BotStream) {
+  private class StreamRunner(initial: BotStream) {
+    private val definition  = new AtomicReference(initial)
     private val running     = new AtomicBoolean(false)
     private val currentGame = new AtomicReference[Option[Game.ID]](none)
     private val watchdog    = new AtomicReference[Option[Cancellable]](none)
-    private val cycleIdx    = new AtomicInteger(scala.util.Random.nextInt(stream.games.length))
+    private val cycleIdx    = new AtomicInteger(scala.util.Random.nextInt(initial.games.length))
+
+    def stream: BotStream = definition.get()
+
+    def redefine(updated: BotStream): Unit = {
+      definition.set(updated)
+      cycleIdx.set(cycleIdx.get() % updated.games.length)
+      logger.info(s"[${updated.name}] redefined — ${updated.games.length} games in cycle from the next game")
+    }
 
     def isRunning: Boolean = running.get()
 
@@ -71,9 +80,10 @@ final class BotVsBotCoordinator(
     def startNextGame(finishedGameId: Option[Game.ID] = none): Funit = {
       if (!running.get()) return funit
       val online = onlineApiUsers.get
-      findNextAvailableGame(cycleIdx.get(), 0, online) match {
+      val games  = stream.games
+      findNextAvailableGame(games, cycleIdx.get(), 0, online) match {
         case Some((idx, spec)) =>
-          cycleIdx.set((idx + 1) % stream.games.length)
+          cycleIdx.set((idx + 1) % games.length)
           createGame(spec, finishedGameId)
         case None =>
           val missing = stream.botIds.diff(online)
@@ -83,13 +93,18 @@ final class BotVsBotCoordinator(
       }
     }
 
-    private def findNextAvailableGame(startIdx: Int, attempts: Int, online: Set[String]): Option[(Int, BotVsBotGame)] =
-      if (attempts >= stream.games.length) none
+    private def findNextAvailableGame(
+        games: List[BotVsBotGame],
+        startIdx: Int,
+        attempts: Int,
+        online: Set[String]
+    ): Option[(Int, BotVsBotGame)] =
+      if (attempts >= games.length) none
       else {
-        val idx  = startIdx % stream.games.length
-        val spec = stream.games(idx)
+        val idx  = startIdx % games.length
+        val spec = games(idx)
         if (online.contains(spec.p1.id) && online.contains(spec.p2.id)) Some((idx, spec))
-        else findNextAvailableGame(idx + 1, attempts + 1, online)
+        else findNextAvailableGame(games, idx + 1, attempts + 1, online)
       }
 
     // TODO: multipoint is hardcoded to false because the stream currently has no backgammonPoints.
@@ -153,7 +168,6 @@ final class BotVsBotCoordinator(
     }
   }
 
-
   private def tellRound(gameId: Game.ID, msg: Any): Unit =
     Bus.publish(Tell(gameId, msg), "roundSocket")
 
@@ -162,19 +176,21 @@ final class BotVsBotCoordinator(
   private val syncSequencer =
     new lila.hub.DuctSequencer(maxSize = 64, timeout = 10.seconds, name = "botVsBotSync")
 
-  private def sync(canStart: BotStream.ID => Boolean, restart: Boolean = false): Funit =
+  private def sync(canStart: BotStream.ID => Boolean): Funit =
     syncSequencer {
       repo.all map { streams =>
-        val wanted     = streams.filter(_.shouldRun).map(s => s.id -> s).toMap
-        val wasRunning = runners.keySet.toSet
+        val wanted = streams.filter(_.shouldRun).map(s => s.id -> s).toMap
         runners.foreach { case (id, runner) =>
-          if (restart || !wanted.get(id).exists(runner.stream.sameDefinition)) {
-            runners.remove(id)
-            runner.stop()
+          wanted.get(id) match {
+            case Some(stream) =>
+              if (!runner.stream.sameDefinition(stream)) runner.redefine(stream)
+            case None =>
+              runners.remove(id)
+              runner.stop()
           }
         }
         wanted.values.foreach { stream =>
-          if (!runners.contains(stream.id) && (wasRunning(stream.id) || canStart(stream.id))) {
+          if (!runners.contains(stream.id) && canStart(stream.id)) {
             val runner = new StreamRunner(stream)
             runners.put(stream.id, runner)
             runner.start().discard

@@ -316,4 +316,3 @@ package plan {
   case class PlanStart(userId: String)
   case class PlanExpire(userId: String)
 }
-
