@@ -1,8 +1,6 @@
 // One-off seed: move the two standing bot streams, previously hard-coded in
 // BotVsBotConfig.streams, into the bot_stream collection that the mod page manages.
 //
-// Variant lists were taken from BotVsBotConfig.variantGroups on 2026-10-30. A game
-// released after that is added from the bot stream page, not here.
 
 const stockfishVariants = [
   'standard',
@@ -53,6 +51,9 @@ const nonStockfishOrBackgammonVariants = [
   'abalone',
   'grandabalone',
   'entropy',
+  'gomoku',
+  'pente',
+  'renju',
 ];
 
 const backgammonVariants = ['backgammon', 'nackgammon', 'hyper'];
