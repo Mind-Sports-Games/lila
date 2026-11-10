@@ -28,6 +28,10 @@ private object BSONHandlers {
         case PlayerIndexChoice.Random => 0
       }
     )
+  implicit val SourceBSONHandler: BSONHandler[lila.game.Source] = tryHandler[lila.game.Source](
+    { case BSONInteger(v) => lila.game.Source(v).toTry(s"No such source: $v") },
+    x => BSONInteger(x.id)
+  )
   // NOTE: the following works because all of our clock type representations are different enough
   //       from each other that we can distinguish between them by the existence of their attributes
   //       New clock types will need to continue this pattern.

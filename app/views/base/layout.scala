@@ -416,12 +416,19 @@ object layout {
               )
           }
         }.some
+      else if (isGranted(_.PublicChatView))
+        a(
+          cls      := "link",
+          title    := "Moderation",
+          href     := routes.Mod.publicChat,
+          dataIcon := ""
+        ).some
       else
-        isGranted(_.PublicChatView).option(
+        isGranted(_.ManageBotStreams).option(
           a(
             cls      := "link",
             title    := "Moderation",
-            href     := routes.Mod.publicChat,
+            href     := routes.BotStream.manager,
             dataIcon := ""
           )
         )

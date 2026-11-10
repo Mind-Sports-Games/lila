@@ -529,7 +529,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .sort(Query.sortCreated)
       .cursor[Game]()
       .list(10)
-      .dmap(ThreadLocalRandom.shuffle(_).headOption)
+      .dmap(games => games.find(_.isBeingPlayed) orElse ThreadLocalRandom.shuffle(games).headOption)
 
   def findPgnImport(pgn: String): Fu[Option[Game]] =
     coll.one[Game](

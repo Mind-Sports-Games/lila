@@ -182,6 +182,11 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
       Modlog(mod, none, Modlog.disableTeam, details = s"$id / $name".take(200).some)
     }
 
+  def botStream(mod: User.ID, action: String, id: String, name: String) =
+    add {
+      Modlog(mod, none, Modlog.botStream, details = s"$action $id / $name".take(200).some)
+    }
+
   def terminateTournament(mod: User.ID, name: String) =
     add {
       Modlog(mod, none, Modlog.terminateTournament, details = name.some)
