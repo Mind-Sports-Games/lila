@@ -55,7 +55,8 @@ object StatusText {
             s"${winner(win)} wins the race."
           case Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka) =>
             s"${winner(win)} wins the race."
-          case _ => "Game ends by variant rule."
+          case Variant.Yonkoma(_) => s"${loser(win)} completes a crosscut."
+          case _                  => "Game ends by variant rule."
         }
       case _ => ""
     }

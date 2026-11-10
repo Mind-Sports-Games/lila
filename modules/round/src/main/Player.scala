@@ -5,6 +5,7 @@ import strategygames.{
   Action,
   Board,
   Centis,
+  GameLogic,
   CubeAction as StratCubeAction,
   DiceRoll as StratDiceRoll,
   DrawCounter as StratDrawCounter,
@@ -118,9 +119,24 @@ final private class Player(
       if (progress.game.selectSquaresPossible) scheduleActionExpiration(progress.game)
       if (!progress.game.flagEndsGame && progress.game.outoftime(withGrace = false))
         playFlaggedActions(progress.game) dmap { progress.events ::: _ }
-      else fuccess(progress.events)
+      else playForcedPass(progress.game) dmap { progress.events ::: _ }
     }
   }
+
+  // A Yonkoma player with no legal move has the turn skipped. The library offers that pass
+  // as the situation's forced action, and it is played here at once, so that the game never
+  // waits for the stuck player's client (a correspondence game, a closed tab, a bot on the API).
+  private def playForcedPass(game: Game)(implicit proxy: GameProxy): Fu[Events] =
+    (game.variant.gameLogic, game.situation.forcedAction) match {
+      case (GameLogic.Yonkoma(), Some(pass: StratPass)) if game.playable =>
+        val progress = game.update(game.stratGame.apply(pass), pass)
+        proxy.save(progress) >> {
+          notifyMove(pass, progress.game)
+          if (progress.game.finished) moveFinish(progress.game) dmap { progress.events ::: _ }
+          else fuccess(progress.events)
+        }
+      case _ => fuccess(Nil)
+    }
 
   private[round] def outOfTime(game: Game)(implicit proxy: GameProxy): Fu[Events] =
     if (game.flagEndsGame) finisher.outOfTime(game)

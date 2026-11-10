@@ -109,7 +109,9 @@ export const boardDimensions = ($el: Cash): { width: number; height: number } =>
         ? { width: 5, height: 5 }
         : $el.hasClass('variant-minixiangqi') || $el.hasClass('variant-entropy')
           ? { width: 7, height: 7 }
-          : $el.hasClass('variant-flipello10') || $el.hasClass('variant-octagonflipello')
+          : $el.hasClass('variant-flipello10') ||
+              $el.hasClass('variant-octagonflipello') ||
+              $el.hasClass('variant-yonkoma10x10')
             ? { width: 10, height: 10 }
             : $el.hasClass('variant-amazons')
               ? { width: 10, height: 10 }
@@ -135,7 +137,9 @@ export const boardDimensions = ($el: Cash): { width: number; height: number } =>
                                 ? { width: 11, height: 11 }
                                 : $el.hasClass('variant-abalone')
                                   ? { width: 9, height: 9 }
-                                  : { width: 8, height: 8 };
+                                  : $el.hasClass('variant-yonkoma12x12')
+                                    ? { width: 12, height: 12 }
+                                    : { width: 8, height: 8 };
 
 // @TODO: rename into variantKeyFromElement
 export const variantFromElement = (element: Cash): string => {

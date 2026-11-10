@@ -146,6 +146,8 @@ final class RankingApi(
       gomoku                 <- topPerf(PerfType.orDefault("gomoku").id, nb)
       pente                  <- topPerf(PerfType.orDefault("pente").id, nb)
       renju                  <- topPerf(PerfType.orDefault("renju").id, nb)
+      yonkoma10x10           <- topPerf(PerfType.orDefault("yonkoma10x10").id, nb)
+      yonkoma12x12           <- topPerf(PerfType.orDefault("yonkoma12x12").id, nb)
     } yield Perfs.Leaderboards(
       ultraBullet = ultraBullet,
       bullet = bullet,
@@ -201,7 +203,9 @@ final class RankingApi(
       entropy = entropy,
       gomoku = gomoku,
       pente = pente,
-      renju = renju
+      renju = renju,
+      yonkoma10x10 = yonkoma10x10,
+      yonkoma12x12 = yonkoma12x12
     )
 
   object weeklyStableRanking {

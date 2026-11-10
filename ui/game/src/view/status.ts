@@ -132,6 +132,9 @@ function describe(ctrl: Ctrl): Description {
           return noarg('checkersConnected');
         case 'dameo':
           return noarg('gameFinished');
+        case 'yonkoma10x10':
+        case 'yonkoma12x12':
+          return noarg('crosscutCompleted');
         case 'breakthrough':
           return noarg('promotion');
         case 'flipello':

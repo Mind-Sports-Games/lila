@@ -194,7 +194,8 @@ trait SetupHelper { self: I18nHelper =>
     GameGroup.Abalone(),
     GameGroup.Amazons(),
     GameGroup.Entropy(),
-    GameGroup.FiveInARow()
+    GameGroup.FiveInARow(),
+    GameGroup.Yonkoma()
   )
 
   // the group button a game family sits under. Not the group's id: the family id of the group's

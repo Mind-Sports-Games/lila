@@ -13,7 +13,7 @@ import { render as keyboardMove } from '../keyboardMove';
 import { render as renderGround } from '../ground';
 import { renderTable } from './table';
 import { Player } from 'game';
-import { fiveInARow } from 'stratutils';
+import { fiveInARow, yonkoma } from 'stratutils';
 
 function renderMaterial(
   material: MaterialDiffSide,
@@ -307,6 +307,7 @@ export function main(ctrl: RoundController): VNode {
     'grandabalone',
     'entropy',
     ...fiveInARow.variants,
+    ...yonkoma.variants,
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

@@ -56,7 +56,8 @@ final class TournamentForm {
           backgammon = true.some,
           abalone = true.some,
           entropy = true.some,
-          fiveinarow = true.some
+          fiveinarow = true.some,
+          yonkoma = true.some
         ),
         variantSettings = VariantSettings(
           handicaps = Handicaps(
@@ -112,7 +113,8 @@ final class TournamentForm {
           backgammon = gameGroupInMedley(tour.medleyVariants, GameGroup.Backgammon()).some,
           abalone = gameGroupInMedley(tour.medleyVariants, GameGroup.Abalone()).some,
           entropy = gameGroupInMedley(tour.medleyVariants, GameGroup.Entropy()).some,
-          fiveinarow = gameGroupInMedley(tour.medleyVariants, GameGroup.FiveInARow()).some
+          fiveinarow = gameGroupInMedley(tour.medleyVariants, GameGroup.FiveInARow()).some,
+          yonkoma = gameGroupInMedley(tour.medleyVariants, GameGroup.Yonkoma()).some
         ),
         variantSettings = VariantSettings(handicaps =
           Handicaps(
@@ -209,7 +211,8 @@ final class TournamentForm {
           "backgammon"         -> optional(boolean),
           "abalone"            -> optional(boolean),
           "entropy"            -> optional(boolean),
-          "fiveinarow"         -> optional(boolean)
+          "fiveinarow"         -> optional(boolean),
+          "yonkoma"            -> optional(boolean)
         )(MedleyGameFamilies.apply)(unapply),
         "variantSettings" -> mapping(
           "handicaps" -> mapping(
@@ -542,7 +545,8 @@ case class MedleyGameFamilies(
     backgammon: Option[Boolean],
     abalone: Option[Boolean],
     entropy: Option[Boolean],
-    fiveinarow: Option[Boolean]
+    fiveinarow: Option[Boolean],
+    yonkoma: Option[Boolean]
 ) {
 
   lazy val ggList: List[GameGroup] = GameGroup.medley
@@ -562,4 +566,5 @@ case class MedleyGameFamilies(
     .filterNot(gg => if (!abalone.getOrElse(false)) gg == GameGroup.Abalone() else false)
     .filterNot(gg => if (!entropy.getOrElse(false)) gg == GameGroup.Entropy() else false)
     .filterNot(gg => if (!fiveinarow.getOrElse(false)) gg == GameGroup.FiveInARow() else false)
+    .filterNot(gg => if (!yonkoma.getOrElse(false)) gg == GameGroup.Yonkoma() else false)
 }
