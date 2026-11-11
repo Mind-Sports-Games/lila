@@ -19,6 +19,10 @@
   --cg-coord-color-dameo-p2: #fff;
   --cg-coord-shadow-dameo: 0 1px 2px #000;
 
+  --cg-coord-color-yonkoma-p1: #fff;
+  --cg-coord-color-yonkoma-p2: #fff;
+  --cg-coord-shadow-yonkoma: 0 1px 2px #000;
+
   --cg-coord-color-flipello-p1: #ffedd1;
   --cg-coord-shadow-flipello: 0 1px 2px #000;
 
@@ -176,6 +180,35 @@ coords {
   .orientation-left .files coord:nth-child(2n),
   .orientation-left .ranks coord:nth-child(2n) {
     color: var(--cg-coord-color-dameo-p2);
+  }
+}
+
+.variant-yonkoma10x10,
+.variant-yonkoma12x12 {
+  coords {
+    text-shadow: var(--cg-coord-shadow-yonkoma);
+  }
+
+  .orientation-p1 .files coord:nth-child(2n + 1),
+  .orientation-p1 .ranks coord:nth-child(2n),
+  .orientation-p2 .files coord:nth-child(2n),
+  .orientation-p2 .ranks coord:nth-child(2n + 1),
+  .orientation-right .files coord:nth-child(2n + 1),
+  .orientation-right .ranks coord:nth-child(2n + 1),
+  .orientation-left .files coord:nth-child(2n + 1),
+  .orientation-left .ranks coord:nth-child(2n + 1) {
+    color: var(--cg-coord-color-yonkoma-p1);
+  }
+
+  .orientation-p1 .files coord:nth-child(2n),
+  .orientation-p1 .ranks coord:nth-child(2n + 1),
+  .orientation-p2 .files coord:nth-child(2n + 1),
+  .orientation-p2 .ranks coord:nth-child(2n),
+  .orientation-right .files coord:nth-child(2n),
+  .orientation-right .ranks coord:nth-child(2n),
+  .orientation-left .files coord:nth-child(2n),
+  .orientation-left .ranks coord:nth-child(2n) {
+    color: var(--cg-coord-color-yonkoma-p2);
   }
 }
 

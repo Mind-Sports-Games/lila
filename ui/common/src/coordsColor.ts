@@ -84,6 +84,10 @@ const changeColorHandle = (): void => {
     'dameo-metal': '#c9c9c9 #727272',
     'dameo-olive': '#b8b19f #6d6655',
     'dameo-purple': '#9f90b0 #7d4a8d',
+    'yonkoma-oak': '#e8d6b2 #b08e60',
+    'yonkoma-green': '#c9ddb8 #6f9a5e',
+    'yonkoma-grey': '#e3e3e3 #9a9a9a',
+    'yonkoma-marble': '#ebe6de #8f8a82',
   };
 
   for (const theme of document.body.className.split(' ')) {
