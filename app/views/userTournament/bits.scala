@@ -48,7 +48,8 @@ object bits {
       title = title,
       moreCss = cssTag("user-tournament"),
       moreJs = moreJs,
-      robots = u.crawlable
+      // the profile is the page; a list of the tournaments it links to is not
+      robots = false
     ) {
       main(cls := "page-menu")(
         st.nav(cls := "page-menu__menu subnav")(

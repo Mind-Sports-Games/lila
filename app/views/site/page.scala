@@ -10,7 +10,8 @@ object page {
   def lone(doc: io.prismic.Document, resolver: io.prismic.DocumentLinkResolver)(implicit ctx: Context) =
     views.html.base.layout(
       moreCss = cssTag("page"),
-      title = ~doc.getText("pages.title")
+      title = ~doc.getText("pages.title"),
+      openGraph = openGraphOf(doc, ctx.req.path)
     ) {
       main(cls := "page-small box box-pad page")(pageContent(doc, resolver))
     }
@@ -22,8 +23,42 @@ object page {
       title = ~doc.getText("pages.title"),
       active = active,
       contentCls = "page box box-pad",
-      moreCss = cssTag("page")
+      moreCss = cssTag("page"),
+      openGraph = openGraphOf(doc, ctx.req.path)
     )(pageContent(doc, resolver))
+
+  // a full stop, unless it closes "eg." and the like
+  private val sentenceEnd =
+    """(?<!\be\.g)(?<!\beg)(?<!\bi\.e)(?<!\bie)(?<!\betc)(?<!\bvs)(?<!\bcf)\.\s""".r
+
+  // a Prismic page has no description field: its first paragraph says what it is, below any heading,
+  // in as many whole sentences as a snippet holds
+  private[html] def bodyDescription(doc: io.prismic.Document): Option[String] =
+    doc
+      .getStructuredText("pages.content")
+      .flatMap(_.blocks.collectFirst {
+        case io.prismic.Fragment.StructuredText.Block.Paragraph(text, _, _) if text.trim.nonEmpty =>
+          text.replaceAll("\\s+", " ").trim
+      })
+      .map { para =>
+        if (para.lengthIs <= 165) para
+        else
+          sentenceEnd.findAllMatchIn(para).map(_.start + 1).takeWhile(_ <= 165).toList.lastOption match {
+            case Some(end) => para.take(end)
+            case None      =>
+              val cut = para.take(156)
+              cut.take(cut.lastIndexOf(' ')).reverse.dropWhile(" ,;:".contains(_)).reverse + "…"
+          }
+      }
+
+  private def openGraphOf(doc: io.prismic.Document, url: String) =
+    bodyDescription(doc).map { description =>
+      lila.app.ui.OpenGraph(
+        title = ~doc.getText("pages.title"),
+        url = s"$netBaseUrl$url",
+        description = description
+      )
+    }
 
   private def pageContent(doc: io.prismic.Document, resolver: io.prismic.DocumentLinkResolver) = frag(
     h1(doc.getText("pages.title")),
@@ -214,12 +249,14 @@ $('#asset-version-message').text(window.playstrategy.info.message);"""
       active: String,
       contentCls: String = "",
       moreCss: Frag = emptyFrag,
-      moreJs: Frag = emptyFrag
+      moreJs: Frag = emptyFrag,
+      openGraph: Option[lila.app.ui.OpenGraph] = None
   )(body: Frag)(implicit ctx: Context) =
     views.html.base.layout(
       title = title,
       moreCss = moreCss,
-      moreJs = moreJs
+      moreJs = moreJs,
+      openGraph = openGraph
     ) {
       val sep                  = div(cls := "sep")
       val external             = frag(" ", i(dataIcon := "0"))

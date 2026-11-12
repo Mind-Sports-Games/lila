@@ -230,6 +230,11 @@ export default class EditorCtrl {
   }
 
   makeUrl(baseUrl: string, fen: string): string {
+    // an untouched board is the variant's own editor page, if it has one, with p1 to move
+    const page = this.cfg.handledVariants?.find(v => v.key === this.variantKey);
+    const untouched = fen === variantClassFromKey(this.variantKey).getInitialFen('p1');
+    // the page's path, on baseUrl's origin
+    if (page && untouched && !this.options.orientation) return new URL(page.url, new URL(baseUrl, location.href)).href;
     let urlParams = this.variantKey !== 'standard' ? `?variant=${this.variantKey}` : '';
     if (this.options.orientation) {
       urlParams += (urlParams.length === 0 ? '?' : '&') + `orientation=${this.options.orientation}`;
@@ -354,6 +359,8 @@ export default class EditorCtrl {
     this.extraPositions = [startPos, { fen: 'prompt', name: this.trans('loadPosition') }, ...extraFromPositions];
     this.positions = newPositions.filter(p => !p.eco?.startsWith('X'));
     this.setRules(variantKeyToRules(variantKey));
+    // the board has to become the new variant's before anything reads a FEN off it
+    this.startPosition();
     this.refreshAbout(variantKey);
   }
 
@@ -378,7 +385,6 @@ export default class EditorCtrl {
       if (rules == '5check') this.remainingChecks = RemainingChecks.fiveCheck();
       else this.remainingChecks = RemainingChecks.default();
     }
-    this.onChange();
   }
 
   isVariantStandardInitialPosition(): boolean {

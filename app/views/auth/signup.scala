@@ -10,6 +10,13 @@ object signup {
   def apply(form: lila.security.HcaptchaForm[?])(implicit ctx: Context) =
     views.html.base.layout(
       title = trans.signUp.txt(),
+      openGraph = lila.app.ui
+        .OpenGraph(
+          title = trans.signUp.txt(),
+          url = s"$netBaseUrl${routes.Auth.signup.url}",
+          description = trans.signUpDescription.txt()
+        )
+        .some,
       moreJs = frag(
         jsModule("login"),
         embedJsUnsafeLoadThen("""PlayStrategyLogin.signupStart()"""),

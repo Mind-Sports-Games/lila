@@ -14,6 +14,8 @@ object theme {
   ) =
     views.html.base.layout(
       title = s"${lila.i18n.VariantKeys.variantName(variant)} — ${trans.puzzle.puzzleThemes.txt()}",
+      description =
+        trans.variantPuzzleThemesDescription.txt(lila.i18n.VariantKeys.variantName(variant)).some,
       canonicalPath = routes.Puzzle.themes(variant.key).url.some,
       moreCss = cssTag("puzzle.page")
     )(

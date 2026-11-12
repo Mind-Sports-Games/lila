@@ -48,7 +48,7 @@ object header {
       ),
       div(cls := "user-show__social")(
         div(cls := "number-menu")(
-          a(cls := "nm-item", href := routes.Relation.followers(u.username))(
+          a(cls := "nm-item", noFollow, href := routes.Relation.followers(u.username))(
             splitNumber(trans.nbFollowers.pluralSame(info.nbFollowers))
           ),
           u.noBot.option(
@@ -65,6 +65,7 @@ object header {
           ),
           a(
             cls  := "nm-item",
+            noFollow,
             href := ctx.noKid.option(routes.ForumPost.search("user:" + u.username, 1).url)
           )(
             splitNumber(trans.nbForumPosts.pluralSame(info.nbPosts))

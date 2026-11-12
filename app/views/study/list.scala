@@ -20,7 +20,9 @@ object list {
       order = order,
       pag = pag,
       searchFilter = "",
-      url = o => routes.Study.all(o)
+      url = o => routes.Study.all(o),
+      canonical = routes.Study.allDefault().some,
+      description = trans.studyHomeDescription.txt().some
     )
 
   def byOwner(pag: Paginator[WithChaptersAndLiked], order: Order, owner: User)(implicit ctx: Context) =
@@ -31,6 +33,7 @@ object list {
       pag = pag,
       searchFilter = s"owner:${owner.username}",
       url = o => routes.Study.byOwner(owner.username, o),
+      canonical = routes.Study.byOwnerDefault(owner.username).some,
       modActions = bits.canUnfeature.option(bits.featureOwnerForms(owner))
     )
 
@@ -96,7 +99,8 @@ object list {
   def search(pag: Paginator[WithChaptersAndLiked], text: String)(implicit ctx: Context) =
     views.html.base.layout(
       title = text,
-      robots = netConfig.crawlable && pag.currentPage == 1,
+      // a search result is not a page of its own, and most queries find nothing
+      robots = false,
       moreCss = cssTag("study.index"),
       wrapClass = "full-screen-force",
       moreJs = infiniteScrollTag
@@ -160,13 +164,19 @@ object list {
       url: String => Call,
       searchFilter: String,
       topics: Option[StudyTopics] = None,
-      modActions: Option[Frag] = None
+      modActions: Option[Frag] = None,
+      canonical: Option[Call] = None,
+      description: Option[String] = None
   )(implicit ctx: Context) =
     // no openGraph: a listing turns over, and what gets shared is a study
     views.html.base.layout(
       title = title,
-      // only the first page of a listing is worth indexing; the rest is a crawl path into every study
-      robots = netConfig.crawlable && pag.currentPage == 1,
+      // only the first page of a listing is worth indexing, and only if it holds something; the
+      // rest is a crawl path into every study
+      robots = netConfig.crawlable && pag.currentPage == 1 && pag.nbResults > 0,
+      // every order of a listing holds the same studies: the orderless route is the one page
+      canonicalPath = canonical.map(_.url),
+      description = description,
       moreCss = cssTag("study.index"),
       wrapClass = "full-screen-force",
       moreJs = infiniteScrollTag
