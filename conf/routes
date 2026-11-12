@@ -765,6 +765,18 @@ GET   /event/manager/clone/$id<\w{8}>  controllers.Event.cloneE(id: String)
 GET   /event/manager/new               controllers.Event.form
 POST  /event/manager                   controllers.Event.create
 
+# Bot streams
+GET   /bot-stream/manager                       controllers.BotStream.manager
+GET   /bot-stream/manager/new                   controllers.BotStream.form
+POST  /bot-stream/manager                       controllers.BotStream.create
+GET   /bot-stream/manager/$id<\w{8}>            controllers.BotStream.edit(id: String)
+POST  /bot-stream/manager/$id<\w{8}>            controllers.BotStream.update(id: String)
+GET   /bot-stream/manager/clone/$id<\w{8}>      controllers.BotStream.cloneS(id: String)
+POST  /bot-stream/manager/$id<\w{8}>/start      controllers.BotStream.start(id: String)
+POST  /bot-stream/manager/$id<\w{8}>/stop       controllers.BotStream.stop(id: String)
+POST  /bot-stream/manager/$id<\w{8}>/restart    controllers.BotStream.restart(id: String)
+POST  /bot-stream/manager/$id<\w{8}>/delete     controllers.BotStream.delete(id: String)
+
 # Misc
 GET   /captcha/$id<\w{8}>              controllers.Main.captchaCheck(id: String)
 GET   /developers                      controllers.Main.webmasters

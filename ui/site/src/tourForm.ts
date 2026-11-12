@@ -68,22 +68,22 @@ playstrategy.load.then(() => {
       $('.form3 .clockIncrement').toggle(!useDelay);
     },
     toggleByoyomiSettings = () => {
-      toggleDelayIncrement();
       $useBronsteinDelay.prop('checked', false);
       $useSimpleDelay.prop('checked', false);
       hideByoyomiSettings();
+      toggleDelayIncrement();
     },
     toggleBronstein = () => {
-      toggleDelayIncrement();
       $useByoyomi.prop('checked', false);
       hideByoyomiSettings();
       $useSimpleDelay.prop('checked', false);
+      toggleDelayIncrement();
     },
     toggleSimpleDelay = () => {
-      toggleDelayIncrement();
       $useByoyomi.prop('checked', false);
       hideByoyomiSettings();
       $useBronsteinDelay.prop('checked', false);
+      toggleDelayIncrement();
     },
     matchSelectors = (selector1: Selector, selector2: Selector) => {
       const $sel1 = $(selector1);

@@ -3,7 +3,7 @@ db.game5.aggregate([
   {
     $match: {
       l: { $exists: true }, // old games dont have library (pre Aug 2021)
-      so: { $ne: 14 }, // exclude lila.game.Source.BotVsBotStream (modules/game/src/main/Source.scala)
+      so: { $nin: [14, 15] }, // exclude lila.game.Source.BotVsBotStream and BotVsBotPriority (modules/game/src/main/Source.scala)
     },
   },
   {
@@ -26,7 +26,7 @@ db.game5.aggregate([
 
 //total game count per month, excluding our bot-vs-bot streams (TAB - Games)
 db.game5.aggregate([
-  { $match: { so: { $ne: 14 } } }, // exclude lila.game.Source.BotVsBotStream (modules/game/src/main/Source.scala)
+  { $match: { so: { $nin: [14, 15] } } }, // exclude lila.game.Source.BotVsBotStream and BotVsBotPriority (modules/game/src/main/Source.scala)
   {
     $project: {
       date: {
@@ -78,7 +78,7 @@ db.game5.aggregate([
         month: { $month: '$ca' },
         year: { $year: '$ca' },
       },
-      isAutoBotVsBot: { $eq: ['$so', 14] },
+      isAutoBotVsBot: { $in: ['$so', [14, 15]] },
       p1IsPsBot: { $in: [{ $arrayElemAt: ['$us', 0] }, PS_BOT_IDS] },
       p2IsPsBot: { $in: [{ $arrayElemAt: ['$us', 1] }, PS_BOT_IDS] },
     },
