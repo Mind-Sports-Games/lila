@@ -727,12 +727,9 @@ object BinaryFormat {
         .to(Map)
     }
 
-    // the squares of the board the game is played on, in index order: 100 on the 10x10
-    // board, 144 on the 12x12 one
     private def yonkomaSquares(variant: yonkoma.variant.Variant): List[yonkoma.Pos] =
       yonkoma.Pos.all.filter(variant.boardSize.onBoard)
 
-    // as for go: 0 is an empty square and the checker's binaryInt is 1
     def writeYonkoma(pieces: yonkoma.PieceMap, variant: yonkoma.variant.Variant): ByteArray = {
       def posInt(pos: yonkoma.Pos): Int =
         (pieces get pos).fold(0) { piece =>

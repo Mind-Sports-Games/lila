@@ -126,8 +126,8 @@ final private class Takebacker(
   private def rewindsToTurnStart(game: Game): Boolean =
     game.variant.gameLogic == GameLogic.FiveInARow()
 
-  // a yonkoma player with no legal move has his turn passed for him, so a takeback drops
-  // actions until the requester's own last move is gone and he is to move again
+  // a yonkoma player with no legal move has their turn passed for them, so a takeback drops
+  // actions until the requester's own last move is gone and they can move again
   private def rewindsToLastMove(game: Game): Boolean =
     game.variant.gameLogic == GameLogic.Yonkoma()
 
@@ -189,7 +189,7 @@ final private class Takebacker(
     } yield events
 
   // drops one action at a time, passes included, until the last one dropped was a move of the
-  // requester; he is then to move in a position where he had a move, so no pass follows
+  // requester; they then move in a position where they had a move, so no pass follows
   private def rewindToLastMoveOf(
       game: Game,
       requester: PlayerIndex
