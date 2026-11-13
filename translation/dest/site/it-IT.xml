@@ -657,8 +657,6 @@ analizzarla con il computer, commentarla in chat, e condividerla tramite un indi
   <string name="keyShowOrHideComments">mostra/nascondi i commenti</string>
   <string name="keyEnterOrExitVariation">entra/esci dalla variante</string>
   <string name="newTournament">Nuovo torneo</string>
-  <string name="tournamentHomeTitle">Torneo con diversi controlli del tempo e varianti</string>
-  <string name="tournamentHomeDescription">Partecipa a frenetici tornei di scacchi! Unisciti a un torneo ufficiale programmato o creane uno. Bullet, Blitz, Classical, Chess960, King of the Hill, Three-check e altre opzioni per un divertimento scacchistico senza fine.</string>
   <string name="tournamentNotFound">Torneo non trovato</string>
   <string name="tournamentDoesNotExist">Questo torneo non esiste.</string>
   <string name="tournamentMayHaveBeenCanceled">Può essere stato annullato, se tutti i giocatori l\'hanno abbandonato prima che il torneo iniziasse.</string>

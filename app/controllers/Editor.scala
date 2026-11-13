@@ -12,6 +12,7 @@ import strategygames.chess.format.Forsyth as ChessForsyth
 
 import lila.app.*
 import lila.common.Json.*
+import views.html.library.bits as libraryBits
 
 final class Editor(env: Env) extends LilaController(env) {
 
@@ -66,14 +67,34 @@ final class Editor(env: Env) extends LilaController(env) {
 
   def index = load("")
 
+  // as /analysis: a name redirects to the key, and a game the editor cannot set up is a 404
+  def variant(key: String) = {
+    val handled = html.board.editor.handledKeys
+    libraryBits.canonicalVariantKey(key) match {
+      case Some(canonical) if handled(canonical) =>
+        Action(MovedPermanently(routes.Editor.variant(canonical).url))
+      case Some(_) => Open { implicit ctx => notFound }
+      case None    =>
+        Variant.byKey.get(key) match {
+          case Some(v) if handled(v.key) => renderEditor(none, v.some)
+          case Some(_)                   => Open { implicit ctx => notFound }
+          case None                      => load(key)
+        }
+    }
+  }
+
   def load(urlFen: String) =
-    Open { implicit ctx =>
-      val urlVariant: Option[String] = ctx.req.getQueryString("variant")
-      val fenStr                     = lila.common.String
+    renderEditor(
+      lila.common.String
         .decodeUriPath(urlFen)
         .map(_.replace('_', ' ').trim)
-        .filter(_.nonEmpty)
-      val variant     = Variant.orDefault(urlVariant.getOrElse(""))
+        .filter(_.nonEmpty),
+      none
+    )
+
+  private def renderEditor(fenStr: Option[String], pathVariant: Option[Variant]) =
+    Open { implicit ctx =>
+      val variant     = pathVariant | Variant.orDefault(ctx.req.getQueryString("variant").getOrElse(""))
       val orientation = ctx.req.getQueryString("orientation")
       fuccess {
         val situation = readFen(fenStr, variant)

@@ -16,7 +16,9 @@ object variant {
     val title = trans.variantStudies.txt(libraryBits.searchName(variant))
     views.html.base.layout(
       title = title,
-      robots = netConfig.crawlable && pag.currentPage == 1,
+      // a variant with no study has nothing to list, and the library page links here only when
+      // there is something to link to
+      robots = netConfig.crawlable && pag.currentPage == 1 && pag.nbResults > 0,
       canonicalPath = routes.Study.byVariantDefault(variant.key).url.some,
       moreCss = cssTag("study.index"),
       wrapClass = "full-screen-force",

@@ -28,8 +28,10 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
   private def forTeamsSelect(ids: Seq[TeamID]) = $doc("forTeams".$in(ids))
   private def sinceSelect(date: DateTime)      = $doc("startsAt".$gt(date))
   private def libSelect(lib: GameLogic)        = $doc("lib" -> lib.id)
+  // only standard chess is stored with no variant field; every other standard, international
+  // draughts included, carries its id
   private def variantSelect(variant: Variant)  =
-    if (variant.standardVariant) $doc("variant".$exists(false))
+    if (variant.key == "standard") $doc("variant".$exists(false))
     else $doc("variant" -> variant.id)
   private val nonEmptySelect           = $doc("nbPlayers".$ne(0))
   private[tournament] val selectUnique = $doc("schedule.freq" -> "unique")
@@ -147,18 +149,28 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .dmap { new lila.db.paginator.StaticAdapter(_) }
 
   // empty means every game; several variants need an $or, as a group can span game logics
+  private def finishedByFreqSelect(freq: Schedule.Freq, variants: List[Variant]) =
+    $doc("schedule.freq" -> freq, "status" -> Status.Finished.id) ++ (variants match {
+      case Nil      => $empty
+      case v :: Nil => libSelect(v.gameLogic) ++ variantSelect(v)
+      case many     => $or(many.map(v => libSelect(v.gameLogic) ++ variantSelect(v))*)
+    })
+
   def finishedByFreqAdapter(freq: Schedule.Freq, variants: List[Variant] = Nil) =
     new lila.db.paginator.Adapter[Tournament](
       collection = coll,
-      selector = $doc("schedule.freq" -> freq, "status" -> Status.Finished.id) ++ (variants match {
-        case Nil      => $empty
-        case v :: Nil => libSelect(v.gameLogic) ++ variantSelect(v)
-        case many     => $or(many.map(v => libSelect(v.gameLogic) ++ variantSelect(v))*)
-      }),
+      selector = finishedByFreqSelect(freq, variants),
       projection = none,
       sort = $sort.desc("startsAt"),
       readPreference = ReadPreference.secondaryPreferred
     )
+
+  // whether finishedByFreqAdapter has anything to page through
+  def hasFinishedByFreq(freq: Schedule.Freq, variants: List[Variant] = Nil): Fu[Boolean] =
+    coll
+      .find(finishedByFreqSelect(freq, variants), $id(true).some)
+      .one[Bdoc](ReadPreference.secondaryPreferred)
+      .dmap(_.isDefined)
 
   def isUnfinished(tourId: Tournament.ID): Fu[Boolean] =
     coll.exists($id(tourId) ++ unfinishedSelect)
@@ -547,12 +559,6 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .cursor[Tournament]()
       .list(max)
 
-  // International draughts counts as the standard variant, but is stored with its id (only standard
-  // chess is stored without one), so the plain variant selector never finds it
-  private def ownVariantSelect(variant: Variant) =
-    if (variant.standardVariant) $or($doc("variant".$exists(false)), $doc("variant" -> variant.id))
-    else variantSelect(variant)
-
   // `anyCreatorFreqs`: series PlayStrategy's own account created for no team (the 2021 online MSO)
   def finishedSeriesOfTeam(
       teamId: TeamID,
@@ -566,7 +572,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
         finishedSelect ++ $and(
           // its own variant, or one of the variants of a medley (stored as "<lib id>:<key>", older ones bare)
           $or(
-            libSelect(variant.gameLogic) ++ ownVariantSelect(variant),
+            libSelect(variant.gameLogic) ++ variantSelect(variant),
             $doc("mVariants".$in(List(s"${variant.gameLogic.id}:${variant.key}", variant.key)))
           ),
           $or(

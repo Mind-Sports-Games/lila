@@ -18,7 +18,7 @@ object home {
       json: play.api.libs.json.JsObject
   )(implicit ctx: Context) =
     views.html.base.layout(
-      title = trans.tournaments.txt(),
+      title = trans.tournamentHomeTitle.txt(),
       moreCss = cssTag("tournament.home"),
       wrapClass = "full-screen-force",
       moreJs = frag(

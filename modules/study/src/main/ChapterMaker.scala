@@ -7,6 +7,7 @@ import strategygames.{ GameLogic, Player as PlayerIndex }
 import strategygames.chess.variant.Variant as ChessVariant
 import lila.chat.{ Chat, ChatApi }
 import lila.game.{ Game, Namer }
+import lila.i18n.VariantKeys
 import lila.user.User
 
 final private class ChapterMaker(
@@ -27,16 +28,31 @@ final private class ChapterMaker(
           case Some(pgn) => fromFenOrPgnOrBlank(study, data.copy(pgn = pgn.some), order, userId)
           case _         => fromFenOrPgnOrBlank(study, data, order, userId)
         }
+      // the variant select offers only the variants with an analysis board; an imported game, a
+      // pasted FEN and a crafted POST all clear the same bar
+      case Some(game) if !game.variant.hasAnalysisBoard => fufail(noAnalysisBoard(game.variant))
       case Some(game) => fromGame(study, game, data, order, userId)
     } map { (c: Chapter) =>
       if (c.name.value.isEmpty) c.copy(name = Chapter.defaultName(order)) else c
     }
 
-  def fromFenOrPgnOrBlank(study: Study, data: Data, order: Int, userId: User.ID): Fu[Chapter] =
-    data.pgn.filter(_.trim.nonEmpty) match {
-      case Some(pgn) => fromPgn(study, pgn, data, order, userId)
-      case None      => fuccess(fromFenOrBlank(study, data, order, userId))
-    }
+  def fromFenOrPgnOrBlank(study: Study, data: Data, order: Int, userId: User.ID): Fu[Chapter] = {
+    val variant = dataVariant(data)
+    if (!variant.hasAnalysisBoard) fufail(noAnalysisBoard(variant))
+    else
+      data.pgn.filter(_.trim.nonEmpty) match {
+        case Some(pgn) => fromPgn(study, pgn, data, order, userId)
+        case None      => fuccess(fromFenOrBlank(study, data, order, userId))
+      }
+  }
+
+  private def dataVariant(data: Data): Variant =
+    data.variant.flatMap(v => Variant.apply(v)) | Variant.default(GameLogic.Chess())
+
+  private def noAnalysisBoard(variant: Variant) =
+    ValidationException(
+      s"${VariantKeys.variantName(variant)} has no analysis board, so it cannot be a chapter"
+    )
 
   private def fromPgn(study: Study, pgn: String, data: Data, order: Int, userId: User.ID): Fu[Chapter] = {
     implicit val variant = Variant.Chess(ChessVariant.default)
@@ -85,8 +101,7 @@ final private class ChapterMaker(
     }
 
   private def fromFenOrBlank(study: Study, data: Data, order: Int, userId: User.ID): Chapter = {
-    val variant =
-      data.variant.flatMap(v => Variant.apply(v)) | Variant.default(GameLogic.Chess())
+    val variant = dataVariant(data)
     (data.fen.map(FEN(variant, _)).flatMap { Forsyth.<<<@(variant.gameLogic, variant, _) } match {
       case Some(sit) =>
         Node.Root(

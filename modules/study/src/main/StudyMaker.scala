@@ -2,6 +2,7 @@ package lila.study
 
 import strategygames.format.FEN
 import lila.game.{ Namer, Pov }
+import lila.i18n.VariantKeys
 import lila.user.User
 
 final private class StudyMaker(
@@ -13,6 +14,13 @@ final private class StudyMaker(
 
   def apply(data: StudyMaker.ImportGame, user: User): Fu[Study.WithChapter] =
     (data.form.gameId so gameRepo.gameWithInitialFen).flatMap {
+      // the same bar as a chapter: no analysis board, no study, not even a blank one
+      case Some((game, _)) if !game.variant.hasAnalysisBoard =>
+        fufail(
+          ChapterMaker.ValidationException(
+            s"${VariantKeys.variantName(game.variant)} has no analysis board, so it cannot be a study"
+          )
+        )
       case Some((game, initialFen)) if game.metadata.multiPointState.isEmpty =>
         createFromPov(data, Pov(game, data.form.orientation), initialFen, user)
       case Some(_) => createFromScratch(data, user)

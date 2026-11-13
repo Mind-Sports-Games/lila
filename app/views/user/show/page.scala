@@ -67,7 +67,8 @@ object page {
         (filters.current.name == "search").option(cssTag("user.show.search")),
         isGranted(_.UserModView).option(cssTag("mod.user"))
       ),
-      robots = u.crawlable
+      // the profile is the page; a filtered list of games it links to is not
+      robots = false
     ) {
       main(cls := "page-menu", dataUsername := u.username)(
         st.aside(cls := "page-menu__menu")(side(u, info.ranks, none)),

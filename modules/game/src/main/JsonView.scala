@@ -290,7 +290,7 @@ object JsonView {
             "height" -> 8
           )
         )
-    }) ++ Json.obj("clientEval" -> BrowserEngine.has(v))
+    }) ++ Json.obj("clientEval" -> BrowserEngine.has(v), "hasAnalysisBoard" -> v.hasAnalysisBoard)
   }
 
   implicit val boardSizeFairyWriter: Writes[strategygames.fairysf.Board.BoardSize] =

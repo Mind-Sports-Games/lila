@@ -145,6 +145,8 @@ final class StudyApi(
           .insert(sc.chapter)
           .andDo(indexStudy(sc.study))
           .andDo(scheduleTimeline(sc.study.id)) inject sc.some
+    } recover { case _: ChapterMaker.ValidationException =>
+      none
     }
 
   def clone(me: User, prev: Study): Fu[Option[Study]] =
@@ -610,7 +612,8 @@ final class StudyApi(
     data.manyGames match {
       case Some(datas) =>
         lila.common.LilaFuture.applySequentially(datas) { data =>
-          addChapter(studyId, data, sticky)(who)
+          // a refused game is already reported below; the rest of the batch still goes in
+          addChapter(studyId, data, sticky)(who).recoverDefault
         }
       case _ =>
         sequenceStudy(studyId) { study =>

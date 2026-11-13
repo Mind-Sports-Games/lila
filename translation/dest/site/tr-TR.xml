@@ -653,8 +653,6 @@
   <string name="keyShowOrHideComments">yorumları gizle/göster</string>
   <string name="keyEnterOrExitVariation">varyasyona gir/çık</string>
   <string name="newTournament">Yeni turnuva</string>
-  <string name="tournamentHomeTitle">Çeşitli zaman kontrolleri ve varyantları içeren satranç turnuvası</string>
-  <string name="tournamentHomeDescription">Hızlı tempolu satranç turnuvalarında oynayın! Önceden planlanmış turnuvalara katılın, ya da kendi turnuvanızı oluşturun. Sınırsız satranç eğlenceniz için Kurşun, Yıldırım, Klasik, Satranç960, Tepenin Şahı, Üçşah ve daha fazla seçenek mevcuttur.</string>
   <string name="tournamentNotFound">Turnuva bulunamadı.</string>
   <string name="tournamentDoesNotExist">Böyle bir turnuva yok.</string>
   <string name="tournamentMayHaveBeenCanceled">Eğer bütün oyuncular turnuva başlamadan ayrıldıysa, iptal edilmiş olabilir.</string>

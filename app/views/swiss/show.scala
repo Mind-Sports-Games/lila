@@ -31,6 +31,8 @@ object show {
     val hasScheduleInput = isDirector && s.settings.manualRounds && s.isNotFinished
     views.html.base.layout(
       title = fullName(s),
+      // an edition that ended without a winner is a page about nothing happening
+      robots = netConfig.crawlable && !(s.isFinished && s.winnerId.isEmpty),
       moreJs = frag(
         jsModule("swiss"),
         hasScheduleInput.option(jsModule("flatpickr")),
@@ -83,6 +85,8 @@ object show {
   def round(s: Swiss, r: SwissRound.Number, pairings: Paginator[SwissPairing])(implicit ctx: Context) =
     views.html.base.layout(
       title = s"${fullName(s)} • Round $r/${s.round}",
+      // the swiss is the page; a round of its pairings is a table of games, each noindex itself
+      robots = false,
       moreCss = cssTag("swiss.show"),
       moreJs = infiniteScrollTag
     ) {

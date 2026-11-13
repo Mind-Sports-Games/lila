@@ -2,8 +2,12 @@ package views.html.board
 
 import strategygames.format.FEN
 import strategygames.Situation
+import strategygames.variant.Variant
+
+import play.api.libs.json.{ JsArray, Json }
 
 import lila.api.Context
+import lila.i18n.VariantKeys
 import lila.app.templating.Environment.*
 import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
@@ -11,23 +15,70 @@ import views.html.library.bits as libraryBits
 
 object editor {
 
+  // the games the editor handles: its select, in this order, and a page of its own for each
+  val handledVariants: List[Variant] = List(
+    "standard",
+    "antichess",
+    "atomic",
+    "crazyhouse",
+    "horde",
+    "kingOfTheHill",
+    "racingKings",
+    "threeCheck",
+    "fiveCheck",
+    "monster",
+    "minibreakthroughtroyka",
+    "breakthroughtroyka",
+    "linesOfAction",
+    "scrambledEggs",
+    "flipello",
+    "flipello10",
+    "antiflipello",
+    "octagonflipello",
+    "xiangqi",
+    "minixiangqi",
+    "amazons",
+    "abalone",
+    "grandabalone"
+  ).flatMap(Variant.byKey.get)
+
+  val handledKeys: Set[String] = handledVariants.map(_.key).toSet
+
+  // a game's page in the editor, if it has one: /editor for chess, /editor/<key> for another it handles
+  def pageUrl(variant: Variant): Option[String] =
+    if (variant.key == "standard") routes.Editor.index.url.some
+    else handledKeys(variant.key).option(routes.Editor.variant(variant.key).url)
+
   def apply(
       sit: Situation,
       fen: FEN,
-      variant: strategygames.variant.Variant,
+      variant: Variant,
       positionsJson: String,
       positionsByVariantJson: String,
       orientation: Option[String] = None
-  )(implicit ctx: Context) =
+  )(implicit ctx: Context) = {
+    // a game with no page of its own (?variant=) is shown as /editor
+    val canonical = pageUrl(variant) | routes.Editor.index.url
+
+    val (pageTitle, pageDescription) =
+      if (canonical == routes.Editor.index.url)
+        (trans.boardEditorTitle.txt(), trans.boardEditorDescription.txt())
+      else {
+        val name = VariantKeys.variantName(variant)
+        (trans.variantBoardEditorTitle.txt(name), trans.variantBoardEditorDescription.txt(name))
+      }
+    val handledVariantsJson = safeJsonValue(JsArray(handledVariants.flatMap { v =>
+      pageUrl(v).map(url => Json.obj("key" -> v.key, "name" -> VariantKeys.variantName(v), "url" -> url))
+    }))
     views.html.base.layout(
-      title = trans.boardEditorTitle.txt(),
+      title = pageTitle,
       boardFamily = variant.gameFamily.key.some,
       soleBoardFamily = true,
       namePieceSets = true,
       moreJs = frag(
         jsModule("editor"),
         embedJsUnsafeLoadThen(
-          s"""const data=${safeJsonValue(bits.jsData(sit, fen, variant))};data.positions=$positionsJson;data.positionsByVariant=$positionsByVariantJson;
+          s"""const data=${safeJsonValue(bits.jsData(sit, fen, variant))};data.positions=$positionsJson;data.positionsByVariant=$positionsByVariantJson;data.handledVariants=$handledVariantsJson;
           data.options = data.options || {};
           ${orientation.fold("")(o => s"data.options.orientation='${o}';\n")}
       PlayStrategyEditor(document.getElementById('board-editor'), data);"""
@@ -37,16 +88,16 @@ object editor {
       zoomable = true,
       openGraph = lila.app.ui
         .OpenGraph(
-          title = trans.boardEditorTitle.txt(),
-          url = s"$netBaseUrl${routes.Editor.index.url}",
-          description = trans.boardEditorDescription.txt()
+          title = pageTitle,
+          url = s"$netBaseUrl$canonical",
+          description = pageDescription
         )
         .some,
-      canonicalPath = routes.Editor.index.url.some
+      canonicalPath = canonical.some
     )(
       frag(
         // outside the element the editor empties on mount
-        h1(cls := "offscreen")(trans.boardEditor()),
+        h1(cls := "offscreen")(pageTitle),
         main(id := "board-editor")(
           div(cls := s"board-editor variant-${variant.key}")(
             div(cls := "spare"),
@@ -58,8 +109,9 @@ object editor {
         )
       )
     )
+  }
 
-  def about(variant: strategygames.variant.Variant)(implicit ctx: Context): Frag =
+  def about(variant: Variant)(implicit ctx: Context): Frag =
     frag(
       h2(
         a(href := routes.Library.variant(variant.key))(

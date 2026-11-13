@@ -71,7 +71,7 @@ function isChessRules(variantKey: VariantKey): boolean {
   return variantClassFromKey(variantKey).family == 'chess';
 }
 
-function variant2option(key: stratopsVariantKey, name: string, ctrl: EditorCtrl): VNode {
+function variant2option(key: VariantKey, name: string, ctrl: EditorCtrl): VNode {
   return h(
     'option',
     {
@@ -83,32 +83,6 @@ function variant2option(key: stratopsVariantKey, name: string, ctrl: EditorCtrl)
     `${ctrl.trans.noarg('variant')} | ${name}`,
   );
 }
-
-const allVariants: Array<[stratopsVariantKey, string]> = [
-  [stratopsVariantKey.standard, 'Standard'],
-  [stratopsVariantKey.antichess, 'Antichess'],
-  [stratopsVariantKey.atomic, 'Atomic'],
-  [stratopsVariantKey.crazyhouse, 'Crazyhouse'],
-  [stratopsVariantKey.horde, 'Horde'],
-  [stratopsVariantKey.kingOfTheHill, 'King of the Hill'],
-  [stratopsVariantKey.racingKings, 'Racing Kings'],
-  [stratopsVariantKey.threeCheck, 'Three-check'],
-  [stratopsVariantKey.fiveCheck, 'Five-check'],
-  [stratopsVariantKey.monster, 'Monster'],
-  [stratopsVariantKey.minibreakthroughtroyka, 'Mini Breakthrough'],
-  [stratopsVariantKey.breakthroughtroyka, 'Breakthrough'],
-  [stratopsVariantKey.linesOfAction, 'Lines of Action'],
-  [stratopsVariantKey.scrambledEggs, 'Scrambled Eggs'],
-  [stratopsVariantKey.flipello, 'Othello'],
-  [stratopsVariantKey.flipello10, 'Grand Othello'],
-  [stratopsVariantKey.antiflipello, 'AntiOthello'],
-  [stratopsVariantKey.octagonflipello, 'Octagon Othello'],
-  [stratopsVariantKey.xiangqi, 'Xiangqi'],
-  [stratopsVariantKey.minixiangqi, 'Mini Xiangqi'],
-  [stratopsVariantKey.amazons, 'Amazons'],
-  [stratopsVariantKey.abalone, 'Abalone'],
-  [stratopsVariantKey.grandAbalone, 'Grand Abalone'],
-];
 
 function controls(ctrl: EditorCtrl, state: EditorState): VNode {
   const position2option = function (pos: Editor.OpeningPosition): VNode {
@@ -187,11 +161,10 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                 on: {
                   change(e) {
                     ctrl.changeVariant((e.target as HTMLSelectElement).value as VariantKey);
-                    ctrl.startPosition();
                   },
                 },
               },
-              allVariants.map(x => variant2option(x[0], x[1], ctrl)),
+              (ctrl.cfg.handledVariants || []).map(v => variant2option(v.key, v.name, ctrl)),
             ),
           ]),
           h('div.actions', [
