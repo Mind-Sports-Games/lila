@@ -12,11 +12,11 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/e391b56a82b7c71e7663082a797f6fc21b18776d
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#pla-1759-add-yonkoma-all-repos
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/672e59b2f84983b519779262ebc769cbc91c579d
+        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.42
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/57426cbbaf65e1826bc15bf567a7aa19d49c6b36
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#pla-1759-add-yonkoma-all-repos
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/18d2711fd11ed7726ced2a7b90e6befb01b3a531
+        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.35
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9df509c74de7098aed8e42ae2f250f26155c1e33
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -47,7 +47,7 @@ importers:
         version: 7.1.0
       prettier:
         specifier: ^3.9.6
-        version: 3.9.10
+        version: 3.10.1
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -592,8 +592,8 @@ importers:
 
 packages:
 
-  '@babel/runtime@7.29.13':
-    resolution: {integrity: sha512-v+oN26xP4YIlQsbQ/CbTH1WG5m/l/DjKKZNy/Kp3f/AFvbgt7Em/D0FeMM3O2hX0YzeN2M16W8lOpyhIkfCBcQ==}
+  '@babel/runtime@7.29.14':
+    resolution: {integrity: sha512-Y5tqevQaUAZhhj82BpYMNC1ssvLQTVAfwKdm8iy8qwmhvC2/CpcAu8OC+QEtjM7pMk7knx83u1Qj8gzkicyelw==}
     engines: {node: '>=6.9.0'}
 
   '@badrap/result@0.2.13':
@@ -815,11 +815,11 @@ packages:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
     engines: {node: '>=8'}
 
-  brace-expansion@1.1.21:
-    resolution: {integrity: sha512-9zeA+KLZNNzglF2TPKRQEDyx6Yby7daAkuy8MiPzpXPsYDWi/DRM8jmwUDxokQjYqBpv5DgPiwD4h4ZZSy1Ujw==}
+  brace-expansion@1.1.22:
+    resolution: {integrity: sha512-CKLDTuSsN0+r1ThM0WkzzBI7dnPI6xEGfa/JnVYIK9JNBA1N1NyPwXVHor//NKD/y3sDxp764sZdLhFK7pH8XQ==}
 
-  brace-expansion@2.1.7:
-    resolution: {integrity: sha512-uZbew1NqdmPDTMJ8ah1y+b+9QEJrfkXFk3RcTQw3X0jW/xRUvFKsg1CfQdSYGdTbXZWExtU3J3ccxtnfw1Fi0g==}
+  brace-expansion@2.1.8:
+    resolution: {integrity: sha512-BnlDzDYQoplTsZSvPi86CNzmbcb07X8ufR8fk1zivaiEJlXJkiq1MQyDCVmlWcsWbj6aWXqHnrwwevbrm/Saig==}
 
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
@@ -865,8 +865,8 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/672e59b2f84983b519779262ebc769cbc91c579d:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/672e59b2f84983b519779262ebc769cbc91c579d}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/57426cbbaf65e1826bc15bf567a7aa19d49c6b36:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/57426cbbaf65e1826bc15bf567a7aa19d49c6b36}
     version: 7.11.1-pstrat3.42
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1323,8 +1323,8 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier@3.9.10:
-    resolution: {integrity: sha512-skGHTH1Yb9QvaTC4hWnRTzEYtCpApF0UMBPz+t/0ZPzP8ihefo/btKd+QA7pUE0fEwA1SbS/NmhyEcstdXOIdA==}
+  prettier@3.10.1:
+    resolution: {integrity: sha512-70vp3ZUYoPlFbF9uiTdXHUUCGEIp7d4+6p+8DYbkm2jP7x/3i/paXVF6dopSI3zd/CEitrZN1rc4i85xWmmXlg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -1423,8 +1423,8 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/18d2711fd11ed7726ced2a7b90e6befb01b3a531:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/18d2711fd11ed7726ced2a7b90e6befb01b3a531}
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9df509c74de7098aed8e42ae2f250f26155c1e33:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9df509c74de7098aed8e42ae2f250f26155c1e33}
     version: 0.8.1-pstrat5.35
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1544,7 +1544,7 @@ packages:
 
 snapshots:
 
-  '@babel/runtime@7.29.13': {}
+  '@babel/runtime@7.29.14': {}
 
   '@badrap/result@0.2.13': {}
 
@@ -1764,12 +1764,12 @@ snapshots:
 
   binary-extensions@2.3.0: {}
 
-  brace-expansion@1.1.21:
+  brace-expansion@1.1.22:
     dependencies:
       balanced-match: 1.0.2
       concat-map: 0.0.1
 
-  brace-expansion@2.1.7:
+  brace-expansion@2.1.8:
     dependencies:
       balanced-match: 1.0.2
 
@@ -1809,7 +1809,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/672e59b2f84983b519779262ebc769cbc91c579d: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/57426cbbaf65e1826bc15bf567a7aa19d49c6b36: {}
 
   chokidar@3.6.0:
     dependencies:
@@ -1854,7 +1854,7 @@ snapshots:
 
   date-fns@2.30.0:
     dependencies:
-      '@babel/runtime': 7.29.13
+      '@babel/runtime': 7.29.14
 
   dayjs@1.11.23: {}
 
@@ -2182,11 +2182,11 @@ snapshots:
 
   minimatch@3.1.5:
     dependencies:
-      brace-expansion: 1.1.21
+      brace-expansion: 1.1.22
 
   minimatch@9.0.9:
     dependencies:
-      brace-expansion: 2.1.7
+      brace-expansion: 2.1.8
 
   mithril@https://codeload.github.com/ornicar/mithril.js/tar.gz/dd92827aec63f921149ca9a3460ccd981e7025bb: {}
 
@@ -2274,7 +2274,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier@3.9.10: {}
+  prettier@3.10.1: {}
 
   prop-types@15.8.1:
     dependencies:
@@ -2350,7 +2350,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/18d2711fd11ed7726ced2a7b90e6befb01b3a531:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9df509c74de7098aed8e42ae2f250f26155c1e33:
     dependencies:
       '@badrap/result': 0.2.13
 
