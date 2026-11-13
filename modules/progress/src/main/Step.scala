@@ -23,6 +23,7 @@ object Step {
   import StepGroup.*
 
   case object ChooseGames        extends Step("chooseGames", Core)
+  case object CompleteProfile    extends Step("completeProfile", Core)
   case object PlayHuman          extends Step("playHuman", Core)
   case object JoinTeam           extends Step("joinTeam", Core)
   case object PlayTournament     extends Step("playTournament", Core)
@@ -41,7 +42,6 @@ object Step {
   case object CreateStudy        extends Step("createStudy", Learn)
   case object FollowPlayer       extends Step("followPlayer", Community)
   case object ForumPost          extends Step("forumPost", Community)
-  case object CompleteProfile    extends Step("completeProfile", Community)
   case object WatchTv            extends Step("watchTv", Watch)
   case object WatchStreamer      extends Step("watchStreamer", Watch)
   case object CustomiseBoard     extends Step("customiseBoard", Customise)
@@ -50,6 +50,7 @@ object Step {
 
   val all: List[Step] = List(
     ChooseGames,
+    CompleteProfile,
     PlayHuman,
     JoinTeam,
     PlayTournament,
@@ -68,7 +69,6 @@ object Step {
     CreateStudy,
     FollowPlayer,
     ForumPost,
-    CompleteProfile,
     WatchTv,
     WatchStreamer,
     CustomiseBoard,

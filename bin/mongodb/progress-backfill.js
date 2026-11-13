@@ -12,7 +12,7 @@
 // STEP_KEYS, CORE_KEYS, NOT_FOR_KIDS_KEYS and VARIANT_KEYS mirror lila.progress.Step and
 // Progress.variantKeys (PerfType.allVariant); keep them in step with the code.
 
-const CORE_KEYS = ['chooseGames', 'playHuman', 'joinTeam', 'playTournament'];
+const CORE_KEYS = ['chooseGames', 'completeProfile', 'playHuman', 'joinTeam', 'playTournament'];
 const STEP_KEYS = CORE_KEYS.concat([
   'playBot',
   'inviteFriend',
@@ -29,7 +29,6 @@ const STEP_KEYS = CORE_KEYS.concat([
   'createStudy',
   'followPlayer',
   'forumPost',
-  'completeProfile',
   'watchTv',
   'watchStreamer',
   'customiseBoard',
