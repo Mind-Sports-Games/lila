@@ -13,7 +13,8 @@ final class Env(
     notifyApi: lila.notify.NotifyApi,
     tournamentRepo: lila.tournament.TournamentRepo,
     swissApi: lila.swiss.SwissApi,
-    studyApi: lila.study.StudyApi
+    studyApi: lila.study.StudyApi,
+    userRepo: lila.user.UserRepo
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   private lazy val coll = db(CollName("progress"))

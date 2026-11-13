@@ -16,20 +16,20 @@ case class Progress(
 
   def has(step: Step): Boolean = steps contains step.key
 
-  def remaining: List[Step] = Step.all.filterNot(has)
+  def remaining(kid: Boolean): List[Step] = Step.allFor(kid).filterNot(has)
 
-  def remainingIn(group: StepGroup): List[Step] = Step.ofGroup(group).filterNot(has)
+  def remainingIn(group: StepGroup, kid: Boolean): List[Step] = Step.ofGroup(group, kid).filterNot(has)
 
-  def nextStep: Option[Step] = remaining.headOption
+  def nextStep(kid: Boolean): Option[Step] = remaining(kid).headOption
 
-  def nbCoreDone: Int    = Step.core.count(has)
-  def nbExploreDone: Int = Step.explore.count(has)
+  def nbCoreDone: Int                 = Step.core.count(has)
+  def nbExploreDone(kid: Boolean): Int = Step.exploreFor(kid).count(has)
 
-  def isOnboarded: Boolean      = Step.core.forall(has)
-  def isFullyOnboarded: Boolean = Step.all.forall(has)
+  def isOnboarded: Boolean                   = Step.core.forall(has)
+  def isFullyOnboarded(kid: Boolean): Boolean = Step.allFor(kid).forall(has)
 
-  def onboardedLevel: Int =
-    if (isFullyOnboarded) 2
+  def onboardedLevel(kid: Boolean): Int =
+    if (isFullyOnboarded(kid)) 2
     else if (isOnboarded) 1
     else 0
 

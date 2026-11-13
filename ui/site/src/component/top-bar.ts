@@ -1,7 +1,6 @@
 import pubsub from './pubsub';
 import spinnerHtml from './spinner';
 import { loadHashedCssPath, loadModule } from './assets';
-import * as xhr from 'common/xhr';
 
 export default function () {
   const initiatingHtml = `<div class="initiating">${spinnerHtml}</div>`,
@@ -130,13 +129,6 @@ export default function () {
         playing = $('body').hasClass('playing');
       loadHashedCssPath('dasher');
       loadModule('dasher').then(() => window.PlayStrategyDasher($el.empty()[0], { playing }));
-    });
-
-    const opened = playstrategy.storage.make('dasher-opened');
-    pubsub.on('top.toggle.user_tag', () => {
-      if (opened.get() || !$('#top .dasher').hasClass('shown')) return;
-      opened.set('1');
-      xhr.text('/dasher/opened', { method: 'post' }).catch(() => opened.remove());
     });
 
     const openFromHash = () => {

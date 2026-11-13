@@ -6,13 +6,16 @@ import reactivemongo.api.bson.*
 import lila.db.BSON
 import lila.memo.CacheApi.beafedAsync
 import lila.db.dsl.*
+import lila.i18n.{ I18nKey, I18nLangPicker }
+import lila.i18n.I18nKeys as trans
 import lila.notify.{ GenericLink, Notification, NotifyApi }
-import lila.user.User
+import lila.user.{ User, UserRepo }
 
 final class ProgressApi(
     coll: Coll,
     cacheApi: lila.memo.CacheApi,
-    notifyApi: NotifyApi
+    notifyApi: NotifyApi,
+    userRepo: UserRepo
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   implicit private val awardHandler: BSONDocumentHandler[BadgeAward] = Macros.handler[BadgeAward]
@@ -79,8 +82,8 @@ final class ProgressApi(
       }
 
   private def awardOnboarded(userId: User.ID): Funit =
-    get(userId) flatMap { progress =>
-      val level = progress.onboardedLevel
+    get(userId) zip userRepo.isKid(userId) flatMap { case (progress, kid) =>
+      val level = progress.onboardedLevel(kid)
       (level > progress.awardLevel(Badge.Onboarded)) so award(userId, Badge.Onboarded, level)
     }
 
@@ -104,32 +107,34 @@ final class ProgressApi(
   }
 
   private def notifyAward(userId: User.ID, badge: Badge, level: Int): Funit =
-    notifyApi.addNotification(
-      Notification.make(
-        Notification.Notifies(userId),
-        GenericLink(
-          url = s"/@/$userId",
-          title = s"Badge earned: ${ProgressApi.badgeName(badge, level)}".some,
-          text = ProgressApi.badgeText(badge, level).some,
-          icon = ProgressIcon(badge, level).toString
+    userRepo.langOf(userId) map I18nLangPicker.byStrOrDefault flatMap { implicit lang =>
+      notifyApi.addNotification(
+        Notification.make(
+          Notification.Notifies(userId),
+          GenericLink(
+            url = s"/@/$userId",
+            title = trans.onboarding.badgeEarned.txt(ProgressApi.badgeName(badge, level).txt()).some,
+            text = ProgressApi.badgeText(badge, level).txt().some,
+            icon = ProgressIcon(badge, level).toString
+          )
         )
       )
-    )
+    }
 }
 
 private object ProgressApi {
 
-  def badgeName(badge: Badge, level: Int): String =
-    (badge, level) match {
-      case (Badge.Onboarded, 1) => "Onboarded"
-      case (Badge.Onboarded, _) => "Fully onboarded"
-      case (Badge.AllVariants, _) => "Every variant played"
+  def badgeName(badge: Badge, level: Int): I18nKey =
+    badge match {
+      case Badge.Onboarded if level >= 2 => trans.onboarding.badgeFullyOnboarded
+      case Badge.Onboarded               => trans.onboarding.badgeOnboarded
+      case Badge.AllVariants             => trans.onboarding.badgeAllVariants
     }
 
-  def badgeText(badge: Badge, level: Int): String =
-    (badge, level) match {
-      case (Badge.Onboarded, 1) => "You've completed the core steps. Keep exploring PlayStrategy!"
-      case (Badge.Onboarded, _) => "You've explored everything on your checklist."
-      case (Badge.AllVariants, _) => "You've played a game in every variant on PlayStrategy."
+  def badgeText(badge: Badge, level: Int): I18nKey =
+    badge match {
+      case Badge.Onboarded if level >= 2 => trans.onboarding.badgeFullyOnboardedText
+      case Badge.Onboarded               => trans.onboarding.badgeOnboardedText
+      case Badge.AllVariants             => trans.onboarding.badgeAllVariantsText
     }
 }

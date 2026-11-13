@@ -79,7 +79,7 @@ final class Pref(env: Env) extends LilaController(env) {
     OpenBody { implicit ctx =>
       implicit val req = ctx.body
       FormResult(forms.pieceSet) { v =>
-        tickProgress(lila.progress.Step.CheckPreferences)
+        tickProgress(lila.progress.Step.CustomiseBoard)
         updatePieceSetForFamily(gameFamily, v, ctx) map { cookie =>
           Ok(()).withCookies(cookie)
         }
@@ -90,7 +90,7 @@ final class Pref(env: Env) extends LilaController(env) {
     OpenBody { implicit ctx =>
       implicit val req = ctx.body
       FormResult(forms.theme) { v =>
-        tickProgress(lila.progress.Step.CheckPreferences)
+        tickProgress(lila.progress.Step.CustomiseBoard)
         updateThemeForFamily(gameFamily, v, ctx) map { cookie =>
           Ok(()).withCookies(cookie)
         }

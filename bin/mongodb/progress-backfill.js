@@ -9,8 +9,8 @@
 // and visit-only steps (library, memory, analysis, editor, tv, streamer) are not backfilled at all.
 // Backfilled badges send no notification.
 //
-// STEP_KEYS, CORE_KEYS and VARIANT_KEYS mirror lila.progress.Step and Progress.variantKeys
-// (PerfType.allVariant); keep them in step with the code.
+// STEP_KEYS, CORE_KEYS, NOT_FOR_KIDS_KEYS and VARIANT_KEYS mirror lila.progress.Step and
+// Progress.variantKeys (PerfType.allVariant); keep them in step with the code.
 
 const CORE_KEYS = ['chooseGames', 'playHuman', 'joinTeam', 'playTournament'];
 const STEP_KEYS = CORE_KEYS.concat([
@@ -36,6 +36,8 @@ const STEP_KEYS = CORE_KEYS.concat([
   'checkPreferences',
   'patron',
 ]);
+
+const NOT_FOR_KIDS_KEYS = ['forumPost', 'watchStreamer'];
 
 const SPEED_KEYS = ['ultraBullet', 'bullet', 'blitz', 'rapid', 'classical', 'correspondence'];
 
@@ -72,7 +74,7 @@ const coordinators = idSet('coordinate_score', '_id');
 const learners = idSet('learn_progress', '_id');
 
 const nb = (u, key) => (u.perfs && u.perfs[key] && u.perfs[key].nb) || 0;
-const nonEmpty = s => typeof s === 'string' && s.trim().length > 0;
+const nonEmpty = s => typeof s === 'string' && s.length > 0;
 
 function stepsOf(u) {
   const count = u.count || {};
@@ -104,18 +106,21 @@ function variantsOf(u) {
   return played;
 }
 
-function onboardedLevel(steps) {
+function onboardedLevel(steps, kid) {
   const has = k => steps[k] !== undefined;
-  if (STEP_KEYS.every(has)) return 2;
+  const all = kid ? STEP_KEYS.filter(k => !NOT_FOR_KIDS_KEYS.includes(k)) : STEP_KEYS;
+  if (all.every(has)) return 2;
   if (CORE_KEYS.every(has)) return 1;
   return 0;
 }
+
+const USER_FIELDS = { count: 1, perfs: 1, profile: 1, plan: 1, kid: 1 };
 
 let nbUsers = 0;
 let nbWritten = 0;
 let nbBadges = 0;
 
-db.user4.find({ enabled: true, title: { $ne: 'BOT' } }, { count: 1, perfs: 1, profile: 1, plan: 1 }).forEach(u => {
+db.user4.find({ enabled: true, title: { $ne: 'BOT' } }, USER_FIELDS).forEach(u => {
   nbUsers++;
   const steps = stepsOf(u);
   const variants = variantsOf(u);
@@ -139,7 +144,7 @@ db.user4.find({ enabled: true, title: { $ne: 'BOT' } }, { count: 1, perfs: 1, pr
   const doc = db.progress.findOne({ _id: u._id });
   const badges = doc.badges || {};
   const badgeSet = {};
-  const level = onboardedLevel(doc.steps || {});
+  const level = onboardedLevel(doc.steps || {}, u.kid === true);
   if (level > ((badges.onboarded && badges.onboarded.level) || 0)) badgeSet['badges.onboarded'] = { level, at: now };
   if (!badges.allVariants && VARIANT_KEYS.every(k => (doc.variants || []).includes(k)))
     badgeSet['badges.allVariants'] = { level: 1, at: now };

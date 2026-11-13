@@ -50,11 +50,6 @@ final class Dasher(env: Env) extends LilaController(env) {
       else I18nLangPicker.bestFromRequestHeaders(ctx.req) | enLang
     )
 
-  def opened =
-    Auth { _ => me =>
-      env.progress.api.tick(me.id, lila.progress.Step.CustomiseBoard) inject NoContent
-    }
-
   def get =
     Open { implicit ctx =>
       negotiate(

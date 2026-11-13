@@ -2775,6 +2775,10 @@ val `badgeGroupOnboarding` = new I18nKey("onboarding:badgeGroupOnboarding")
 val `badgeOnboarded` = new I18nKey("onboarding:badgeOnboarded")
 val `badgeFullyOnboarded` = new I18nKey("onboarding:badgeFullyOnboarded")
 val `badgeAllVariants` = new I18nKey("onboarding:badgeAllVariants")
+val `badgeEarned` = new I18nKey("onboarding:badgeEarned")
+val `badgeOnboardedText` = new I18nKey("onboarding:badgeOnboardedText")
+val `badgeFullyOnboardedText` = new I18nKey("onboarding:badgeFullyOnboardedText")
+val `badgeAllVariantsText` = new I18nKey("onboarding:badgeAllVariantsText")
 }
 
 }

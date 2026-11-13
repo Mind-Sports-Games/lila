@@ -321,7 +321,7 @@ lazy val activity = module("activity",
 )
 
 lazy val progress = module("progress",
-  Seq(common, db, memo, hub, user, rating, game, notifyModule, puzzle, forum, study, tournament, swiss),
+  Seq(common, db, memo, hub, i18n, user, rating, game, notifyModule, puzzle, forum, study, tournament, swiss),
   reactivemongo.bundle
 )
 

@@ -76,10 +76,15 @@ object Step {
     Patron
   )
 
-  val core: List[Step]    = all.filter(_.isCore)
-  val explore: List[Step] = all.filterNot(_.isCore)
+  val core: List[Step] = all.filter(_.isCore)
+
+  val notForKids: Set[Step] = Set(ForumPost, WatchStreamer)
+
+  def allFor(kid: Boolean): List[Step] = if (kid) all.filterNot(notForKids) else all
+
+  def exploreFor(kid: Boolean): List[Step] = allFor(kid).filterNot(_.isCore)
 
   val byKey: Map[String, Step] = all.map(s => s.key -> s).toMap
 
-  def ofGroup(group: StepGroup): List[Step] = all.filter(_.group == group)
+  def ofGroup(group: StepGroup, kid: Boolean): List[Step] = allFor(kid).filter(_.group == group)
 }

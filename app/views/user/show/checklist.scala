@@ -14,7 +14,8 @@ object checklist {
       achievements(progress)
     )
 
-  private def onboarding(u: User, progress: Progress)(implicit ctx: Context) =
+  private def onboarding(u: User, progress: Progress)(implicit ctx: Context) = {
+    val explore = Step.exploreFor(u.kid)
     div(cls := "checklist__onboarding")(
       h2(
         if (progress.isOnboarded) trans.onboarding.keepExploring()
@@ -22,9 +23,9 @@ object checklist {
       ),
       if (progress.isOnboarded)
         progressBar(
-          progress.nbExploreDone,
-          Step.explore.size,
-          trans.onboarding.exploreProgress.txt(progress.nbExploreDone, Step.explore.size)
+          progress.nbExploreDone(u.kid),
+          explore.size,
+          trans.onboarding.exploreProgress.txt(progress.nbExploreDone(u.kid), explore.size)
         )
       else
         progressBar(
@@ -32,14 +33,14 @@ object checklist {
           Step.core.size,
           trans.onboarding.coreProgress.txt(progress.nbCoreDone, Step.core.size)
         ),
-      progress.nextStep.fold(p(cls := "checklist__done")(trans.onboarding.allStepsDone())) { next =>
+      progress.nextStep(u.kid).fold(p(cls := "checklist__done")(trans.onboarding.allStepsDone())) { next =>
         frag(
           a(cls := "checklist__next", href := url(next))(
             span(cls := "checklist__next-label")(trans.onboarding.nextStep()),
             strong(label(next))
           ),
           StepGroup.all.map { group =>
-            progress.remainingIn(group).filterNot(_ == next) match {
+            progress.remainingIn(group, u.kid).filterNot(_ == next) match {
               case Nil   => emptyFrag
               case steps =>
                 div(cls := s"checklist__group checklist__group--${group.key}")(
@@ -56,6 +57,7 @@ object checklist {
         )
       )
     )
+  }
 
   private def achievements(progress: Progress)(implicit ctx: Context) =
     div(cls := "checklist__achievements")(

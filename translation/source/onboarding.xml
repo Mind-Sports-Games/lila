@@ -64,4 +64,8 @@
   <string name="badgeOnboarded">Onboarded</string>
   <string name="badgeFullyOnboarded">Fully onboarded</string>
   <string name="badgeAllVariants">Every variant played</string>
+  <string name="badgeEarned">Badge earned: %1$s</string>
+  <string name="badgeOnboardedText">You've completed the core steps. Keep exploring PlayStrategy!</string>
+  <string name="badgeFullyOnboardedText">You've explored everything on your checklist.</string>
+  <string name="badgeAllVariantsText">You've played a game in every variant on PlayStrategy.</string>
 </resources>
