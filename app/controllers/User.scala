@@ -336,7 +336,9 @@ final class User(
                   "entropy"                -> leaderboards.entropy,
                   "gomoku"                 -> leaderboards.gomoku,
                   "pente"                  -> leaderboards.pente,
-                  "renju"                  -> leaderboards.renju
+                  "renju"                  -> leaderboards.renju,
+                  "yonkoma10x10"           -> leaderboards.yonkoma10x10,
+                  "yonkoma12x12"           -> leaderboards.yonkoma12x12
                 )
               )
             }

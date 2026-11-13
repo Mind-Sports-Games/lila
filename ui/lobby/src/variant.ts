@@ -43,6 +43,8 @@ type variantConfirmsType = {
   gomoku: string;
   pente: string;
   renju: string;
+  yonkoma10x10: string;
+  yonkoma12x12: string;
 };
 
 const variantConfirms: variantConfirmsType = {
@@ -113,6 +115,10 @@ const variantConfirms: variantConfirmsType = {
     "This is a Pente game!\n\nOn a 19x19 board, the first to make an unbroken line of five or more stones wins, or the first to capture ten stones. Closing off exactly two of your opponent's stones in a line captures them. It opens with swap2, as gomoku does.",
   renju:
     'This is a Renju game!\n\nBlack wins only with exactly five in a row, and loses at once by making a double three, a double four or an overline. White wins with five or more. It opens with Taraguchi-10: the first stones go near the centre with a swap offered after each, and black may offer ten fifth stones for white to choose from.',
+  yonkoma10x10:
+    'This is a Yonkoma game!\n\nEach player has two checkers that slide like bishops. A move must bring the checker closer to the two enemy checkers, or keep that distance and move away from its partner. Whoever completes a crosscut (all four checkers in a 2x2 block, each player holding one of its diagonals) loses.',
+  yonkoma12x12:
+    'This is a Yonkoma game on a 12x12 board!\n\nEach player has two checkers that slide like bishops. A move must bring the checker closer to the two enemy checkers, or keep that distance and move away from its partner. Whoever completes a crosscut (all four checkers in a 2x2 block, each player holding one of its diagonals) loses.',
 };
 
 function storageKey(key: string) {

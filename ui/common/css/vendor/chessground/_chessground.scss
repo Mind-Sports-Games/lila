@@ -117,6 +117,16 @@ span.mini-game.variant-togyzkumalak.is2d {
   height: calc(100% / 10);
 }
 
+.variant-yonkoma10x10 square {
+  width: calc(100% / 10);
+  height: calc(100% / 10);
+}
+
+.variant-yonkoma12x12 square {
+  width: calc(100% / 12);
+  height: calc(100% / 12);
+}
+
 .variant-oware square {
   width: calc(100% / 6);
   height: calc(100% / 2);
@@ -689,6 +699,16 @@ square {
   height: calc(100% / 10);
 }
 
+.variant-yonkoma10x10 piece {
+  width: calc(100% / 10);
+  height: calc(100% / 10);
+}
+
+.variant-yonkoma12x12 piece {
+  width: calc(100% / 12);
+  height: calc(100% / 12);
+}
+
 .variant-oware piece {
   width: calc(100% / 6);
   height: calc(100% / 2);
@@ -898,6 +918,16 @@ piece {
   padding-bottom: calc(100% / 10);
 }
 
+.variant-yonkoma10x10 cg-helper {
+  width: calc(100% / 10);
+  padding-bottom: calc(100% / 10);
+}
+
+.variant-yonkoma12x12 cg-helper {
+  width: calc(100% / 12);
+  padding-bottom: calc(100% / 12);
+}
+
 .variant-oware cg-helper {
   width: calc(100% / 6);
   padding-bottom: calc(100% / 6);
@@ -997,6 +1027,16 @@ cg-helper {
 .variant-amazons cg-container {
   width: calc(100% * 10);
   height: calc(100% * 10);
+}
+
+.variant-yonkoma10x10 cg-container {
+  width: calc(100% * 10);
+  height: calc(100% * 10);
+}
+
+.variant-yonkoma12x12 cg-container {
+  width: calc(100% * 12);
+  height: calc(100% * 12);
 }
 
 .variant-oware cg-container {

@@ -694,6 +694,12 @@ coords {
   }
 }
 
+@each $variant in ('yonkoma10x10', 'yonkoma12x12') {
+  .variant-#{$variant} cg-coords-container coords.files coord {
+    flex: 1 1 0;
+  }
+}
+
 @each $variant in $fiveinarow-variants {
   .variant-#{$variant} cg-coords-container.inner-coords coords,
   .variant-#{$variant} cg-coords-container.outer-coords coords {

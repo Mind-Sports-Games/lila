@@ -99,6 +99,7 @@ object Tv {
   import strategygames.dameo.variant as D2V
   import strategygames.entropy.variant as EV
   import strategygames.fiveinarow.variant as FIRV
+  import strategygames.yonkoma.variant as YV
   import strategygames.{ GameFamily, Speed as S }
 
   case class Champion(user: LightUser, rating: Int, gameId: Game.ID)
@@ -781,6 +782,33 @@ object Tv {
           familyChannel = false,
           gameFamily = "fiveinarow"
         )
+    case object YonkomaFamily
+        extends Channel(
+          name = s"All ${VariantKeys.gameFamilyName(GameFamily.Yonkoma())}",
+          icon = YV.Yonkoma10x10.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(anyVariant(Variant.all(GameLogic.Yonkoma())), noBot),
+          familyChannel = true,
+          gameFamily = "yonkoma"
+        )
+    case object Yonkoma10x10
+        extends Channel(
+          name = VariantKeys.variantName(Variant.Yonkoma(YV.Yonkoma10x10)),
+          icon = YV.Yonkoma10x10.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.Yonkoma(YV.Yonkoma10x10)), noBot),
+          familyChannel = false,
+          gameFamily = "yonkoma"
+        )
+    case object Yonkoma12x12
+        extends Channel(
+          name = VariantKeys.variantName(Variant.Yonkoma(YV.Yonkoma12x12)),
+          icon = YV.Yonkoma12x12.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.Yonkoma(YV.Yonkoma12x12)), noBot),
+          familyChannel = false,
+          gameFamily = "yonkoma"
+        )
     case object Bot
         extends Channel(
           name = "Bot",
@@ -869,6 +897,9 @@ object Tv {
       Gomoku,
       Pente,
       Renju,
+      YonkomaFamily,
+      Yonkoma10x10,
+      Yonkoma12x12,
       Bot,
       Computer
     )

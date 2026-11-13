@@ -56,6 +56,8 @@ case class History(
     gomoku: RatingsMap,
     pente: RatingsMap,
     renju: RatingsMap,
+    yonkoma10x10: RatingsMap,
+    yonkoma12x12: RatingsMap,
     ultraBullet: RatingsMap,
     bullet: RatingsMap,
     blitz: RatingsMap,
@@ -128,6 +130,8 @@ case class History(
       case "gomoku"                 => gomoku
       case "pente"                  => pente
       case "renju"                  => renju
+      case "yonkoma10x10"           => yonkoma10x10
+      case "yonkoma12x12"           => yonkoma12x12
       case "puzzle_standard"        => puzzle_standard
       case "puzzle_kingOfTheHill"   => puzzle_kingOfTheHill
       case "puzzle_atomic"          => puzzle_atomic
@@ -214,6 +218,8 @@ object History {
             gomoku = ratingsMap("gomoku"),
             pente = ratingsMap("pente"),
             renju = ratingsMap("renju"),
+            yonkoma10x10 = ratingsMap("yonkoma10x10"),
+            yonkoma12x12 = ratingsMap("yonkoma12x12"),
             ultraBullet = ratingsMap("ultraBullet"),
             bullet = ratingsMap("bullet"),
             blitz = ratingsMap("blitz"),

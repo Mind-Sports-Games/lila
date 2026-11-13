@@ -41,7 +41,9 @@ object BrowserEngine {
     "entropy",
     "gomoku",
     "pente",
-    "renju"
+    "renju",
+    "yonkoma10x10",
+    "yonkoma12x12"
   )
 
   def has(variant: Variant): Boolean = !without(variant.key)

@@ -102,7 +102,9 @@ object list {
               userTopPerf(leaderboards.entropy, PerfType.orDefault("entropy")),
               userTopPerf(leaderboards.gomoku, PerfType.orDefault("gomoku")),
               userTopPerf(leaderboards.pente, PerfType.orDefault("pente")),
-              userTopPerf(leaderboards.renju, PerfType.orDefault("renju"))
+              userTopPerf(leaderboards.renju, PerfType.orDefault("renju")),
+              userTopPerf(leaderboards.yonkoma10x10, PerfType.orDefault("yonkoma10x10")),
+              userTopPerf(leaderboards.yonkoma12x12, PerfType.orDefault("yonkoma12x12"))
             )
           )
         )

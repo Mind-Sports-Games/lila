@@ -120,6 +120,8 @@ object side {
           showNonEmptyPerf(u.perfs.gomoku, PerfType.orDefault("gomoku")),
           showNonEmptyPerf(u.perfs.pente, PerfType.orDefault("pente")),
           showNonEmptyPerf(u.perfs.renju, PerfType.orDefault("renju")),
+          showNonEmptyPerf(u.perfs.yonkoma10x10, PerfType.orDefault("yonkoma10x10")),
+          showNonEmptyPerf(u.perfs.yonkoma12x12, PerfType.orDefault("yonkoma12x12")),
           hr,
           a(
             dataIcon := "7",

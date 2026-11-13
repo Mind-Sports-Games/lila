@@ -16,4 +16,5 @@ export const gameFamily: GameFamilyKey[] = [
   'abalone',
   'entropy',
   'fiveinarow',
+  'yonkoma',
 ];

@@ -27,9 +27,9 @@ case class BadgeAward(level: Int, at: DateTime)
 object ProgressIcon {
 
   // glyphs in public/font/playstrategy.woff(2)
-  val onboarded: Char      = '\ue947'
-  val fullyOnboarded: Char = '\ue948'
-  val allVariants: Char    = '\ue949'
+  val onboarded: Char      = '\ue949'
+  val fullyOnboarded: Char = '\ue94a'
+  val allVariants: Char    = '\ue94b'
 
   def apply(badge: Badge, level: Int): Char =
     badge match {

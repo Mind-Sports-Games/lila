@@ -87,4 +87,7 @@ export const perfIcons: any = {
   Gomoku: '\ue93A',
   Pente: '\ue93B',
   Renju: '\ue93C',
+  Yonkoma: '\ue947',
+  'Yonkoma 10x10': '\ue947',
+  'Yonkoma 12x12': '\ue948',
 };

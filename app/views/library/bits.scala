@@ -166,6 +166,7 @@ object bits {
       case "flipello10" | "octagonflipello" | "antiflipello" => "flipello"
       case "hyper" | "nackgammon"                            => "backgammon"
       case "grandabalone"                                    => "abalone"
+      case "yonkoma12x12"                                    => "yonkoma10x10"
       case "minibreakthroughtroyka"                          => "breakthroughtroyka"
       case "bestemshe"                                       => "togyzkumalak"
       case "frysk"                                           => "frisian"
@@ -212,6 +213,7 @@ object bits {
     "octagonreversi"        -> "octagonflipello",
     "chess"                 -> "standard",
     "go"                    -> "go19x19",
+    "yonkoma"               -> "yonkoma10x10",
     "baduk"                 -> "go19x19",
     "weiqi"                 -> "go19x19",
     "chinesechess"          -> "xiangqi",
