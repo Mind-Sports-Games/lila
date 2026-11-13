@@ -94,6 +94,7 @@ final class Editor(env: Env) extends LilaController(env) {
 
   private def renderEditor(fenStr: Option[String], pathVariant: Option[Variant]) =
     Open { implicit ctx =>
+      tickProgress(lila.progress.Step.BoardEditor)
       val variant     = pathVariant | Variant.orDefault(ctx.req.getQueryString("variant").getOrElse(""))
       val orientation = ctx.req.getQueryString("orientation")
       fuccess {

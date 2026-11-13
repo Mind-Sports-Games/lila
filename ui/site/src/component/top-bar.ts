@@ -1,6 +1,7 @@
 import pubsub from './pubsub';
 import spinnerHtml from './spinner';
 import { loadHashedCssPath, loadModule } from './assets';
+import * as xhr from 'common/xhr';
 
 export default function () {
   const initiatingHtml = `<div class="initiating">${spinnerHtml}</div>`,
@@ -130,6 +131,23 @@ export default function () {
       loadHashedCssPath('dasher');
       loadModule('dasher').then(() => window.PlayStrategyDasher($el.empty()[0], { playing }));
     });
+
+    const opened = playstrategy.storage.make('dasher-opened');
+    pubsub.on('top.toggle.user_tag', () => {
+      if (opened.get() || !$('#top .dasher').hasClass('shown')) return;
+      opened.set('1');
+      xhr.text('/dasher/opened', { method: 'post' }).catch(() => opened.remove());
+    });
+
+    const openFromHash = () => {
+      if (location.hash !== '#dasher') return;
+      history.replaceState(null, '', location.pathname + location.search);
+      setTimeout(() => {
+        if (!$('#top .dasher').hasClass('shown')) $('#top .dasher .toggle').trigger('click');
+      }, 50);
+    };
+    openFromHash();
+    window.addEventListener('hashchange', openFromHash);
   }
 
   {

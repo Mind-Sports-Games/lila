@@ -21,6 +21,8 @@ case class Profile(
       case names => (names mkString " ").some
     }
 
+  def isComplete = countryInfo.isDefined && (ne(bio).isDefined || nonEmptyRealName.isDefined)
+
   def countryInfo = country flatMap Countries.info
 
   def nonEmptyLocation = ne(location)

@@ -713,6 +713,12 @@ abstract private[controllers] class LilaController(val env: Env)
 
   protected def pageHit(implicit ctx: lila.api.Context): Unit = pageHit(ctx.req)
 
+  protected def tickProgress(step: lila.progress.Step)(implicit ctx: lila.api.Context): Unit =
+    ctx.userId foreach { tickProgress(_, step) }
+
+  protected def tickProgress(userId: lila.user.User.ID, step: lila.progress.Step): Unit =
+    env.progress.api.tick(userId, step).discard
+
   protected val noProxyBufferHeader        = "X-Accel-Buffering" -> "no"
   protected val noProxyBuffer              = (res: Result) => res.withHeaders(noProxyBufferHeader)
   protected def asAttachment(name: String) = (res: Result) =>

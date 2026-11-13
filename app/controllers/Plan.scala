@@ -33,6 +33,7 @@ final class Plan(env: Env)(implicit @annotation.nowarn("msg=unused") system: akk
   def index =
     Open { implicit ctx =>
       pageHit
+      tickProgress(lila.progress.Step.Patron)
       ctx.me.fold(indexAnon) { me =>
         import lila.plan.PlanApi.SyncResult.*
         env.plan.api.sync(me) flatMap {

@@ -90,6 +90,7 @@ final class UserAnalysis(
     }
 
   private def loadPage(urlFen: String, variant: Variant)(implicit ctx: Context): Fu[Result] = {
+    tickProgress(lila.progress.Step.AnalyseGame)
     val decodedFen: Option[FEN] = lila.common.String
       .decodeUriPath(urlFen)
       .filter(_.trim.nonEmpty)

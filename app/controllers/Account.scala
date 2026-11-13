@@ -41,7 +41,9 @@ final class Account(
           }
         spamReport.so { case (resource, text) =>
           env.report.api.autoCommFlag(lila.report.Suspect(me).id, resource, text)
-        } >> env.user.repo.setProfile(me.id, profile) inject Redirect(routes.Account.profile).flashSuccess
+        } >> env.user.repo.setProfile(me.id, profile) >>
+          (profile.isComplete so env.progress.api.tick(me.id, lila.progress.Step.CompleteProfile)) inject
+          Redirect(routes.Account.profile).flashSuccess
       }
     }
 

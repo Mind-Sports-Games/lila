@@ -121,6 +121,8 @@ final class Setup(
                           )
                           env.challenge.api.create(challenge).flatMap {
                             case true =>
+                              if (config.opponent == "friend" && destUser.isEmpty)
+                                tickProgress(lila.progress.Step.InviteFriend)
                               negotiate(
                                 html = fuccess(
                                   Redirect(routes.Challenge.show(challenge.id, None))

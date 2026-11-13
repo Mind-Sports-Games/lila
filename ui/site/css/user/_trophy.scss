@@ -209,3 +209,36 @@
   text-shadow: 0 0 4px #444;
   margin-top: -18px;
 }
+
+.progress-badges {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 0.3em;
+  height: 40px;
+  margin-right: 0.6em;
+}
+
+.progress-badge {
+  display: flex;
+  align-items: center;
+  font-size: 34px;
+  line-height: 1;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+
+  &--onboarded {
+    color: $c-primary;
+
+    &.level-2 {
+      color: $c-brag;
+    }
+  }
+
+  &--allVariants {
+    color: $c-good;
+  }
+}

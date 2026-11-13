@@ -30,7 +30,7 @@ object page {
           description = describeUser(u)
         )
         .some,
-      moreJs = moreJs(info),
+      moreJs = moreJs(),
       moreCss = frag(
         cssTag("user.show"),
         isGranted(_.UserModView).option(cssTag("mod.user"))
@@ -61,7 +61,7 @@ object page {
           if (games.currentPage == 1) ""
           else " - page " + games.currentPage
         }",
-      moreJs = moreJs(info, filters.current.name == "search"),
+      moreJs = moreJs(filters.current.name == "search"),
       moreCss = frag(
         cssTag("user.show"),
         (filters.current.name == "search").option(cssTag("user.show.search")),
@@ -79,15 +79,10 @@ object page {
       )
     }
 
-  private def moreJs(info: UserInfo, withSearch: Boolean = false)(implicit ctx: Context) =
+  private def moreJs(withSearch: Boolean = false)(implicit ctx: Context) =
     frag(
       infiniteScrollTag,
       jsModule("user"),
-      info.ratingChart.map { ratingChart =>
-        embedJsUnsafeLoadThen(
-          s"playstrategy.lazyChart('.rating-history-container','chart.ratingHistory',()=>playstrategy.ratingHistoryChart($ratingChart))"
-        )
-      },
       withSearch.option(jsModule("gameSearch")),
       isGranted(_.UserModView).option(jsModule("mod.user"))
     )

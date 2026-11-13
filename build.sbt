@@ -130,7 +130,7 @@ lazy val modules = Seq(
   playban, insight, perfStat, irc, quote, challenge,
   study, studySearch, fishnet, explorer, learn, plan,
   event, coach, practice, evalCache, irwin,
-  activity, relay, streamer, bot, clas, swiss, storm, racer, web, ui
+  activity, progress, relay, streamer, bot, clas, swiss, storm, racer, web, ui
 )
 
 lazy val moduleRefs = modules map projectToRef
@@ -317,6 +317,11 @@ lazy val pool = module("pool",
 
 lazy val activity = module("activity",
   Seq(common, game, analyse, user, forum, study, pool, puzzle, tournament, swiss, practice, team),
+  reactivemongo.bundle
+)
+
+lazy val progress = module("progress",
+  Seq(common, db, memo, hub, user, rating, game, notifyModule, puzzle, forum, study, tournament, swiss),
   reactivemongo.bundle
 )
 

@@ -32,13 +32,18 @@ final class Pref(env: Env) extends LilaController(env) {
       lila.pref.PrefCateg(categSlug) match {
         case None        => notFound
         case Some(categ) =>
+          if (categ == lila.pref.PrefCateg.GameDisplay || categ == lila.pref.PrefCateg.GameBehavior)
+            tickProgress(me.id, lila.progress.Step.CheckPreferences)
           Ok(html.account.pref(me, forms.prefOf(ctx.pref), categ)).fuccess
       }
     }
 
   def formApply =
     AuthBody { implicit ctx => _ =>
-      def onSuccess(data: lila.pref.PrefForm.PrefData) = api.setPref(data(ctx.pref)) inject Ok("saved")
+      def onSuccess(data: lila.pref.PrefForm.PrefData) = {
+        tickProgress(lila.progress.Step.CheckPreferences)
+        api.setPref(data(ctx.pref)) inject Ok("saved")
+      }
       implicit val req                                 = ctx.body
       forms.pref
         .bindFromRequest()
@@ -74,6 +79,7 @@ final class Pref(env: Env) extends LilaController(env) {
     OpenBody { implicit ctx =>
       implicit val req = ctx.body
       FormResult(forms.pieceSet) { v =>
+        tickProgress(lila.progress.Step.CheckPreferences)
         updatePieceSetForFamily(gameFamily, v, ctx) map { cookie =>
           Ok(()).withCookies(cookie)
         }
@@ -84,6 +90,7 @@ final class Pref(env: Env) extends LilaController(env) {
     OpenBody { implicit ctx =>
       implicit val req = ctx.body
       FormResult(forms.theme) { v =>
+        tickProgress(lila.progress.Step.CheckPreferences)
         updateThemeForFamily(gameFamily, v, ctx) map { cookie =>
           Ok(()).withCookies(cookie)
         }

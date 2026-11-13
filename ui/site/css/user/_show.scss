@@ -67,21 +67,103 @@
     width: auto;
   }
 
-  .new-player {
-    padding: 1.5em;
-    overflow-y: scroll;
+  .checklist {
+    @include hoverflow;
+
+    flex: 1 1 58%;
+    align-self: stretch;
+    height: 332px;
+    padding: 1.2em 1.5em;
+    overflow-y: auto;
 
     h2 {
-      font-size: 1.5em;
+      font-size: 1.4em;
+      margin-bottom: 0.6em;
     }
 
-    p {
-      margin: 1em 0;
+    h3 {
+      font-size: 1em;
+      color: $c-font-dim;
+      margin: 1em 0 0.3em 0;
     }
 
     li {
       list-style: disc inside;
-      line-height: 1.5em;
+      line-height: 1.6em;
+    }
+
+    &__progress {
+      display: flex;
+      align-items: center;
+      gap: 0.8em;
+      margin-bottom: 1em;
+    }
+
+    &__bar {
+      flex: 1 1 auto;
+      height: 0.6em;
+      border-radius: 0.3em;
+      background: $c-bg-low;
+      overflow: hidden;
+
+      span {
+        display: block;
+        height: 100%;
+        background: $c-good;
+      }
+    }
+
+    &__count {
+      flex: 0 0 auto;
+      color: $c-font-dim;
+      font-size: 0.9em;
+    }
+
+    &__next {
+      @extend %box-radius;
+
+      display: flex;
+      flex-flow: column;
+      padding: 0.7em 1em;
+      background: mix($c-primary, $c-bg-box, 12%);
+      border: 1px solid mix($c-primary, $c-bg-box, 40%);
+
+      &:hover {
+        background: mix($c-primary, $c-bg-box, 22%);
+      }
+    }
+
+    &__next-label {
+      font-size: 0.85em;
+      text-transform: uppercase;
+      color: $c-font-dim;
+    }
+
+    &__done {
+      color: $c-good;
+    }
+
+    &__kid {
+      margin-top: 1.5em;
+      font-size: 0.9em;
+      color: $c-font-dim;
+    }
+
+    &__achievements {
+      margin-top: 1.5em;
+      padding-top: 1em;
+      border-top: $border;
+    }
+
+    &__achievement {
+      strong {
+        display: block;
+        margin-bottom: 0.3em;
+      }
+
+      &.done strong {
+        color: $c-brag;
+      }
     }
   }
 

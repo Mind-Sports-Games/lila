@@ -21,18 +21,6 @@
     margin: 10px 0;
   }
 
-  .rating-history-container {
-    flex: 1 1 58%;
-    margin: -10px 0 -14px 0;
-    height: 350px;
-
-    .spinner {
-      width: 90px;
-      height: 90px;
-      margin: 120px auto 0 auto;
-    }
-  }
-
   .profile-side {
     @extend %flex-column;
 

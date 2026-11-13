@@ -13,6 +13,7 @@ final class Library(env: Env) extends LilaController(env) {
 
   def home =
     Open { implicit ctx =>
+      tickProgress(lila.progress.Step.ChooseGames)
       {
         for {
           monthlyGameData <- env.game.cached.monthlyGames
@@ -66,7 +67,8 @@ final class Library(env: Env) extends LilaController(env) {
         }
     }
 
-  private def showVariant(key: String)(implicit ctx: Context): Fu[Result] =
+  private def showVariant(key: String)(implicit ctx: Context): Fu[Result] = {
+    tickProgress(lila.progress.Step.ChooseGames)
     Variant.byKey.get(key) match {
       case Some(variant) => {
         val tvChannel = lila.tv.Tv.Channel.find(variant.key)
@@ -103,5 +105,6 @@ final class Library(env: Env) extends LilaController(env) {
       }
       case None => NotFound("Variant not found").fuccess
     }
+  }
 
 }

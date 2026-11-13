@@ -16,6 +16,7 @@ final class Tv(
 
   def onChannel(chanKey: String) =
     Open { implicit ctx =>
+      tickProgress(lila.progress.Step.WatchTv)
       lila.tv.Tv.Channel.find(chanKey).fold(notFound) { channel =>
         if (channel.key == chanKey) playstrategyTv(channel)
         else fuccess(MovedPermanently(routes.Tv.onChannel(channel.key).url))

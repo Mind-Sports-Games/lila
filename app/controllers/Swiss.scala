@@ -114,6 +114,7 @@ final class Swiss(
             data =>
               tourC.rateLimitCreation(me, isPrivate = true, ctx.req, Redirect(routes.Team.show(teamId))) {
                 env.swiss.api.create(data, me, teamId) map { swiss =>
+                  tickProgress(me.id, lila.progress.Step.CreateTournament)
                   Redirect(routes.Swiss.show(swiss.id.value))
                 }
               }

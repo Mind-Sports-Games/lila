@@ -20,7 +20,9 @@ final class Coordinate(env: Env) extends LilaController(env) {
         .bindFromRequest()
         .fold(
           _ => fuccess(BadRequest),
-          data => env.coordinate.api.addScore(me.id, data.isP1, data.score)
+          data =>
+            env.coordinate.api.addScore(me.id, data.isP1, data.score) >>
+              env.progress.api.tick(me.id, lila.progress.Step.Coordinates)
         ) >> {
         env.coordinate.api.getScore(me.id) map { s =>
           Ok(views.html.coordinate.scoreCharts(s))

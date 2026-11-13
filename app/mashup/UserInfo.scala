@@ -17,7 +17,7 @@ case class UserInfo(
     user: User,
     ranks: lila.rating.UserRankMap,
     hasSimul: Boolean,
-    ratingChart: Option[String],
+    progress: lila.progress.Progress,
     nbs: UserInfo.NbGames,
     nbFollowers: Int,
     nbPosts: Int,
@@ -130,7 +130,7 @@ object UserInfo {
       revolutionApi: lila.tournament.RevolutionApi,
       postApi: PostApi,
       studyRepo: lila.study.StudyRepo,
-      ratingChartApi: lila.history.RatingChartApi,
+      progressApi: lila.progress.ProgressApi,
       userCached: lila.user.Cached,
       isHostingSimul: lila.round.IsSimulHost,
       streamerApi: lila.streamer.StreamerApi,
@@ -140,7 +140,7 @@ object UserInfo {
       playbanApi: lila.playban.PlaybanApi
   )(implicit ec: scala.concurrent.ExecutionContext) {
     def apply(user: User, nbs: NbGames, ctx: Context): Fu[UserInfo] =
-      (ctx.noBlind so ratingChartApi(user)).mon(_.user.segment("ratingChart")) zip
+      progressApi.get(user.id).mon(_.user.segment("progress")) zip
         relationApi.countFollowers(user.id).mon(_.user.segment("nbFollowers")) zip
         postApi.nbByUser(user.id).mon(_.user.segment("nbPosts")) zip
         studyRepo.countByOwner(user.id).recoverDefault.mon(_.user.segment("nbStudies")) zip
@@ -158,14 +158,14 @@ object UserInfo {
         (nbs.playing > 0).so(isHostingSimul(user.id).mon(_.user.segment("simul"))) zip
         userCached.rankingsOf(user.id) map {
           // format: off
-          case (((((((((((((ratingChart, nbFollowers), nbPosts), nbStudies), trophies), shields), revols), teamIds), isCoach), isStreamer), insightVisible), completionRate), hasSimul), ranks) =>
+          case (((((((((((((progress, nbFollowers), nbPosts), nbStudies), trophies), shields), revols), teamIds), isCoach), isStreamer), insightVisible), completionRate), hasSimul), ranks) =>
           // format: on
             new UserInfo(
               user = user,
               ranks = ranks,
               nbs = nbs,
               hasSimul = hasSimul,
-              ratingChart = ratingChart,
+              progress = progress,
               nbFollowers = nbFollowers,
               nbPosts = nbPosts,
               nbStudies = nbStudies,

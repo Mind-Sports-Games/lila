@@ -20,6 +20,7 @@ final class Streamer(
       NoBot {
         ctx.noKid so {
           pageHit
+          tickProgress(lila.progress.Step.WatchStreamer)
           val requests = getBool("requests") && isGranted(_.Streamers)
           for {
             liveStreams <- env.streamer.liveStreamApi.all

@@ -589,6 +589,18 @@ final class User(
       }
     }
 
+  def allPerfs(username: String) =
+    Open { implicit ctx =>
+      OptionFuResult(env.user.repo.named(username)) { u =>
+        if ((u.disabled || (u.lame && !ctx.is(u))) && !isGranted(_.UserModView)) notFound
+        else
+          for {
+            ranks       <- env.user.cached.rankingsOf(u.id)
+            ratingChart <- env.history.ratingChartApi(u)
+          } yield Ok(html.user.allPerfs(u, ranks, ratingChart))
+      }
+    }
+
   def autocomplete =
     Open { implicit ctx =>
       get("term", ctx.req).filter(_.nonEmpty).filter(lila.user.User.couldBeUsername) match {
