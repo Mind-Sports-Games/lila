@@ -27,6 +27,7 @@ import strategygames.abalone
 import strategygames.dameo
 import strategygames.entropy
 import strategygames.fiveinarow
+import strategygames.yonkoma
 import org.joda.time.DateTime
 import org.lichess.compression.clock.Encoder as ClockEncoder
 import scala.util.Try
@@ -726,6 +727,29 @@ object BinaryFormat {
         .to(Map)
     }
 
+    private def yonkomaSquares(variant: yonkoma.variant.Variant): List[yonkoma.Pos] =
+      yonkoma.Pos.all.filter(variant.boardSize.onBoard)
+
+    def writeYonkoma(pieces: yonkoma.PieceMap, variant: yonkoma.variant.Variant): ByteArray = {
+      def posInt(pos: yonkoma.Pos): Int =
+        (pieces get pos).fold(0) { piece =>
+          piece.player.fold(0, 128) + piece.role.binaryInt
+        }
+      ByteArray(yonkomaSquares(variant).map(posInt(_).toByte).toArray)
+    }
+
+    def readYonkoma(ba: ByteArray, variant: yonkoma.variant.Variant): yonkoma.PieceMap = {
+      def intPiece(int: Int): Option[yonkoma.Piece] =
+        yonkoma.Role.allByBinaryInt.get(int & 127) map { role =>
+          yonkoma.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
+        }
+      (yonkomaSquares(variant) zip ba.value).view
+        .flatMap { case (pos, int) =>
+          intPiece(int) map (pos -> _)
+        }
+        .to(Map)
+    }
+
     // cache standard start position
     def standard(lib: GameLogic) = lib match {
       case GameLogic.Chess()    => writeChess(chess.Board.init(chess.variant.Standard).pieces)
@@ -745,6 +769,8 @@ object BinaryFormat {
       case GameLogic.Entropy() => writeEntropy(entropy.Board.init(entropy.variant.Entropy).pieces)
       case GameLogic.FiveInARow() =>
         writeFiveInARow(fiveinarow.Board.init(fiveinarow.variant.Gomoku).pieces)
+      case GameLogic.Yonkoma() =>
+        writeYonkoma(yonkoma.Board.init(yonkoma.variant.Yonkoma10x10).pieces, yonkoma.variant.Yonkoma10x10)
       case _                   =>
         sys.error("Cant write to binary for lib")
     }

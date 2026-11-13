@@ -331,7 +331,8 @@ final private class SwissFields(form: Form[?], swiss: Option[Swiss])(implicit ct
       medleyGameGroup(GameGroup.Backgammon()),
       medleyGameGroup(GameGroup.Abalone()),
       medleyGameGroup(GameGroup.Entropy()),
-      medleyGameGroup(GameGroup.FiveInARow())
+      medleyGameGroup(GameGroup.FiveInARow()),
+      medleyGameGroup(GameGroup.Yonkoma())
     )
 
   private def onePerGameFamily =

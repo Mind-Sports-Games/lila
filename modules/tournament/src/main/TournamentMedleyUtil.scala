@@ -103,7 +103,9 @@ object TournamentMedleyUtil {
       "entropy"                -> slow,
       "gomoku"                 -> medium,
       "pente"                  -> medium,
-      "renju"                  -> medium
+      "renju"                  -> medium,
+      "yonkoma10x10"           -> quick,
+      "yonkoma12x12"           -> quick
     )
   }
 

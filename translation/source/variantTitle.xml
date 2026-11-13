@@ -53,4 +53,6 @@
   <string name="gomoku">Be the first to make an unbroken line of exactly five stones</string>
   <string name="pente">Make five in a row, or capture ten stones by closing off pairs</string>
   <string name="renju">Make exactly five in a row; black must avoid the forbidden double three, double four and overline</string>
+  <string name="yonkoma10x10">Slide your two checkers towards the enemy pair; whoever completes a crosscut loses</string>
+  <string name="yonkoma12x12">Yonkoma on a 12x12 board: slide your checkers towards the enemy pair, and never complete a crosscut</string>
 </resources>

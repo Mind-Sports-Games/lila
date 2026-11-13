@@ -11,6 +11,7 @@ export * as dameo from './dameo';
 export * as backgammon from './backgammon';
 export * as entropy from './entropy';
 export * as fiveInARow from './fiveInARow';
+export * as yonkoma from './yonkoma';
 import {
   isFiveInARow,
   isOpeningAction as isFiveInARowOpeningAction,
@@ -18,6 +19,7 @@ import {
   dropPiece as fiveInARowDropPiece,
   seatToMove as fiveInARowSeatToMove,
 } from './fiveInARow';
+import { variants as yonkomaVariants } from './yonkoma';
 
 export const initialFen: Fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
@@ -198,6 +200,7 @@ const noFishnetVariants: VariantKey[] = [
   'grandabalone',
   'entropy',
   ...fiveInARowVariants,
+  ...yonkomaVariants,
 ];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;

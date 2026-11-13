@@ -1,6 +1,7 @@
 package lila.round
 
 import cats.data.Validated
+import strategygames.format.FEN
 import strategygames.{ GameLogic, Player as PlayerIndex }
 import lila.common.Bus
 import lila.game.{ Event, Game, GameRepo, Pov, Progress, Rewind, UciMemo }
@@ -125,14 +126,21 @@ final private class Takebacker(
   private def rewindsToTurnStart(game: Game): Boolean =
     game.variant.gameLogic == GameLogic.FiveInARow()
 
+  // a yonkoma player with no legal move has their turn passed for them, so a takeback drops
+  // actions until the requester's own last move is gone and they can move again
+  private def rewindsToLastMove(game: Game): Boolean =
+    game.variant.gameLogic == GameLogic.Yonkoma()
+
   private def takebackSwitchPlayer(game: Game, requester: PlayerIndex)(implicit proxy: GameProxy): Fu[Events] =
     if (rewindsToTurnStart(game)) rewindToTurnStartOf(game, requester)
+    else if (rewindsToLastMove(game)) rewindToLastMoveOf(game, requester)
     else if (alwaysRewindSinglePly(game) || currentPlayerTakingBack(game)) rewindPly(game)
     else rewindTurnAndPly(game)
   private def takebackRetainPlayer(game: Game, requester: PlayerIndex)(implicit
       proxy: GameProxy
   ): Fu[Events] =
     if (rewindsToTurnStart(game)) rewindToTurnStartOf(game, requester)
+    else if (rewindsToLastMove(game)) rewindToLastMoveOf(game, requester)
     else if (chaosTakingBackToDrop(game, requester)) rewindTwoTurnsAndPly(game)
     else if (alwaysRewindSinglePly(game) || !currentPlayerTakingBack(game)) rewindPly(game)
     else rewindTurnAndPly(game)
@@ -179,6 +187,29 @@ final private class Takebacker(
       _      <- uciMemo.set(prog.game, fen)
       events <- saveAndNotify(prog)
     } yield events
+
+  // drops one action at a time, passes included, until the last one dropped was a move of the
+  // requester; they then move in a position where they had a move, so no pass follows
+  private def rewindToLastMoveOf(
+      game: Game,
+      requester: PlayerIndex
+  )(implicit proxy: GameProxy): Fu[Events] = {
+    def loop(g: Game, fen: Option[FEN], acc: Option[Progress]): Validated[String, Progress] = {
+      val droppedPass = g.actionStrs.lastOption.exists(_.lastOption.contains("pass"))
+      Rewind(g, fen, false).andThen { next =>
+        val prog     = acc.fold(next)(_.withGame(next.game))
+        val finished = next.game.turnPlayerIndex == requester && !droppedPass
+        if (finished || next.game.actionStrs.flatten.isEmpty) Validated.valid(prog)
+        else loop(next.game, fen, Some(prog))
+      }
+    }
+    for {
+      fen    <- gameRepo.initialFen(game)
+      prog   <- loop(game, fen, None).toEither.toFuture
+      _      <- uciMemo.set(prog.game, fen)
+      events <- saveAndNotify(prog)
+    } yield events
+  }
 
   // private def double(game: Game)(implicit proxy: GameProxy): Fu[Events] =
   //  for {

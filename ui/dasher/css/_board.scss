@@ -53,6 +53,10 @@
       height: 125px;
     }
 
+    &.yonkoma {
+      height: 125px;
+    }
+
     @extend %flex-center;
 
     justify-content: center;
@@ -304,6 +308,13 @@
     .fiveinarow-wood {
       background-image: url(../images/board/fiveinarow/wood.svg);
       background-size: 100px;
+    }
+
+    @each $theme in ('oak', 'green', 'grey', 'marble') {
+      .yonkoma-#{$theme} {
+        background-image: url(../images/board/yonkoma/#{$theme}.thumbnail.svg);
+        background-size: cover;
+      }
     }
   }
 

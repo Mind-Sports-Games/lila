@@ -18,7 +18,8 @@ $game-family: (
   'abalone',
   'dameo',
   'entropy',
-  'fiveinarow'
+  'fiveinarow',
+  'yonkoma'
 );
 
 $game-family-random-pieces: (
@@ -37,7 +38,8 @@ $game-family-random-pieces: (
   'bwS.svg',
   'wbK.png',
   'mixed.svg',
-  'bwS.svg'
+  'bwS.svg',
+  'wbC.svg'
 );
 
 $game-family-p1-pieces: (
@@ -56,7 +58,8 @@ $game-family-p1-pieces: (
   'abalone/classic/bS.svg',
   'dameo/wide_crown_dameo/wK.svg',
   'entropy/classic_entropy/R.svg',
-  'fiveinarow/classic_stone/B.svg'
+  'fiveinarow/classic_stone/B.svg',
+  'yonkoma/classic_yonkoma/wC.svg'
 );
 
 $game-family-p2-pieces: (
@@ -75,7 +78,8 @@ $game-family-p2-pieces: (
   'abalone/classic/wS.svg',
   'dameo/wide_crown_dameo/bK.svg',
   'entropy/classic_entropy/B.svg',
-  'fiveinarow/classic_stone/W.svg'
+  'fiveinarow/classic_stone/W.svg',
+  'yonkoma/classic_yonkoma/bC.svg'
 );
 
 .game-setup {

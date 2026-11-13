@@ -131,6 +131,9 @@ export function convertVariantKeyToGameFamily(variantKey: VariantKey | DraughtsV
     case 'pente':
     case 'renju':
       return 'fiveinarow';
+    case 'yonkoma10x10':
+    case 'yonkoma12x12':
+      return 'yonkoma';
     default:
       return 'chess';
   }

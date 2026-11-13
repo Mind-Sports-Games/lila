@@ -1,6 +1,7 @@
 package lila.mod
 
 import strategygames.Player as PlayerIndex
+import strategygames.variant.Variant
 import com.github.blemale.scaffeine.Cache
 
 import lila.game.Game
@@ -85,12 +86,18 @@ final private class SandbagWatch(
   // TODO extract this variable number of turns into strategygames
   private def isSandbag(game: Game): Boolean =
     game.playedTurns <= {
-      if (game.variant == strategygames.chess.variant.Atomic) 3
+      if (SandbagWatch.quickEndingVariants.contains(game.variant)) 3
       else 8
     } && game.winner.so(~_.ratingDiff > 0)
 }
 
 private object SandbagWatch {
+
+  val quickEndingVariants: Set[Variant] = Set(
+    Variant.wrap(strategygames.chess.variant.Atomic),
+    Variant.wrap(strategygames.yonkoma.variant.Yonkoma10x10),
+    Variant.wrap(strategygames.yonkoma.variant.Yonkoma12x12)
+  )
 
   sealed trait Outcome
   case object Good                      extends Outcome

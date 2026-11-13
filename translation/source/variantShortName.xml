@@ -53,4 +53,6 @@
   <string name="gomoku">Gomoku</string>
   <string name="pente">Pente</string>
   <string name="renju">Renju</string>
+  <string name="yonkoma10x10">Yon10</string>
+  <string name="yonkoma12x12">Yon12</string>
 </resources>

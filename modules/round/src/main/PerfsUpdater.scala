@@ -129,6 +129,10 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.pente, ratingsB.pente, game)
               case Variant.FiveInARow(strategygames.fiveinarow.variant.Renju) =>
                 updateRatings(ratingsW.renju, ratingsB.renju, game)
+              case Variant.Yonkoma(strategygames.yonkoma.variant.Yonkoma10x10) =>
+                updateRatings(ratingsW.yonkoma10x10, ratingsB.yonkoma10x10, game)
+              case Variant.Yonkoma(strategygames.yonkoma.variant.Yonkoma12x12) =>
+                updateRatings(ratingsW.yonkoma12x12, ratingsB.yonkoma12x12, game)
               case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
@@ -215,6 +219,8 @@ final class PerfsUpdater(
       gomoku: Rating,
       pente: Rating,
       renju: Rating,
+      yonkoma10x10: Rating,
+      yonkoma12x12: Rating,
       ultraBullet: Rating,
       bullet: Rating,
       blitz: Rating,
@@ -275,6 +281,8 @@ final class PerfsUpdater(
       gomoku = perfs.gomoku.toRating,
       pente = perfs.pente.toRating,
       renju = perfs.renju.toRating,
+      yonkoma10x10 = perfs.yonkoma10x10.toRating,
+      yonkoma12x12 = perfs.yonkoma12x12.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
       blitz = perfs.blitz.toRating,
@@ -569,6 +577,16 @@ final class PerfsUpdater(
             perfs.renju,
             ratings.renju
           ),
+          yonkoma10x10 = addRatingVariant(
+            Variant.Yonkoma(strategygames.yonkoma.variant.Yonkoma10x10),
+            perfs.yonkoma10x10,
+            ratings.yonkoma10x10
+          ),
+          yonkoma12x12 = addRatingVariant(
+            Variant.Yonkoma(strategygames.yonkoma.variant.Yonkoma12x12),
+            perfs.yonkoma12x12,
+            ratings.yonkoma12x12
+          ),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
           bullet = addRatingIf(isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),
@@ -634,6 +652,8 @@ final class PerfsUpdater(
           gomoku = r(PT.orDefault("gomoku"), perfs.gomoku, perfs1.gomoku),
           pente = r(PT.orDefault("pente"), perfs.pente, perfs1.pente),
           renju = r(PT.orDefault("renju"), perfs.renju, perfs1.renju),
+          yonkoma10x10 = r(PT.orDefault("yonkoma10x10"), perfs.yonkoma10x10, perfs1.yonkoma10x10),
+          yonkoma12x12 = r(PT.orDefault("yonkoma12x12"), perfs.yonkoma12x12, perfs1.yonkoma12x12),
           bullet = r(PT.orDefault("bullet"), perfs.bullet, perfs1.bullet),
           blitz = r(PT.orDefault("blitz"), perfs.blitz, perfs1.blitz),
           rapid = r(PT.orDefault("rapid"), perfs.rapid, perfs1.rapid),
