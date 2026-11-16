@@ -36,7 +36,7 @@ final class Env(
       player.userId.flatMap(id => users.find(_.id == id)).filterNot(_.isBot) foreach { user =>
         val opponent      = game.opponent(player)
         val opponentIsBot =
-          opponent.isAi || opponent.isPSBot || opponent.userId.exists(id => users.exists(u => u.id == id && u.isBot))
+          opponent.isPSBot || opponent.userId.exists(id => users.exists(u => u.id == id && u.isBot))
         val inTournament  = game.tournamentId.isDefined || game.swissId.isDefined
         val steps = List(
           (if (opponentIsBot) Step.PlayBot else Step.PlayHuman).some,
@@ -46,7 +46,7 @@ final class Env(
         ).flatten
         (api.tickAll(user.id, steps) >>
           (inTournament so tickMedley(user.id, game)) >>
-          api.playedVariant(user.id, game.ratingVariant.key)).discard
+          (game.rated so api.playedVariant(user.id, game.ratingVariant.key))).discard
       }
     }
 

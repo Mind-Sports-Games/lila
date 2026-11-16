@@ -4,13 +4,24 @@
 // the onboarding checklist existed. Run after deploy. It only sets steps that are absent and only
 // raises badge levels, so it is safe to re-run and safe to run while the site is up.
 //
-// Sources are limited to user fields and small distinct lookups: nothing here scans the `game`
-// collection, so bot, correspondence (beyond rated) and medley games are only partly backfilled,
-// and visit-only steps (library, memory, analysis, editor, tv, streamer) are not backfilled at all.
+// Sources are limited to user fields, the `pref` and `crosstable2` collections and small distinct
+// lookups: nothing here scans the `game` collection. Known gaps, all ticked live on the next action:
+// - playHuman and playBot come from crosstables, so games against anonymous players are not seen.
+// - playCorrespondence comes from perfs, so only rated correspondence games are seen, and only
+//   standard chess ones are told apart from other speeds (variants share one perf for every speed).
+// - playTournament counts joining an arena or swiss, whether or not a game was played.
+// - variants come from perfs.nb, which, like the live rule, counts rated games only.
+// - customiseBoard compares the saved theme and piece set to today's defaults, so a player whose pref
+//   was saved under an older default counts as having customised.
+// - not backfilled: chooseGames (placeholder for a future feature), inviteFriend (challenges expire),
+//   playMedley (needs game data), checkPreferences (a pref document does not show the pages were
+//   opened) and the visit-only steps memoryGame, analyseGame, boardEditor, watchTv, watchStreamer.
 // Backfilled badges send no notification.
 //
 // STEP_KEYS, CORE_KEYS, NOT_FOR_KIDS_KEYS and VARIANT_KEYS mirror lila.progress.Step and
-// Progress.variantKeys (PerfType.allVariant); keep them in step with the code.
+// Progress.variantKeys (PerfType.allVariant); DEFAULT_THEME and DEFAULT_PIECE_SET mirror
+// GameFamily.boardThemeDefault and pieceSetDefault in strategygames, keyed by GameFamily.id. Keep
+// them in step with the code.
 
 const CORE_KEYS = ['chooseGames', 'completeProfile', 'playHuman', 'joinTeam', 'playTournament'];
 const STEP_KEYS = CORE_KEYS.concat([
@@ -51,6 +62,20 @@ const VARIANT_KEYS = [
   'backgammon', 'hyper', 'nackgammon', 'abalone', 'grandabalone', 'entropy', 'gomoku', 'pente', 'renju',
 ];
 
+// prettier-ignore
+const DEFAULT_THEME = {
+  0: 'maple', 1: 'blue3', 2: 'marble', 3: 'wood', 4: 'green', 5: 'green', 6: 'light-wood', 7: 'blue',
+  8: 'leather', 9: 'light-wood', 10: 'classic', 11: 'purple-diag', 12: 'classic', 13: 'blue3', 14: 'wood',
+  15: 'wood', 16: 'marble',
+};
+
+// prettier-ignore
+const DEFAULT_PIECE_SET = {
+  0: 'staunty', 1: 'wide_crown', 2: 'check_yb_loa', 3: '2kanji', 4: '2dhanzi', 5: 'disc_flipello',
+  6: 'green', 7: 'black_gloss', 8: 'arrow', 9: 'classic_stone', 10: 'wooden', 11: 'staunty', 12: 'classic',
+  13: 'wide_crown_dameo', 14: 'classic_entropy', 15: 'classic_stone', 16: 'classic_yonkoma',
+};
+
 const now = new Date();
 
 function idSet(coll, field, match) {
@@ -72,6 +97,24 @@ const studyOwners = idSet('study', 'ownerId');
 const coordinators = idSet('coordinate_score', '_id');
 const learners = idSet('learn_progress', '_id');
 
+const bots = idSet('user4', '_id', { title: 'BOT' });
+const playedHuman = new Set();
+const playedBot = new Set();
+db.crosstable2.find({}, { _id: 1 }).forEach(c => {
+  const [a, b] = c._id.split('/');
+  (bots.has(b) ? playedBot : playedHuman).add(a);
+  (bots.has(a) ? playedBot : playedHuman).add(b);
+});
+print(`crosstable2: ${playedHuman.size} played a human, ${playedBot.size} played a bot`);
+
+const isCustom = (list, defaults) =>
+  Array.isArray(list) && list.some(x => defaults[x.gameFamily] !== undefined && x.name !== defaults[x.gameFamily]);
+const customisers = new Set();
+db.pref.find({}, { theme: 1, pieceSet: 1 }).forEach(p => {
+  if (isCustom(p.theme, DEFAULT_THEME) || isCustom(p.pieceSet, DEFAULT_PIECE_SET)) customisers.add(p._id);
+});
+print(`pref: ${customisers.size} customised their board`);
+
 const nb = (u, key) => (u.perfs && u.perfs[key] && u.perfs[key].nb) || 0;
 const nonEmpty = s => typeof s === 'string' && s.length > 0;
 
@@ -80,10 +123,10 @@ function stepsOf(u) {
   const profile = u.profile || {};
   const id = u._id;
   const steps = [];
-  if ((count.game || 0) - (count.ai || 0) > 0) steps.push('playHuman');
+  if (playedHuman.has(id)) steps.push('playHuman');
   if (teamMembers.has(id)) steps.push('joinTeam');
   if (arenaPlayers.has(id) || swissPlayers.has(id)) steps.push('playTournament');
-  if ((count.ai || 0) > 0) steps.push('playBot');
+  if (playedBot.has(id)) steps.push('playBot');
   if (nb(u, 'correspondence') > 0) steps.push('playCorrespondence');
   if ((count.rated || 0) > 0) steps.push('playRated');
   if (arenaCreators.has(id) || swissCreators.has(id)) steps.push('createTournament');
@@ -95,6 +138,7 @@ function stepsOf(u) {
   if (posters.has(id)) steps.push('forumPost');
   if (nonEmpty(profile.country) && (nonEmpty(profile.bio) || nonEmpty(profile.firstName) || nonEmpty(profile.lastName)))
     steps.push('completeProfile');
+  if (customisers.has(id)) steps.push('customiseBoard');
   if (u.plan && u.plan.months > 0) steps.push('patron');
   return steps;
 }

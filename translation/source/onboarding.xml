@@ -58,8 +58,8 @@
   <string name="stepCheckPreferences">Check your game display and behaviour preferences</string>
   <string name="stepPatron">Consider becoming a patron</string>
   <string name="achievements">Achievements</string>
-  <string name="playEveryVariant">Play every variant</string>
-  <string name="variantsPlayed">%1$s of %2$s variants played</string>
+  <string name="playEveryVariant">Play a rated game in every variant</string>
+  <string name="variantsPlayed">%1$s of %2$s variants played rated</string>
   <string name="badgeGroupOnboarding">Onboarding</string>
   <string name="badgeOnboarded">Onboarded</string>
   <string name="badgeFullyOnboarded">Fully onboarded</string>
@@ -67,5 +67,5 @@
   <string name="badgeEarned">Badge earned: %1$s</string>
   <string name="badgeOnboardedText">You've completed the core steps. Keep exploring PlayStrategy!</string>
   <string name="badgeFullyOnboardedText">You've explored everything on your checklist.</string>
-  <string name="badgeAllVariantsText">You've played a game in every variant on PlayStrategy.</string>
+  <string name="badgeAllVariantsText">You've played a rated game in every variant on PlayStrategy.</string>
 </resources>
