@@ -208,7 +208,7 @@
       color: $c-good;
     }
 
-    &__achievements {
+    &__achievements:not(:first-child) {
       margin-top: 1.5em;
       padding-top: 1em;
       border-top: $border;

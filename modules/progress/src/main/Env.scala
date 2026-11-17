@@ -23,7 +23,7 @@ final class Env(
 
   private def onFinishGame(game: Game, users: List[User]): Unit =
     game.players.foreach { player =>
-      player.userId.flatMap(id => users.find(_.id == id)).filterNot(_.isBot) foreach { user =>
+      player.userId.flatMap(id => users.find(_.id == id)) foreach { user =>
         val opponent      = game.opponent(player)
         val opponentIsBot =
           opponent.isPSBot || opponent.userId.exists(id => users.exists(u => u.id == id && u.isBot))
@@ -34,7 +34,7 @@ final class Env(
           (game.isCorrespondence || game.daysPerTurn.isDefined).option(Step.PlayCorrespondence),
           inTournament.option(Step.PlayTournament)
         ).flatten
-        (api.tickAll(user.id, steps) >>
+        ((if (user.isBot) funit else api.tickAll(user.id, steps)) >>
           (game.rated so api.playedVariant(user.id, game.ratingVariant.key))).discard
       }
     }

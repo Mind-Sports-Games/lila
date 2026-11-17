@@ -23,7 +23,7 @@ case class Progress(
   def nextStep(kid: Boolean): Option[Step] = remaining(kid).headOption
 
   def nbCoreDone: Int                 = Step.core.count(has)
-  def nbExploreDone(kid: Boolean): Int = Step.exploreFor(kid).count(has)
+  def nbDone(kid: Boolean): Int        = Step.allFor(kid).count(has)
 
   def isOnboarded: Boolean                   = Step.core.forall(has)
   def isFullyOnboarded(kid: Boolean): Boolean = Step.allFor(kid).forall(has)

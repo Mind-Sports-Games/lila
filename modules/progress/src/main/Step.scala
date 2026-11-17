@@ -22,9 +22,9 @@ sealed abstract class Step(val key: String, val group: StepGroup) {
 object Step {
   import StepGroup.*
 
+  case object CompleteProfile    extends Step("completeProfile", Core)
   case object KidMode            extends Step("kidMode", Core)
   case object ChooseGames        extends Step("chooseGames", Core)
-  case object CompleteProfile    extends Step("completeProfile", Core)
   case object PlayHuman          extends Step("playHuman", Core)
   case object JoinTeam           extends Step("joinTeam", Core)
   case object PlayTournament     extends Step("playTournament", Core)
@@ -49,9 +49,9 @@ object Step {
   case object Patron             extends Step("patron", Support)
 
   val all: List[Step] = List(
+    CompleteProfile,
     KidMode,
     ChooseGames,
-    CompleteProfile,
     PlayHuman,
     JoinTeam,
     PlayTournament,
@@ -81,8 +81,6 @@ object Step {
   val notForKids: Set[Step] = Set(ForumPost, WatchStreamer)
 
   def allFor(kid: Boolean): List[Step] = if (kid) all.filterNot(notForKids) else all
-
-  def exploreFor(kid: Boolean): List[Step] = allFor(kid).filterNot(_.isCore)
 
   val byKey: Map[String, Step] = all.map(s => s.key -> s).toMap
 

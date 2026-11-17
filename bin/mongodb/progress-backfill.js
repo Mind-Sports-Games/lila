@@ -13,10 +13,12 @@
 // - variants come from perfs.nb, which, like the live rule, counts rated games only.
 // - customiseBoard compares the saved theme and piece set to today's defaults, so a player whose pref
 //   was saved under an older default counts as having customised.
-// - kidMode is ticked only for kid accounts; everyone else still has to look at the kid mode page.
+// - kidMode is ticked for every existing account, kid or not: the step is meant for new accounts, so
+//   players who joined before the checklist never see it. This writes a progress doc for every user.
 // - not backfilled: chooseGames (placeholder for a future feature), inviteFriend (challenges expire),
 //   checkPreferences (a pref document does not show the pages were opened) and the visit-only steps
 //   memoryGame, analyseGame, boardEditor, watchTv, watchStreamer.
+// BOT accounts get no steps (the checklist is hidden from them), only variants and achievements.
 // Backfilled badges send no notification.
 //
 // STEP_KEYS, CORE_KEYS, NOT_FOR_KIDS_KEYS and VARIANT_KEYS mirror lila.progress.Step and
@@ -24,7 +26,7 @@
 // GameFamily.boardThemeDefault and pieceSetDefault in strategygames, keyed by GameFamily.id. Keep
 // them in step with the code.
 
-const CORE_KEYS = ['kidMode', 'chooseGames', 'completeProfile', 'playHuman', 'joinTeam', 'playTournament'];
+const CORE_KEYS = ['completeProfile', 'kidMode', 'chooseGames', 'playHuman', 'joinTeam', 'playTournament'];
 const STEP_KEYS = CORE_KEYS.concat([
   'playBot',
   'inviteFriend',
@@ -124,7 +126,7 @@ function stepsOf(u) {
   const profile = u.profile || {};
   const id = u._id;
   const steps = [];
-  if (u.kid === true) steps.push('kidMode');
+  steps.push('kidMode');
   if (playedHuman.has(id)) steps.push('playHuman');
   if (teamMembers.has(id)) steps.push('joinTeam');
   if (arenaPlayers.has(id) || swissPlayers.has(id)) steps.push('playTournament');
@@ -159,15 +161,16 @@ function onboardedLevel(steps, kid) {
   return 0;
 }
 
-const USER_FIELDS = { count: 1, perfs: 1, profile: 1, plan: 1, kid: 1 };
+const USER_FIELDS = { count: 1, perfs: 1, profile: 1, plan: 1, kid: 1, title: 1 };
 
 let nbUsers = 0;
 let nbWritten = 0;
 let nbBadges = 0;
 
-db.user4.find({ enabled: true, title: { $ne: 'BOT' } }, USER_FIELDS).forEach(u => {
+db.user4.find({ enabled: true }, USER_FIELDS).forEach(u => {
   nbUsers++;
-  const steps = stepsOf(u);
+  const isBot = u.title === 'BOT';
+  const steps = isBot ? [] : stepsOf(u);
   const variants = variantsOf(u);
   if (!steps.length && !variants.length) return;
 
@@ -189,7 +192,7 @@ db.user4.find({ enabled: true, title: { $ne: 'BOT' } }, USER_FIELDS).forEach(u =
   const doc = db.progress.findOne({ _id: u._id });
   const badges = doc.badges || {};
   const badgeSet = {};
-  const level = onboardedLevel(doc.steps || {}, u.kid === true);
+  const level = isBot ? 0 : onboardedLevel(doc.steps || {}, u.kid === true);
   if (level > ((badges.onboarded && badges.onboarded.level) || 0)) badgeSet['badges.onboarded'] = { level, at: now };
   if (!badges.allVariants && VARIANT_KEYS.every(k => (doc.variants || []).includes(k)))
     badgeSet['badges.allVariants'] = { level: 1, at: now };

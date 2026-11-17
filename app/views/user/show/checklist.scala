@@ -11,13 +11,13 @@ object checklist {
 
   def apply(u: User, progress: Progress)(implicit ctx: Context) =
     div(cls := "checklist")(
-      onboarding(u, progress),
+      (!u.isBot).option(onboarding(u, progress)),
       achievements(progress)
     )
 
   def full(u: User, progress: Progress)(implicit ctx: Context) =
     div(cls := "checklist checklist--full")(
-      fullOnboarding(u, progress),
+      (!u.isBot).option(fullOnboarding(u, progress)),
       fullAchievements(progress)
     )
 
@@ -63,9 +63,9 @@ object checklist {
         trans.onboarding.coreProgress.txt(progress.nbCoreDone, Step.core.size)
       ),
       progressBar(
-        progress.nbExploreDone(u.kid),
-        Step.exploreFor(u.kid).size,
-        trans.onboarding.exploreProgress.txt(progress.nbExploreDone(u.kid), Step.exploreFor(u.kid).size)
+        progress.nbDone(u.kid),
+        Step.allFor(u.kid).size,
+        trans.onboarding.exploreProgress.txt(progress.nbDone(u.kid), Step.allFor(u.kid).size)
       ),
       progress.nextStep(u.kid).fold(p(cls := "checklist__done")(trans.onboarding.allStepsDone()))(nextStep),
       div(cls := "checklist__groups")(
@@ -105,9 +105,9 @@ object checklist {
   private def onboardingProgress(u: User, progress: Progress)(implicit ctx: Context) =
     if (progress.isOnboarded)
       progressBar(
-        progress.nbExploreDone(u.kid),
-        Step.exploreFor(u.kid).size,
-        trans.onboarding.exploreProgress.txt(progress.nbExploreDone(u.kid), Step.exploreFor(u.kid).size)
+        progress.nbDone(u.kid),
+        Step.allFor(u.kid).size,
+        trans.onboarding.exploreProgress.txt(progress.nbDone(u.kid), Step.allFor(u.kid).size)
       )
     else
       progressBar(
@@ -208,6 +208,8 @@ object checklist {
 
   private val lobbySetup = s"${routes.Lobby.home}#game"
 
+  private val correspondenceSetup = s"${routes.Lobby.home}?time=correspondence#game"
+
   private def url(step: Step): String =
     step match {
       case Step.KidMode            => routes.Account.kid.url
@@ -217,7 +219,7 @@ object checklist {
       case Step.PlayTournament     => routes.Tournament.home.url
       case Step.PlayBot            => routes.PlayApi.botOnline.url
       case Step.InviteFriend       => lobbySetup
-      case Step.PlayCorrespondence => lobbySetup
+      case Step.PlayCorrespondence => correspondenceSetup
       case Step.PlayRated          => lobbySetup
       case Step.CreateTournament   => routes.Tournament.form.url
       case Step.SolvePuzzle        => routes.Puzzle.base.url
