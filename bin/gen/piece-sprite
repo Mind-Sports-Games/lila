@@ -10,22 +10,36 @@ dest_dir = lila_dir + '/public/piece-css/'
 
 # The same piece is referenced by its game selector and again by every variant selector, so a
 # 100KB data URI was repeated up to 14 times per file. One rule per image, selectors joined.
+# A selector never joins a rule placed before one it overrides (english draughts swaps colours).
+def piece_classes(selector)
+  selector.split(',').map { |s| s.strip.split(' ').last.to_s.scan(/\.([\w-]+)/).flatten }
+end
+
+def same_piece?(a, b)
+  a.any? { |x| b.any? { |y| (x - y).empty? || (y - x).empty? } }
+end
+
 def merge_rules(classes)
-  order = []
-  selectors = {}
-  literals = {}
-  classes.compact.each_with_index do |rule, index|
+  rules = []
+  placed = []
+  classes.compact.each do |rule|
     selector, declaration = rule.split(' {', 2)
     if declaration.nil? # not a rule of ours (the backgammon score blocks): leave it where it is
-      key = 'literal:' + index.to_s
-      order << key
-      literals[key] = rule
-    else
-      order << declaration unless selectors.key?(declaration)
-      (selectors[declaration] ||= []) << selector
+      rules << [nil, rule]
+      next
     end
+    pieces = piece_classes(selector)
+    after = placed.select { |p, d, _| d != declaration && same_piece?(p, pieces) }.map(&:last).max || -1
+    index = (after + 1...rules.size).find { |i| rules[i][0] == declaration }
+    if index
+      rules[index][1] << selector
+    else
+      index = rules.size
+      rules << [declaration, [selector]]
+    end
+    placed << [pieces, declaration, index]
   end
-  order.map { |key| literals.key?(key) ? literals[key] : selectors[key].join(',') + ' {' + key }
+  rules.map { |declaration, rule| declaration ? rule.join(',') + ' {' + declaration : rule }
 end
 
 chess_themes = [
