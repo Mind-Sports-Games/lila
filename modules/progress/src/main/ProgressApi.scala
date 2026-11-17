@@ -81,7 +81,7 @@ final class ProgressApi(
         coll.update.one(selector, modifier, upsert = true)
       }
 
-  private def awardOnboarded(userId: User.ID): Funit =
+  def awardOnboarded(userId: User.ID): Funit =
     get(userId) zip userRepo.isKid(userId) flatMap { case (progress, kid) =>
       val level = progress.onboardedLevel(kid)
       (level > progress.awardLevel(Badge.Onboarded)) so award(userId, Badge.Onboarded, level)

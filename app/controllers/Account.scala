@@ -337,6 +337,7 @@ final class Account(
                 ),
               _ =>
                 env.user.repo.setKid(me, getBool("v")) >>
+                  env.progress.api.awardOnboarded(me.id) >>
                   negotiate(
                     html = Redirect(routes.Account.kid).flashSuccess.fuccess,
                     api = _ => jsonOkResult.fuccess
@@ -348,7 +349,8 @@ final class Account(
 
   def apiKidPost =
     Scoped(_.Preference.Write) { req => me =>
-      env.user.repo.setKid(me, getBool("v", req)) inject jsonOkResult
+      env.user.repo.setKid(me, getBool("v", req)) >>
+        env.progress.api.awardOnboarded(me.id) inject jsonOkResult
     }
 
   private def currentSessionId(implicit ctx: Context) =

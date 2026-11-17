@@ -60,6 +60,7 @@ const VARIANT_KEYS = [
   'flipello10', 'antiflipello', 'octagonflipello', 'amazons', 'breakthroughtroyka',
   'minibreakthroughtroyka', 'oware', 'togyzkumalak', 'bestemshe', 'go9x9', 'go13x13', 'go19x19',
   'backgammon', 'hyper', 'nackgammon', 'abalone', 'grandabalone', 'entropy', 'gomoku', 'pente', 'renju',
+  'yonkoma10x10', 'yonkoma12x12',
 ];
 
 // prettier-ignore
