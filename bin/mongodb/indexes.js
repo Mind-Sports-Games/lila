@@ -30,6 +30,11 @@ db.game5.createIndex(
   { partialFilterExpression: { s: { $lte: 20 } } },
 );
 
+db.progress.createIndex(
+  { 'badges.allVariants': 1 },
+  { partialFilterExpression: { 'badges.allVariants': { $exists: true } } },
+);
+
 // you may want to run these on the puzzle database
 db.puzzle2_round.createIndex({ p: 1 }, { partialFilterExpression: { t: { $exists: true } } });
 db.puzzle2_round.createIndex({ u: 1, d: -1 }, { partialFilterExpression: { u: { $exists: 1 } } });
