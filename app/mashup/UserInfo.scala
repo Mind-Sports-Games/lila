@@ -58,6 +58,7 @@ object UserInfo {
   object Angle {
     case object Activity                          extends Angle("activity")
     case class Games(searchForm: Option[Form[?]]) extends Angle("games")
+    case object Progress                          extends Angle("progress")
     case object Other                             extends Angle("other")
   }
 

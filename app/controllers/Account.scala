@@ -310,6 +310,7 @@ final class Account(
 
   def kid =
     Auth { implicit ctx => me =>
+      tickProgress(lila.progress.Step.KidMode)
       env.clas.api.student.isManaged(me) flatMap { managed =>
         env.security.forms toggleKid me map { form =>
           Ok(html.account.kid(me, form, managed))

@@ -1,24 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-  <string name="configure">Configure PlayStrategy to your liking</string>
-  <string name="explore">Explore the site and have fun :)</string>
-  <string name="follow">Follow your friends on PlayStrategy</string>
-  <string name="improveIt">improve it</string>
-  <string name="joinCommunities">Join communities for your favourite games</string>
-  <string name="kidModeEnabled">Kid mode is enabled.</string>
-  <string name="kidMode">Kid mode</string>
-  <string name="learnFrom">Learn from : %1$s</string>
-  <string name="learnRules">Learn the rules to some of our games</string>
-  <string name="playBot">Play against one of our bots</string>
-  <string name="playOthers">Play opponents from around the world</string>
-  <string name="playTournaments">Play in tournaments</string>
-  <string name="profilePage">This is your profile page.</string>
-  <string name="studies">studies</string>
-  <string name="suggestions">What now? Here are a few suggestions:</string>
-  <string name="weeklyChallenge">Have a go at the weekly challenge</string>
-  <string name="welcome">Welcome to playstrategy.org!</string>
-  <string name="willAChildUse">Will a child use this account? You might want to enable %1$s.</string>
-  <string name="wouldYou">Would you like to %1$s ?</string>
   <string name="checklistTitle">Getting started on PlayStrategy</string>
   <string name="keepExploring">Keep exploring PlayStrategy</string>
   <string name="coreProgress">Getting started: %1$s of %2$s done</string>
@@ -32,6 +13,7 @@
   <string name="groupWatch">Watch</string>
   <string name="groupCustomise">Customise</string>
   <string name="groupSupport">Support</string>
+  <string name="stepKidMode">Decide whether this should be a kid account</string>
   <string name="stepChooseGames">Choose your games</string>
   <string name="stepPlayHuman">Play a game against another person</string>
   <string name="stepJoinTeam">Join a team</string>
@@ -40,7 +22,6 @@
   <string name="stepInviteFriend">Challenge a friend with an invite link</string>
   <string name="stepPlayCorrespondence">Play a correspondence game</string>
   <string name="stepPlayRated">Play a rated game</string>
-  <string name="stepPlayMedley">Play in a medley tournament</string>
   <string name="stepCreateTournament">Create your own tournament</string>
   <string name="stepSolvePuzzle">Solve a puzzle</string>
   <string name="stepLearnRules">Learn the rules of a game</string>
@@ -60,12 +41,19 @@
   <string name="achievements">Achievements</string>
   <string name="playEveryVariant">Play a rated game in every variant</string>
   <string name="variantsPlayed">%1$s of %2$s variants played rated</string>
+  <string name="variantsPlayedSoFar">Played rated so far</string>
+  <string name="variantsStillToPlay">Still to play rated</string>
+  <string name="viewAllProgress">View all</string>
+  <string name="backToProfile">Back to profile</string>
+  <string name="stepDoneOn">Done on %s</string>
   <string name="badgeGroupOnboarding">Onboarding</string>
   <string name="badgeOnboarded">Onboarded</string>
   <string name="badgeFullyOnboarded">Fully onboarded</string>
   <string name="badgeAllVariants">Every variant played</string>
   <string name="badgeEarned">Badge earned: %1$s</string>
+  <string name="badgeLost">Badge lost: %1$s</string>
   <string name="badgeOnboardedText">You've completed the core steps. Keep exploring PlayStrategy!</string>
   <string name="badgeFullyOnboardedText">You've explored everything on your checklist.</string>
   <string name="badgeAllVariantsText">You've played a rated game in every variant on PlayStrategy.</string>
+  <string name="badgeAllVariantsLostText">A new variant has been added to PlayStrategy. Play a rated game in it to earn the badge back.</string>
 </resources>

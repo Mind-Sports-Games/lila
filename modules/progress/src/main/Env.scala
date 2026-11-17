@@ -11,8 +11,6 @@ final class Env(
     db: lila.db.Db,
     cacheApi: lila.memo.CacheApi,
     notifyApi: lila.notify.NotifyApi,
-    tournamentRepo: lila.tournament.TournamentRepo,
-    swissApi: lila.swiss.SwissApi,
     studyApi: lila.study.StudyApi,
     userRepo: lila.user.UserRepo
 )(implicit ec: scala.concurrent.ExecutionContext) {
@@ -21,15 +19,7 @@ final class Env(
 
   lazy val api: ProgressApi = wire[ProgressApi]
 
-  private val isMedleyTour = cacheApi[String, Boolean](256, "progress.isMedleyTour") {
-    _.expireAfterWrite(1 hour)
-      .buildAsyncFuture(id => tournamentRepo.byId(id).dmap(_.exists(_.isMedley)))
-  }
-
-  private val isMedleySwiss = cacheApi[String, Boolean](256, "progress.isMedleySwiss") {
-    _.expireAfterWrite(1 hour)
-      .buildAsyncFuture(id => swissApi.byId(lila.swiss.Swiss.Id(id)).dmap(_.exists(_.isMedley)))
-  }
+  api.revokeOutdatedAllVariants.discard
 
   private def onFinishGame(game: Game, users: List[User]): Unit =
     game.players.foreach { player =>
@@ -45,16 +35,7 @@ final class Env(
           inTournament.option(Step.PlayTournament)
         ).flatten
         (api.tickAll(user.id, steps) >>
-          (inTournament so tickMedley(user.id, game)) >>
           (game.rated so api.playedVariant(user.id, game.ratingVariant.key))).discard
-      }
-    }
-
-  private def tickMedley(userId: User.ID, game: Game): Funit =
-    api.get(userId) flatMap { progress =>
-      (!progress.has(Step.PlayMedley)) so {
-        val isMedley = game.tournamentId.map(isMedleyTour.get) orElse game.swissId.map(isMedleySwiss.get)
-        isMedley so { _ flatMap { _ so api.tick(userId, Step.PlayMedley) } }
       }
     }
 

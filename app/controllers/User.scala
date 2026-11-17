@@ -89,6 +89,19 @@ final class User(
         status(html.activity(u, as))
       }
 
+  def progress(username: String) =
+    Auth { implicit ctx => _ =>
+      EnabledUser(username) { u =>
+        if (!ctx.is(u)) Redirect(routes.User.show(u.username)).fuccess
+        else
+          for {
+            nbs    <- env.userNbGames(u, ctx, withCrosstable = false)
+            info   <- env.userInfo(u, nbs, ctx)
+            social <- env.socialInfo(u, ctx)
+          } yield Ok(html.user.show.page.progress(u, info, social))
+      }
+    }
+
   def gamesAll(username: String, page: Int) = games(username, GameFilter.All.name, page)
 
   def games(username: String, filter: String, page: Int) =

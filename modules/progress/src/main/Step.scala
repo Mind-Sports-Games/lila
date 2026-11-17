@@ -22,6 +22,7 @@ sealed abstract class Step(val key: String, val group: StepGroup) {
 object Step {
   import StepGroup.*
 
+  case object KidMode            extends Step("kidMode", Core)
   case object ChooseGames        extends Step("chooseGames", Core)
   case object CompleteProfile    extends Step("completeProfile", Core)
   case object PlayHuman          extends Step("playHuman", Core)
@@ -31,7 +32,6 @@ object Step {
   case object InviteFriend       extends Step("inviteFriend", Play)
   case object PlayCorrespondence extends Step("playCorrespondence", Play)
   case object PlayRated          extends Step("playRated", Play)
-  case object PlayMedley         extends Step("playMedley", Play)
   case object CreateTournament   extends Step("createTournament", Play)
   case object SolvePuzzle        extends Step("solvePuzzle", Learn)
   case object LearnRules         extends Step("learnRules", Learn)
@@ -49,6 +49,7 @@ object Step {
   case object Patron             extends Step("patron", Support)
 
   val all: List[Step] = List(
+    KidMode,
     ChooseGames,
     CompleteProfile,
     PlayHuman,
@@ -58,7 +59,6 @@ object Step {
     InviteFriend,
     PlayCorrespondence,
     PlayRated,
-    PlayMedley,
     CreateTournament,
     SolvePuzzle,
     LearnRules,

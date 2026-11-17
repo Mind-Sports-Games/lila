@@ -93,6 +93,28 @@ final class ProgressApi(
         award(userId, Badge.AllVariants, 1)
     }
 
+  def revokeOutdatedAllVariants: Funit = {
+    val field = s"badges.${Badge.AllVariants.key}"
+    coll
+      .distinctEasy[User.ID, List](
+        "_id",
+        $doc(
+          field      -> $doc("$exists" -> true),
+          "variants" -> $doc("$not" -> $doc("$all" -> Progress.variantKeys))
+        )
+      )
+      .flatMap {
+        _.foldLeft(funit) { (acc, userId) =>
+          acc >> coll.update
+            .one($id(userId) ++ $doc(field -> $doc("$exists" -> true)), $unset(field))
+            .flatMap { res =>
+              cache.invalidate(userId)
+              (res.nModified > 0) so notifyAllVariantsRevoked(userId)
+            }
+        }
+      }
+  }
+
   private def award(userId: User.ID, badge: Badge, level: Int): Funit = {
     val field = s"badges.${badge.key}"
     coll.update
@@ -116,6 +138,21 @@ final class ProgressApi(
             title = trans.onboarding.badgeEarned.txt(ProgressApi.badgeName(badge, level).txt()).some,
             text = ProgressApi.badgeText(badge, level).txt().some,
             icon = ProgressIcon(badge, level).toString
+          )
+        )
+      )
+    }
+
+  private def notifyAllVariantsRevoked(userId: User.ID): Funit =
+    userRepo.langOf(userId) map I18nLangPicker.byStrOrDefault flatMap { implicit lang =>
+      notifyApi.addNotification(
+        Notification.make(
+          Notification.Notifies(userId),
+          GenericLink(
+            url = s"/@/$userId",
+            title = trans.onboarding.badgeLost.txt(trans.onboarding.badgeAllVariants.txt()).some,
+            text = trans.onboarding.badgeAllVariantsLostText.txt().some,
+            icon = ProgressIcon(Badge.AllVariants, 1).toString
           )
         )
       )

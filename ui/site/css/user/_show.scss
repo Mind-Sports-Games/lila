@@ -87,6 +87,71 @@
       margin: 1em 0 0.3em 0;
     }
 
+    &__top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1em;
+    }
+
+    &__toggle {
+      flex: 0 0 auto;
+      padding: 0.3em 0.8em;
+      font-size: 0.9em;
+    }
+
+    &--full {
+      height: auto;
+      overflow: visible;
+      border-top: $border;
+
+      .checklist__groups {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 0 2em;
+        margin-top: 0.5em;
+      }
+
+      .checklist__group-count {
+        margin-left: 0.5em;
+        font-weight: normal;
+      }
+
+      .checklist__group li {
+        list-style: none;
+        padding-left: 1.4em;
+        position: relative;
+
+        &::before {
+          position: absolute;
+          left: 0;
+        }
+
+        &.done {
+          color: $c-font-dim;
+
+          &::before {
+            color: $c-good;
+          }
+        }
+
+        &:not(.done)::before {
+          content: '○';
+          color: $c-font-dimmer;
+        }
+      }
+
+      .checklist__variants ul {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 0.2em 1em;
+
+        li {
+          list-style: none;
+        }
+      }
+    }
+
     li {
       list-style: disc inside;
       line-height: 1.6em;
@@ -141,12 +206,6 @@
 
     &__done {
       color: $c-good;
-    }
-
-    &__kid {
-      margin-top: 1.5em;
-      font-size: 0.9em;
-      color: $c-font-dim;
     }
 
     &__achievements {

@@ -13,9 +13,10 @@
 // - variants come from perfs.nb, which, like the live rule, counts rated games only.
 // - customiseBoard compares the saved theme and piece set to today's defaults, so a player whose pref
 //   was saved under an older default counts as having customised.
+// - kidMode is ticked only for kid accounts; everyone else still has to look at the kid mode page.
 // - not backfilled: chooseGames (placeholder for a future feature), inviteFriend (challenges expire),
-//   playMedley (needs game data), checkPreferences (a pref document does not show the pages were
-//   opened) and the visit-only steps memoryGame, analyseGame, boardEditor, watchTv, watchStreamer.
+//   checkPreferences (a pref document does not show the pages were opened) and the visit-only steps
+//   memoryGame, analyseGame, boardEditor, watchTv, watchStreamer.
 // Backfilled badges send no notification.
 //
 // STEP_KEYS, CORE_KEYS, NOT_FOR_KIDS_KEYS and VARIANT_KEYS mirror lila.progress.Step and
@@ -23,13 +24,12 @@
 // GameFamily.boardThemeDefault and pieceSetDefault in strategygames, keyed by GameFamily.id. Keep
 // them in step with the code.
 
-const CORE_KEYS = ['chooseGames', 'completeProfile', 'playHuman', 'joinTeam', 'playTournament'];
+const CORE_KEYS = ['kidMode', 'chooseGames', 'completeProfile', 'playHuman', 'joinTeam', 'playTournament'];
 const STEP_KEYS = CORE_KEYS.concat([
   'playBot',
   'inviteFriend',
   'playCorrespondence',
   'playRated',
-  'playMedley',
   'createTournament',
   'solvePuzzle',
   'learnRules',
@@ -123,6 +123,7 @@ function stepsOf(u) {
   const profile = u.profile || {};
   const id = u._id;
   const steps = [];
+  if (u.kid === true) steps.push('kidMode');
   if (playedHuman.has(id)) steps.push('playHuman');
   if (teamMembers.has(id)) steps.push('joinTeam');
   if (arenaPlayers.has(id) || swissPlayers.has(id)) steps.push('playTournament');

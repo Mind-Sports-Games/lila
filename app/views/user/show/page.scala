@@ -48,6 +48,21 @@ object page {
       )
     }
 
+  def progress(u: User, info: UserInfo, social: lila.app.mashup.UserInfo.Social)(implicit ctx: Context) =
+    views.html.base.layout(
+      title = s"${u.username} : ${trans.onboarding.achievements.txt()}",
+      moreJs = moreJs(),
+      moreCss = cssTag("user.show"),
+      robots = false
+    ) {
+      main(cls := "page-menu", dataUsername := u.username)(
+        st.aside(cls := "page-menu__menu")(side(u, info.ranks, none)),
+        div(cls := "page-menu__content box user-show")(
+          views.html.user.show.header(u, info, Angle.Progress, social)
+        )
+      )
+    }
+
   def games(
       u: User,
       info: UserInfo,

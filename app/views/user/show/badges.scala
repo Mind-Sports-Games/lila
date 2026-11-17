@@ -4,13 +4,13 @@ import lila.api.Context
 import lila.app.templating.Environment.*
 import lila.app.ui.ScalatagsTemplate.*
 import lila.progress.{ Badge, BadgeGroup, Progress, ProgressIcon }
-import lila.user.Trophy
+import lila.user.{ Trophy, User }
 
 object badges {
 
   def apply(info: lila.app.mashup.UserInfo)(implicit ctx: Context) =
     frag(
-      progressBadges(info.progress),
+      progressBadges(info.user, info.progress),
       info.trophies.filter(_.kind.klass.has("icon3d")).sorted.map { trophy =>
         trophy.kind.icon.map { iconChar =>
           a(
@@ -38,20 +38,14 @@ object badges {
       }
     )
 
-  private def progressBadges(progress: Progress)(implicit ctx: Context) =
-    BadgeGroup.all.map { group =>
-      progress.awarded.filter(_._1.group == group) match {
-        case Nil    => emptyFrag
-        case awards =>
-          span(cls := s"progress-badges progress-badges--${group.key}", title := groupName(group))(
-            awards.map { case (badge, award) =>
-              span(
-                cls      := s"progress-badge progress-badge--${badge.key} level-${award.level}",
-                dataIcon := badgeIcon(badge, award.level),
-                ariaTitle(s"${badgeName(badge, award.level)} · ${showDate(award.at)}")
-              )
-            }
-          )
+  private def progressBadges(u: User, progress: Progress)(implicit ctx: Context) =
+    BadgeGroup.all.flatMap { group =>
+      progress.awarded.filter(_._1.group == group).map { case (badge, award) =>
+        a(
+          href := ctx.is(u).option(routes.User.progress(u.username).url),
+          cls  := s"trophy award icon3d progress-badge progress-badge--${badge.key} level-${award.level}",
+          ariaTitle(s"${groupName(group)}: ${badgeName(badge, award.level)} · ${showDate(award.at)}")
+        )(badgeIcon(badge, award.level))
       }
     }
 

@@ -4,6 +4,7 @@ import lila.api.Context
 import lila.app.templating.Environment.*
 import lila.app.ui.ScalatagsTemplate.*
 import lila.progress.{ Badge, Progress, ProgressIcon, Step, StepGroup }
+import lila.rating.PerfType
 import lila.user.User
 
 object checklist {
@@ -14,31 +15,24 @@ object checklist {
       achievements(progress)
     )
 
-  private def onboarding(u: User, progress: Progress)(implicit ctx: Context) = {
-    val explore = Step.exploreFor(u.kid)
+  def full(u: User, progress: Progress)(implicit ctx: Context) =
+    div(cls := "checklist checklist--full")(
+      fullOnboarding(u, progress),
+      fullAchievements(progress)
+    )
+
+  private def onboarding(u: User, progress: Progress)(implicit ctx: Context) =
     div(cls := "checklist__onboarding")(
-      h2(
-        if (progress.isOnboarded) trans.onboarding.keepExploring()
-        else trans.onboarding.checklistTitle()
-      ),
-      if (progress.isOnboarded)
-        progressBar(
-          progress.nbExploreDone(u.kid),
-          explore.size,
-          trans.onboarding.exploreProgress.txt(progress.nbExploreDone(u.kid), explore.size)
+      top(
+        onboardingTitle(progress),
+        a(cls := "checklist__toggle button button-empty", href := routes.User.progress(u.username))(
+          trans.onboarding.viewAllProgress()
         )
-      else
-        progressBar(
-          progress.nbCoreDone,
-          Step.core.size,
-          trans.onboarding.coreProgress.txt(progress.nbCoreDone, Step.core.size)
-        ),
+      ),
+      onboardingProgress(u, progress),
       progress.nextStep(u.kid).fold(p(cls := "checklist__done")(trans.onboarding.allStepsDone())) { next =>
         frag(
-          a(cls := "checklist__next", href := url(next))(
-            span(cls := "checklist__next-label")(trans.onboarding.nextStep()),
-            strong(label(next))
-          ),
+          nextStep(next),
           StepGroup.all.map { group =>
             progress.remainingIn(group, u.kid).filterNot(_ == next) match {
               case Nil   => emptyFrag
@@ -50,28 +44,118 @@ object checklist {
             }
           }
         )
-      },
-      (!u.kid && !progress.isOnboarded).option(
-        p(cls := "checklist__kid")(
-          trans.onboarding.willAChildUse(a(href := routes.Account.kid)(trans.onboarding.kidMode()))
-        )
+      }
+    )
+
+  private def fullOnboarding(u: User, progress: Progress)(implicit ctx: Context) =
+    div(cls := "checklist__onboarding")(
+      top(
+        onboardingTitle(progress),
+        a(
+          cls      := "checklist__toggle button button-empty text",
+          dataIcon := "I",
+          href     := routes.User.show(u.username)
+        )(trans.onboarding.backToProfile())
+      ),
+      progressBar(
+        progress.nbCoreDone,
+        Step.core.size,
+        trans.onboarding.coreProgress.txt(progress.nbCoreDone, Step.core.size)
+      ),
+      progressBar(
+        progress.nbExploreDone(u.kid),
+        Step.exploreFor(u.kid).size,
+        trans.onboarding.exploreProgress.txt(progress.nbExploreDone(u.kid), Step.exploreFor(u.kid).size)
+      ),
+      progress.nextStep(u.kid).fold(p(cls := "checklist__done")(trans.onboarding.allStepsDone()))(nextStep),
+      div(cls := "checklist__groups")(
+        StepGroup.all.map { group =>
+          Step.ofGroup(group, u.kid) match {
+            case Nil   => emptyFrag
+            case steps =>
+              div(cls := s"checklist__group checklist__group--${group.key}")(
+                h3(
+                  groupName(group),
+                  span(cls := "checklist__group-count")(s"${steps.count(progress.has)}/${steps.size}")
+                ),
+                ul(steps.map { step =>
+                  progress.steps.get(step.key) match {
+                    case Some(date) =>
+                      li(
+                        cls      := "done",
+                        dataIcon := "E",
+                        title    := trans.onboarding.stepDoneOn.txt(showDate(date))
+                      )(label(step))
+                    case None => li(a(href := url(step))(label(step)))
+                  }
+                })
+              )
+          }
+        }
       )
     )
-  }
+
+  private def top(title: Frag, toggle: Frag) =
+    div(cls := "checklist__top")(h2(title), toggle)
+
+  private def onboardingTitle(progress: Progress)(implicit ctx: Context) =
+    if (progress.isOnboarded) trans.onboarding.keepExploring()
+    else trans.onboarding.checklistTitle()
+
+  private def onboardingProgress(u: User, progress: Progress)(implicit ctx: Context) =
+    if (progress.isOnboarded)
+      progressBar(
+        progress.nbExploreDone(u.kid),
+        Step.exploreFor(u.kid).size,
+        trans.onboarding.exploreProgress.txt(progress.nbExploreDone(u.kid), Step.exploreFor(u.kid).size)
+      )
+    else
+      progressBar(
+        progress.nbCoreDone,
+        Step.core.size,
+        trans.onboarding.coreProgress.txt(progress.nbCoreDone, Step.core.size)
+      )
+
+  private def nextStep(next: Step)(implicit ctx: Context) =
+    a(cls := "checklist__next", href := url(next))(
+      span(cls := "checklist__next-label")(trans.onboarding.nextStep()),
+      strong(label(next))
+    )
 
   private def achievements(progress: Progress)(implicit ctx: Context) =
     div(cls := "checklist__achievements")(
       h2(trans.onboarding.achievements()),
-      div(cls := List("checklist__achievement" -> true, "done" -> progress.hasPlayedAllVariants))(
-        strong(dataIcon := ProgressIcon(Badge.AllVariants, 1).toString, cls := "text")(
-          trans.onboarding.playEveryVariant()
-        ),
-        progressBar(
-          progress.nbVariantsPlayed,
-          Progress.nbVariants,
-          trans.onboarding.variantsPlayed.txt(progress.nbVariantsPlayed, Progress.nbVariants)
-        )
+      allVariantsAchievement(progress)
+    )
+
+  private def fullAchievements(progress: Progress)(implicit ctx: Context) = {
+    val (played, unplayed) = PerfType.allVariant.partition(pt => progress.hasPlayed(pt.key))
+    div(cls := "checklist__achievements")(
+      h2(trans.onboarding.achievements()),
+      allVariantsAchievement(progress),
+      if (unplayed.isEmpty) emptyFrag
+      else if (played.isEmpty || played.size * 2 > Progress.nbVariants)
+        variantList(trans.onboarding.variantsStillToPlay(), unplayed)
+      else variantList(trans.onboarding.variantsPlayedSoFar(), played)
+    )
+  }
+
+  private def allVariantsAchievement(progress: Progress)(implicit ctx: Context) =
+    div(cls := List("checklist__achievement" -> true, "done" -> progress.hasPlayedAllVariants))(
+      strong(dataIcon := ProgressIcon(Badge.AllVariants, 1).toString, cls := "text")(
+        trans.onboarding.playEveryVariant()
+      ),
+      progressBar(
+        progress.nbVariantsPlayed,
+        Progress.nbVariants,
+        trans.onboarding.variantsPlayed.txt(progress.nbVariantsPlayed, Progress.nbVariants)
       )
+    )
+
+  private def variantList(heading: Frag, variants: List[PerfType])(implicit ctx: Context) =
+    div(cls := "checklist__variants")(
+      h3(heading),
+      ul(variants.map(pt => li(span(dataIcon := pt.iconString, cls := "text")(pt.trans))))
     )
 
   private def progressBar(done: Int, total: Int, text: String) =
@@ -95,6 +179,7 @@ object checklist {
 
   private def label(step: Step)(implicit ctx: Context) =
     step match {
+      case Step.KidMode            => trans.onboarding.stepKidMode()
       case Step.ChooseGames        => trans.onboarding.stepChooseGames()
       case Step.PlayHuman          => trans.onboarding.stepPlayHuman()
       case Step.JoinTeam           => trans.onboarding.stepJoinTeam()
@@ -103,7 +188,6 @@ object checklist {
       case Step.InviteFriend       => trans.onboarding.stepInviteFriend()
       case Step.PlayCorrespondence => trans.onboarding.stepPlayCorrespondence()
       case Step.PlayRated          => trans.onboarding.stepPlayRated()
-      case Step.PlayMedley         => trans.onboarding.stepPlayMedley()
       case Step.CreateTournament   => trans.onboarding.stepCreateTournament()
       case Step.SolvePuzzle        => trans.onboarding.stepSolvePuzzle()
       case Step.LearnRules         => trans.onboarding.stepLearnRules()
@@ -126,6 +210,7 @@ object checklist {
 
   private def url(step: Step): String =
     step match {
+      case Step.KidMode            => routes.Account.kid.url
       case Step.ChooseGames        => routes.Library.home.url
       case Step.PlayHuman          => lobbySetup
       case Step.JoinTeam           => routes.Team.all(1).url
@@ -134,7 +219,6 @@ object checklist {
       case Step.InviteFriend       => lobbySetup
       case Step.PlayCorrespondence => lobbySetup
       case Step.PlayRated          => lobbySetup
-      case Step.PlayMedley         => routes.Tournament.home.url
       case Step.CreateTournament   => routes.Tournament.form.url
       case Step.SolvePuzzle        => routes.Puzzle.base.url
       case Step.LearnRules         => routes.Page.variantHome.url
