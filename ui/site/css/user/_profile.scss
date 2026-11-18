@@ -30,6 +30,11 @@
     overflow: hidden;
   }
 
+  &:has(.checklist--compact) .profile-side {
+    height: auto;
+    max-height: 332px;
+  }
+
   .country img {
     vertical-align: text-bottom;
     margin: 0 0.3em;

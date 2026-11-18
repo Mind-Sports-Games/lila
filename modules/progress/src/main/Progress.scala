@@ -28,6 +28,9 @@ case class Progress(
   def isOnboarded: Boolean                   = Step.core.forall(has)
   def isFullyOnboarded(kid: Boolean): Boolean = Step.allFor(kid).forall(has)
 
+  def hasCompletedOnboarding(kid: Boolean): Boolean =
+    isFullyOnboarded(kid) || awardLevel(Badge.Onboarded) >= 2
+
   def onboardedLevel(kid: Boolean): Int =
     if (isFullyOnboarded(kid)) 2
     else if (isOnboarded) 1

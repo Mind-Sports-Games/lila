@@ -12,7 +12,7 @@ object checklist {
   def apply(u: User, progress: Progress)(implicit ctx: Context) =
     if (showsOnboarding(u, progress))
       div(cls := "checklist")(onboarding(u, progress), achievements(progress, none))
-    else div(cls := "checklist")(achievements(progress, viewAllLink(u).some))
+    else div(cls := "checklist checklist--compact")(achievements(progress, viewAllLink(u).some))
 
   def full(u: User, progress: Progress)(implicit ctx: Context) =
     if (showsOnboarding(u, progress))
@@ -24,7 +24,7 @@ object checklist {
       )
 
   private def showsOnboarding(u: User, progress: Progress) =
-    !u.isBot && !progress.isFullyOnboarded(u.kid)
+    !u.isBot && !progress.hasCompletedOnboarding(u.kid)
 
   private def viewAllLink(u: User)(implicit ctx: Context) =
     a(cls := "checklist__toggle button button-empty", href := routes.User.progress(u.username))(
