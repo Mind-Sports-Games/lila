@@ -22,7 +22,7 @@ final class LibraryStats(
         ReadPreference.secondaryPreferred
       ) { framework =>
         import framework.*
-        Match(Query.finished) -> List(
+        Match(Query.finished ++ Query.notBotVsBotStream) -> List(
           Project(
             $doc(
               "clock"   -> $doc("$cond" -> $arr($doc("$ifNull" -> $arr(s"$$${F.clock}", false)), 1, 0)),

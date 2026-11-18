@@ -55,6 +55,7 @@ object Source {
     BotVsBotPriority
   )
   val expirable: Set[Source] = Set(Lobby, Tournament, Pool, Swiss)
+  val botVsBot: Set[Source]  = Set(BotVsBotStream, BotVsBotPriority)
 
   def apply(id: Int): Option[Source] = byId get id
 }
