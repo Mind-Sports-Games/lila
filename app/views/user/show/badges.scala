@@ -49,6 +49,15 @@ object badges {
       }
     }
 
+  def mini(progress: Progress)(implicit ctx: Context) =
+    progress.awarded map { case (badge, award) =>
+      span(
+        cls      := s"upt__badge progress-badge--${badge.key} level-${award.level}",
+        dataIcon := badgeIcon(badge, award.level),
+        title    := s"${badgeName(badge, award.level)} · ${showDate(award.at)}"
+      )
+    }
+
   private def groupName(group: BadgeGroup)(implicit ctx: Context): String =
     group match {
       case BadgeGroup.Onboarding   => trans.onboarding.badgeGroupOnboarding.txt()

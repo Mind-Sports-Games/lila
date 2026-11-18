@@ -13,13 +13,13 @@
   <string name="groupWatch">Watch</string>
   <string name="groupCustomise">Customise</string>
   <string name="groupSupport">Support</string>
-  <string name="stepKidMode">Decide whether this should be a kid account</string>
+  <string name="stepKidMode">Consider whether this should be a kid account</string>
   <string name="stepChooseGames">Choose your games</string>
   <string name="stepPlayHuman">Play a game against another person</string>
   <string name="stepJoinTeam">Join a team</string>
   <string name="stepPlayTournament">Play in a tournament</string>
   <string name="stepPlayBot">Play against a bot</string>
-  <string name="stepInviteFriend">Challenge a friend with an invite link</string>
+  <string name="stepInviteFriend">Challenge a friend and finish the game</string>
   <string name="stepPlayCorrespondence">Play a correspondence game</string>
   <string name="stepPlayRated">Play a rated game</string>
   <string name="stepCreateTournament">Create your own tournament</string>
@@ -32,6 +32,7 @@
   <string name="stepCreateStudy">Create a study</string>
   <string name="stepFollowPlayer">Follow a player</string>
   <string name="stepForumPost">Post in the forum or the weekly challenge</string>
+  <string name="stepMindSportsOlympiad">Find out about the Mind Sports Olympiad</string>
   <string name="stepCompleteProfile">Complete your profile: a flag, plus a bio or your real name</string>
   <string name="stepWatchTv">Watch a live game on TV</string>
   <string name="stepWatchStreamer">Watch a streamer</string>

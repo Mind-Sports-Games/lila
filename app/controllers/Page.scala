@@ -20,6 +20,7 @@ final class Page(
   def page(uid: String, active: Option[String]) =
     Open { implicit ctx =>
       pageHit
+      if (uid == "mind-sports-olympiad") tickProgress(lila.progress.Step.MindSportsOlympiad)
       OptionOk(prismicC.getPage(uid)) { case (doc, resolver) =>
         active match {
           case None      => views.html.site.page.lone(doc, resolver)

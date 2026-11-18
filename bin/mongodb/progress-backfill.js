@@ -15,9 +15,9 @@
 //   was saved under an older default counts as having customised.
 // - kidMode is ticked for every existing account, kid or not: the step is meant for new accounts, so
 //   players who joined before the checklist never see it. This writes a progress doc for every user.
-// - not backfilled: chooseGames (placeholder for a future feature), inviteFriend (challenges expire),
+// - not backfilled: chooseGames (placeholder for a future feature), inviteFriend (needs a game scan),
 //   checkPreferences (a pref document does not show the pages were opened) and the visit-only steps
-//   memoryGame, analyseGame, boardEditor, watchTv, watchStreamer.
+//   mindSportsOlympiad, memoryGame, analyseGame, boardEditor, watchTv, watchStreamer.
 // BOT accounts get no steps (the checklist is hidden from them), only variants and achievements.
 // Backfilled badges send no notification.
 //
@@ -42,6 +42,7 @@ const STEP_KEYS = CORE_KEYS.concat([
   'createStudy',
   'followPlayer',
   'forumPost',
+  'mindSportsOlympiad',
   'watchTv',
   'watchStreamer',
   'customiseBoard',

@@ -130,6 +130,10 @@
         &.done {
           color: $c-font-dim;
 
+          a {
+            color: $c-font-dim;
+          }
+
           &::before {
             color: $c-good;
           }
@@ -208,7 +212,8 @@
       color: $c-good;
     }
 
-    &__achievements:not(:first-child) {
+    &__achievements:not(:first-child),
+    &__onboarding:not(:first-child) {
       margin-top: 1.5em;
       padding-top: 1em;
       border-top: $border;
@@ -220,7 +225,8 @@
         margin-bottom: 0.3em;
       }
 
-      &.done strong {
+      &.done strong,
+      &.done strong a {
         color: $c-brag;
       }
     }

@@ -30,6 +30,7 @@ final class Env(
         val inTournament  = game.tournamentId.isDefined || game.swissId.isDefined
         val steps = List(
           (if (opponentIsBot) Step.PlayBot else Step.PlayHuman).some,
+          (game.fromFriend && !opponentIsBot).option(Step.InviteFriend),
           game.rated.option(Step.PlayRated),
           (game.isCorrespondence || game.daysPerTurn.isDefined).option(Step.PlayCorrespondence),
           inTournament.option(Step.PlayTournament)

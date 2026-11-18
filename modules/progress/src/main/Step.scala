@@ -42,6 +42,7 @@ object Step {
   case object CreateStudy        extends Step("createStudy", Learn)
   case object FollowPlayer       extends Step("followPlayer", Community)
   case object ForumPost          extends Step("forumPost", Community)
+  case object MindSportsOlympiad extends Step("mindSportsOlympiad", Community)
   case object WatchTv            extends Step("watchTv", Watch)
   case object WatchStreamer      extends Step("watchStreamer", Watch)
   case object CustomiseBoard     extends Step("customiseBoard", Customise)
@@ -69,6 +70,7 @@ object Step {
     CreateStudy,
     FollowPlayer,
     ForumPost,
+    MindSportsOlympiad,
     WatchTv,
     WatchStreamer,
     CustomiseBoard,

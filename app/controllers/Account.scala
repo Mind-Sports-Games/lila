@@ -14,7 +14,8 @@ import lila.user.{ Holder, TotpSecret, User as UserModel }
 final class Account(
     env: Env,
     auth: Auth,
-    apiC: => Api
+    apiC: => Api,
+    prismicC: => Prismic
 ) extends LilaController(env) {
 
   def profile =
@@ -311,11 +312,11 @@ final class Account(
   def kid =
     Auth { implicit ctx => me =>
       tickProgress(lila.progress.Step.KidMode)
-      env.clas.api.student.isManaged(me) flatMap { managed =>
-        env.security.forms toggleKid me map { form =>
-          Ok(html.account.kid(me, form, managed))
-        }
-      }
+      for {
+        managed <- env.clas.api.student.isManaged(me)
+        form    <- env.security.forms toggleKid me
+        page    <- prismicC.getPage("kid-mode")
+      } yield Ok(html.account.kid(me, form, managed, page))
     }
   def apiKid =
     Scoped(_.Preference.Read) { _ => me =>
@@ -332,7 +333,9 @@ final class Account(
             .fold(
               err =>
                 negotiate(
-                  html = BadRequest(html.account.kid(me, err, managed = false)).fuccess,
+                  html = prismicC.getPage("kid-mode") map { page =>
+                    BadRequest(html.account.kid(me, err, managed = false, page))
+                  },
                   api = _ => BadRequest(errorsAsJson(err)).fuccess
                 ),
               _ =>

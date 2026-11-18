@@ -176,12 +176,13 @@ final class User(
           ctx.userId.so { relationApi.fetchBlocks(user.id, _) } zip
             ctx.userId.so { env.game.crosstableApi(user.id, _).dmap(some) } zip
             ctx.isAuth.so { env.pref.api.followable(user.id) } zip
-            ctx.userId.so { relationApi.fetchRelation(_, user.id) } flatMap {
-              case (((blocked, crosstable), followable), relation) =>
+            ctx.userId.so { relationApi.fetchRelation(_, user.id) } zip
+            env.progress.api.get(user.id) flatMap {
+              case ((((blocked, crosstable), followable), relation), progress) =>
                 val ping = env.socket.isOnline(user.id) so UserLagCache.getLagRating(user.id)
                 negotiate(
                   html = !ctx.is(user) so currentlyPlaying(user) map { pov =>
-                    Ok(html.user.mini(user, pov, blocked, followable, relation, ping, crosstable))
+                    Ok(html.user.mini(user, pov, blocked, followable, relation, ping, crosstable, progress))
                       .withHeaders(CACHE_CONTROL -> "max-age=5")
                   },
                   api = _ => {

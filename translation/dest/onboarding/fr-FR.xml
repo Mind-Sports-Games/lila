@@ -13,13 +13,13 @@
   <string name="groupWatch">Regarder</string>
   <string name="groupCustomise">Personnaliser</string>
   <string name="groupSupport">Soutenir</string>
-  <string name="stepKidMode">Décidez s'il s'agit d'un compte enfant</string>
+  <string name="stepKidMode">Demandez-vous s'il doit s'agir d'un compte enfant</string>
   <string name="stepChooseGames">Choisissez vos jeux</string>
   <string name="stepPlayHuman">Jouez une partie contre une autre personne</string>
   <string name="stepJoinTeam">Rejoignez une équipe</string>
   <string name="stepPlayTournament">Jouez dans un tournoi</string>
   <string name="stepPlayBot">Jouez contre un bot</string>
-  <string name="stepInviteFriend">Défiez un ami avec un lien d'invitation</string>
+  <string name="stepInviteFriend">Défiez un ami et terminez la partie</string>
   <string name="stepPlayCorrespondence">Jouez une partie par correspondance</string>
   <string name="stepPlayRated">Jouez une partie classée</string>
   <string name="stepCreateTournament">Créez votre propre tournoi</string>
@@ -32,6 +32,7 @@
   <string name="stepCreateStudy">Créez une étude</string>
   <string name="stepFollowPlayer">Suivez un joueur</string>
   <string name="stepForumPost">Publiez un message sur le forum ou dans le défi hebdomadaire</string>
+  <string name="stepMindSportsOlympiad">Découvrez les Mind Sports Olympiad</string>
   <string name="stepCompleteProfile">Complétez votre profil : un drapeau, plus une biographie ou votre vrai nom</string>
   <string name="stepWatchTv">Regardez une partie en direct sur la TV</string>
   <string name="stepWatchStreamer">Regardez un streamer</string>
