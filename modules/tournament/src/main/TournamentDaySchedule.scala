@@ -104,8 +104,8 @@ object TournamentDaySchedule {
             Variant.FiveInARow(strategygames.fiveinarow.variant.Gomoku)           -> Blitz32,
             Variant.FiveInARow(strategygames.fiveinarow.variant.Pente)            -> Blitz32,
             Variant.FiveInARow(strategygames.fiveinarow.variant.Renju)            -> Blitz32,
-            Variant.Yonkoma(strategygames.yonkoma.variant.Yonkoma10x10)           -> Blitz32,
-            Variant.Yonkoma(strategygames.yonkoma.variant.Yonkoma12x12)           -> Blitz32
+            Variant.Yonkoma(strategygames.yonkoma.variant.Yonkoma10x10)           -> Blitz21,
+            Variant.Yonkoma(strategygames.yonkoma.variant.Yonkoma12x12)           -> Blitz21
           )
         )
 
