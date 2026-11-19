@@ -159,6 +159,8 @@ export default class Setup {
         });
       case '1_8': //frysk
       case '11_10': //minibreakthrough
+      case '16_1': //yonkoma10x10
+      case '16_2': //yonkoma12x12
         return Object.assign({}, defaultClockConfig, {
           bullet: { timemode: '1', initial: '0.5', increment: '0' },
           blitz: { timemode: '1', initial: '2', increment: '1' },
