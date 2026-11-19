@@ -205,6 +205,7 @@ object header {
             ctx.is(u).option(checklist(u, info.progress)),
             div(cls := "profile-side")(
               div(cls := "user-infos")(
+                ctx.is(u).option(checklist.viewAchievementsLink(u, info.progress)).flatten,
                 (!ctx.is(u)).option(
                   frag(
                     u.lame.option(

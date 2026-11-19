@@ -1442,6 +1442,9 @@ export default class Setup {
       $rated.prop('checked', true);
       $casual.prop('checked', false);
     }
+    const inputOpponent = $form.data('opponent');
+    if (inputOpponent && !user)
+      $opponentInput.filter(`[value="${inputOpponent}"]`).prop('checked', true).trigger('change');
     $botInput.on('change', function (this: HTMLElement) {
       updateBotDetails();
       toggleButtons();

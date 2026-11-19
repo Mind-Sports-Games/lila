@@ -9,10 +9,22 @@ import lila.user.User
 
 object checklist {
 
-  def apply(u: User, progress: Progress)(implicit ctx: Context) =
+  def apply(u: User, progress: Progress)(implicit ctx: Context): Frag =
     if (showsOnboarding(u, progress))
-      div(cls := "checklist")(onboarding(u, progress), achievements(progress, none))
-    else div(cls := "checklist checklist--compact")(achievements(progress, viewAllLink(u).some))
+      div(cls := "checklist")(
+        onboarding(u, progress),
+        (!progress.hasPlayedAllVariants).option(achievements(progress, none))
+      )
+    else if (!progress.hasPlayedAllVariants)
+      div(cls := "checklist checklist--compact")(achievements(progress, viewAllLink(u).some))
+    else emptyFrag
+
+  def viewAchievementsLink(u: User, progress: Progress)(implicit ctx: Context): Option[Frag] =
+    (!showsOnboarding(u, progress) && progress.hasPlayedAllVariants).option(
+      a(cls := "view-achievements button button-empty", href := routes.User.progress(u.username))(
+        trans.onboarding.viewAchievements()
+      )
+    )
 
   def full(u: User, progress: Progress)(implicit ctx: Context) =
     if (showsOnboarding(u, progress))
@@ -64,10 +76,12 @@ object checklist {
   ) =
     div(cls := "checklist__onboarding")(
       top(onboardingTitle(progress), withToggle.option(backToProfileLink(u))),
-      progressBar(
-        progress.nbCoreDone,
-        Step.core.size,
-        trans.onboarding.coreProgress.txt(progress.nbCoreDone, Step.core.size)
+      (!progress.isOnboarded).option(
+        progressBar(
+          progress.nbCoreDone,
+          Step.core.size,
+          trans.onboarding.coreProgress.txt(progress.nbCoreDone, Step.core.size)
+        )
       ),
       progressBar(
         progress.nbDone(u.kid),
@@ -142,8 +156,8 @@ object checklist {
       allVariantsAchievement(progress),
       if (unplayed.isEmpty) emptyFrag
       else if (played.isEmpty || played.size * 2 > Progress.nbVariants)
-        variantList(trans.onboarding.variantsStillToPlay(), unplayed)
-      else variantList(trans.onboarding.variantsPlayedSoFar(), played)
+        variantList(trans.onboarding.variantsStillToPlay(), unplayed, linked = true)
+      else variantList(trans.onboarding.variantsPlayedSoFar(), played, linked = false)
     )
   }
 
@@ -166,14 +180,21 @@ object checklist {
   private def playVariantUrl(progress: Progress): String = {
     val unplayed = PerfType.allVariant.filterNot(pt => progress.hasPlayed(pt.key))
     val choices  = if (unplayed.isEmpty) PerfType.allVariant else unplayed
-    val variant  = PerfType.variantOf(choices(scala.util.Random.nextInt(choices.size)))
-    s"${routes.Lobby.home}?variant=${variant.key}&mode=rated#game"
+    ratedSetupUrl(choices(scala.util.Random.nextInt(choices.size)))
   }
 
-  private def variantList(heading: Frag, variants: List[PerfType])(implicit ctx: Context) =
+  private def ratedSetupUrl(pt: PerfType): String =
+    s"${routes.Lobby.home}?variant=${PerfType.variantOf(pt).key}&mode=rated#game"
+
+  private def variantList(heading: Frag, variants: List[PerfType], linked: Boolean)(implicit ctx: Context) =
     div(cls := "checklist__variants")(
       h3(heading),
-      ul(variants.map(pt => li(span(dataIcon := pt.iconString, cls := "text")(pt.trans))))
+      ul(variants.map { pt =>
+        li(
+          if (linked) a(dataIcon := pt.iconString, cls := "text", href := ratedSetupUrl(pt))(pt.trans)
+          else span(dataIcon := pt.iconString, cls := "text")(pt.trans)
+        )
+      })
     )
 
   private def progressBar(done: Int, total: Int, text: String) =
@@ -209,7 +230,6 @@ object checklist {
       case Step.CreateTournament   => trans.onboarding.stepCreateTournament()
       case Step.SolvePuzzle        => trans.onboarding.stepSolvePuzzle()
       case Step.LearnRules         => trans.onboarding.stepLearnRules()
-      case Step.Coordinates        => trans.onboarding.stepCoordinates()
       case Step.MemoryGame         => trans.onboarding.stepMemoryGame()
       case Step.AnalyseGame        => trans.onboarding.stepAnalyseGame()
       case Step.BoardEditor        => trans.onboarding.stepBoardEditor()
@@ -230,6 +250,8 @@ object checklist {
 
   private val lobbySetup = s"${routes.Lobby.home}#game"
 
+  private val friendSetup = s"${routes.Lobby.home}?opponent=friend#game"
+
   private val correspondenceSetup = s"${routes.Lobby.home}?time=correspondence#game"
 
   private def url(step: Step): String =
@@ -240,13 +262,12 @@ object checklist {
       case Step.JoinTeam           => routes.Team.all(1).url
       case Step.PlayTournament     => routes.Tournament.home.url
       case Step.PlayBot            => routes.PlayApi.botOnline.url
-      case Step.InviteFriend       => lobbySetup
+      case Step.InviteFriend       => friendSetup
       case Step.PlayCorrespondence => correspondenceSetup
       case Step.PlayRated          => lobbySetup
       case Step.CreateTournament   => routes.Tournament.form.url
       case Step.SolvePuzzle        => routes.Puzzle.base.url
       case Step.LearnRules         => routes.Page.variantHome.url
-      case Step.Coordinates        => routes.Coordinate.home.url
       case Step.MemoryGame         => routes.Memory.home.url
       case Step.AnalyseGame        => routes.UserAnalysis.index.url
       case Step.BoardEditor        => routes.Editor.index.url

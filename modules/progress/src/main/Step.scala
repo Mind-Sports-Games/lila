@@ -35,7 +35,6 @@ object Step {
   case object CreateTournament   extends Step("createTournament", Play)
   case object SolvePuzzle        extends Step("solvePuzzle", Learn)
   case object LearnRules         extends Step("learnRules", Learn)
-  case object Coordinates        extends Step("coordinates", Learn)
   case object MemoryGame         extends Step("memoryGame", Learn)
   case object AnalyseGame        extends Step("analyseGame", Learn)
   case object BoardEditor        extends Step("boardEditor", Learn)
@@ -63,7 +62,6 @@ object Step {
     CreateTournament,
     SolvePuzzle,
     LearnRules,
-    Coordinates,
     MemoryGame,
     AnalyseGame,
     BoardEditor,

@@ -35,7 +35,6 @@ const STEP_KEYS = CORE_KEYS.concat([
   'createTournament',
   'solvePuzzle',
   'learnRules',
-  'coordinates',
   'memoryGame',
   'analyseGame',
   'boardEditor',
@@ -98,7 +97,6 @@ const swissCreators = idSet('swiss', 'createdBy');
 const followers = idSet('relation', 'u1', { r: true });
 const posters = idSet('f_post', 'userId');
 const studyOwners = idSet('study', 'ownerId');
-const coordinators = idSet('coordinate_score', '_id');
 const learners = idSet('learn_progress', '_id');
 
 const bots = idSet('user4', '_id', { title: 'BOT' });
@@ -137,7 +135,6 @@ function stepsOf(u) {
   if (arenaCreators.has(id) || swissCreators.has(id)) steps.push('createTournament');
   if (Object.keys(u.perfs || {}).some(k => k.startsWith('puzzle_') && nb(u, k) > 0)) steps.push('solvePuzzle');
   if (learners.has(id)) steps.push('learnRules');
-  if (coordinators.has(id)) steps.push('coordinates');
   if (studyOwners.has(id)) steps.push('createStudy');
   if (followers.has(id)) steps.push('followPlayer');
   if (posters.has(id)) steps.push('forumPost');

@@ -30,9 +30,17 @@
     overflow: hidden;
   }
 
-  &:has(.checklist--compact) .profile-side {
+  &:has(.checklist--compact) .profile-side,
+  &:not(:has(.checklist)) .profile-side {
     height: auto;
     max-height: 332px;
+  }
+
+  .view-achievements {
+    float: right;
+    margin: 0 0 0.5em 1em;
+    padding: 0.3em 0.8em;
+    font-size: 0.9em;
   }
 
   .country img {
