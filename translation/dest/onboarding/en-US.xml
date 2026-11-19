@@ -28,7 +28,7 @@
   <string name="stepMemoryGame">Play the memory game</string>
   <string name="stepAnalyseGame">Visit the analysis board</string>
   <string name="stepBoardEditor">Visit the board editor</string>
-  <string name="stepCreateStudy">Create a study (it's a multi-chapter game repertoire builder)</string>
+  <string name="stepCreateStudy">Create a study</string>
   <string name="stepFollowPlayer">Follow a player</string>
   <string name="stepForumPost">Post in the forum or the weekly challenge</string>
   <string name="stepMindSportsOlympiad">Find out about the Mind Sports Olympiad</string>
