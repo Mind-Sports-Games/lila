@@ -11,7 +11,8 @@ object side {
   def apply(
       u: User,
       @annotation.nowarn("msg=unused") rankMap: lila.rating.UserRankMap,
-      active: Option[lila.rating.PerfType]
+      active: Option[lila.rating.PerfType],
+      allGamesActive: Boolean = false
   )(implicit ctx: Context) = {
 
     def showNonEmptyPerf(perf: lila.rating.Perf, perfType: PerfType) =
@@ -121,6 +122,15 @@ object side {
           showNonEmptyPerf(u.perfs.renju, PerfType.orDefault("renju")),
           showNonEmptyPerf(u.perfs.yonkoma10x10, PerfType.orDefault("yonkoma10x10")),
           showNonEmptyPerf(u.perfs.yonkoma12x12, PerfType.orDefault("yonkoma12x12")),
+          hr,
+          a(
+            dataIcon := "7",
+            cls      := List("all-games" -> true, "active" -> allGamesActive),
+            href     := routes.User.allPerfs(u.username)
+          )(
+            span(h3(trans.perfStat.allGames())),
+            iconTag("G")
+          ),
           u.noBot.option(
             frag(
               hr,

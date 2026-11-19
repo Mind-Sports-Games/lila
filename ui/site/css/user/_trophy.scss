@@ -11,8 +11,16 @@
 
   @include breakpoint($mq-not-small) {
     position: unset;
-    height: 60px;
+    height: auto;
+    padding-bottom: 10px;
+    justify-content: flex-start;
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
     .trophy {
+      flex: 0 0 auto;
       height: 60px;
       &.icon3d {
         height: 60px;
@@ -208,4 +216,18 @@
   color: #fff !important;
   text-shadow: 0 0 4px #444;
   margin-top: -18px;
+}
+
+.trophy.progress-badge {
+  &--onboarded {
+    color: $c-primary;
+
+    &.level-2 {
+      color: $c-brag;
+    }
+  }
+
+  &--allVariants {
+    color: $c-good;
+  }
 }

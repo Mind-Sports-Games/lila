@@ -14,7 +14,8 @@ import lila.user.{ Holder, TotpSecret, User as UserModel }
 final class Account(
     env: Env,
     auth: Auth,
-    apiC: => Api
+    apiC: => Api,
+    prismicC: => Prismic
 ) extends LilaController(env) {
 
   def profile =
@@ -41,7 +42,9 @@ final class Account(
           }
         spamReport.so { case (resource, text) =>
           env.report.api.autoCommFlag(lila.report.Suspect(me).id, resource, text)
-        } >> env.user.repo.setProfile(me.id, profile) inject Redirect(routes.Account.profile).flashSuccess
+        } >> env.user.repo.setProfile(me.id, profile) >>
+          (profile.isComplete so env.progress.api.tick(me.id, lila.progress.Step.CompleteProfile)) inject
+          Redirect(routes.Account.profile).flashSuccess
       }
     }
 
@@ -308,11 +311,12 @@ final class Account(
 
   def kid =
     Auth { implicit ctx => me =>
-      env.clas.api.student.isManaged(me) flatMap { managed =>
-        env.security.forms toggleKid me map { form =>
-          Ok(html.account.kid(me, form, managed))
-        }
-      }
+      tickProgress(lila.progress.Step.KidMode)
+      for {
+        managed <- env.clas.api.student.isManaged(me)
+        form    <- env.security.forms toggleKid me
+        page    <- prismicC.getPage("kid-mode")
+      } yield Ok(html.account.kid(me, form, managed, page))
     }
   def apiKid =
     Scoped(_.Preference.Read) { _ => me =>
@@ -329,11 +333,14 @@ final class Account(
             .fold(
               err =>
                 negotiate(
-                  html = BadRequest(html.account.kid(me, err, managed = false)).fuccess,
+                  html = prismicC.getPage("kid-mode") map { page =>
+                    BadRequest(html.account.kid(me, err, managed = false, page))
+                  },
                   api = _ => BadRequest(errorsAsJson(err)).fuccess
                 ),
               _ =>
                 env.user.repo.setKid(me, getBool("v")) >>
+                  env.progress.api.awardOnboarded(me.id) >>
                   negotiate(
                     html = Redirect(routes.Account.kid).flashSuccess.fuccess,
                     api = _ => jsonOkResult.fuccess
@@ -345,7 +352,8 @@ final class Account(
 
   def apiKidPost =
     Scoped(_.Preference.Write) { req => me =>
-      env.user.repo.setKid(me, getBool("v", req)) inject jsonOkResult
+      env.user.repo.setKid(me, getBool("v", req)) >>
+        env.progress.api.awardOnboarded(me.id) inject jsonOkResult
     }
 
   private def currentSessionId(implicit ctx: Context) =

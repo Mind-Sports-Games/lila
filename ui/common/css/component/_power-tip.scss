@@ -34,6 +34,12 @@
         @extend %flex-center-nowrap;
       }
 
+      &__right {
+        @extend %flex-center-nowrap;
+
+        flex: 0 0 auto;
+      }
+
       &__country {
         margin-left: 0.5em;
       }
@@ -56,6 +62,23 @@
         img {
           margin-right: 0.3em;
         }
+      }
+    }
+
+    .upt__badge {
+      font-size: 1.3em;
+      margin-right: 0.4em;
+
+      &.progress-badge--onboarded {
+        color: $c-primary;
+
+        &.level-2 {
+          color: $c-brag;
+        }
+      }
+
+      &.progress-badge--allVariants {
+        color: $c-good;
       }
     }
 

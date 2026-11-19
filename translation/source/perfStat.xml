@@ -30,4 +30,6 @@
   <string name="lessThanOneHour">Less than one hour between games</string>
   <string name="maxTimePlaying">Max time spent playing</string>
   <string name="now">now</string>
+  <string name="allGames">All games</string>
+  <string name="allGamesRatingHistory">Rating history across all games</string>
 </resources>
