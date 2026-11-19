@@ -49,6 +49,8 @@ object Query {
 
   val friend: Bdoc = s"${F.source}".$eq(Source.Friend.id)
 
+  val notBotVsBotStream: Bdoc = F.source.$nin(Source.botVsBot.map(_.id))
+
   def clock(c: Boolean): Bdoc = F.clock.$exists(c)
 
   def clockHistory(c: Boolean): Bdoc = F.p1ClockHistory.$exists(c)

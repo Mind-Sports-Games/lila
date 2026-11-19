@@ -591,7 +591,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         Match(
           $doc(
             F.status -> $gte(30)
-          )
+          ) ++ Query.notBotVsBotStream
         ) -> List(
           Project(
             $doc(
@@ -649,7 +649,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         Match(
           $doc(
             F.status -> $gte(30)
-          )
+          ) ++ Query.notBotVsBotStream
         ) -> List(
           Project(
             $doc(
