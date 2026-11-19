@@ -104,8 +104,8 @@ object TournamentMedleyUtil {
       "gomoku"                 -> medium,
       "pente"                  -> medium,
       "renju"                  -> medium,
-      "yonkoma10x10"           -> quick,
-      "yonkoma12x12"           -> quick
+      "yonkoma10x10"           -> fastest,
+      "yonkoma12x12"           -> fastest
     )
   }
 
