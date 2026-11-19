@@ -1192,4 +1192,10 @@ computer analysis, game chat and shareable URL.</string>
   <string name="historyTitle">%s — every edition and winner</string>
   <string name="historyDescription">Every edition of the %s arena on PlayStrategy, with its winner.</string>
   <string name="historyAllGames">All games</string>
+  <string name="favouriteGames">Favourite games</string>
+  <string name="favouriteGamesIntro">Star the games you like most: they are marked with a star wherever they appear on PlayStrategy.</string>
+  <string name="addToFavourites">Add to favourites</string>
+  <string name="removeFromFavourites">Remove from favourites</string>
+  <string name="favourites">Favourites</string>
+  <string name="highlightFavourites">Highlight your favourite games</string>
 </resources>

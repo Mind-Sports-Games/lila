@@ -130,6 +130,7 @@ object Tv {
     // def filter(c: Candidate): Boolean = filters.forall { _(c) } && isFresh(c.game)
     def filter(c: Candidate): Boolean = filters.forall { _(c) } && isOngoingGame(c.game)
     val key                           = s"${toString.head.toLower}${toString.drop(1)}"
+    lazy val variants: List[Variant] = filters.toList.flatMap { case VariantFilter(vs) => vs; case _ => Nil }
   }
   object Channel {
     case object AllGames
@@ -916,8 +917,11 @@ object Tv {
 
   // private def rated(min: Int)                           = (c: Candidate) => c.game.rated && hasMinRating(c.game, min)
   private def speed(speed: strategygames.Speed)      = (c: Candidate) => c.game.speed == speed
-  private def variant(variant: Variant)              = (c: Candidate) => c.game.variant == variant
-  private def anyVariant(variantList: List[Variant]) = (c: Candidate) => variantList.contains(c.game.variant)
+  private case class VariantFilter(variants: List[Variant]) extends (Candidate => Boolean) {
+    def apply(c: Candidate) = variants.contains(c.game.variant)
+  }
+  private def variant(variant: Variant)              = VariantFilter(List(variant))
+  private def anyVariant(variantList: List[Variant]) = VariantFilter(variantList)
   private val standard                               = variant(Variant.libStandard(GameLogic.Chess()))
   private val freshBlitz                             = 60 * 2
   private val freshRapid                             = 60 * 5

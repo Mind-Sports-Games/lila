@@ -2,8 +2,9 @@ import { h, VNode } from 'snabbdom';
 import { tds, bind } from './util';
 import LobbyController from '../ctrl';
 import { Seek, MaybeVNodes } from '../interfaces';
+import { favourites } from 'common/favourites';
 
-function renderSeek(ctrl: LobbyController, seek: Seek): VNode {
+function renderSeek(ctrl: LobbyController, seek: Seek, favs: Set<string>): VNode {
   const klass = seek.action === 'joinSeek' ? 'join' : 'cancel',
     noarg = ctrl.trans.noarg;
   return h(
@@ -28,7 +29,7 @@ function renderSeek(ctrl: LobbyController, seek: Seek): VNode {
         : 'Anonymous',
       seek.rating + (seek.provisional ? '?' : ''),
       seek.days ? ctrl.trans.plural('nbDays', seek.days) : '∞',
-      h('span', [
+      h('span', { class: { fav: favs.has(seek.variant.key) } }, [
         h('span.varicon', {
           attrs: { 'data-icon': seek.perf.icon },
         }),
@@ -61,6 +62,7 @@ function createSeek(ctrl: LobbyController): VNode | undefined {
 }
 
 export default function (ctrl: LobbyController): MaybeVNodes {
+  const favs = favourites();
   return [
     h('table.hooks__list', [
       h('thead', [
@@ -86,7 +88,7 @@ export default function (ctrl: LobbyController): MaybeVNodes {
             } while (el.nodeName !== 'TABLE');
           }),
         },
-        ctrl.data.seeks.map(s => renderSeek(ctrl, s)),
+        ctrl.data.seeks.map(s => renderSeek(ctrl, s, favs)),
       ),
     ]),
     createSeek(ctrl),

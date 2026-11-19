@@ -1,4 +1,5 @@
 import { VNode } from 'snabbdom';
+import { GamePicker } from 'common/gamePicker';
 
 export type MaybeVNode = VNode | string | null | undefined;
 export type MaybeVNodes = MaybeVNode[];
@@ -13,6 +14,7 @@ export interface SimulOpts {
   chat: any;
   i18n: I18nDict;
   socketSend: SocketSend;
+  gamePicker?: GamePicker;
 }
 
 export interface SimulData {
@@ -38,7 +40,6 @@ export interface Variant {
   key: VariantKey;
   name: string;
   icon: string;
-  group?: { key: string; name: string };
 }
 
 export interface Team {

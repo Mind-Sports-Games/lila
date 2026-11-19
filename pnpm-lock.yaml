@@ -564,6 +564,9 @@ importers:
 
   ui/tournamentCalendar:
     dependencies:
+      common:
+        specifier: workspace:*
+        version: link:../common
       date-fns:
         specifier: ^2.14.0
         version: 2.30.0
@@ -573,6 +576,9 @@ importers:
 
   ui/tournamentSchedule:
     dependencies:
+      common:
+        specifier: workspace:*
+        version: link:../common
       dragscroll:
         specifier: ^0.0.8
         version: 0.0.8

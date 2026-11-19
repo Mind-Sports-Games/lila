@@ -571,6 +571,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     ongoing: false,
     playBestMove,
     session,
+    gamePicker: opts.gamePicker,
     allThemes: opts.themes && {
       dynamic: opts.themes.dynamic.split(' '),
       static: new Set(opts.themes.static.split(' ')),

@@ -6,10 +6,21 @@
   gap: 0.4em 0.5em;
   margin: 0 var(--box-padding) 1em;
 
-  a {
+  .box-pad & {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .box > h1 + & {
+    margin-top: -2.5vh;
+  }
+
+  a,
+  button {
     @extend %flex-center-nowrap;
 
     padding: 0.3em 0.85em;
+    background: none;
     border: 1px solid $c-border;
     border-radius: 999px;
     color: $c-font;

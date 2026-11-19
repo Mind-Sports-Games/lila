@@ -1,9 +1,3 @@
-@import 'variant';
-
-.puzzle-themes__variant_select {
-  @extend %box-padding-horiz, %roboto;
-}
-
 .puzzle-themes {
   h2 {
     @extend %box-padding-horiz, %roboto;

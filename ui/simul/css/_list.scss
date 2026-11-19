@@ -32,13 +32,19 @@
     }
 
     .host,
+    .clock,
     .players {
       display: none;
     }
 
     @include breakpoint($mq-x-small) {
-      .host {
+      .host,
+      .clock {
         display: table-cell;
+      }
+
+      .name-clock {
+        display: none;
       }
     }
 
@@ -58,9 +64,39 @@
     }
 
     .name {
+      display: flex;
+      align-items: baseline;
+      gap: 1em;
       white-space: nowrap;
       font-size: 1.7em;
-      display: block;
+    }
+
+    td.clock {
+      font-size: 1.5em;
+      white-space: nowrap;
+    }
+
+    .name-clock {
+      margin-left: auto;
+      font-size: 0.8em;
+    }
+
+    .games {
+      display: flex;
+      flex-flow: row wrap;
+      align-items: center;
+      gap: 0.4em;
+      margin-top: 0.3em;
+    }
+
+    .game {
+      padding: 0.1em 0.7em;
+      border: 1px solid $c-border;
+      border-radius: 999px;
+      color: $c-font;
+      font-size: 0.9em;
+      line-height: 1.4;
+      white-space: nowrap;
     }
 
     .create td {

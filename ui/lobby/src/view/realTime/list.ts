@@ -3,8 +3,9 @@ import LobbyController from '../../ctrl';
 import { bind, tds, perfIcons } from '../util';
 import * as hookRepo from '../../hookRepo';
 import { Hook } from '../../interfaces';
+import { favourites } from 'common/favourites';
 
-function renderHook(ctrl: LobbyController, hook: Hook) {
+function renderHook(ctrl: LobbyController, hook: Hook, favs: Set<string>) {
   const noarg = ctrl.trans.noarg;
   return h(
     'tr.hook.' + hook.action,
@@ -32,6 +33,7 @@ function renderHook(ctrl: LobbyController, hook: Hook) {
       h(
         'span',
         {
+          class: { fav: favs.has(hook.vkey) },
           attrs: { 'data-icon': perfIcons[hook.perf] },
         },
         [noarg(hook.ra ? 'Rated ' : 'Casual '), '(' + noarg(hook.perf) + ')'],
@@ -66,7 +68,8 @@ export function render(ctrl: LobbyController, allHooks: Hook[]) {
   const mine = allHooks.find(isMine),
     max = mine ? 13 : 14,
     hooks = allHooks.slice(0, max),
-    render = (hook: Hook) => renderHook(ctrl, hook),
+    favs = favourites(),
+    render = (hook: Hook) => renderHook(ctrl, hook, favs),
     standards = hooks.filter(isNotMine).filter(isStandard(true));
   hookRepo.sort(ctrl, standards);
   const variants = hooks

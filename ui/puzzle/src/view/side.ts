@@ -1,7 +1,8 @@
 import { Controller, Puzzle, PuzzleGame, MaybeVNode } from '../interfaces';
-import { dataIcon, onInsert, bind } from '../util';
+import { dataIcon, bind } from '../util';
 import { h, VNode } from 'snabbdom';
 import { numberFormat } from 'common/number';
+import { grid, GridState } from 'common/gamePicker';
 import PuzzleStreak from '../streak';
 
 export function puzzleBox(ctrl: Controller): VNode {
@@ -156,14 +157,24 @@ export const streakBox = (ctrl: Controller) =>
 //   ['hardest', 600],
 // ];
 
-const variants: [string, string][] = [
-  ['standard', 'Chess'],
-  ['kingOfTheHill', 'King of the Hill'],
-  ['atomic', 'Atomic'],
-  ['horde', 'Horde'],
-  ['racingKings', 'Racing Kings'],
-  ['linesOfAction', 'Lines of Action'],
-];
+const pickerState: GridState = {};
+
+const chooseVariant = (ctrl: Controller, key: string) => {
+  if (key === ctrl.getData().game.variant.key) return;
+  if (!ctrl.getData().user) window.location.href = `/training/${key}`;
+  else {
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.action = '/training/set-variant/mix';
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'variant';
+    input.value = key;
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+  }
+};
 
 export function replay(ctrl: Controller): MaybeVNode {
   const replay = ctrl.getData().replay;
@@ -256,70 +267,17 @@ export function config(ctrl: Controller): MaybeVNode {
     //       ],
     //     )
     //   : null,
-    !ctrl.getData().replay && !ctrl.streak
-      ? !ctrl.getData().user
-        ? // For anonymous users, use a select and redirect on change
-          h('div.puzzle__side__config__variant', [
-            h('label', { attrs: { for: 'puzzle-variant' } }, ctrl.trans.noarg('variant')),
-            h(
-              'select#puzzle-variant.puzzle__variant__selector',
-              {
-                attrs: { name: 'variant' },
-                hook: onInsert(elm =>
-                  elm.addEventListener('change', () => {
-                    const variant = (elm as HTMLSelectElement).value;
-                    window.location.href = `/training/${variant}`;
-                  }),
-                ),
-              },
-              variants.map(([variantKey, variantName]) =>
-                h(
-                  'option',
-                  {
-                    attrs: {
-                      value: variantKey,
-                      selected: variantKey == ctrl.getData().game.variant.key,
-                    },
-                  },
-                  ctrl.trans.noarg(variantName),
-                ),
-              ),
-            ),
-          ])
-        : // For logged-in users, render the form as before
-          h(
-            'form.puzzle__side__config__variant',
-            {
-              attrs: {
-                action: `/training/set-variant/mix`,
-                method: 'post',
-              },
-            },
-            [
-              h('label', { attrs: { for: 'puzzle-variant' } }, ctrl.trans.noarg('variant')),
-              h(
-                'select#puzzle-variant.puzzle__variant__selector',
-                {
-                  attrs: { name: 'variant' },
-                  hook: onInsert(elm =>
-                    elm.addEventListener('change', () => (elm.parentNode as HTMLFormElement).submit()),
-                  ),
-                },
-                variants.map(([variantKey, variantName]) =>
-                  h(
-                    'option',
-                    {
-                      attrs: {
-                        value: variantKey,
-                        selected: variantKey == ctrl.getData().game.variant.key,
-                      },
-                    },
-                    ctrl.trans.noarg(variantName),
-                  ),
-                ),
-              ),
-            ],
-          )
+    !ctrl.getData().replay && !ctrl.streak && ctrl.gamePicker
+      ? h(
+          'div.puzzle__side__config__variant',
+          grid({
+            picker: ctrl.gamePicker,
+            chosen: ctrl.getData().game.variant.key,
+            state: pickerState,
+            choose: key => chooseVariant(ctrl, key),
+            redraw: ctrl.redraw,
+          }),
+        )
       : null,
     h(
       'a.puzzle__side__config__zen',

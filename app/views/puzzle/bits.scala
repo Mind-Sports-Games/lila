@@ -8,9 +8,10 @@ import play.api.libs.json.{ JsString, Json }
 import strategygames.variant.Variant
 import lila.puzzle.Puzzle
 
+import lila.api.Context
 import lila.app.templating.Environment.*
 import lila.app.ui.ScalatagsTemplate.*
-import lila.i18n.{ MessageKey, VariantKeys }
+import lila.i18n.MessageKey
 import lila.puzzle.{ PuzzleDifficulty, PuzzleTheme }
 
 object bits {
@@ -38,16 +39,10 @@ object bits {
       )
   }
 
-  def variantSelector(variant: Variant, link: Variant => String)(implicit lang: Lang) =
-    div(cls := s"variant_group")(
-      Puzzle.puzzleVariants.map { v =>
-        button(cls := s"variant ${if (v.key == variant.key) "selected" else ""}")(
-          a(
-            href     := link(v),
-            dataIcon := v.perfIcon
-          )(VariantKeys.variantName(v))
-        )
-      }
+  def variantSelector(variant: Variant, link: Variant => String)(implicit ctx: Context) =
+    views.html.base.gamePicker.chips(
+      Puzzle.puzzleVariants.map(v => views.html.base.gamePicker.variantChoice(v, link(v))),
+      variant.key
     )
 
   def pageMenu(active: String, variant: Variant, days: Int = 30)(implicit lang: Lang) =

@@ -2,6 +2,7 @@ import view from './view';
 
 import { init, VNode, classModule, attributesModule } from 'snabbdom';
 import dragscroll from 'dragscroll';
+import { favourites } from 'common/favourites';
 
 const patch = init([classModule, attributesModule]);
 
@@ -15,6 +16,7 @@ export default function PlayStrategyTournamentSchedule(env: any) {
   const ctrl = {
     data: () => env.data,
     trans: playstrategy.trans(env.i18n),
+    favs: favourites(),
   };
 
   let vnode: VNode;

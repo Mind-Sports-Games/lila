@@ -116,8 +116,11 @@
       }
     }
 
-    &__difficulty,
     &__variant {
+      margin-top: 2vmin;
+    }
+
+    &__difficulty {
       margin-top: 2vmin;
 
       display: flex;

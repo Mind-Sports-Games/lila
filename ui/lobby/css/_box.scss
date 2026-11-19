@@ -125,6 +125,19 @@
     }
   }
 
+  &__tournaments td.fav {
+    position: relative;
+    padding-right: 2em;
+
+    &::after {
+      position: absolute;
+      right: 0.7em;
+      top: 50%;
+      transform: translateY(-50%);
+      margin: 0;
+    }
+  }
+
   &__leaderboard,
   &__winners {
     td:first-child {

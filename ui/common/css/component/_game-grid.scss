@@ -1,0 +1,156 @@
+.game-grid {
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    width: 100%;
+    padding: 0.5em 0.8em;
+    background: none;
+    border: none;
+    border-bottom: $border;
+    color: $c-font;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background: $c-bg-zebra;
+    }
+
+    &.open {
+      background: mix($c-primary, $c-bg-box, 18%);
+    }
+  }
+
+  &__label {
+    flex: 0 0 33%;
+    text-align: right;
+    font-weight: bold;
+  }
+
+  &__value {
+    @extend %flex-center-nowrap;
+
+    gap: 0.5em;
+
+    &::before {
+      font-size: 1.5em;
+    }
+  }
+
+  &__panel {
+    display: none;
+    padding: 0.5em 0;
+
+    &.open {
+      display: block;
+    }
+  }
+
+  &__tiles {
+    @extend %box-neat;
+
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow: hidden;
+
+    &:not(:has(> :nth-child(4))) {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(0, 1fr);
+    }
+  }
+
+  &__games:not(.open) {
+    display: none;
+  }
+
+  &__tile {
+    @extend %metal;
+
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-height: 64px;
+    padding: 4px 2px;
+    border: none;
+    border-right: $border;
+    border-bottom: $border;
+    color: $c-font;
+    font-size: 0.9em;
+    line-height: 1.2;
+    text-align: center;
+    hyphens: auto;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+    user-select: none;
+
+    &::before {
+      font-size: 200%;
+    }
+
+    &:not(.disabled, .chosen):hover {
+      @extend %metal-hover;
+    }
+
+    &.open {
+      box-shadow: inset 0 0 0 2px $c-secondary;
+    }
+
+    &.chosen {
+      @extend %active;
+
+      background: $c-secondary;
+    }
+
+    &.disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    &.fav::after {
+      position: absolute;
+      top: 0.3em;
+      right: 0.4em;
+      margin: 0;
+    }
+
+    &.chosen.fav::after {
+      color: inherit;
+    }
+  }
+
+  &--off &__row {
+    color: $c-font-dimmer;
+    cursor: default;
+
+    &:hover {
+      background: none;
+    }
+  }
+}
+
+@mixin game-grid-wide {
+  .game-grid__row {
+    padding: 0 0 0.4em;
+    border: none;
+    background: none;
+    pointer-events: none;
+  }
+
+  .game-grid__label {
+    flex: 1 1 auto;
+    text-align: left;
+  }
+
+  .game-grid__value {
+    display: none;
+  }
+
+  .game-grid__panel {
+    display: block;
+    padding-top: 0;
+    margin-bottom: 1em;
+  }
+}

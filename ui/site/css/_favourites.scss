@@ -1,0 +1,56 @@
+.favourites {
+  &__intro {
+    margin-bottom: 1.5em;
+  }
+
+  &__group {
+    border-top: $border;
+    padding: 0.5em 0;
+  }
+
+  &__head {
+    @extend %flex-center-nowrap;
+
+    gap: 0.5em;
+    font-size: 1.15em;
+  }
+
+  summary.favourites__head {
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::after {
+      content: '›';
+      margin-left: auto;
+      padding: 0 0.4em;
+      color: $c-font-dim;
+      font-size: 1.4em;
+      line-height: 1;
+
+      @include transition(transform);
+    }
+  }
+
+  details[open] > summary.favourites__head::after {
+    transform: rotate(90deg);
+  }
+
+  &__star {
+    background: none;
+    border: none;
+    padding: 0.2em;
+    line-height: 1;
+  }
+
+  .series-links {
+    margin: 0.7em 0 0.5em;
+
+    button.fav {
+      border-color: $c-primary;
+    }
+  }
+}

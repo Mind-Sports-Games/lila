@@ -9,6 +9,7 @@ import { Selected, CastlingToggle, EditorState } from './interfaces';
 import { VariantKey as stratopsVariantKey } from 'stratops/variants/types';
 import { variantClassFromKey } from 'stratops/variants/util';
 import { makeSquare, parseSquare } from 'stratops';
+import { grid, GamePicker, GridState } from 'common/gamePicker';
 
 function capitalizeFirstLetter(val: string) {
   return val.charAt(0).toUpperCase() + val.slice(1);
@@ -71,17 +72,22 @@ function isChessRules(variantKey: VariantKey): boolean {
   return variantClassFromKey(variantKey).family == 'chess';
 }
 
-function variant2option(key: VariantKey, name: string, ctrl: EditorCtrl): VNode {
-  return h(
-    'option',
-    {
-      attrs: {
-        value: key,
-        selected: key == ctrl.variantKey,
-      },
-    },
-    `${ctrl.trans.noarg('variant')} | ${name}`,
-  );
+const pickerState: GridState = {};
+
+function picker(ctrl: EditorCtrl): VNode | null {
+  const gamePicker = (ctrl.cfg as Editor.Config & { gamePicker?: GamePicker }).gamePicker;
+  return ctrl.cfg.embed || !gamePicker
+    ? null
+    : h(
+        'div.board-editor__picker',
+        grid({
+          picker: gamePicker,
+          chosen: ctrl.variantKey,
+          state: pickerState,
+          choose: key => ctrl.changeVariant(key as VariantKey),
+          redraw: ctrl.redraw,
+        }),
+      );
 }
 
 function controls(ctrl: EditorCtrl, state: EditorState): VNode {
@@ -153,20 +159,6 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
     ...(ctrl.cfg.embed
       ? [h('div.actions', [buttonStart(), buttonClear()])]
       : [
-          h('div', [
-            h(
-              'select',
-              {
-                attrs: { id: 'variants' },
-                on: {
-                  change(e) {
-                    ctrl.changeVariant((e.target as HTMLSelectElement).value as VariantKey);
-                  },
-                },
-              },
-              (ctrl.cfg.handledVariants || []).map(v => variant2option(v.key, v.name, ctrl)),
-            ),
-          ]),
           h('div.actions', [
             buttonStart('P'),
             buttonClear('q'),
@@ -557,6 +549,7 @@ export default function (ctrl: EditorCtrl): VNode {
       },
     },
     [
+      picker(ctrl),
       sparePieces(ctrl, opposite(playerIndex), playerIndex, 'top'),
       h('div.main-board', [chessground(ctrl)]),
       sparePieces(ctrl, playerIndex, playerIndex, 'bottom'),

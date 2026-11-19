@@ -61,7 +61,8 @@
       "src/publicChats.ts",
       "src/contact.ts",
       "src/coordinate.ts",
-      "src/memory.ts"
+      "src/memory.ts",
+      "src/favourites.ts"
     ],
     "sync": {
       "node_modules/hopscotch/dist/js/hopscotch.min.js": "public/vendor/hopscotch/dist/js",

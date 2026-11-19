@@ -25,9 +25,9 @@ object calendar {
       ),
       moreCss = cssTag("tournament.calendar")
     ) {
-      main(cls := "box")(
+      main(cls := "box tour-calendar")(
         h1("Tournament calendar"),
-        bits.freqKey(),
+        bits.freqKey(favouritesToggle = true),
         div(id := "tournament-calendar")
       )
     }

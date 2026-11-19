@@ -1,0 +1,38 @@
+$fav-some-opacity: 0.45;
+
+.fav-star {
+  color: $c-primary;
+
+  &::before {
+    @extend %data-icon;
+
+    content: 's';
+    opacity: 1;
+  }
+
+  &.on::before,
+  &.some::before {
+    content: 't';
+  }
+
+  &.some::before {
+    opacity: $fav-some-opacity;
+  }
+}
+
+.fav::after {
+  @extend %data-icon;
+
+  content: 't';
+  color: $c-primary;
+  font-size: 0.9em;
+  line-height: 1;
+  vertical-align: super;
+  align-self: flex-start;
+  margin-left: 0.25em;
+  opacity: 1;
+}
+
+.fav.fav-some::after {
+  opacity: $fav-some-opacity;
+}

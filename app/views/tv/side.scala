@@ -13,7 +13,8 @@ object side {
       channel: lila.tv.Tv.Channel,
       champions: lila.tv.Tv.Champions,
       baseUrl: String
-  ): Frag =
+  )(implicit ctx: Context): Frag = {
+    val favs = favVariants
     div(cls := "tv-channels subnav")(
       lila.tv.Tv.Channel.all.map { c =>
         a(
@@ -29,7 +30,7 @@ object side {
         )(
           span(dataIcon := c.icon)(
             span(
-              strong(c.name),
+              strong(cls := favMark(c.variants, favs))(c.name),
               span(cls := "champion")(
                 champions.get(c).fold[Frag](raw(" - ")) { p =>
                   frag(
@@ -44,6 +45,7 @@ object side {
         )
       }
     )
+  }
 
   private val separator = " • "
 

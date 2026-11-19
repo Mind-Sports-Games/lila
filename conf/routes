@@ -823,6 +823,11 @@ GET   /$lang<[a-z]{2}|pt-br|pt-pt|zh-cn>/library/:key  controllers.Library.langV
 GET   /$lang<[a-z]{2}|pt-br|pt-pt|zh-cn>/analysis       controllers.UserAnalysis.langIndex(lang: String)
 GET   /$lang<[a-z]{2}|pt-br|pt-pt|zh-cn>/analysis/:key  controllers.UserAnalysis.langLoad(lang: String, key: String)
 
+# Favourites
+GET   /favourites                     controllers.Favourites.index
+POST  /favourites/variant/:key        controllers.Favourites.variant(key)
+POST  /favourites/group/:key          controllers.Favourites.group(key)
+
 # Help
 GET   /help/contribute                 controllers.Page.help
 GET   /help/master                     controllers.Page.master

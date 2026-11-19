@@ -178,6 +178,20 @@
     }
   }
 
+  &.fav {
+    padding-right: 1.2em;
+
+    &::after {
+      position: absolute;
+      top: 3px;
+      right: 4px;
+      margin: 0;
+      font-size: 0.9em;
+      line-height: 1;
+      color: inherit;
+    }
+  }
+
   .name,
   .body {
     @extend %nowrap-ellipsis;

@@ -25,13 +25,4 @@
       height: 100%;
     }
   }
-
-  .mselect {
-    display: inline-block;
-
-    &__list > * {
-      font-size: 1.3rem;
-      padding: 0.3em 1em 0.3em 0.7em;
-    }
-  }
 }

@@ -286,4 +286,10 @@ trait UserHelper { self: I18nHelper & StringHelper & NumberHelper =>
   def lineIcon(user: LightUser)(implicit lang: Lang): Frag                 = lineIcon(user.isPatron)
   def lineIcon(user: User)(implicit lang: Lang): Frag                      = lineIcon(user.isPatron)
   def lineIconChar(user: User): Frag = if (user.isPatron) patronIconChar else lineIconChar
+
+  def favVariants(implicit ctx: lila.user.UserContext): Set[String] =
+    ctx.me.fold(Set.empty[String])(_.favVariants)
+
+  def favStar(on: Boolean, some: Boolean = false): Tag =
+    i(cls := List("fav-star" -> true, "on" -> on, "some" -> some))
 }

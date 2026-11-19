@@ -34,6 +34,11 @@ object show {
               )
               .add("themes" -> ctx.isAuth.option(bits.jsonThemes(puzzle.variant)))
               .add("difficulty" -> difficulty.map(_.key))
+              .add(
+                "gamePicker" -> (!isStreak).option(
+                  views.html.base.gamePicker.json(lila.puzzle.Puzzle.puzzleVariants, everySlot = false)
+                )
+              )
           )})""")
       ),
       csp = defaultCsp.withWebAssembly.some,
