@@ -189,7 +189,6 @@
   <string name="variant">Вариант</string>
   <string name="variants">Варианты</string>
   <string name="timeControl">Контроль времени</string>
-  <string name="realTime">По часам</string>
   <string name="correspondence">Игра по переписке</string>
   <string name="daysPerTurn">Дней на ход</string>
   <string name="oneDay">Один день</string>

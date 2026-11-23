@@ -162,7 +162,6 @@
   <string name="variant">변형게임</string>
   <string name="variants">변형</string>
   <string name="timeControl">시간 제한</string>
-  <string name="realTime">짧은 대국</string>
   <string name="correspondence">긴 대국</string>
   <string name="daysPerTurn">한 수에 걸리는 일수</string>
   <string name="oneDay">1일</string>
