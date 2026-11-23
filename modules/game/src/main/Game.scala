@@ -460,8 +460,7 @@ case class Game(
           .filter(p => p == playerIndex.name)
           .size
           .toString()
-      case "threeCheck" | "fiveCheck" =>
-        history.checkCount(opponent(playerIndex).playerIndex).toString()
+      case "threeCheck" | "fiveCheck" => history.score(playerIndex).toString()
       case "oware" =>
         val fen   = Forsyth.>>(variant.gameLogic, situation)
         val score = if (playerIndex.name == "p1") fen.player1Score else fen.player2Score
@@ -485,7 +484,8 @@ case class Game(
   def displayScore: Option[Score] =
     if variant.gameLogic == GameLogic.Togyzkumalak() || variant.gameLogic == GameLogic
         .Backgammon() || variant.gameLogic == GameLogic.Abalone() || variant.gameLogic == GameLogic.Entropy() ||
-      (variant.gameLogic == GameLogic.FiveInARow() && variant.hasGameScore)
+      (variant.gameLogic == GameLogic.FiveInARow() && variant.hasGameScore) ||
+      (variant.gameLogic == GameLogic.Chess() && variant.hasGameScore)
     then history.score.some
     else if (variant.gameLogic == GameLogic.Go()) {
       if (finished || selectSquaresPossible) history.score.some

@@ -59,6 +59,8 @@
 
 //score for games (togyzkumalak and Oware has own layout below)
 $score-variants: (
+  'threeCheck',
+  'fiveCheck',
   'flipello',
   'flipello10',
   'antiflipello',
@@ -446,6 +448,8 @@ $pocket-height-oware: 14vh;
   }
 }
 
+.variant-threeCheck .game-score,
+.variant-fiveCheck .game-score,
 .variant-flipello .game-score,
 .variant-flipello10 .game-score,
 .variant-antiflipello .game-score,

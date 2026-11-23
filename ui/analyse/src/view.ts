@@ -468,6 +468,9 @@ function renderPlayerScore(
     children.push(h(`piece.${score > 9 ? 's-piece' : 'hole-piece'}.slot-bot-right.${opp}`));
 
     return h('div.game-score.game-score-top' + '.' + playerIndex, { attrs: { 'data-score': score } }, children);
+  } else if (variantKey === 'threeCheck' || variantKey === 'fiveCheck') {
+    children.push(h('piece.k-piece.' + playerIndex, { attrs: { 'data-score': score } }));
+    return h('div.game-score.game-score-top' + '.' + playerIndex, children);
   } else {
     //flipello variants
     const pieceClass = 'piece.p-piece.';
@@ -623,6 +626,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
       }
+      case 'threeCheck':
+      case 'fiveCheck':
       case 'backgammon':
       case 'hyper':
       case 'nackgammon': {

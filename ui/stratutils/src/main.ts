@@ -116,7 +116,6 @@ export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | und
   }
 }
 
-// 3 check and 5 check dont have consistent fen formats, its calculated from running through game plys.
 export function getScore(variant: VariantKey, fen: string, playerIndex: string): number | undefined {
   return getScoreFromFen(variant, fen, playerIndex);
 }
