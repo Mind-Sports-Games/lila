@@ -1,0 +1,20 @@
+@import '../../analyse/css/score';
+
+$puzzle-score-variants: ('threeCheck');
+
+@each $variant in $puzzle-score-variants {
+  .puzzle.variant-#{$variant} {
+    grid-template-rows: $pocket-height-mobile auto;
+    grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'session' 'side';
+
+    @include breakpoint($mq-col2) {
+      grid-template-rows: $pocket-height fit-content(0);
+      grid-template-areas: 'board   gauge pocket-top' 'board   gauge tools' 'session .     controls' 'side    side  side';
+    }
+
+    @include breakpoint($mq-col3) {
+      grid-template-rows: $pocket-height fit-content(0);
+      grid-template-areas: 'side    . board   gauge pocket-top' 'side    . board   gauge tools' 'side    . session .     controls' 'side    . .       .     .';
+    }
+  }
+}

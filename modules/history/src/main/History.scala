@@ -66,6 +66,7 @@ case class History(
     correspondence: RatingsMap,
     puzzle_standard: RatingsMap,
     puzzle_kingOfTheHill: RatingsMap,
+    puzzle_threeCheck: RatingsMap,
     puzzle_atomic: RatingsMap,
     puzzle_horde: RatingsMap,
     puzzle_racingKings: RatingsMap,
@@ -134,6 +135,7 @@ case class History(
       case "yonkoma12x12"           => yonkoma12x12
       case "puzzle_standard"        => puzzle_standard
       case "puzzle_kingOfTheHill"   => puzzle_kingOfTheHill
+      case "puzzle_threeCheck"      => puzzle_threeCheck
       case "puzzle_atomic"          => puzzle_atomic
       case "puzzle_horde"           => puzzle_horde
       case "puzzle_racingKings"     => puzzle_racingKings
@@ -228,6 +230,7 @@ object History {
             correspondence = ratingsMap("correspondence"),
             puzzle_standard = ratingsMap("puzzle_standard"),
             puzzle_kingOfTheHill = ratingsMap("puzzle_kingOfTheHill"),
+            puzzle_threeCheck = ratingsMap("puzzle_threeCheck"),
             puzzle_atomic = ratingsMap("puzzle_atomic"),
             puzzle_horde = ratingsMap("puzzle_horde"),
             puzzle_racingKings = ratingsMap("puzzle_racingKings"),

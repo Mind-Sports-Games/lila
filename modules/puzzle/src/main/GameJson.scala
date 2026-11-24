@@ -97,7 +97,8 @@ final private class GameJson(
     "lib"              -> game.variant.gameLogic.id,
     "boardSize"        -> boardSize(game.variant),
     "clientEval"       -> lila.game.BrowserEngine.has(game.variant),
-    "hasAnalysisBoard" -> game.variant.hasAnalysisBoard
+    "hasAnalysisBoard" -> game.variant.hasAnalysisBoard,
+    "hasGameScore"     -> game.variant.hasGameScore
   )
 
   def boardSize(variant: Variant) = variant match {

@@ -70,6 +70,7 @@ case class Perfs(
     correspondence: Perf,
     puzzle_standard: Perf,
     puzzle_kingOfTheHill: Perf,
+    puzzle_threeCheck: Perf,
     puzzle_atomic: Perf,
     puzzle_horde: Perf,
     puzzle_racingKings: Perf,
@@ -142,6 +143,7 @@ case class Perfs(
       "correspondence"         -> correspondence,
       "puzzle_standard"        -> puzzle_standard,
       "puzzle_kingOfTheHill"   -> puzzle_kingOfTheHill,
+      "puzzle_threeCheck"      -> puzzle_threeCheck,
       "puzzle_atomic"          -> puzzle_atomic,
       "puzzle_horde"           -> puzzle_horde,
       "puzzle_racingKings"     -> puzzle_racingKings,
@@ -271,6 +273,7 @@ case class Perfs(
     "correspondence"         -> correspondence,
     "puzzle_standard"        -> puzzle_standard,
     "puzzle_kingOfTheHill"   -> puzzle_kingOfTheHill,
+    "puzzle_threeCheck"      -> puzzle_threeCheck,
     "puzzle_atomic"          -> puzzle_atomic,
     "puzzle_horde"           -> puzzle_horde,
     "puzzle_racingKings"     -> puzzle_racingKings,
@@ -399,6 +402,7 @@ case object Perfs {
       p,
       p,
       p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -417,6 +421,7 @@ case object Perfs {
       correspondence = managed,
       puzzle_standard = managedPuzzle,
       puzzle_kingOfTheHill = managedPuzzle,
+      puzzle_threeCheck = managedPuzzle,
       puzzle_atomic = managedPuzzle,
       puzzle_horde = managedPuzzle,
       puzzle_racingKings = managedPuzzle,
@@ -489,6 +494,8 @@ case object Perfs {
         Some(PerfLens(_.puzzle_standard, (p, v) => p.copy(puzzle_standard = v)))
       case Variant.Chess(strategygames.chess.variant.KingOfTheHill) =>
         Some(PerfLens(_.puzzle_kingOfTheHill, (p, v) => p.copy(puzzle_kingOfTheHill = v)))
+      case Variant.Chess(strategygames.chess.variant.ThreeCheck) =>
+        Some(PerfLens(_.puzzle_threeCheck, (p, v) => p.copy(puzzle_threeCheck = v)))
       case Variant.Chess(strategygames.chess.variant.Atomic) =>
         Some(PerfLens(_.puzzle_atomic, (p, v) => p.copy(puzzle_atomic = v)))
       case Variant.Chess(strategygames.chess.variant.Horde) =>
@@ -578,6 +585,7 @@ case object Perfs {
         correspondence = perf("correspondence"),
         puzzle_standard = perf("puzzle_standard"),
         puzzle_kingOfTheHill = perf("puzzle_kingOfTheHill"),
+        puzzle_threeCheck = perf("puzzle_threeCheck"),
         puzzle_atomic = perf("puzzle_atomic"),
         puzzle_horde = perf("puzzle_horde"),
         puzzle_racingKings = perf("puzzle_racingKings"),
@@ -653,6 +661,7 @@ case object Perfs {
         "correspondence"         -> notNew(o.correspondence),
         "puzzle_standard"        -> notNew(o.puzzle_standard),
         "puzzle_kingOfTheHill"   -> notNew(o.puzzle_kingOfTheHill),
+        "puzzle_threeCheck"      -> notNew(o.puzzle_threeCheck),
         "puzzle_atomic"          -> notNew(o.puzzle_atomic),
         "puzzle_horde"           -> notNew(o.puzzle_horde),
         "puzzle_racingKings"     -> notNew(o.puzzle_racingKings),

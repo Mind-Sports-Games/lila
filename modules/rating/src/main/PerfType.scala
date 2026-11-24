@@ -34,6 +34,15 @@ object PuzzlePerf {
         title = "King of the Hill tactics trainer",
         iconChar = Variant.orDefault(GameLogic.Chess(), "kingOfTheHill").perfIcon
       )
+  case object ThreeCheckPuzzle
+      extends PuzzlePerf(
+        GameFamily.Chess(),
+        1000015,
+        key = "puzzle_threeCheck",
+        name = "Three-check Training",
+        title = "Three-check tactics trainer",
+        iconChar = Variant.orDefault(GameLogic.Chess(), "threeCheck").perfIcon
+      )
   case object AtomicPuzzle
       extends PuzzlePerf(
         GameFamily.Chess(),
@@ -125,6 +134,7 @@ object PerfType {
     List(
       new PerfType(Right(PuzzlePerf.ChessPuzzle)),
       new PerfType(Right(PuzzlePerf.KingOfTheHillPuzzle)),
+      new PerfType(Right(PuzzlePerf.ThreeCheckPuzzle)),
       new PerfType(Right(PuzzlePerf.AtomicPuzzle)),
       new PerfType(Right(PuzzlePerf.HordePuzzle)),
       new PerfType(Right(PuzzlePerf.RacingKingsPuzzle)),

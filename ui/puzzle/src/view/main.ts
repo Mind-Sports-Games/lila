@@ -10,6 +10,7 @@ import { h, VNode } from 'snabbdom';
 import { onInsert, bind, bindMobileMousedown } from '../util';
 import { render as treeView } from './tree';
 import { view as cevalView } from 'ceval';
+import renderScore from './score';
 
 function renderAnalyse(ctrl: Controller): VNode {
   return h('div.puzzle__moves.areplay', [treeView(ctrl)]);
@@ -82,7 +83,7 @@ export default function (ctrl: Controller): VNode {
     cevalShown = showCeval;
   }
   return h(
-    `main.puzzle.puzzle-${ctrl.getData().replay ? 'replay' : 'play'}${ctrl.streak ? '.puzzle--streak' : ''}`,
+    `main.puzzle.puzzle-${ctrl.getData().replay ? 'replay' : 'play'}${ctrl.streak ? '.puzzle--streak' : ''}.variant-${ctrl.vm.variant.key}`,
     {
       class: { 'gauge-on': gaugeOn },
       hook: {
@@ -125,6 +126,7 @@ export default function (ctrl: Controller): VNode {
         [chessground(ctrl), ctrl.promotion.view()],
       ),
       cevalView.renderGauge(ctrl),
+      ...renderScore(ctrl),
       h('div.puzzle__tools', [
         // we need the wrapping div here
         // so the siblings are only updated when ceval is added

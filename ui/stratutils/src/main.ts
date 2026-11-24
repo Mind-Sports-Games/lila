@@ -12,6 +12,7 @@ export * as backgammon from './backgammon';
 export * as entropy from './entropy';
 export * as fiveInARow from './fiveInARow';
 export * as yonkoma from './yonkoma';
+export * as score from './score';
 import {
   isFiveInARow,
   isOpeningAction as isFiveInARowOpeningAction,
