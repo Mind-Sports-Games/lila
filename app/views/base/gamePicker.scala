@@ -14,9 +14,6 @@ object gamePicker {
 
   case class Choice(key: String, name: String, icon: String, variant: Variant, href: String)
 
-  def variantChoice(variant: Variant, href: String)(implicit ctx: Context) =
-    Choice(variant.key, VariantKeys.variantName(variant), variant.perfIcon.toString, variant, href)
-
   def chips(choices: List[Choice], chosen: String)(implicit ctx: Context): Frag = {
     val favs   = favVariants
     val groups = displayedGameGroups.flatMap { g =>

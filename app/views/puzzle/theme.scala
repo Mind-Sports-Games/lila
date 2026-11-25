@@ -23,7 +23,9 @@ object theme {
         bits.pageMenu("themes", variant),
         div(cls := "page-menu__content box")(
           h1(trans.puzzle.puzzleThemes()),
-          bits.variantSelector(variant, v => routes.Puzzle.themes(v.key).url),
+          div(cls := "puzzle-themes__variant_select")(
+            bits.variantSelector(variant, v => routes.Puzzle.themes(v.key).url)
+          ),
           div(cls := "puzzle-themes")(
             themes map { case (cat, themes) =>
               themes.map(_.count).sum > 0 option {

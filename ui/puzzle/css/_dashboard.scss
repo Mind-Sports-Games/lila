@@ -1,8 +1,5 @@
 @import 'history';
-
-.box.puzzle-dashboard .box__top {
-  padding-bottom: calc(var(--box-padding) / 2);
-}
+@import 'variant';
 
 .puzzle-dashboard {
   .box__top {

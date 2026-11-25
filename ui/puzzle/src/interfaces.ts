@@ -4,7 +4,6 @@ import { CevalCtrl, NodeEvals } from 'ceval';
 import { Config as CgConfig } from 'chessground/config';
 import { Coords as CgCoords } from 'chessground/types';
 import { Deferred } from 'common/defer';
-import { GamePicker } from 'common/gamePicker';
 import { Outcome, Role, Move } from 'stratops/types';
 import { Prop } from 'common';
 import { StoredBooleanProp } from 'common/storage';
@@ -66,7 +65,6 @@ export interface Controller extends KeyboardController {
   autoNexting: () => boolean;
   session: PuzzleSession;
   allThemes?: AllThemes;
-  gamePicker?: GamePicker;
 
   streak?: PuzzleStreak;
   skip(): void;
@@ -122,7 +120,6 @@ export interface PuzzleOpts {
     dynamic: string;
     static: string;
   };
-  gamePicker?: GamePicker;
 }
 
 export interface PuzzlePrefs {
