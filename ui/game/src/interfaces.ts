@@ -130,7 +130,6 @@ export interface Player {
   blurs?: Blurs;
   hold?: Hold;
   ratingDiff?: number;
-  checks?: number;
   score?: number;
   rating?: number;
   provisional?: string;

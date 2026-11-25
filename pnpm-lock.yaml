@@ -16,7 +16,7 @@ importers:
         version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/57426cbbaf65e1826bc15bf567a7aa19d49c6b36
       stratops:
         specifier: github:Mind-Sports-Games/stratops#pla-1524-make-3check-5check-a-score-based-game
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5fcfdfa45c8b4ccc76d8b5199ee87e18bb5a0408
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f80240a5f2936ef7c65c7f69276064145e6e87bc
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -676,8 +676,8 @@ packages:
   '@types/node@20.19.43':
     resolution: {integrity: sha512-6oYBAi5ikg4Pl+kGsoYtawUMBT2zZMCvPNF7pVLnHZfd1zf38DRiWn/gT01RYCdUqkv7Fhr+C9ot4/tb+2sVvA==}
 
-  '@types/react@19.3.0':
-    resolution: {integrity: sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg==}
+  '@types/react@19.3.2':
+    resolution: {integrity: sha512-0QJbb58RxWJL3VAa5tvk7QhJamz0S+MpFL2xDuF/+THRR+kldyhPjRZ1iwvK45AEHZ1BVGS3otPsl7QlNVRizQ==}
 
   '@types/web@0.0.269':
     resolution: {integrity: sha512-V0GRvvdAa79Wok8aRrlaSLcGxjixiQbcet3kq+5ixIq9L4jsG+QZd91HEYOXTMF+My745N/KtsM9eyPY1iVINg==}
@@ -1426,8 +1426,8 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5fcfdfa45c8b4ccc76d8b5199ee87e18bb5a0408:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5fcfdfa45c8b4ccc76d8b5199ee87e18bb5a0408}
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f80240a5f2936ef7c65c7f69276064145e6e87bc:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f80240a5f2936ef7c65c7f69276064145e6e87bc}
     version: 0.8.1-pstrat5.36
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1620,7 +1620,7 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
-  '@types/react@19.3.0':
+  '@types/react@19.3.2':
     dependencies:
       csstype: 3.2.4
 
@@ -1630,7 +1630,7 @@ snapshots:
 
   '@types/yaireo__tagify@4.27.0':
     dependencies:
-      '@types/react': 19.3.0
+      '@types/react': 19.3.2
 
   '@types/zxcvbn@4.4.5': {}
 
@@ -2353,7 +2353,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5fcfdfa45c8b4ccc76d8b5199ee87e18bb5a0408:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f80240a5f2936ef7c65c7f69276064145e6e87bc:
     dependencies:
       '@badrap/result': 0.2.13
 

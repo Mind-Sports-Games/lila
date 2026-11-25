@@ -12,8 +12,8 @@ export default function renderScore(ctrl: Controller): (VNode | undefined)[] {
     capturesTitle = ctrl.trans.noarg('captures');
   const scoreOf = (playerIndex: PlayerIndex): number => getScore(variantKey, fen, playerIndex) ?? 0;
   const scorePlayer = (playerIndex: PlayerIndex): score.ScorePlayer => {
-    const player = game.players.find(p => p.playerIndex === playerIndex)!;
-    return { name: player.name, userId: player.userId !== 'anon' ? player.userId : undefined };
+    const playerColor = ctrl.vm.playerColors[playerIndex === 'p1' ? 0 : 1];
+    return { name: playerColor.charAt(0).toUpperCase() + playerColor.slice(1) };
   };
   return [
     score.renderPlayerScore(scoreOf(top), 'top', top, variantKey, fen, capturesTitle),

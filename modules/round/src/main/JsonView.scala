@@ -29,13 +29,6 @@ final class JsonView(
 
   import JsonView.*
 
-  private def checkCount(game: Game, playerIndex: PlayerIndex) =
-    (game.variant == strategygames.chess.variant.ThreeCheck || game.variant == strategygames.chess.variant.FiveCheck)
-      .option(
-        game.history
-          .checkCount(playerIndex)
-      )
-
   private def score(game: Game, playerIndex: PlayerIndex) =
     game.displayScore.map(_.apply(playerIndex))
 
@@ -77,7 +70,6 @@ final class JsonView(
       .add("offeringDraw" -> p.isOfferingDraw)
       .add("offeringSelectSquares" -> p.isOfferingSelectSquares)
       .add("proposingTakeback" -> p.isProposingTakeback)
-      .add("checks" -> checkCount(g, p.playerIndex))
       .add("score" -> score(g, p.playerIndex))
       .add("kingMoves" -> kingMoves(g, p.playerIndex))
       .add("berserk" -> p.berserk)
@@ -221,7 +213,6 @@ final class JsonView(
       .add("ratingDiff" -> p.ratingDiff)
       .add("provisional" -> p.provisional)
       .add("isInputRating" -> p.isInputRating)
-      .add("checks" -> checkCount(g, p.playerIndex))
       .add("score" -> score(g, p.playerIndex))
       .add("kingMoves" -> kingMoves(g, p.playerIndex))
       .add("berserk" -> p.berserk)
