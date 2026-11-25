@@ -159,6 +159,7 @@
   <string name="variant">變體</string>
   <string name="variants">變體</string>
   <string name="timeControl">時間限制</string>
+  <string name="realTime">實時棋局</string>
   <string name="correspondence">通信棋局</string>
   <string name="daysPerTurn">每步允許天數</string>
   <string name="oneDay">一天</string>

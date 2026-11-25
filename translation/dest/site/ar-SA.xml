@@ -180,6 +180,7 @@
   <string name="variant">النوع</string>
   <string name="variants">الأنواع</string>
   <string name="timeControl">التوقيت</string>
+  <string name="realTime">سريع</string>
   <string name="correspondence">مراسلة</string>
   <string name="daysPerTurn">يوم لكل نقلة</string>
   <string name="oneDay">يوم واحد</string>

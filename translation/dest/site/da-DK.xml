@@ -173,6 +173,7 @@
   <string name="variant">Variant</string>
   <string name="variants">Varianter</string>
   <string name="timeControl">Tidskontrol</string>
+  <string name="realTime">Realtid</string>
   <string name="correspondence">Korrespondance</string>
   <string name="daysPerTurn">Dage per træk</string>
   <string name="oneDay">En dag</string>

@@ -76,6 +76,7 @@
   <string name="variant">Caochladh</string>
   <string name="variants">Seòrsachan</string>
   <string name="timeControl">Smachd air an ùine</string>
+  <string name="realTime">Fìor-ùine</string>
   <string name="correspondence">Co-sgrìobhadh</string>
   <string name="daysPerTurn">Làithean gach cuairt</string>
   <string name="oneDay">Aon latha</string>

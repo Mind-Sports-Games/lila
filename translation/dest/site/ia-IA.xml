@@ -160,6 +160,7 @@
   <string name="variant">Variante</string>
   <string name="variants">Variantes</string>
   <string name="timeControl">Controlo de tempore</string>
+  <string name="realTime">Tempore real</string>
   <string name="correspondence">Correspondentia</string>
   <string name="daysPerTurn">Dies per torno</string>
   <string name="oneDay">Un die</string>

@@ -159,6 +159,7 @@
   <string name="variant">نوع</string>
   <string name="variants">انواع</string>
   <string name="timeControl">دورانیہ</string>
+  <string name="realTime">کم مدتی</string>
   <string name="correspondence">طویل مدتی</string>
   <string name="daysPerTurn">چال کیلیے دن</string>
   <string name="oneDay">ایک دن</string>

@@ -171,6 +171,7 @@
   <string name="variant">Варіант</string>
   <string name="variants">Варіанти</string>
   <string name="timeControl">Контроль часу</string>
+  <string name="realTime">Наживо</string>
   <string name="correspondence">За листуванням</string>
   <string name="daysPerTurn">Днів на хід</string>
   <string name="oneDay">Один день</string>

@@ -169,6 +169,7 @@
   <string name="variant">Вариант</string>
   <string name="variants">Варианти</string>
   <string name="timeControl">Времева контрола</string>
+  <string name="realTime">Определено време</string>
   <string name="correspondence">Кореспондентски</string>
   <string name="daysPerTurn">Дни за ход</string>
   <string name="oneDay">Един ден</string>

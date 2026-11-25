@@ -157,6 +157,7 @@
   <string name="variant">واریانت</string>
   <string name="variants">واریانت ها</string>
   <string name="timeControl">زمان</string>
+  <string name="realTime">زمان محدود</string>
   <string name="correspondence">مکاتبه ای</string>
   <string name="daysPerTurn">روز برای هر حرکت</string>
   <string name="oneDay">یک روز</string>

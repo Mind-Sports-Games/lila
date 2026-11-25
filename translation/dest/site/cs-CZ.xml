@@ -191,6 +191,7 @@
   <string name="variant">Varianta</string>
   <string name="variants">Varianty</string>
   <string name="timeControl">Tempo hry</string>
+  <string name="realTime">Skutečný čas</string>
   <string name="correspondence">Korespondenčně</string>
   <string name="daysPerTurn">Dnů na tah</string>
   <string name="oneDay">Jeden den</string>

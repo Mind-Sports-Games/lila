@@ -160,6 +160,7 @@
   <string name="variant">বিকল্প</string>
   <string name="variants">বিভিন্ন</string>
   <string name="timeControl">সময় নিয়ন্ত্রণ</string>
+  <string name="realTime">সঠিক সময়</string>
   <string name="correspondence">দীর্ঘ খেলা</string>
   <string name="daysPerTurn">প্রতিটি চালের জন্য বরাদ্দ দিন</string>
   <string name="oneDay">একদিন</string>

@@ -162,6 +162,7 @@
   <string name="variant">Вариант</string>
   <string name="variants">Вариантлар</string>
   <string name="timeControl">Вакыт контроле</string>
+  <string name="realTime">Хәзерге вакытта</string>
   <string name="correspondence">Хат алмашып уйнау</string>
   <string name="daysPerTurn">Бер йөреш вакыты</string>
   <string name="oneDay">Бер көн</string>

@@ -177,6 +177,7 @@
   <string name="variant">Variantă</string>
   <string name="variants">Variante</string>
   <string name="timeControl">Controlul de timp</string>
+  <string name="realTime">În timp real</string>
   <string name="correspondence">Corespondență</string>
   <string name="daysPerTurn">Zile pentru o mutare</string>
   <string name="oneDay">O zi</string>

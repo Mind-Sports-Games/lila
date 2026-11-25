@@ -190,6 +190,7 @@
   <string name="variant">Variantas</string>
   <string name="variants">Variantai</string>
   <string name="timeControl">Laiko kontrolė</string>
+  <string name="realTime">Realiu laiku</string>
   <string name="correspondence">Korespondencija</string>
   <string name="daysPerTurn">Dienų ėjimui</string>
   <string name="oneDay">Viena diena</string>

@@ -155,6 +155,7 @@
   <string name="variant">Afbrigði</string>
   <string name="variants">Taflafbrigði</string>
   <string name="timeControl">Tímaskorður</string>
+  <string name="realTime">Rauntími</string>
   <string name="correspondence">Bréfskák</string>
   <string name="daysPerTurn">Dagar á leik</string>
   <string name="oneDay">Einn dagur</string>

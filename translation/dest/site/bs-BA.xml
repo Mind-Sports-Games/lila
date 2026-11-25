@@ -182,6 +182,7 @@
   <string name="variant">Varijanta</string>
   <string name="variants">Varijante</string>
   <string name="timeControl">Vremenska kontrola</string>
+  <string name="realTime">Stvarno vrijeme</string>
   <string name="correspondence">Dopisni šah</string>
   <string name="daysPerTurn">Dana po potezu</string>
   <string name="oneDay">Jedan dan</string>

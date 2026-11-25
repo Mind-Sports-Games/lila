@@ -173,6 +173,7 @@
   <string name="variant">Variant</string>
   <string name="variants">Variants</string>
   <string name="timeControl">Control de temps</string>
+  <string name="realTime">Temps real</string>
   <string name="correspondence">Correspondència</string>
   <string name="daysPerTurn">Dies per torn</string>
   <string name="oneDay">Un dia</string>

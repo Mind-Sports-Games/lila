@@ -161,6 +161,7 @@
   <string name="variant">Variant</string>
   <string name="variants">Variante</string>
   <string name="timeControl">Tydkontrole</string>
+  <string name="realTime">Intyds</string>
   <string name="correspondence">Korrespondensie</string>
   <string name="daysPerTurn">Dae per beurt</string>
   <string name="oneDay">Een dag</string>

@@ -161,6 +161,7 @@
   <string name="variant">प्रकार</string>
   <string name="variants">प्रकार</string>
   <string name="timeControl">समय नियंत्रण</string>
+  <string name="realTime">वास्तविक खेल</string>
   <string name="correspondence">काफी लम्बे वक़्त का खेल</string>
   <string name="daysPerTurn">दिन प्रति चाल</string>
   <string name="oneDay">एक दिन</string>

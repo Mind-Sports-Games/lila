@@ -173,6 +173,7 @@
   <string name="variant">Variáns</string>
   <string name="variants">Variánsok</string>
   <string name="timeControl">Játékidő</string>
+  <string name="realTime">Valós idő</string>
   <string name="correspondence">Levelezés</string>
   <string name="daysPerTurn">Nap lépésenként</string>
   <string name="oneDay">Egy nap</string>

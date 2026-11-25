@@ -85,7 +85,7 @@ trait SetupHelper { self: I18nHelper =>
 
   def translatedTimeModeChoices(implicit lang: Lang) =
     List(
-      (TimeMode.FischerClock.id.toString, trans.realTime.txt(), none),
+      (TimeMode.FischerClock.id.toString, trans.fischer.txt(), none),
       (TimeMode.ByoyomiClock.id.toString, trans.byoyomiTime.txt(), none),
       (TimeMode.BronsteinDelayClock.id.toString, trans.bronsteinDelay.txt(), none),
       (TimeMode.SimpleDelayClock.id.toString, trans.simpleDelay.txt(), none),
@@ -98,12 +98,12 @@ trait SetupHelper { self: I18nHelper =>
       case _: ByoyomiClock.Config     => trans.byoyomiTime.txt()
       case _: Clock.BronsteinConfig   => trans.bronsteinDelay.txt()
       case _: Clock.SimpleDelayConfig => trans.simpleDelay.txt()
-      case _                          => trans.realTime.txt()
+      case _                          => trans.fischer.txt()
     }
 
   def translatedTimeModeChoicesLive(implicit lang: Lang) =
     List(
-      (TimeMode.FischerClock.id.toString, trans.realTime.txt(), none),
+      (TimeMode.FischerClock.id.toString, trans.fischer.txt(), none),
       (TimeMode.ByoyomiClock.id.toString, trans.byoyomiTime.txt(), none),
       (TimeMode.BronsteinDelayClock.id.toString, trans.bronsteinDelay.txt(), none),
       (TimeMode.SimpleDelayClock.id.toString, trans.simpleDelay.txt(), none)

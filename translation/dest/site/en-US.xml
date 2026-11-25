@@ -245,7 +245,7 @@
   <string name="medleyIntervalOptionDefn">Duration approx. (Interval Time * Intervals)</string>
   <string name="medleyBalanceIntervalDefn">Quicker/slower variants have shorter/longer interval times. Duration is still approx. (Interval Time * Intervals)</string>
   <string name="timeControl">Time control</string>
-  <string name="realTime">Fischer</string>
+  <string name="realTime">Real time</string>
   <string name="correspondence">Correspondence</string>
   <string name="daysPerTurn">Days per turn</string>
   <string name="oneDay">One day</string>
