@@ -42,7 +42,9 @@ object show {
               }
             ).add(
               "gamePicker" -> (sim.isCreated && sim.variants.sizeIs > 1)
-                .option(views.html.base.gamePicker.json(sim.variants, everySlot = true))
+                .option(
+                  views.html.base.gamePicker.json(sim.variants, everySlot = true, offUnsupported = false)
+                )
             )
           )})""")
       )

@@ -1208,4 +1208,5 @@ computer analysis, game chat and shareable URL.</string>
     <item quantity="other">all %s games</item>
   </plurals>
   <string name="oneGame">1 game</string>
+  <string name="notSupportedYet">Not supported yet</string>
 </resources>

@@ -1038,6 +1038,7 @@
     <item quantity="other">les %s jeux</item>
   </plurals>
   <string name="oneGame">1 jeu</string>
+  <string name="notSupportedYet">Pas encore supporté</string>
   <string name="variantBoardEditorTitle">Éditeur de plateau %s — composez une position</string>
   <string name="variantBoardEditorDescription">Éditeur de plateau %s en ligne et gratuit : composez une position à la main ou depuis un FEN, puis analysez-la ou partagez-la.</string>
   <string name="signInDescription">Connectez-vous à PlayStrategy pour jouer aux échecs, au go, au backgammon, à Othello et à plus de 40 autres jeux en ligne gratuitement, avec classements.</string>

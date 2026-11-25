@@ -72,7 +72,7 @@ function isChessRules(variantKey: VariantKey): boolean {
   return variantClassFromKey(variantKey).family == 'chess';
 }
 
-const pickerState: GridState = {};
+const pickerState: GridState = { groups: true, games: true };
 
 function picker(ctrl: EditorCtrl): VNode | null {
   const gamePicker = (ctrl.cfg as Editor.Config & { gamePicker?: GamePicker }).gamePicker;

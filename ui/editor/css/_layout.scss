@@ -36,13 +36,15 @@
   }
 
   &__picker {
+    @include game-grid-every-game;
+
     grid-row: span 1 / 1;
     grid-column: 1 / -1;
     margin-bottom: $block-gap;
   }
 
   @include breakpoint($mq-col3-uniboard) {
-    grid-template-columns: $col3-uniboard-side 2vmin minmax(30vmin, $board-width) 2vmin minmax(200px, 300px);
+    grid-template-columns: $col3-picker-side 2vmin minmax(30vmin, $board-width) 2vmin minmax(200px, 300px);
     grid-template-areas: 'picker . .            . tools' 'picker . spare-top    . tools' 'picker . board        . tools' 'picker . spare-bottom . tools' 'picker . .            . tools' '.      . copyables    . about';
 
     &__picker {

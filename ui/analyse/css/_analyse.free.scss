@@ -51,6 +51,8 @@
    above the explicit grid needs no template at all, so it works for every variant. The named side
    area is then simply left empty below 3-col. */
 div.analyse .analyse__side {
+  @include game-grid-every-game;
+
   grid-row: span 1 / 1;
   grid-column: 1 / -1;
   margin: 0 0 $block-gap 0;
@@ -60,6 +62,12 @@ div.analyse .analyse__side {
 
     grid-area: side;
     margin: 0;
+  }
+}
+
+div.analyse:has(> .analyse__side .game-grid) {
+  @include breakpoint($mq-col3) {
+    grid-template-columns: $col3-picker-side $block-gap $col3-uniboard-width var(--gauge-gap) $col3-uniboard-table;
   }
 }
 

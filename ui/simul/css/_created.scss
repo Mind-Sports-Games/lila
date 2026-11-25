@@ -46,6 +46,8 @@
 }
 
 .simul-join {
+  @include game-grid-every-game;
+
   width: 30em;
   text-align: left;
 

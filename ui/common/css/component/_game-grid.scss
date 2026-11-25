@@ -38,11 +38,23 @@
   }
 
   &__panel {
-    display: none;
-    padding: 0.5em 0;
+    display: grid;
+    grid-template-rows: 0fr;
+    padding: 0;
+    visibility: hidden;
+    transition:
+      grid-template-rows 150ms,
+      padding 150ms,
+      visibility 150ms;
 
     &.open {
-      display: block;
+      grid-template-rows: 1fr;
+      padding: 0.5em 0;
+      visibility: visible;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
     }
   }
 
@@ -150,7 +162,20 @@
 
   .game-grid__panel {
     display: block;
-    padding-top: 0;
+    padding: 0 0 0.5em;
     margin-bottom: 1em;
+    visibility: visible;
+  }
+}
+
+$game-grid-longest-word: 6.9; // Togyzqumalaq, in em
+
+@mixin game-grid-every-game {
+  .game-grid__tiles {
+    container-type: inline-size;
+  }
+
+  .game-grid__tile {
+    font-size: min(0.9em, calc((25cqi - 6px) / #{$game-grid-longest-word}));
   }
 }

@@ -17,7 +17,7 @@ export interface PickerGroup {
 }
 
 export interface GamePicker {
-  labels: { group: string; variant: string };
+  labels: { group: string; variant: string; off?: string };
   groups: PickerGroup[];
 }
 
@@ -42,22 +42,31 @@ export function grid(o: GridOpts): VNode {
     return h('div.game-grid.game-grid--off', [row(picker.labels.variant, { name: o.automatic, icon: '' }, false, {})]);
   const favs = favourites();
   const isDisabled = (v: PickerGame) => !!v.off || !!o.disabled?.(v.key);
+  const offTitle = (disabled: boolean): Attrs => (disabled && picker.labels.off ? { title: picker.labels.off } : {});
   const chosenGroup = picker.groups.find(g => g.games.some(v => v.key === o.chosen));
   const chosenGame = chosenGroup?.games.find(v => v.key === o.chosen);
   const toggle = (which: 'groups' | 'games') => bind('click', () => (state[which] = !state[which]), o.redraw);
   const pick = (key: string) =>
-    bind('click', e => (e.currentTarget as HTMLElement).classList.contains('disabled') || o.choose(key), o.redraw);
-  const pickGroup = (g: PickerGroup) =>
+    bind(
+      'click',
+      e => {
+        const tile = e.currentTarget as HTMLElement;
+        if (tile.classList.contains('disabled')) return;
+        state.groups = false;
+        if (tile.classList.contains('chosen')) state.games = false;
+        else o.choose(key);
+      },
+      o.redraw,
+    );
+  const pickGroup = () =>
     bind(
       'click',
       e => {
         const tile = e.currentTarget as HTMLElement;
         const first = tile.dataset.first;
         if (!first) return;
-        if (g.games.length > 1) {
-          state.games = true;
-          if (tile.classList.contains('open')) return;
-        }
+        state.games = true;
+        if (tile.classList.contains('open')) return;
         o.choose(first);
       },
       o.redraw,
@@ -73,14 +82,13 @@ export function grid(o: GridOpts): VNode {
     h('div.game-grid__panel', { class: { open: !!state.groups } }, [
       h(
         'div.game-grid__tiles',
-        picker.groups.map(g =>
-          tile(
-            g,
-            { open: g === chosenGroup, disabled: g.games.every(isDisabled), ...favMark(g.variantKeys, favs) },
-            pickGroup(g),
-            { 'data-first': g.games.find(v => !isDisabled(v))?.key || false },
-          ),
-        ),
+        picker.groups.map(g => {
+          const disabled = g.games.every(isDisabled);
+          return tile(g, { open: g === chosenGroup, disabled, ...favMark(g.variantKeys, favs) }, pickGroup(), {
+            'data-first': g.games.find(v => !isDisabled(v))?.key || false,
+            ...offTitle(disabled),
+          });
+        }),
       ),
     ]),
     row(
@@ -94,9 +102,15 @@ export function grid(o: GridOpts): VNode {
       chosenGroup
         ? h(
             'div.game-grid__tiles.game-grid__games.open',
-            chosenGroup.games.map(v =>
-              tile(v, { chosen: v.key === o.chosen, disabled: isDisabled(v), fav: favs.has(v.key) }, pick(v.key)),
-            ),
+            chosenGroup.games.map(v => {
+              const disabled = isDisabled(v);
+              return tile(
+                v,
+                { chosen: v.key === o.chosen, disabled, fav: favs.has(v.key) },
+                pick(v.key),
+                offTitle(disabled),
+              );
+            }),
           )
         : null,
     ]),
@@ -119,7 +133,7 @@ const tile = (item: PickerGame, classes: Record<string, boolean>, hook: Hooks, a
   h(
     'button.game-grid__tile',
     { key: item.key, attrs: { type: 'button', 'data-icon': item.icon, ...attrs }, class: classes, hook },
-    item.name,
+    item.name.replace(/\//g, '/\u200b'),
   );
 
 const bind = (eventName: string, f: (e: Event) => unknown, redraw?: () => void): Hooks => ({
@@ -137,6 +151,10 @@ export function bindStaticGrids(): void {
     if (!grid) return;
     const row = el.closest('.game-grid__row');
     if (row) return setOpen(row, !row.classList.contains('open'));
+    if (el.closest('a.game-grid__tile.chosen') && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      return grid.querySelectorAll('.game-grid__row').forEach(r => setOpen(r, false));
+    }
     const group = el.closest<HTMLElement>('button.game-grid__tile[data-group]');
     if (!group) return;
     grid.querySelectorAll('.game-grid__tile[data-group]').forEach(t => t.classList.toggle('open', t === group));

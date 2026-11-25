@@ -65,9 +65,13 @@ object gamePicker {
       g -> variantsInSetupOrder.filter(v => inGroup(v) && !v.fromPositionVariant)
     }
 
-  def json(variants: List[Variant], everySlot: Boolean)(implicit ctx: Context): JsObject =
+  def json(variants: List[Variant], everySlot: Boolean, offUnsupported: Boolean = true)(implicit
+      ctx: Context
+  ): JsObject =
     Json.obj(
-      "labels" -> Json.obj("group" -> trans.gameGroup.txt(), "variant" -> trans.variant.txt()),
+      "labels" -> Json
+        .obj("group" -> trans.gameGroup.txt(), "variant" -> trans.variant.txt())
+        .add("off" -> offUnsupported.option(trans.notSupportedYet.txt())),
       "groups" -> slots(variants, everySlot).map { case (g, games) =>
         Json.obj(
           "key"         -> g.key,
@@ -83,21 +87,28 @@ object gamePicker {
       }
     )
 
-  def grid(variants: List[Variant], chosen: Variant, link: Variant => String, everySlot: Boolean)(implicit
-      ctx: Context
-  ): Frag = {
+  def grid(
+      variants: List[Variant],
+      chosen: Variant,
+      link: Variant => String,
+      everySlot: Boolean,
+      groupsOpen: Boolean
+  )(implicit ctx: Context): Frag = {
     val favs        = favVariants
     val groups      = slots(variants, everySlot)
     val chosenGroup = groups.collectFirst { case (g, games) if games.contains(chosen -> true) => g }
-    def row(kind: String, label: Frag, value: Option[Frag]) =
-      button(tpe := "button", cls := s"game-grid__row game-grid__row--$kind")(
+    def row(kind: String, open: Boolean, label: Frag, value: Option[Frag]) =
+      button(tpe := "button", cls := List(s"game-grid__row game-grid__row--$kind" -> true, "open" -> open))(
         span(cls := "game-grid__label")(label),
         value
       )
-    def off(icon: String, name: String) = span(cls := "game-grid__tile disabled", dataIcon := icon)(name)
+    def label(name: String)             = name.replace("/", "/\u200b")
+    def off(icon: String, name: String) =
+      span(cls := "game-grid__tile disabled", dataIcon := icon, title := trans.notSupportedYet.txt())(name)
     div(cls := "game-grid game-grid--static")(
       row(
         "group",
+        groupsOpen,
         trans.gameGroup(),
         chosenGroup.map { g =>
           span(cls := ("game-grid__value" -> true) :: favMark(g.variants, favs), dataIcon := gameGroupIcon(g))(
@@ -105,10 +116,10 @@ object gamePicker {
           )
         }
       ),
-      div(cls := "game-grid__panel")(
+      div(cls := List("game-grid__panel" -> true, "open" -> groupsOpen))(
         div(cls := "game-grid__tiles")(
           groups.map { case (g, games) =>
-            val name = VariantKeys.gameGroupName(g)
+            val name = label(VariantKeys.gameGroupName(g))
             val mods: Seq[Modifier] = Seq(
               cls := List("game-grid__tile" -> true, "open" -> chosenGroup.contains(g)) ::: favMark(g.variants, favs),
               dataIcon := gameGroupIcon(g)
@@ -123,6 +134,7 @@ object gamePicker {
       ),
       row(
         "game",
+        true,
         trans.variant(),
         chosenGroup.map { _ =>
           span(cls := List("game-grid__value" -> true, "fav" -> favs(chosen.key)), dataIcon := chosen.perfIcon.toString)(
@@ -130,7 +142,7 @@ object gamePicker {
           )
         }
       ),
-      div(cls := "game-grid__panel")(
+      div(cls := "game-grid__panel open")(
         groups.map { case (g, games) =>
           div(
             cls                := List("game-grid__tiles game-grid__games" -> true, "open" -> chosenGroup.contains(g)),
@@ -142,8 +154,8 @@ object gamePicker {
                   cls      := List("game-grid__tile" -> true, "chosen" -> (v == chosen), "fav" -> favs(v.key)),
                   dataIcon := v.perfIcon.toString,
                   href     := link(v)
-                )(VariantKeys.variantName(v))
-              case (v, false) => off(v.perfIcon.toString, VariantKeys.variantName(v))
+                )(label(VariantKeys.variantName(v)))
+              case (v, false) => off(v.perfIcon.toString, label(VariantKeys.variantName(v)))
             }
           )
         }
