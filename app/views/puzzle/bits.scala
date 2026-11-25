@@ -91,6 +91,8 @@ object bits {
       trans.yourTurn,
       trans.variant,
       trans.puzzle.findTheBestMoveForPlayerIndex,
+      trans.white,
+      trans.black,
       trans.viewTheSolution,
       trans.puzzle.puzzleSuccess,
       trans.puzzle.puzzleComplete,

@@ -467,41 +467,16 @@ export default function (ctrl: AnalyseCtrl): VNode {
       case 'flipello':
       case 'flipello10':
       case 'antiflipello':
-      case 'octagonflipello': {
-        const p1Score = getScoreFromFen(variantKey, fen, 'p1');
-        const p2Score = getScoreFromFen(variantKey, fen, 'p2');
-        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
-        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
-        break;
-      }
+      case 'octagonflipello':
       case 'oware':
       case 'togyzkumalak':
-      case 'bestemshe': {
-        const p1Score = getScoreFromFen(variantKey, fen, 'p1');
-        const p2Score = getScoreFromFen(variantKey, fen, 'p2');
-        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
-        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
-        break;
-      }
+      case 'bestemshe':
       case 'abalone':
-      case 'grandabalone': {
-        const fen = ctrl.node.fen;
-        const p1Score = getScoreFromFen(variantKey, fen, 'p1');
-        const p2Score = getScoreFromFen(variantKey, fen, 'p2');
-        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
-        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
-        break;
-      }
+      case 'grandabalone':
       case 'go9x9':
       case 'go13x13':
       case 'go19x19':
-      case 'pente': {
-        const p1Score = getScoreFromFen(variantKey, fen, 'p1');
-        const p2Score = getScoreFromFen(variantKey, fen, 'p2');
-        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
-        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
-        break;
-      }
+      case 'pente':
       case 'threeCheck':
       case 'fiveCheck':
       case 'backgammon':
