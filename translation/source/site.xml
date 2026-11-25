@@ -1199,4 +1199,13 @@ computer analysis, game chat and shareable URL.</string>
   <string name="removeFromFavourites">Remove from favourites</string>
   <string name="favourites">Favourites</string>
   <string name="highlightFavourites">Highlight your favourite games</string>
+  <plurals name="nbOfNbGames">
+    <item quantity="one">%1$s of %2$s game</item>
+    <item quantity="other">%1$s of %2$s games</item>
+  </plurals>
+  <plurals name="allNbGames">
+    <item quantity="one">the only game</item>
+    <item quantity="other">all %s games</item>
+  </plurals>
+  <string name="oneGame">1 game</string>
 </resources>

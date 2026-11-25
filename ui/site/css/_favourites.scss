@@ -25,7 +25,6 @@
 
     &::after {
       content: '›';
-      margin-left: auto;
       padding: 0 0.4em;
       color: $c-font-dim;
       font-size: 1.4em;
@@ -37,6 +36,13 @@
 
   details[open] > summary.favourites__head::after {
     transform: rotate(90deg);
+  }
+
+  &__count {
+    margin-left: auto;
+    color: $c-font-dim;
+    font-size: 0.75em;
+    white-space: nowrap;
   }
 
   &__star {

@@ -45,17 +45,25 @@ object favourites {
                   dataUrl := routes.Favourites.variant(v.key).url,
                   dataKey := v.key
                 ),
-                groupName(g)
+                groupName(g),
+                span(cls := "favourites__count")(trans.oneGame())
               )
             )
           case (g, variants) =>
-            val nb = variants.count(v => favs(v.key))
+            val nb    = variants.count(v => favs(v.key))
+            val total = variants.size
+            val all   = trans.allNbGames.pluralSameTxt(total)
             detailsTag(cls := "favourites__group", (nb > 0).option(attr("open").empty))(
               summaryTag(cls := "favourites__head")(
-                starButton(nb == variants.size, some = nb > 0 && nb < variants.size, group = true)(
+                starButton(nb == total, some = nb > 0 && nb < total, group = true)(
                   dataUrl := routes.Favourites.group(g.key).url
                 ),
-                groupName(g)
+                groupName(g),
+                span(
+                  cls              := "favourites__count",
+                  attr("data-of")  := trans.nbOfNbGames.pluralTxt(total, "%s", total),
+                  attr("data-all") := all
+                )(if (nb == total) all else trans.nbOfNbGames.pluralTxt(total, nb, total))
               ),
               div(cls := "series-links")(variants.map { v =>
                 val on = favs(v.key)

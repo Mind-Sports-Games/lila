@@ -34,6 +34,8 @@ playstrategy.load.then(() => {
       const keys = groupKeys(star);
       const nb = keys.filter(k => set.has(k)).length;
       setStar(star, nb === keys.length, nb > 0 && nb < keys.length);
+      const count = star.parentElement?.querySelector<HTMLElement>('.favourites__count');
+      if (count) count.textContent = nb === keys.length ? count.dataset.all! : count.dataset.of!.replace('%s', `${nb}`);
     });
     setFavourites(set);
   };

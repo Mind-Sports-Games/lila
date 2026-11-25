@@ -1029,6 +1029,15 @@
   <string name="removeFromFavourites">Retirer des favoris</string>
   <string name="favourites">Favoris</string>
   <string name="highlightFavourites">Mettre en avant vos jeux favoris</string>
+  <plurals name="nbOfNbGames">
+    <item quantity="one">%1$s sur %2$s jeu</item>
+    <item quantity="other">%1$s sur %2$s jeux</item>
+  </plurals>
+  <plurals name="allNbGames">
+    <item quantity="one">le seul jeu</item>
+    <item quantity="other">les %s jeux</item>
+  </plurals>
+  <string name="oneGame">1 jeu</string>
   <string name="variantBoardEditorTitle">Éditeur de plateau %s — composez une position</string>
   <string name="variantBoardEditorDescription">Éditeur de plateau %s en ligne et gratuit : composez une position à la main ou depuis un FEN, puis analysez-la ou partagez-la.</string>
   <string name="signInDescription">Connectez-vous à PlayStrategy pour jouer aux échecs, au go, au backgammon, à Othello et à plus de 40 autres jeux en ligne gratuitement, avec classements.</string>
