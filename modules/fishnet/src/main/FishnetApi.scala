@@ -68,6 +68,7 @@ final class FishnetApi(
         s"allowedLogics=${allowedLogicIds.toList.sorted.mkString(",")} slow=$slow"
     )
     workQueue {
+      val startedAt = System.nanoTime()
       analysisColl
         .find(
           $doc("acquired".$exists(false)) ++ {
@@ -83,13 +84,22 @@ final class FishnetApi(
           )
         )
         .one[Work.Analysis]
-        .flatMap {
-          _ so { work =>
+        .flatMap { found =>
+          val foundAt = System.nanoTime()
+          val assigned = found so { work =>
             logger.info(
               s"assign ${work.id} variant=${work.game.variant.key}(gl=${work.game.variant.gameLogic.id}) " +
                 s"to ${client.fullId}"
             )
             repo.updateAnalysis(work.assignTo(client)) inject work.some
+          }
+          assigned.addEffectAnyway {
+            val doneAt   = System.nanoTime()
+            val findMs   = (foundAt - startedAt) / 1000000
+            val updateMs = (doneAt - foundAt) / 1000000
+            val totalMs  = (doneAt - startedAt) / 1000000
+            if (totalMs > 1000)
+              logger.info(s"acquire slow find=${findMs}ms update=${updateMs}ms")
           }
         }
     }.map { _ map JsonApi.analysisFromWork(config.analysisNodes) }
