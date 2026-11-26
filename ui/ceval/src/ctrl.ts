@@ -5,7 +5,7 @@ import { prop } from 'common';
 import { storedProp } from 'common/storage';
 import throttle from 'common/throttle';
 import { povChances } from './winningChances';
-import { allowedForVariant, sanIrreversible } from './util';
+import { allowedForVariant, engineFen, sanIrreversible } from './util';
 import { Cache } from './cache';
 import { variantClassFromKey } from 'stratops/variants/util';
 
@@ -227,6 +227,8 @@ export default function (opts: CevalOpts): CevalCtrl {
         } else work.moves.push(s.uci!);
       }
     }
+
+    work.initialFen = engineFen(opts.variant.key, work.initialFen);
 
     // Notify all other tabs to disable ceval.
     playstrategy.storage.fire('ceval.disable');
