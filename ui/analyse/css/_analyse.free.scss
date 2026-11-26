@@ -45,23 +45,34 @@
   }
 }
 
-/* Below 3-col, the side column would fall under the tools, so the game picker takes a full-width row
-   above the board instead. Restating every grid-template-areas here would lose to the per-variant
+/* Below 3-col, the side column would fall under the tools, so the game picker's one line, which opens
+   the grid in a modal, takes a full-width row above the board instead. Restating every grid-template-areas here would lose to the per-variant
    templates in _score.scss, which carry two classes; placing the picker itself in an implicit row
    above the explicit grid needs no template at all, so it works for every variant. The named side
    area is then simply left empty below 3-col. */
 div.analyse .analyse__side {
-  @include game-grid-every-game;
-
   grid-row: span 1 / 1;
   grid-column: 1 / -1;
   margin: 0 0 $block-gap 0;
 
+  > .game-grid {
+    display: none;
+  }
+
   @include breakpoint($mq-col3) {
+    @include game-grid-every-game;
     @include game-grid-wide;
 
     grid-area: side;
     margin: 0;
+
+    > .game-grid {
+      display: block;
+    }
+
+    > .game-grid-summary {
+      display: none;
+    }
   }
 }
 

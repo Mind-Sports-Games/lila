@@ -1,5 +1,6 @@
 import { Attrs, h, Hooks, VNode } from 'snabbdom';
 import { favMark, favourites } from './favourites';
+import modal from './modal';
 
 export interface PickerGame {
   key: string;
@@ -34,6 +35,8 @@ export interface GridOpts {
   redraw: () => void;
   disabled?: (key: string) => boolean;
   automatic?: string;
+  // the grid sits in a modal, which a game pick closes
+  close?: () => void;
 }
 
 export function grid(o: GridOpts): VNode {
@@ -52,9 +55,9 @@ export function grid(o: GridOpts): VNode {
       e => {
         const tile = e.currentTarget as HTMLElement;
         if (tile.classList.contains('disabled')) return;
-        state.groups = false;
-        if (tile.classList.contains('chosen')) state.games = false;
-        else o.choose(key);
+        state.groups = state.games = false;
+        if (!tile.classList.contains('chosen')) o.choose(key);
+        o.close?.();
       },
       o.redraw,
     );
@@ -117,6 +120,25 @@ export function grid(o: GridOpts): VNode {
   ]);
 }
 
+// one line naming the chosen game, which opens the grid in a modal
+export function summary(picker: GamePicker, chosen: string, open: () => void): VNode | null {
+  const group = picker.groups.find(g => g.games.some(v => v.key === chosen));
+  const game = group?.games.find(v => v.key === chosen);
+  if (!group || !game) return null;
+  return h(
+    'button.game-grid__row.game-grid-summary',
+    { attrs: { type: 'button', 'aria-haspopup': 'dialog' }, hook: bind('click', open) },
+    [
+      h('span.game-grid__label', picker.labels.variant),
+      h('span.game-grid__value', { attrs: { 'data-icon': game.icon } }, summaryName(group.name, game.name)),
+    ],
+  );
+}
+
+// "Chess · Crazyhouse", but "Mini Shogi" rather than "Shogi · Mini Shogi"
+const summaryName = (group: string, game: string) =>
+  game.toLowerCase().includes(group.toLowerCase()) ? game : `${group} · ${game}`;
+
 const row = (
   label: string,
   value: { name: string; icon: string } | undefined,
@@ -145,24 +167,39 @@ const bind = (eventName: string, f: (e: Event) => unknown, redraw?: () => void):
 });
 
 export function bindStaticGrids(): void {
-  document.addEventListener('click', e => {
-    const el = e.target as HTMLElement;
-    const grid = el.closest('.game-grid--static');
-    if (!grid) return;
-    const row = el.closest('.game-grid__row');
-    if (row) return setOpen(row, !row.classList.contains('open'));
-    if (el.closest('a.game-grid__tile.chosen') && !e.ctrlKey && !e.metaKey) {
-      e.preventDefault();
-      return grid.querySelectorAll('.game-grid__row').forEach(r => setOpen(r, false));
-    }
-    const group = el.closest<HTMLElement>('button.game-grid__tile[data-group]');
-    if (!group) return;
-    grid.querySelectorAll('.game-grid__tile[data-group]').forEach(t => t.classList.toggle('open', t === group));
-    grid
-      .querySelectorAll<HTMLElement>('.game-grid__games')
-      .forEach(g => g.classList.toggle('open', g.dataset.group === group.dataset.group));
-    setOpen(grid.querySelector('.game-grid__row--game'), true);
-  });
+  document.addEventListener('click', onStaticClick);
+}
+
+// the modal stops clicks at its edge, so its copy of the grid listens for itself
+function openStaticGrid(grid: Element | null) {
+  if (!grid) return;
+  const wrap: HTMLElement = modal($(grid))[0];
+  wrap.classList.add('game-picker-modal');
+  wrap.addEventListener('click', onStaticClick);
+  setOpen(wrap.querySelector('.game-grid__row--group'), true);
+  setOpen(wrap.querySelector('.game-grid__row--game'), true);
+}
+
+function onStaticClick(e: MouseEvent) {
+  const el = e.target as HTMLElement;
+  const opener = el.closest('.game-grid-summary');
+  if (opener) return openStaticGrid(opener.parentElement!.querySelector('.game-grid--static'));
+  const grid = el.closest('.game-grid--static');
+  if (!grid) return;
+  const row = el.closest('.game-grid__row');
+  if (row) return setOpen(row, !row.classList.contains('open'));
+  if (el.closest('a.game-grid__tile.chosen') && !e.ctrlKey && !e.metaKey) {
+    e.preventDefault();
+    if (grid.closest('#modal-wrap')) modal.close();
+    return;
+  }
+  const group = el.closest<HTMLElement>('button.game-grid__tile[data-group]');
+  if (!group) return;
+  grid.querySelectorAll('.game-grid__tile[data-group]').forEach(t => t.classList.toggle('open', t === group));
+  grid
+    .querySelectorAll<HTMLElement>('.game-grid__games')
+    .forEach(g => g.classList.toggle('open', g.dataset.group === group.dataset.group));
+  setOpen(grid.querySelector('.game-grid__row--game'), true);
 }
 
 const setOpen = (row: Element | null, open: boolean) => {

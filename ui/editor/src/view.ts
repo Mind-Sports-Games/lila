@@ -9,7 +9,8 @@ import { Selected, CastlingToggle, EditorState } from './interfaces';
 import { VariantKey as stratopsVariantKey } from 'stratops/variants/types';
 import { variantClassFromKey } from 'stratops/variants/util';
 import { makeSquare, parseSquare } from 'stratops';
-import { grid, GamePicker, GridState } from 'common/gamePicker';
+import { grid, summary, GamePicker, GridState } from 'common/gamePicker';
+import { snabModal } from 'common/modal';
 
 function capitalizeFirstLetter(val: string) {
   return val.charAt(0).toUpperCase() + val.slice(1);
@@ -72,22 +73,37 @@ function isChessRules(variantKey: VariantKey): boolean {
   return variantClassFromKey(variantKey).family == 'chess';
 }
 
-const pickerState: GridState = { groups: true, games: true };
+const pickerState: GridState = {};
+const modalState: GridState = {};
+let modalOpen = false;
 
+// at three columns the grid stays open beside the board; below, a line opens it in a modal
 function picker(ctrl: EditorCtrl): VNode | null {
   const gamePicker = (ctrl.cfg as Editor.Config & { gamePicker?: GamePicker }).gamePicker;
-  return ctrl.cfg.embed || !gamePicker
-    ? null
-    : h(
-        'div.board-editor__picker',
-        grid({
-          picker: gamePicker,
-          chosen: ctrl.variantKey,
-          state: pickerState,
-          choose: key => ctrl.changeVariant(key as VariantKey),
-          redraw: ctrl.redraw,
-        }),
-      );
+  if (ctrl.cfg.embed || !gamePicker) return null;
+  const open = () => {
+    modalState.groups = modalState.games = true;
+    modalOpen = true;
+    ctrl.redraw();
+  };
+  const close = () => {
+    modalOpen = false;
+    ctrl.redraw();
+  };
+  const pick = (state: GridState, inModal: boolean) =>
+    grid({
+      picker: gamePicker,
+      chosen: ctrl.variantKey,
+      state,
+      choose: key => ctrl.changeVariant(key as VariantKey),
+      redraw: ctrl.redraw,
+      close: inModal ? close : undefined,
+    });
+  return h('div.board-editor__picker', [
+    summary(gamePicker, ctrl.variantKey, open),
+    pick(pickerState, false),
+    modalOpen ? snabModal({ class: 'game-picker-modal', content: [pick(modalState, true)], onClose: close }) : null,
+  ]);
 }
 
 function controls(ctrl: EditorCtrl, state: EditorState): VNode {

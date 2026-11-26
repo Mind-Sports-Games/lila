@@ -21,9 +21,7 @@ final class UserAnalysis(
 ) extends LilaController(env)
     with TheftPrevention {
 
-  def index = Open { implicit ctx =>
-    loadPage("", Variant.libStandard(GameLogic.Chess()), groupsOpen = true)
-  }
+  def index = load("", Variant.libStandard(GameLogic.Chess()))
 
   // a name or a key in the wrong case redirects to the canonical URL; an alias for a variant with
   // no analysis board stops here
@@ -72,7 +70,7 @@ final class UserAnalysis(
 
   def langIndex(lang: String) =
     LangPage(routes.UserAnalysis.index.url)(ctx =>
-      loadPage("", Variant.libStandard(GameLogic.Chess()), groupsOpen = true)(using ctx)
+      loadPage("", Variant.libStandard(GameLogic.Chess()))(using ctx)
     )(lang)
 
   // only a variant key gets a localised URL, never a pasted position; the same gate as the
@@ -91,9 +89,7 @@ final class UserAnalysis(
         )(lang)
     }
 
-  private def loadPage(urlFen: String, variant: Variant, groupsOpen: Boolean = false)(implicit
-      ctx: Context
-  ): Fu[Result] = {
+  private def loadPage(urlFen: String, variant: Variant)(implicit ctx: Context): Fu[Result] = {
     val decodedFen: Option[FEN] = lila.common.String
       .decodeUriPath(urlFen)
       .filter(_.trim.nonEmpty)
@@ -102,7 +98,7 @@ final class UserAnalysis(
     val orientation = get("orientation").flatMap(PlayerIndex.fromName) | pov.playerIndex
     env.api.roundApi
       .userAnalysisJson(pov, ctx.pref, decodedFen, orientation, owner = false, me = ctx.me) map { data =>
-      EnableSharedArrayBuffer(Ok(html.board.userAnalysis(data, pov, groupsOpen = groupsOpen)))
+      EnableSharedArrayBuffer(Ok(html.board.userAnalysis(data, pov)))
     }
   }
 

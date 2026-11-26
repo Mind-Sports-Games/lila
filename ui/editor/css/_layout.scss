@@ -36,11 +36,17 @@
   }
 
   &__picker {
-    @include game-grid-every-game;
-
     grid-row: span 1 / 1;
     grid-column: 1 / -1;
     margin-bottom: $block-gap;
+
+    > .game-grid {
+      display: none;
+    }
+
+    #modal-overlay {
+      cursor: default;
+    }
   }
 
   @include breakpoint($mq-col3-uniboard) {
@@ -48,10 +54,19 @@
     grid-template-areas: 'picker . .            . tools' 'picker . spare-top    . tools' 'picker . board        . tools' 'picker . spare-bottom . tools' 'picker . .            . tools' '.      . copyables    . about';
 
     &__picker {
+      @include game-grid-every-game;
       @include game-grid-wide;
 
       grid-area: picker;
       margin: 0;
+
+      > .game-grid {
+        display: block;
+      }
+
+      > .game-grid-summary {
+        display: none;
+      }
     }
   }
 }

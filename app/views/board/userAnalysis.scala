@@ -34,9 +34,7 @@ object userAnalysis {
     )
       .filterNot(noAnalysisVariants.contains(_))
 
-  def apply(data: JsObject, pov: lila.game.Pov, withForecast: Boolean = false, groupsOpen: Boolean = false)(
-      implicit ctx: Context
-  ) = {
+  def apply(data: JsObject, pov: lila.game.Pov, withForecast: Boolean = false)(implicit ctx: Context) = {
     val variant = pov.game.variant
     val canonical =
       if (variant == Variant.libStandard(GameLogic.Chess())) routes.UserAnalysis.index.url
@@ -91,12 +89,12 @@ object userAnalysis {
         main(cls := s"analyse variant-${variant.key}")(
         pov.game.synthetic.option(
           st.aside(cls := "analyse__side")(
+            views.html.base.gamePicker.summary(pov.game.variant),
             views.html.base.gamePicker.grid(
               analysisVariants,
               pov.game.variant,
               v => routes.UserAnalysis.parseArg(v.key).url,
-              everySlot = true,
-              groupsOpen = groupsOpen
+              everySlot = true
             )
           )
         ),

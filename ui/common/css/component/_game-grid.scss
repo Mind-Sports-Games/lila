@@ -179,3 +179,18 @@ $game-grid-longest-word: 6.9; // Togyzqumalaq, in em
     font-size: min(0.9em, calc((25cqi - 6px) / #{$game-grid-longest-word}));
   }
 }
+
+.game-grid-summary .game-grid__value::after {
+  @extend %data-icon;
+
+  content: 'u';
+  font-size: 70%;
+  opacity: 0.6;
+}
+
+#modal-wrap.game-picker-modal {
+  @include game-grid-every-game;
+
+  width: min(42rem, 100vw);
+  padding: 2rem 0 0;
+}

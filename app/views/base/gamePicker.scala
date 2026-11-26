@@ -87,18 +87,31 @@ object gamePicker {
       }
     )
 
+  // one line naming the chosen game, which opens the grid in a modal
+  def summary(chosen: Variant)(implicit ctx: Context): Frag = {
+    val game = VariantKeys.variantName(chosen)
+    val name = displayedGameGroups
+      .find(_.variants.contains(chosen))
+      .map(VariantKeys.gameGroupName)
+      .filterNot(group => game.toLowerCase.contains(group.toLowerCase))
+      .fold(game)(group => s"$group · $game")
+    button(tpe := "button", cls := "game-grid__row game-grid-summary", aria.haspopup := "dialog")(
+      span(cls := "game-grid__label")(trans.variant()),
+      span(cls := "game-grid__value", dataIcon := chosen.perfIcon.toString)(name)
+    )
+  }
+
   def grid(
       variants: List[Variant],
       chosen: Variant,
       link: Variant => String,
-      everySlot: Boolean,
-      groupsOpen: Boolean
+      everySlot: Boolean
   )(implicit ctx: Context): Frag = {
     val favs        = favVariants
     val groups      = slots(variants, everySlot)
     val chosenGroup = groups.collectFirst { case (g, games) if games.contains(chosen -> true) => g }
-    def row(kind: String, open: Boolean, label: Frag, value: Option[Frag]) =
-      button(tpe := "button", cls := List(s"game-grid__row game-grid__row--$kind" -> true, "open" -> open))(
+    def row(kind: String, label: Frag, value: Option[Frag]) =
+      button(tpe := "button", cls := s"game-grid__row game-grid__row--$kind")(
         span(cls := "game-grid__label")(label),
         value
       )
@@ -108,7 +121,6 @@ object gamePicker {
     div(cls := "game-grid game-grid--static")(
       row(
         "group",
-        groupsOpen,
         trans.gameGroup(),
         chosenGroup.map { g =>
           span(cls := ("game-grid__value" -> true) :: favMark(g.variants, favs), dataIcon := gameGroupIcon(g))(
@@ -116,7 +128,7 @@ object gamePicker {
           )
         }
       ),
-      div(cls := List("game-grid__panel" -> true, "open" -> groupsOpen))(
+      div(cls := "game-grid__panel")(
         div(cls := "game-grid__tiles")(
           groups.map { case (g, games) =>
             val name = label(VariantKeys.gameGroupName(g))
@@ -124,17 +136,13 @@ object gamePicker {
               cls := List("game-grid__tile" -> true, "open" -> chosenGroup.contains(g)) ::: favMark(g.variants, favs),
               dataIcon := gameGroupIcon(g)
             )
-            games match {
-              case _ if !games.exists(_._2) => off(gameGroupIcon(g), name)
-              case List((sole, _))         => a(href := link(sole))(mods*)(name)
-              case _ => button(tpe := "button", attr("data-group") := g.key)(mods*)(name)
-            }
+            if (games.exists(_._2)) button(tpe := "button", attr("data-group") := g.key)(mods*)(name)
+            else off(gameGroupIcon(g), name)
           }
         )
       ),
       row(
         "game",
-        true,
         trans.variant(),
         chosenGroup.map { _ =>
           span(cls := List("game-grid__value" -> true, "fav" -> favs(chosen.key)), dataIcon := chosen.perfIcon.toString)(
@@ -142,7 +150,7 @@ object gamePicker {
           )
         }
       ),
-      div(cls := "game-grid__panel open")(
+      div(cls := "game-grid__panel")(
         groups.map { case (g, games) =>
           div(
             cls                := List("game-grid__tiles game-grid__games" -> true, "open" -> chosenGroup.contains(g)),
