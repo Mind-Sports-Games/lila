@@ -15,8 +15,8 @@ importers:
         specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.42
         version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/57426cbbaf65e1826bc15bf567a7aa19d49c6b36
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.35
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9df509c74de7098aed8e42ae2f250f26155c1e33
+        specifier: github:Mind-Sports-Games/stratops#pla-1524-make-3check-5check-a-score-based-game
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f80240a5f2936ef7c65c7f69276064145e6e87bc
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -140,16 +140,16 @@ importers:
     dependencies:
       chart.js:
         specifier: ^4.4.8
-        version: 4.6.1
+        version: 4.6.2
       chartjs-adapter-dayjs-4:
         specifier: ^1.0.4
-        version: 1.0.4(chart.js@4.6.1)(dayjs@1.11.23)
+        version: 1.0.4(chart.js@4.6.2)(dayjs@1.11.23)
       chartjs-plugin-datalabels:
         specifier: ^2.2.0
-        version: 2.2.0(chart.js@4.6.1)
+        version: 2.2.0(chart.js@4.6.2)
       chartjs-plugin-zoom:
         specifier: ^2.2.0
-        version: 2.2.0(chart.js@4.6.1)
+        version: 2.2.0(chart.js@4.6.2)
       common:
         specifier: workspace:*
         version: link:../common
@@ -365,7 +365,7 @@ importers:
         version: link:../chart
       chart.js:
         specifier: ^4.4.8
-        version: 4.6.1
+        version: 4.6.2
       common:
         specifier: workspace:*
         version: link:../common
@@ -519,6 +519,9 @@ importers:
       game:
         specifier: workspace:*
         version: link:../game
+      snabbdom:
+        specifier: ^3.0.1
+        version: 3.5.1
 
   ui/swiss:
     dependencies:
@@ -592,8 +595,8 @@ importers:
 
 packages:
 
-  '@babel/runtime@7.29.14':
-    resolution: {integrity: sha512-Y5tqevQaUAZhhj82BpYMNC1ssvLQTVAfwKdm8iy8qwmhvC2/CpcAu8OC+QEtjM7pMk7knx83u1Qj8gzkicyelw==}
+  '@babel/runtime@7.29.15':
+    resolution: {integrity: sha512-304gsbbGVmQc+cNGHzwHBlqepYdWLKj3VXCQBGt/EGcV7PUPfKI7kAUNW1FZEOCwlQiLvQjg1JEaAlRQ616h+Q==}
     engines: {node: '>=6.9.0'}
 
   '@badrap/result@0.2.13':
@@ -639,8 +642,8 @@ packages:
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
     deprecated: Use @eslint/object-schema instead
 
-  '@kurkle/color@0.3.4':
-    resolution: {integrity: sha512-M5UknZPHRu3DEDWoipU6sE8PdkZ6Z/S+v4dD+Ke8IaNlpdSQah50lz1KtcFBa2vsdOnwbbnxJwVM4wty6udA5w==}
+  '@kurkle/color@0.6.6':
+    resolution: {integrity: sha512-Bd1NjGyoe27ExXRIBu13YymFP6k/wFxpUkX97Z3RlofLFV43nECB2G8vETZzcZzz2Ct2oRzwYElX65lxyi5UNg==}
 
   '@msgpack/msgpack@2.8.0':
     resolution: {integrity: sha512-h9u4u/jiIRKbq25PM+zymTyW6bhTzELvOoUd+AvYriWOAKpLGnIamaET3pnHYoI5iYphAHBI4ayx0MehR+VVPQ==}
@@ -673,8 +676,8 @@ packages:
   '@types/node@20.19.43':
     resolution: {integrity: sha512-6oYBAi5ikg4Pl+kGsoYtawUMBT2zZMCvPNF7pVLnHZfd1zf38DRiWn/gT01RYCdUqkv7Fhr+C9ot4/tb+2sVvA==}
 
-  '@types/react@19.3.0':
-    resolution: {integrity: sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg==}
+  '@types/react@19.3.2':
+    resolution: {integrity: sha512-0QJbb58RxWJL3VAa5tvk7QhJamz0S+MpFL2xDuF/+THRR+kldyhPjRZ1iwvK45AEHZ1BVGS3otPsl7QlNVRizQ==}
 
   '@types/web@0.0.269':
     resolution: {integrity: sha512-V0GRvvdAa79Wok8aRrlaSLcGxjixiQbcet3kq+5ixIq9L4jsG+QZd91HEYOXTMF+My745N/KtsM9eyPY1iVINg==}
@@ -840,9 +843,9 @@ packages:
     resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
-  chart.js@4.6.1:
-    resolution: {integrity: sha512-hJyniucsFmq//EvXYvJ6c6mahPoI3kaxdjVH8awTaJ/fDNWeSqqqArixMJWkWNN6fcYvPU3HneSANFNYtRi61g==}
-    engines: {pnpm: '>=8'}
+  chart.js@4.6.2:
+    resolution: {integrity: sha512-xachB+pPHjp0syJi7llUBA1w3kMYl6NF3o7eVrvjnWCT+IB2zMaF2pX5UYDiwbbfsioFEIRnAjreNOMsGj5TIA==}
+    engines: {pnpm: '>=12'}
 
   chartjs-adapter-dayjs-4@1.0.4:
     resolution: {integrity: sha512-yy9BAYW4aNzPVrCWZetbILegTRb7HokhgospPoC3b5iZ5qdlqNmXts2KdSp6AqnjkPAp/YWyHDxLvIvwt5x81w==}
@@ -903,8 +906,8 @@ packages:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
 
-  csstype@3.2.3:
-    resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
+  csstype@3.2.4:
+    resolution: {integrity: sha512-PoKaoPzQapnEoqUSnHx1u6W6ku8CVEgKsnpmmzU3m1nwkidpPBQ8V/Zq2+bWNrsOKoKLwTGdbx6xF7BXP1zLVQ==}
 
   date-fns@2.30.0:
     resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
@@ -1423,9 +1426,9 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9df509c74de7098aed8e42ae2f250f26155c1e33:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9df509c74de7098aed8e42ae2f250f26155c1e33}
-    version: 0.8.1-pstrat5.35
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f80240a5f2936ef7c65c7f69276064145e6e87bc:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f80240a5f2936ef7c65c7f69276064145e6e87bc}
+    version: 0.8.1-pstrat5.36
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   string-argv@0.3.2:
@@ -1544,7 +1547,7 @@ packages:
 
 snapshots:
 
-  '@babel/runtime@7.29.14': {}
+  '@babel/runtime@7.29.15': {}
 
   '@badrap/result@0.2.13': {}
 
@@ -1589,7 +1592,7 @@ snapshots:
 
   '@humanwhocodes/object-schema@2.0.3': {}
 
-  '@kurkle/color@0.3.4': {}
+  '@kurkle/color@0.6.6': {}
 
   '@msgpack/msgpack@2.8.0': {}
 
@@ -1617,9 +1620,9 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
-  '@types/react@19.3.0':
+  '@types/react@19.3.2':
     dependencies:
-      csstype: 3.2.3
+      csstype: 3.2.4
 
   '@types/web@0.0.269': {}
 
@@ -1627,7 +1630,7 @@ snapshots:
 
   '@types/yaireo__tagify@4.27.0':
     dependencies:
-      '@types/react': 19.3.0
+      '@types/react': 19.3.2
 
   '@types/zxcvbn@4.4.5': {}
 
@@ -1788,23 +1791,23 @@ snapshots:
 
   chalk@5.6.2: {}
 
-  chart.js@4.6.1:
+  chart.js@4.6.2:
     dependencies:
-      '@kurkle/color': 0.3.4
+      '@kurkle/color': 0.6.6
 
-  chartjs-adapter-dayjs-4@1.0.4(chart.js@4.6.1)(dayjs@1.11.23):
+  chartjs-adapter-dayjs-4@1.0.4(chart.js@4.6.2)(dayjs@1.11.23):
     dependencies:
-      chart.js: 4.6.1
+      chart.js: 4.6.2
       dayjs: 1.11.23
 
-  chartjs-plugin-datalabels@2.2.0(chart.js@4.6.1):
+  chartjs-plugin-datalabels@2.2.0(chart.js@4.6.2):
     dependencies:
-      chart.js: 4.6.1
+      chart.js: 4.6.2
 
-  chartjs-plugin-zoom@2.2.0(chart.js@4.6.1):
+  chartjs-plugin-zoom@2.2.0(chart.js@4.6.2):
     dependencies:
       '@types/hammerjs': 2.0.46
-      chart.js: 4.6.1
+      chart.js: 4.6.2
       hammerjs: 2.0.8
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
@@ -1850,11 +1853,11 @@ snapshots:
       shebang-command: 2.0.0
       which: 2.0.2
 
-  csstype@3.2.3: {}
+  csstype@3.2.4: {}
 
   date-fns@2.30.0:
     dependencies:
-      '@babel/runtime': 7.29.14
+      '@babel/runtime': 7.29.15
 
   dayjs@1.11.23: {}
 
@@ -2350,7 +2353,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9df509c74de7098aed8e42ae2f250f26155c1e33:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f80240a5f2936ef7c65c7f69276064145e6e87bc:
     dependencies:
       '@badrap/result': 0.2.13
 

@@ -288,11 +288,6 @@ export interface MaterialDiff {
   p1: MaterialDiffSide;
   p2: MaterialDiffSide;
 }
-export interface CheckCount {
-  p1: number;
-  p2: number;
-}
-
 export interface Score {
   p1: number;
   p2: number;

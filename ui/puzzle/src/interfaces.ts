@@ -87,6 +87,7 @@ export interface Vm {
     lib: number;
     clientEval: boolean;
     hasAnalysisBoard: boolean;
+    hasGameScore: boolean;
     boardSize: {
       width: number;
       height: number;
@@ -171,6 +172,7 @@ export interface PuzzleGame {
     lib: number;
     clientEval: boolean;
     hasAnalysisBoard: boolean;
+    hasGameScore: boolean;
     boardSize: {
       width: number;
       height: number;

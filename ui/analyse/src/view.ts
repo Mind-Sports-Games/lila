@@ -1,6 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
-import { fiveInARow, yonkoma } from 'stratutils';
+import { fiveInARow, score, yonkoma } from 'stratutils';
 import * as chessground from './ground';
 import { Coords as CgCoords } from 'chessground/types';
 import {
@@ -388,140 +388,19 @@ function addChapterId(study: StudyCtrl | undefined, cssClass: string) {
   return cssClass + (study && study.data.chapter ? '.' + study.data.chapter.id : '');
 }
 
-function renderPlayerScore(
-  ctrl: AnalyseCtrl,
-  score: number,
-  position: Position,
-  playerIndex: string,
-  variantKey: VariantKey,
-  fen: string,
-): VNode | undefined {
-  const defaultMancalaRole = 's';
-  const children: VNode[] = [];
-  if (variantKey === 'togyzkumalak' || variantKey === 'bestemshe') {
-    let part1Score = 0;
-    let part2Score = 0;
-    let part2Offset = false;
-    if (score <= 10) {
-      part1Score = score;
-      part2Score = 0;
-    } else if (score <= 20) {
-      part1Score = 10;
-      part2Score = score - 10;
-    } else {
-      part1Score = Math.min((score % 20) + 10, 20);
-      part2Score = Math.max(score % 20, 10);
-      if (part2Score === 10) part2Offset = true;
-    }
-
-    const pieceClassPart1 = `piece.${defaultMancalaRole}${part1Score.toString()}-piece.part1.`;
-    const pieceClassPart2 = `piece.${defaultMancalaRole}${part2Score.toString()}${part2Offset ? 'o' : ''}-piece.part2.`;
-
-    children.push(h(pieceClassPart1 + playerIndex));
-    if (score > 10) {
-      children.push(h(pieceClassPart2 + playerIndex));
-    }
-    return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
-  } else if (variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19') {
-    children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
-    return h('div.game-score.game-score-top' + '.' + playerIndex, children);
-  } else if (variantKey === 'pente') {
-    const stone = fiveInARow.seatColor(fen, playerIndex as PlayerIndex) === 'black' ? 'b-piece' : 'w-piece';
-    children.push(h(`piece.${stone}.${playerIndex}`, { attrs: { 'data-score': score } }));
-    return h(
-      'div.game-score.game-score-top.' + playerIndex + '.captures',
-      { attrs: { title: ctrl.trans.noarg('captures') } },
-      children,
-    );
-  } else if (variantKey === 'backgammon' || variantKey === 'hyper' || variantKey === 'nackgammon') {
-    for (let i = 0; i < score; i++) {
-      children.push(h('piece.side-piece.' + playerIndex + (i === 0 ? ' first' : '')));
-    }
-    return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
-  } else if (variantKey === 'oware') {
-    const pieceClass = `piece.${defaultMancalaRole}${score.toString()}-piece.`;
-    children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
-    return h('div.game-score.game-score-' + position + '.' + playerIndex, children);
-  } else if (variantKey === 'abalone') {
-    const opp = playerIndex === 'p1' ? 'p2' : 'p1';
-
-    children.push(h(`piece.${score > 0 ? 's-piece' : 'hole-piece'}.slot-top.${opp}`));
-    children.push(h(`piece.${score > 1 ? 's-piece' : 'hole-piece'}.slot-mid-left.${opp}`));
-    children.push(h(`piece.${score > 2 ? 's-piece' : 'hole-piece'}.slot-mid-right.${opp}`));
-    children.push(h(`piece.${score > 3 ? 's-piece' : 'hole-piece'}.slot-bot-left.${opp}`));
-    children.push(h(`piece.${score > 4 ? 's-piece' : 'hole-piece'}.slot-bot-mid.${opp}`));
-    children.push(h(`piece.${score > 5 ? 's-piece' : 'hole-piece'}.slot-bot-right.${opp}`));
-
-    return h('div.game-score.game-score-top' + '.' + playerIndex, { attrs: { 'data-score': score } }, children);
-  } else if (variantKey === 'grandabalone') {
-    const opp = playerIndex === 'p1' ? 'p2' : 'p1';
-
-    children.push(h(`piece.${score > 0 ? 's-piece' : 'hole-piece'}.slot-top.${opp}`));
-    children.push(h(`piece.${score > 1 ? 's-piece' : 'hole-piece'}.slot-top-left.${opp}`));
-    children.push(h(`piece.${score > 2 ? 's-piece' : 'hole-piece'}.slot-top-right.${opp}`));
-    children.push(h(`piece.${score > 3 ? 's-piece' : 'hole-piece'}.slot-mid-left.${opp}`));
-    children.push(h(`piece.${score > 4 ? 's-piece' : 'hole-piece'}.slot-mid-mid.${opp}`));
-    children.push(h(`piece.${score > 5 ? 's-piece' : 'hole-piece'}.slot-mid-right.${opp}`));
-    children.push(h(`piece.${score > 6 ? 's-piece' : 'hole-piece'}.slot-bot-left.${opp}`));
-    children.push(h(`piece.${score > 7 ? 's-piece' : 'hole-piece'}.slot-bot-mid-left.${opp}`));
-    children.push(h(`piece.${score > 8 ? 's-piece' : 'hole-piece'}.slot-bot-mid-right.${opp}`));
-    children.push(h(`piece.${score > 9 ? 's-piece' : 'hole-piece'}.slot-bot-right.${opp}`));
-
-    return h('div.game-score.game-score-top' + '.' + playerIndex, { attrs: { 'data-score': score } }, children);
-  } else {
-    //flipello variants
-    const pieceClass = 'piece.p-piece.';
-    children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
-    return h('div.game-score.game-score-top' + '.' + playerIndex, children);
-  }
-}
-
 function renderPlayerScoreNames(ctrl: AnalyseCtrl): VNode | undefined {
-  const children: VNode[] = [];
   const study = ctrl.study;
-  let playerNames = { p1: 'Player 1', p2: 'player 2' };
   const p1player = ctrl.data.player.playerIndex === 'p1' ? ctrl.data.player : ctrl.data.opponent;
   const p2player = ctrl.data.player.playerIndex === 'p2' ? ctrl.data.player : ctrl.data.opponent;
-  if (study !== undefined) {
-    const tags = study.data.chapter.tags;
-    playerNames = {
-      p1: findTag(tags, 'p1') ?? p1player.playerName,
-      p2: findTag(tags, 'p2') ?? p2player.playerName,
-    };
-  } else {
-    playerNames = {
-      p1: p1player.user ? p1player.user.username : p1player.playerName,
-      p2: p2player.user ? p2player.user.username : p2player.playerName,
-    };
-  }
-
-  const flippedCss =
-    (ctrl.flipped && ctrl.data.player.playerIndex === 'p1') || (!ctrl.flipped && ctrl.data.player.playerIndex === 'p2')
-      ? '.flipped'
-      : '';
-
-  if (p1player.user) {
-    children.push(
-      h(
-        'div.game-score-name.p1.text.player' + flippedCss,
-        h('a.user-link.ulpt', { attrs: { href: `/@/${p1player.user.id}` } }, playerNames.p1),
-      ),
-    );
-  } else {
-    children.push(h('div.game-score-name.p1.text' + flippedCss, playerNames.p1));
-  }
-  children.push(h('div.game-score-name.vs.text', 'vs'));
-  if (p2player.user) {
-    children.push(
-      h(
-        'div.game-score-name.p2.text.player' + flippedCss,
-        h('a.user-link.ulpt', { attrs: { href: `/@/${p2player.user.id}` } }, playerNames.p2),
-      ),
-    );
-  } else {
-    children.push(h('div.game-score-name.p2.text' + flippedCss, playerNames.p2));
-  }
-  return h('div.game-score-names', children);
+  const scorePlayer = (player: typeof p1player, studyTag: 'p1' | 'p2'): score.ScorePlayer => ({
+    name:
+      (study !== undefined ? findTag(study.data.chapter.tags, studyTag) : undefined) ??
+      (study === undefined && player.user ? player.user.username : player.playerName),
+    userId: player.user?.id,
+  });
+  const flipped =
+    (ctrl.flipped && ctrl.data.player.playerIndex === 'p1') || (!ctrl.flipped && ctrl.data.player.playerIndex === 'p2');
+  return score.renderPlayerScoreNames(scorePlayer(p1player, 'p1'), scorePlayer(p2player, 'p2'), flipped);
 }
 
 function renderPlayerName(ctrl: AnalyseCtrl, position: Position): VNode | undefined {
@@ -588,41 +467,18 @@ export default function (ctrl: AnalyseCtrl): VNode {
       case 'flipello':
       case 'flipello10':
       case 'antiflipello':
-      case 'octagonflipello': {
-        const p1Score = getScoreFromFen(variantKey, fen, 'p1');
-        const p2Score = getScoreFromFen(variantKey, fen, 'p2');
-        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
-        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
-        break;
-      }
+      case 'octagonflipello':
       case 'oware':
       case 'togyzkumalak':
-      case 'bestemshe': {
-        const p1Score = getScoreFromFen(variantKey, fen, 'p1');
-        const p2Score = getScoreFromFen(variantKey, fen, 'p2');
-        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
-        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
-        break;
-      }
+      case 'bestemshe':
       case 'abalone':
-      case 'grandabalone': {
-        const fen = ctrl.node.fen;
-        const p1Score = getScoreFromFen(variantKey, fen, 'p1');
-        const p2Score = getScoreFromFen(variantKey, fen, 'p2');
-        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
-        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
-        break;
-      }
+      case 'grandabalone':
       case 'go9x9':
       case 'go13x13':
       case 'go19x19':
-      case 'pente': {
-        const p1Score = getScoreFromFen(variantKey, fen, 'p1');
-        const p2Score = getScoreFromFen(variantKey, fen, 'p2');
-        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
-        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
-        break;
-      }
+      case 'pente':
+      case 'threeCheck':
+      case 'fiveCheck':
       case 'backgammon':
       case 'hyper':
       case 'nackgammon': {
@@ -734,7 +590,16 @@ export default function (ctrl: AnalyseCtrl): VNode {
             ],
           ),
         gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,
-        tour || !showScoreBox ? null : renderPlayerScore(ctrl, topScore, 'top', ctrl.topPlayerIndex(), variantKey, fen),
+        tour || !showScoreBox
+          ? null
+          : score.renderPlayerScore(
+              topScore,
+              'top',
+              ctrl.topPlayerIndex(),
+              variantKey,
+              fen,
+              ctrl.trans.noarg('captures'),
+            ),
         tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'top'),
         tour || !showScoreBox ? null : renderPlayerScoreNames(ctrl),
         tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
@@ -758,7 +623,14 @@ export default function (ctrl: AnalyseCtrl): VNode {
               ])),
         tour || !showScoreBox
           ? null
-          : renderPlayerScore(ctrl, bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey, fen),
+          : score.renderPlayerScore(
+              bottomScore,
+              'bottom',
+              ctrl.bottomPlayerIndex(),
+              variantKey,
+              fen,
+              ctrl.trans.noarg('captures'),
+            ),
         tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'bottom'),
         tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
         gamebookPlayView || tour ? null : controls(ctrl),

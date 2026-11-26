@@ -66,6 +66,7 @@ object PuzzleTheme {
   val winIn2           = PuzzleTheme(Key("winIn2"), i.winIn2, i.winIn2Description)
   val winIn3           = PuzzleTheme(Key("winIn3"), i.winIn3, i.winIn3Description)
   val smotheredMate    = PuzzleTheme(Key("smotheredMate"), i.smotheredMate, i.smotheredMateDescription)
+  val threeCheckIn2    = PuzzleTheme(Key("threeCheckIn2"), i.threeCheckIn2, i.threeCheckIn2Description)
   val middlegame       = PuzzleTheme(Key("middlegame"), i.middlegame, i.middlegameDescription)
   val oneMove          = PuzzleTheme(Key("oneMove"), i.oneMove, i.oneMoveDescription)
   val opening          = PuzzleTheme(Key("opening"), i.opening, i.openingDescription)
@@ -133,6 +134,13 @@ object PuzzleTheme {
       winIn2,
       mateIn2,
       kingOnHillIn2
+    )
+  )
+  val categorizedThreeCheck = List[(I18nKey, List[PuzzleTheme])](
+    trans.puzzle.wins -> List(
+      winIn2,
+      mateIn2,
+      threeCheckIn2
     )
   )
   val categorizedChessPhases = List[(I18nKey, List[PuzzleTheme])](
@@ -256,6 +264,8 @@ object PuzzleTheme {
 
   val categorizedRacingKingsVariant = categorizedChessVariantBase ::: categorizedWinIn2
 
+  val categorizedThreeCheckVariant = categorizedChessVariantBase ::: categorizedThreeCheck
+
   val categorizedXiangqi = categorizedMix ::: categorizedPhases ::: List[(I18nKey, List[PuzzleTheme])](
     trans.puzzle.motifs -> List(
       advancedPawn,
@@ -275,6 +285,7 @@ object PuzzleTheme {
   val byCategorizedVariant: Map[String, List[(I18nKey, List[PuzzleTheme])]] = Map(
     "standard"      -> categorizedStandard,
     "kingOfTheHill" -> categorizedKingOfTheHillVariant,
+    "threeCheck"    -> categorizedThreeCheckVariant,
     "atomic"        -> categorizedAtomicVariant,
     "horde"         -> categorizedHordeVariant,
     "racingKings"   -> categorizedRacingKingsVariant,
@@ -330,6 +341,7 @@ object PuzzleTheme {
     opening,
     short,
     smotheredMate,
+    threeCheckIn2,
     veryLong,
     pawns,
     pieces

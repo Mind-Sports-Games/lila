@@ -6,7 +6,7 @@ import RoundController from '../ctrl';
 import { h, VNode } from 'snabbdom';
 import { plyStep } from '../round';
 import { finished } from 'game/status';
-import { Position, MaterialDiff, MaterialDiffSide, CheckCount } from '../interfaces';
+import { Position, MaterialDiff, MaterialDiffSide } from '../interfaces';
 import { read as fenRead, readPocket as pocketRead } from 'chessground/fen';
 import * as cg from 'chessground/types';
 import { render as keyboardMove } from '../keyboardMove';
@@ -15,13 +15,7 @@ import { renderTable } from './table';
 import { Player } from 'game';
 import { fiveInARow, yonkoma } from 'stratutils';
 
-function renderMaterial(
-  material: MaterialDiffSide,
-  score: number,
-  position: Position,
-  noMaterial: boolean,
-  checks?: number,
-) {
+function renderMaterial(material: MaterialDiffSide, score: number, position: Position, noMaterial: boolean) {
   if (noMaterial) return;
   const children: VNode[] = [];
   let role: string, i: number;
@@ -32,7 +26,6 @@ function renderMaterial(
       children.push(h('div', content));
     }
   }
-  if (checks) for (i = 0; i < checks; i++) children.push(h('div', h('mpiece.k-piece')));
   if (score > 0) children.push(h('score', '+' + score));
   return h('div.material.material-' + position, children);
 }
@@ -131,6 +124,9 @@ function renderPlayerScore(
     children.push(h(`piece.${score > 5 ? 's-piece' : 'hole-piece'}.slot-bot-right.${opp}`));
 
     return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
+  } else if (variantKey === 'threeCheck' || variantKey === 'fiveCheck') {
+    children.push(h('piece.k-piece.' + playerIndex, { attrs: { 'data-score': score } }));
+    return h('div.game-score.game-score-' + position, children);
   } else {
     children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-' + position, children);
@@ -179,26 +175,14 @@ export function main(ctrl: RoundController): VNode {
       case 'flipello':
       case 'flipello10':
       case 'antiflipello':
-      case 'octagonflipello': {
-        const p1Score = util.getScoreFromFen(variantKey, fen, 'p1');
-        const p2Score = util.getScoreFromFen(variantKey, fen, 'p2');
-        topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
-        bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
-        break;
-      }
+      case 'octagonflipello':
       case 'abalone':
-      case 'grandabalone': {
-        const fen = plyStep(ctrl.data, ctrl.ply).fen;
-        const p1Score = util.getScoreFromFen(variantKey, fen, 'p1');
-        const p2Score = util.getScoreFromFen(variantKey, fen, 'p2');
-        topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
-        bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
-        break;
-      }
+      case 'grandabalone':
+      case 'threeCheck':
+      case 'fiveCheck':
       case 'oware':
       case 'togyzkumalak':
       case 'bestemshe': {
-        //oware stores the score in the board fen so we can do this instead
         const p1Score = util.getScoreFromFen(variantKey, fen, 'p1');
         const p2Score = util.getScoreFromFen(variantKey, fen, 'p2');
         topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
@@ -282,9 +266,6 @@ export function main(ctrl: RoundController): VNode {
     score = util.getScore(variantKey, pieces) * (bottomPlayerIndex === 'p1' ? 1 : -1);
   } else material = emptyMaterialDiff;
 
-  const checks: CheckCount =
-    d.player.checks || d.opponent.checks ? util.countChecks(ctrl.data.steps, ctrl.ply) : util.noChecks;
-
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
   const notationBasic = [
     'dameo',
@@ -340,10 +321,10 @@ export function main(ctrl: RoundController): VNode {
           showScoreBox ? renderPlayerScore(ctrl, topScore, 'top', topPlayerIndex, variantKey, captures, fen) : null,
           showScoreBox ? renderPlayerScoreNames(ctrl.data.player, ctrl.data.opponent, topPlayerIndex) : null,
           crazyView(ctrl, topPlayerIndex, 'top') ||
-            renderMaterial(material[topPlayerIndex], -score, 'top', d.hasGameScore, checks[topPlayerIndex]),
+            renderMaterial(material[topPlayerIndex], -score, 'top', d.hasGameScore),
           ...renderTable(ctrl),
           crazyView(ctrl, bottomPlayerIndex, 'bottom') ||
-            renderMaterial(material[bottomPlayerIndex], score, 'bottom', d.hasGameScore, checks[bottomPlayerIndex]),
+            renderMaterial(material[bottomPlayerIndex], score, 'bottom', d.hasGameScore),
           showScoreBox
             ? renderPlayerScore(ctrl, bottomScore, 'bottom', bottomPlayerIndex, variantKey, captures, fen)
             : null,

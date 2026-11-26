@@ -159,6 +159,7 @@ export const streakBox = (ctrl: Controller) =>
 const variants: [string, string][] = [
   ['standard', 'Chess'],
   ['kingOfTheHill', 'King of the Hill'],
+  ['threeCheck', 'Three-check'],
   ['atomic', 'Atomic'],
   ['horde', 'Horde'],
   ['racingKings', 'Racing Kings'],

@@ -56,6 +56,7 @@ object Puzzle {
   val puzzleVariants: List[Variant] = List(
     Variant.orDefault(GameLogic.Chess(), 1), // Standard
     Variant.orDefault(GameLogic.Chess(), 4), // King of the Hill
+    Variant.orDefault(GameLogic.Chess(), 5), // Three-check
     Variant.orDefault(GameLogic.Chess(), 7), // Atomic
     Variant.orDefault(GameLogic.Chess(), 8), // Horde
     Variant.orDefault(GameLogic.Chess(), 9), // Racing Kings

@@ -85,6 +85,17 @@ export function sanIrreversible(variant: VariantKey, san: string): boolean {
   return (variant === 'threeCheck' || variant === 'fiveCheck') && san.includes('+');
 }
 
+// Fairy-Stockfish reads a trailing checks-given count ("+1+0") as out of three, so five-check
+// must be sent as checks remaining ("4+5") in the field after en passant.
+export function engineFen(variant: VariantKey, fen: string): string {
+  if (variant !== 'fiveCheck') return fen;
+  const given = fen.match(/ \+(\d)\+(\d)/);
+  if (!given) return fen;
+  const fields = fen.replace(given[0], '').split(' ');
+  const remaining = `${5 - parseInt(given[1])}+${5 - parseInt(given[2])}`;
+  return [...fields.slice(0, 4), remaining, ...fields.slice(4)].join(' ');
+}
+
 // the server says which games the browser can run an engine for (lila.game.BrowserEngine)
 export function allowedForVariant(variant: { clientEval: boolean }) {
   return variant.clientEval;

@@ -1,7 +1,7 @@
 import * as cg from 'chessground/types';
 import { h, Hooks, VNodeData } from 'snabbdom';
 import { opposite, calculatePieceGroup, backgammonPosDiff } from 'chessground/util';
-import { Redraw, EncodedDests, Dests, MaterialDiff, Step, CheckCount } from './interfaces';
+import { Redraw, EncodedDests, Dests, MaterialDiff } from './interfaces';
 import { ByoyomiClockData, ClockData } from './clock/clockCtrl';
 import * as stratutils from 'stratutils';
 
@@ -187,23 +187,6 @@ export function goStonesToSelect(deadstones: cg.Key[], pieces: cg.Pieces, bd: cg
   }
 
   return stonesToSelect;
-}
-
-export const noChecks: CheckCount = {
-  p1: 0,
-  p2: 0,
-};
-
-export function countChecks(steps: Step[], ply: Ply): CheckCount {
-  const checks: CheckCount = { ...noChecks };
-  for (const step of steps) {
-    if (ply < step.ply) break;
-    if (step.check) {
-      if (step.turnCount % 2 === 1) checks.p1++;
-      else checks.p2++;
-    }
-  }
-  return checks;
 }
 
 export const spinner = () =>

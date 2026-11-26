@@ -1619,15 +1619,6 @@ object Event {
       CorrespondenceClock(clock.p1Time, clock.p2Time)
   }
 
-  case class CheckCount(p1: Int, p2: Int) extends Event {
-    def typ  = "checkCount"
-    def data =
-      Json.obj(
-        "p1" -> p1,
-        "p2" -> p2
-      )
-  }
-
   case class Score(p1: Int, p2: Int) extends Event {
     def typ  = "score"
     def data =
