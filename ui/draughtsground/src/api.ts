@@ -183,6 +183,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     getKeyAtDomPos(pos) {
+      state.dom.bounds.clear();
       return board.getKeyAtDomPos(pos, state.boardSize, board.p1Pov(state), state.dom.bounds());
     },
 
