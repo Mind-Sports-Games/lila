@@ -381,6 +381,7 @@ final class Tournament(
                 setup =>
                   rateLimitCreation(me, setup.isPrivate, ctx.req, Redirect(routes.Tournament.home)) {
                     api.createTournament(setup, me, teams) map { tour =>
+                      tickProgress(me.id, lila.progress.Step.CreateTournament)
                       Redirect {
                         if (tour.isTeamBattle) routes.Tournament.teamBattleEdit(tour.id)
                         else routes.Tournament.show(tour.id)

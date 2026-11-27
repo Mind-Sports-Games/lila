@@ -130,6 +130,16 @@ export default function () {
       loadHashedCssPath('dasher');
       loadModule('dasher').then(() => window.PlayStrategyDasher($el.empty()[0], { playing }));
     });
+
+    const openFromHash = () => {
+      if (location.hash !== '#dasher') return;
+      history.replaceState(null, '', location.pathname + location.search);
+      setTimeout(() => {
+        if (!$('#top .dasher').hasClass('shown')) $('#top .dasher .toggle').trigger('click');
+      }, 50);
+    };
+    openFromHash();
+    window.addEventListener('hashchange', openFromHash);
   }
 
   {

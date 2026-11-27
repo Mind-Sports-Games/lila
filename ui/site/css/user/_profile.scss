@@ -21,18 +21,6 @@
     margin: 10px 0;
   }
 
-  .rating-history-container {
-    flex: 1 1 58%;
-    margin: -10px 0 -14px 0;
-    height: 350px;
-
-    .spinner {
-      width: 90px;
-      height: 90px;
-      margin: 120px auto 0 auto;
-    }
-  }
-
   .profile-side {
     @extend %flex-column;
 
@@ -40,6 +28,19 @@
     height: 332px;
     border-left: $border;
     overflow: hidden;
+  }
+
+  &:has(.checklist--compact) .profile-side,
+  &:not(:has(.checklist)) .profile-side {
+    height: auto;
+    max-height: 332px;
+  }
+
+  .view-achievements {
+    float: right;
+    margin: 0 0 0.5em 1em;
+    padding: 0.3em 0.8em;
+    font-size: 0.9em;
   }
 
   .country img {

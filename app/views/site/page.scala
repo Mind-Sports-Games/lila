@@ -60,7 +60,7 @@ object page {
       )
     }
 
-  private def pageContent(doc: io.prismic.Document, resolver: io.prismic.DocumentLinkResolver) = frag(
+  private[html] def pageContent(doc: io.prismic.Document, resolver: io.prismic.DocumentLinkResolver) = frag(
     h1(doc.getText("pages.title")),
     div(cls := "body")(
       raw {

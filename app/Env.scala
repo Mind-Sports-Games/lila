@@ -75,6 +75,7 @@ final class Env(
     val practice: lila.practice.Env,
     val irwin: lila.irwin.Env,
     val activity: lila.activity.Env,
+    val progress: lila.progress.Env,
     val relay: lila.relay.Env,
     val streamer: lila.streamer.Env,
     val oAuth: lila.oauth.Env,
@@ -271,6 +272,7 @@ final class EnvBoot(
   lazy val practice: lila.practice.Env       = wire[lila.practice.Env]
   lazy val irwin: lila.irwin.Env             = wire[lila.irwin.Env]
   lazy val activity: lila.activity.Env       = wire[lila.activity.Env]
+  lazy val progress: lila.progress.Env       = wire[lila.progress.Env]
   lazy val relay: lila.relay.Env             = wire[lila.relay.Env]
   lazy val streamer: lila.streamer.Env       = wire[lila.streamer.Env]
   lazy val oAuth: lila.oauth.Env             = wire[lila.oauth.Env]

@@ -14,7 +14,8 @@ object mini {
       followable: Boolean,
       rel: Option[lila.relation.Relation],
       ping: Option[Int],
-      crosstable: Option[lila.game.Crosstable]
+      crosstable: Option[lila.game.Crosstable],
+      progress: lila.progress.Progress
   )(implicit ctx: Context) =
     frag(
       div(cls := "upt__info")(
@@ -32,7 +33,10 @@ object mini {
               )
             }
           ),
-          ping map bits.signalBars
+          div(cls := "upt__info__top__right")(
+            show.badges.mini(progress),
+            ping map bits.signalBars
+          )
         ),
         if (u.lame && !ctx.me.contains(u) && !isGranted(_.UserModView))
           div(cls := "upt__info__warning")(trans.thisAccountViolatedTos())

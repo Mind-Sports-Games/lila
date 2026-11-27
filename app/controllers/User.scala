@@ -89,6 +89,19 @@ final class User(
         status(html.activity(u, as))
       }
 
+  def progress(username: String) =
+    Auth { implicit ctx => _ =>
+      EnabledUser(username) { u =>
+        if (!ctx.is(u)) Redirect(routes.User.show(u.username)).fuccess
+        else
+          for {
+            nbs    <- env.userNbGames(u, ctx, withCrosstable = false)
+            info   <- env.userInfo(u, nbs, ctx)
+            social <- env.socialInfo(u, ctx)
+          } yield Ok(html.user.show.page.progress(u, info, social))
+      }
+    }
+
   def gamesAll(username: String, page: Int) = games(username, GameFilter.All.name, page)
 
   def games(username: String, filter: String, page: Int) =
@@ -163,12 +176,13 @@ final class User(
           ctx.userId.so { relationApi.fetchBlocks(user.id, _) } zip
             ctx.userId.so { env.game.crosstableApi(user.id, _).dmap(some) } zip
             ctx.isAuth.so { env.pref.api.followable(user.id) } zip
-            ctx.userId.so { relationApi.fetchRelation(_, user.id) } flatMap {
-              case (((blocked, crosstable), followable), relation) =>
+            ctx.userId.so { relationApi.fetchRelation(_, user.id) } zip
+            env.progress.api.get(user.id) flatMap {
+              case ((((blocked, crosstable), followable), relation), progress) =>
                 val ping = env.socket.isOnline(user.id) so UserLagCache.getLagRating(user.id)
                 negotiate(
                   html = !ctx.is(user) so currentlyPlaying(user) map { pov =>
-                    Ok(html.user.mini(user, pov, blocked, followable, relation, ping, crosstable))
+                    Ok(html.user.mini(user, pov, blocked, followable, relation, ping, crosstable, progress))
                       .withHeaders(CACHE_CONTROL -> "max-age=5")
                   },
                   api = _ => {
@@ -588,6 +602,18 @@ final class User(
               )
             } yield response
           }
+      }
+    }
+
+  def allPerfs(username: String) =
+    Open { implicit ctx =>
+      OptionFuResult(env.user.repo.named(username)) { u =>
+        if ((u.disabled || (u.lame && !ctx.is(u))) && !isGranted(_.UserModView)) notFound
+        else
+          for {
+            ranks       <- env.user.cached.rankingsOf(u.id)
+            ratingChart <- env.history.ratingChartApi(u)
+          } yield Ok(html.user.allPerfs(u, ranks, ratingChart))
       }
     }
 

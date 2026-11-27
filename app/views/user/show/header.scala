@@ -197,15 +197,15 @@ object header {
       standardFlash(),
       angle match {
         case Angle.Games(Some(searchForm)) => views.html.search.user(u, searchForm)
+        case Angle.Progress                => checklist.full(u, info.progress)
         case _                             =>
           val profile   = u.profileOrDefault
           val hideTroll = u.marks.troll && !ctx.is(u)
           div(id := "us_profile")(
-            if (info.ratingChart.isDefined && (!u.lame || ctx.is(u) || isGranted(_.UserModView)))
-              views.html.user.bits.ratingHistoryContainer
-            else ctx.is(u).option(newPlayer(u)),
+            ctx.is(u).option(checklist(u, info.progress)),
             div(cls := "profile-side")(
               div(cls := "user-infos")(
+                ctx.is(u).option(checklist.viewAchievementsLink(u, info.progress)).flatten,
                 (!ctx.is(u)).option(
                   frag(
                     u.lame.option(
@@ -291,30 +291,32 @@ object header {
             )
           )
       },
-      div(cls := "angles number-menu number-menu--tabs menu-box-pop")(
-        a(
-          dataTab := "activity",
-          cls     := List(
-            "nm-item to-activity" -> true,
-            "active"              -> (angle == Angle.Activity)
-          ),
-          href := routes.User.show(u.username)
-        )(trans.activity.activity()),
-        a(
-          dataTab := "games",
-          cls     := List(
-            "nm-item to-games" -> true,
-            "active"           -> (angle.key == "games")
-          ),
-          href := routes.User.gamesAll(u.username)
-        )(
-          trans.nbGames.plural(info.user.count.game, info.user.count.game.localize),
-          (info.nbs.playing > 0).option(
-            span(
-              cls   := "unread",
-              title := trans.nbPlaying.pluralTxt(info.nbs.playing, info.nbs.playing.localize)
-            )(
-              info.nbs.playing
+      (angle != Angle.Progress).option(
+        div(cls := "angles number-menu number-menu--tabs menu-box-pop")(
+          a(
+            dataTab := "activity",
+            cls     := List(
+              "nm-item to-activity" -> true,
+              "active"              -> (angle == Angle.Activity)
+            ),
+            href := routes.User.show(u.username)
+          )(trans.activity.activity()),
+          a(
+            dataTab := "games",
+            cls     := List(
+              "nm-item to-games" -> true,
+              "active"           -> (angle.key == "games")
+            ),
+            href := routes.User.gamesAll(u.username)
+          )(
+            trans.nbGames.plural(info.user.count.game, info.user.count.game.localize),
+            (info.nbs.playing > 0).option(
+              span(
+                cls   := "unread",
+                title := trans.nbPlaying.pluralTxt(info.nbs.playing, info.nbs.playing.localize)
+              )(
+                info.nbs.playing
+              )
             )
           )
         )

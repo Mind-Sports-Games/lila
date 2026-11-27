@@ -191,3 +191,40 @@
 .page-menu__content {
   overflow: hidden; // prevents pre overflow (personal-data)
 }
+
+.account.kid-mode {
+  min-height: 0;
+
+  br {
+    display: none;
+  }
+
+  form {
+    margin: 1.5em 0;
+  }
+}
+
+.kid-mode-page {
+  margin-top: 1.5em;
+
+  > h1 {
+    color: $c-accent;
+    margin-bottom: 0.5em;
+  }
+
+  .body {
+    h2 {
+      overflow: visible;
+      white-space: normal;
+      margin-bottom: 0;
+
+      &::after {
+        display: none;
+      }
+    }
+
+    > :first-child {
+      margin-top: 0;
+    }
+  }
+}

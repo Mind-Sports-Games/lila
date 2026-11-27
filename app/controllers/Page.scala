@@ -20,6 +20,7 @@ final class Page(
   def page(uid: String, active: Option[String]) =
     Open { implicit ctx =>
       pageHit
+      if (uid == "mind-sports-olympiad") tickProgress(lila.progress.Step.MindSportsOlympiad)
       OptionOk(prismicC.getPage(uid)) { case (doc, resolver) =>
         active match {
           case None      => views.html.site.page.lone(doc, resolver)
@@ -65,7 +66,8 @@ final class Page(
       }
     }
 
-  private def showVariantPage(key: String)(implicit ctx: Context): Fu[Result] =
+  private def showVariantPage(key: String)(implicit ctx: Context): Fu[Result] = {
+    tickProgress(lila.progress.Step.LearnRules)
     (for {
       variant <- Variant.all.map { v =>
         (v.key, v)
@@ -73,6 +75,7 @@ final class Page(
     } yield OptionOk(prismicC.getPage(prismicUid(key))) { case (doc, resolver) =>
       views.html.site.variant.show(doc, resolver, variant)
     }) | notFound
+  }
 
   // The UID field in prismic has to be unique, lowercase, and some are taken by other pages
   def prismicUid(key: String) =
