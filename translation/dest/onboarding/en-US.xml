@@ -14,7 +14,7 @@
   <string name="groupCustomise">Customize</string>
   <string name="groupSupport">Support</string>
   <string name="stepKidMode">Consider whether this should be a kid account</string>
-  <string name="stepChooseGames">Choose your games</string>
+  <string name="stepChooseGames">Choose your favorite games</string>
   <string name="stepPlayHuman">Play a game against another person</string>
   <string name="stepJoinTeam">Join a team</string>
   <string name="stepPlayTournament">Play in a tournament</string>

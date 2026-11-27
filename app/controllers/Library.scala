@@ -13,14 +13,11 @@ final class Library(env: Env) extends LilaController(env) {
 
   def home =
     Open { implicit ctx =>
-      tickProgress(lila.progress.Step.ChooseGames)
-      {
-        for {
-          monthlyGameData <- env.game.cached.monthlyGames
-          clockRates      <- env.game.libraryStats.gameClockRates
-          // botOrHumanGames <- env.game.libraryStats.botOrHumanGames
-        } yield Ok(views.html.library.home(monthlyGameData, clockRates))
-      }
+      for {
+        monthlyGameData <- env.game.cached.monthlyGames
+        clockRates      <- env.game.libraryStats.gameClockRates
+        // botOrHumanGames <- env.game.libraryStats.botOrHumanGames
+      } yield Ok(views.html.library.home(monthlyGameData, clockRates))
     }
 
   def variant(key: String) =
@@ -68,7 +65,6 @@ final class Library(env: Env) extends LilaController(env) {
     }
 
   private def showVariant(key: String)(implicit ctx: Context): Fu[Result] = {
-    tickProgress(lila.progress.Step.ChooseGames)
     Variant.byKey.get(key) match {
       case Some(variant) => {
         val tvChannel = lila.tv.Tv.Channel.find(variant.key)

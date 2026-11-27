@@ -257,7 +257,7 @@ object checklist {
   private def url(step: Step): String =
     step match {
       case Step.KidMode            => routes.Account.kid.url
-      case Step.ChooseGames        => routes.Library.home.url
+      case Step.ChooseGames        => routes.Favourites.index.url
       case Step.PlayHuman          => lobbySetup
       case Step.JoinTeam           => routes.Team.all(1).url
       case Step.PlayTournament     => routes.Tournament.home.url

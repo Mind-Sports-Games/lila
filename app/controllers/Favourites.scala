@@ -37,6 +37,7 @@ final class Favourites(env: Env) extends LilaController(env) {
   private def toggle(me: UserModel, keys: List[String])(implicit ctx: Context) =
     ToggleLimitPerUser(me.id) {
       env.user.repo.setFavVariants(me.id, keys, getBool("v")) map { favs =>
+        if (favs.nonEmpty) tickProgress(me.id, lila.progress.Step.ChooseGames)
         JsonOk(Json.obj("favourites" -> favs.toList.sorted))
       }
     }(rateLimitedFu)
