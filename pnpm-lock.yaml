@@ -12,8 +12,8 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/e391b56a82b7c71e7663082a797f6fc21b18776d
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#fix-board-bounds-after-layout-shift
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/d35c9903a77a6b4f3b19c86c6625f1d14567dc32
+        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.43
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/208c7a4e440b3b374a2002e999a0f58d99ee2fc6
       stratops:
         specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.35
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9df509c74de7098aed8e42ae2f250f26155c1e33
@@ -871,9 +871,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/d35c9903a77a6b4f3b19c86c6625f1d14567dc32:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/d35c9903a77a6b4f3b19c86c6625f1d14567dc32}
-    version: 7.11.1-pstrat3.42
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/208c7a4e440b3b374a2002e999a0f58d99ee2fc6:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/208c7a4e440b3b374a2002e999a0f58d99ee2fc6}
+    version: 7.11.1-pstrat3.43
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   chokidar@3.6.0:
@@ -1815,7 +1815,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/d35c9903a77a6b4f3b19c86c6625f1d14567dc32: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/208c7a4e440b3b374a2002e999a0f58d99ee2fc6: {}
 
   chokidar@3.6.0:
     dependencies:
