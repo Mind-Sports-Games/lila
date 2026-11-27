@@ -42,13 +42,12 @@ private object bits {
     )
   }
 
-  @annotation.nowarn("msg=unused")
   def renderGameGroupOptions(form: Form[?], libs: List[SelectChoice])(implicit ctx: Context) =
     div(cls := "gameGroup_choice buttons collapsible optional_config")(
       div(cls := "section_title")("Game Group"),
       div(id := "gameGroup_icons")(
-        renderIconRadios(form("gameGroup"), libs),
-        renderSelectedChoice(form("gameGroup"), libs)
+        renderIconRadios(form("gameGroup"), libs, fav = favGroupMark(favVariants)),
+        renderSelectedChoice(form("gameGroup"), libs, fav = favGroupMark(favVariants))
       )
     )
 
@@ -68,9 +67,10 @@ private object bits {
         renderIconRadios(
           form("variant"),
           libs,
-          key => gameGroupValueByFamilyId.get(key.takeWhile(_ != '_'))
+          key => gameGroupValueByFamilyId.get(key.takeWhile(_ != '_')),
+          favVariantMark(favVariants)
         ),
-        renderSelectedChoice(form("variant"), libs)
+        renderSelectedChoice(form("variant"), libs, fav = favVariantMark(favVariants))
       ),
       renderRatings()
     )
@@ -157,9 +157,14 @@ private object bits {
       )(name)
     }
 
-  def renderSelectedChoice(field: Field, options: Seq[SelectChoice], userPart: Option[Tag] = None) =
+  def renderSelectedChoice(
+      field: Field,
+      options: Seq[SelectChoice],
+      userPart: Option[Tag] = None,
+      fav: String => List[(String, Boolean)] = _ => Nil
+  ) =
     options.map { case (key, icon, hint) =>
-      div(cls := s"${field.name}_$key choice", dataIcon := icon)(
+      div(cls := (s"${field.name}_$key choice" -> true) :: fav(key), dataIcon := icon)(
         (userPart == None).option(hint),
         (key == "bot" || key == "friend").option(userPart)
       )
@@ -169,7 +174,8 @@ private object bits {
   def renderIconRadios(
       field: Field,
       options: Seq[SelectChoice],
-      gameGroupOf: String => Option[String] = _ => None
+      gameGroupOf: String => Option[String] = _ => None,
+      fav: String => List[(String, Boolean)] = _ => Nil
   ) =
     st.group(cls := "radio")(
       options.map { case (key, icon, hint) =>
@@ -183,7 +189,7 @@ private object bits {
             field.value.has(key).option(checked)
           ),
           label(
-            cls      := "required",
+            cls      := ("required" -> true) :: fav(key),
             dataIcon := icon,
             `for`    := s"$prefix${field.id}_$key"
           )(hint)

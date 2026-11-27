@@ -49,4 +49,30 @@ class UserTest extends munit.FunSuite {
     assert(couldBeUsername("G_FOo"))
     assert(couldBeUsername("g-foo"))
   }
+
+  test("favourite games: round trip, unknown keys dropped, empty set not stored") {
+    import reactivemongo.api.bson.BSONDocument
+    val h = User.userBSONHandler
+    val u = User(
+      id = "fav",
+      username = "fav",
+      perfs = Perfs.default,
+      count = Count.default,
+      enabled = true,
+      roles = Nil,
+      playTime = None,
+      createdAt = org.joda.time.DateTime.now,
+      seenAt = None,
+      kid = false,
+      lang = None,
+      plan = Plan.empty,
+      favVariants = Set("chess960", "abalone")
+    )
+    val doc = h.writeTry(u).get
+    assertEquals(h.readTry(doc).get.favVariants, Set("chess960", "abalone"))
+    val stale = (doc -- "favVariants") ++ BSONDocument("favVariants" -> List("chess960", "gone"))
+    assertEquals(h.readTry(stale).get.favVariants, Set("chess960"))
+    assert(!h.writeTry(u.copy(favVariants = Set.empty)).get.contains("favVariants"))
+    assertEquals(h.readTry(doc -- "favVariants").get.favVariants, Set.empty[String])
+  }
 }

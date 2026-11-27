@@ -10,8 +10,6 @@ import lila.api.Context
 import lila.app.templating.Environment.*
 import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
-import lila.rating.PerfType.iconByVariant
-import lila.i18n.VariantKeys
 import views.html.library.bits as libraryBits
 
 object userAnalysis {
@@ -91,18 +89,12 @@ object userAnalysis {
         main(cls := s"analyse variant-${variant.key}")(
         pov.game.synthetic.option(
           st.aside(cls := "analyse__side")(
-            views.html.base.bits.mselect(
-              "analyse-variant",
-              span(cls := "text", dataIcon := iconByVariant(pov.game.variant))(
-                VariantKeys.variantName(pov.game.variant)
-              ),
-              analysisVariants.map { v =>
-                a(
-                  dataIcon := iconByVariant(v),
-                  cls      := (pov.game.variant == v).option("current"),
-                  href     := routes.UserAnalysis.parseArg(v.key)
-                )(VariantKeys.variantName(v))
-              }
+            views.html.base.gamePicker.summary(pov.game.variant),
+            views.html.base.gamePicker.grid(
+              analysisVariants,
+              pov.game.variant,
+              v => routes.UserAnalysis.parseArg(v.key).url,
+              everySlot = true
             )
           )
         ),

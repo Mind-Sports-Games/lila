@@ -220,6 +220,7 @@ object layout {
   // define data-attr in the header of the page for client-side interactions
   private val dataVapid         = attr("data-vapid")
   private val dataUser          = attr("data-user")
+  private val dataFav           = attr("data-fav")
   private val dataSocketDomains = attr("data-socket-domains")
   private val dataI18n          = attr("data-i18n")
   private val dataNonce         = attr("data-nonce")
@@ -358,6 +359,7 @@ object layout {
           dataDev           := (!netConfig.minifiedAssets).option("true"),
           dataVapid         := vapidPublicKey,
           dataUser          := ctx.userId,
+          dataFav           := favVariants.some.filter(_.nonEmpty).map(_.toList.sorted.mkString(" ")),
           dataSoundSet      := ctx.currentSoundSet.toString,
           dataSocketDomains := netConfig.socketDomains.mkString(","),
           dataAssetUrl      := netConfig.assetBaseUrl,

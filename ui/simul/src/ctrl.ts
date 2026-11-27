@@ -1,11 +1,13 @@
 import { makeSocket, SimulSocket } from './socket';
 import xhr from './xhr';
 import { SimulData, SimulOpts } from './interfaces';
+import { GridState } from 'common/gamePicker';
 
 export default class SimulCtrl {
   data: SimulData;
   trans: Trans;
   socket: SimulSocket;
+  joining?: { chosen: string; picker: GridState };
 
   constructor(
     readonly opts: SimulOpts,

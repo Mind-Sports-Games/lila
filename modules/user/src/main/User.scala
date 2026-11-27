@@ -28,7 +28,8 @@ case class User(
     lang: Option[String],
     plan: Plan,
     totpSecret: Option[TotpSecret] = None,
-    marks: UserMarks = UserMarks.empty
+    marks: UserMarks = UserMarks.empty,
+    favVariants: Set[String] = Set.empty
 ) extends Ordered[User] {
 
   override def equals(other: Any) =
@@ -294,9 +295,12 @@ object User {
     val eraseAt               = "eraseAt"
     val erasedAt              = "erasedAt"
     val blind                 = "blind"
+    val favVariants           = "favVariants"
   }
 
   def withFields[A](f: BSONFields.type => A): A = f(BSONFields)
+
+  private lazy val variantKeys: Set[String] = strategygames.variant.Variant.all.map(_.key).toSet
 
   import lila.db.BSON
   import lila.db.dsl.*
@@ -335,29 +339,31 @@ object User {
         title = userTitle,
         plan = r.getO[Plan](plan) | Plan.empty,
         totpSecret = r.getO[TotpSecret](totpSecret),
-        marks = r.getO[UserMarks](marks) | UserMarks.empty
+        marks = r.getO[UserMarks](marks) | UserMarks.empty,
+        favVariants = r.strsD(favVariants).filter(variantKeys).toSet
       )
     }
 
     def writes(w: BSON.Writer, o: User) =
       BSONDocument(
-        id         -> o.id,
-        username   -> o.username,
-        perfs      -> o.perfs,
-        count      -> o.count,
-        enabled    -> o.enabled,
-        roles      -> o.roles.some.filter(_.nonEmpty),
-        profile    -> o.profile,
-        toints     -> w.intO(o.toints),
-        playTime   -> o.playTime,
-        createdAt  -> o.createdAt,
-        seenAt     -> o.seenAt,
-        kid        -> w.boolO(o.kid),
-        lang       -> o.lang,
-        title      -> o.title,
-        plan       -> o.plan.nonEmpty,
-        totpSecret -> o.totpSecret,
-        marks      -> o.marks.nonEmpty
+        id          -> o.id,
+        username    -> o.username,
+        perfs       -> o.perfs,
+        count       -> o.count,
+        enabled     -> o.enabled,
+        roles       -> o.roles.some.filter(_.nonEmpty),
+        profile     -> o.profile,
+        toints      -> w.intO(o.toints),
+        playTime    -> o.playTime,
+        createdAt   -> o.createdAt,
+        seenAt      -> o.seenAt,
+        kid         -> w.boolO(o.kid),
+        lang        -> o.lang,
+        title       -> o.title,
+        plan        -> o.plan.nonEmpty,
+        totpSecret  -> o.totpSecret,
+        marks       -> o.marks.nonEmpty,
+        favVariants -> o.favVariants.some.filter(_.nonEmpty).map(_.toList)
       )
   }
 

@@ -4,6 +4,7 @@ import PlayStrategyChat from 'chat';
 // eslint-disable-next-line no-duplicate-imports
 import makeCtrl from './ctrl';
 import menuHover from 'common/menuHover';
+import { bindStaticGrids } from 'common/gamePicker';
 import { register as registerPieceSets } from 'common/piece-sprite';
 import view from './view';
 import { AnalyseApi, AnalyseOpts } from './interfaces';
@@ -14,6 +15,7 @@ export function PlayStrategyAnalyse(opts: AnalyseOpts): AnalyseApi {
   opts.element = document.querySelector('main.analyse') as HTMLElement;
   opts.trans = playstrategy.trans(opts.i18n);
   const aboutHtml = opts.element.querySelector('.analyse__about')?.innerHTML;
+  if (opts.element.querySelector('.game-grid--static')) bindStaticGrids();
   registerPieceSets(opts.data.pref.pieceSet);
 
   let vnode: VNode | undefined;

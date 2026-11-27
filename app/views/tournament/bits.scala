@@ -24,7 +24,11 @@ object bits {
       )
     }
 
-  def enterable(tours: List[Tournament]) =
+  private def isFav(tour: Tournament, favs: Set[String]) =
+    tour.medleyVariants.fold(favs(tour.variant.key))(_.exists(v => favs(v.key)))
+
+  def enterable(tours: List[Tournament], markFavourites: Boolean = true)(implicit ctx: Context) = {
+    val favs = if (markFavourites) favVariants else Set.empty[String]
     table(cls := "tournaments")(
       tours map { tour =>
         tr(
@@ -37,10 +41,11 @@ object bits {
             td(momentFromNow(s.at))
           },
           td(tour.durationString),
-          td(dataIcon := "r", cls := "text")(tour.nbPlayers)
+          td(dataIcon := "r", cls := List("text" -> true, "fav" -> isFav(tour, favs)))(tour.nbPlayers)
         )
       }
     )
+  }
 
   def userPrizeDisclaimer(ownerId: lila.user.User.ID) =
     (!env.prizeTournamentMakers.get().value.contains(ownerId)).option(
@@ -90,7 +95,9 @@ object bits {
     ("public", trans.arena.public, trans.arena.publicDescription)
   )
 
-  def freqKey(withUserTournaments: Boolean = false)(implicit ctx: Context) = {
+  def freqKey(withUserTournaments: Boolean = false, favouritesToggle: Boolean = false)(implicit
+      ctx: Context
+  ) = {
     val entries = freqKeyEntries.map { case (freq, label, description) => (freq.name, label, description) } :::
       (if (withUserTournaments) userTournamentKeyEntries else Nil)
     div(cls := "tour-freq-key")(
@@ -99,7 +106,19 @@ object bits {
           span(cls := s"tour-freq-key__swatch $swatch"),
           label()
         )
-      }
+      },
+      (favouritesToggle && ctx.isAuth).option(
+        button(
+          tpe                  := "button",
+          cls                  := "tour-freq-key__fav",
+          title                := trans.highlightFavourites.txt(),
+          attr("aria-pressed") := "false"
+        )(
+          favStar(false),
+          span(cls := "tour-freq-key__fav-label")(trans.favourites()),
+          span(cls := "tour-freq-key__fav-switch")
+        )
+      )
     )
   }
 

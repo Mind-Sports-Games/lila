@@ -56,6 +56,7 @@ final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurren
         "isMedley"    -> tour.isMedley,
         "handicapped" -> tour.handicapped
       )
+      .add("medleyVariantKeys", tour.medleyVariants.map(_.map(_.key)))
       .add("secondsToStart", tour.secondsToStart.some.filter(0 <))
       .add("hasMaxRating", tour.conditions.maxRating.isDefined)
       .add("private", tour.isPrivate)

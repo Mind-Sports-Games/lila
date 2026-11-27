@@ -8,7 +8,6 @@ import lila.api.Context
 import lila.app.templating.Environment.*
 import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
-import lila.i18n.VariantKeys
 
 object show {
 
@@ -41,6 +40,11 @@ object show {
                   localMod = ctx.userId `has` sim.hostId
                 )
               }
+            ).add(
+              "gamePicker" -> (sim.isCreated && sim.variants.sizeIs > 1)
+                .option(
+                  views.html.base.gamePicker.json(sim.variants, everySlot = true, offUnsupported = false)
+                )
             )
           )})""")
       )
@@ -54,7 +58,7 @@ object show {
                 div(
                   span(cls := "clock")(sim.clock.config.show),
                   div(cls := "setup")(
-                    sim.variants.map(VariantKeys.variantName).mkString(", "),
+                    bits.games(sim),
                     " • ",
                     trans.casual(),
                     ((isGranted(_.ManageSimul) || ctx.userId.has(sim.hostId)) && sim.isCreated).option(

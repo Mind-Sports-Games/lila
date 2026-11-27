@@ -170,13 +170,24 @@ $game-family-p2-pieces: (
       background: $c-setup;
     }
 
+    input:checked + label.fav::after {
+      color: inherit;
+    }
+
     label {
       display: flex;
       flex-flow: column;
+      position: relative;
       &::before {
         font-size: 200%;
       }
       height: 64px;
+      &.fav::after {
+        position: absolute;
+        top: 0.3em;
+        right: 0.4em;
+        margin: 0;
+      }
     }
   }
 

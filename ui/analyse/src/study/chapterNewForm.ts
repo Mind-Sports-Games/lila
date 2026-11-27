@@ -5,7 +5,8 @@ import { storedProp, StoredProp } from 'common/storage';
 import * as xhr from 'common/xhr';
 import { allowAnalysisForVariant, isChess, allowGameBookStudyForVariant } from 'common/analysis';
 import { bind, bindSubmit, spinner, option, onInsert } from '../util';
-import { variants as xhrVariants, importPgn } from './studyXhr';
+import { importPgn } from './studyXhr';
+import { grid, GridState } from 'common/gamePicker';
 import * as modal from '../modal';
 import { chapter as chapterTour } from './studyTour';
 import { ChapterData, ChapterMode, Orientation, StudyChapterMeta } from './interfaces';
@@ -33,11 +34,12 @@ export const fieldValue = (e: Event, id: string) =>
 export interface StudyChapterNewFormCtrl {
   root: AnalyseCtrl;
   vm: {
-    variants: Variant[];
+    picker: GridState;
     open: boolean;
     initial: Prop<boolean>;
     tab: StoredProp<string>;
     editor: PlayStrategyEditor | null;
+    editorVariant: VariantKey | null;
     editorFen: Prop<Fen | null>;
     variantKey: Prop<VariantKey | null>;
     isDefaultName: boolean;
@@ -53,6 +55,8 @@ export interface StudyChapterNewFormCtrl {
   redraw: Redraw;
 }
 
+const pickerOpen: GridState = { groups: true, games: true };
+
 export function ctrl(
   send: StudySocketSend,
   chapters: Prop<StudyChapterMeta[]>,
@@ -62,27 +66,21 @@ export function ctrl(
   const multiPgnMax = 20;
 
   const vm = {
-    variants: [],
+    picker: { ...pickerOpen },
     open: false,
     initial: prop(false),
     tab: storedProp('study.form.tab', 'init'),
     editor: null,
+    editorVariant: null,
     editorFen: prop(null),
     variantKey: prop(null),
     isDefaultName: true,
   };
 
-  function loadVariants() {
-    if (!vm.variants.length)
-      xhrVariants().then(function (vs) {
-        vm.variants = vs;
-        root.redraw();
-      });
-  }
-
   function open() {
     vm.open = true;
-    loadVariants();
+    vm.picker = { ...pickerOpen };
+    vm.variantKey(root.study!.data.chapter.setup.variant.key);
     vm.initial(false);
   }
   function close() {
@@ -128,20 +126,23 @@ export function ctrl(
 function edittab(ctrl: StudyChapterNewFormCtrl): VNode {
   const currentChapter = ctrl.root.study!.data.chapter;
   const variantKeySelected = ctrl.vm.variantKey() ?? 'standard';
+  const fenFor = (key: VariantKey) => (currentChapter.setup.variant.key === key ? ctrl.root.node.fen : undefined);
+  const follow = () => {
+    const key = ctrl.vm.variantKey() ?? 'standard';
+    if (ctrl.vm.editor && ctrl.vm.editorVariant !== key) {
+      ctrl.vm.editorVariant = key;
+      ctrl.vm.editor.changeVariant(key, fenFor(key));
+    }
+  };
   return h(
     'div.board-editor-wrap',
     {
-      key: variantKeySelected,
       hook: {
         insert(vnode) {
+          const fen = fenFor(variantKeySelected);
           Promise.all([
             playstrategy.loadModule('editor'),
-            xhr.json(
-              xhr.url('/editor.json', {
-                variant: variantKeySelected,
-                ...(currentChapter.setup.variant.key === ctrl.vm.variantKey() ? { fen: ctrl.root.node.fen } : {}),
-              }),
-            ),
+            xhr.json(xhr.url('/editor.json', { variant: variantKeySelected, ...(fen ? { fen } : {}) })),
           ]).then(([_, data]) => {
             data.embed = true;
             data.options = {
@@ -150,11 +151,15 @@ function edittab(ctrl: StudyChapterNewFormCtrl): VNode {
               onChange: ctrl.vm.editorFen,
             };
             ctrl.vm.editor = window.PlayStrategyEditor!(vnode.elm as HTMLElement, data);
+            ctrl.vm.editorVariant = variantKeySelected;
             ctrl.vm.editorFen(ctrl.vm.editor.getFen());
+            follow();
           });
         },
+        postpatch: follow,
         destroy: _ => {
           ctrl.vm.editor = null;
+          ctrl.vm.editorVariant = null;
         },
       },
     },
@@ -317,44 +322,21 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
           onlyForAnalysisVariants(activeTab === 'fen' ? fentab(ctrl) : null),
           onlyForChessVariants(activeTab === 'pgn' ? pgntab(ctrl) : null),
           h('div.form-group', [
-            h(
-              'label.form-label',
-              {
-                attrs: { for: 'chapter-variant' },
-              },
-              noarg('Variant'),
-            ),
-            h(
-              'select#chapter-variant.form-control',
-              {
-                attrs: { disabled: gameOrPgn },
-                hook: {
-                  init: () => ctrl.vm.variantKey(currentChapter.setup.variant.key),
-                  ...bind('change', e => {
-                    const select = e.target as HTMLInputElement;
-                    ctrl.vm.variantKey(select.value as VariantKey);
-                    ctrl.redraw();
-                  }),
-                },
-              },
-              gameOrPgn
-                ? [h('option', noarg('automatic'))]
-                : ctrl.vm.variants
-                    .filter(v => allowAnalysisForVariant(v.key))
-                    .map(v =>
-                      h(
-                        'option',
-                        {
-                          attrs: {
-                            value: v.key,
-                            selected: v.key === currentChapter.setup.variant.key,
-                            ...(activeTab === 'edit' && !canUseBoardEditor(v.key) ? { disabled: 'disabled' } : {}),
-                          },
-                        },
-                        v.name,
-                      ),
-                    ),
-            ),
+            h('label.form-label', noarg('Variant')),
+            h('input#chapter-variant', {
+              attrs: { type: 'hidden', value: gameOrPgn ? noarg('automatic') : variantKeySelected },
+            }),
+            ctrl.root.opts.gamePicker
+              ? grid({
+                  picker: ctrl.root.opts.gamePicker,
+                  chosen: variantKeySelected,
+                  state: ctrl.vm.picker,
+                  choose: key => ctrl.vm.variantKey(key as VariantKey),
+                  redraw: ctrl.redraw,
+                  disabled: activeTab === 'edit' ? key => !canUseBoardEditor(key as VariantKey) : undefined,
+                  automatic: gameOrPgn ? noarg('automatic') : undefined,
+                })
+              : null,
           ]),
           activeTab === 'edit' && canUseBoardEditor(variantKeySelected) ? edittab(ctrl) : null,
           h('div.form-split', [

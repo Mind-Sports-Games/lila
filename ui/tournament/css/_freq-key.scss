@@ -27,6 +27,80 @@ $c-tour-max-rating: #8572ff;
     cursor: help;
   }
 
+  &__fav {
+    @extend %flex-center-nowrap;
+
+    gap: 0.4em;
+    margin-left: auto;
+    align-self: center;
+    padding: 0.3em 0.85em;
+    background: none;
+    border: 1px solid $c-border;
+    border-radius: 999px;
+    color: $c-font;
+    line-height: 1.4;
+    cursor: pointer;
+
+    @include transition;
+
+    &:hover {
+      border-color: $c-font-dim;
+    }
+
+    &-label {
+      display: none;
+
+      @include breakpoint($mq-small) {
+        display: inline;
+      }
+    }
+
+    &-switch {
+      flex: 0 0 auto;
+      position: relative;
+      width: 2em;
+      height: 1.1em;
+      border-radius: 1em;
+      background: $c-font-dimmer;
+
+      @include transition(background);
+
+      &::after {
+        @extend %metal;
+
+        content: '';
+        position: absolute;
+        top: 0.1em;
+        left: 0.1em;
+        width: 0.9em;
+        height: 0.9em;
+        border-radius: 50%;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+
+        @include transition(left);
+      }
+    }
+
+    &[aria-pressed='true'] {
+      background: $c-primary;
+      border-color: $c-primary;
+      color: $c-primary-over;
+
+      .fav-star {
+        color: inherit;
+      }
+
+      .tour-freq-key__fav-switch {
+        background: fade-out($c-primary-over, 0.6);
+
+        &::after {
+          left: 1em;
+          background: $c-primary-over;
+        }
+      }
+    }
+  }
+
   &__swatch {
     @extend %box-radius;
 

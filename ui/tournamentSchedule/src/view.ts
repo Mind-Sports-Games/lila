@@ -1,4 +1,5 @@
 import { h, VNode } from 'snabbdom';
+import { isFavTournament } from 'common/favourites';
 
 const scale = 8;
 let now: number, startTime: number, stopTime: number;
@@ -180,7 +181,7 @@ function renderTournament(ctrl: any, tour: any) {
   return h(
     'a.tsht',
     {
-      class: tournamentClass(tour),
+      class: { ...tournamentClass(tour), fav: isFavTournament(tour, ctrl.favs) },
       attrs: {
         href: '/tournament/' + tour.id,
         style: 'width: ' + width + 'px; left: ' + left + 'px; padding-left: ' + paddingLeft + 'px',

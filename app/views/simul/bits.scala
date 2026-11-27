@@ -53,12 +53,26 @@ object bits {
       }
     )
 
-  private[simul] def setup(sim: lila.simul.Simul) =
-    span(cls := List("setup" -> true, "rich" -> sim.variantRich))(
-      sim.clock.config.show,
-      " • ",
-      sim.variants.map(VariantKeys.variantName).mkString(", ")
+  private[simul] def gameChips(sim: lila.simul.Simul)(implicit ctx: Context) = {
+    val favs = favVariants
+    span(cls := "games")(
+      if (lila.simul.SimulForm.isAnyVariant(sim.variants)) span(cls := "game")(trans.historyAllGames())
+      else
+        frag(sim.variants.map { v =>
+          span(cls := List("game text" -> true, "fav" -> favs(v.key)), dataIcon := v.perfIcon.toString)(
+            VariantKeys.variantName(v)
+          )
+        }*)
     )
+  }
+
+  private[simul] def games(sim: lila.simul.Simul)(implicit ctx: Context): Frag = {
+    val favs = favVariants
+    frag(sim.variants.zipWithIndex.map { case (v, i) =>
+      val name = VariantKeys.variantName(v)
+      frag(if (i > 0) ", " else "", if (favs(v.key)) span(cls := "fav")(name) else frag(name))
+    }*)
+  }
 
   private val baseTranslations = Vector(
     trans.finished,

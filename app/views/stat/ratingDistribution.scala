@@ -32,20 +32,18 @@ object ratingDistribution {
       main(cls := "page-menu")(
         user.bits.communityMenu("ratings"),
         div(cls := "rating-stats page-menu__content box box-pad")(
-          h1(
-            trans.weeklyPerfTypeRatingDistribution(
-              views.html.base.bits.mselect(
-                "variant-stats",
-                span(perfType.trans),
-                PerfType.leaderboardable map { pt =>
-                  a(
-                    dataIcon := pt.iconChar,
-                    cls      := (perfType == pt).option("current"),
-                    href     := routes.Stat.ratingDistribution(pt.key)
-                  )(pt.trans)
-                }
+          h1(trans.weeklyPerfTypeRatingDistribution(perfType.trans)),
+          views.html.base.gamePicker.chips(
+            PerfType.leaderboardable.map { pt =>
+              views.html.base.gamePicker.Choice(
+                pt.key,
+                pt.trans,
+                pt.iconChar.toString,
+                PerfType.variantOf(pt),
+                routes.Stat.ratingDistribution(pt.key).url
               )
-            )
+            },
+            perfType.key
           ),
           div(cls := "desc", dataIcon := perfType.iconChar)(
             ctx.me.flatMap(_.perfs(perfType).glicko.establishedIntRating).map { rating =>

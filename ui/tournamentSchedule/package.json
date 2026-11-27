@@ -15,6 +15,7 @@
     "@types/dragscroll": "^0.0.3"
   },
   "dependencies": {
+    "common": "workspace:*",
     "dragscroll": "^0.0.8",
     "snabbdom": "^3.0.1"
   },

@@ -37,7 +37,8 @@ object topnav {
       st.section(
         linkTitle(routes.Library.home.path, trans.games()),
         div(role := "group")(
-          a(href := routes.Library.home)(trans.gameLibrary())
+          a(href := routes.Library.home)(trans.gameLibrary()),
+          ctx.isAuth.option(a(href := routes.Favourites.index)(trans.favouriteGames()))
         )
       ),
       ctx.noBot.option(

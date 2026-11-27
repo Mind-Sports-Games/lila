@@ -117,6 +117,7 @@ object history {
           // game group, then game: each chip is a link to a page of its own
           hasSeries(freq).option {
             val open = group orElse variant.flatMap(v => displayedGameGroups.find(_.variants.contains(v)))
+            val favs = favVariants
             frag(
               div(cls := "series-links series-links__groups")(
                 a(
@@ -129,7 +130,7 @@ object history {
                       "text"   -> true,
                       "group"  -> true,
                       "active" -> open.contains(g)
-                    ),
+                    ) ::: favMark(g.variants, favs),
                     dataIcon := gameGroupIcon(g),
                     // an active chip steps back out: a family chip drops the filter entirely,
                     // whether the page is showing that family or one of its games
@@ -141,7 +142,7 @@ object history {
                 div(cls := "series-links series-links__variants")(
                   g.variants.filterNot(_.fromPositionVariant).map { v =>
                     a(
-                      cls      := List("text" -> true, "active" -> variant.contains(v)),
+                      cls      := List("text" -> true, "active" -> variant.contains(v), "fav" -> favs(v.key)),
                       dataIcon := v.perfIcon,
                       href     := (if (variant.contains(v)) groupUrl(freq, g) else url(freq, v.some))
                     )(VariantKeys.variantName(v))

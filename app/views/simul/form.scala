@@ -88,11 +88,15 @@ object form {
               .getOrElse(simul.filterNot(s => SimulForm.isAnyVariant(s.variants)).so(_.variants.map(encode)))
               .toSet
             val variantOf = Variant.all.map(v => encode(v) -> v).toMap
+            val favs      = favVariants
             // the index stays the option's own, so the form posts as before
             def chip(option: ((String, String, Option[String]), Int)) = {
               val ((value, text, hint), index) = option
               label(
-                cls      := "text variants__chip",
+                cls := List(
+                  "text variants__chip" -> true,
+                  "fav"                 -> variantOf.get(value).exists(v => favs(v.key))
+                ),
                 dataIcon := variantOf.get(value).fold("")(_.perfIcon.toString),
                 title    := hint
               )(
@@ -132,7 +136,12 @@ object form {
                       cls      := "text variants__family-name",
                       `for`    := inputId,
                       dataIcon := gameGroupIcon(g)
-                    )(VariantKeys.gameGroupName(g), span(cls := "variants__count"))
+                    )(
+                      span(cls := favMark(items.flatMap(i => variantOf.get(i._1._1)), favs))(
+                        VariantKeys.gameGroupName(g)
+                      ),
+                      span(cls := "variants__count")
+                    )
                   )
                 case _ => emptyFrag
               },
