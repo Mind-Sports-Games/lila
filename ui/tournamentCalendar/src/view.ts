@@ -13,6 +13,7 @@ function tournamentClass(tour: Tournament, day: Date) {
     casual: !tour.rated,
     'max-rating': tour.hasMaxRating,
     yesterday: tour.bounds.start < day,
+    favourite: tour.favourite,
   };
   if (tour.schedule) classes[tour.schedule.freq] = true;
   return classes;

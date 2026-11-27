@@ -10,6 +10,7 @@ import { ExplorerOpts } from './explorer/interfaces';
 import { StudyData } from './study/interfaces';
 import { AnalyseSocketSend } from './socket';
 import * as Prefs from 'common/prefs';
+import { GamePicker } from 'common/gamePicker';
 
 export type MaybeVNode = VNode | string | null | undefined;
 export type MaybeVNodes = MaybeVNode[];
@@ -196,6 +197,7 @@ export interface AnalyseOpts {
   socketSend: AnalyseSocketSend;
   trans: Trans;
   study?: StudyData;
+  gamePicker?: GamePicker;
   tagTypes?: string;
   practice?: StudyPracticeData;
   relay?: RelayData;

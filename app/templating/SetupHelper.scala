@@ -1,7 +1,7 @@
 package lila.app
 package templating
 
-import strategygames.{ GameFamily, GameGroup, Mode, Speed }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, GameGroup, Mode, Speed }
 import strategygames.variant.Variant
 import play.api.i18n.Lang
 
@@ -85,7 +85,7 @@ trait SetupHelper { self: I18nHelper =>
 
   def translatedTimeModeChoices(implicit lang: Lang) =
     List(
-      (TimeMode.FischerClock.id.toString, trans.realTime.txt(), none),
+      (TimeMode.FischerClock.id.toString, trans.fischer.txt(), none),
       (TimeMode.ByoyomiClock.id.toString, trans.byoyomiTime.txt(), none),
       (TimeMode.BronsteinDelayClock.id.toString, trans.bronsteinDelay.txt(), none),
       (TimeMode.SimpleDelayClock.id.toString, trans.simpleDelay.txt(), none),
@@ -93,9 +93,17 @@ trait SetupHelper { self: I18nHelper =>
       (TimeMode.Unlimited.id.toString, trans.unlimited.txt(), none)
     )
 
+  def clockTypeName(config: ClockConfig)(implicit lang: Lang): String =
+    config match {
+      case _: ByoyomiClock.Config     => trans.byoyomiTime.txt()
+      case _: Clock.BronsteinConfig   => trans.bronsteinDelay.txt()
+      case _: Clock.SimpleDelayConfig => trans.simpleDelay.txt()
+      case _                          => trans.fischer.txt()
+    }
+
   def translatedTimeModeChoicesLive(implicit lang: Lang) =
     List(
-      (TimeMode.FischerClock.id.toString, trans.realTime.txt(), none),
+      (TimeMode.FischerClock.id.toString, trans.fischer.txt(), none),
       (TimeMode.ByoyomiClock.id.toString, trans.byoyomiTime.txt(), none),
       (TimeMode.BronsteinDelayClock.id.toString, trans.bronsteinDelay.txt(), none),
       (TimeMode.SimpleDelayClock.id.toString, trans.simpleDelay.txt(), none)
@@ -234,7 +242,10 @@ trait SetupHelper { self: I18nHelper =>
       VariantKeys.gameGroupName(gameGroup).replace("Of ", "of ").some
     )
 
-  def translatedVariantIconChoices(implicit lang: Lang): List[SelectChoice] = {
+  def translatedVariantIconChoices(implicit lang: Lang): List[SelectChoice] =
+    variantsInSetupOrder.map(translatedVariantIconChoice)
+
+  lazy val variantsInSetupOrder: List[Variant] = {
     val chessOrder = List(
       "0_1",  // Chess
       "0_2",  // Chess960
@@ -267,7 +278,7 @@ trait SetupHelper { self: I18nHelper =>
     val chessVariants    = chessOrder.flatMap(id => all.find(v => s"${v.gameFamily.id}_${v.id}" == id))
     val draughtsVariants = draughtsOrder.flatMap(id => all.find(v => s"${v.gameFamily.id}_${v.id}" == id))
     val rest             = all.filterNot(v => chessVariants.contains(v) || draughtsVariants.contains(v))
-    (chessVariants ++ draughtsVariants ++ rest).map(translatedVariantIconChoice)
+    chessVariants ++ draughtsVariants ++ rest
   }
 
   private def translatedVariantIconChoice(
@@ -617,10 +628,24 @@ trait SetupHelper { self: I18nHelper =>
       Pref.Blindfold.YES -> trans.yes.txt()
     )
 
-  def variantKey(id: String): String =
-    Variant.all
-      .find(v => s"${encodeGameFamilyId(v.gameFamily)}_${encodeId(v)}" == id)
-      .map(_.key)
-      .getOrElse("standard")
+  private lazy val variantKeyByValue: Map[String, String] =
+    Variant.all.map(v => s"${encodeGameFamilyId(v.gameFamily)}_${encodeId(v)}" -> v.key).toMap
+
+  private lazy val variantsByGroupValue: Map[String, List[Variant]] =
+    displayedGameGroups.map(g => encodeGameGroupId(g) -> g.variants).toMap
+
+  def variantKey(id: String): String = variantKeyByValue.getOrElse(id, "standard")
+
+  def favMark(variants: List[Variant], favs: Set[String]): List[(String, Boolean)] = {
+    val games = variants.filterNot(_.fromPositionVariant)
+    val nb    = games.count(v => favs(v.key))
+    List("fav" -> (nb > 0), "fav-some" -> (nb > 0 && nb < games.size))
+  }
+
+  def favVariantMark(favs: Set[String])(value: String): List[(String, Boolean)] =
+    List("fav" -> variantKeyByValue.get(value).exists(favs))
+
+  def favGroupMark(favs: Set[String])(value: String): List[(String, Boolean)] =
+    variantsByGroupValue.get(value).fold(List.empty[(String, Boolean)])(favMark(_, favs))
 
 }

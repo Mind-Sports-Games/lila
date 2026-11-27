@@ -3,12 +3,15 @@ import view from './view';
 import { init, VNode, classModule, attributesModule } from 'snabbdom';
 
 import { Ctrl } from './interfaces';
+import { favourites, isFavTournament } from 'common/favourites';
 
 const patch = init([classModule, attributesModule]);
 
 export function PlayStrategyTournamentCalendar(element: HTMLElement, env: any) {
+  const favs = favourites();
   // enrich tournaments
   env.data.tournaments.forEach((t: any) => {
+    t.favourite = isFavTournament(t, favs);
     if (!t.bounds) {
       // Scheduled tournaments carry a random 0-59s start jitter (Tournament.scheduleAs) so they
       // do not all start on the same tick. Bars are positioned to the minute, so drop those
@@ -34,6 +37,23 @@ export function PlayStrategyTournamentCalendar(element: HTMLElement, env: any) {
   }
 
   redraw();
+
+  const page = document.querySelector<HTMLElement>('.tour-calendar'),
+    toggle = page?.querySelector<HTMLElement>('.tour-freq-key__fav');
+  if (page && toggle) {
+    const favOnly = playstrategy.storage.makeBoolean('favourites.highlight');
+    const show = () => {
+      const on = favOnly.get();
+      page.classList.toggle('fav-only', on);
+      toggle.setAttribute('aria-pressed', String(on));
+      toggle.querySelector('.fav-star')?.classList.toggle('on', on);
+    };
+    show();
+    toggle.addEventListener('click', () => {
+      favOnly.toggle();
+      show();
+    });
+  }
 }
 
 (window as any).PlayStrategyTournamentCalendar = PlayStrategyTournamentCalendar; // esbuild

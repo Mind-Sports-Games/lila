@@ -22,6 +22,10 @@ export default function PlayStrategyEditor(element: HTMLElement, config: Editor.
   return {
     getFen: ctrl.getFenFromSetup.bind(ctrl),
     setOrientation: ctrl.setOrientation.bind(ctrl),
+    changeVariant(key: VariantKey, fen?: string) {
+      ctrl.changeVariant(key);
+      if (fen) ctrl.setFen(fen);
+    },
   };
 }
 

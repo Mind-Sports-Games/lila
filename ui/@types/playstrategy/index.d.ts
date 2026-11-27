@@ -208,6 +208,7 @@ interface PlayStrategyAnnouncement {
 interface PlayStrategyEditor {
   getFen(): string;
   setOrientation(o: PlayerIndex): void;
+  changeVariant(key: VariantKey, fen?: string): void;
 }
 
 declare namespace Editor {

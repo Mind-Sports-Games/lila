@@ -195,7 +195,7 @@ object show {
         a(href := routes.Tournament.home.url, cls := "more")(trans.more(), " »")
       ),
       div(cls := "enterable_list lobby__box__content")(
-        views.html.tournament.bits.enterable(tours)
+        views.html.tournament.bits.enterable(tours, markFavourites = false)
       )
     )
 

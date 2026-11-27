@@ -21,6 +21,7 @@ object homeInner {
             thead(
               tr(
                 th("Your pending simuls"),
+                th(cls := "clock")(trans.clock()),
                 th(cls := "host")(trans.host()),
                 th(cls := "players")(trans.players())
               )
@@ -29,6 +30,7 @@ object homeInner {
               pendings.map { sim =>
                 tr(cls := "scheduled")(
                   simTd(sim),
+                  clockTd(sim),
                   simHost(sim),
                   td(cls := "players text", dataIcon := "r")(sim.applicants.size)
                 )
@@ -39,6 +41,7 @@ object homeInner {
         thead(
           tr(
             th(trans.createdSimuls()),
+            th(cls := "clock")(trans.clock()),
             th(cls := "host")(trans.host()),
             th(cls := "players")(trans.players())
           )
@@ -47,6 +50,7 @@ object homeInner {
           createds.map { sim =>
             tr(cls := "scheduled")(
               simTd(sim),
+              clockTd(sim),
               simHost(sim),
               td(cls := "players text", dataIcon := "r")(sim.applicants.size)
             )
@@ -64,6 +68,7 @@ object homeInner {
             thead(
               tr(
                 th(trans.eventInProgress()),
+                th(cls := "clock")(trans.clock()),
                 th(cls := "host")(trans.host()),
                 th(cls := "players")(trans.players())
               )
@@ -71,6 +76,7 @@ object homeInner {
             starteds.map { sim =>
               tr(
                 simTd(sim),
+                clockTd(sim),
                 simHost(sim),
                 td(cls := "players text", dataIcon := "r")(sim.pairings.size)
               )
@@ -80,6 +86,7 @@ object homeInner {
         thead(
           tr(
             th(trans.finished()),
+            th(cls := "clock")(trans.clock()),
             th(cls := "host")(trans.host()),
             th(cls := "players")(trans.players())
           )
@@ -88,6 +95,7 @@ object homeInner {
           finisheds.map { sim =>
             tr(
               simTd(sim),
+              clockTd(sim),
               simHost(sim),
               td(cls := "players text", dataIcon := "r")(sim.pairings.size)
             )
@@ -96,11 +104,21 @@ object homeInner {
       )
     )
 
-  private def simTd(sim: lila.simul.Simul) =
+  private def simTd(sim: lila.simul.Simul)(implicit ctx: Context) =
     td(cls := "header")(
       a(href := routes.Simul.show(sim.id))(
-        span(cls := "name")(sim.fullName),
-        bits.setup(sim)
+        span(cls := "name")(
+          sim.fullName,
+          span(cls := "name-clock", title := clockTypeName(sim.clock.config))(sim.clock.config.show)
+        ),
+        bits.gameChips(sim)
+      )
+    )
+
+  private def clockTd(sim: lila.simul.Simul)(implicit ctx: Context) =
+    td(cls := "clock")(
+      a(href := routes.Page.lonePage("clocks"), title := clockTypeName(sim.clock.config))(
+        sim.clock.config.show
       )
     )
 

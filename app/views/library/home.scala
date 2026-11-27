@@ -65,7 +65,11 @@ object home {
         div(cls := "gamegroup-choice")(
           div(cls := "section-title")(trans.gameGroup()),
           div(cls := "gamegroup-icons")(translatedGameGroupIconChoices map { case (id, icon, hint) =>
-            button(cls := "gamegroup", value := id, dataIcon := icon)(hint)
+            button(
+              cls      := ("gamegroup" -> true) :: favGroupMark(favVariants)(id),
+              value    := id,
+              dataIcon := icon
+            )(hint)
           })
         ),
         div(cls := "variants-choice hidden")(
@@ -74,7 +78,7 @@ object home {
             id != "0_3" // from position
           } map { case (id, icon, name) =>
             a(
-              cls                := "variant",
+              cls                := ("variant" -> true) :: favVariantMark(favVariants)(id),
               dataIcon           := icon,
               attr("data-value") := id,
               attr("data-gamegroup") := gameGroupValueByFamilyId.getOrElse(id.takeWhile(_ != '_'), ""),

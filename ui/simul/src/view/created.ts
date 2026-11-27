@@ -1,9 +1,9 @@
 import { h, VNode } from 'snabbdom';
 import SimulCtrl from '../ctrl';
-import { Applicant, Variant } from '../interfaces';
+import { Applicant } from '../interfaces';
 import xhr from '../xhr';
 import * as util from './util';
-import modal from 'common/modal';
+import { grid, GamePicker } from 'common/gamePicker';
 
 export default function (showText: (ctrl: SimulCtrl) => VNode) {
   return (ctrl: SimulCtrl) => {
@@ -47,23 +47,12 @@ export default function (showText: (ctrl: SimulCtrl) => VNode) {
                       hook: ctrl.teamBlock()
                         ? {}
                         : util.bind('click', () => {
-                            if (ctrl.data.variants.length === 1) xhr.join(ctrl.data.id, ctrl.data.variants[0].key);
+                            const first = ctrl.opts.gamePicker?.groups.flatMap(g => g.games).find(v => !v.off);
+                            if (ctrl.data.variants.length === 1 || !first)
+                              xhr.join(ctrl.data.id, ctrl.data.variants[0].key);
                             else {
-                              const $wrap = modal($('.simul .continue-with'));
-                              $wrap.find('a[data-variant]').on('click', function (this: HTMLElement) {
-                                modal.close();
-                                xhr.join(ctrl.data.id, $(this).data('variant'));
-                              });
-                              $wrap.find('.simul-join__family').on('click', function (this: HTMLElement) {
-                                const group = this.dataset.group,
-                                  wasOpen = this.classList.contains('active');
-                                $wrap.find('.simul-join__family').removeClass('active');
-                                $wrap.find('.simul-join__games').addClass('none');
-                                if (!wasOpen) {
-                                  this.classList.add('active');
-                                  $wrap.find(`.simul-join__games[data-group="${group}"]`).removeClass('none');
-                                }
-                              });
+                              ctrl.joining = { chosen: first.key, picker: { groups: true, games: true } };
+                              ctrl.redraw();
                             }
                           }),
                     },
@@ -209,41 +198,42 @@ export default function (showText: (ctrl: SimulCtrl) => VNode) {
       ctrl.data.quote
         ? h('blockquote.pull-quote', [h('p', ctrl.data.quote.text), h('footer', ctrl.data.quote.author)])
         : null,
-      h('div.continue-with.none', joinChoices(ctrl)),
+      ctrl.joining && ctrl.opts.gamePicker ? joinDialog(ctrl, ctrl.joining, ctrl.opts.gamePicker) : null,
     ];
   };
 }
 
-// a family of several games is a chip that shows them; a family of one game joins with it
-const joinChoices = (ctrl: SimulCtrl): VNode[] => {
-  const groups = new Map<string, Variant[]>();
-  ctrl.data.variants.forEach(v => {
-    const key = v.group?.key ?? v.key;
-    groups.set(key, [...(groups.get(key) ?? []), v]);
-  });
-  const several = [...groups.entries()].filter(([, vs]) => vs.length > 1);
-  const gameChip = (v: Variant) =>
-    h('a.simul-join__chip.text', { attrs: { 'data-variant': v.key, 'data-icon': v.icon } }, v.name);
-  // all in one family: its games straight away
-  if (several.length === 1 && groups.size === 1) return [h('div.simul-join__row', several[0][1].map(gameChip))];
-  return [
-    h('div.simul-join__row', [
-      ...several.map(([key, vs]) =>
+const joinDialog = (ctrl: SimulCtrl, joining: NonNullable<SimulCtrl['joining']>, picker: GamePicker): VNode => {
+  const close = () => {
+    ctrl.joining = undefined;
+    ctrl.redraw();
+  };
+  return h('div#modal-overlay', { hook: util.bind('mousedown', close) }, [
+    h('div#modal-wrap.simul-join', { hook: util.bind('mousedown', e => e.stopPropagation()) }, [
+      h('span.close', { attrs: { 'data-icon': 'L' }, hook: util.bind('click', close) }),
+      h('div', [
+        grid({
+          picker,
+          chosen: joining.chosen,
+          state: joining.picker,
+          choose: key => {
+            joining.chosen = key;
+          },
+          redraw: ctrl.redraw,
+        }),
         h(
-          'span.simul-join__chip.simul-join__family.text',
-          { attrs: { 'data-group': key, 'data-icon': vs[0].icon } },
-          vs[0].group?.name ?? key,
+          'button.button.simul-join__submit',
+          {
+            hook: util.bind('click', () => {
+              xhr.join(ctrl.data.id, joining.chosen as VariantKey);
+              close();
+            }),
+          },
+          ctrl.trans('join'),
         ),
-      ),
+      ]),
     ]),
-    h(
-      'div.simul-join__row.simul-join__singles',
-      [...groups.values()].filter(vs => vs.length === 1).map(vs => gameChip(vs[0])),
-    ),
-    ...several.map(([key, vs]) =>
-      h('div.simul-join__row.simul-join__games.none', { attrs: { 'data-group': key } }, vs.map(gameChip)),
-    ),
-  ];
+  ]);
 };
 
 const byName = (a: Applicant, b: Applicant) => (a.player.name > b.player.name ? 1 : -1);

@@ -1,41 +1,8 @@
 import { h, VNode } from 'snabbdom';
-import { MaybeVNodes } from './interfaces';
-import { bind, onInsert } from './util';
+import { SnabModal, snabModal } from 'common/modal';
 
-interface Modal {
-  class?: string;
-  content: MaybeVNodes;
-  onInsert?: (el: HTMLElement) => void;
-  onClose(): void;
-  noClickAway?: boolean;
-}
-
-export function modal(d: Modal): VNode {
-  return h(
-    'div#modal-overlay',
-    {
-      ...(!d.noClickAway ? { hook: bind('mousedown', d.onClose) } : {}),
-    },
-    [
-      h(
-        'div#modal-wrap.study__modal.' + d.class,
-        {
-          hook: onInsert(el => {
-            el.addEventListener('mousedown', e => e.stopPropagation());
-            d.onInsert && d.onInsert(el);
-          }),
-        },
-        [
-          h('span.close', {
-            attrs: { 'data-icon': 'L' },
-            hook: bind('click', d.onClose),
-          }),
-          h('div', d.content),
-        ],
-      ),
-    ],
-  );
-}
+export const modal = (d: SnabModal): VNode =>
+  snabModal({ ...d, class: d.class ? `study__modal.${d.class}` : 'study__modal' });
 
 export function button(name: string): VNode {
   return h(

@@ -78,7 +78,9 @@ object editor {
       moreJs = frag(
         jsModule("editor"),
         embedJsUnsafeLoadThen(
-          s"""const data=${safeJsonValue(bits.jsData(sit, fen, variant))};data.positions=$positionsJson;data.positionsByVariant=$positionsByVariantJson;data.handledVariants=$handledVariantsJson;
+          s"""const data=${safeJsonValue(bits.jsData(sit, fen, variant))};data.positions=$positionsJson;data.positionsByVariant=$positionsByVariantJson;data.handledVariants=$handledVariantsJson;data.gamePicker=${safeJsonValue(
+              views.html.base.gamePicker.json(handledVariants, everySlot = true)
+            )};
           data.options = data.options || {};
           ${orientation.fold("")(o => s"data.options.orientation='${o}';\n")}
       PlayStrategyEditor(document.getElementById('board-editor'), data);"""

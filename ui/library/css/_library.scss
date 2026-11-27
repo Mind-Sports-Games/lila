@@ -316,6 +316,7 @@
       color: $c-font;
       flex: 0 0 25%;
       max-width: 25%;
+      position: relative;
       border-right: 1px solid $c-border;
       border-left: none;
       border-top: none;
@@ -340,6 +341,18 @@
 
       &.button.button-color-choice {
         text-transform: initial;
+      }
+
+      &.fav::after {
+        position: absolute;
+        top: 0.3em;
+        right: 0.4em;
+        margin: 0;
+      }
+
+      &.fav.selected::after,
+      &.fav:hover::after {
+        color: inherit;
       }
     }
   }

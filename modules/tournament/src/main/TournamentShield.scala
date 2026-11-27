@@ -1085,14 +1085,14 @@ object TournamentShield {
     case object Yonkoma10x10
         extends Category(
           Variant.Yonkoma(strategygames.yonkoma.variant.Yonkoma10x10),
-          Blitz32,
+          Blitz21,
           4,
           1
         )
     case object Yonkoma12x12
         extends Category(
           Variant.Yonkoma(strategygames.yonkoma.variant.Yonkoma12x12),
-          Blitz32,
+          Blitz21,
           11,
           1
         )

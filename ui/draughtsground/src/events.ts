@@ -61,6 +61,7 @@ function unbindable(el: EventTarget, eventName: string, callback: MouchBind, opt
 
 function startDragOrDraw(s: State): MouchBind {
   return e => {
+    s.dom.bounds.clear(); // the board may have moved without resizing or scrolling
     if (s.draggable.current) drag.cancel(s);
     else if (s.drawable.current) draw.cancel(s);
     else if (e.shiftKey || isRightButton(e)) {

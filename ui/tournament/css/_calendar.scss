@@ -179,3 +179,12 @@
     }
   }
 }
+
+.tour-calendar.fav-only #tournament-calendar .tournament:not(.favourite)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: fade-out($c-bg-page, 0.3);
+  pointer-events: none;
+}

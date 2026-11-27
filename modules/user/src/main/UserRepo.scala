@@ -400,6 +400,16 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def setRankban   = setMark(UserMark.Rankban)
   def setAlt       = setMark(UserMark.Alt)
 
+  def setFavVariants(id: ID, keys: List[String], on: Boolean): Fu[Set[String]] =
+    coll.update.one(
+      $id(id),
+      if (on) $addToSet(F.favVariants -> $doc("$each" -> keys))
+      else $pull(F.favVariants.$in(keys))
+    ) >> coll.primitiveOne[List[String]]($id(id), F.favVariants).flatMap { stored =>
+      val favs = ~stored
+      (favs.isEmpty so coll.unsetField($id(id), F.favVariants).void) inject favs.toSet
+    }
+
   def setKid(user: User, v: Boolean) = coll.updateField($id(user.id), F.kid, v).void
 
   def isKid(id: ID) = coll.exists($id(id) ++ $doc(F.kid -> true))
